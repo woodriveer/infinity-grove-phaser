@@ -3,9 +3,10 @@ export const MONSTER_MAX_HEALTH = 10;
 
 export class Monster
 {
-    constructor (maxHealth = MONSTER_MAX_HEALTH)
+    constructor (maxHealth = MONSTER_MAX_HEALTH, level = 1)
     {
         this.maxHealth = maxHealth;
+        this.level = level;
         this.health = maxHealth;
     }
 

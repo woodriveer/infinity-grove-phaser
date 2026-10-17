@@ -67,4 +67,19 @@ describe('Monster', () => {
         monster.hit();
         expect(monster.health).toBe(9);
     });
+
+    it('is level 1 by default and keeps the level it is given', () => {
+        expect(new Monster().level).toBe(1);
+        expect(new Monster(10, 2).level).toBe(2);
+    });
+
+    it('keeps its level while taking damage and respawning', () => {
+        const monster = new Monster(10, 3);
+
+        monster.hit(10);
+        monster.respawn();
+
+        expect(monster.level).toBe(3);
+        expect(monster.health).toBe(10);
+    });
 });

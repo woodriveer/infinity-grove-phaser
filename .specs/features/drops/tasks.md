@@ -76,9 +76,9 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `new Monster().level` is 1; `new Monster(10, 2).level` is 2
-- [ ] Health behavior is unchanged
-- [ ] Gate check passes: `npm test`
+- [x] `new Monster().level` is 1; `new Monster(10, 2).level` is 2
+- [x] Health behavior is unchanged
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick
