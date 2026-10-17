@@ -124,16 +124,17 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `isUsableAt` is false when revoked, false when `now >= expiresAt`, true otherwise
-- [ ] `issue` sets `expiresAt = now + 30 days` and stores only the hash of the generated raw value
-- [ ] `RefreshTokenTest` covers: usable, expired at the exact boundary, revoked, revoke() is idempotent, issue stores hash not raw
-- [ ] Gate passes: `cd backend && ./gradlew ktlintCheck test`
-- [ ] Test count: previous + new tests, none deleted
+- [x] `isUsableAt` is false when revoked, false when `now >= expiresAt`, true otherwise
+- [x] `issue` sets `expiresAt = now + 30 days` and stores only the hash of the generated raw value
+- [x] `RefreshTokenTest` covers: usable, expired at the exact boundary, revoked, revoke() is idempotent, issue stores hash not raw
+- [x] Gate passes: `cd backend && ./gradlew ktlintCheck test`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(auth): add RefreshToken domain model`
+**Status**: ✅ Complete
 
 ---
 
