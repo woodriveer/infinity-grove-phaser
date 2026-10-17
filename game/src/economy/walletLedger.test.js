@@ -152,3 +152,167 @@ describe('WalletLedger landing coins', () => {
         expect(ledger.display()).toEqual(wallet(0, 2, 50));
     });
 });
+
+describe('WalletLedger starting a sync', () => {
+    it('has nothing to send before any drop was taken', () => {
+        expect(loaded().beginSync()).toBeNull();
+    });
+
+    it('sends the unreported kills per level', () => {
+        const ledger = loaded(wallet(), { 1: [3, 1, 5], 2: [9, 8] });
+        ledger.takeDrop(1);
+        ledger.takeDrop(1);
+        ledger.takeDrop(2);
+
+        expect(ledger.beginSync()).toEqual({ 1: 2, 2: 1 });
+    });
+
+    it('does not count a kill that dropped nothing', () => {
+        const ledger = loaded(wallet(), { 1: [] });
+        ledger.takeDrop(1);
+
+        expect(ledger.beginSync()).toBeNull();
+    });
+
+    it('starts no second sync while one is in flight', () => {
+        const ledger = loaded();
+        ledger.takeDrop(1);
+        expect(ledger.beginSync()).toEqual({ 1: 1 });
+
+        ledger.takeDrop(1);
+
+        expect(ledger.beginSync()).toBeNull();
+    });
+});
+
+describe('WalletLedger completing a sync', () => {
+    const response = (coins, drops) => ({ wallet: coins, accepted: {}, drops });
+
+    it('settles the sent kills and takes the server wallet as the new base', () => {
+        const ledger = loaded(wallet(0, 0, 10));
+        landAll(ledger, ledger.takeDrop(1));
+        ledger.beginSync();
+
+        ledger.completeSync(response(wallet(0, 0, 13), { 1: [1, 5] }));
+
+        expect(ledger.display()).toEqual(wallet(0, 0, 13));
+        expect(ledger.hasUnreported()).toBe(false);
+    });
+
+    it('replaces the queue with the server queue minus the drops taken since the request', () => {
+        const ledger = loaded(wallet(), { 1: [3, 1, 5, 2, 4] });
+        ledger.takeDrop(1);
+        ledger.takeDrop(1);
+        ledger.beginSync();
+        ledger.takeDrop(1);
+
+        ledger.completeSync(response(wallet(0, 0, 4), { 1: [5, 2, 4, 6, 7] }));
+
+        expect(ledger.takeDrop(1).value).toBe(2);
+        expect(ledger.takeDrop(1).value).toBe(4);
+    });
+
+    it('treats a level missing from the response as an empty queue', () => {
+        const ledger = loaded(wallet(), { 1: [3], 2: [9, 8] });
+        ledger.takeDrop(1);
+        ledger.beginSync();
+
+        ledger.completeSync(response(wallet(0, 0, 3), { 1: [4] }));
+
+        expect(ledger.takeDrop(2)).toBeNull();
+        expect(ledger.takeDrop(1).value).toBe(4);
+    });
+
+    it('allows a new sync afterwards', () => {
+        const ledger = loaded();
+        ledger.takeDrop(1);
+        ledger.beginSync();
+        ledger.completeSync(response(wallet(0, 0, 3), { 1: [1, 5] }));
+
+        ledger.takeDrop(1);
+
+        expect(ledger.beginSync()).toEqual({ 1: 1 });
+    });
+
+    it('counts a kill made while the sync was in flight for the next sync, not the current one', () => {
+        const ledger = loaded();
+        ledger.takeDrop(1);
+        expect(ledger.beginSync()).toEqual({ 1: 1 });
+        ledger.takeDrop(1);
+
+        ledger.completeSync(response(wallet(0, 0, 3), { 1: [1, 5, 2] }));
+
+        expect(ledger.hasUnreported()).toBe(true);
+        expect(ledger.beginSync()).toEqual({ 1: 1 });
+    });
+
+    it('does not count the coins of a covered drop again when they land after the response', () => {
+        const ledger = loaded(wallet(0, 0, 10), { 1: [3] });
+        const drop = ledger.takeDrop(1);
+        ledger.beginSync();
+
+        ledger.completeSync(response(wallet(0, 0, 13), { 1: [] }));
+        landAll(ledger, drop);
+
+        expect(ledger.display()).toEqual(wallet(0, 0, 13));
+    });
+
+    it('adds the landed coins of drops the response does not cover on top of the server wallet', () => {
+        const ledger = loaded(wallet(0, 0, 10), { 1: [2, 1, 4] });
+        landAll(ledger, ledger.takeDrop(1));
+        ledger.beginSync();
+        const later = ledger.takeDrop(1);
+        landAll(ledger, later);
+
+        ledger.completeSync(response(wallet(0, 0, 12), { 1: [1, 4] }));
+
+        expect(ledger.display()).toEqual(wallet(0, 0, 13));
+    });
+
+    it('snaps to the server wallet when the server credited less than was shown', () => {
+        const ledger = loaded(wallet(0, 0, 10), { 1: [1, 1] });
+        landAll(ledger, ledger.takeDrop(1));
+        landAll(ledger, ledger.takeDrop(1));
+        expect(ledger.display()).toEqual(wallet(0, 0, 12));
+        ledger.beginSync();
+
+        ledger.completeSync(response(wallet(0, 0, 10), { 1: [3] }));
+
+        expect(ledger.display()).toEqual(wallet(0, 0, 10));
+    });
+
+    it('syncs a drop larger than 5 copper like any other', () => {
+        const ledger = loaded(wallet(), { 1: [250] });
+        ledger.takeDrop(1);
+
+        expect(ledger.beginSync()).toEqual({ 1: 1 });
+        ledger.completeSync(response(wallet(0, 2, 50), { 1: [1] }));
+
+        expect(ledger.display()).toEqual(wallet(0, 2, 50));
+    });
+});
+
+describe('WalletLedger failing a sync', () => {
+    it('keeps every kill unreported and sends them with newer ones on the next sync', () => {
+        const ledger = loaded();
+        ledger.takeDrop(1);
+        ledger.beginSync();
+        ledger.takeDrop(1);
+
+        ledger.failSync();
+
+        expect(ledger.hasUnreported()).toBe(true);
+        expect(ledger.beginSync()).toEqual({ 1: 2 });
+    });
+
+    it('keeps the queue and the landed coins as they were', () => {
+        const ledger = loaded(wallet(0, 0, 10), { 1: [3, 1] });
+        landAll(ledger, ledger.takeDrop(1));
+        ledger.beginSync();
+
+        ledger.failSync();
+
+        expect(ledger.display()).toEqual(wallet(0, 0, 13));
+        expect(ledger.takeDrop(1).value).toBe(1);
+    });
+});

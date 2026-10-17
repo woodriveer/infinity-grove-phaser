@@ -160,13 +160,13 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `beginSync()` returns the unreported kill counts per level, marks them in flight, and returns null while a sync is in flight or when nothing is unreported
-- [ ] A kill taken while a sync is in flight is not in that sync and is unreported for the next one
-- [ ] `completeSync` removes the sent entries, sets the base wallet from the response, and replaces each queue with the response `drops` minus the first m values taken since the request; a level missing from the response gets an empty queue
-- [ ] Coins of a covered entry that land after `completeSync` do not change the display; coins of an uncovered entry that landed before it still count on top of the response wallet
-- [ ] `failSync` keeps every entry unreported and allows the next `beginSync` to send them together with newer ones
-- [ ] A drop above 5 copper is handled like any other value
-- [ ] Gate check passes: `npm test`
+- [x] `beginSync()` returns the unreported kill counts per level, marks them in flight, and returns null while a sync is in flight or when nothing is unreported
+- [x] A kill taken while a sync is in flight is not in that sync and is unreported for the next one
+- [x] `completeSync` removes the sent entries, sets the base wallet from the response, and replaces each queue with the response `drops` minus the first m values taken since the request; a level missing from the response gets an empty queue
+- [x] Coins of a covered entry that land after `completeSync` do not change the display; coins of an uncovered entry that landed before it still count on top of the response wallet
+- [x] `failSync` keeps every entry unreported and allows the next `beginSync` to send them together with newer ones
+- [x] A drop above 5 copper is handled like any other value
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick

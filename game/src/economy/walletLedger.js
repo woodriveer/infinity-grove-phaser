@@ -14,6 +14,7 @@ export class WalletLedger
         this.queues = {};
         this.entries = [];
         this.nextId = 1;
+        this.syncing = false;
     }
 
     load ({ wallet, drops })
@@ -65,5 +66,57 @@ export class WalletLedger
     hasUnreported ()
     {
         return this.entries.length > 0;
+    }
+
+    //  Marks every unreported drop as sent and returns the kill counts per level for POST /wallet/sync.
+    //  Null while a sync is in flight (never two at once) or when there is nothing to send.
+    beginSync ()
+    {
+        const pending = this.entries.filter((entry) => !entry.inFlight);
+
+        if (this.syncing || pending.length === 0)
+        {
+            return null;
+        }
+
+        const kills = {};
+
+        pending.forEach((entry) =>
+        {
+            entry.inFlight = true;
+            kills[entry.level] = (kills[entry.level] ?? 0) + 1;
+        });
+        this.syncing = true;
+
+        return kills;
+    }
+
+    //  The server confirmed the sent drops: they leave the ledger, its wallet becomes the base, and each queue
+    //  is the server queue minus the drops this client already took since the request was sent.
+    completeSync ({ wallet, drops })
+    {
+        const takenSince = {};
+
+        this.entries.filter((entry) => !entry.inFlight).forEach((entry) =>
+        {
+            takenSince[entry.level] = (takenSince[entry.level] ?? 0) + 1;
+        });
+
+        this.entries = this.entries.filter((entry) => !entry.inFlight);
+        this.base = { ...wallet };
+        this.queues = Object.fromEntries(
+            Object.entries(drops).map(([ level, values ]) => [ level, values.slice(takenSince[level] ?? 0) ])
+        );
+        this.syncing = false;
+    }
+
+    //  The request failed: every drop stays unreported and goes out with the next sync
+    failSync ()
+    {
+        this.entries.forEach((entry) =>
+        {
+            entry.inFlight = false;
+        });
+        this.syncing = false;
     }
 }
