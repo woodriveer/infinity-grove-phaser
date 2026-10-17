@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 import { walletApi } from '../api';
-import { DAMAGE_PER_CLICK, Monster } from '../combat/monster';
-import { WalletLedger } from '../economy/walletLedger';
+import { DAMAGE_PER_CLICK, Monster } from '../domain/combat/monster';
+import { WalletLedger } from '../domain/economy/walletLedger';
 
 const CHARACTER = { x: 300, y: 500, size: 100, color: 0x000000 };
 const MONSTER = { x: 700, y: 500, width: 160, height: 200, color: 0xcc2222 };

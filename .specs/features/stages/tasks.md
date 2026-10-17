@@ -340,12 +340,13 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] Files live under `src/domain/`, tests moved with them and unchanged in assertions
-- [ ] Gate passes: `npm test` with the same test count as before
+- [x] Files live under `src/domain/`, tests moved with them and unchanged in assertions
+- [x] Gate passes: `npm test` with the same test count as before
 
 **Tests**: unit
 **Gate**: quick
 
+**Status**: Done
 **Commit**: `refactor(game): move combat and economy into the domain layer`
 
 ---
