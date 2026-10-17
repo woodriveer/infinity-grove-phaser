@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { httpClient } from './httpClient';
-import { ApiError } from './ApiError';
-import { sessionManager } from '../auth/sessionManager';
+import { ApiError } from '../application/ApiError';
+import { sessionManager } from '../composition';
 
-vi.mock('../auth/sessionManager', () => ({
+vi.mock('../composition', () => ({
     sessionManager: { accessToken: vi.fn(() => null), refresh: vi.fn() }
 }));
 

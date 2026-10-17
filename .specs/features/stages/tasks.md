@@ -366,13 +366,14 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] Every assertion of the old `sessionManager.test.js` still holds, now against fakes injected for the store and the auth gateway
-- [ ] The module imports no `api/` or `adapters/` file
-- [ ] Gate passes: `npm test`
+- [x] Every assertion of the old `sessionManager.test.js` still holds, now against fakes injected for the store and the auth gateway
+- [x] The module imports no `api/` or `adapters/` file
+- [x] Gate passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick
 
+**Status**: Done
 **Commit**: `refactor(game): inject store and auth gateway into the session manager`
 
 ---

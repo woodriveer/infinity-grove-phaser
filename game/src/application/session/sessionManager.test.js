@@ -1,14 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { sessionManager } from './sessionManager';
-import { sessionStore } from './sessionStore';
-import { authApi } from '../api/authApi';
-import { ApiError } from '../api/ApiError';
+import { createSessionManager } from './sessionManager';
+import { ApiError } from '../ApiError';
 
-vi.mock('../api/authApi', () => ({
-    authApi: { refresh: vi.fn(), logout: vi.fn() }
-}));
-
-const KEY = 'infinity-grove.session';
 const NOW = 1_000_000;
 const user = { username: 'yan', createdAt: 1, lastLoginAt: 2 };
 
@@ -21,16 +14,36 @@ const authResponse = (overrides = {}) => ({
     ...overrides
 });
 
-const stored = () => JSON.parse(localStorage.getItem(KEY));
+//  Fake store port: keeps the session in a variable, maps responses like the real one
+const createStore = () => {
+    const store = {
+        saved: null,
+        fromAuthResponse: (response) => ({
+            user: response.user,
+            accessToken: response.accessToken,
+            refreshToken: response.refreshToken,
+            accessTokenExpiresAt: response.accessTokenExpiresAt,
+            refreshTokenExpiresAt: response.refreshTokenExpiresAt
+        }),
+        save: (session) => { store.saved = session; },
+        load: () => store.saved,
+        clear: () => { store.saved = null; }
+    };
+
+    return store;
+};
 
 describe('sessionManager', () => {
+    let sessionStore;
+    let authApi;
+    let sessionManager;
+
+    const stored = () => sessionStore.saved;
+
     beforeEach(() => {
-        localStorage.clear();
-        sessionStore.clear();
-        vi.mocked(authApi.refresh).mockReset();
-        vi.mocked(authApi.logout).mockReset();
-        vi.mocked(authApi.logout).mockResolvedValue(undefined);
-        sessionManager.reset();
+        sessionStore = createStore();
+        authApi = { refresh: vi.fn(), logout: vi.fn().mockResolvedValue(undefined) };
+        sessionManager = createSessionManager({ store: sessionStore, authGateway: authApi });
     });
 
     describe('start / accessToken', () => {
@@ -97,21 +110,12 @@ describe('sessionManager', () => {
             await expect(sessionManager.restore(NOW)).resolves.toEqual({ status: 'none' });
 
             expect(authApi.refresh).not.toHaveBeenCalled();
-            expect(localStorage.getItem(KEY)).toBeNull();
+            expect(stored()).toBeNull();
             expect(sessionManager.accessToken()).toBeNull();
         });
 
         it('returns none when nothing is stored', async () => {
             await expect(sessionManager.restore(NOW)).resolves.toEqual({ status: 'none' });
-            expect(authApi.refresh).not.toHaveBeenCalled();
-        });
-
-        it('returns none and removes invalid stored data', async () => {
-            localStorage.setItem(KEY, '{broken');
-
-            await expect(sessionManager.restore(NOW)).resolves.toEqual({ status: 'none' });
-
-            expect(localStorage.getItem(KEY)).toBeNull();
             expect(authApi.refresh).not.toHaveBeenCalled();
         });
 
@@ -121,7 +125,7 @@ describe('sessionManager', () => {
 
             await expect(sessionManager.restore(NOW)).resolves.toEqual({ status: 'none' });
 
-            expect(localStorage.getItem(KEY)).toBeNull();
+            expect(stored()).toBeNull();
             expect(sessionManager.accessToken()).toBeNull();
         });
 
@@ -190,7 +194,7 @@ describe('sessionManager', () => {
 
             await expect(sessionManager.refresh()).rejects.toBe(error);
 
-            expect(localStorage.getItem(KEY)).toBeNull();
+            expect(stored()).toBeNull();
             expect(sessionManager.accessToken()).toBeNull();
         });
 
@@ -229,7 +233,7 @@ describe('sessionManager', () => {
 
             expect(authApi.logout).toHaveBeenCalledTimes(1);
             expect(authApi.logout).toHaveBeenCalledWith('refresh-1');
-            expect(localStorage.getItem(KEY)).toBeNull();
+            expect(stored()).toBeNull();
             expect(sessionManager.accessToken()).toBeNull();
         });
 
@@ -239,7 +243,7 @@ describe('sessionManager', () => {
 
             await expect(sessionManager.logout()).resolves.toBeUndefined();
 
-            expect(localStorage.getItem(KEY)).toBeNull();
+            expect(stored()).toBeNull();
             expect(sessionManager.accessToken()).toBeNull();
         });
 

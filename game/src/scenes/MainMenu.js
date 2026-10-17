@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { userApi } from '../api';
-import { sessionManager } from '../auth/sessionManager';
+import { sessionManager } from '../composition';
 
 const FORM_HTML = `
     <div class="auth-form">

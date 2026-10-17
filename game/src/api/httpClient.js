@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { config } from './config';
-import { ApiError } from './ApiError';
-import { sessionManager } from '../auth/sessionManager';
+import { ApiError } from '../application/ApiError';
+import { sessionManager } from '../composition';
 
 export const httpClient = axios.create({
     baseURL: config.apiBaseUrl,

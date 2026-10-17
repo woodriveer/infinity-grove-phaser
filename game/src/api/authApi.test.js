@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authApi, authClient } from './authApi';
 import { httpClient } from './httpClient';
-import { ApiError } from './ApiError';
+import { ApiError } from '../application/ApiError';
 
 const authResponse = {
     user: { username: 'yan', createdAt: 1, lastLoginAt: 2 },

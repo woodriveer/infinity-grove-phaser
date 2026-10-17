@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { config } from './config';
-import { ApiError } from './ApiError';
+import { ApiError } from '../application/ApiError';
 
 //  Dedicated client without auth interceptors: a failing refresh must never trigger another refresh.
-//  This module must not import httpClient (httpClient -> sessionManager -> authApi).
+//  This module must not import httpClient (httpClient -> composition -> authApi).
 export const authClient = axios.create({
     baseURL: config.apiBaseUrl,
     timeout: config.apiTimeoutMs,
