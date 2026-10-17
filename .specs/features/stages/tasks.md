@@ -143,12 +143,13 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] Ports match the design interfaces and the two use cases live in `usecase/ProgressUseCase.kt`
-- [ ] Gate passes: `./gradlew ktlintCheck build -x test`
+- [x] Ports match the design interfaces and the two use cases live in `usecase/ProgressUseCase.kt`
+- [x] Gate passes: `./gradlew ktlintCheck build -x test`
 
 **Tests**: none
 **Gate**: build
 
+**Status**: Done
 **Commit**: `feat(stages): add progress ports and use cases`
 
 ---

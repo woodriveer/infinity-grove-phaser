@@ -126,6 +126,7 @@ The game has one endless level 1 monster and no sense of progress. This feature 
 - WHEN a player is on `PHASE` 5 after a failed boss and kills it THEN the game SHALL spawn the miniboss of that stage again with a full countdown.
 - IF the countdown reaches 0 in the same frame the boss reaches 0 health THEN the kill SHALL win, because health is checked on the click that dealt the damage.
 - WHEN the scene shuts down with reports still queued THEN the game SHALL make one best-effort attempt to send them in order and not retry, like the wallet sync on exit.
+- WHEN a user is deleted THEN the backend SHALL delete that user's progress and leave other players' progress, as it does for the wallet.
 - WHEN the player has the game open in two tabs THEN the older tab's next report SHALL get 409 and realign to the stored position.
 
 ---
