@@ -44,16 +44,18 @@ Execution notes: the user asked for the loop to run to the end of the spec, so t
 
 ## Execution Plan
 
-### Phase 1: Backend domain and service
+### Phase 1: Backend domain and ports
 
 ```
-T1 → T2 → T3 → T4
+T1 → T2 → T3
 ```
 
-### Phase 2: Backend adapters
+### Phase 2: Backend persistence, service and API
+
+Persistence comes before the service so the Spring context always has the beans the service needs and no commit leaves the integration tests broken.
 
 ```
-T5 → T6 → T7 → T8 → T9
+T4 → T5 → T6 → T7 → T8 → T9
 ```
 
 ### Phase 3: Game refactor to ADR 0007 (behavior-preserving)
@@ -154,34 +156,7 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 ---
 
-### T4: Progress service
-
-**What**: `ProgressService` (transactional): checks the user, loads the locked progress or creates it, calls `Progress.report`, saves; plus in-memory fakes for both ports.
-**Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/ProgressService.kt`
-**Depends on**: T3
-**Reuses**: `service/WalletService.kt` load pattern; `Fakes.kt` (add `InMemoryProgressRepository`, `InMemoryChapterRepository`)
-**Requirement**: STG-03, STG-04, STG-11, STG-14
-
-**Tools**:
-
-- MCP: NONE
-- Skill: `kotlin-backend-ddd`
-
-**Done when**:
-
-- [ ] `get` creates stage 1 phase 1 for a player without progress and returns the view with the chapter definition
-- [ ] `report` saves the transition and returns the new view; a conflict saves nothing
-- [ ] An unknown user throws `UserNotFoundException` and creates no progress; a missing chapter throws `ChapterNotFoundException`
-- [ ] Gate passes: `./gradlew ktlintCheck test --tests "*Test"`
-
-**Tests**: unit
-**Gate**: quick
-
-**Commit**: `feat(stages): add progress service`
-
----
-
-### T5: Chapter persistence
+### T4: Chapter persistence
 
 **What**: `ChapterEntity` and `StageEntity` (in `ChapterEntities.kt`), the Jpa repositories and `ChapterRepository : ChapterRepositoryPort`.
 **Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ChapterRepository.kt`
@@ -196,23 +171,24 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] A saved chapter reads back equal, stages in order, with every field
-- [ ] `existsByNumber` is false then true; an unknown number reads `null`
-- [ ] `IntegrationTestBase` clears the new tables before each test
-- [ ] Gate passes: `./gradlew ktlintCheck test`
+- [x] A saved chapter reads back equal, stages in order, with every field
+- [x] `existsByNumber` is false then true; an unknown number reads `null`
+- [x] Tests use their own chapter numbers and remove them, so the seeded chapter 1 other tests rely on is never deleted; `IntegrationTestBase` exposes the two Jpa repositories
+- [x] Gate passes: `./gradlew ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
 
+**Status**: Done
 **Commit**: `feat(stages): persist chapter definitions`
 
 ---
 
-### T6: Progress persistence
+### T5: Progress persistence
 
 **What**: `ProgressEntity`, `JpaProgressRepository` (`PESSIMISTIC_WRITE` lookup, native insert-if-absent) and `ProgressRepository : ProgressRepositoryPort`.
 **Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ProgressRepository.kt`
-**Depends on**: T5
+**Depends on**: T4
 **Reuses**: `adapter/repository/WalletRepository.kt`, `WalletRepositoryIT.kt` concurrency test
 **Requirement**: STG-03, STG-15
 
@@ -232,6 +208,34 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 **Gate**: full
 
 **Commit**: `feat(stages): persist player progress`
+
+---
+
+### T6: Progress service
+
+**What**: `ProgressService` (transactional): checks the user, loads the locked progress or creates it, calls `Progress.report`, saves; in-memory fakes for both ports; `UserService.delete` also deletes the user's progress (spec edge case).
+**Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/ProgressService.kt`
+**Depends on**: T5
+**Reuses**: `service/WalletService.kt` load pattern; `Fakes.kt` (add `InMemoryProgressRepository`, `InMemoryChapterRepository`)
+**Requirement**: STG-03, STG-04, STG-11, STG-14
+
+**Tools**:
+
+- MCP: NONE
+- Skill: `kotlin-backend-ddd`
+
+**Done when**:
+
+- [ ] `get` creates stage 1 phase 1 for a player without progress and returns the view with the chapter definition
+- [ ] `report` saves the transition and returns the new view; a conflict saves nothing
+- [ ] An unknown user throws `UserNotFoundException` and creates no progress; a missing chapter throws `ChapterNotFoundException`
+- [ ] Deleting a user deletes that user's progress and no one else's
+- [ ] Gate passes: `./gradlew ktlintCheck test --tests "*Test"`
+
+**Tests**: unit
+**Gate**: quick
+
+**Commit**: `feat(stages): add progress service`
 
 ---
 
@@ -691,8 +695,8 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 ```
 Phase 1 → Phase 2 → Phase 3 → Phase 4
 
-Phase 1:  T1 ------→ T2 ------→ T3 ------→ T4
-Phase 2:  T5 ------→ T6 ------→ T7 ------→ T8 ------→ T9
+Phase 1:  T1 ------→ T2 ------→ T3
+Phase 2:  T4 ------→ T5 ------→ T6 ------→ T7 ------→ T8 ------→ T9
 Phase 3:  T10 -----→ T11 -----→ T12 -----→ T13 -----→ T14 -----→ T15
 Phase 4:  T16 -----→ T17 -----→ T18 -----→ T19 -----→ T20 -----→ T21 -----→ T22 -----→ T23
 ```

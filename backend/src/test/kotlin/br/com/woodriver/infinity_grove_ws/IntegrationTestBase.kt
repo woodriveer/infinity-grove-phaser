@@ -1,6 +1,8 @@
 package br.com.woodriver.infinity_grove_ws
 
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaChapterRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaRefreshTokenRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaStageRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaUserRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletLevelRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletRepository
@@ -46,6 +48,12 @@ abstract class IntegrationTestBase {
 
     @Autowired
     protected lateinit var jpaWalletLevelRepository: JpaWalletLevelRepository
+
+    @Autowired
+    protected lateinit var jpaChapterRepository: JpaChapterRepository
+
+    @Autowired
+    protected lateinit var jpaStageRepository: JpaStageRepository
 
     @Autowired
     private lateinit var accessTokenIssuer: JwtAccessTokenIssuer
