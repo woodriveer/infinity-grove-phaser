@@ -1,12 +1,16 @@
 package br.com.woodriver.infinity_grove_ws
 
+import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
+import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import br.com.woodriver.infinity_grove_ws.port.AccessToken
 import br.com.woodriver.infinity_grove_ws.port.AccessTokenIssuerPort
+import br.com.woodriver.infinity_grove_ws.port.ChapterRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.DropRollerPort
 import br.com.woodriver.infinity_grove_ws.port.PasswordHasherPort
+import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenSecretPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
@@ -100,6 +104,34 @@ class InMemoryWalletRepository : WalletRepositoryPort {
     override fun deleteByUsername(username: String) {
         wallets.remove(username)
     }
+}
+
+class InMemoryProgressRepository : ProgressRepositoryPort {
+    val progresses = linkedMapOf<String, Progress>()
+
+    override fun findForUpdate(username: String) = progresses[username]
+
+    override fun createIfAbsent(progress: Progress) {
+        progresses.putIfAbsent(progress.username, progress)
+    }
+
+    override fun save(progress: Progress): Progress = progress.also { progresses[it.username] = it }
+
+    override fun deleteByUsername(username: String) {
+        progresses.remove(username)
+    }
+}
+
+class InMemoryChapterRepository(
+    vararg chapters: ChapterDefinition,
+) : ChapterRepositoryPort {
+    val chapters = chapters.associateBy { it.number }.toMutableMap()
+
+    override fun findByNumber(number: Int) = chapters[number]
+
+    override fun existsByNumber(number: Int) = chapters.containsKey(number)
+
+    override fun save(chapter: ChapterDefinition): ChapterDefinition = chapter.also { chapters[it.number] = it }
 }
 
 /** Rolls the scripted values in order, cycling; fails when a value is outside the range the caller asked for. */

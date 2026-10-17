@@ -227,15 +227,16 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] `get` creates stage 1 phase 1 for a player without progress and returns the view with the chapter definition
-- [ ] `report` saves the transition and returns the new view; a conflict saves nothing
-- [ ] An unknown user throws `UserNotFoundException` and creates no progress; a missing chapter throws `ChapterNotFoundException`
-- [ ] Deleting a user deletes that user's progress and no one else's
-- [ ] Gate passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] `get` creates stage 1 phase 1 for a player without progress and returns the view with the chapter definition
+- [x] `report` saves the transition and returns the new view; a conflict saves nothing
+- [x] An unknown user throws `UserNotFoundException` and creates no progress; a missing chapter throws `ChapterNotFoundException`
+- [x] Deleting a user deletes that user's progress and no one else's
+- [x] Gate passes: `./gradlew ktlintCheck test --tests "*Test"`
 
 **Tests**: unit
 **Gate**: quick
 
+**Status**: Done
 **Commit**: `feat(stages): add progress service`
 
 ---

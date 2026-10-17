@@ -1,6 +1,7 @@
 package br.com.woodriver.infinity_grove_ws.service
 
 import br.com.woodriver.infinity_grove_ws.FakePasswordHasher
+import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryRefreshTokenRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
@@ -9,6 +10,7 @@ import br.com.woodriver.infinity_grove_ws.domain.DropRule
 import br.com.woodriver.infinity_grove_ws.domain.DropTable
 import br.com.woodriver.infinity_grove_ws.domain.InvalidPasswordException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
 import br.com.woodriver.infinity_grove_ws.domain.UserAlreadyExistsException
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
@@ -25,7 +27,8 @@ class UserServiceTest {
     private val hasher = FakePasswordHasher()
     private val refreshTokens = InMemoryRefreshTokenRepository()
     private val wallets = InMemoryWalletRepository()
-    private val service = UserService(repository, hasher, refreshTokens, wallets)
+    private val progresses = InMemoryProgressRepository()
+    private val service = UserService(repository, hasher, refreshTokens, wallets, progresses)
 
     private fun wallet(username: String) =
         Wallet.open(username, DropTable(listOf(DropRule(1, 1, 5, 1500))), SequenceDropRoller(1, 2, 3, 4, 5), now = 0)
@@ -178,6 +181,27 @@ class UserServiceTest {
         service.delete("yan")
 
         assertEquals(setOf("ana"), wallets.wallets.keys)
+    }
+
+    @Test
+    fun `delete removes that user's progress and leaves other progress`() {
+        service.create("yan", "password123")
+        service.create("ana", "password123")
+        progresses.save(Progress.start("yan"))
+        progresses.save(Progress.start("ana"))
+
+        service.delete("yan")
+
+        assertEquals(setOf("ana"), progresses.progresses.keys)
+    }
+
+    @Test
+    fun `failed delete touches no progress`() {
+        progresses.save(Progress.start("yan"))
+
+        assertFailsWith<UserNotFoundException> { service.delete("ghost") }
+
+        assertEquals(setOf("yan"), progresses.progresses.keys)
     }
 
     @Test
