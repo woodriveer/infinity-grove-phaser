@@ -134,11 +134,11 @@ T15 → T16 → T17 → T18
 
 **Done when**:
 
-- [ ] `DropRule` rejects level below 1, `minCopper` below 1, `maxCopper` below `minCopper`, `killIntervalMs` below 1, with the level in the message
-- [ ] `DropTable` rejects an empty list and duplicate levels
-- [ ] `roll` returns the roller's value for the rule's min and max; `accepts` is true only inside the range, bounds included
-- [ ] `DropTableTest` covers every branch above
-- [ ] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] `DropRule` rejects level below 1, `minCopper` below 1, `maxCopper` below `minCopper`, `killIntervalMs` below 1, with the level in the message
+- [x] `DropTable` rejects an empty list and duplicate levels
+- [x] `roll` returns the roller's value for the rule's min and max; `accepts` is true only inside the range, bounds included
+- [x] `DropTableTest` covers every branch above
+- [x] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
 
 **Tests**: unit
 **Gate**: quick
