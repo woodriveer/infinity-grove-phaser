@@ -247,8 +247,8 @@ T15 → T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Interfaces compile
-- [ ] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] Interfaces compile
+- [x] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
 
 **Tests**: none
 **Gate**: quick
