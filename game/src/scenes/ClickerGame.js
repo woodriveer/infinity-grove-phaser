@@ -1,7 +1,6 @@
 import { Scene } from 'phaser';
-import { walletApi } from '../composition';
+import { createWalletSync } from '../composition';
 import { DAMAGE_PER_CLICK, Monster } from '../domain/combat/monster';
-import { WalletLedger } from '../domain/economy/walletLedger';
 
 const CHARACTER = { x: 300, y: 500, size: 100, color: 0x000000 };
 const MONSTER = { x: 700, y: 500, width: 160, height: 200, color: 0xcc2222 };
@@ -23,7 +22,7 @@ export class ClickerGame extends Scene
     create ()
     {
         this.monster = new Monster();
-        this.ledger = new WalletLedger();
+        this.wallet = createWalletSync();
 
         this.add.image(512, 384, 'background');
 
@@ -52,102 +51,43 @@ export class ClickerGame extends Scene
         this.events.once('shutdown', () => this.syncOnExit());
     }
 
-    //  Every tick either retries a wallet that never loaded or sends the unreported kills
-    tick ()
+    //  Kills reach the backend in batches; the wallet service decides what each tick does
+    async tick ()
     {
-        if (this.ledger.loaded)
+        const changed = await this.wallet.tick();
+
+        if (changed && this.sys.isActive())
         {
-            this.syncWallet();
+            this.showWallet();
         }
-        else
-        {
-            this.loadWallet();
-        }
-    }
-
-    async syncWallet ()
-    {
-        const kills = this.ledger.beginSync();
-
-        if (!kills)
-        {
-            return;
-        }
-
-        let result;
-
-        try
-        {
-            result = await walletApi.sync(kills);
-        }
-        catch
-        {
-            if (this.sys.isActive())
-            {
-                this.ledger.failSync();
-            }
-
-            return;
-        }
-
-        if (!this.sys.isActive())
-        {
-            return;
-        }
-
-        this.ledger.completeSync(result);
-        this.refreshWalletText();
     }
 
     //  One last, best-effort sync when the scene ends; a failure is not retried
     syncOnExit ()
     {
-        const kills = this.ledger.beginSync();
-
-        if (kills)
-        {
-            walletApi.sync(kills).catch(() => {});
-        }
+        this.wallet.syncOnExit();
     }
 
     //  Without a wallet the game plays on but nothing drops
     async loadWallet ()
     {
-        if (this.loadingWallet)
-        {
-            return;
-        }
+        const loaded = await this.wallet.load();
 
-        this.loadingWallet = true;
-
-        let data;
-
-        try
+        if (loaded && this.sys.isActive())
         {
-            data = await walletApi.get();
+            this.showWallet();
         }
-        catch
-        {
-            return;
-        }
-        finally
-        {
-            this.loadingWallet = false;
-        }
+    }
 
-        if (!this.sys.isActive())
-        {
-            return;
-        }
-
-        this.ledger.load(data);
+    showWallet ()
+    {
         this.refreshWalletText();
         this.walletText.setVisible(true);
     }
 
     refreshWalletText ()
     {
-        const { gold, silver, copper } = this.ledger.display();
+        const { gold, silver, copper } = this.wallet.display();
 
         this.walletText.node.querySelector('.wallet').textContent = `Gold: ${gold}  Silver: ${silver}  Copper: ${copper}`;
     }
@@ -172,7 +112,7 @@ export class ClickerGame extends Scene
     //  One coin per copper of the next queued drop flies from the monster to the wallet text; each landing counts 1 copper
     dropCoins ()
     {
-        const drop = this.ledger.takeDrop(this.monster.level);
+        const drop = this.wallet.takeDrop(this.monster.level);
 
         if (!drop)
         {
@@ -192,7 +132,7 @@ export class ClickerGame extends Scene
                 onComplete: () =>
                 {
                     coin.destroy();
-                    this.ledger.land(drop.id);
+                    this.wallet.land(drop.id);
                     this.refreshWalletText();
                 }
             });

@@ -6,9 +6,13 @@ vi.mock('phaser', () => ({
     Scene: class { constructor (key) { this.key = key; } }
 }));
 
-vi.mock('../composition', () => ({
-    walletApi: { get: vi.fn(), sync: vi.fn() }
-}));
+//  The real wallet service over a mocked backend gateway: these scene tests cover scene and service together
+vi.mock('../composition', async () => {
+    const { createWalletSync } = await import('../application/wallet/walletSync');
+    const walletApi = { get: vi.fn(), sync: vi.fn() };
+
+    return { walletApi, createWalletSync: () => createWalletSync({ gateway: walletApi }) };
+});
 
 const flush = () => new Promise((resolve) => setTimeout(resolve));
 

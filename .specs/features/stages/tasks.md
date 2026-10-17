@@ -420,13 +420,14 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] The sync, retry, failure and exit cases of the old scene test move to service tests with a fake gateway, same assertions
-- [ ] `ClickerGame.js` no longer imports `walletApi`
-- [ ] Gate passes: `npm test && npm run test:e2e`
+- [x] The wallet service has its own unit tests over a fake gateway (load, tick, single flight, retry, exit); the 186 scene and other tests pass with unchanged assertions, the scene tests now running the real service over a mocked gateway
+- [x] `ClickerGame.js` no longer imports `walletApi`
+- [x] Gate passes: `npm test && npm run test:e2e`
 
 **Tests**: unit
 **Gate**: full
 
+**Status**: Done
 **Commit**: `refactor(game): extract wallet sync from the scene`
 
 ---
