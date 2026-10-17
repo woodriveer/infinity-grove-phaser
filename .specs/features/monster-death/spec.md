@@ -81,15 +81,15 @@ Supersedes `clicker-combat` CLK-05 and CLK-08 (immediate respawn). Their other c
 
 | Requirement ID | Story                      | Phase | Status  |
 | -------------- | -------------------------- | ----- | ------- |
-| DEATH-01       | P1: Monster fades out      | -     | Implementing |
-| DEATH-02       | P1: Monster fades out      | -     | Implementing |
-| DEATH-03       | P1: Monster fades out      | -     | Implementing |
-| DEATH-04       | P1: Monster fades out      | -     | Implementing |
-| DEATH-05       | P1: Next monster spawns    | -     | Implementing |
-| DEATH-06       | P1: Next monster spawns    | -     | Implementing |
-| DEATH-07       | P1: Next monster spawns    | -     | Implementing |
+| DEATH-01       | P1: Monster fades out      | -     | Verified |
+| DEATH-02       | P1: Monster fades out      | -     | Verified |
+| DEATH-03       | P1: Monster fades out      | -     | Verified |
+| DEATH-04       | P1: Monster fades out      | -     | Verified |
+| DEATH-05       | P1: Next monster spawns    | -     | Verified |
+| DEATH-06       | P1: Next monster spawns    | -     | Verified |
+| DEATH-07       | P1: Next monster spawns    | -     | Verified |
 
-**Coverage:** 7 total, 0 mapped to tasks, 7 unmapped ⚠️
+**Coverage:** 7 total, 7 verified
 
 ---
 
