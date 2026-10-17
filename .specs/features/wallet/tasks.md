@@ -192,13 +192,13 @@ T15 → T16 → T17 → T18
 
 **Done when**:
 
-- [ ] `open` starts at 0 copper with a fresh state for every table level
-- [ ] `coins()` derives gold, silver, copper (0, 99, 100, 9 999, 10 000, `Long.MAX_VALUE` cases)
-- [ ] `refreshed` adds levels new to the table, keeps hidden levels untouched and is idempotent when nothing changed (same drops twice)
-- [ ] `credit` sums the credited copper, reports accepted per level, throws `UnknownLevelException` before changing anything (also when other levels are valid) and clamps at `Long.MAX_VALUE`
-- [ ] `dropsFor` returns table levels only
-- [ ] `WalletTest` covers every branch and edge case of the spec
-- [ ] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] `open` starts at 0 copper with a fresh state for every table level
+- [x] `coins()` derives gold, silver, copper (0, 99, 100, 9 999, 10 000, `Long.MAX_VALUE` cases)
+- [x] `refreshed` adds levels new to the table, keeps hidden levels untouched and is idempotent when nothing changed (same drops twice)
+- [x] `credit` sums the credited copper, reports accepted per level, throws `UnknownLevelException` before changing anything (also when other levels are valid) and clamps at `Long.MAX_VALUE`
+- [x] `dropsFor` returns table levels only
+- [x] `WalletTest` covers every branch and edge case of the spec
+- [x] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
 
 **Tests**: unit
 **Gate**: quick
