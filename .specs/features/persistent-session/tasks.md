@@ -180,14 +180,15 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] Three interfaces exist as in the design
-- [ ] Gate passes: `cd backend && ./gradlew build`
-- [ ] Test count: unchanged
+- [x] Three interfaces exist as in the design
+- [x] Gate passes: `cd backend && ./gradlew build`
+- [x] Test count: unchanged
 
 **Tests**: none
 **Gate**: build
 
 **Commit**: `feat(auth): add session use cases`
+**Status**: ✅ Complete
 
 ---
 
