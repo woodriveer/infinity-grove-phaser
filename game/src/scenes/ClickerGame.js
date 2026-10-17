@@ -1,11 +1,15 @@
 import { Scene } from 'phaser';
+import { walletApi } from '../api';
 import { DAMAGE_PER_CLICK, Monster } from '../combat/monster';
+import { WalletLedger } from '../economy/walletLedger';
 
 const CHARACTER = { x: 300, y: 500, size: 100, color: 0x000000 };
 const MONSTER = { x: 700, y: 500, width: 160, height: 200, color: 0xcc2222 };
 const HEALTH_BAR = { width: 120, height: 12, gap: 16, backColor: 0x222222, fillColor: 0x33cc33 };
 const DAMAGE_TEXT = { rise: 40, duration: 800 };
 const DEATH = { fadeDuration: 500, respawnDelay: 1000 };
+const WALLET = { x: 180, y: 32 };
+const WALLET_HTML = '<div class="wallet"></div>';
 
 export class ClickerGame extends Scene
 {
@@ -17,6 +21,7 @@ export class ClickerGame extends Scene
     create ()
     {
         this.monster = new Monster();
+        this.ledger = new WalletLedger();
 
         this.add.image(512, 384, 'background');
 
@@ -34,6 +39,42 @@ export class ClickerGame extends Scene
 
         //  Any click on the canvas hits the monster, not only a click on the monster itself
         this.input.on('pointerdown', (pointer) => this.hitMonster(pointer));
+
+        //  Real HTML text in the top-left corner (ADR 0004); click-through so the canvas still gets every click
+        this.walletText = this.add.dom(WALLET.x, WALLET.y).createFromHTML(WALLET_HTML).setVisible(false);
+        this.walletText.pointerEvents = 'none';
+        this.loadWallet();
+    }
+
+    //  Without a wallet the game plays on but nothing drops
+    async loadWallet ()
+    {
+        let data;
+
+        try
+        {
+            data = await walletApi.get();
+        }
+        catch
+        {
+            return;
+        }
+
+        if (!this.sys.isActive())
+        {
+            return;
+        }
+
+        this.ledger.load(data);
+        this.refreshWalletText();
+        this.walletText.setVisible(true);
+    }
+
+    refreshWalletText ()
+    {
+        const { gold, silver, copper } = this.ledger.display();
+
+        this.walletText.node.querySelector('.wallet').textContent = `Gold: ${gold}  Silver: ${silver}  Copper: ${copper}`;
     }
 
     hitMonster (pointer)

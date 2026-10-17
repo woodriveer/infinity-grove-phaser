@@ -190,13 +190,13 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] On create the scene calls `walletApi.get()` once
-- [ ] After it resolves, the text reads `Gold: G  Silver: S  Copper: C` for the response wallet, at the top-left (`WALLET` point), and is visible
-- [ ] Before it resolves, and after it fails, the text is hidden
-- [ ] A response that arrives after the scene shut down changes nothing and throws nothing
-- [ ] `public/style.css` styles `.wallet`
-- [ ] All earlier `ClickerGame` tests still pass, with only stand-in stubs added; the "no coins or score" test name is updated for the new wallet text (its assertions are unchanged)
-- [ ] Gate check passes: `npm test`
+- [x] On create the scene calls `walletApi.get()` once
+- [x] After it resolves, the text reads `Gold: G  Silver: S  Copper: C` for the response wallet, at the top-left (`WALLET` point), and is visible
+- [x] Before it resolves, and after it fails, the text is hidden
+- [x] A response that arrives after the scene shut down changes nothing and throws nothing
+- [x] `public/style.css` styles `.wallet`
+- [x] All earlier `ClickerGame` tests still pass, with only stand-in stubs added; the "no coins or score" test name is updated for the new wallet text (its assertions are unchanged)
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick

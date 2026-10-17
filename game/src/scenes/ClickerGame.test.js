@@ -1,13 +1,30 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClickerGame } from './ClickerGame';
+import { walletApi } from '../api';
 
 vi.mock('phaser', () => ({
     Scene: class { constructor (key) { this.key = key; } }
 }));
 
+vi.mock('../api', () => ({
+    walletApi: { get: vi.fn(), sync: vi.fn() }
+}));
+
+const flush = () => new Promise((resolve) => setTimeout(resolve));
+
+const walletResponse = (coins = { gold: 2, silver: 14, copper: 37 }, drops = { 1: [3, 1, 5, 2, 4] }) => ({ wallet: coins, drops });
+
 //  Minimal Phaser stand-in: records what ClickerGame adds and exposes the click handler and tweens.
-const createScene = () => {
+//  `wallet` is what GET /wallet answers: a response object, an Error to reject with, or omitted to never answer.
+const createScene = ({ wallet } = {}) => {
+    walletApi.get.mockReset();
+    walletApi.get.mockImplementation(() => {
+        if (wallet instanceof Error) { return Promise.reject(wallet); }
+        return wallet ? Promise.resolve(wallet) : new Promise(() => {});
+    });
+
     const rectangles = [];
+    const doms = [];
     const texts = [];
     const tweens = [];
     const handlers = {};
@@ -33,8 +50,23 @@ const createScene = () => {
             obj.setDepth = () => obj;
             texts.push(obj);
             return obj;
+        }),
+        dom: vi.fn((x, y) => {
+            const element = { x, y, visible: true };
+
+            element.createFromHTML = (html) => {
+                const root = document.createElement('div');
+
+                root.innerHTML = html;
+                element.node = root; //  like Phaser, node is the wrapper div around the html
+                return element;
+            };
+            element.setVisible = (visible) => { element.visible = visible; return element; };
+            doms.push(element);
+            return element;
         })
     };
+    scene.sys = { isActive: vi.fn(() => true) };
     scene.tweens = { add: vi.fn((config) => { tweens.push(config); }) };
     scene.time = { delayedCall: vi.fn((delay, callback) => { timers.push({ delay, callback }); }) };
     scene.input = { on: vi.fn((event, cb) => { handlers[event] = cb; }) };
@@ -48,11 +80,14 @@ const createScene = () => {
     const fill = byColor(0x33cc33)[0];
     const back = byColor(0x222222)[0];
 
-    return { scene, rectangles, texts, tweens, timers, click, monster, fill, back, byColor };
+    const walletText = () => doms.map((d) => d.node.querySelector('.wallet')).find(Boolean);
+    const walletElement = () => doms.find((d) => d.node.querySelector('.wallet'));
+
+    return { scene, rectangles, texts, tweens, timers, doms, click, monster, fill, back, byColor, walletText, walletElement };
 };
 
 describe('ClickerGame scene', () => {
-    it('shows one black square character and one monster, and no coins or score', () => {
+    it('shows one black square character and one monster, and no coins yet', () => {
         const { scene, rectangles, byColor } = createScene();
 
         expect(byColor(0x000000)).toHaveLength(1);
@@ -267,5 +302,59 @@ describe('ClickerGame damage number position', () => {
         click({ x: 650, y: 100 });
 
         expect(texts[0].x).toBe(monster.x);
+    });
+});
+
+describe('ClickerGame wallet text', () => {
+    beforeEach(() => {
+        walletApi.get.mockReset();
+    });
+
+    it('asks the backend for the wallet once when the scene starts', () => {
+        createScene({ wallet: walletResponse() });
+
+        expect(walletApi.get).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the wallet text hidden until the wallet has loaded', () => {
+        const { walletElement } = createScene();
+
+        expect(walletElement().visible).toBe(false);
+    });
+
+    it('shows "Gold: G  Silver: S  Copper: C" in the top-left corner once the wallet has loaded', async () => {
+        const { walletText, walletElement } = createScene({ wallet: walletResponse() });
+        await flush();
+
+        expect(walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
+        expect(walletElement().visible).toBe(true);
+        expect(walletElement().x).toBeLessThan(512);
+        expect(walletElement().y).toBeLessThan(100);
+    });
+
+    it('always shows all three denominations, also when they are zero', async () => {
+        const { walletText } = createScene({ wallet: walletResponse({ gold: 0, silver: 0, copper: 0 }) });
+        await flush();
+
+        expect(walletText().textContent).toBe('Gold: 0  Silver: 0  Copper: 0');
+    });
+
+    it('shows no wallet text when the wallet cannot be loaded', async () => {
+        const { walletElement } = createScene({ wallet: new Error('down') });
+        await flush();
+
+        expect(walletElement().visible).toBe(false);
+    });
+
+    it('changes nothing when the wallet arrives after the scene shut down', async () => {
+        let resolve;
+        const pending = new Promise((done) => { resolve = done; });
+        const { scene, walletElement } = createScene({ wallet: pending });
+        scene.sys.isActive.mockReturnValue(false);
+
+        resolve(walletResponse());
+        await flush();
+
+        expect(walletElement().visible).toBe(false);
     });
 });

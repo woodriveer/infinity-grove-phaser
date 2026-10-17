@@ -84,3 +84,11 @@ body {
 .welcome p {
     margin: 0 0 20px;
 }
+
+.wallet {
+    font-family: 'Arial Black', sans-serif;
+    font-size: 22px;
+    color: #ffffff;
+    white-space: pre;
+    text-shadow: 0 0 4px #000000, 0 0 4px #000000;
+}
