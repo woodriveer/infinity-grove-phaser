@@ -10,6 +10,7 @@ const DAMAGE_TEXT = { rise: 40, duration: 800 };
 const DEATH = { fadeDuration: 500, respawnDelay: 1000 };
 const WALLET = { x: 180, y: 32 };
 const COIN = { duration: 600, stagger: 100 };
+const WALLET_SYNC_MS = 10000;
 const WALLET_HTML = '<div class="wallet"></div>';
 
 export class ClickerGame extends Scene
@@ -45,11 +46,80 @@ export class ClickerGame extends Scene
         this.walletText = this.add.dom(WALLET.x, WALLET.y).createFromHTML(WALLET_HTML).setVisible(false);
         this.walletText.pointerEvents = 'none';
         this.loadWallet();
+
+        //  Kills reach the backend in batches, never one request per kill
+        this.time.addEvent({ delay: WALLET_SYNC_MS, loop: true, callback: () => this.tick() });
+        this.events.once('shutdown', () => this.syncOnExit());
+    }
+
+    //  Every tick either retries a wallet that never loaded or sends the unreported kills
+    tick ()
+    {
+        if (this.ledger.loaded)
+        {
+            this.syncWallet();
+        }
+        else
+        {
+            this.loadWallet();
+        }
+    }
+
+    async syncWallet ()
+    {
+        const kills = this.ledger.beginSync();
+
+        if (!kills)
+        {
+            return;
+        }
+
+        let result;
+
+        try
+        {
+            result = await walletApi.sync(kills);
+        }
+        catch
+        {
+            if (this.sys.isActive())
+            {
+                this.ledger.failSync();
+            }
+
+            return;
+        }
+
+        if (!this.sys.isActive())
+        {
+            return;
+        }
+
+        this.ledger.completeSync(result);
+        this.refreshWalletText();
+    }
+
+    //  One last, best-effort sync when the scene ends; a failure is not retried
+    syncOnExit ()
+    {
+        const kills = this.ledger.beginSync();
+
+        if (kills)
+        {
+            walletApi.sync(kills).catch(() => {});
+        }
     }
 
     //  Without a wallet the game plays on but nothing drops
     async loadWallet ()
     {
+        if (this.loadingWallet)
+        {
+            return;
+        }
+
+        this.loadingWallet = true;
+
         let data;
 
         try
@@ -59,6 +129,10 @@ export class ClickerGame extends Scene
         catch
         {
             return;
+        }
+        finally
+        {
+            this.loadingWallet = false;
         }
 
         if (!this.sys.isActive())

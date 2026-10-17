@@ -251,16 +251,16 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] The scene registers one looping 10 000 ms timer
-- [ ] On a tick with unreported kills and no sync in flight the scene calls `walletApi.sync({ "1": n })`; with none it calls nothing
-- [ ] While a sync is in flight a tick starts no second sync
-- [ ] On success the wallet text shows the response wallet plus the landed coins the response does not cover, and the queues follow the ledger rules
-- [ ] On failure the kills stay unreported, play continues, and the next tick retries
-- [ ] On a tick with the wallet not loaded the scene calls `walletApi.get()` again until it succeeds
-- [ ] On shutdown with unreported kills the scene sends one `walletApi.sync` and never retries it; with none it sends nothing
-- [ ] A kill made while a sync is in flight goes to the next sync
-- [ ] Responses after shutdown change nothing
-- [ ] Gate check passes: `npm test`
+- [x] The scene registers one looping 10 000 ms timer
+- [x] On a tick with unreported kills and no sync in flight the scene calls `walletApi.sync({ "1": n })`; with none it calls nothing
+- [x] While a sync is in flight a tick starts no second sync
+- [x] On success the wallet text shows the response wallet plus the landed coins the response does not cover, and the queues follow the ledger rules
+- [x] On failure the kills stay unreported, play continues, and the next tick retries
+- [x] On a tick with the wallet not loaded the scene calls `walletApi.get()` again until it succeeds
+- [x] On shutdown with unreported kills the scene sends one `walletApi.sync` and never retries it; with none it sends nothing
+- [x] A kill made while a sync is in flight goes to the next sync
+- [x] Responses after shutdown change nothing
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick
