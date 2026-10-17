@@ -297,11 +297,11 @@ T15 → T16 → T17 → T18
 
 **Done when**:
 
-- [ ] `get` creates the wallet for an existing user without one, and returns the stored one otherwise (same drops twice)
-- [ ] `get` and `sync` throw `UserNotFoundException` and create no wallet when the user does not exist
-- [ ] `sync` credits, persists the new wallet and returns accepted counts; an unknown level persists nothing
-- [ ] `WalletServiceTest` covers each path with the in-memory fakes
-- [ ] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] `get` creates the wallet for an existing user without one, and returns the stored one otherwise (same drops twice)
+- [x] `get` and `sync` throw `UserNotFoundException` and create no wallet when the user does not exist
+- [x] `sync` credits, persists the new wallet and returns accepted counts; an unknown level persists nothing
+- [x] `WalletServiceTest` covers each path with the in-memory fakes
+- [x] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
 
 **Tests**: unit
 **Gate**: quick
