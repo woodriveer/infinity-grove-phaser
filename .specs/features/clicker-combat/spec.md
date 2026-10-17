@@ -88,13 +88,13 @@ The `ClickerGame` scene is a coin-catching prototype (falling coins, score) and 
 
 | Requirement ID | Story                    | Phase | Status  |
 | -------------- | ------------------------ | ----- | ------- |
-| CLK-01         | P1: Hit the monster      | -     | Pending |
+| CLK-01         | P1: Hit the monster      | -     | Implementing |
 | CLK-02         | P1: Hit the monster      | -     | Implementing |
-| CLK-03         | P1: Hit the monster      | -     | Pending |
-| CLK-04         | P1: Hit the monster      | -     | Pending |
+| CLK-03         | P1: Hit the monster      | -     | Implementing |
+| CLK-04         | P1: Hit the monster      | -     | Implementing |
 | CLK-05         | P1: Hit the monster      | -     | Implementing |
-| CLK-06         | P1: Monster health bar   | -     | Pending |
-| CLK-07         | P1: Monster health bar   | -     | Pending |
+| CLK-06         | P1: Monster health bar   | -     | Implementing |
+| CLK-07         | P1: Monster health bar   | -     | Implementing |
 | CLK-08         | P1: Monster health bar   | -     | Implementing |
 | CLK-09         | P1: Hit the monster      | -     | Pending |
 

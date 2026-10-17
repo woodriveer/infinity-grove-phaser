@@ -1,5 +1,10 @@
 import { Scene } from 'phaser';
-import * as Phaser from 'phaser';
+import { DAMAGE_PER_CLICK, Monster } from '../combat/monster';
+
+const CHARACTER = { x: 300, y: 500, size: 100, color: 0x000000 };
+const MONSTER = { x: 700, y: 500, width: 160, height: 200, color: 0xcc2222 };
+const HEALTH_BAR = { width: 120, height: 12, gap: 16, backColor: 0x222222, fillColor: 0x33cc33 };
+const DAMAGE_TEXT = { rise: 40, duration: 800 };
 
 export class ClickerGame extends Scene
 {
@@ -10,97 +15,44 @@ export class ClickerGame extends Scene
 
     create ()
     {
-        this.score = 0;
-
-        this.coins = [];
-
-        const textStyle = { fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff', stroke: '#000000', strokeThickness: 8 };
+        this.monster = new Monster();
 
         this.add.image(512, 384, 'background');
 
-        this.scoreText = this.add.text(32, 32, 'Coins: 0', textStyle).setDepth(1);
-        this.timeText = this.add.text(1024 - 32, 32, 'Time: 10', textStyle).setOrigin(1, 0).setDepth(1);
+        this.add.rectangle(CHARACTER.x, CHARACTER.y, CHARACTER.size, CHARACTER.size, CHARACTER.color);
+        this.add.rectangle(MONSTER.x, MONSTER.y, MONSTER.width, MONSTER.height, MONSTER.color);
 
-        //  Our 10 second timer. It starts automatically when the scene is created.
-        this.timer = this.time.addEvent({ delay: 10000, callback: () => this.gameOver() });
+        //  The bar is centred above the monster's head
+        const barX = MONSTER.x - HEALTH_BAR.width / 2;
+        const barY = MONSTER.y - MONSTER.height / 2 - HEALTH_BAR.gap - HEALTH_BAR.height;
 
-        this.physics.world.setBounds(0, -400, 1024, 768 + 310);
+        this.add.rectangle(barX, barY, HEALTH_BAR.width, HEALTH_BAR.height, HEALTH_BAR.backColor).setOrigin(0, 0);
+        this.healthFill = this.add.rectangle(barX, barY, HEALTH_BAR.width, HEALTH_BAR.height, HEALTH_BAR.fillColor).setOrigin(0, 0);
+        this.damageTextY = barY - 8;
 
-        for (let i = 0; i < 32; i++)
-        {
-            this.dropCoin();
-        }
-
-        this.input.on('gameobjectdown', (pointer, gameObject) => this.clickCoin(gameObject));
+        //  Any click on the canvas hits the monster, not only a click on the monster itself
+        this.input.on('pointerdown', () => this.hitMonster());
     }
 
-    dropCoin ()
+    hitMonster ()
     {
-        const x = Phaser.Math.Between(128, 896);
-        const y = Phaser.Math.Between(0, -400);
-
-        const coin = this.physics.add.sprite(x, y, 'coin').play('rotate');
-
-        coin.setVelocityX(Phaser.Math.Between(-400, 400));
-        coin.setCollideWorldBounds(true);
-        coin.setBounce(0.9);
-        coin.setInteractive();
-
-        this.coins.push(coin);
+        this.monster.hit();
+        this.healthFill.setSize(HEALTH_BAR.width * this.monster.health / this.monster.maxHealth, HEALTH_BAR.height);
+        this.showDamage(DAMAGE_PER_CLICK);
     }
 
-    clickCoin (coin)
+    showDamage (damage)
     {
-        //  Disable the coin from being clicked
-        coin.disableInteractive();
+        const textStyle = { fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff', stroke: '#000000', strokeThickness: 8 };
 
-        //  Stop it from moving
-        coin.setVelocity(0, 0);
+        const text = this.add.text(MONSTER.x, this.damageTextY, String(damage), textStyle).setOrigin(0.5, 1).setDepth(1);
 
-        //  Play the 'vanish' animation
-        coin.play('vanish');
-
-        coin.once('animationcomplete-vanish', () => coin.destroy());
-
-        //  Add 1 to the score
-        this.score++;
-
-        //  Update the score text
-        this.scoreText.setText('Coins: ' + this.score);
-
-        //  Drop a new coin
-        this.dropCoin();
-    }
-
-    update ()
-    {
-        this.timeText.setText('Time: ' + Math.ceil(this.timer.getRemainingSeconds()));
-    }
-
-    gameOver ()
-    {
-        this.coins.forEach((coin) => {
-
-            if (coin.active)
-            {
-                coin.setVelocity(0, 0);
-
-                coin.play('vanish');
-            }
-
+        this.tweens.add({
+            targets: text,
+            y: text.y - DAMAGE_TEXT.rise,
+            alpha: 0,
+            duration: DAMAGE_TEXT.duration,
+            onComplete: () => text.destroy()
         });
-
-        this.input.off('gameobjectdown');
-
-        //  Save our highscore to the registry
-        const highscore = this.registry.get('highscore');
-
-        if (this.score > highscore)
-        {
-            this.registry.set('highscore', this.score);
-        }
-
-        //  Swap to the GameOver scene after a 2 second delay
-        this.time.delayedCall(2000, () => this.scene.start('GameOver'));
     }
 }
