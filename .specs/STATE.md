@@ -13,10 +13,10 @@
 ## Handoff
 
 - **Feature**: .specs/features/persistent-session
-- **Phase / Task**: Design/Tasks drafted, awaiting approval
-- **Completed**: none
+- **Phase / Task**: Done - T1-T27 committed, Verifier PASS (`validation.md`)
+- **Completed**: T1-T27
 - **In-progress** (file:line): none
-- **Next step**: Approve tasks.md, then execute T1
+- **Next step**: Open gap G-3 (401-after-refresh from an in-game protected call) when the first such call is added; commit the staged baseline before merging
 - **Blockers**: none
-- **Uncommitted files**: .specs/
+- **Uncommitted files**: .specs/LESSONS.md, .specs/lessons.json (candidate lessons, left out on purpose)
 - **Branch**: main
