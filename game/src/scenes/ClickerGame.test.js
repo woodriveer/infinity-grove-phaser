@@ -183,6 +183,20 @@ describe('ClickerGame monster death', () => {
         expect(ctx.tweens).toHaveLength(tweenCount);
     });
 
+    it('ignores clicks after the fade ends and before the next monster spawns', () => {
+        const ctx = createScene();
+        kill(ctx);
+        fadeTween(ctx).onComplete();
+        const tweenCount = ctx.tweens.length;
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(0);
+        expect(ctx.fill.width).toBe(0);
+        expect(ctx.texts).toHaveLength(10);
+        expect(ctx.tweens).toHaveLength(tweenCount);
+    });
+
     it('waits 1000 ms after the fade ends, and not before, to spawn the next monster', () => {
         const ctx = createScene();
         kill(ctx);
