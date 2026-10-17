@@ -491,8 +491,8 @@ T14 → T15 → T16 → T17
 
 **Done when**:
 
-- [ ] ADR states context, decision, consequences, alternatives, and the cheating limitation
-- [ ] Gate check passes: `./gradlew build`
+- [x] ADR states context, decision, consequences, alternatives, and the cheating limitation
+- [x] Gate check passes: `./gradlew build`
 
 **Tests**: none
 **Gate**: build
