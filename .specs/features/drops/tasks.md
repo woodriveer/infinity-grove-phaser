@@ -313,11 +313,11 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] After 10 clicks the wallet text grows by the first queued value once the coins land
-- [ ] About 10 s later the fake backend recorded exactly one `POST /wallet/sync` with `kills: { "1": 1 }`
-- [ ] After a reload and starting the game again the text shows the synced wallet
-- [ ] A scenario with a wallet of 99 copper and a drop of 2 shows 1 silver and 1 copper
-- [ ] Gate check passes: `npm test && npm run test:e2e`
+- [x] After 10 clicks the wallet text grows by the first queued value once the coins land
+- [x] About 10 s later the fake backend recorded exactly one `POST /wallet/sync` with `kills: { "1": 1 }`
+- [x] After a reload and starting the game again the text shows the synced wallet
+- [x] A scenario with a wallet of 99 copper and a drop of 2 shows 1 silver and 1 copper
+- [x] Gate check passes: `npm test && npm run test:e2e`
 
 **Tests**: e2e
 **Gate**: full

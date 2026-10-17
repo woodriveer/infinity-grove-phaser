@@ -7,6 +7,8 @@ export default defineConfig({
     //  Booting the game takes ~15 s under parallel load; reload scenarios boot it twice
     timeout: 60_000,
     fullyParallel: true,
+    //  Every test boots the whole game in a real browser; more than 3 at once starves the boot and flakes unrelated scenarios
+    workers: 3,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
     reporter: process.env.CI ? 'github' : 'list',
