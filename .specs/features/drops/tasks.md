@@ -341,8 +341,8 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] ADR states context, decision, consequences and alternatives
-- [ ] Gate check passes: `npm run build && npm test`
+- [x] ADR states context, decision, consequences and alternatives
+- [x] Gate check passes: `npm run build && npm test`
 
 **Tests**: none
 **Gate**: build
