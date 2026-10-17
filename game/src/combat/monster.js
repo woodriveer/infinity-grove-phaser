@@ -9,14 +9,26 @@ export class Monster
         this.health = maxHealth;
     }
 
-    //  Applies damage; a monster that reaches 0 respawns at once with full health
+    get dead ()
+    {
+        return this.health === 0;
+    }
+
+    //  Applies damage and returns whether it landed; a dead monster cannot be hit
     hit (damage = DAMAGE_PER_CLICK)
     {
+        if (this.dead)
+        {
+            return false;
+        }
+
         this.health = Math.max(0, this.health - damage);
 
-        if (this.health === 0)
-        {
-            this.health = this.maxHealth;
-        }
+        return true;
+    }
+
+    respawn ()
+    {
+        this.health = this.maxHealth;
     }
 }

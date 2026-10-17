@@ -11,6 +11,7 @@ const createScene = () => {
     const texts = [];
     const tweens = [];
     const handlers = {};
+    const timers = [];
 
     const scene = new ClickerGame();
     scene.add = {
@@ -20,6 +21,8 @@ const createScene = () => {
 
             rect.setOrigin = (ox, oy) => { rect.originX = ox; rect.originY = oy; return rect; };
             rect.setSize = (w, h) => { rect.width = w; rect.height = h; return rect; };
+            rect.alpha = 1;
+            rect.setAlpha = (a) => { rect.alpha = a; return rect; };
             rectangles.push(rect);
             return rect;
         }),
@@ -33,6 +36,7 @@ const createScene = () => {
         })
     };
     scene.tweens = { add: vi.fn((config) => { tweens.push(config); }) };
+    scene.time = { delayedCall: vi.fn((delay, callback) => { timers.push({ delay, callback }); }) };
     scene.input = { on: vi.fn((event, cb) => { handlers[event] = cb; }) };
 
     scene.create();
@@ -43,7 +47,7 @@ const createScene = () => {
     const fill = byColor(0x33cc33)[0];
     const back = byColor(0x222222)[0];
 
-    return { scene, rectangles, texts, tweens, click, monster, fill, back, byColor };
+    return { scene, rectangles, texts, tweens, timers, click, monster, fill, back, byColor };
 };
 
 describe('ClickerGame scene', () => {
@@ -92,22 +96,6 @@ describe('ClickerGame scene', () => {
         expect(texts[0].destroy).toHaveBeenCalledTimes(1);
     });
 
-    it('refills the monster and the bar after the tenth click', () => {
-        const { scene, fill, click } = createScene();
-
-        for (let i = 0; i < 9; i++)
-        {
-            click();
-        }
-        expect(scene.monster.health).toBe(1);
-        expect(fill.width).toBe(12);
-
-        click();
-
-        expect(scene.monster.health).toBe(10);
-        expect(fill.width).toBe(120);
-    });
-
     it('shows one independent damage number per click', () => {
         const { texts, tweens, click } = createScene();
 
@@ -138,5 +126,97 @@ describe('ClickerGame health bar', () => {
         click();
 
         expect(fill.width).toBe(108);
+    });
+});
+
+describe('ClickerGame monster death', () => {
+    const kill = (ctx) => {
+        for (let i = 0; i < 10; i++)
+        {
+            ctx.click();
+        }
+    };
+    const fadeTween = (ctx) => ctx.tweens.find((t) => Array.isArray(t.targets));
+
+    it('fades the monster body and its health bar to alpha 0 over 500 ms on the tenth click', () => {
+        const ctx = createScene();
+        for (let i = 0; i < 9; i++)
+        {
+            ctx.click();
+        }
+        expect(fadeTween(ctx)).toBeUndefined();
+
+        ctx.click();
+
+        expect(fadeTween(ctx)).toEqual(expect.objectContaining({ alpha: 0, duration: 500 }));
+        expect(fadeTween(ctx).targets).toEqual([ ctx.monster, ctx.back, ctx.fill ]);
+    });
+
+    it('sets the health bar fill to 0 px wide on death', () => {
+        const ctx = createScene();
+
+        kill(ctx);
+
+        expect(ctx.fill.width).toBe(0);
+    });
+
+    it('shows the damage number of the killing click', () => {
+        const ctx = createScene();
+
+        kill(ctx);
+
+        expect(ctx.texts).toHaveLength(10);
+        expect(ctx.texts[9].text).toBe('1');
+    });
+
+    it('ignores clicks while the monster is dead: no damage, no damage number', () => {
+        const ctx = createScene();
+        kill(ctx);
+        const tweenCount = ctx.tweens.length;
+
+        ctx.click();
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(0);
+        expect(ctx.texts).toHaveLength(10);
+        expect(ctx.tweens).toHaveLength(tweenCount);
+    });
+
+    it('waits 1000 ms after the fade ends, and not before, to spawn the next monster', () => {
+        const ctx = createScene();
+        kill(ctx);
+        expect(ctx.timers).toHaveLength(0);
+
+        fadeTween(ctx).onComplete();
+
+        expect(ctx.timers).toHaveLength(1);
+        expect(ctx.timers[0].delay).toBe(1000);
+        expect(ctx.scene.monster.health).toBe(0);
+    });
+
+    it('spawns a monster with health 10, alpha 1 and a 120 px bar when the wait ends', () => {
+        const ctx = createScene();
+        kill(ctx);
+        fadeTween(ctx).onComplete();
+        [ ctx.monster, ctx.back, ctx.fill ].forEach((part) => { part.alpha = 0; });
+
+        ctx.timers[0].callback();
+
+        expect(ctx.scene.monster.health).toBe(10);
+        expect([ ctx.monster.alpha, ctx.back.alpha, ctx.fill.alpha ]).toEqual([ 1, 1, 1 ]);
+        expect(ctx.fill.width).toBe(120);
+    });
+
+    it('takes 1 damage per click again after the respawn', () => {
+        const ctx = createScene();
+        kill(ctx);
+        fadeTween(ctx).onComplete();
+        ctx.timers[0].callback();
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(9);
+        expect(ctx.fill.width).toBe(108);
+        expect(ctx.texts).toHaveLength(11);
     });
 });
