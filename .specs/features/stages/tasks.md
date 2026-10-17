@@ -256,13 +256,14 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] On an empty database the application start leaves chapter 1 with the seed values
-- [ ] With chapter 1 edited in the database, running the seeder again keeps the edit
-- [ ] Gate passes: `./gradlew ktlintCheck test`
+- [x] On an empty database the application start leaves chapter 1 with the seed values
+- [x] With chapter 1 edited in the database, running the seeder again keeps the edit
+- [x] Gate passes: `./gradlew ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
 
+**Status**: Done
 **Commit**: `feat(stages): seed chapter 1 at startup`
 
 ---

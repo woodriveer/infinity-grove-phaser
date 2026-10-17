@@ -1,0 +1,50 @@
+package br.com.woodriver.infinity_grove_ws.adapter.config
+
+import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
+import br.com.woodriver.infinity_grove_ws.adapter.repository.ChapterRepository
+import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
+import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.AfterTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class ChapterSeederIT : IntegrationTestBase() {
+    @Autowired
+    private lateinit var seeder: ChapterSeeder
+
+    @Autowired
+    private lateinit var repository: ChapterRepository
+
+    // other integration tests play against the seeded chapter 1, so every test leaves it seeded again
+    @AfterTest
+    fun restoreSeed() {
+        jpaStageRepository.deleteAll(jpaStageRepository.findAllByChapterOrderByNumber(1))
+        jpaChapterRepository.deleteById(1)
+        seeder.seed()
+    }
+
+    @Test
+    fun `application start leaves chapter 1 with the seed values`() {
+        assertEquals(ChapterDefinition.first(), repository.findByNumber(1))
+    }
+
+    @Test
+    fun `seeding an empty database creates chapter 1 with its 10 stages`() {
+        jpaStageRepository.deleteAll(jpaStageRepository.findAllByChapterOrderByNumber(1))
+        jpaChapterRepository.deleteById(1)
+
+        seeder.seed()
+
+        assertEquals(ChapterDefinition.first(), repository.findByNumber(1))
+    }
+
+    @Test
+    fun `seeding again keeps values edited in the database`() {
+        val edited = ChapterDefinition.first().copy(bossHealth = 1234)
+        repository.save(edited)
+
+        seeder.seed()
+
+        assertEquals(1234, repository.findByNumber(1)!!.bossHealth)
+    }
+}
