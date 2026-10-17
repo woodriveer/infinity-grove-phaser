@@ -20,21 +20,12 @@ See `docs/adr/` for the architecture decisions.
 
 ## Deploy
 
-The game is served by a Cloudflare Worker at `https://infinity-grove.yan-tapajos.workers.dev/`. It forwards `/api/*` to the backend, which runs on your machine behind a fixed ngrok domain. A push to `main` that touches `game/` runs `.github/workflows/deploy-game.yml` (unit tests, then `npm run deploy`).
+The game is served by a Cloudflare Worker at `https://infinity-grove.yan-tapajos.workers.dev/`. It forwards `/api/*` to a backend that must be reachable from the internet (the backend has no `/api` prefix; the Worker strips it).
 
-One-time setup:
-
-1. ngrok dashboard: claim the free static domain (Universal Gateway > Domains), e.g. `your-name.ngrok-free.app`.
-2. GitHub repository secrets:
-   - `BACKEND_URL`: `https://your-name.ngrok-free.app` (no `/api`; the Worker strips it)
-   - `CLOUDFLARE_API_TOKEN`: token with the "Edit Cloudflare Workers" template
-   - `CLOUDFLARE_ACCOUNT_ID`: shown in the Cloudflare dashboard
-
-Whenever you want the site to work, run the backend and the tunnel:
+Deploy by hand after every change to `game/`; a `git push` does not publish:
 
 ```
-./start.sh                                   # postgres + backend (+ local dev server)
-ngrok http --domain=your-name.ngrok-free.app 8080
+BACKEND_URL=https://<backend-host> npm run deploy
 ```
 
-Manual deploy: `BACKEND_URL=https://your-name.ngrok-free.app npm run deploy`.
+`BACKEND_URL` is the bare backend address, without `/api`. It needs a prior `npx wrangler login`.
