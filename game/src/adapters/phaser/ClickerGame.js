@@ -17,6 +17,21 @@ const STAGE_MESSAGE = { x: 512, y: 384 };
 const STAGE_HUD_HTML = '<div class="stage-hud"></div>';
 const BOSS_TIMER_HTML = '<div class="boss-timer"></div>';
 const STAGE_MESSAGE_HTML = '<div class="stage-message"></div>';
+const FARM_TOGGLE = { x: 512, y: 730 };
+const PAUSE_MENU = { x: 512, y: 384 };
+const FARM_TOGGLE_HTML = '<label class="farm-toggle"><input type="checkbox"> Farm boss</label>';
+const PAUSE_MENU_HTML = '<div class="pause-menu" hidden>'
+    + '<div class="pause-title">Paused</div>'
+    + '<div class="pause-options">'
+    + '<button class="pause-continue">1. Continue</button>'
+    + '<button class="pause-leave">2. Leave fight</button>'
+    + '</div>'
+    + '<div class="pause-confirm" hidden>'
+    + '<div class="pause-question">Leave the fight? It counts as failed.</div>'
+    + '<button class="pause-confirm-yes">Yes, leave</button>'
+    + '<button class="pause-confirm-no">No, stay</button>'
+    + '</div>'
+    + '</div>';
 const LOAD_FAILED_TEXT = 'Could not load progress';
 const COMPLETED_TEXT = 'Chapter complete!';
 
@@ -37,6 +52,7 @@ export class ClickerGame extends Scene
         this.countdown = null;
         this.generation = 0;
         this.loadingCampaign = false;
+        this.paused = false;
         this.session.onRealign((encounter) => this.realign(encounter));
 
         this.add.image(512, 384, 'background');
@@ -66,6 +82,7 @@ export class ClickerGame extends Scene
         this.stageHud = this.createHtml(STAGE_HUD, STAGE_HUD_HTML, '.stage-hud');
         this.bossTimer = this.createHtml(BOSS_TIMER, BOSS_TIMER_HTML, '.boss-timer');
         this.stageMessage = this.createHtml(STAGE_MESSAGE, STAGE_MESSAGE_HTML, '.stage-message');
+        this.createControls();
         this.loadCampaign();
 
         //  Kills reach the backend in batches, never one request per kill
@@ -73,14 +90,87 @@ export class ClickerGame extends Scene
         this.events.once('shutdown', () => this.syncOnExit());
     }
 
-    //  A click-through HTML element; returns the node that holds the text
-    createHtml ({ x, y }, html, selector)
+    //  An HTML element; returns the node that holds the text. Click-through unless it is a control.
+    createHtml ({ x, y }, html, selector, interactive = false)
     {
         const element = this.add.dom(x, y).createFromHTML(html);
 
-        element.pointerEvents = 'none';
+        if (!interactive)
+        {
+            element.pointerEvents = 'none';
+        }
 
         return element.node.querySelector(selector);
+    }
+
+    //  The farm toggle and the pause menu are clickable HTML; Esc opens the menu during a fight
+    createControls ()
+    {
+        this.farmToggle = this.createHtml(FARM_TOGGLE, FARM_TOGGLE_HTML, '.farm-toggle input', true);
+        this.pauseMenu = this.createHtml(PAUSE_MENU, PAUSE_MENU_HTML, '.pause-menu', true);
+        this.pauseOptions = this.pauseMenu.querySelector('.pause-options');
+        this.pauseConfirm = this.pauseMenu.querySelector('.pause-confirm');
+
+        this.pauseMenu.querySelector('.pause-continue').addEventListener('click', () => this.resumeFight());
+        this.pauseMenu.querySelector('.pause-leave').addEventListener('click', () => this.askToLeave());
+        this.pauseMenu.querySelector('.pause-confirm-yes').addEventListener('click', () => this.leaveFight());
+        this.pauseMenu.querySelector('.pause-confirm-no').addEventListener('click', () => this.showPauseOptions());
+
+        this.input.keyboard.on('keydown-ESC', () => (this.paused ? this.resumeFight() : this.pauseFight()));
+    }
+
+    //  Freezes the fight: clicks, the boss countdown, timers and tweens all stop until the player resumes
+    pauseFight ()
+    {
+        if (this.paused || !this.monster || this.monster.dead)
+        {
+            return;
+        }
+
+        this.paused = true;
+        this.time.paused = true;
+        this.tweens.paused = true;
+        this.showPauseOptions();
+        this.pauseMenu.hidden = false;
+    }
+
+    resumeFight ()
+    {
+        if (!this.paused)
+        {
+            return;
+        }
+
+        this.paused = false;
+        this.time.paused = false;
+        this.tweens.paused = false;
+        this.pauseMenu.hidden = true;
+    }
+
+    //  Only a boss can be left: a phase monster has no failed outcome
+    showPauseOptions ()
+    {
+        this.pauseOptions.hidden = false;
+        this.pauseConfirm.hidden = true;
+        this.pauseMenu.querySelector('.pause-leave').hidden = !this.countdown;
+    }
+
+    askToLeave ()
+    {
+        this.pauseOptions.hidden = true;
+        this.pauseConfirm.hidden = false;
+    }
+
+    //  The confirmed exit: the boss counts as failed, exactly like a timeout
+    leaveFight ()
+    {
+        if (!this.paused || !this.countdown)
+        {
+            return;
+        }
+
+        this.resumeFight();
+        this.bossTimedOut();
     }
 
     //  The first encounter comes from the backend; until it does, nothing spawns
@@ -164,7 +254,7 @@ export class ClickerGame extends Scene
 
     update (time, delta)
     {
-        if (!this.countdown)
+        if (!this.countdown || this.paused)
         {
             return;
         }
@@ -239,6 +329,7 @@ export class ClickerGame extends Scene
     realign (encounter)
     {
         this.generation += 1;
+        this.resumeFight();
         this.hideCountdown();
         this.showEncounter(encounter);
     }
@@ -269,7 +360,7 @@ export class ClickerGame extends Scene
 
     hitMonster (pointer)
     {
-        if (!this.monster || !this.monster.hit())
+        if (this.paused || !this.monster || !this.monster.hit())
         {
             return;
         }
@@ -280,9 +371,18 @@ export class ClickerGame extends Scene
         if (this.monster.dead)
         {
             this.dropCoins();
-            this.hideCountdown();
-            this.fadeOutMonster(this.session.clear());
+            this.fadeOutMonster(this.clearEncounter());
         }
+    }
+
+    //  Farming a boss replays it without reporting a win, so the stored position stays on that boss
+    clearEncounter ()
+    {
+        const farming = this.countdown && this.farmToggle.checked;
+
+        this.hideCountdown();
+
+        return farming ? this.session.encounter() : this.session.clear();
     }
 
     //  One coin per copper of the next queued drop flies from the monster to the wallet text; each landing counts 1 copper

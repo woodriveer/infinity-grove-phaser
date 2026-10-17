@@ -106,7 +106,7 @@ const createScene = async ({ wallet, start = progress() } = {}) => {
         addEvent: vi.fn((config) => { loops.push(config); })
     };
     scene.events = { once: vi.fn((event, callback) => { eventHandlers[event] = callback; }) };
-    scene.input = { on: vi.fn((event, cb) => { handlers[event] = cb; }) };
+    scene.input = { on: vi.fn((event, cb) => { handlers[event] = cb; }), keyboard: { on: vi.fn((event, cb) => { handlers[event] = cb; }) } };
 
     scene.create();
     await flush(); //  the first encounter arrives from the backend
@@ -119,10 +119,11 @@ const createScene = async ({ wallet, start = progress() } = {}) => {
     const back = byColor(0x222222)[0];
 
     const walletText = () => doms.map((d) => d.node.querySelector('.wallet')).find(Boolean);
+    const control = (selector) => doms.map((d) => d.node.querySelector(selector)).find(Boolean);
     const hud = (selector) => doms.map((d) => d.node.querySelector(selector)).find(Boolean);
     const walletElement = () => doms.find((d) => d.node.querySelector('.wallet'));
 
-    return { scene, rectangles, texts, tweens, timers, loops, eventHandlers, sprites, doms, click, monster, fill, back, byColor, walletText, walletElement, hud };
+    return { scene, rectangles, texts, tweens, timers, loops, eventHandlers, sprites, doms, click, monster, fill, back, byColor, walletText, walletElement, hud, control, handlers };
 };
 
 describe('ClickerGame scene', () => {
@@ -1271,5 +1272,155 @@ describe('ClickerGame progress saving', () => {
         await flush();
 
         expect(campaignGateway.report).not.toHaveBeenCalled();
+    });
+});
+
+describe('ClickerGame pause and leave fight', () => {
+    const bossStart = () => progress(1, 'MINIBOSS', 1);
+    const press = (ctx, selector) => ctx.control(selector).click();
+    const killAll = (ctx) => {
+        while (ctx.scene.monster && !ctx.scene.monster.dead)
+        {
+            ctx.click();
+        }
+    };
+    const advance = (ctx) => {
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+    };
+    const label = (ctx) => ctx.hud('.stage-hud').textContent;
+
+    it('starts with the pause menu hidden', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        expect(ctx.control('.pause-menu').hidden).toBe(true);
+    });
+
+    it('pauses on Esc: shows the menu and freezes clicks, the countdown, timers and tweens', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.handlers['keydown-ESC']();
+        ctx.click();
+        ctx.scene.update(0, 30000);
+
+        expect(ctx.control('.pause-menu').hidden).toBe(false);
+        expect(ctx.scene.time.paused).toBe(true);
+        expect(ctx.scene.tweens.paused).toBe(true);
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth);
+        expect(ctx.scene.monster).not.toBeNull();
+    });
+
+    it('continues on the Continue button and on a second Esc', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.handlers['keydown-ESC']();
+        press(ctx, '.pause-continue');
+        expect(ctx.control('.pause-menu').hidden).toBe(true);
+        expect(ctx.scene.time.paused).toBe(false);
+        ctx.click();
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 1);
+
+        ctx.handlers['keydown-ESC']();
+        ctx.handlers['keydown-ESC']();
+        expect(ctx.control('.pause-menu').hidden).toBe(true);
+    });
+
+    it('does not pause when there is no monster to fight', async () => {
+        const ctx = await createScene({ start: new Error('down') });
+
+        ctx.handlers['keydown-ESC']();
+
+        expect(ctx.control('.pause-menu').hidden).toBe(true);
+    });
+
+    it('asks for confirmation before leaving, and No goes back to the menu', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.handlers['keydown-ESC']();
+        press(ctx, '.pause-leave');
+
+        expect(ctx.control('.pause-confirm').hidden).toBe(false);
+        expect(ctx.control('.pause-options').hidden).toBe(true);
+        expect(ctx.scene.monster).not.toBeNull();
+
+        press(ctx, '.pause-confirm-no');
+
+        expect(ctx.control('.pause-confirm').hidden).toBe(true);
+        expect(ctx.control('.pause-options').hidden).toBe(false);
+        expect(campaignGateway.report).not.toHaveBeenCalled();
+    });
+
+    it('leaves the boss as a failed outcome and brings phase 5 back', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.handlers['keydown-ESC']();
+        press(ctx, '.pause-leave');
+        press(ctx, '.pause-confirm-yes');
+
+        expect(ctx.scene.monster).toBeNull();
+        expect(ctx.control('.pause-menu').hidden).toBe(true);
+        expect(ctx.scene.time.paused).toBe(false);
+        expect(ctx.hud('.boss-timer').textContent).toBe('');
+
+        ctx.timers.at(-1).callback();
+        expect(label(ctx)).toBe('Stage 1/10  Phase 5/5');
+
+        await ctx.scene.session.flush();
+        expect(campaignGateway.report).toHaveBeenCalledWith({ chapter: 1, stage: 1, encounter: 'MINIBOSS', phase: 1 }, 'FAILED');
+    });
+
+    it('offers no way to leave a phase monster', async () => {
+        const ctx = await createScene();
+
+        ctx.handlers['keydown-ESC']();
+
+        expect(ctx.control('.pause-leave').hidden).toBe(true);
+        expect(ctx.control('.pause-continue').hidden).toBe(false);
+    });
+
+    it('moves on after a boss kill when farming is off', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        killAll(ctx);
+        advance(ctx);
+
+        expect(label(ctx)).toBe('Stage 2/10  Phase 1/5');
+    });
+
+    it('respawns the same boss after a kill when farming is on, without reporting a win', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.control('.farm-toggle input').checked = true;
+        killAll(ctx);
+        advance(ctx);
+        await ctx.scene.session.flush();
+
+        expect(label(ctx)).toBe('Stage 1/10  Miniboss');
+        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth);
+        expect(campaignGateway.report).not.toHaveBeenCalled();
+    });
+
+    it('still moves on after a phase monster when farming is on', async () => {
+        const ctx = await createScene();
+
+        ctx.control('.farm-toggle input').checked = true;
+        killAll(ctx);
+        advance(ctx);
+
+        expect(label(ctx)).toBe('Stage 1/10  Phase 2/5');
+    });
+
+    it('goes back to phase 5 and then to the boss again when the farmed boss times out', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.control('.farm-toggle input').checked = true;
+        ctx.scene.update(0, 30000);
+        ctx.timers.at(-1).callback();
+        expect(label(ctx)).toBe('Stage 1/10  Phase 5/5');
+
+        killAll(ctx);
+        advance(ctx);
+        expect(label(ctx)).toBe('Stage 1/10  Miniboss');
     });
 });

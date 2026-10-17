@@ -114,3 +114,53 @@ body {
 .stage-message {
     font-size: 40px;
 }
+
+.farm-toggle {
+    font-family: 'Arial Black', sans-serif;
+    font-size: 18px;
+    color: #ffffff;
+    text-shadow: 0 0 4px #000000, 0 0 4px #000000;
+    cursor: pointer;
+}
+
+.pause-menu {
+    width: 1024px;
+    height: 768px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    background: rgba(0, 0, 0, 0.6);
+    font-family: 'Arial Black', sans-serif;
+    color: #ffffff;
+}
+
+.pause-menu[hidden],
+.pause-menu [hidden] {
+    display: none;
+}
+
+.pause-title {
+    font-size: 48px;
+}
+
+.pause-options,
+.pause-confirm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.pause-menu button {
+    width: 260px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.pause-question {
+    font-size: 24px;
+}
