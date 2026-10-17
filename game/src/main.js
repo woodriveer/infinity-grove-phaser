@@ -1,7 +1,6 @@
 import { Boot } from './scenes/Boot';
 import { ClickerGame } from './scenes/ClickerGame';
 import { Game } from 'phaser';
-import { GameOver } from './scenes/GameOver';
 import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
 import * as Phaser from 'phaser';
@@ -30,8 +29,7 @@ const config = {
         Boot,
         Preloader,
         MainMenu,
-        ClickerGame,
-        GameOver
+        ClickerGame
     ]
 };
 

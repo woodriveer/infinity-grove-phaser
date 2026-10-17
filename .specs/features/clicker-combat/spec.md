@@ -96,7 +96,7 @@ The `ClickerGame` scene is a coin-catching prototype (falling coins, score) and 
 | CLK-06         | P1: Monster health bar   | -     | Implementing |
 | CLK-07         | P1: Monster health bar   | -     | Implementing |
 | CLK-08         | P1: Monster health bar   | -     | Implementing |
-| CLK-09         | P1: Hit the monster      | -     | Pending |
+| CLK-09         | P1: Hit the monster      | -     | Implementing |
 
 **Coverage:** 9 total, 0 mapped to tasks, 9 unmapped ⚠️
 
