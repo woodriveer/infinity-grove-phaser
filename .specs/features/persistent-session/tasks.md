@@ -411,17 +411,18 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] Sign-up returns 201 with `user.username`, non-blank `accessToken`/`refreshToken`, `accessTokenExpiresAt` about now + 24 h and `refreshTokenExpiresAt` about now + 30 days
-- [ ] Login returns 200 with the same shape; wrong password / unknown user responses unchanged (401 / 404 and codes)
-- [ ] The refresh token row exists in the DB as a hash that differs from the returned token
-- [ ] `UserControllerIT` updated for the new response shape (existing assertions kept)
-- [ ] Gate passes: `cd backend && ./gradlew ktlintCheck test` (Docker running)
-- [ ] Test count: previous + new tests, none deleted
+- [x] Sign-up returns 201 with `user.username`, non-blank `accessToken`/`refreshToken`, `accessTokenExpiresAt` about now + 24 h and `refreshTokenExpiresAt` about now + 30 days
+- [x] Login returns 200 with the same shape; wrong password / unknown user responses unchanged (401 / 404 and codes)
+- [x] The refresh token row exists in the DB as a hash that differs from the returned token
+- [x] `UserControllerIT` updated for the new response shape (existing assertions kept)
+- [x] Gate passes: `cd backend && ./gradlew ktlintCheck test` (Docker running)
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: integration
 **Gate**: full
 
 **Commit**: `feat(auth): return access and refresh tokens on login and sign-up`
+**Status**: ✅ Complete
 
 ---
 
