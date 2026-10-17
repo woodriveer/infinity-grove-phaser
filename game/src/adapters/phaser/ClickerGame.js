@@ -1,6 +1,5 @@
 import { Scene } from 'phaser';
-import { createWalletSync } from '../composition';
-import { DAMAGE_PER_CLICK, Monster } from '../domain/combat/monster';
+import { DAMAGE_PER_CLICK, Monster } from '../../domain/combat/monster';
 
 const CHARACTER = { x: 300, y: 500, size: 100, color: 0x000000 };
 const MONSTER = { x: 700, y: 500, width: 160, height: 200, color: 0xcc2222 };
@@ -22,7 +21,7 @@ export class ClickerGame extends Scene
     create ()
     {
         this.monster = new Monster();
-        this.wallet = createWalletSync();
+        this.wallet = this.registry.get('services').createWalletSync();
 
         this.add.image(512, 384, 'background');
 

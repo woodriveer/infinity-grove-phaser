@@ -11,7 +11,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 **Design**: `.specs/features/stages/design.md`
 **Status**: Approved
 
-Execution notes: the user asked for the loop to run to the end of the spec, so tasks run inline in one session (no batch sub-agents), and `CLAUDE.md` makes `git push` part of every commit. Unrelated working-tree changes (`game/src/scenes/Preloader.js`, `game/public/assets/coin-*.png`) are never staged by a task; T14 moves `Preloader.js` and takes that file's pending change with it, so the change is committed on its own first (T14 step 0).
+Execution notes: the user asked for the loop to run to the end of the spec, so tasks run inline in one session (no batch sub-agents), and `CLAUDE.md` makes `git push` part of every commit. Unrelated working-tree changes (`game/src/scenes/Preloader.js`, `game/public/assets/coin-*.png`) are never staged by a task; T14 moves `Preloader.js` with `git mv` and leaves that pending change unstaged at the new path, still the owner's to commit.
 
 ---
 
@@ -434,7 +434,7 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 ### T14: Scenes as Phaser adapters
 
-**What**: First commit the pending `Preloader.js` change on its own, then move `src/scenes` to `src/adapters/phaser`; `main.js` composes the services and puts them in `game.registry`; scenes read them from the registry; `composition.js` is imported only by `main.js`.
+**What**: Move `src/scenes` to `src/adapters/phaser` (the pending `Preloader.js` change stays unstaged); `main.js` composes the services and puts them in `game.registry`; scenes read them from the registry; `composition.js` is imported only by `main.js`.
 **Where**: `game/src/main.js`
 **Depends on**: T13
 **Reuses**: `composition.js`, scene tests
@@ -447,13 +447,14 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] No scene imports `composition.js`, `api` or an application singleton; scene tests supply services through a fake registry
-- [ ] All scene assertions unchanged
-- [ ] Gate passes: `npm test && npm run test:e2e`
+- [x] No scene imports `composition.js`, `api` or an application singleton; scene tests supply services through a fake registry
+- [x] All scene assertions unchanged
+- [x] Gate passes: `npm test && npm run test:e2e`
 
 **Tests**: unit
 **Gate**: full
 
+**Status**: Done
 **Commit**: `refactor(game): move scenes to adapters and inject services`
 
 ---

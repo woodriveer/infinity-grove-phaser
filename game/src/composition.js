@@ -16,3 +16,6 @@ export const walletApi = createWalletApi(httpClient);
 
 //  A fresh wallet service per game scene
 export const createWalletSync = () => createWalletSyncService({ gateway: walletApi });
+
+//  What the scenes receive through the game registry (see main.js)
+export const services = { session: sessionManager, users: userApi, createWalletSync };

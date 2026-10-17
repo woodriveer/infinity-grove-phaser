@@ -1,20 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MainMenu } from './MainMenu';
-import { sessionManager, userApi } from '../composition';
 
 vi.mock('phaser', () => ({
     Scene: class { constructor (key) { this.key = key; } }
 }));
 
-vi.mock('../composition', () => ({
-    userApi: { login: vi.fn(), signUp: vi.fn() },
-    sessionManager: { restore: vi.fn(), start: vi.fn(), logout: vi.fn() }
-}));
+const userApi = { login: vi.fn(), signUp: vi.fn() };
+const sessionManager = { restore: vi.fn(), start: vi.fn(), logout: vi.fn() };
 
 const flush = () => new Promise((resolve) => setTimeout(resolve));
 
 //  Minimal Phaser stand-in: only what MainMenu touches. The form HTML is real DOM (jsdom).
-const createScene = (registryData = {}) => {
+const createScene = (data = {}) => {
+    const registryData = { ...data, services: { session: sessionManager, users: userApi } };
     const doms = [];
     const form = { destroy: vi.fn() };
     const logo = { width: 2760, setScale: vi.fn() };

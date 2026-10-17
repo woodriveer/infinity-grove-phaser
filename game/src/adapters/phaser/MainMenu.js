@@ -1,5 +1,4 @@
 import { Scene } from 'phaser';
-import { sessionManager, userApi } from '../composition';
 
 const FORM_HTML = `
     <div class="auth-form">
@@ -32,6 +31,8 @@ export class MainMenu extends Scene
 
     create ()
     {
+        ({ session: this.session, users: this.users } = this.registry.get('services'));
+
         this.add.image(512, 384, 'background');
 
         //  Source art is 2760 px wide; start above the canvas, rest at y = 150
@@ -66,7 +67,7 @@ export class MainMenu extends Scene
     {
         this.showMessage('...');
 
-        const result = await sessionManager.restore();
+        const result = await this.session.restore();
 
         //  Scene may have been left while the restore was in flight
         if (!this.sys.isActive()) { return; }
@@ -108,7 +109,7 @@ export class MainMenu extends Scene
                 //  Scene may have been left while the request was in flight
                 if (!this.sys.isActive()) { return; }
 
-                sessionManager.start(response);
+                this.session.start(response);
                 this.registry.set('user', response.user);
                 this.showMessage(successMessage(response.user));
                 form.destroy();
@@ -123,8 +124,8 @@ export class MainMenu extends Scene
             }
         };
 
-        buttons[0].addEventListener('click', () => submit(userApi.login, (u) => `Welcome back, ${u.username}!`));
-        buttons[1].addEventListener('click', () => submit(userApi.signUp, (u) => `Account created, ${u.username}!`));
+        buttons[0].addEventListener('click', () => submit(this.users.login, (u) => `Welcome back, ${u.username}!`));
+        buttons[1].addEventListener('click', () => submit(this.users.signUp, (u) => `Account created, ${u.username}!`));
 
         //  Enter in either field logs in (click() is a no-op while the button is disabled)
         [ username, password ].forEach((input) => {
@@ -163,7 +164,7 @@ export class MainMenu extends Scene
             this.input.off('pointerdown', start);
 
             //  logout() clears the local session even when the server call fails
-            await sessionManager.logout().catch(() => {});
+            await this.session.logout().catch(() => {});
 
             if (!this.sys.isActive()) { return; }
 

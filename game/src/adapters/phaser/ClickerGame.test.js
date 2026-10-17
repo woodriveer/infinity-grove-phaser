@@ -1,18 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClickerGame } from './ClickerGame';
-import { walletApi } from '../composition';
+import { createWalletSync } from '../../application/wallet/walletSync';
 
 vi.mock('phaser', () => ({
     Scene: class { constructor (key) { this.key = key; } }
 }));
 
 //  The real wallet service over a mocked backend gateway: these scene tests cover scene and service together
-vi.mock('../composition', async () => {
-    const { createWalletSync } = await import('../application/wallet/walletSync');
-    const walletApi = { get: vi.fn(), sync: vi.fn() };
-
-    return { walletApi, createWalletSync: () => createWalletSync({ gateway: walletApi }) };
-});
+const walletApi = { get: vi.fn(), sync: vi.fn() };
+const services = { createWalletSync: () => createWalletSync({ gateway: walletApi }) };
 
 const flush = () => new Promise((resolve) => setTimeout(resolve));
 
@@ -80,6 +76,7 @@ const createScene = ({ wallet } = {}) => {
             return element;
         })
     };
+    scene.registry = { get: vi.fn(() => services) };
     scene.sys = { isActive: vi.fn(() => true) };
     scene.tweens = { add: vi.fn((config) => { tweens.push(config); }) };
     scene.time = {

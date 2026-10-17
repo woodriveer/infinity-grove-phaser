@@ -1,8 +1,9 @@
-import { Boot } from './scenes/Boot';
-import { ClickerGame } from './scenes/ClickerGame';
+import { Boot } from './adapters/phaser/Boot';
+import { ClickerGame } from './adapters/phaser/ClickerGame';
 import { Game } from 'phaser';
-import { MainMenu } from './scenes/MainMenu';
-import { Preloader } from './scenes/Preloader';
+import { MainMenu } from './adapters/phaser/MainMenu';
+import { Preloader } from './adapters/phaser/Preloader';
+import { services } from './composition';
 import * as Phaser from 'phaser';
 
 //  Find out more information about the Game Config at: https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
@@ -24,6 +25,10 @@ const config = {
         arcade: {
             gravity: { y: 400 }
         }
+    },
+    callbacks: {
+        //  Scenes get their services from the registry; they import no adapter or composition code (ADR 0007)
+        preBoot: (game) => game.registry.set('services', services)
     },
     scene: [
         Boot,
