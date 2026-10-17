@@ -41,3 +41,22 @@ class InvalidKillsException(
 class UnknownLevelException(
     level: String,
 ) : WalletRequestException("WALLET_UNKNOWN_LEVEL", "Monster level '$level' is unknown")
+
+/** Base type for a progress request the client built wrongly. */
+open class ProgressRequestException(
+    code: String,
+    message: String,
+) : BusinessException(code, message)
+
+class InvalidOutcomeException(
+    reason: String,
+) : ProgressRequestException("PROGRESS_INVALID_OUTCOME", "Outcome is invalid: $reason")
+
+/** The reported position is not the stored one (or the report is not allowed there); [current] is the stored progress. */
+class ProgressConflictException(
+    val current: ProgressView,
+) : BusinessException("PROGRESS_CONFLICT", "Reported position does not match the stored progress")
+
+class ChapterNotFoundException(
+    chapter: Int,
+) : BusinessException("CHAPTER_NOT_FOUND", "Chapter '$chapter' not found")

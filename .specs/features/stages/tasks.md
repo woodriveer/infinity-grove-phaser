@@ -115,14 +115,15 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] `start` is chapter 1, stage 1, `PHASE`, phase 1, not completed
-- [ ] Every row of the transition table in design.md is a test; `phase` is 1 outside `PHASE`
-- [ ] A different reported position, `FAILED` on `PHASE`, and any report once completed throw `ProgressConflictException` carrying the unchanged stored progress
-- [ ] Gate passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] `start` is chapter 1, stage 1, `PHASE`, phase 1, not completed
+- [x] Every row of the transition table in design.md is a test; `phase` is 1 outside `PHASE`
+- [x] A different reported position, `FAILED` on `PHASE`, and any report once completed throw `ProgressConflictException` carrying the unchanged stored progress
+- [x] Gate passes: `./gradlew ktlintCheck test --tests "*Test"`
 
 **Tests**: unit
 **Gate**: quick
 
+**Status**: Done
 **Commit**: `feat(stages): add progress state machine`
 
 ---
