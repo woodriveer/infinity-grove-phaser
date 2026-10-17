@@ -1,12 +1,12 @@
 //  Builds the game and publishes it to Cloudflare Workers (free *.workers.dev address).
-//  Usage: BACKEND_URL=https://<tunnel>.trycloudflare.com/api npm run deploy
+//  Usage: BACKEND_URL=https://<tunnel>.trycloudflare.com npm run deploy
 import { spawnSync } from 'node:child_process';
 
 const backendUrl = process.env.BACKEND_URL;
 
 if (!backendUrl)
 {
-    console.error('Set BACKEND_URL to the backend base the Worker should proxy /api to, e.g. https://<tunnel>.trycloudflare.com/api');
+    console.error('Set BACKEND_URL to the backend base the Worker should proxy /api to, e.g. https://<tunnel>.trycloudflare.com');
     process.exit(1);
 }
 

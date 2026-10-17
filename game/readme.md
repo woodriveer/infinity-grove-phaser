@@ -26,7 +26,7 @@ One-time setup:
 
 1. ngrok dashboard: claim the free static domain (Universal Gateway > Domains), e.g. `your-name.ngrok-free.app`.
 2. GitHub repository secrets:
-   - `BACKEND_URL`: `https://your-name.ngrok-free.app/api`
+   - `BACKEND_URL`: `https://your-name.ngrok-free.app` (no `/api`; the Worker strips it)
    - `CLOUDFLARE_API_TOKEN`: token with the "Edit Cloudflare Workers" template
    - `CLOUDFLARE_ACCOUNT_ID`: shown in the Cloudflare dashboard
 
@@ -34,7 +34,7 @@ Whenever you want the site to work, run the backend and the tunnel:
 
 ```
 ./start.sh                                   # postgres + backend (+ local dev server)
-ngrok http --url=your-name.ngrok-free.app 8080
+ngrok http --domain=your-name.ngrok-free.app 8080
 ```
 
-Manual deploy: `BACKEND_URL=https://your-name.ngrok-free.app/api npm run deploy`.
+Manual deploy: `BACKEND_URL=https://your-name.ngrok-free.app npm run deploy`.
