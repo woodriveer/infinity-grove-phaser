@@ -17,3 +17,10 @@ spring:
 app:
   security:
     jwt-secret: ${JWT_SECRET}
+  wallet:
+    # one entry per monster level: copper per kill (min..max) and the fastest honest time between kills
+    drop-table:
+      - level: 1
+        min-copper: 1
+        max-copper: 5
+        kill-interval-ms: 1500

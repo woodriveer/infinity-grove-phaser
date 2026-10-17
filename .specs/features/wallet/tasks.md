@@ -466,8 +466,8 @@ T14 → T15 → T16 → T17
 
 **Done when**:
 
-- [ ] The table is in the YAML and the context still starts
-- [ ] Gate check passes: `./gradlew build`
+- [x] The table is in the YAML and the context still starts
+- [x] Gate check passes: `./gradlew build`
 
 **Tests**: none
 **Gate**: build
