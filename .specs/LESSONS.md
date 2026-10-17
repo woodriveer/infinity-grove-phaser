@@ -56,6 +56,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: WAL-23 (spec)
 - last seen: 2026-10-17T16:57:26Z
 
+### L-008 - Scope Playwright route globs to the API path so they cannot match the dev server's module URLs under src/api
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `game-e2e` · harmful: 0
+- features: drops
+- evidence: T8 npm run test:e2e (game-e2e)
+- last seen: 2026-10-17T17:20:35Z
+
+### L-009 - State behavior that exists only in the design, such as click-through DOM overlays, as an acceptance criterion so a test anchors to it
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: drops
+- evidence: G2 click-through wallet text (spec)
+- last seen: 2026-10-17T17:20:35Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

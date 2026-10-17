@@ -20,11 +20,11 @@
 
 ## Handoff
 
-- **Feature**: .specs/features/persistent-session
-- **Phase / Task**: Done - T1-T27 committed, Verifier PASS (`validation.md`)
-- **Completed**: T1-T27
+- **Feature**: .specs/features/wallet and .specs/features/drops
+- **Phase / Task**: Done - wallet T1-T17 and drops T1-T10 committed, both Verifier-style reports PASS (`validation.md`)
+- **Completed**: wallet T1-T17, drops T1-T10
 - **In-progress** (file:line): none
-- **Next step**: Open gap G-3 (401-after-refresh from an in-game protected call) when the first such call is added; commit the staged baseline before merging
+- **Next step**: Run the backend (port 8080, `JWT_SECRET` set) and `npm run dev` together once by hand to see the real queue and sync; open gap G-3 of persistent-session (401-after-refresh from an in-game call) now applies to `GET /wallet` and `POST /wallet/sync`
 - **Blockers**: none
-- **Uncommitted files**: .specs/LESSONS.md, .specs/lessons.json (candidate lessons, left out on purpose)
+- **Uncommitted files**: none
 - **Branch**: main

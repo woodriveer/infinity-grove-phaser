@@ -113,24 +113,24 @@ Supersedes the `clicker-combat` criteria "no coins or score" (goal and the scene
 
 | Requirement ID | Story                      | Phase | Status  |
 | -------------- | -------------------------- | ----- | ------- |
-| DROP-01        | P1: Coins drop and fly     | -     | Pending |
-| DROP-02        | P1: Coins drop and fly     | -     | Pending |
-| DROP-03        | P1: Coins drop and fly     | -     | Pending |
-| DROP-04        | P1: Coins drop and fly     | -     | Pending |
-| DROP-05        | P1: Coins drop and fly     | -     | Pending |
-| DROP-06        | P1: Coins drop and fly     | -     | Pending |
-| DROP-07        | P1: Coins drop and fly     | -     | Pending |
-| DROP-08        | P1: Coins drop and fly     | -     | Pending |
-| DROP-09        | P1: Coins drop and fly     | -     | Pending |
-| DROP-10        | P1: Kills sync             | -     | Pending |
-| DROP-11        | P1: Kills sync             | -     | Pending |
-| DROP-12        | P1: Kills sync             | -     | Pending |
-| DROP-13        | P1: Kills sync             | -     | Pending |
-| DROP-14        | P1: Kills sync             | -     | Pending |
-| DROP-15        | P1: Kills sync             | -     | Pending |
-| DROP-16        | P1: Kills sync             | -     | Pending |
+| DROP-01        | P1: Coins drop and fly     | -     | Verified |
+| DROP-02        | P1: Coins drop and fly     | -     | Verified |
+| DROP-03        | P1: Coins drop and fly     | -     | Verified |
+| DROP-04        | P1: Coins drop and fly     | -     | Verified |
+| DROP-05        | P1: Coins drop and fly     | -     | Verified |
+| DROP-06        | P1: Coins drop and fly     | -     | Verified |
+| DROP-07        | P1: Coins drop and fly     | -     | Verified |
+| DROP-08        | P1: Coins drop and fly     | -     | Verified |
+| DROP-09        | P1: Coins drop and fly     | -     | Verified |
+| DROP-10        | P1: Kills sync             | -     | Verified |
+| DROP-11        | P1: Kills sync             | -     | Verified |
+| DROP-12        | P1: Kills sync             | -     | Verified |
+| DROP-13        | P1: Kills sync             | -     | Verified |
+| DROP-14        | P1: Kills sync             | -     | Verified |
+| DROP-15        | P1: Kills sync             | -     | Verified |
+| DROP-16        | P1: Kills sync             | -     | Verified |
 
-**Coverage:** 16 total, 0 mapped to tasks, 16 unmapped ⚠️
+**Coverage:** 16 total, 16 verified
 
 ---
 

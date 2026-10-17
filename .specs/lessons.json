@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 8,
+  "next_id": 10,
   "lessons": [
     {
       "id": "L-001",
@@ -130,6 +130,42 @@
       ],
       "created": "2026-10-17T16:57:26Z",
       "last_seen": "2026-10-17T16:57:26Z"
+    },
+    {
+      "id": "L-008",
+      "key": "gate_fail::scope playwright route globs to the api path so they cannot match the dev server s module urls under src api",
+      "text": "Scope Playwright route globs to the API path so they cannot match the dev server's module URLs under src/api",
+      "signal": "gate_fail",
+      "scope": "game-e2e",
+      "status": "candidate",
+      "features": [
+        "drops"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "T8 npm run test:e2e (game-e2e)"
+      ],
+      "created": "2026-10-17T17:20:35Z",
+      "last_seen": "2026-10-17T17:20:35Z"
+    },
+    {
+      "id": "L-009",
+      "key": "spec_precision_gap::state behavior that exists only in the design such as click through dom overlays as an acceptance criterion so a test anchors to it",
+      "text": "State behavior that exists only in the design, such as click-through DOM overlays, as an acceptance criterion so a test anchors to it",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "drops"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "G2 click-through wallet text (spec)"
+      ],
+      "created": "2026-10-17T17:20:35Z",
+      "last_seen": "2026-10-17T17:20:35Z"
     }
   ]
 }
