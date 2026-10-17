@@ -671,14 +671,15 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] Five kills show `Stage 1/10  Phase 1/5` to `Phase 5/5`, then the miniboss with a countdown
-- [ ] Letting the countdown expire returns to `Phase 5/5`; killing the miniboss in time shows `Stage 2/10  Phase 1/5`
-- [ ] After a reload the stored position is shown again
-- [ ] Gate passes: `npm test && npm run test:e2e`
+- [x] Five kills show `Stage 1/10  Phase 1/5` to `Phase 5/5`, then the miniboss with a countdown
+- [x] Letting the countdown expire returns to `Phase 5/5`; killing the miniboss in time shows `Stage 2/10  Phase 1/5`
+- [x] After a reload the stored position is shown again
+- [x] Gate passes: `npm test && npm run test:e2e`
 
 **Tests**: e2e
 **Gate**: full
 
+**Status**: Done
 **Commit**: `test(stages): cover phases, a failed boss and reload end to end`
 
 ---
