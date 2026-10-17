@@ -136,6 +136,7 @@ Players earn coins from monsters, but nothing stores them: the game has no curre
 ## Edge Cases
 
 - WHEN a player syncs after a long idle period THEN the backend SHALL accept at most 20 kills per level, because the allowance and the queue are both capped at 20.
+- IF the access token is valid but its user no longer exists THEN the backend SHALL respond 404 with code `USER_NOT_FOUND` on `GET /wallet` and `POST /wallet/sync` and create no wallet.
 - WHEN a sync arrives with 20 kills for a level whose allowance and queue are full THEN the backend SHALL credit all 20 and respond with a fresh queue of 20.
 
 ---
