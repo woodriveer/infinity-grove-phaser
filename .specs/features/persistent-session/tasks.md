@@ -324,15 +324,16 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `generate` returns 43-char Base64URL strings that differ between calls
-- [ ] `hash` is deterministic, 64 hex chars, and differs from the input
-- [ ] Gate passes: `cd backend && ./gradlew ktlintCheck test`
-- [ ] Test count: previous + new tests, none deleted
+- [x] `generate` returns 43-char Base64URL strings that differ between calls
+- [x] `hash` is deterministic, 64 hex chars, and differs from the input
+- [x] Gate passes: `cd backend && ./gradlew ktlintCheck test`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(auth): add SHA-256 refresh token secrets adapter`
+**Status**: ✅ Complete
 
 ---
 
