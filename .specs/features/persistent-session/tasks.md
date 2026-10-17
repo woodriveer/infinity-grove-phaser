@@ -783,20 +783,21 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] After login and reload, the welcome shows with no form and no `/users/login` call; `localStorage` holds the session
-- [ ] With the stored access expiry set to the past, reload shows the welcome after exactly one `/auth/refresh` call and tokens in storage change
-- [ ] A rejected refresh (401) removes the storage entry and shows the form
-- [ ] With the server down on reload, storage is kept, the form shows with "Cannot reach the server. Try again later."
-- [ ] Corrupt stored JSON is removed and the form shows
-- [ ] Logout removes the storage entry, sends one `/auth/logout`, shows the form, and does not start `ClickerGame`; reload then shows the form
-- [ ] The logo `displayWidth` is 400 via `window.__PHASER_GAME__`
-- [ ] Gate passes: `cd game && npm test && npm run test:e2e`
-- [ ] Test count: previous + 7 new scenarios, none deleted
+- [x] After login and reload, the welcome shows with no form and no `/users/login` call; `localStorage` holds the session
+- [x] With the stored access expiry set to the past, reload shows the welcome after exactly one `/auth/refresh` call and tokens in storage change
+- [x] A rejected refresh (401) removes the storage entry and shows the form
+- [x] With the server down on reload, storage is kept, the form shows with "Cannot reach the server. Try again later."
+- [x] Corrupt stored JSON is removed and the form shows
+- [x] Logout removes the storage entry, sends one `/auth/logout`, shows the form, and does not start `ClickerGame`; reload then shows the form
+- [x] The logo `displayWidth` is 400 via `window.__PHASER_GAME__`
+- [x] Gate passes: `cd game && npm test && npm run test:e2e`
+- [x] Test count: previous + 7 new scenarios, none deleted
 
 **Tests**: e2e
 **Gate**: full
 
 **Commit**: `test(game): add persistent session e2e scenarios`
+**Status**: ✅ Complete
 
 ---
 
