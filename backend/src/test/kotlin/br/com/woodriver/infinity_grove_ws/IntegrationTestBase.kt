@@ -1,5 +1,6 @@
 package br.com.woodriver.infinity_grove_ws
 
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaRefreshTokenRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaUserRepository
 import io.restassured.RestAssured
 import org.junit.jupiter.api.BeforeEach
@@ -33,10 +34,14 @@ abstract class IntegrationTestBase {
     @Autowired
     protected lateinit var jpaUserRepository: JpaUserRepository
 
+    @Autowired
+    protected lateinit var jpaRefreshTokenRepository: JpaRefreshTokenRepository
+
     @BeforeEach
     fun setUpRestAssured() {
         RestAssured.port = port
         RestAssured.basePath = ""
+        jpaRefreshTokenRepository.deleteAll()
         jpaUserRepository.deleteAll()
     }
 }

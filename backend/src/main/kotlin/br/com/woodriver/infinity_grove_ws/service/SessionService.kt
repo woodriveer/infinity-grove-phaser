@@ -12,10 +12,12 @@ import br.com.woodriver.infinity_grove_ws.usecase.EndSessionUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.RefreshSessionUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.StartSessionUseCase
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 
-// TODO(persistent-session T12): add @Service and @Transactional once the T8/T9/T11 adapters provide the ports as beans.
-// They are withheld in T5 because Spring context startup (integration tests) fails while the ports have no implementation.
+@Service
+@Transactional
 class SessionService(
     private val userRepository: UserRepositoryPort,
     private val refreshTokenRepository: RefreshTokenRepositoryPort,

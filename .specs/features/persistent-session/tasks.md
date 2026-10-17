@@ -379,18 +379,19 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `save` then `findByHash` returns the token; unknown hash returns null
-- [ ] `revokeAllByUsername` sets `revoked` only on that user's tokens
-- [ ] `deleteAllByUsername` removes only that user's tokens
-- [ ] `RefreshTokenRepositoryIT` covers each bullet; table is cleaned before each test
-- [ ] `@Service` and `@Transactional` are restored on `SessionService` (removed in T5 so the context loads before its adapters exist) and the TODO comment is removed; the application context loads
-- [ ] Gate passes: `cd backend && ./gradlew ktlintCheck test` (Docker running)
-- [ ] Test count: previous + new tests, none deleted
+- [x] `save` then `findByHash` returns the token; unknown hash returns null
+- [x] `revokeAllByUsername` sets `revoked` only on that user's tokens
+- [x] `deleteAllByUsername` removes only that user's tokens
+- [x] `RefreshTokenRepositoryIT` covers each bullet; table is cleaned before each test
+- [x] `@Service` and `@Transactional` are restored on `SessionService` (removed in T5 so the context loads before its adapters exist) and the TODO comment is removed; the application context loads
+- [x] Gate passes: `cd backend && ./gradlew ktlintCheck test` (Docker running)
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: integration
 **Gate**: full
 
 **Commit**: `feat(auth): add refresh token repository`
+**Status**: ✅ Complete
 
 ---
 
