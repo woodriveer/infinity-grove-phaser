@@ -33,10 +33,10 @@ export class ClickerGame extends Scene
         this.damageTextY = barY - 8;
 
         //  Any click on the canvas hits the monster, not only a click on the monster itself
-        this.input.on('pointerdown', () => this.hitMonster());
+        this.input.on('pointerdown', (pointer) => this.hitMonster(pointer));
     }
 
-    hitMonster ()
+    hitMonster (pointer)
     {
         if (!this.monster.hit())
         {
@@ -44,7 +44,7 @@ export class ClickerGame extends Scene
         }
 
         this.updateHealthBar();
-        this.showDamage(DAMAGE_PER_CLICK);
+        this.showDamage(DAMAGE_PER_CLICK, this.damageTextX(pointer));
 
         if (this.monster.dead)
         {
@@ -74,11 +74,19 @@ export class ClickerGame extends Scene
         this.monsterParts.forEach((part) => part.setAlpha(1));
     }
 
-    showDamage (damage)
+    //  A click on the monster shows the number where it landed; any other click centres it on the monster
+    damageTextX (pointer)
+    {
+        const onMonster = Math.abs(pointer.x - MONSTER.x) <= MONSTER.width / 2 && Math.abs(pointer.y - MONSTER.y) <= MONSTER.height / 2;
+
+        return onMonster ? pointer.x : MONSTER.x;
+    }
+
+    showDamage (damage, x)
     {
         const textStyle = { fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff', stroke: '#000000', strokeThickness: 8 };
 
-        const text = this.add.text(MONSTER.x, this.damageTextY, String(damage), textStyle).setOrigin(0.5, 1).setDepth(1);
+        const text = this.add.text(x, this.damageTextY, String(damage), textStyle).setOrigin(0.5, 1).setDepth(1);
 
         this.tweens.add({
             targets: text,

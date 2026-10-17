@@ -41,7 +41,8 @@ const createScene = () => {
 
     scene.create();
 
-    const click = () => handlers.pointerdown();
+    //  Default pointer is off the monster
+    const click = (pointer = { x: 100, y: 100 }) => handlers.pointerdown(pointer);
     const byColor = (color) => rectangles.filter((r) => r.color === color);
     const monster = byColor(0xcc2222)[0];
     const fill = byColor(0x33cc33)[0];
@@ -218,5 +219,39 @@ describe('ClickerGame monster death', () => {
         expect(ctx.scene.monster.health).toBe(9);
         expect(ctx.fill.width).toBe(108);
         expect(ctx.texts).toHaveLength(11);
+    });
+});
+
+describe('ClickerGame damage number position', () => {
+    it('shows the number at the pointer x when the click lands on the monster', () => {
+        const { texts, click } = createScene();
+
+        click({ x: 650, y: 450 });
+
+        expect(texts[0].x).toBe(650);
+    });
+
+    it('keeps the number at the usual height when it follows the pointer', () => {
+        const { texts, click } = createScene();
+        click();
+        click({ x: 650, y: 450 });
+
+        expect(texts[1].y).toBe(texts[0].y);
+    });
+
+    it('centres the number on the monster when the click is off the monster', () => {
+        const { texts, monster, click } = createScene();
+
+        click({ x: 100, y: 100 });
+
+        expect(texts[0].x).toBe(monster.x);
+    });
+
+    it('centres the number when the click is above the monster even if x is within its width', () => {
+        const { texts, monster, click } = createScene();
+
+        click({ x: 650, y: 100 });
+
+        expect(texts[0].x).toBe(monster.x);
     });
 });
