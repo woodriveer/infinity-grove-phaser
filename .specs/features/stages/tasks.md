@@ -555,15 +555,16 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] A position change queues one report with the position it left; `flush` sends them in order with one request in flight
-- [ ] A network error keeps the report at the head and a later `flush` resends it
-- [ ] A 409 drops the queue, replaces the campaign with the body's progress and calls `onRealign`
-- [ ] `load` failure rejects without state; `flushOnExit` sends once, in order, without retry
-- [ ] Gate passes: `npm test`
+- [x] A position change queues one report with the position it left; `flush` sends them in order with one request in flight
+- [x] A network error keeps the report at the head and a later `flush` resends it
+- [x] A 409 drops the queue, replaces the campaign with the body's progress and calls `onRealign`
+- [x] `load` failure rejects without state; `flushOnExit` sends once, in order, without retry
+- [x] Gate passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick
 
+**Status**: Done
 **Commit**: `feat(stages): add campaign session with ordered outcome reports`
 
 ---

@@ -20,6 +20,13 @@ describe('ApiError.from', () => {
             .toBe('Request failed (502)');
     });
 
+    it('keeps the response body, which a 409 uses to carry the stored progress', () => {
+        const data = { detail: 'Reported position does not match', code: 'PROGRESS_CONFLICT', progress: { stage: 2 } };
+
+        expect(ApiError.from({ response: { status: 409, data } }).body).toEqual(data);
+        expect(ApiError.from({ request: {}, message: 'Network Error' }).body).toBeNull();
+    });
+
     it('has no code when the backend sends none', () => {
         expect(ApiError.from({ response: { status: 400, data: { detail: 'Bad request' } } }).code).toBeNull();
     });
