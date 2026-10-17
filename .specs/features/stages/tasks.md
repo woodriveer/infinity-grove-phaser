@@ -598,7 +598,7 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 ### T20: Stage flow in the scene
 
-**What**: `ClickerGame` loads the campaign, spawns the encounter with its health, shows the HUD, advances on kills, runs the boss countdown, handles boss failure and completion; drops unchanged.
+**What**: `ClickerGame` loads the campaign, spawns the encounter with its health, shows the HUD, advances on kills, runs the boss countdown, handles boss failure, completion and a failed load; drops unchanged. The e2e fake backend serves `/progress` in the same commit so the existing scenarios keep passing.
 **Where**: `game/src/adapters/phaser/ClickerGame.js`
 **Depends on**: T19
 **Reuses**: existing death fade and respawn, `domain/combat/monster.js`, `BossCountdown`
@@ -611,16 +611,18 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] Loaded progress spawns the monster with the definition's health and shows the label
-- [ ] Killing a phase monster respawns the next encounter after the 500 ms fade and 1 000 ms delay
-- [ ] A boss shows a whole-second countdown; killing it in time moves on; reaching 0 removes it and spawns phase 5 of the same stage
-- [ ] The chapter boss dying shows the completion message, spawns nothing and ignores clicks
-- [ ] Every kill, bosses included, still takes its level 1 drop
-- [ ] Gate passes: `npm test`
+- [x] Loaded progress spawns the monster with the definition's health and shows the label
+- [x] Killing a phase monster respawns the next encounter after the 500 ms fade and 1 000 ms delay
+- [x] A boss shows a whole-second countdown; killing it in time moves on; reaching 0 removes it and spawns phase 5 of the same stage
+- [x] The chapter boss dying shows the completion message, spawns nothing and ignores clicks
+- [x] Every kill, bosses included, still takes its level 1 drop
+- [x] A failed load shows "Could not load progress" and spawns nothing
+- [x] Gate passes: `npm test && npm run test:e2e`
 
 **Tests**: unit
-**Gate**: quick
+**Gate**: full
 
+**Status**: Done
 **Commit**: `feat(stages): play phases, minibosses and the chapter boss`
 
 ---
@@ -640,7 +642,7 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] A load failure shows the message, spawns no monster, and a later tick that succeeds spawns it
+- [ ] After a failed load (message shown in T20), a later tick that succeeds spawns the monster and clears the message
 - [ ] A phase advance results in a report at the next tick; a failed report is resent at the following tick
 - [ ] A realign respawns the encounter of the returned progress
 - [ ] Shutdown with queued reports sends one best-effort flush
@@ -655,7 +657,7 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 ### T22: End-to-end stages scenario
 
-**What**: `fakeBackend.js` serves `/progress` with the server table; `e2e/stages.spec.js` plays phases, fails a boss, reloads; existing e2e specs keep passing.
+**What**: `e2e/stages.spec.js` plays phases, fails a boss, reloads, against the `/progress` fake backend added in T20.
 **Where**: `game/e2e/stages.spec.js`
 **Depends on**: T21
 **Reuses**: `e2e/support/fakeBackend.js`, `e2e/drops.spec.js` helpers

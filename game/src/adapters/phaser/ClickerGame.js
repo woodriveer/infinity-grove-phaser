@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { BossCountdown } from '../../domain/campaign/bossCountdown';
 import { DAMAGE_PER_CLICK, Monster } from '../../domain/combat/monster';
 
 const CHARACTER = { x: 300, y: 500, size: 100, color: 0x000000 };
@@ -10,6 +11,14 @@ const WALLET = { x: 180, y: 32 };
 const COIN = { duration: 600, stagger: 100 };
 const WALLET_SYNC_MS = 10000;
 const WALLET_HTML = '<div class="wallet"></div>';
+const STAGE_HUD = { x: 512, y: 32 };
+const BOSS_TIMER = { x: 512, y: 72 };
+const STAGE_MESSAGE = { x: 512, y: 384 };
+const STAGE_HUD_HTML = '<div class="stage-hud"></div>';
+const BOSS_TIMER_HTML = '<div class="boss-timer"></div>';
+const STAGE_MESSAGE_HTML = '<div class="stage-message"></div>';
+const LOAD_FAILED_TEXT = 'Could not load progress';
+const COMPLETED_TEXT = 'Chapter complete!';
 
 export class ClickerGame extends Scene
 {
@@ -20,8 +29,12 @@ export class ClickerGame extends Scene
 
     create ()
     {
-        this.monster = new Monster();
-        this.wallet = this.registry.get('services').createWalletSync();
+        const services = this.registry.get('services');
+
+        this.wallet = services.createWalletSync();
+        this.session = services.createCampaignSession();
+        this.monster = null;
+        this.countdown = null;
 
         this.add.image(512, 384, 'background');
 
@@ -35,6 +48,7 @@ export class ClickerGame extends Scene
         const back = this.add.rectangle(barX, barY, HEALTH_BAR.width, HEALTH_BAR.height, HEALTH_BAR.backColor).setOrigin(0, 0);
         this.healthFill = this.add.rectangle(barX, barY, HEALTH_BAR.width, HEALTH_BAR.height, HEALTH_BAR.fillColor).setOrigin(0, 0);
         this.monsterParts = [ body, back, this.healthFill ];
+        this.monsterParts.forEach((part) => part.setAlpha(0));
         this.damageTextY = barY - 8;
 
         //  Any click on the canvas hits the monster, not only a click on the monster itself
@@ -45,9 +59,121 @@ export class ClickerGame extends Scene
         this.walletText.pointerEvents = 'none';
         this.loadWallet();
 
+        //  Stage position, boss countdown and messages are real HTML too, click-through like the wallet text
+        this.stageHud = this.createHtml(STAGE_HUD, STAGE_HUD_HTML, '.stage-hud');
+        this.bossTimer = this.createHtml(BOSS_TIMER, BOSS_TIMER_HTML, '.boss-timer');
+        this.stageMessage = this.createHtml(STAGE_MESSAGE, STAGE_MESSAGE_HTML, '.stage-message');
+        this.loadCampaign();
+
         //  Kills reach the backend in batches, never one request per kill
         this.time.addEvent({ delay: WALLET_SYNC_MS, loop: true, callback: () => this.tick() });
         this.events.once('shutdown', () => this.syncOnExit());
+    }
+
+    //  A click-through HTML element; returns the node that holds the text
+    createHtml ({ x, y }, html, selector)
+    {
+        const element = this.add.dom(x, y).createFromHTML(html);
+
+        element.pointerEvents = 'none';
+
+        return element.node.querySelector(selector);
+    }
+
+    //  The first encounter comes from the backend; until it does, nothing spawns
+    async loadCampaign ()
+    {
+        let encounter;
+
+        try
+        {
+            encounter = await this.session.load();
+        }
+        catch
+        {
+            if (this.sys.isActive())
+            {
+                this.stageMessage.textContent = LOAD_FAILED_TEXT;
+            }
+
+            return;
+        }
+
+        if (!this.sys.isActive())
+        {
+            return;
+        }
+
+        this.stageMessage.textContent = '';
+        this.showEncounter(encounter);
+    }
+
+    //  Spawns the encounter, or ends the game when there is none left
+    showEncounter (encounter)
+    {
+        if (!encounter)
+        {
+            this.completeChapter();
+            return;
+        }
+
+        this.monster = new Monster(encounter.health);
+        this.updateHealthBar();
+        this.monsterParts.forEach((part) => part.setAlpha(1));
+        this.stageHud.textContent = encounter.label;
+
+        if (encounter.timeLimitMs)
+        {
+            this.countdown = new BossCountdown(encounter.timeLimitMs);
+            this.showCountdown();
+        }
+    }
+
+    completeChapter ()
+    {
+        this.monster = null;
+        this.monsterParts.forEach((part) => part.setAlpha(0));
+        this.stageHud.textContent = '';
+        this.stageMessage.textContent = COMPLETED_TEXT;
+    }
+
+    showCountdown ()
+    {
+        this.bossTimer.textContent = `Time: ${this.countdown.seconds}`;
+    }
+
+    hideCountdown ()
+    {
+        this.countdown = null;
+        this.bossTimer.textContent = '';
+    }
+
+    update (time, delta)
+    {
+        if (!this.countdown)
+        {
+            return;
+        }
+
+        this.countdown.advance(delta);
+        this.showCountdown();
+
+        if (this.countdown.expired)
+        {
+            this.bossTimedOut();
+        }
+    }
+
+    //  The boss survived its time limit: it leaves, and the stage's last phase comes back after the respawn delay
+    bossTimedOut ()
+    {
+        this.hideCountdown();
+        this.monster = null;
+        this.monsterParts.forEach((part) => part.setAlpha(0));
+
+        const next = this.session.fail();
+
+        this.time.delayedCall(DEATH.respawnDelay, () => this.showEncounter(next));
     }
 
     //  Kills reach the backend in batches; the wallet service decides what each tick does
@@ -93,7 +219,7 @@ export class ClickerGame extends Scene
 
     hitMonster (pointer)
     {
-        if (!this.monster.hit())
+        if (!this.monster || !this.monster.hit())
         {
             return;
         }
@@ -103,8 +229,9 @@ export class ClickerGame extends Scene
 
         if (this.monster.dead)
         {
-            this.fadeOutMonster();
             this.dropCoins();
+            this.hideCountdown();
+            this.fadeOutMonster(this.session.clear());
         }
     }
 
@@ -143,21 +270,15 @@ export class ClickerGame extends Scene
         this.healthFill.setSize(HEALTH_BAR.width * this.monster.health / this.monster.maxHealth, HEALTH_BAR.height);
     }
 
-    fadeOutMonster ()
+    //  The monster fades; `next` is the encounter that follows it (null when the chapter is over)
+    fadeOutMonster (next)
     {
         this.tweens.add({
             targets: this.monsterParts,
             alpha: 0,
             duration: DEATH.fadeDuration,
-            onComplete: () => this.time.delayedCall(DEATH.respawnDelay, () => this.respawnMonster())
+            onComplete: () => this.time.delayedCall(DEATH.respawnDelay, () => this.showEncounter(next))
         });
-    }
-
-    respawnMonster ()
-    {
-        this.monster.respawn();
-        this.updateHealthBar();
-        this.monsterParts.forEach((part) => part.setAlpha(1));
     }
 
     //  A click on the monster shows the number where it landed; any other click centres it on the monster

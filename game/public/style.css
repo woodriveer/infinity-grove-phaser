@@ -92,3 +92,25 @@ body {
     white-space: pre;
     text-shadow: 0 0 4px #000000, 0 0 4px #000000;
 }
+
+.stage-hud,
+.boss-timer,
+.stage-message {
+    font-family: 'Arial Black', sans-serif;
+    color: #ffffff;
+    white-space: pre;
+    text-align: center;
+    text-shadow: 0 0 4px #000000, 0 0 4px #000000;
+}
+
+.stage-hud {
+    font-size: 22px;
+}
+
+.boss-timer {
+    font-size: 30px;
+}
+
+.stage-message {
+    font-size: 40px;
+}

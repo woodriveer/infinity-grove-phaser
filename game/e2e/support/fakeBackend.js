@@ -19,13 +19,51 @@ const DEFAULT_DROPS = [ 3, 1, 5, 2, 4 ];
 
 const coins = (copper) => ({ gold: Math.floor(copper / 10_000), silver: Math.floor(copper / 100) % 100, copper: copper % 100 });
 
+//  Progress contract (ProgressController): chapter 1 as seeded by the backend, the transition table of Progress.kt,
+//  and a 409 carrying the stored progress when a report does not start from the stored position.
+const seededDefinition = () => ({
+    bossHealth: 300,
+    bossTimeLimitMs: 60_000,
+    stages: Array.from({ length: 10 }, (_, i) => ({
+        number: i + 1, phasesPerStage: 5, monsterHealth: 10 + i, minibossHealth: 5 * (10 + i), minibossTimeLimitMs: 30_000
+    }))
+});
+
+const startOfCampaign = () => ({ stage: 1, encounter: 'PHASE', phase: 1, completed: false });
+
+//  The position after an outcome, or null when the outcome does not apply (a conflict)
+const afterOutcome = (progress, outcome, definition) => {
+    if (progress.completed) { return null; }
+
+    const stage = definition.stages.find((candidate) => candidate.number === progress.stage);
+    const lastStage = definition.stages.length;
+
+    if (outcome === 'FAILED') {
+        return progress.encounter === 'PHASE' ? null : { ...progress, encounter: 'PHASE', phase: stage.phasesPerStage };
+    }
+
+    if (progress.encounter === 'PHASE') {
+        return progress.phase < stage.phasesPerStage ? { ...progress, phase: progress.phase + 1 } : { ...progress, encounter: 'MINIBOSS', phase: 1 };
+    }
+
+    if (progress.encounter === 'MINIBOSS') {
+        return progress.stage < lastStage
+            ? { ...progress, stage: progress.stage + 1, encounter: 'PHASE', phase: 1 }
+            : { ...progress, encounter: 'CHAPTER_BOSS', phase: 1 };
+    }
+
+    return { ...progress, completed: true };
+};
+
 const isPublic = (method, path) => method === 'POST' && (path === '/users' || path === '/users/login');
 
 //  Options: users {name: password}, delayMs, accessTtlMs (default 24 h), refreshTtlMs (default 30 days),
-//  wallets {name: copper} (starting totals) and drops (the repeating list the wallet queues are rolled from).
+//  wallets {name: copper} (starting totals), drops (the repeating list the wallet queues are rolled from),
+//  progress {name: {stage, encounter, phase, completed}} (starting positions, default stage 1 phase 1) and
+//  definition (the chapter every player plays, default the backend seed).
 //  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens.
 export async function mockBackend (page, {
-    users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS
+    users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition()
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -42,6 +80,16 @@ export async function mockBackend (page, {
 
         return wallets.get(username);
     };
+
+    const progresses = new Map();
+    const progressOf = (username) => {
+        if (!progresses.has(username)) {
+            progresses.set(username, { ...startOfCampaign(), ...startingProgress[username] });
+        }
+
+        return progresses.get(username);
+    };
+    const progressBody = (progress) => ({ chapter: 1, ...progress, definition });
 
     const issue = (user, now) => {
         counter += 1;
@@ -98,6 +146,44 @@ export async function mockBackend (page, {
             wallet.queue.push(...Array.from({ length: accepted }, nextDrop));
 
             return route.fulfill({ json: { wallet: coins(wallet.copper), accepted: { 1: accepted }, drops: { 1: [ ...wallet.queue ] } } });
+        }
+
+        return route.fulfill(problem(404, 'Not found'));
+    };
+
+    const handleProgress = (route, method, path, body, now) => {
+        const request = route.request();
+
+        if (!hasValidBearer(request, now)) { return route.fulfill(unauthenticated()); }
+
+        const username = bearerUsername(request);
+
+        if (!store.has(username)) { return route.fulfill(problem(404, `User '${username}' not found`, 'USER_NOT_FOUND')); }
+
+        const progress = progressOf(username);
+
+        if (method === 'GET' && path === '/progress') {
+            return route.fulfill({ json: progressBody(progress) });
+        }
+
+        if (method === 'POST' && path === '/progress/outcome') {
+            const valid = ['CLEARED', 'FAILED'].includes(body.outcome) && ['PHASE', 'MINIBOSS', 'CHAPTER_BOSS'].includes(body.encounter)
+                && [body.chapter, body.stage, body.phase].every((value) => Number.isInteger(value) && value >= 1);
+
+            if (!valid) { return route.fulfill(problem(400, 'Outcome is invalid', 'PROGRESS_INVALID_OUTCOME')); }
+
+            const reportedFromStored = body.chapter === 1 && body.stage === progress.stage && body.encounter === progress.encounter && body.phase === progress.phase;
+            const next = reportedFromStored ? afterOutcome(progress, body.outcome, definition) : null;
+
+            if (!next) {
+                const conflict = problem(409, 'Reported position does not match the stored progress', 'PROGRESS_CONFLICT');
+
+                conflict.json.progress = progressBody(progress);
+                return route.fulfill(conflict);
+            }
+
+            progresses.set(username, next);
+            return route.fulfill({ json: progressBody(next) });
         }
 
         return route.fulfill(problem(404, 'Not found'));
@@ -167,6 +253,7 @@ export async function mockBackend (page, {
         }
 
         if (path === '/wallet' || path === '/wallet/sync') { return handleWallet(route, method, path, body, now); }
+        if (path === '/progress' || path === '/progress/outcome') { return handleProgress(route, method, path, body, now); }
 
         if (path.startsWith('/users') && !isPublic(method, path)) {
             if (!hasValidBearer(request, now)) { return route.fulfill(unauthenticated()); }
@@ -184,11 +271,14 @@ export async function mockBackend (page, {
     //  Not `**/api/wallet**`: that would also catch Vite's module request for /src/api/walletApi.js
     await page.route('**/api/wallet', handler);
     await page.route('**/api/wallet/**', handler);
+    await page.route('**/api/progress', handler);
+    await page.route('**/api/progress/**', handler);
 
     return {
         calls,
         users: store,
         wallets,
+        progresses,
         sessions,
         //  Makes every issued access token expired, as if 24 h had passed
         expireAccessTokens: () => {
