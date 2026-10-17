@@ -869,13 +869,14 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] ADR states storage key and shape, restore outcomes, single-flight refresh, `skipAuth`, logout, localStorage XSS trade-off
-- [ ] Gate passes: `cd game && npm run build && npm test && npm run test:e2e`
+- [x] ADR states storage key and shape, restore outcomes, single-flight refresh, `skipAuth`, logout, localStorage XSS trade-off
+- [x] Gate passes: `cd game && npm run build && npm test && npm run test:e2e`
 
 **Tests**: none
 **Gate**: build
 
 **Commit**: `docs(game): add ADR for persistent session`
+**Status**: ✅ Complete
 
 ---
 
