@@ -753,17 +753,18 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `mockBackend` routes `**/api/users**` and `**/api/auth/**`; login/sign-up return the full `AuthResponse`
-- [ ] Refresh rotates tokens and rejects unknown/used tokens with 401 `AUTH_INVALID_REFRESH_TOKEN`; logout revokes with 204
-- [ ] `serverDown` aborts both route groups
-- [ ] Existing `auth.spec.js` scenarios all pass
-- [ ] Gate passes: `cd game && npm test && npm run test:e2e`
-- [ ] Test count: all existing e2e scenarios still present
+- [x] `mockBackend` routes `**/api/users**` and `**/api/auth/**`; login/sign-up return the full `AuthResponse`
+- [x] Refresh rotates tokens and rejects unknown/used tokens with 401 `AUTH_INVALID_REFRESH_TOKEN`; logout revokes with 204
+- [x] `serverDown` aborts both route groups
+- [x] Existing `auth.spec.js` scenarios all pass
+- [x] Gate passes: `cd game && npm test && npm run test:e2e`
+- [x] Test count: all existing e2e scenarios still present
 
 **Tests**: e2e
 **Gate**: full
 
 **Commit**: `test(game): teach fake backend the token contract`
+**Status**: ✅ Complete
 
 ---
 
