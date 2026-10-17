@@ -699,12 +699,13 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] ADR records the campaign module split, the report queue and the 409 realignment
-- [ ] Gate passes: `npm run build && npm test`
+- [x] ADR records the campaign module split, the report queue and the 409 realignment
+- [x] Gate passes: `npm run build && npm test`
 
 **Tests**: none
 **Gate**: build
 
+**Status**: Done
 **Commit**: `docs(stages): record the game stage design`
 
 ---
