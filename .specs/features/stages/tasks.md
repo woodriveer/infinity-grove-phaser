@@ -313,13 +313,14 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] ADR records the state machine, tables, seed rule, 409 contract and the AD-002 limit on timers
-- [ ] `.specs/STATE.md` has `AD-003` (hexagonal game, ADR 0007) and `AD-004` (server state machine with optimistic mirror)
-- [ ] Gate passes: `./gradlew ktlintCheck build`
+- [x] ADR records the state machine, tables, seed rule, 409 contract and the AD-002 limit on timers
+- [x] `.specs/STATE.md` has `AD-003` (hexagonal game, ADR 0007) and `AD-004` (server state machine with optimistic mirror)
+- [x] Gate passes: `./gradlew ktlintCheck build`
 
 **Tests**: none
 **Gate**: build
 
+**Status**: Done
 **Commit**: `docs(stages): record stage progress decisions`
 
 ---

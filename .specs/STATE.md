@@ -18,6 +18,22 @@
 - **Date**: 2026-10-17
 - **Status**: active
 
+### AD-003
+- **Decision**: The game follows a hexagonal layout (ADR 0007): `domain` (pure rules), `application` (services that receive ports by injection), `adapters` (Phaser scenes, http, storage), composed in `main.js`; imports point inward only and a Vitest test enforces it.
+- **Reason**: The stages feature adds a state machine, timers and an ordered report queue that must be testable without Phaser or the network, and `ClickerGame` already mixed rendering with sync policy.
+- **Trade-off**: More files and one more hop between a click and a request; hand-written factories instead of a DI container.
+- **Scope**: all of `game/src`; new game features are written in this shape
+- **Date**: 2026-10-17
+- **Status**: active
+
+### AD-004
+- **Decision**: Campaign progress is a server-side state machine. The game reports `CLEARED` or `FAILED` from the position it leaves (`POST /progress/outcome`), the server derives the destination and answers 409 with the stored progress on any mismatch; the game mirrors the rules locally and advances before the server answers.
+- **Reason**: Play must not wait between phases, but the client must not be able to name an arbitrary destination.
+- **Trade-off**: The rules exist on both sides, and boss time limits are not enforced by the server (same limit as AD-002).
+- **Scope**: `backend` progress code (ADR 0006), `game/src/domain/campaign`, `game/src/application/campaign`
+- **Date**: 2026-10-17
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: .specs/features/wallet and .specs/features/drops
