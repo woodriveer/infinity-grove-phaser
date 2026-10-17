@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws
 
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
 import br.com.woodriver.infinity_grove_ws.domain.User
+import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import br.com.woodriver.infinity_grove_ws.port.AccessToken
 import br.com.woodriver.infinity_grove_ws.port.AccessTokenIssuerPort
 import br.com.woodriver.infinity_grove_ws.port.DropRollerPort
@@ -9,6 +10,7 @@ import br.com.woodriver.infinity_grove_ws.port.PasswordHasherPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenSecretPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.WalletRepositoryPort
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
@@ -82,6 +84,22 @@ class MutableClock(
     override fun withZone(zone: ZoneId?): Clock = this
 
     override fun instant(): Instant = Instant.ofEpochMilli(millis)
+}
+
+class InMemoryWalletRepository : WalletRepositoryPort {
+    val wallets = linkedMapOf<String, Wallet>()
+
+    override fun findForUpdate(username: String) = wallets[username]
+
+    override fun createIfAbsent(wallet: Wallet) {
+        wallets.putIfAbsent(wallet.username, wallet)
+    }
+
+    override fun save(wallet: Wallet): Wallet = wallet.also { wallets[it.username] = it }
+
+    override fun deleteByUsername(username: String) {
+        wallets.remove(username)
+    }
 }
 
 /** Rolls the scripted values in order, cycling; fails when a value is outside the range the caller asked for. */

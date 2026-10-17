@@ -272,8 +272,8 @@ T15 → T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Fakes implement the ports; `SequenceDropRoller` yields a scripted, cycling sequence clamped into the asked range
-- [ ] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] Fakes implement the ports; `SequenceDropRoller` yields a scripted, cycling sequence clamped into the asked range
+- [x] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
 
 **Tests**: none
 **Gate**: quick
