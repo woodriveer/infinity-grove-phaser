@@ -2,6 +2,8 @@ package br.com.woodriver.infinity_grove_ws
 
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaRefreshTokenRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaUserRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletLevelRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletRepository
 import br.com.woodriver.infinity_grove_ws.adapter.security.JwtAccessTokenIssuer
 import io.restassured.RestAssured
 import io.restassured.specification.RequestSpecification
@@ -40,6 +42,12 @@ abstract class IntegrationTestBase {
     protected lateinit var jpaRefreshTokenRepository: JpaRefreshTokenRepository
 
     @Autowired
+    protected lateinit var jpaWalletRepository: JpaWalletRepository
+
+    @Autowired
+    protected lateinit var jpaWalletLevelRepository: JpaWalletLevelRepository
+
+    @Autowired
     private lateinit var accessTokenIssuer: JwtAccessTokenIssuer
 
     /** A valid `Bearer` header value for [username]; the user does not need to exist, the access token is stateless. */
@@ -54,6 +62,8 @@ abstract class IntegrationTestBase {
         RestAssured.port = port
         RestAssured.basePath = ""
         jpaRefreshTokenRepository.deleteAll()
+        jpaWalletLevelRepository.deleteAll()
+        jpaWalletRepository.deleteAll()
         jpaUserRepository.deleteAll()
     }
 }

@@ -380,11 +380,11 @@ T14 → T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Round trip returns an equal `Wallet`, including queue order and allowance fields
-- [ ] `createIfAbsent` twice keeps the first row; `findForUpdate` returns null for an unknown user
-- [ ] `deleteByUsername` removes the wallet and its level rows
-- [ ] `WalletRepositoryIT` covers these paths on real PostgreSQL
-- [ ] Gate check passes: `./gradlew ktlintCheck test`
+- [x] Round trip returns an equal `Wallet`, including queue order and allowance fields
+- [x] `createIfAbsent` twice keeps the first row; `findForUpdate` returns null for an unknown user
+- [x] `deleteByUsername` removes the wallet and its level rows
+- [x] `WalletRepositoryIT` covers these paths on real PostgreSQL
+- [x] Gate check passes: `./gradlew ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
