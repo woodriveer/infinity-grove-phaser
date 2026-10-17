@@ -295,16 +295,17 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] Issued token decodes with the same key; `sub` equals the username; `exp - iat` equals 24 h; returned `expiresAt` equals `exp` in epoch ms
-- [ ] A token signed with another key fails decoding; an expired token fails decoding
-- [ ] Existing integration tests still pass (dependency does not enable Spring Security auto-configuration)
-- [ ] Gate passes: `cd backend && ./gradlew ktlintCheck test`
-- [ ] Test count: previous + new tests, none deleted
+- [x] Issued token decodes with the same key; `sub` equals the username; `exp - iat` equals 24 h; returned `expiresAt` equals `exp` in epoch ms
+- [x] A token signed with another key fails decoding; an expired token fails decoding
+- [x] Existing integration tests still pass (dependency does not enable Spring Security auto-configuration)
+- [x] Gate passes: `cd backend && ./gradlew ktlintCheck test`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit
 **Gate**: full
 
 **Commit**: `feat(auth): add HS256 JWT access token issuer`
+**Status**: ✅ Complete
 
 ---
 
