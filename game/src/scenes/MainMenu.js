@@ -40,11 +40,13 @@ export class MainMenu extends Scene
 
         this.add.image(512, 384, 'background');
 
-        const logo = this.add.image(512, -270, 'logo');
+        //  Source art is 2760 px wide; start above the canvas, rest at y = 150
+        const logo = this.add.image(512, -150, 'logo');
+        logo.setScale(400 / logo.width);
 
         this.tweens.add({
             targets: logo,
-            y: 270,
+            y: 150,
             duration: 1000,
             ease: 'Bounce'
         });

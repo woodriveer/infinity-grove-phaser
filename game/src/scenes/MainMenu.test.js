@@ -21,6 +21,7 @@ const flush = () => new Promise((resolve) => setTimeout(resolve));
 const createScene = (registryData = {}) => {
     const doms = [];
     const form = { destroy: vi.fn() };
+    const logo = { width: 2760, setScale: vi.fn() };
     const inputHandlers = {};
 
     const scene = new MainMenu();
@@ -30,7 +31,7 @@ const createScene = (registryData = {}) => {
         remove: vi.fn((key) => { delete registryData[key]; })
     };
     scene.add = {
-        image: vi.fn(() => ({})),
+        image: vi.fn((x, y, key) => (key === 'logo' ? logo : {})),
         text: vi.fn(() => ({})),
         dom: vi.fn(() => ({
             createFromHTML: (html) => {
@@ -59,7 +60,7 @@ const createScene = (registryData = {}) => {
 
     const logoutButton = () => doms.map((d) => d.node.querySelector('[name="logout"]')).find(Boolean);
 
-    return { scene, form, doms, welcomeTitle, logoutButton, message, inputHandlers, registryData };
+    return { scene, form, logo, doms, welcomeTitle, logoutButton, message, inputHandlers, registryData };
 };
 
 const fill = (form, username, password) => {
@@ -316,5 +317,25 @@ describe('MainMenu logout', () => {
 
         expect(inputHandlers.pointerdown).toBeUndefined();
         expect(scene.scene.start).not.toHaveBeenCalled();
+    });
+});
+
+describe('MainMenu logo', () => {
+    it('scales the logo to 400 px wide and drops it to y = 150', () => {
+        const { scene, logo } = createScene({ highscore: 0 });
+
+        scene.create();
+
+        expect(logo.setScale).toHaveBeenCalledWith(400 / 2760);
+        expect(scene.tweens.add).toHaveBeenCalledWith(expect.objectContaining({ targets: logo, y: 150, duration: 1000, ease: 'Bounce' }));
+    });
+
+    it('starts the logo above the visible canvas', () => {
+        const { scene } = createScene({ highscore: 0 });
+
+        scene.create();
+
+        const [ , y ] = scene.add.image.mock.calls.find(([ , , key ]) => key === 'logo');
+        expect(y).toBeLessThan(0);
     });
 });

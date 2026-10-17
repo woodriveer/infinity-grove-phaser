@@ -725,15 +725,16 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `logo.setScale(400 / logo.width)` is applied and the tween targets `y: 150`
-- [ ] Unit test asserts the scale and tween target using a logo stand-in with `width: 2760`
-- [ ] Gate passes: `cd game && npm test && npm run test:e2e`
-- [ ] Test count: previous + new tests, none deleted
+- [x] `logo.setScale(400 / logo.width)` is applied and the tween targets `y: 150`
+- [x] Unit test asserts the scale and tween target using a logo stand-in with `width: 2760`
+- [x] Gate passes: `cd game && npm test && npm run test:e2e`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit + e2e
 **Gate**: full
 
 **Commit**: `fix(game): shrink main menu logo`
+**Status**: ✅ Complete
 
 ---
 
