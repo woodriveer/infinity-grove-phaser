@@ -238,17 +238,18 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] Deleting a user removes all of that user's tokens and leaves other users' tokens
-- [ ] Changing a password marks all of that user's tokens revoked and leaves other users' tokens
-- [ ] A failed delete (user missing) touches no tokens
-- [ ] `UserServiceTest` updated and extended for the three bullets above
-- [ ] Gate passes: `cd backend && ./gradlew ktlintCheck test`
-- [ ] Test count: previous + new tests, none deleted
+- [x] Deleting a user removes all of that user's tokens and leaves other users' tokens
+- [x] Changing a password marks all of that user's tokens revoked and leaves other users' tokens
+- [x] A failed delete (user missing) touches no tokens
+- [x] `UserServiceTest` updated and extended for the three bullets above
+- [x] Gate passes: `cd backend && ./gradlew ktlintCheck test`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(auth): revoke refresh tokens when a user is deleted or changes password`
+**Status**: ✅ Complete
 
 ---
 

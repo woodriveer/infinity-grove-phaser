@@ -11,13 +11,13 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 interface JpaRefreshTokenRepository : JpaRepository<RefreshTokenEntity, String> {
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update RefreshTokenEntity t set t.revoked = true where t.username = :username")
     fun revokeAllByUsername(
         @Param("username") username: String,
     ): Int
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from RefreshTokenEntity t where t.username = :username")
     fun deleteAllByUsername(
         @Param("username") username: String,
