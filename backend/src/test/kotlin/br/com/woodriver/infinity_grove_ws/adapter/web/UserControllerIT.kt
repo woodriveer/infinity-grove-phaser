@@ -58,12 +58,12 @@ class UserControllerIT : IntegrationTestBase() {
         createUser("yan")
         createUser("ana")
 
-        given()
+        authenticated()
             .get("/users")
             .then()
             .statusCode(200)
             .body("$", hasSize<Any>(2))
-        given()
+        authenticated()
             .get("/users/ana")
             .then()
             .statusCode(200)
@@ -72,7 +72,7 @@ class UserControllerIT : IntegrationTestBase() {
 
     @Test
     fun `GET user returns 404 with USER_NOT_FOUND when missing`() {
-        given()
+        authenticated()
             .get("/users/ghost")
             .then()
             .statusCode(404)
@@ -85,6 +85,7 @@ class UserControllerIT : IntegrationTestBase() {
         val before = jpaUserRepository.findById("yan").get().password
 
         request(json("password" to "newpassword1"))
+            .header("Authorization", bearerToken())
             .put("/users/yan/password")
             .then()
             .statusCode(200)
@@ -99,6 +100,7 @@ class UserControllerIT : IntegrationTestBase() {
     @Test
     fun `PUT password returns 404 when user is missing`() {
         request(json("password" to "newpassword1"))
+            .header("Authorization", bearerToken())
             .put("/users/ghost/password")
             .then()
             .statusCode(404)
@@ -108,10 +110,10 @@ class UserControllerIT : IntegrationTestBase() {
     fun `DELETE removes the user`() {
         createUser()
 
-        given().delete("/users/yan").then().statusCode(204)
+        authenticated().delete("/users/yan").then().statusCode(204)
 
         assertTrue(jpaUserRepository.findById("yan").isEmpty)
-        given().delete("/users/yan").then().statusCode(404)
+        authenticated().delete("/users/yan").then().statusCode(404)
     }
 
     @Test

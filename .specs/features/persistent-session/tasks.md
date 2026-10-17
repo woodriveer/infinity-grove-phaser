@@ -472,18 +472,19 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `GET /users`, `GET /users/{u}`, `PUT /users/{u}/password`, `DELETE /users/{u}` return 401 `AUTH_UNAUTHENTICATED` with no header, with a malformed token, with a token signed by another key, and with an expired token
-- [ ] The same routes work with a valid token (existing behavior assertions kept)
-- [ ] The four public routes work without a token
-- [ ] 401 body is `application/problem+json` with `status`, `detail`, `code`
-- [ ] `SecurityIT` covers each bullet; `UserControllerIT` and `AuthControllerIT` still pass
-- [ ] Gate passes: `cd backend && ./gradlew ktlintCheck test` (Docker running)
-- [ ] Test count: previous + new tests, none deleted
+- [x] `GET /users`, `GET /users/{u}`, `PUT /users/{u}/password`, `DELETE /users/{u}` return 401 `AUTH_UNAUTHENTICATED` with no header, with a malformed token, with a token signed by another key, and with an expired token
+- [x] The same routes work with a valid token (existing behavior assertions kept)
+- [x] The four public routes work without a token
+- [x] 401 body is `application/problem+json` with `status`, `detail`, `code`
+- [x] `SecurityIT` covers each bullet; `UserControllerIT` and `AuthControllerIT` still pass
+- [x] Gate passes: `cd backend && ./gradlew ktlintCheck test` (Docker running)
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: integration
 **Gate**: full
 
 **Commit**: `feat(auth): require bearer token on user endpoints`
+**Status**: ✅ Complete
 
 ---
 

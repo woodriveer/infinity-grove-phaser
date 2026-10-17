@@ -99,7 +99,7 @@ class AuthControllerIT : IntegrationTestBase() {
     fun `deleting a user through the API invalidates their refresh token`() {
         val raw = signUp().path<String>("refreshToken")
 
-        given().delete("/users/yan").then().statusCode(204)
+        authenticated().delete("/users/yan").then().statusCode(204)
 
         assertInvalidRefreshToken(refresh(raw))
         assertEquals(0, jpaRefreshTokenRepository.count())
@@ -109,7 +109,7 @@ class AuthControllerIT : IntegrationTestBase() {
     fun `changing the password revokes existing refresh tokens`() {
         val raw = signUp().path<String>("refreshToken")
 
-        given()
+        authenticated()
             .contentType(ContentType.JSON)
             .body("""{"password":"newpassword1"}""")
             .put("/users/yan/password")

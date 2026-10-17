@@ -2,7 +2,9 @@ package br.com.woodriver.infinity_grove_ws
 
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaRefreshTokenRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaUserRepository
+import br.com.woodriver.infinity_grove_ws.adapter.security.JwtAccessTokenIssuer
 import io.restassured.RestAssured
+import io.restassured.specification.RequestSpecification
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -36,6 +38,16 @@ abstract class IntegrationTestBase {
 
     @Autowired
     protected lateinit var jpaRefreshTokenRepository: JpaRefreshTokenRepository
+
+    @Autowired
+    private lateinit var accessTokenIssuer: JwtAccessTokenIssuer
+
+    /** A valid `Bearer` header value for [username]; the user does not need to exist, the access token is stateless. */
+    protected fun bearerToken(username: String = "test-caller") =
+        "Bearer " + accessTokenIssuer.issue(username, System.currentTimeMillis()).value
+
+    /** A request specification that carries a valid access token. */
+    protected fun authenticated(): RequestSpecification = RestAssured.given().header("Authorization", bearerToken())
 
     @BeforeEach
     fun setUpRestAssured() {
