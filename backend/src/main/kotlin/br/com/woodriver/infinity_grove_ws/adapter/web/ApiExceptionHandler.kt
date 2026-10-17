@@ -6,6 +6,7 @@ import br.com.woodriver.infinity_grove_ws.domain.LoginException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.UserAlreadyExistsException
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.WalletRequestException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
@@ -28,6 +29,9 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(UserAlreadyExistsException::class)
     fun conflict(e: UserAlreadyExistsException) = problem(HttpStatus.CONFLICT, e)
+
+    @ExceptionHandler(WalletRequestException::class)
+    fun walletRequest(e: WalletRequestException) = problem(HttpStatus.BAD_REQUEST, e)
 
     @ExceptionHandler(BusinessException::class)
     fun business(e: BusinessException) = problem(HttpStatus.UNPROCESSABLE_CONTENT, e)

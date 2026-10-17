@@ -408,12 +408,12 @@ T14 → T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `GET /wallet` returns the documented body for an existing user, 404 `USER_NOT_FOUND` for a deleted one, 401 `AUTH_UNAUTHENTICATED` without a token
-- [ ] `POST /wallet/sync` credits and returns `wallet`, `accepted`, `drops`; 401 without a token
-- [ ] Missing `kills`, a non-object, a negative, fractional or string count return 400 `WALLET_INVALID_KILLS`; an unknown level returns 400 `WALLET_UNKNOWN_LEVEL` and credits nothing
-- [ ] A token for user A never reads or changes user B's wallet
-- [ ] `WalletControllerIT` covers every case above
-- [ ] Gate check passes: `./gradlew ktlintCheck test`
+- [x] `GET /wallet` returns the documented body for an existing user, 404 `USER_NOT_FOUND` for a deleted one, 401 `AUTH_UNAUTHENTICATED` without a token
+- [x] `POST /wallet/sync` credits and returns `wallet`, `accepted`, `drops`; 401 without a token
+- [x] Missing `kills`, a non-object, a negative, fractional or string count return 400 `WALLET_INVALID_KILLS`; an unknown level returns 400 `WALLET_UNKNOWN_LEVEL` and credits nothing
+- [x] A token for user A never reads or changes user B's wallet
+- [x] `WalletControllerIT` covers every case above
+- [x] Gate check passes: `./gradlew ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
