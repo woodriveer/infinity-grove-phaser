@@ -351,12 +351,12 @@ T14 → T15 → T16 → T17
 
 **Done when**:
 
-- [ ] With no configuration the table holds level 1 as 1, 5, 1500
-- [ ] Configured values replace the default
-- [ ] An invalid entry stops the application context and names the entry
-- [ ] `RandomDropRoller` stays inside the requested range over many rolls
-- [ ] `WalletConfigTest` covers binding and fail-fast
-- [ ] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] With no configuration the table holds level 1 as 1, 5, 1500
+- [x] Configured values replace the default
+- [x] An invalid entry stops the application context and names the entry
+- [x] `RandomDropRoller` stays inside the requested range over many rolls
+- [x] `WalletConfigTest` covers binding and fail-fast
+- [x] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
 
 **Tests**: unit
 **Gate**: quick
