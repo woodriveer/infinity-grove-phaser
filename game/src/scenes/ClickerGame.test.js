@@ -346,6 +346,12 @@ describe('ClickerGame wallet text', () => {
         expect(walletElement().y).toBeLessThan(100);
     });
 
+    it('lets clicks through the wallet text so a click on it still hits the monster', () => {
+        const { walletElement } = createScene();
+
+        expect(walletElement().pointerEvents).toBe('none');
+    });
+
     it('always shows all three denominations, also when they are zero', async () => {
         const { walletText } = createScene({ wallet: walletResponse({ gold: 0, silver: 0, copper: 0 }) });
         await flush();
