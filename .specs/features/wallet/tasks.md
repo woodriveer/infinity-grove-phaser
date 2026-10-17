@@ -162,13 +162,13 @@ T15 → T16 → T17 → T18
 
 **Done when**:
 
-- [ ] `fresh` builds a queue of 20 rolled values and an allowance of 20
-- [ ] Allowance grows 1 per interval, caps at 20, keeps fractional progress, and starts its timer at `now` when it leaves the cap
-- [ ] `accept` takes min(requested, allowance) values from the front, refills the queue to 20, spends the allowance and returns the credited copper
-- [ ] `refreshed` re-rolls the whole queue when a value is out of range or the size is not 20
-- [ ] Zero requested kills change nothing; a negative clock difference adds nothing
-- [ ] `LevelDropsTest` covers every branch, including a 500-kill request after a long idle (at most 20 accepted)
-- [ ] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] `fresh` builds a queue of 20 rolled values and an allowance of 20
+- [x] Allowance grows 1 per interval, caps at 20, keeps fractional progress, and starts its timer at `now` when it leaves the cap
+- [x] `accept` takes min(requested, allowance) values from the front, refills the queue to 20, spends the allowance and returns the credited copper
+- [x] `refreshed` re-rolls the whole queue when a value is out of range or the size is not 20
+- [x] Zero requested kills change nothing; a negative clock difference adds nothing
+- [x] `LevelDropsTest` covers every branch, including a 500-kill request after a long idle (at most 20 accepted)
+- [x] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
 
 **Tests**: unit
 **Gate**: quick
