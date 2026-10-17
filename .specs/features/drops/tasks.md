@@ -130,13 +130,13 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] Before `load`, `loaded` is false and `takeDrop` returns null
-- [ ] `takeDrop(level)` pops the first value of that level's queue and returns `{ id, value }`; an empty or missing queue returns null and changes nothing
-- [ ] `land(id)` adds 1 copper to the display; a value of 3 lands three times to add 3
-- [ ] `display()` carries 100 copper to 1 silver and 100 silver to 1 gold (99 copper + 1 gives 1 silver 0 copper; 99 silver 99 copper + 1 gives 1 gold 0 silver 0 copper)
-- [ ] Gold above 99 999 and above 2^31 displays as is (no cap)
-- [ ] Level keys work as numbers or strings
-- [ ] Gate check passes: `npm test`
+- [x] Before `load`, `loaded` is false and `takeDrop` returns null
+- [x] `takeDrop(level)` pops the first value of that level's queue and returns `{ id, value }`; an empty or missing queue returns null and changes nothing
+- [x] `land(id)` adds 1 copper to the display; a value of 3 lands three times to add 3
+- [x] `display()` carries 100 copper to 1 silver and 100 silver to 1 gold (99 copper + 1 gives 1 silver 0 copper; 99 silver 99 copper + 1 gives 1 gold 0 silver 0 copper)
+- [x] Gold above 99 999 and above 2^31 displays as is (no cap)
+- [x] Level keys work as numbers or strings
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick
