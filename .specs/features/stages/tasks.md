@@ -529,12 +529,13 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] A 30 000 ms limit reads 30, 30 after 1 ms, 29 after 1 001 ms, 0 and `expired` at 30 000 ms, and never negative
-- [ ] Gate passes: `npm test`
+- [x] A 30 000 ms limit reads 30, 30 after 1 ms, 29 after 1 001 ms, 0 and `expired` at 30 000 ms, and never negative
+- [x] Gate passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick
 
+**Status**: Done
 **Commit**: `feat(stages): add boss countdown`
 
 ---
