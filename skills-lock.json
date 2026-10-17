@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "tlc-spec-driven": {
+      "source": "tech-leads-club/agent-skills",
+      "sourceType": "github",
+      "skillPath": "packages/skills-catalog/skills/(development)/tlc-spec-driven/SKILL.md",
+      "computedHash": "37d7c4ef89141c6c8a246f4ba09033986957d7ad596c45022337c8fbac3e235b"
+    }
+  }
+}
