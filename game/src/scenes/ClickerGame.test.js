@@ -24,6 +24,7 @@ const createScene = ({ wallet } = {}) => {
     });
 
     const rectangles = [];
+    const sprites = [];
     const doms = [];
     const texts = [];
     const tweens = [];
@@ -50,6 +51,13 @@ const createScene = ({ wallet } = {}) => {
             obj.setDepth = () => obj;
             texts.push(obj);
             return obj;
+        }),
+        sprite: vi.fn((x, y, key) => {
+            const sprite = { x, y, key, anim: null, destroy: vi.fn() };
+
+            sprite.play = (anim) => { sprite.anim = anim; return sprite; };
+            sprites.push(sprite);
+            return sprite;
         }),
         dom: vi.fn((x, y) => {
             const element = { x, y, visible: true };
@@ -83,7 +91,7 @@ const createScene = ({ wallet } = {}) => {
     const walletText = () => doms.map((d) => d.node.querySelector('.wallet')).find(Boolean);
     const walletElement = () => doms.find((d) => d.node.querySelector('.wallet'));
 
-    return { scene, rectangles, texts, tweens, timers, doms, click, monster, fill, back, byColor, walletText, walletElement };
+    return { scene, rectangles, texts, tweens, timers, sprites, doms, click, monster, fill, back, byColor, walletText, walletElement };
 };
 
 describe('ClickerGame scene', () => {
@@ -356,5 +364,167 @@ describe('ClickerGame wallet text', () => {
         await flush();
 
         expect(walletElement().visible).toBe(false);
+    });
+});
+
+describe('ClickerGame coin drops', () => {
+    const kill = (ctx) => {
+        for (let i = 0; i < 10; i++)
+        {
+            ctx.click();
+        }
+    };
+    const loadedScene = async (wallet) => {
+        const ctx = createScene({ wallet });
+        await flush();
+        return ctx;
+    };
+    const coinTweens = (ctx) => ctx.tweens.filter((t) => ctx.sprites.includes(t.targets));
+    const landAll = (ctx) => coinTweens(ctx).forEach((t) => t.onComplete());
+
+    it('spawns no coins before the killing click', async () => {
+        const ctx = await loadedScene(walletResponse());
+
+        for (let i = 0; i < 9; i++)
+        {
+            ctx.click();
+        }
+
+        expect(ctx.sprites).toHaveLength(0);
+    });
+
+    it('spawns one rotating coin per copper of the drop at the monster center when the monster dies', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 1: [3, 1] }));
+
+        kill(ctx);
+
+        expect(ctx.sprites).toHaveLength(3);
+        ctx.sprites.forEach((coin) => {
+            expect([ coin.x, coin.y, coin.key, coin.anim ]).toEqual([ 700, 500, 'coin', 'rotate' ]);
+        });
+    });
+
+    it('tweens each coin to the wallet text over 600 ms, each one starting 100 ms after the previous', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 1: [3] }));
+
+        kill(ctx);
+
+        const tweens = coinTweens(ctx);
+        expect(tweens).toHaveLength(3);
+        tweens.forEach((tween, i) => {
+            expect(tween).toEqual(expect.objectContaining({
+                targets: ctx.sprites[i],
+                x: ctx.walletElement().x,
+                y: ctx.walletElement().y,
+                duration: 600,
+                delay: i * 100
+            }));
+        });
+    });
+
+    it('adds 1 copper and destroys the coin each time a coin reaches the wallet text', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 1: [3] }));
+        kill(ctx);
+        const [ first, second, third ] = coinTweens(ctx);
+
+        first.onComplete();
+        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 38');
+        expect(ctx.sprites[0].destroy).toHaveBeenCalledTimes(1);
+        expect(ctx.sprites[1].destroy).not.toHaveBeenCalled();
+
+        second.onComplete();
+        third.onComplete();
+        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 40');
+    });
+
+    it('does not change the wallet text before any coin lands', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 1: [3] }));
+
+        kill(ctx);
+
+        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
+    });
+
+    it('shows 1 silver and 1 copper for 99 copper plus a drop of 2', async () => {
+        const ctx = await loadedScene(walletResponse({ gold: 0, silver: 0, copper: 99 }, { 1: [2] }));
+        kill(ctx);
+
+        landAll(ctx);
+
+        expect(ctx.walletText().textContent).toBe('Gold: 0  Silver: 1  Copper: 1');
+    });
+
+    it('carries 100 silver into gold', async () => {
+        const ctx = await loadedScene(walletResponse({ gold: 7, silver: 99, copper: 99 }, { 1: [1] }));
+        kill(ctx);
+
+        landAll(ctx);
+
+        expect(ctx.walletText().textContent).toBe('Gold: 8  Silver: 0  Copper: 0');
+    });
+
+    it('spawns that many coins for a drop above 5 copper', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 1: [12] }));
+
+        kill(ctx);
+        landAll(ctx);
+
+        expect(ctx.sprites).toHaveLength(12);
+        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 49');
+    });
+
+    it('drops nothing when the wallet has not loaded', () => {
+        const ctx = createScene();
+
+        kill(ctx);
+
+        expect(ctx.sprites).toHaveLength(0);
+    });
+
+    it('drops nothing when the queue of the monster level is empty', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 1: [] }));
+
+        kill(ctx);
+
+        expect(ctx.sprites).toHaveLength(0);
+        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
+    });
+
+    it('drops nothing when the backend sent no queue for the monster level', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 2: [5] }));
+
+        kill(ctx);
+
+        expect(ctx.sprites).toHaveLength(0);
+    });
+
+    it('reads the queue of the level of the monster', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 1: [3], 2: [2] }));
+        ctx.scene.monster.level = 2;
+
+        kill(ctx);
+
+        expect(ctx.sprites).toHaveLength(2);
+    });
+
+    it('takes the next queued value on the next kill after the respawn', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 1: [3, 1] }));
+        kill(ctx);
+        ctx.tweens.find((t) => Array.isArray(t.targets)).onComplete();
+        ctx.timers[0].callback();
+
+        kill(ctx);
+
+        expect(ctx.sprites).toHaveLength(4);
+    });
+
+    it('does not drop again for clicks on a dead monster', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 1: [3, 1] }));
+        kill(ctx);
+
+        ctx.click();
+        ctx.click();
+
+        expect(ctx.sprites).toHaveLength(3);
     });
 });

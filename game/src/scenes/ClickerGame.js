@@ -9,6 +9,7 @@ const HEALTH_BAR = { width: 120, height: 12, gap: 16, backColor: 0x222222, fillC
 const DAMAGE_TEXT = { rise: 40, duration: 800 };
 const DEATH = { fadeDuration: 500, respawnDelay: 1000 };
 const WALLET = { x: 180, y: 32 };
+const COIN = { duration: 600, stagger: 100 };
 const WALLET_HTML = '<div class="wallet"></div>';
 
 export class ClickerGame extends Scene
@@ -90,6 +91,37 @@ export class ClickerGame extends Scene
         if (this.monster.dead)
         {
             this.fadeOutMonster();
+            this.dropCoins();
+        }
+    }
+
+    //  One coin per copper of the next queued drop flies from the monster to the wallet text; each landing counts 1 copper
+    dropCoins ()
+    {
+        const drop = this.ledger.takeDrop(this.monster.level);
+
+        if (!drop)
+        {
+            return;
+        }
+
+        for (let i = 0; i < drop.value; i++)
+        {
+            const coin = this.add.sprite(MONSTER.x, MONSTER.y, 'coin').play('rotate');
+
+            this.tweens.add({
+                targets: coin,
+                x: WALLET.x,
+                y: WALLET.y,
+                duration: COIN.duration,
+                delay: i * COIN.stagger,
+                onComplete: () =>
+                {
+                    coin.destroy();
+                    this.ledger.land(drop.id);
+                    this.refreshWalletText();
+                }
+            });
         }
     }
 

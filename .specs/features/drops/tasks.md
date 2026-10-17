@@ -220,14 +220,14 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] A kill with a drop of v spawns v `coin` sprites at (700, 500), each playing `rotate`
-- [ ] Coin i is tweened to the wallet text point over 600 ms with a start delay of i x 100 ms
-- [ ] When a coin's tween completes the coin is destroyed, the ledger lands one copper and the text refreshes; after all v coins the text grew by v
-- [ ] 99 copper plus a drop of 2 shows 1 silver and 1 copper
-- [ ] With the wallet not loaded, or an empty or missing queue, a kill spawns no coins and leaves the text unchanged
-- [ ] The monster's `level` picks the queue
-- [ ] The existing death, fade and respawn tests still pass
-- [ ] Gate check passes: `npm test`
+- [x] A kill with a drop of v spawns v `coin` sprites at (700, 500), each playing `rotate`
+- [x] Coin i is tweened to the wallet text point over 600 ms with a start delay of i x 100 ms
+- [x] When a coin's tween completes the coin is destroyed, the ledger lands one copper and the text refreshes; after all v coins the text grew by v
+- [x] 99 copper plus a drop of 2 shows 1 silver and 1 copper
+- [x] With the wallet not loaded, or an empty or missing queue, a kill spawns no coins and leaves the text unchanged
+- [x] The monster's `level` picks the queue
+- [x] The existing death, fade and respawn tests still pass
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick
