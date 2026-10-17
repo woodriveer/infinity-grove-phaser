@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:17
+    image: postgres:16
     container_name: infinity-grove-postgres
     restart: unless-stopped
     environment:
