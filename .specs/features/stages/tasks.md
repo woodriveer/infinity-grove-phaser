@@ -642,15 +642,16 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] After a failed load (message shown in T20), a later tick that succeeds spawns the monster and clears the message
-- [ ] A phase advance results in a report at the next tick; a failed report is resent at the following tick
-- [ ] A realign respawns the encounter of the returned progress
-- [ ] Shutdown with queued reports sends one best-effort flush
-- [ ] Gate passes: `npm test`
+- [x] After a failed load (message shown in T20), a later tick that succeeds spawns the monster and clears the message
+- [x] A phase advance results in a report at the next tick; a failed report is resent at the following tick
+- [x] A realign respawns the encounter of the returned progress
+- [x] Shutdown with queued reports sends one best-effort flush
+- [x] Gate passes: `npm test && npm run test:e2e`
 
 **Tests**: unit
-**Gate**: quick
+**Gate**: full
 
+**Status**: Done
 **Commit**: `feat(stages): save progress and recover from failures`
 
 ---

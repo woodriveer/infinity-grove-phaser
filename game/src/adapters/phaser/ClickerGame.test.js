@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClickerGame } from './ClickerGame';
+import { ApiError } from '../../application/ApiError';
 import { createCampaignSession } from '../../application/campaign/campaignSession';
 import { createWalletSync } from '../../application/wallet/walletSync';
 
@@ -1029,5 +1030,246 @@ describe('ClickerGame stages', () => {
         killAll(ctx);
 
         expect(ctx.sprites).toHaveLength(4);
+    });
+});
+
+describe('ClickerGame progress saving', () => {
+    const killAll = (ctx) => {
+        while (ctx.scene.monster && !ctx.scene.monster.dead)
+        {
+            ctx.click();
+        }
+    };
+    const advance = (ctx) => {
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+    };
+    const tick = (ctx) => ctx.loops[0].callback();
+    const label = (ctx) => ctx.hud('.stage-hud').textContent;
+    const message = (ctx) => ctx.hud('.stage-message').textContent;
+    const at = (stage, encounter, phase = 1) => ({ chapter: 1, stage, encounter, phase });
+    const conflict = (stored) => new ApiError('Reported position does not match the stored progress', {
+        status: 409, code: 'PROGRESS_CONFLICT', body: { progress: stored }
+    });
+
+    it('sends nothing until a tick: a kill only queues its report', async () => {
+        const ctx = await createScene();
+
+        killAll(ctx);
+        advance(ctx);
+
+        expect(campaignGateway.report).not.toHaveBeenCalled();
+    });
+
+    it('sends the CLEARED report with the position it left on the next tick', async () => {
+        const ctx = await createScene();
+        killAll(ctx);
+        advance(ctx);
+
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.report).toHaveBeenCalledTimes(1);
+        expect(campaignGateway.report).toHaveBeenCalledWith(at(1, 'PHASE', 1), 'CLEARED');
+    });
+
+    it('sends several kills in order on one tick', async () => {
+        const ctx = await createScene();
+        killAll(ctx);
+        advance(ctx);
+        killAll(ctx);
+        advance(ctx);
+
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.report).toHaveBeenCalledTimes(2);
+        expect(campaignGateway.report).toHaveBeenNthCalledWith(1, at(1, 'PHASE', 1), 'CLEARED');
+        expect(campaignGateway.report).toHaveBeenNthCalledWith(2, at(1, 'PHASE', 2), 'CLEARED');
+    });
+
+    it('sends the FAILED report of a boss that ran out of time on the next tick', async () => {
+        const ctx = await createScene({ start: progress(2, 'MINIBOSS', 1) });
+        ctx.scene.update(0, 30000);
+
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.report).toHaveBeenCalledWith(at(2, 'MINIBOSS', 1), 'FAILED');
+    });
+
+    it('keeps playing and sends the same report again on the next tick after a failed one', async () => {
+        const ctx = await createScene();
+        killAll(ctx);
+        advance(ctx);
+        campaignGateway.report.mockRejectedValueOnce(new ApiError('Cannot reach the server. Try again later.'));
+
+        tick(ctx);
+        await flush();
+        expect(label(ctx)).toBe('Stage 1/10  Phase 2/5');
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.report).toHaveBeenCalledTimes(2);
+        expect(campaignGateway.report).toHaveBeenNthCalledWith(2, at(1, 'PHASE', 1), 'CLEARED');
+    });
+
+    it('sends nothing on a tick without queued reports', async () => {
+        const ctx = await createScene();
+
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.report).not.toHaveBeenCalled();
+    });
+
+    it('plays the stored position when a report is answered 409', async () => {
+        const ctx = await createScene();
+        killAll(ctx);
+        advance(ctx);
+        campaignGateway.report.mockRejectedValueOnce(conflict(progress(1, 'PHASE', 4)));
+
+        tick(ctx);
+        await flush();
+
+        expect(label(ctx)).toBe('Stage 1/10  Phase 4/5');
+        expect(ctx.scene.monster.health).toBe(10);
+        expect(ctx.monster.alpha).toBe(1);
+    });
+
+    it('does not resend the voided reports after a 409', async () => {
+        const ctx = await createScene();
+        killAll(ctx);
+        advance(ctx);
+        killAll(ctx);
+        advance(ctx);
+        campaignGateway.report.mockRejectedValueOnce(conflict(progress(1, 'PHASE', 4)));
+
+        tick(ctx);
+        await flush();
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.report).toHaveBeenCalledTimes(1);
+    });
+
+    it('realigns to a boss with its countdown when the stored position is a boss', async () => {
+        const ctx = await createScene();
+        killAll(ctx);
+        advance(ctx);
+        campaignGateway.report.mockRejectedValueOnce(conflict(progress(3, 'MINIBOSS', 1)));
+
+        tick(ctx);
+        await flush();
+
+        expect(label(ctx)).toBe('Stage 3/10  Miniboss');
+        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
+    });
+
+    it('does not spawn a stale encounter when a realignment happens while the monster fades', async () => {
+        const ctx = await createScene();
+        killAll(ctx);
+        campaignGateway.report.mockRejectedValueOnce(conflict(progress(2, 'PHASE', 1)));
+        tick(ctx);
+        await flush();
+
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+
+        expect(ctx.timers).toHaveLength(0);
+        expect(label(ctx)).toBe('Stage 2/10  Phase 1/5');
+    });
+
+    it('does not spawn a stale encounter when a realignment happens during the respawn wait', async () => {
+        const ctx = await createScene();
+        killAll(ctx);
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        campaignGateway.report.mockRejectedValueOnce(conflict(progress(2, 'PHASE', 1)));
+        tick(ctx);
+        await flush();
+
+        ctx.timers.at(-1).callback();
+
+        expect(label(ctx)).toBe('Stage 2/10  Phase 1/5');
+        expect(ctx.scene.monster.maxHealth).toBe(11);
+    });
+
+    it('asks for the progress again on a tick while it has not loaded, and spawns the monster once it arrives', async () => {
+        const ctx = await createScene({ start: new Error('down') });
+        expect(message(ctx)).toBe('Could not load progress');
+        campaignGateway.get.mockResolvedValue(progress(1, 'PHASE', 1));
+
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.get).toHaveBeenCalledTimes(2);
+        expect(message(ctx)).toBe('');
+        expect(ctx.scene.monster.maxHealth).toBe(10);
+        expect(label(ctx)).toBe('Stage 1/10  Phase 1/5');
+    });
+
+    it('keeps the message while the progress still cannot be loaded', async () => {
+        const ctx = await createScene({ start: new Error('down') });
+
+        tick(ctx);
+        await flush();
+
+        expect(message(ctx)).toBe('Could not load progress');
+        expect(ctx.scene.monster).toBeNull();
+    });
+
+    it('stops asking for the progress once it has loaded', async () => {
+        const ctx = await createScene();
+
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.get).toHaveBeenCalledTimes(1);
+    });
+
+    it('starts no second progress request while one is pending', async () => {
+        const ctx = await createScene({ start: new Promise(() => {}) });
+
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.get).toHaveBeenCalledTimes(1);
+    });
+
+    it('sends the queued reports in order once when the scene shuts down', async () => {
+        const ctx = await createScene();
+        killAll(ctx);
+        advance(ctx);
+        killAll(ctx);
+        advance(ctx);
+
+        ctx.eventHandlers.shutdown();
+        await flush();
+
+        expect(campaignGateway.report).toHaveBeenCalledTimes(2);
+        expect(campaignGateway.report).toHaveBeenNthCalledWith(1, at(1, 'PHASE', 1), 'CLEARED');
+        expect(campaignGateway.report).toHaveBeenNthCalledWith(2, at(1, 'PHASE', 2), 'CLEARED');
+    });
+
+    it('does not retry the reports when the final attempt fails', async () => {
+        const ctx = await createScene();
+        killAll(ctx);
+        advance(ctx);
+        campaignGateway.report.mockRejectedValue(new ApiError('down'));
+
+        ctx.eventHandlers.shutdown();
+        await flush();
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.report).toHaveBeenCalledTimes(1);
+    });
+
+    it('sends no report on shutdown without queued reports', async () => {
+        const ctx = await createScene();
+
+        ctx.eventHandlers.shutdown();
+        await flush();
+
+        expect(campaignGateway.report).not.toHaveBeenCalled();
     });
 });

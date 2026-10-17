@@ -35,6 +35,9 @@ export class ClickerGame extends Scene
         this.session = services.createCampaignSession();
         this.monster = null;
         this.countdown = null;
+        this.generation = 0;
+        this.loadingCampaign = false;
+        this.session.onRealign((encounter) => this.realign(encounter));
 
         this.add.image(512, 384, 'background');
 
@@ -83,6 +86,13 @@ export class ClickerGame extends Scene
     //  The first encounter comes from the backend; until it does, nothing spawns
     async loadCampaign ()
     {
+        if (this.loadingCampaign)
+        {
+            return;
+        }
+
+        this.loadingCampaign = true;
+
         let encounter;
 
         try
@@ -97,6 +107,10 @@ export class ClickerGame extends Scene
             }
 
             return;
+        }
+        finally
+        {
+            this.loadingCampaign = false;
         }
 
         if (!this.sys.isActive())
@@ -171,14 +185,28 @@ export class ClickerGame extends Scene
         this.monster = null;
         this.monsterParts.forEach((part) => part.setAlpha(0));
 
-        const next = this.session.fail();
+        this.showAfterDelay(this.session.fail());
+    }
 
-        this.time.delayedCall(DEATH.respawnDelay, () => this.showEncounter(next));
+    //  Shows `next` after the respawn delay unless a realignment replaced the position in the meantime
+    showAfterDelay (next)
+    {
+        const generation = this.generation;
+
+        this.time.delayedCall(DEATH.respawnDelay, () =>
+        {
+            if (generation === this.generation)
+            {
+                this.showEncounter(next);
+            }
+        });
     }
 
     //  Kills reach the backend in batches; the wallet service decides what each tick does
     async tick ()
     {
+        this.tickCampaign();
+
         const changed = await this.wallet.tick();
 
         if (changed && this.sys.isActive())
@@ -187,10 +215,32 @@ export class ClickerGame extends Scene
         }
     }
 
+    //  Every tick either retries a campaign that never loaded or sends the queued outcome reports
+    tickCampaign ()
+    {
+        if (this.session.loaded)
+        {
+            this.session.flush();
+        }
+        else
+        {
+            this.loadCampaign();
+        }
+    }
+
     //  One last, best-effort sync when the scene ends; a failure is not retried
     syncOnExit ()
     {
         this.wallet.syncOnExit();
+        this.session.flushOnExit();
+    }
+
+    //  The backend holds another position than ours (a lost report, or another tab): play that one now
+    realign (encounter)
+    {
+        this.generation += 1;
+        this.hideCountdown();
+        this.showEncounter(encounter);
     }
 
     //  Without a wallet the game plays on but nothing drops
@@ -273,11 +323,19 @@ export class ClickerGame extends Scene
     //  The monster fades; `next` is the encounter that follows it (null when the chapter is over)
     fadeOutMonster (next)
     {
+        const generation = this.generation;
+
         this.tweens.add({
             targets: this.monsterParts,
             alpha: 0,
             duration: DEATH.fadeDuration,
-            onComplete: () => this.time.delayedCall(DEATH.respawnDelay, () => this.showEncounter(next))
+            onComplete: () =>
+            {
+                if (generation === this.generation)
+                {
+                    this.showAfterDelay(next);
+                }
+            }
         });
     }
 
