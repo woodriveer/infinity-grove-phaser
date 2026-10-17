@@ -207,18 +207,19 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `start(user)` returns access token + expiry from the issuer and a refresh token expiring 30 days after `now`; persists only the hash
-- [ ] `refresh` with a usable token revokes the old one, persists a new one and returns new access + refresh tokens
-- [ ] `refresh` throws `InvalidRefreshTokenException` for unknown, expired, revoked tokens and when the user no longer exists
-- [ ] `end` revokes a known token; unknown or already revoked token does not throw
-- [ ] `SessionServiceTest` covers each bullet above including both failure paths per cause
-- [ ] Gate passes: `cd backend && ./gradlew ktlintCheck test`
-- [ ] Test count: previous + new tests, none deleted
+- [x] `start(user)` returns access token + expiry from the issuer and a refresh token expiring 30 days after `now`; persists only the hash
+- [x] `refresh` with a usable token revokes the old one, persists a new one and returns new access + refresh tokens
+- [x] `refresh` throws `InvalidRefreshTokenException` for unknown, expired, revoked tokens and when the user no longer exists
+- [x] `end` revokes a known token; unknown or already revoked token does not throw
+- [x] `SessionServiceTest` covers each bullet above including both failure paths per cause
+- [x] Gate passes: `cd backend && ./gradlew ktlintCheck test`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(auth): add SessionService with refresh token rotation`
+**Status**: ✅ Complete
 
 ---
 
