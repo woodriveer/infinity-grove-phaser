@@ -145,33 +145,33 @@ Players earn coins from monsters, but nothing stores them: the game has no curre
 
 | Requirement ID | Story                       | Phase | Status  |
 | -------------- | --------------------------- | ----- | ------- |
-| WAL-01         | P1: Read the wallet         | -     | Pending |
-| WAL-02         | P1: Read the wallet         | -     | Pending |
-| WAL-03         | P1: Read the wallet         | -     | Pending |
-| WAL-04         | P1: Read the wallet         | -     | Pending |
-| WAL-05         | P1: Read the wallet         | -     | Pending |
-| WAL-06         | P1: Read the wallet         | -     | Pending |
-| WAL-07         | P1: Configurable table      | -     | Pending |
-| WAL-08         | P1: Configurable table      | -     | Pending |
-| WAL-09         | P1: Configurable table      | -     | Pending |
-| WAL-10         | P1: Configurable table      | -     | Pending |
-| WAL-11         | P1: Configurable table      | -     | Pending |
-| WAL-12         | P1: Credit kills            | -     | Pending |
-| WAL-13         | P1: Credit kills            | -     | Pending |
-| WAL-14         | P1: Credit kills            | -     | Pending |
-| WAL-15         | P1: Credit kills            | -     | Pending |
-| WAL-16         | P1: Credit kills            | -     | Pending |
-| WAL-17         | P1: Credit kills            | -     | Pending |
-| WAL-18         | P1: Credit kills            | -     | Pending |
-| WAL-19         | P1: Credit kills            | -     | Pending |
-| WAL-20         | P1: Credit kills            | -     | Pending |
-| WAL-21         | P1: Credit kills            | -     | Pending |
-| WAL-22         | P1: Credit kills            | -     | Pending |
-| WAL-23         | P1: Credit kills            | -     | Pending |
-| WAL-24         | P2: Wallet follows account  | -     | Pending |
-| WAL-25         | P2: Wallet follows account  | -     | Pending |
+| WAL-01         | P1: Read the wallet         | -     | Verified |
+| WAL-02         | P1: Read the wallet         | -     | Verified |
+| WAL-03         | P1: Read the wallet         | -     | Verified |
+| WAL-04         | P1: Read the wallet         | -     | Verified |
+| WAL-05         | P1: Read the wallet         | -     | Verified |
+| WAL-06         | P1: Read the wallet         | -     | Verified |
+| WAL-07         | P1: Configurable table      | -     | Verified |
+| WAL-08         | P1: Configurable table      | -     | Verified |
+| WAL-09         | P1: Configurable table      | -     | Verified |
+| WAL-10         | P1: Configurable table      | -     | Verified |
+| WAL-11         | P1: Configurable table      | -     | Verified |
+| WAL-12         | P1: Credit kills            | -     | Verified |
+| WAL-13         | P1: Credit kills            | -     | Verified |
+| WAL-14         | P1: Credit kills            | -     | Verified |
+| WAL-15         | P1: Credit kills            | -     | Verified |
+| WAL-16         | P1: Credit kills            | -     | Verified |
+| WAL-17         | P1: Credit kills            | -     | Verified |
+| WAL-18         | P1: Credit kills            | -     | Verified |
+| WAL-19         | P1: Credit kills            | -     | Verified |
+| WAL-20         | P1: Credit kills            | -     | Verified |
+| WAL-21         | P1: Credit kills            | -     | Verified |
+| WAL-22         | P1: Credit kills            | -     | Verified |
+| WAL-23         | P1: Credit kills            | -     | Verified |
+| WAL-24         | P2: Wallet follows account  | -     | Verified |
+| WAL-25         | P2: Wallet follows account  | -     | Verified |
 
-**Coverage:** 25 total, 0 mapped to tasks, 25 unmapped ⚠️
+**Coverage:** 25 total, 25 verified
 
 ---
 

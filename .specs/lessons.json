@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 6,
+  "next_id": 8,
   "lessons": [
     {
       "id": "L-001",
@@ -94,6 +94,42 @@
       ],
       "created": "2026-10-17T15:39:33Z",
       "last_seen": "2026-10-17T15:39:33Z"
+    },
+    {
+      "id": "L-006",
+      "key": "surviving_mutant::when an adapter maps domain data to a response add a test whose stored state holds extra data the response must omit",
+      "text": "When an adapter maps domain data to a response, add a test whose stored state holds extra data the response must omit",
+      "signal": "surviving_mutant",
+      "scope": "backend-web",
+      "status": "candidate",
+      "features": [
+        "wallet"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "mutant 16 backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/WalletController.kt:66 (backend-web)"
+      ],
+      "created": "2026-10-17T16:57:26Z",
+      "last_seen": "2026-10-17T16:57:26Z"
+    },
+    {
+      "id": "L-007",
+      "key": "spec_precision_gap::do not write log output as an acceptance criterion unless a test can assert it state it as a convention instead",
+      "text": "Do not write log output as an acceptance criterion unless a test can assert it; state it as a convention instead",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "wallet"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "WAL-23 (spec)"
+      ],
+      "created": "2026-10-17T16:57:26Z",
+      "last_seen": "2026-10-17T16:57:26Z"
     }
   ]
 }

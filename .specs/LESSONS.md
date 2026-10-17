@@ -44,6 +44,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: CLK-01 (spec)
 - last seen: 2026-10-17T15:39:33Z
 
+### L-006 - When an adapter maps domain data to a response, add a test whose stored state holds extra data the response must omit
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `backend-web` · harmful: 0
+- features: wallet
+- evidence: mutant 16 backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/WalletController.kt:66 (backend-web)
+- last seen: 2026-10-17T16:57:26Z
+
+### L-007 - Do not write log output as an acceptance criterion unless a test can assert it; state it as a convention instead
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: wallet
+- evidence: WAL-23 (spec)
+- last seen: 2026-10-17T16:57:26Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
