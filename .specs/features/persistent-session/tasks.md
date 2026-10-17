@@ -843,13 +843,14 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] ADR states endpoints, token lifetimes, hashing, secret configuration (`JWT_SECRET`), public routes, consequences (24 h revocation lag, username enumeration unchanged)
-- [ ] Gate passes: `cd backend && ./gradlew build`
+- [x] ADR states endpoints, token lifetimes, hashing, secret configuration (`JWT_SECRET`), public routes, consequences (24 h revocation lag, username enumeration unchanged)
+- [x] Gate passes: `cd backend && ./gradlew build`
 
 **Tests**: none
 **Gate**: build
 
 **Commit**: `docs(backend): add ADR for session tokens`
+**Status**: ✅ Complete
 
 ---
 
