@@ -29,3 +29,5 @@ BACKEND_URL=https://<backend-host> npm run deploy
 ```
 
 `BACKEND_URL` is the bare backend address, without `/api`. It needs a prior `npx wrangler login`.
+
+From the repository root, `./publish.sh` does all of it: it runs `start.sh`, opens a Cloudflare quick tunnel to the backend and publishes the latest game pointing at that tunnel (needs `cloudflared` and `npx wrangler login`). The tunnel address changes on every run, so the site works only while the script runs. `./publish.sh --no-deploy` skips the publish.
