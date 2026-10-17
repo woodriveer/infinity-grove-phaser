@@ -49,13 +49,13 @@ Phases are ordered and run sequentially - each phase completes before the next b
 ### Phase 1: Backend session core (domain, ports, services)
 
 ```
-T1 → T2 → T3 → T4 → T5 → T6
+T1 → T2 → T3 → T4 → T5
 ```
 
 ### Phase 2: Backend adapters and HTTP
 
 ```
-T7 → T8 → T9 → T10 → T11 → T12 → T13 → T14
+T7 → T8 → T9 → T10 → T11 → T6 → T12 → T13 → T14
 ```
 
 ### Phase 3: Game session core
@@ -227,7 +227,7 @@ T25 → T26 → T27
 
 **What**: `UserService.delete` deletes and `updatePassword` revokes all refresh tokens of the user through `RefreshTokenRepositoryPort`.
 **Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/UserService.kt`
-**Depends on**: T5
+**Depends on**: T11
 **Reuses**: Existing `UserServiceTest` setup
 **Requirement**: SESS-11
 
@@ -267,15 +267,16 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] A secret of 31 bytes is rejected, 32 bytes accepted (unit test on validation logic)
-- [ ] `application.yaml` has no default secret; `IntegrationTestBase` supplies a test secret so the context loads
-- [ ] Gate passes: `cd backend && ./gradlew ktlintCheck test`
-- [ ] Test count: previous + new tests, none deleted
+- [x] A secret of 31 bytes is rejected, 32 bytes accepted (unit test on validation logic)
+- [x] `application.yaml` has no default secret; `IntegrationTestBase` supplies a test secret so the context loads
+- [x] Gate passes: `cd backend && ./gradlew ktlintCheck test`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit
 **Gate**: full
 
 **Commit**: `feat(auth): add security properties with jwt secret validation`
+**Status**: ✅ Complete
 
 ---
 
@@ -379,6 +380,7 @@ T25 → T26 → T27
 - [ ] `revokeAllByUsername` sets `revoked` only on that user's tokens
 - [ ] `deleteAllByUsername` removes only that user's tokens
 - [ ] `RefreshTokenRepositoryIT` covers each bullet; table is cleaned before each test
+- [ ] `@Service` and `@Transactional` are restored on `SessionService` (removed in T5 so the context loads before its adapters exist) and the TODO comment is removed; the application context loads
 - [ ] Gate passes: `cd backend && ./gradlew ktlintCheck test` (Docker running)
 - [ ] Test count: previous + new tests, none deleted
 
@@ -393,7 +395,7 @@ T25 → T26 → T27
 
 **What**: `POST /users` and `POST /users/login` return `AuthResponse` (user + both tokens + expiries) by calling `StartSessionUseCase` after the user use case.
 **Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/UserController.kt`
-**Depends on**: T11
+**Depends on**: T6
 **Reuses**: `UserResponse`, `SessionService`
 **Requirement**: SESS-01
 
@@ -862,14 +864,14 @@ T25 → T26 → T27
 ```
 Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5
 
-Phase 1:  T1 ------→ T2 ------→ T3 ------→ T4 ------→ T5 ------→ T6
-Phase 2:  T7 ------→ T8 ------→ T9 ------→ T10 -----→ T11 -----→ T12 -----→ T13 -----→ T14
+Phase 1:  T1 ------→ T2 ------→ T3 ------→ T4 ------→ T5
+Phase 2:  T7 ------→ T8 ------→ T9 ------→ T10 -----→ T11 -----→ T6 ------→ T12 -----→ T13 -----→ T14
 Phase 3:  T15 -----→ T16 -----→ T17 -----→ T18 -----→ T19
 Phase 4:  T20 -----→ T21 -----→ T22 -----→ T23 -----→ T24
 Phase 5:  T25 -----→ T26 -----→ T27
 ```
 
-Execution is strictly sequential - there is no intra-phase parallelism. 27 tasks pack into 4 batches of whole phases (P1 = 6, P2 = 8, P3+P4 = 10 would exceed; planned batches: [P1], [P2], [P3], [P4+P5]).
+Execution is strictly sequential - there is no intra-phase parallelism. 27 tasks pack into 4 batches of whole phases: [P1 = 5], [P2 = 9, includes T6 moved after T11], [P3 = 5], [P4+P5 = 8].
 
 ---
 

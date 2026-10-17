@@ -13,3 +13,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+# no default: startup fails when JWT_SECRET is missing or shorter than 32 bytes
+app:
+  security:
+    jwt-secret: ${JWT_SECRET}
