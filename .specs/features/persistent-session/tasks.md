@@ -153,14 +153,15 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] Interfaces match the design (`issue`, `generate`, `hash`, `save`, `findByHash`, `revokeAllByUsername`, `deleteAllByUsername`)
-- [ ] Gate passes: `cd backend && ./gradlew build`
-- [ ] Test count: unchanged
+- [x] Interfaces match the design (`issue`, `generate`, `hash`, `save`, `findByHash`, `revokeAllByUsername`, `deleteAllByUsername`)
+- [x] Gate passes: `cd backend && ./gradlew build`
+- [x] Test count: unchanged
 
 **Tests**: none
 **Gate**: build
 
 **Commit**: `feat(auth): add session ports`
+**Status**: ✅ Complete
 
 ---
 
