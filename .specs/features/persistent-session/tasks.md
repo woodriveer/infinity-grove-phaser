@@ -661,20 +661,21 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] Registry `user` present: welcome shown, `sessionManager.restore` not called
-- [ ] `restore` `active`: registry set, welcome shown, no form
-- [ ] `restore` `none`: form shown
-- [ ] `restore` `offline`: form shown and the message displayed with the error style
-- [ ] Login or sign-up success calls `sessionManager.start` with the response and sets registry `user` to the user object
-- [ ] The scene being left while `restore` is pending does not throw
-- [ ] `MainMenu.test.js` updated and extended for each bullet
-- [ ] Gate passes: `cd game && npm test && npm run test:e2e`
-- [ ] Test count: previous + new tests, none deleted
+- [x] Registry `user` present: welcome shown, `sessionManager.restore` not called
+- [x] `restore` `active`: registry set, welcome shown, no form
+- [x] `restore` `none`: form shown
+- [x] `restore` `offline`: form shown and the message displayed with the error style
+- [x] Login or sign-up success calls `sessionManager.start` with the response and sets registry `user` to the user object
+- [x] The scene being left while `restore` is pending does not throw
+- [x] `MainMenu.test.js` updated and extended for each bullet
+- [x] Gate passes: `cd game && npm test && npm run test:e2e`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit + e2e
 **Gate**: full
 
 **Commit**: `feat(game): restore stored session in main menu`
+**Status**: ✅ Complete
 
 ---
 
