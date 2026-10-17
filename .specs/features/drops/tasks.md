@@ -284,12 +284,12 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] Wallet routes return 401 `AUTH_UNAUTHENTICATED` without a valid Bearer
-- [ ] `GET /wallet` returns `{ wallet, drops: { "1": [20 values] } }` for the logged-in user and keeps state per user
-- [ ] `POST /wallet/sync` credits the first k queued values, removes them, refills to 20, and returns `{ wallet, accepted, drops }`
-- [ ] The helper exposes the recorded wallet calls and a way to seed the queue and the starting wallet
-- [ ] Existing e2e scenarios still pass: `npm run test:e2e`
-- [ ] Gate check passes: `npm run build && npm test`
+- [x] Wallet routes return 401 `AUTH_UNAUTHENTICATED` without a valid Bearer
+- [x] `GET /wallet` returns `{ wallet, drops: { "1": [20 values] } }` for the logged-in user and keeps state per user
+- [x] `POST /wallet/sync` credits the first k queued values, removes them, refills to 20, and returns `{ wallet, accepted, drops }`
+- [x] The helper exposes the recorded wallet calls and a way to seed the queue and the starting wallet
+- [x] Existing e2e scenarios still pass: `npm run test:e2e`
+- [x] Gate check passes: `npm run build && npm test`
 
 **Tests**: none
 **Gate**: build

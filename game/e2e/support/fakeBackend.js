@@ -13,15 +13,35 @@ const problem = (status, detail, code) => ({
 const unauthenticated = () => problem(401, 'Authentication is required', 'AUTH_UNAUTHENTICATED');
 const invalidRefreshToken = () => problem(401, 'Refresh token is invalid', 'AUTH_INVALID_REFRESH_TOKEN');
 
+//  Wallet contract (WalletController): level 1 only, a queue of 20 pre-rolled drops, the first k are credited per sync
+const QUEUE_SIZE = 20;
+const DEFAULT_DROPS = [ 3, 1, 5, 2, 4 ];
+
+const coins = (copper) => ({ gold: Math.floor(copper / 10_000), silver: Math.floor(copper / 100) % 100, copper: copper % 100 });
+
 const isPublic = (method, path) => method === 'POST' && (path === '/users' || path === '/users/login');
 
-//  Options: users {name: password}, delayMs, accessTtlMs (default 24 h), refreshTtlMs (default 30 days).
-//  Returns the recorded `calls` (users and auth routes), the `users` store and test controls over issued tokens.
-export async function mockBackend (page, { users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS } = {}) {
+//  Options: users {name: password}, delayMs, accessTtlMs (default 24 h), refreshTtlMs (default 30 days),
+//  wallets {name: copper} (starting totals) and drops (the repeating list the wallet queues are rolled from).
+//  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens.
+export async function mockBackend (page, {
+    users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS
+} = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
     const sessions = { access: new Map(), refresh: new Map() };
     let counter = 0;
+    const wallets = new Map();
+    let rolled = 0;
+
+    const nextDrop = () => drops[rolled++ % drops.length];
+    const walletOf = (username) => {
+        if (!wallets.has(username)) {
+            wallets.set(username, { copper: startingWallets[username] ?? 0, queue: Array.from({ length: QUEUE_SIZE }, nextDrop) });
+        }
+
+        return wallets.get(username);
+    };
 
     const issue = (user, now) => {
         counter += 1;
@@ -41,6 +61,46 @@ export async function mockBackend (page, { users = {}, delayMs = 0, accessTtlMs 
         const entry = sessions.access.get(token);
 
         return Boolean(entry) && now < entry.expiresAt;
+    };
+
+    const bearerUsername = (request) => sessions.access.get((request.headers().authorization ?? '').replace(/^Bearer /, ''))?.username;
+
+    const handleWallet = (route, method, path, body, now) => {
+        const request = route.request();
+
+        if (!hasValidBearer(request, now)) { return route.fulfill(unauthenticated()); }
+
+        const username = bearerUsername(request);
+
+        if (!store.has(username)) { return route.fulfill(problem(404, `User '${username}' not found`, 'USER_NOT_FOUND')); }
+
+        const wallet = walletOf(username);
+
+        if (method === 'GET' && path === '/wallet') {
+            return route.fulfill({ json: { wallet: coins(wallet.copper), drops: { 1: [ ...wallet.queue ] } } });
+        }
+
+        if (method === 'POST' && path === '/wallet/sync') {
+            const kills = body.kills;
+            const entries = kills && typeof kills === 'object' && !Array.isArray(kills) ? Object.entries(kills) : null;
+
+            if (!entries || entries.some(([ , count ]) => !Number.isInteger(count) || count < 0)) {
+                return route.fulfill(problem(400, 'Kills are invalid', 'WALLET_INVALID_KILLS'));
+            }
+            if (entries.some(([ level ]) => level !== '1')) {
+                return route.fulfill(problem(400, 'Monster level is unknown', 'WALLET_UNKNOWN_LEVEL'));
+            }
+
+            const accepted = Math.min(Number(kills['1'] ?? 0), QUEUE_SIZE);
+            const credited = wallet.queue.splice(0, accepted);
+
+            wallet.copper += credited.reduce((sum, value) => sum + value, 0);
+            wallet.queue.push(...Array.from({ length: accepted }, nextDrop));
+
+            return route.fulfill({ json: { wallet: coins(wallet.copper), accepted: { 1: accepted }, drops: { 1: [ ...wallet.queue ] } } });
+        }
+
+        return route.fulfill(problem(404, 'Not found'));
     };
 
     const handler = async (route) => {
@@ -106,6 +166,8 @@ export async function mockBackend (page, { users = {}, delayMs = 0, accessTtlMs 
             return route.fulfill({ status: 204 });
         }
 
+        if (path === '/wallet' || path === '/wallet/sync') { return handleWallet(route, method, path, body, now); }
+
         if (path.startsWith('/users') && !isPublic(method, path)) {
             if (!hasValidBearer(request, now)) { return route.fulfill(unauthenticated()); }
 
@@ -119,10 +181,14 @@ export async function mockBackend (page, { users = {}, delayMs = 0, accessTtlMs 
 
     await page.route('**/api/users**', handler);
     await page.route('**/api/auth/**', handler);
+    //  Not `**/api/wallet**`: that would also catch Vite's module request for /src/api/walletApi.js
+    await page.route('**/api/wallet', handler);
+    await page.route('**/api/wallet/**', handler);
 
     return {
         calls,
         users: store,
+        wallets,
         sessions,
         //  Makes every issued access token expired, as if 24 h had passed
         expireAccessTokens: () => {
