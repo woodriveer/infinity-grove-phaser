@@ -6,6 +6,7 @@ import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.port.PasswordHasherPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.WalletRepositoryPort
 import br.com.woodriver.infinity_grove_ws.usecase.CreateUserUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.DeleteUserUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.GetUserUseCase
@@ -21,6 +22,7 @@ class UserService(
     private val userRepository: UserRepositoryPort,
     private val passwordHasher: PasswordHasherPort,
     private val refreshTokenRepository: RefreshTokenRepositoryPort,
+    private val walletRepository: WalletRepositoryPort,
 ) : CreateUserUseCase,
     GetUserUseCase,
     UpdateUserUseCase,
@@ -66,6 +68,7 @@ class UserService(
         if (!userRepository.existsByUsername(username)) throw UserNotFoundException(username)
         userRepository.deleteByUsername(username)
         refreshTokenRepository.deleteAllByUsername(username)
+        walletRepository.deleteByUsername(username)
     }
 
     override fun login(

@@ -3,11 +3,16 @@ package br.com.woodriver.infinity_grove_ws.service
 import br.com.woodriver.infinity_grove_ws.FakePasswordHasher
 import br.com.woodriver.infinity_grove_ws.InMemoryRefreshTokenRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
+import br.com.woodriver.infinity_grove_ws.SequenceDropRoller
+import br.com.woodriver.infinity_grove_ws.domain.DropRule
+import br.com.woodriver.infinity_grove_ws.domain.DropTable
 import br.com.woodriver.infinity_grove_ws.domain.InvalidPasswordException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
 import br.com.woodriver.infinity_grove_ws.domain.UserAlreadyExistsException
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -19,7 +24,11 @@ class UserServiceTest {
     private val repository = InMemoryUserRepository()
     private val hasher = FakePasswordHasher()
     private val refreshTokens = InMemoryRefreshTokenRepository()
-    private val service = UserService(repository, hasher, refreshTokens)
+    private val wallets = InMemoryWalletRepository()
+    private val service = UserService(repository, hasher, refreshTokens, wallets)
+
+    private fun wallet(username: String) =
+        Wallet.open(username, DropTable(listOf(DropRule(1, 1, 5, 1500))), SequenceDropRoller(1, 2, 3, 4, 5), now = 0)
 
     private fun token(
         hash: String,
@@ -157,5 +166,26 @@ class UserServiceTest {
         assertFailsWith<IllegalArgumentException> { service.updatePassword("yan", "short") }
 
         assertFalse(refreshTokens.tokens.getValue("y1").revoked)
+    }
+
+    @Test
+    fun `delete removes that user's wallet and leaves other wallets`() {
+        service.create("yan", "password123")
+        service.create("ana", "password123")
+        wallets.save(wallet("yan"))
+        wallets.save(wallet("ana"))
+
+        service.delete("yan")
+
+        assertEquals(setOf("ana"), wallets.wallets.keys)
+    }
+
+    @Test
+    fun `failed delete touches no wallets`() {
+        wallets.save(wallet("yan"))
+
+        assertFailsWith<UserNotFoundException> { service.delete("ghost") }
+
+        assertEquals(setOf("yan"), wallets.wallets.keys)
     }
 }

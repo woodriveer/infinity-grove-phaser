@@ -325,9 +325,9 @@ T14 → T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Deleting a user removes their wallet; deleting an unknown user still throws `UserNotFoundException` and touches nothing
-- [ ] `UserServiceTest` updated for the new constructor and covers both cases
-- [ ] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] Deleting a user removes their wallet; deleting an unknown user still throws `UserNotFoundException` and touches nothing
+- [x] `UserServiceTest` updated for the new constructor and covers both cases
+- [x] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
 
 **Tests**: unit
 **Gate**: quick
