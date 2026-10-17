@@ -102,11 +102,11 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `get` calls `GET /wallet` through `httpClient` (with auth) and returns `data`
-- [ ] `sync(kills)` calls `POST /wallet/sync` with body `{ kills }` and returns `data`
-- [ ] Errors from the client propagate
-- [ ] `src/api/index.js` exports `walletApi`
-- [ ] Gate check passes: `npm test`
+- [x] `get` calls `GET /wallet` through `httpClient` (with auth) and returns `data`
+- [x] `sync(kills)` calls `POST /wallet/sync` with body `{ kills }` and returns `data`
+- [x] Errors from the client propagate
+- [x] `src/api/index.js` exports `walletApi`
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick
