@@ -135,4 +135,14 @@ test.describe('Persistent session', () => {
 
         expect(width).toBeCloseTo(400, 1);
     });
+
+    test('the logo rests at y = 150 after the drop-in', async ({ page }) => {
+        await mockBackend(page);
+        await openMainMenu(page);
+
+        await expect.poll(() => page.evaluate(() => {
+            const scene = window.__PHASER_GAME__.scene.getScene('MainMenu');
+            return scene.children.list.find((child) => child.texture?.key === 'logo').y;
+        })).toBeCloseTo(150, 0);
+    });
 });
