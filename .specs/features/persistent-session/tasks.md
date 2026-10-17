@@ -503,19 +503,20 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `save` then `load` returns an equal session (user, both tokens, both expiries)
-- [ ] Invalid JSON, a missing field, or a non-numeric expiry makes `load` return null and removes the entry
-- [ ] `clear` removes the entry
-- [ ] When `localStorage` throws on read and write, `save` then `load` still works in memory
-- [ ] `fromAuthResponse` maps the backend response to the stored shape
-- [ ] `sessionStore.test.js` covers each bullet
-- [ ] Gate passes: `cd game && npm test`
-- [ ] Test count: previous + new tests, none deleted
+- [x] `save` then `load` returns an equal session (user, both tokens, both expiries)
+- [x] Invalid JSON, a missing field, or a non-numeric expiry makes `load` return null and removes the entry
+- [x] `clear` removes the entry
+- [x] When `localStorage` throws on read and write, `save` then `load` still works in memory
+- [x] `fromAuthResponse` maps the backend response to the stored shape
+- [x] `sessionStore.test.js` covers each bullet
+- [x] Gate passes: `cd game && npm test`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(game): add session store`
+**Status**: ✅ Complete
 
 ---
 
