@@ -55,13 +55,13 @@ T6 → T7 → T8 → T9 → T10
 ### Phase 3: Adapters
 
 ```
-T11 → T12 → T13 → T14
+T11 → T12 → T13
 ```
 
 ### Phase 4: Wiring and docs
 
 ```
-T15 → T16 → T17 → T18
+T14 → T15 → T16 → T17
 ```
 
 ---
@@ -336,64 +336,11 @@ T15 → T16 → T17 → T18
 
 ---
 
-### T11: Add wallet entities
-
-**What**: `WalletEntity` and `WalletLevelEntity` (composite id, comma-separated drops) with domain mapping.
-**Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/WalletEntities.kt`
-**Depends on**: None (previous phase complete)
-**Reuses**: `UserEntity`, `RefreshTokenEntity`
-**Requirement**: WAL-03, WAL-04
-
-**Tools**:
-
-- MCP: NONE
-- Skill: `kotlin-backend-ddd`
-
-**Done when**:
-
-- [ ] Entities map to and from the domain `Wallet` without loss (verified by the T12 round-trip IT)
-- [ ] Gate check passes: `./gradlew build`
-
-**Tests**: none
-**Gate**: build
-
-**Commit**: `feat(wallet): add wallet entities`
-
----
-
-### T12: Add the wallet repository adapter
-
-**What**: `JpaWalletRepository` (locked find, native insert-on-conflict, deletes) and `WalletRepository` implementing the port.
-**Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/WalletRepository.kt`
-**Depends on**: T11
-**Reuses**: `RefreshTokenRepository` (custom queries, `@Transactional`)
-**Requirement**: WAL-04, WAL-21, WAL-24
-
-**Tools**:
-
-- MCP: NONE
-- Skill: `kotlin-backend-ddd`
-
-**Done when**:
-
-- [ ] Round trip returns an equal `Wallet`, including queue order and allowance fields
-- [ ] `createIfAbsent` twice keeps the first row; `findForUpdate` returns null for an unknown user
-- [ ] `deleteByUsername` removes the wallet and its level rows
-- [ ] `WalletRepositoryIT` covers these paths on real PostgreSQL
-- [ ] Gate check passes: `./gradlew ktlintCheck test`
-
-**Tests**: integration
-**Gate**: full
-
-**Commit**: `feat(wallet): add wallet repository adapter`
-
----
-
-### T13: Add drop table configuration
+### T11: Add drop table configuration
 
 **What**: `WalletProperties` bound from `app.wallet.drop-table` (default level 1: 1, 5, 1500), the `DropTable` bean and `RandomDropRoller`.
 **Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/WalletConfig.kt`
-**Depends on**: T12
+**Depends on**: None (previous phase complete)
 **Reuses**: `SecurityProperties` and its startup tests
 **Requirement**: WAL-07, WAL-08, WAL-11
 
@@ -418,11 +365,39 @@ T15 → T16 → T17 → T18
 
 ---
 
-### T14: Add the wallet controller
+### T12: Add the wallet repository adapter
+
+**What**: Entities `WalletEntity` and `WalletLevelEntity` (composite id, comma-separated drops; file `adapter/repository/WalletEntities.kt`), `JpaWalletRepository` (locked find, native insert-on-conflict, deletes) and `WalletRepository` implementing the port, so the Spring context has every bean again.
+**Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/WalletRepository.kt`
+**Depends on**: T11
+**Reuses**: `RefreshTokenRepository` (custom queries, `@Transactional`)
+**Requirement**: WAL-03, WAL-04, WAL-21, WAL-24
+
+**Tools**:
+
+- MCP: NONE
+- Skill: `kotlin-backend-ddd`
+
+**Done when**:
+
+- [ ] Round trip returns an equal `Wallet`, including queue order and allowance fields
+- [ ] `createIfAbsent` twice keeps the first row; `findForUpdate` returns null for an unknown user
+- [ ] `deleteByUsername` removes the wallet and its level rows
+- [ ] `WalletRepositoryIT` covers these paths on real PostgreSQL
+- [ ] Gate check passes: `./gradlew ktlintCheck test`
+
+**Tests**: integration
+**Gate**: full
+
+**Commit**: `feat(wallet): add wallet repository adapter`
+
+---
+
+### T13: Add the wallet controller
 
 **What**: `GET /wallet` and `POST /wallet/sync` with DTOs and body validation; `ApiExceptionHandler` maps `WalletRequestException` to 400.
 **Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/WalletController.kt`
-**Depends on**: T13
+**Depends on**: T12
 **Reuses**: `AuthController`, `ApiExceptionHandler`
 **Requirement**: WAL-01, WAL-02, WAL-05, WAL-06, WAL-15, WAL-18, WAL-19, WAL-22
 
@@ -447,7 +422,7 @@ T15 → T16 → T17 → T18
 
 ---
 
-### T15: Add the concurrency and cleanup integration tests
+### T14: Add the concurrency and cleanup integration tests
 
 **What**: Parallel sync test (no value credited twice), user deletion removes the wallet, existing user gets a wallet lazily, allowance bound over HTTP.
 **Where**: `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/WalletFlowIT.kt`
@@ -476,11 +451,11 @@ T15 → T16 → T17 → T18
 
 ---
 
-### T16: Declare the drop table in application.yaml
+### T15: Declare the drop table in application.yaml
 
 **What**: Add `app.wallet.drop-table` with level 1 (1, 5, 1500) so the shipped table is visible.
 **Where**: `backend/src/main/resources/application.yaml`
-**Depends on**: T15
+**Depends on**: T14
 **Reuses**: Existing `app.security` block
 **Requirement**: WAL-07
 
@@ -501,11 +476,11 @@ T15 → T16 → T17 → T18
 
 ---
 
-### T17: Add ADR 0005 for the wallet
+### T16: Add ADR 0005 for the wallet
 
 **What**: Record the drop-queue, sync and allowance design.
 **Where**: `backend/docs/adr/0005-wallet-drops.md`
-**Depends on**: T16
+**Depends on**: T15
 **Reuses**: ADR 0004 format
 **Requirement**: WAL-12
 
@@ -526,11 +501,11 @@ T15 → T16 → T17 → T18
 
 ---
 
-### T18: Record AD-002 in STATE.md
+### T17: Record AD-002 in STATE.md
 
 **What**: Add the project-level decision that kills are client-reported and bounded by the allowance.
 **Where**: `.specs/STATE.md`
-**Depends on**: T17
+**Depends on**: T16
 **Reuses**: AD-001 format
 **Requirement**: WAL-12
 
@@ -558,6 +533,6 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4
 
 Phase 1:  T1 ------→ T2 ------→ T3 ------→ T4 ------→ T5
 Phase 2:  T6 ------→ T7 ------→ T8 ------→ T9 ------→ T10
-Phase 3:  T11 -----→ T12 -----→ T13 -----→ T14
-Phase 4:  T15 -----→ T16 -----→ T17 -----→ T18
+Phase 3:  T11 -----→ T12 -----→ T13
+Phase 4:  T14 -----→ T15 -----→ T16 -----→ T17
 ```
