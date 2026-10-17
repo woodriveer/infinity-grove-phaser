@@ -83,9 +83,9 @@ T15 → T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Three classes compile; `WalletRequestException` extends `BusinessException`
-- [ ] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
-- [ ] Existing tests still pass (no deletions)
+- [x] Three classes compile; `WalletRequestException` extends `BusinessException`
+- [x] Gate check passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] Existing tests still pass (no deletions)
 
 **Tests**: none
 **Gate**: quick

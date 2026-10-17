@@ -27,3 +27,17 @@ class LoginUserNotFoundException(
 class InvalidPasswordException : LoginException("LOGIN_INVALID_PASSWORD", "Password is invalid")
 
 class InvalidRefreshTokenException : BusinessException("AUTH_INVALID_REFRESH_TOKEN", "Refresh token is invalid")
+
+/** Base type for a wallet request the client built wrongly. */
+open class WalletRequestException(
+    code: String,
+    message: String,
+) : BusinessException(code, message)
+
+class InvalidKillsException(
+    reason: String,
+) : WalletRequestException("WALLET_INVALID_KILLS", "Kills are invalid: $reason")
+
+class UnknownLevelException(
+    level: String,
+) : WalletRequestException("WALLET_UNKNOWN_LEVEL", "Monster level '$level' is unknown")
