@@ -437,12 +437,12 @@ T14 → T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Two parallel syncs credit the queue values at most once each
-- [ ] `DELETE /users/{name}` leaves no wallet rows
-- [ ] A user created before any wallet call gets one on first `GET /wallet`
-- [ ] Syncing 500 kills right after reading accepts at most 20 and a second immediate sync accepts 0
-- [ ] `IntegrationTestBase` cleans wallet tables before each test
-- [ ] Gate check passes: `./gradlew ktlintCheck test`
+- [x] Two parallel syncs credit the queue values at most once each
+- [x] `DELETE /users/{name}` leaves no wallet rows
+- [x] A user created before any wallet call gets one on first `GET /wallet`
+- [x] Syncing 500 kills right after reading accepts at most 20 and a second immediate sync accepts 0
+- [x] `IntegrationTestBase` cleans wallet tables before each test
+- [x] Gate check passes: `./gradlew ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
