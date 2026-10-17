@@ -474,13 +474,14 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] Passes on the current tree
-- [ ] A scratch file in `domain/` importing `phaser` or `axios`, or in `application/` importing `adapters/`, makes it fail (checked once by hand and recorded in the commit body)
-- [ ] Gate passes: `npm run build && npm test`
+- [x] Passes on the current tree
+- [x] A scratch file in `domain/` importing `phaser` or `axios`, or in `application/` importing `adapters/`, makes it fail (checked once by hand and recorded in the commit body)
+- [x] Gate passes: `npm run build && npm test`
 
 **Tests**: unit
 **Gate**: build
 
+**Status**: Done
 **Commit**: `test(game): enforce the hexagonal import rule`
 
 ---
