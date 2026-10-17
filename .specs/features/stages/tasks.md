@@ -584,13 +584,14 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] `get` calls `GET /progress`; `report` posts `{ chapter, stage, encounter, phase, outcome }` to `/progress/outcome`
-- [ ] A 409 rejects with `status` 409 and the `progress` payload reachable
-- [ ] Gate passes: `npm test`
+- [x] `get` calls `GET /progress`; `report` posts `{ chapter, stage, encounter, phase, outcome }` to `/progress/outcome`
+- [x] A 409 rejects with `status` 409 and the `progress` payload reachable
+- [x] Gate passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick
 
+**Status**: Done
 **Commit**: `feat(stages): add the progress http adapter`
 
 ---
