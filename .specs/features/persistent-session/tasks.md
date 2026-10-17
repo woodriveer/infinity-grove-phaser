@@ -633,15 +633,16 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] Both calls send `skipAuth: true` in the axios config and return `response.data` unchanged
-- [ ] `userApi.test.js` updated with the new response fixture and the `skipAuth` assertion
-- [ ] Gate passes: `cd game && npm test`
-- [ ] Test count: previous + new tests, none deleted
+- [x] Both calls send `skipAuth: true` in the axios config and return `response.data` unchanged
+- [x] `userApi.test.js` updated with the new response fixture and the `skipAuth` assertion
+- [x] Gate passes: `cd game && npm test`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(game): mark login and sign-up requests as unauthenticated`
+**Status**: ✅ Complete
 
 ---
 
