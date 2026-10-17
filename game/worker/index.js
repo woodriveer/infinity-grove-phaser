@@ -13,7 +13,11 @@ export default {
 
         try
         {
-            return await fetch(new Request(target, request));
+            const forwarded = new Request(target, request);
+            //  ngrok shows an interstitial page to browser-like clients unless this header is present
+            forwarded.headers.set('ngrok-skip-browser-warning', '1');
+
+            return await fetch(forwarded);
         }
         catch
         {
