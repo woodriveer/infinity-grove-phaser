@@ -11,3 +11,9 @@ This is a simple coin clicker game. The goal is to click the coin as many times 
 
 
 ![screenshot](screenshot.png)
+## Tests
+
+- `npm test`: unit tests (Vitest). `npm run test:watch` for watch mode.
+- `npm run test:e2e`: Playwright end-to-end tests against a faked backend. First run: `npx playwright install chromium`.
+
+See `docs/adr/` for the architecture decisions.

@@ -12,6 +12,9 @@ const config = {
     width: 1024,
     height: 768,
     parent: 'game-container',
+    dom: {
+        createContainer: true
+    },
     backgroundColor: '#028af8',
     scale: {
         mode: Phaser.Scale.FIT,
@@ -32,4 +35,12 @@ const config = {
     ]
 };
 
-export default new Game(config);
+const game = new Game(config);
+
+//  Test hook: lets Playwright read canvas-rendered state. Stripped from production builds.
+if (import.meta.env.DEV)
+{
+    window.__PHASER_GAME__ = game;
+}
+
+export default game;
