@@ -816,14 +816,15 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `JWT_SECRET="${JWT_SECRET:-<dev-only 32+ byte string>}"` is exported, with a comment saying it is not for production
-- [ ] `bash -n start.sh` passes
-- [ ] Gate passes: `cd backend && ./gradlew build`
+- [x] `JWT_SECRET="${JWT_SECRET:-<dev-only 32+ byte string>}"` is exported, with a comment saying it is not for production
+- [x] `bash -n start.sh` passes
+- [x] Gate passes: `cd backend && ./gradlew build`
 
 **Tests**: none
 **Gate**: build
 
 **Commit**: `chore: export dev jwt secret in start script`
+**Status**: ✅ Complete
 
 ---
 

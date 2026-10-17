@@ -17,6 +17,10 @@ trap cleanup EXIT INT TERM
 echo "Starting docker-compose (postgres + pgadmin)..."
 (cd "$ROOT/backend" && docker compose up -d --wait)
 
+# Local development only: insecure default signing key for access tokens (>= 32 bytes).
+# Never use this value in production; set JWT_SECRET in the environment instead.
+export JWT_SECRET="${JWT_SECRET:-dev-only-insecure-secret-change-me-0123456789}"
+
 echo "Starting backend..."
 (cd "$ROOT/backend" && ./gradlew bootRun) &
 PIDS+=($!)
