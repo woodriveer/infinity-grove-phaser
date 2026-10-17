@@ -565,22 +565,23 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `restore` with an unexpired access token returns `active` with the stored user and makes no request
-- [ ] `restore` with an expired access token and unexpired refresh token calls refresh once, stores the new tokens and returns `active`
-- [ ] `restore` with both expiries in the past returns `none`, clears storage and makes no request
-- [ ] `restore` with no or invalid stored data returns `none`
-- [ ] A refresh that rejects with status 401 clears storage and `restore` returns `none`
-- [ ] A refresh that rejects with status 0 keeps storage and `restore` returns `offline` with the error message
-- [ ] Three concurrent `refresh()` calls issue one request and share its result
-- [ ] `logout` calls `authApi.logout` with the refresh token and clears storage; when the call rejects it still clears storage and resolves
-- [ ] `sessionManager.test.js` covers each bullet (authApi mocked, fake clock)
-- [ ] Gate passes: `cd game && npm test`
-- [ ] Test count: previous + new tests, none deleted
+- [x] `restore` with an unexpired access token returns `active` with the stored user and makes no request
+- [x] `restore` with an expired access token and unexpired refresh token calls refresh once, stores the new tokens and returns `active`
+- [x] `restore` with both expiries in the past returns `none`, clears storage and makes no request
+- [x] `restore` with no or invalid stored data returns `none`
+- [x] A refresh that rejects with status 401 clears storage and `restore` returns `none`
+- [x] A refresh that rejects with status 0 keeps storage and `restore` returns `offline` with the error message
+- [x] Three concurrent `refresh()` calls issue one request and share its result
+- [x] `logout` calls `authApi.logout` with the refresh token and clears storage; when the call rejects it still clears storage and resolves
+- [x] `sessionManager.test.js` covers each bullet (authApi mocked, fake clock)
+- [x] Gate passes: `cd game && npm test`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(game): add session manager`
+**Status**: ✅ Complete
 
 ---
 
