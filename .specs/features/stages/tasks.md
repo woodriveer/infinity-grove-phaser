@@ -186,7 +186,7 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 ### T5: Progress persistence
 
-**What**: `ProgressEntity`, `JpaProgressRepository` (`PESSIMISTIC_WRITE` lookup, native insert-if-absent) and `ProgressRepository : ProgressRepositoryPort`.
+**What**: `ProgressEntity` (file `ProgressEntity.kt`), `JpaProgressRepository` (`PESSIMISTIC_WRITE` lookup, native insert-if-absent) and `ProgressRepository : ProgressRepositoryPort`.
 **Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ProgressRepository.kt`
 **Depends on**: T4
 **Reuses**: `adapter/repository/WalletRepository.kt`, `WalletRepositoryIT.kt` concurrency test
@@ -199,14 +199,15 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] `createIfAbsent` then `findForUpdate` returns the same progress for every encounter value
-- [ ] A second `createIfAbsent` for the same player changes nothing and does not fail, also when two run concurrently
-- [ ] While one transaction holds `findForUpdate`, a second blocks until it ends
-- [ ] Gate passes: `./gradlew ktlintCheck test`
+- [x] `createIfAbsent` then `findForUpdate` returns the same progress for every encounter value
+- [x] A second `createIfAbsent` for the same player changes nothing and does not fail, also when two run concurrently
+- [x] While one transaction holds `findForUpdate`, a second blocks until it ends
+- [x] Gate passes: `./gradlew ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
 
+**Status**: Done
 **Commit**: `feat(stages): persist player progress`
 
 ---

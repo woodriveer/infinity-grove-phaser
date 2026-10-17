@@ -1,6 +1,7 @@
 package br.com.woodriver.infinity_grove_ws
 
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaChapterRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaProgressRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaRefreshTokenRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaStageRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaUserRepository
@@ -50,6 +51,9 @@ abstract class IntegrationTestBase {
     protected lateinit var jpaWalletLevelRepository: JpaWalletLevelRepository
 
     @Autowired
+    protected lateinit var jpaProgressRepository: JpaProgressRepository
+
+    @Autowired
     protected lateinit var jpaChapterRepository: JpaChapterRepository
 
     @Autowired
@@ -70,6 +74,7 @@ abstract class IntegrationTestBase {
         RestAssured.port = port
         RestAssured.basePath = ""
         jpaRefreshTokenRepository.deleteAll()
+        jpaProgressRepository.deleteAll()
         jpaWalletLevelRepository.deleteAll()
         jpaWalletRepository.deleteAll()
         jpaUserRepository.deleteAll()
