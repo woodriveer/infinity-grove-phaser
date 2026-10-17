@@ -352,14 +352,15 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `toDomain()` and `from()` round-trip all fields
-- [ ] Gate passes: `cd backend && ./gradlew build` (context loads, Hibernate creates the table)
-- [ ] Test count: unchanged
+- [x] `toDomain()` and `from()` round-trip all fields
+- [x] Gate passes: `cd backend && ./gradlew build` (context loads, Hibernate creates the table)
+- [x] Test count: unchanged
 
 **Tests**: none
 **Gate**: build
 
 **Commit**: `feat(auth): add refresh token entity`
+**Status**: ✅ Complete
 
 ---
 
