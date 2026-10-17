@@ -600,20 +600,21 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] With a session, requests carry the Bearer header; without one, they carry none; `skipAuth` requests carry none
-- [ ] A 401 on a Bearer request triggers one refresh and one retry with the new token, and the retry result is returned
-- [ ] If the retry also returns 401, the call rejects with `ApiError` and no second refresh happens
-- [ ] If the refresh rejects, the call rejects with that `ApiError`
-- [ ] A 401 on a `skipAuth` request is rejected without refresh
-- [ ] Two concurrent 401s cause one refresh call and both requests are retried
-- [ ] Existing `httpClient.test.js` tests still pass; new tests added for the bullets above
-- [ ] Gate passes: `cd game && npm test`
-- [ ] Test count: previous + new tests, none deleted
+- [x] With a session, requests carry the Bearer header; without one, they carry none; `skipAuth` requests carry none
+- [x] A 401 on a Bearer request triggers one refresh and one retry with the new token, and the retry result is returned
+- [x] If the retry also returns 401, the call rejects with `ApiError` and no second refresh happens
+- [x] If the refresh rejects, the call rejects with that `ApiError`
+- [x] A 401 on a `skipAuth` request is rejected without refresh
+- [x] Two concurrent 401s cause one refresh call and both requests are retried
+- [x] Existing `httpClient.test.js` tests still pass; new tests added for the bullets above
+- [x] Gate passes: `cd game && npm test`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(game): send bearer token and refresh on 401`
+**Status**: ✅ Complete
 
 ---
 
