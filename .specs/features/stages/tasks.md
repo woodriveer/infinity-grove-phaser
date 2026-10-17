@@ -501,14 +501,15 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] Each row of the transition table is a test, with health and time limit taken from the payload definition
-- [ ] Labels are `Stage S/10  Phase P/5`, `Stage S/10  Miniboss`, `Chapter Boss` with counts from the definition
-- [ ] After `cleared()` on the chapter boss `completed` is true and `encounter()` is null
-- [ ] Gate passes: `npm test`
+- [x] Each row of the transition table is a test, with health and time limit taken from the payload definition
+- [x] Labels are `Stage S/10  Phase P/5`, `Stage S/10  Miniboss`, `Chapter Boss` with counts from the definition
+- [x] After `cleared()` on the chapter boss `completed` is true and `encounter()` is null
+- [x] Gate passes: `npm test`
 
 **Tests**: unit
 **Gate**: quick
 
+**Status**: Done
 **Commit**: `feat(stages): add campaign rules to the game domain`
 
 ---
