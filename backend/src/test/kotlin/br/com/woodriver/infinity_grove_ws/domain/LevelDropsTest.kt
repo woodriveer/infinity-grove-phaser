@@ -39,6 +39,18 @@ class LevelDropsTest {
     }
 
     @Test
+    fun `accepting all 20 kills of a full allowance credits all 20 and returns a fresh queue of 20`() {
+        val roller = roller()
+        val drops = LevelDrops.fresh(rule, roller, now = 0)
+
+        val result = drops.accept(20, rule, roller, now = 0)
+
+        assertEquals(20, result.count)
+        assertEquals(firstTwenty.sum().toLong(), result.copper)
+        assertEquals(firstTwenty, result.drops.queue)
+    }
+
+    @Test
     fun `accept spends one allowance per accepted kill`() {
         val roller = roller()
         val drops = LevelDrops.fresh(rule, roller, now = 0)
