@@ -535,17 +535,18 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] `refresh` POSTs `{ refreshToken }` to `/auth/refresh` and returns the response data
-- [ ] `logout` POSTs `{ refreshToken }` to `/auth/logout`
-- [ ] A 401 rejects with `ApiError` status 401 and the code; a network failure rejects with `ApiError` status 0
-- [ ] `authApi.test.js` covers each bullet
-- [ ] Gate passes: `cd game && npm test`
-- [ ] Test count: previous + new tests, none deleted
+- [x] `refresh` POSTs `{ refreshToken }` to `/auth/refresh` and returns the response data
+- [x] `logout` POSTs `{ refreshToken }` to `/auth/logout`
+- [x] A 401 rejects with `ApiError` status 401 and the code; a network failure rejects with `ApiError` status 0
+- [x] `authApi.test.js` covers each bullet
+- [x] Gate passes: `cd game && npm test`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(game): add auth api`
+**Status**: ✅ Complete
 
 ---
 
