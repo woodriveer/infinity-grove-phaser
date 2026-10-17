@@ -441,18 +441,19 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] Refresh with a valid token returns new tokens and the old token then fails with 401 `AUTH_INVALID_REFRESH_TOKEN`
-- [ ] Unknown token, expired token (row with past `expires_at`), revoked token, and token of a deleted user each return 401 with that code
-- [ ] Blank or missing `refreshToken` returns 400
-- [ ] Logout returns 204, the token no longer refreshes; logout with an unknown or already revoked token still returns 204
-- [ ] `AuthControllerIT` covers each bullet
-- [ ] Gate passes: `cd backend && ./gradlew ktlintCheck test` (Docker running)
-- [ ] Test count: previous + new tests, none deleted
+- [x] Refresh with a valid token returns new tokens and the old token then fails with 401 `AUTH_INVALID_REFRESH_TOKEN`
+- [x] Unknown token, expired token (row with past `expires_at`), revoked token, and token of a deleted user each return 401 with that code
+- [x] Blank or missing `refreshToken` returns 400
+- [x] Logout returns 204, the token no longer refreshes; logout with an unknown or already revoked token still returns 204
+- [x] `AuthControllerIT` covers each bullet
+- [x] Gate passes: `cd backend && ./gradlew ktlintCheck test` (Docker running)
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: integration
 **Gate**: full
 
 **Commit**: `feat(auth): add refresh and logout endpoints`
+**Status**: ✅ Complete
 
 ---
 
