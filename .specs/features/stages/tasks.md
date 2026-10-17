@@ -87,14 +87,15 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] A stage with a non-positive health, phase count or time limit, and a chapter whose stages are not 1..n, are rejected
-- [ ] `first()` has 10 stages of 5 phases, monster health 10..19, miniboss health 5 × monster health, miniboss limit 30 000 ms, boss health 300, boss limit 60 000 ms
-- [ ] `stage(n)` returns the stage or fails for an unknown number
-- [ ] Gate passes: `./gradlew ktlintCheck test --tests "*Test"`
+- [x] A stage with a non-positive health, phase count or time limit, and a chapter whose stages are not 1..n, are rejected
+- [x] `first()` has 10 stages of 5 phases, monster health 10..19, miniboss health 5 × monster health, miniboss limit 30 000 ms, boss health 300, boss limit 60 000 ms
+- [x] `stage(n)` returns the stage or fails for an unknown number
+- [x] Gate passes: `./gradlew ktlintCheck test --tests "*Test"`
 
 **Tests**: unit
 **Gate**: quick
 
+**Status**: Done
 **Commit**: `feat(stages): add chapter and stage definitions`
 
 ---
