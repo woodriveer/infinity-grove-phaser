@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 6,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "spec_precision_gap::assert the realised end state of an animation or tween read the object s final position not only the tween configuration value",
+      "text": "Assert the realised end state of an animation or tween (read the object's final position), not only the tween configuration value",
+      "signal": "spec_precision_gap",
+      "scope": "game-ui",
+      "status": "candidate",
+      "features": [
+        "persistent-session"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "SESS-17 AC2 MainMenu.test.js:330 (game-ui)"
+      ],
+      "created": "2026-10-17T13:06:22Z",
+      "last_seen": "2026-10-17T13:06:22Z"
+    },
+    {
+      "id": "L-002",
+      "key": "spec_precision_gap::prove a fail fast startup requirement by booting the application context with the invalid configuration not only by constructing the properties class",
+      "text": "Prove a fail-fast startup requirement by booting the application context with the invalid configuration, not only by constructing the properties class",
+      "signal": "spec_precision_gap",
+      "scope": "backend-config",
+      "status": "candidate",
+      "features": [
+        "persistent-session"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "SESS-12 AC8 SecurityPropertiesTest.kt:10-23 (backend-config)"
+      ],
+      "created": "2026-10-17T13:06:22Z",
+      "last_seen": "2026-10-17T13:06:22Z"
+    },
+    {
+      "id": "L-003",
+      "key": "spec_precision_gap::when a spec edge case spans modules add one test at the boundary that proves the end to end outcome instead of testing each half separately",
+      "text": "When a spec edge case spans modules, add one test at the boundary that proves the end-to-end outcome instead of testing each half separately",
+      "signal": "spec_precision_gap",
+      "scope": "game-auth",
+      "status": "candidate",
+      "features": [
+        "persistent-session"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Edge case 2 httpClient.test.js:128-137 (game-auth)"
+      ],
+      "created": "2026-10-17T13:06:22Z",
+      "last_seen": "2026-10-17T13:06:22Z"
+    },
+    {
+      "id": "L-004",
+      "key": "surviving_mutant::assert placeholder entity dimensions that the spec assumptions table states or the layout values can change unnoticed",
+      "text": "Assert placeholder entity dimensions that the spec Assumptions table states, or the layout values can change unnoticed",
+      "signal": "surviving_mutant",
+      "scope": "scenes",
+      "status": "candidate",
+      "features": [
+        "clicker-combat"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "mutant 15-16 game/src/scenes/ClickerGame.js:4-5 (scenes)"
+      ],
+      "created": "2026-10-17T15:39:33Z",
+      "last_seen": "2026-10-17T15:39:33Z"
+    },
+    {
+      "id": "L-005",
+      "key": "spec_precision_gap::put stated sizes and positions into the acceptance criterion not only the assumptions table so tests can anchor to them",
+      "text": "Put stated sizes and positions into the acceptance criterion, not only the Assumptions table, so tests can anchor to them",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "clicker-combat"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "CLK-01 (spec)"
+      ],
+      "created": "2026-10-17T15:39:33Z",
+      "last_seen": "2026-10-17T15:39:33Z"
+    }
+  ]
+}
