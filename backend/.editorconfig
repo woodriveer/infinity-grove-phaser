@@ -1,0 +1,7 @@
+root = true
+
+[*.{kt,kts}]
+indent_style = space
+indent_size = 4
+# Spring Initializr generated package (infinity_grove_ws) contains underscores
+ktlint_standard_package-name = disabled

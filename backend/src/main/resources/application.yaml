@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: infinity-grove-ws
+  datasource:
+    url: jdbc:postgresql://localhost:5432/infinity_grove
+    username: infinity
+    password: infinity
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
