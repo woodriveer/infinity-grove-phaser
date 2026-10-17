@@ -1,10 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { httpClient } from './httpClient';
-import { userApi } from './userApi';
+import { createUserApi } from './userApi';
 
-vi.mock('./httpClient', () => ({
-    httpClient: { post: vi.fn() }
-}));
+const httpClient = { post: vi.fn() };
+const userApi = createUserApi(httpClient);
 
 const user = { username: 'yan', createdAt: 1, lastLoginAt: 1 };
 const authResponse = {

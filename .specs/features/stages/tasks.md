@@ -393,13 +393,14 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] The `httpClient` -> `sessionManager` import and its warning comment are gone; the client receives the session as a parameter
-- [ ] All `httpClient`, `authApi`, `userApi`, `walletApi`, `config` and `ApiError` tests pass with unchanged assertions
-- [ ] Gate passes: `npm test && npm run test:e2e`
+- [x] The `httpClient` -> `sessionManager` import and its warning comment are gone; the client receives the session as a parameter
+- [x] All `httpClient`, `authApi`, `userApi`, `walletApi`, `config` and `ApiError` tests pass with unchanged assertions
+- [x] Gate passes: `npm test && npm run test:e2e`
 
 **Tests**: unit
 **Gate**: full
 
+**Status**: Done
 **Commit**: `refactor(game): build the http adapters by factories`
 
 ---

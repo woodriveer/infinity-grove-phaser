@@ -1,10 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { httpClient } from './httpClient';
-import { walletApi } from './walletApi';
+import { createWalletApi } from './walletApi';
 
-vi.mock('./httpClient', () => ({
-    httpClient: { get: vi.fn(), post: vi.fn() }
-}));
+const httpClient = { get: vi.fn(), post: vi.fn() };
+const walletApi = createWalletApi(httpClient);
 
 const walletResponse = {
     wallet: { gold: 1, silver: 2, copper: 3 },

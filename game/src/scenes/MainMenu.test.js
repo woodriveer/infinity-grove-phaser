@@ -1,17 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MainMenu } from './MainMenu';
-import { userApi } from '../api';
-import { sessionManager } from '../composition';
+import { sessionManager, userApi } from '../composition';
 
 vi.mock('phaser', () => ({
     Scene: class { constructor (key) { this.key = key; } }
 }));
 
-vi.mock('../api', () => ({
-    userApi: { login: vi.fn(), signUp: vi.fn() }
-}));
-
 vi.mock('../composition', () => ({
+    userApi: { login: vi.fn(), signUp: vi.fn() },
     sessionManager: { restore: vi.fn(), start: vi.fn(), logout: vi.fn() }
 }));
 

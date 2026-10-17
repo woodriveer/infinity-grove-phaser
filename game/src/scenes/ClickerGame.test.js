@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClickerGame } from './ClickerGame';
-import { walletApi } from '../api';
+import { walletApi } from '../composition';
 
 vi.mock('phaser', () => ({
     Scene: class { constructor (key) { this.key = key; } }
 }));
 
-vi.mock('../api', () => ({
+vi.mock('../composition', () => ({
     walletApi: { get: vi.fn(), sync: vi.fn() }
 }));
 

@@ -1,11 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { httpClient } from './httpClient';
-import { ApiError } from '../application/ApiError';
-import { sessionManager } from '../composition';
+import { createHttpClient } from './httpClient';
+import { ApiError } from '../../application/ApiError';
 
-vi.mock('../composition', () => ({
-    sessionManager: { accessToken: vi.fn(() => null), refresh: vi.fn() }
-}));
+//  The session port the client is built with
+const sessionManager = { accessToken: vi.fn(() => null), refresh: vi.fn() };
+const httpClient = createHttpClient({ session: sessionManager });
 
 //  Replaces the network with a fake adapter; interceptors and defaults still run.
 const respondWith = (status, data) => (config) => {

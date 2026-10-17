@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authApi, authClient } from './authApi';
-import { httpClient } from './httpClient';
-import { ApiError } from '../application/ApiError';
+import { createHttpClient } from './httpClient';
+import { ApiError } from '../../application/ApiError';
 
 const authResponse = {
     user: { username: 'yan', createdAt: 1, lastLoginAt: 2 },
@@ -21,6 +21,8 @@ const fakeAdapter = (status, data) => vi.fn((config) => {
 });
 
 describe('authApi', () => {
+    const httpClient = createHttpClient({ session: { accessToken: () => null, refresh: vi.fn() } });
+
     beforeEach(() => {
         authClient.defaults.adapter = fakeAdapter(200, authResponse);
     });

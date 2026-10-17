@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { walletApi } from '../api';
+import { walletApi } from '../composition';
 import { DAMAGE_PER_CLICK, Monster } from '../domain/combat/monster';
 import { WalletLedger } from '../domain/economy/walletLedger';
 
