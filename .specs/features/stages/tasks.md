@@ -283,16 +283,17 @@ T16 → T17 → T18 → T19 → T20 → T21 → T22 → T23
 
 **Done when**:
 
-- [ ] `GET /progress` of a new player is 200 with stage 1 phase 1 and the full chapter definition
-- [ ] `POST /progress/outcome` `CLEARED` through a whole stage, the miniboss, stage 10, the chapter boss and completion returns each next position; `FAILED` on a boss returns the last phase of the stage
-- [ ] A wrong position, `FAILED` on `PHASE`, and any report after completion are 409 with `code` `PROGRESS_CONFLICT` and the stored progress in `progress`, and the stored row is unchanged
-- [ ] A malformed body is 400 `PROGRESS_INVALID_OUTCOME`; no or a bad token is 401 on both routes; a player only reads and writes their own row
-- [ ] Two concurrent identical reports give exactly one 200 and one 409
-- [ ] Gate passes: `./gradlew ktlintCheck test`
+- [x] `GET /progress` of a new player is 200 with stage 1 phase 1 and the full chapter definition
+- [x] `POST /progress/outcome` `CLEARED` through a whole stage, the miniboss, stage 10, the chapter boss and completion returns each next position; `FAILED` on a boss returns the last phase of the stage
+- [x] A wrong position, `FAILED` on `PHASE`, and any report after completion are 409 with `code` `PROGRESS_CONFLICT` and the stored progress in `progress`, and the stored row is unchanged
+- [x] A malformed body is 400 `PROGRESS_INVALID_OUTCOME`; no or a bad token is 401 on both routes; a player only reads and writes their own row
+- [x] Two concurrent identical reports give exactly one 200 and one 409
+- [x] Gate passes: `./gradlew ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
 
+**Status**: Done
 **Commit**: `feat(stages): expose progress endpoints`
 
 ---

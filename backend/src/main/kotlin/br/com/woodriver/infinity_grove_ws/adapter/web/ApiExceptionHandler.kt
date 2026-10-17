@@ -4,6 +4,8 @@ import br.com.woodriver.infinity_grove_ws.domain.BusinessException
 import br.com.woodriver.infinity_grove_ws.domain.InvalidRefreshTokenException
 import br.com.woodriver.infinity_grove_ws.domain.LoginException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.ProgressConflictException
+import br.com.woodriver.infinity_grove_ws.domain.ProgressRequestException
 import br.com.woodriver.infinity_grove_ws.domain.UserAlreadyExistsException
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.WalletRequestException
@@ -32,6 +34,14 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(WalletRequestException::class)
     fun walletRequest(e: WalletRequestException) = problem(HttpStatus.BAD_REQUEST, e)
+
+    @ExceptionHandler(ProgressRequestException::class)
+    fun progressRequest(e: ProgressRequestException) = problem(HttpStatus.BAD_REQUEST, e)
+
+    /** The body carries the stored progress so the game can realign without another request. */
+    @ExceptionHandler(ProgressConflictException::class)
+    fun progressConflict(e: ProgressConflictException) =
+        problem(HttpStatus.CONFLICT, e).apply { setProperty("progress", ProgressResponse.from(e.current)) }
 
     @ExceptionHandler(BusinessException::class)
     fun business(e: BusinessException) = problem(HttpStatus.UNPROCESSABLE_CONTENT, e)
