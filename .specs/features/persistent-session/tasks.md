@@ -694,18 +694,19 @@ T25 → T26 → T27
 
 **Done when**:
 
-- [ ] Welcome state renders a button with accessible name "Logout"; auth form state does not
-- [ ] Click calls `sessionManager.logout` once, clears registry `user`, destroys welcome and logout DOM, shows the form
-- [ ] When `logout` rejects the form still shows
-- [ ] Clicking Logout does not call `scene.start('ClickerGame')`
-- [ ] `MainMenu.test.js` extended for each bullet
-- [ ] Gate passes: `cd game && npm test && npm run test:e2e`
-- [ ] Test count: previous + new tests, none deleted
+- [x] Welcome state renders a button with accessible name "Logout"; auth form state does not
+- [x] Click calls `sessionManager.logout` once, clears registry `user`, destroys welcome and logout DOM, shows the form
+- [x] When `logout` rejects the form still shows
+- [x] Clicking Logout does not call `scene.start('ClickerGame')`
+- [x] `MainMenu.test.js` extended for each bullet
+- [x] Gate passes: `cd game && npm test && npm run test:e2e`
+- [x] Test count: previous + new tests, none deleted
 
 **Tests**: unit + e2e
 **Gate**: full
 
 **Commit**: `feat(game): add logout button`
+**Status**: ✅ Complete
 
 ---
 

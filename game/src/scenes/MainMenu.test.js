@@ -48,6 +48,7 @@ const createScene = (registryData = {}) => {
     scene.tweens = { add: vi.fn() };
     scene.input = {
         once: vi.fn((event, cb) => { inputHandlers[event] = cb; }),
+        off: vi.fn((event, cb) => { if (inputHandlers[event] === cb) { delete inputHandlers[event]; } }),
         keyboard: { disableGlobalCapture: vi.fn() }
     };
     scene.scene = { start: vi.fn() };
@@ -56,7 +57,9 @@ const createScene = (registryData = {}) => {
     const welcomeTitle = () => doms.map((d) => d.node.querySelector('.welcome-title')).find(Boolean)?.textContent;
     const message = () => ({ text: scene.message.textContent, isError: scene.message.classList.contains('error') });
 
-    return { scene, form, welcomeTitle, message, inputHandlers, registryData };
+    const logoutButton = () => doms.map((d) => d.node.querySelector('[name="logout"]')).find(Boolean);
+
+    return { scene, form, doms, welcomeTitle, logoutButton, message, inputHandlers, registryData };
 };
 
 const fill = (form, username, password) => {
@@ -253,5 +256,65 @@ describe('MainMenu session restore', () => {
         expect(registryData.user).toBeUndefined();
         expect(welcomeTitle()).toBeUndefined();
         expect(scene.add.dom.mock.calls.length).toBe(domCount);
+    });
+});
+
+describe('MainMenu logout', () => {
+    const loggedIn = () => createScene({ highscore: 0, user: { username: 'yan' } });
+
+    it('renders a Logout button in the welcome state', () => {
+        const { scene, logoutButton } = loggedIn();
+
+        scene.create();
+
+        expect(logoutButton().textContent).toBe('Logout');
+        expect(logoutButton().tagName).toBe('BUTTON');
+    });
+
+    it('does not render a Logout button in the auth form state', async () => {
+        const { scene, logoutButton } = createScene({ highscore: 0 });
+
+        await open(scene);
+
+        expect(logoutButton()).toBeUndefined();
+    });
+
+    it('logs out once, clears the user, destroys the welcome and shows the form', async () => {
+        const { scene, form, doms, logoutButton, registryData, message } = loggedIn();
+        scene.create();
+        const welcomeDoms = doms.filter((d) => d.node.querySelector('.welcome-title') || d.node.querySelector('[name="logout"]'));
+
+        logoutButton().click();
+        await flush();
+
+        expect(sessionManager.logout).toHaveBeenCalledTimes(1);
+        expect(registryData.user).toBeUndefined();
+        expect(welcomeDoms.every((d) => d.destroy.mock.calls.length === 1)).toBe(true);
+        expect(welcomeDoms).toHaveLength(2);
+        expect(form.getChildByName('login')).not.toBeNull();
+        expect(message()).toEqual({ text: '', isError: false });
+    });
+
+    it('still shows the form when the logout request rejects', async () => {
+        vi.mocked(sessionManager.logout).mockRejectedValue(new Error('boom'));
+        const { scene, form, logoutButton, registryData } = loggedIn();
+        scene.create();
+
+        logoutButton().click();
+        await flush();
+
+        expect(registryData.user).toBeUndefined();
+        expect(form.getChildByName('login')).not.toBeNull();
+    });
+
+    it('does not start the game when logging out, even on a later canvas click', async () => {
+        const { scene, logoutButton, inputHandlers } = loggedIn();
+        scene.create();
+
+        logoutButton().click();
+        await flush();
+
+        expect(inputHandlers.pointerdown).toBeUndefined();
+        expect(scene.scene.start).not.toHaveBeenCalled();
     });
 });

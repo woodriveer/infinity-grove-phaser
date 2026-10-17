@@ -22,6 +22,8 @@ const WELCOME_HTML = `
     </div>
 `;
 
+const LOGOUT_HTML = '<button type="button" class="logout" name="logout">Logout</button>';
+
 export class MainMenu extends Scene
 {
     constructor ()
@@ -140,10 +142,32 @@ export class MainMenu extends Scene
         welcome.pointerEvents = 'none';
         welcome.node.querySelector('.welcome-title').textContent = `Hello, ${user.username}!`;
 
-        this.input.once('pointerdown', () => {
+        //  Own DOM element: the welcome block is click-through, the button must receive clicks
+        const logout = this.add.dom(512, 640).createFromHTML(LOGOUT_HTML);
+
+        const start = () => {
 
             this.scene.start('ClickerGame');
 
+        };
+
+        this.input.once('pointerdown', start);
+
+        logout.getChildByName('logout').addEventListener('click', async (event) => {
+
+            event.currentTarget.disabled = true;
+            this.input.off('pointerdown', start);
+
+            //  logout() clears the local session even when the server call fails
+            await sessionManager.logout().catch(() => {});
+
+            if (!this.sys.isActive()) { return; }
+
+            this.registry.remove('user');
+            welcome.destroy();
+            logout.destroy();
+            this.showMessage('');
+            this.showAuthForm();
         });
     }
 
