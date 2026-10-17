@@ -10,6 +10,14 @@
 - **Date**: 2026-10-17
 - **Status**: active
 
+### AD-002
+- **Decision**: Kills are reported by the game in batches (`POST /wallet/sync`); the server credits only the drops it pre-rolled and accepts at most one kill per level `kill-interval-ms` (bucket of 20).
+- **Reason**: One request per kill does not scale for a clicker, and combat runs in the browser so the server cannot see a kill.
+- **Trade-off**: A client can claim kills it did not make, up to the allowance; kills never synced are lost. Closing the gap needs server-side combat.
+- **Scope**: `backend` wallet code, `game/src/scenes/ClickerGame.js` and any future reward (XP, items) that depends on kills
+- **Date**: 2026-10-17
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: .specs/features/persistent-session

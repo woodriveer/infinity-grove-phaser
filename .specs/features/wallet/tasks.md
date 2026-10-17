@@ -516,8 +516,8 @@ T14 → T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `validate_state.py` structure is unchanged and AD-002 is `active`
-- [ ] Gate check passes: `./gradlew build`
+- [x] `validate_state.py` structure is unchanged and AD-002 is `active`
+- [x] Gate check passes: `./gradlew build`
 
 **Tests**: none
 **Gate**: build
