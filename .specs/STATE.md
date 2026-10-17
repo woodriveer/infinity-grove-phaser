@@ -36,11 +36,11 @@
 
 ## Handoff
 
-- **Feature**: .specs/features/wallet and .specs/features/drops
-- **Phase / Task**: Done - wallet T1-T17 and drops T1-T10 committed, both Verifier-style reports PASS (`validation.md`)
-- **Completed**: wallet T1-T17, drops T1-T10
+- **Feature**: .specs/features/stages (builds on wallet and drops)
+- **Phase / Task**: Done - stages T1-T23 committed and pushed, Verifier-style report PASS (`validation.md`, 28/28 ACs, 10/10 mutants killed)
+- **Completed**: stages T1-T23 (backend domain, service, persistence, seeder, endpoints; game refactor to ADR 0007; campaign domain, session, http adapter, scene flow, saving, e2e); earlier wallet T1-T17 and drops T1-T10
 - **In-progress** (file:line): none
-- **Next step**: Run the backend (port 8080, `JWT_SECRET` set) and `npm run dev` together once by hand to see the real queue and sync; open gap G-3 of persistent-session (401-after-refresh from an in-game call) now applies to `GET /wallet` and `POST /wallet/sync`
+- **Next step**: Run the backend (port 8080, `JWT_SECRET` set) and `npm run dev` together once by hand to see the real `/progress` flow (gap G4: the two sides are verified separately); decide the wording of the countdown (`Time: N`) and the completion message (`Chapter complete!`) (gaps G1, G2); the persistent-session gap G-3 (401-after-refresh from an in-game call) now also applies to `GET /progress` and `POST /progress/outcome`
 - **Blockers**: none
-- **Uncommitted files**: none
+- **Uncommitted files**: `game/src/adapters/phaser/Preloader.js` (the owner's switch of the coin atlas image to `coin-copper.png`) and `game/public/assets/coin-*.png`; they predate this feature and were never staged
 - **Branch**: main

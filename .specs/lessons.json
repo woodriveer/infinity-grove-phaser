@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 10,
+  "next_id": 11,
   "lessons": [
     {
       "id": "L-001",
@@ -166,6 +166,24 @@
       ],
       "created": "2026-10-17T17:20:35Z",
       "last_seen": "2026-10-17T17:20:35Z"
+    },
+    {
+      "id": "L-010",
+      "key": "spec_precision_gap::state the exact on screen text of every message and countdown a criterion adds or tests pin a wording the spec never chose",
+      "text": "State the exact on-screen text of every message and countdown a criterion adds, or tests pin a wording the spec never chose",
+      "signal": "spec_precision_gap",
+      "scope": "game",
+      "status": "candidate",
+      "features": [
+        "stages"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "STG-19, STG-22 (validation.md G1, G2) (game)"
+      ],
+      "created": "2026-10-17T19:41:03Z",
+      "last_seen": "2026-10-17T19:41:03Z"
     }
   ]
 }

@@ -68,6 +68,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: G2 click-through wallet text (spec)
 - last seen: 2026-10-17T17:20:35Z
 
+### L-010 - State the exact on-screen text of every message and countdown a criterion adds, or tests pin a wording the spec never chose
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: stages
+- evidence: STG-19, STG-22 (validation.md G1, G2) (game)
+- last seen: 2026-10-17T19:41:03Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

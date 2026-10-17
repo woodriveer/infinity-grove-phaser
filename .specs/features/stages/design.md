@@ -1,7 +1,7 @@
 # Stages Design
 
 **Spec**: `.specs/features/stages/spec.md`
-**Status**: Approved
+**Status**: Implemented
 
 Conforms to `AD-001` (JWT session; progress endpoints sit behind the existing chain) and `AD-002` (combat runs in the browser; the server guards transitions, not timers). Adds `AD-003` and `AD-004` to `.specs/STATE.md`.
 

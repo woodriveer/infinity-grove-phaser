@@ -6,10 +6,10 @@ The game has one endless level 1 monster and no sense of progress. This feature 
 
 ## Goals
 
-- [ ] A player advances phase 1 to 5, then the miniboss, through stage 10, then the chapter boss, and the game ends with a completion message.
-- [ ] A boss that is not killed in time sends the player back to phase 5 of the same stage, with no other loss.
-- [ ] The position is stored per player in the database and a reload resumes at the same phase, stage or boss.
-- [ ] Health and time limits come from the database; the game holds no stage numbers except the display of what the backend sends.
+- [x] A player advances phase 1 to 5, then the miniboss, through stage 10, then the chapter boss, and the game ends with a completion message.
+- [x] A boss that is not killed in time sends the player back to phase 5 of the same stage, with no other loss.
+- [x] The position is stored per player in the database and a reload resumes at the same phase, stage or boss.
+- [x] Health and time limits come from the database; the game holds no stage numbers except the display of what the backend sends.
 
 ## Out of Scope
 
@@ -135,44 +135,44 @@ The game has one endless level 1 monster and no sense of progress. This feature 
 
 | Requirement ID | Story                           | Phase | Status  |
 | -------------- | ------------------------------- | ----- | ------- |
-| STG-01         | P1: Backend stores and moves    | -     | Pending |
-| STG-02         | P1: Backend stores and moves    | -     | Pending |
-| STG-03         | P1: Backend stores and moves    | -     | Pending |
-| STG-04         | P1: Backend stores and moves    | -     | Pending |
-| STG-05         | P1: Backend stores and moves    | -     | Pending |
-| STG-06         | P1: Backend stores and moves    | -     | Pending |
-| STG-07         | P1: Backend stores and moves    | -     | Pending |
-| STG-08         | P1: Backend stores and moves    | -     | Pending |
-| STG-09         | P1: Backend stores and moves    | -     | Pending |
-| STG-10         | P1: Backend stores and moves    | -     | Pending |
-| STG-11         | P1: Backend stores and moves    | -     | Pending |
-| STG-12         | P1: Backend stores and moves    | -     | Pending |
-| STG-13         | P1: Backend stores and moves    | -     | Pending |
-| STG-14         | P1: Backend stores and moves    | -     | Pending |
-| STG-15         | P1: Backend stores and moves    | -     | Pending |
-| STG-16         | P1: Fights                      | -     | Pending |
-| STG-17         | P1: Fights                      | -     | Pending |
-| STG-18         | P1: Fights                      | -     | Pending |
-| STG-19         | P1: Fights                      | -     | Pending |
-| STG-20         | P1: Fights                      | -     | Pending |
-| STG-21         | P1: Fights                      | -     | Pending |
-| STG-22         | P1: Fights                      | -     | Pending |
-| STG-23         | P1: Fights                      | -     | Pending |
-| STG-24         | P1: Saves and recovers          | -     | Pending |
-| STG-25         | P1: Saves and recovers          | -     | Pending |
-| STG-26         | P1: Saves and recovers          | -     | Pending |
-| STG-27         | P1: Saves and recovers          | -     | Pending |
-| STG-28         | P1: Saves and recovers          | -     | Pending |
+| STG-01         | P1: Backend stores and moves    | -     | Verified |
+| STG-02         | P1: Backend stores and moves    | -     | Verified |
+| STG-03         | P1: Backend stores and moves    | -     | Verified |
+| STG-04         | P1: Backend stores and moves    | -     | Verified |
+| STG-05         | P1: Backend stores and moves    | -     | Verified |
+| STG-06         | P1: Backend stores and moves    | -     | Verified |
+| STG-07         | P1: Backend stores and moves    | -     | Verified |
+| STG-08         | P1: Backend stores and moves    | -     | Verified |
+| STG-09         | P1: Backend stores and moves    | -     | Verified |
+| STG-10         | P1: Backend stores and moves    | -     | Verified |
+| STG-11         | P1: Backend stores and moves    | -     | Verified |
+| STG-12         | P1: Backend stores and moves    | -     | Verified |
+| STG-13         | P1: Backend stores and moves    | -     | Verified |
+| STG-14         | P1: Backend stores and moves    | -     | Verified |
+| STG-15         | P1: Backend stores and moves    | -     | Verified |
+| STG-16         | P1: Fights                      | -     | Verified |
+| STG-17         | P1: Fights                      | -     | Verified |
+| STG-18         | P1: Fights                      | -     | Verified |
+| STG-19         | P1: Fights                      | -     | Verified |
+| STG-20         | P1: Fights                      | -     | Verified |
+| STG-21         | P1: Fights                      | -     | Verified |
+| STG-22         | P1: Fights                      | -     | Verified |
+| STG-23         | P1: Fights                      | -     | Verified |
+| STG-24         | P1: Saves and recovers          | -     | Verified |
+| STG-25         | P1: Saves and recovers          | -     | Verified |
+| STG-26         | P1: Saves and recovers          | -     | Verified |
+| STG-27         | P1: Saves and recovers          | -     | Verified |
+| STG-28         | P1: Saves and recovers          | -     | Verified |
 
-**Coverage:** 28 total, 0 mapped to tasks, 28 unmapped
+**Coverage:** 28 total, 28 verified
 
 ---
 
 ## Success Criteria
 
-- [ ] A fresh player plays phases 1 to 5, the miniboss, and reaches stage 2; a reload shows the same position.
-- [ ] Letting a boss countdown expire returns the player to phase 5 of that stage.
-- [ ] Beating the chapter boss shows the completion message and the stored progress is completed.
-- [ ] Changing a health or time limit value in the database changes the fight with no game change.
-- [ ] The wallet and auth code is refactored to ADR 0007 with their existing tests passing and no behavior change, before any stage code builds on it.
-- [ ] Backend tests and `npm test` pass with tests covering STG-01 to STG-28, and one Playwright scenario covers phases, a failed boss and a reload.
+- [x] A fresh player plays phases 1 to 5, the miniboss, and reaches stage 2; a reload shows the same position.
+- [x] Letting a boss countdown expire returns the player to phase 5 of that stage.
+- [x] Beating the chapter boss shows the completion message and the stored progress is completed.
+- [x] Changing a health or time limit value in the database changes the fight with no game change.
+- [x] The wallet and auth code is refactored to ADR 0007 with their existing tests passing and no behavior change, before any stage code builds on it.
+- [x] Backend tests and `npm test` pass with tests covering STG-01 to STG-28, and one Playwright scenario covers phases, a failed boss and a reload.

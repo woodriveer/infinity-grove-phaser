@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/stages/design.md`
-**Status**: Approved
+**Status**: Done
 
 Execution notes: the user asked for the loop to run to the end of the spec, so tasks run inline in one session (no batch sub-agents), and `CLAUDE.md` makes `git push` part of every commit. Unrelated working-tree changes (`game/src/scenes/Preloader.js`, `game/public/assets/coin-*.png`) are never staged by a task; T14 moves `Preloader.js` with `git mv` and leaves that pending change unstaged at the new path, still the owner's to commit.
 
