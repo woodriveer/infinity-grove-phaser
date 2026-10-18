@@ -503,7 +503,7 @@ describe('ClickerGame coin drops', () => {
 
         expect(ctx.sprites).toHaveLength(3);
         ctx.sprites.forEach((coin) => {
-            expect([ coin.x, coin.y, coin.key, coin.anim ]).toEqual([ 670, 460, 'coin', 'rotate' ]);
+            expect([ coin.x, coin.y, coin.key, coin.anim ]).toEqual([ 670, 440, 'coin', 'rotate' ]);
         });
     });
 

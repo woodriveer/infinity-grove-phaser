@@ -416,8 +416,7 @@ button:disabled {
 
 .hud-enemy {
     width: 400px;
-    height: 90px;
-    align-items: flex-end;
+    height: 48px;
 }
 
 .hud-message {
@@ -485,7 +484,7 @@ button:disabled {
     flex-wrap: wrap;
     justify-content: center;
     gap: 6px;
-    padding: 10px 14px;
+    padding: 8px 12px;
     white-space: pre;
     border-radius: var(--radius-lg);
     background: var(--color-bg);

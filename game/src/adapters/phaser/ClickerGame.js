@@ -8,7 +8,7 @@ import { el } from './views/dom';
 //  The leader hero stands on the ground line of the monster; y is its feet
 const CHARACTER = { x: 230, y: 612, height: 320 };
 //  The monster is a translucent cream placeholder until its art arrives
-const MONSTER = { x: 670, y: 460, width: 220, height: 250, color: 0xf5ead8, fillAlpha: 0.35 };
+const MONSTER = { x: 670, y: 440, width: 220, height: 250, color: 0xf5ead8, fillAlpha: 0.35 };
 const HEALTH_BAR = { width: 240, height: 16, gap: 18, backColor: 0xdcd3c4, fillColor: 0xc67139 };
 const DAMAGE_TEXT = { rise: 40, duration: 800 };
 const DEATH = { fadeDuration: 500, respawnDelay: 1000 };
@@ -22,8 +22,9 @@ const WALLET_SYNC_MS = 10000;
 //  fixed-size box (style.css) so it stays where it was placed
 const WALLET_HTML = '<div class="hud-box hud-wallet"><div class="wallet"></div></div>';
 const STAGE_HUD = { x: 356, y: 44 };
-const BOSS_TIMER = { x: 670, y: 186 };
-const ENEMY_STATS = { x: 670, y: 250 };
+const BOSS_TIMER = { x: 670, y: 230 };
+//  Under the monster, clear of the damage numbers that rise above its health bar
+const ENEMY_STATS = { x: 670, y: 596 };
 const DAMAGE_FONT = { fontFamily: 'Caprasimo', stroke: '#2e2b25', strokeThickness: 8 };
 const CRITICAL_TEXT = { color: '#ffc6a5', fontSize: 48 };
 const NORMAL_TEXT = { color: '#f5ead8', fontSize: 32 };
