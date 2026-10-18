@@ -22,7 +22,8 @@ const WALLET_SYNC_MS = 10000;
 //  fixed-size box (style.css) so it stays where it was placed
 const WALLET_HTML = '<div class="hud-box hud-wallet"><div class="wallet"></div></div>';
 const STAGE_HUD = { x: 356, y: 44 };
-const BOSS_TIMER = { x: 670, y: 230 };
+//  Top centre of the screen, in the row of the stage and wallet pills
+const BOSS_TIMER = { x: 512, y: 44 };
 //  Under the monster, clear of the damage numbers that rise above its health bar
 const ENEMY_STATS = { x: 670, y: 596 };
 const DAMAGE_FONT = { fontFamily: 'Caprasimo', stroke: '#2e2b25', strokeThickness: 8 };
