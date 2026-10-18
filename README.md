@@ -87,8 +87,8 @@ vento. Especialista em dano rápido e preciso.
 | **Tiro Preciso** | Ataque (conjuração) | Concentra a mira por 2s e dispara uma flecha com crítico garantido de 3000% de dano. Se Lyra for interrompida, a habilidade é perdida. | 30s |
 | **Ventos Ligeiros** | Buff de grupo | Lyra e todos os aliados ganham +50% de velocidade de ataque por 12s. | 40s |
 
-### Orin Brumaestrela — Mago
-Estudioso das estrelas que caem sobre a floresta; canaliza a magia bruta que
+### Orina Brumaestrela — Maga
+Estudiosa das estrelas que caem sobre a floresta; canaliza a magia bruta que
 corre pelos galhos da Grande Árvore. Especialista em dano mágico em área.
 **Bônus de líder:** +20% de Poder Arcano para todo o grupo.
 
@@ -135,7 +135,7 @@ eles mesmos. Especialista em dano contínuo e precisão.
   aplicados pelos chefes.
 
 ## Inimigos e camada estratégica
-- **Blindados:** alta resistência física (fracos contra Mago e Clériga).
+- **Blindados:** alta resistência física (fracos contra Maga e Clériga).
 - **Ágeis:** alta evasão (fracos contra Bomba de Fumaça e Bênção).
 - **Conjuradores:** alta resistência mágica (fracos contra Guerreiro e
   Arqueira).
@@ -180,8 +180,8 @@ eles mesmos. Especialista em dano contínuo e precisão.
 
 ## Escopo do MVP
 - [ ] Clique causando dano em um inimigo
-- [ ] Seleção de personagem inicial (Kael ou Orin)
-- [ ] Kael e Orin jogáveis com suas 3 habilidades e bônus de líder
+- [ ] Seleção de personagem inicial (Kael ou Orina)
+- [ ] Kael e Orina jogáveis com suas 3 habilidades e bônus de líder
 - [ ] Sistema de efeitos de status (atordoar, medo, prisão)
 - [ ] 1 região com 5 fases e 1 chefe com Fúria
 - [ ] Upgrades com Seiva
