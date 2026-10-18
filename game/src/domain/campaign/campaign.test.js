@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CHAPTER_BOSS, Campaign, MINIBOSS, PHASE } from './campaign';
+import { CHAPTER_BOSS, Campaign, FARM, MINIBOSS, PHASE } from './campaign';
 import { DEFAULT_STATS } from '../combat/monster';
 
 //  3 stages; stage 2 has 3 phases so rules must use the current stage's phase count
@@ -146,5 +146,56 @@ describe('Campaign encounter', () => {
 
     it('position carries the chapter, stage, encounter and phase of the payload', () => {
         expect(at(2, PHASE, 3).position()).toEqual({ chapter: 1, stage: 2, encounter: PHASE, phase: 3 });
+    });
+});
+
+describe('Campaign farm encounters', () => {
+    const farmDefinition = {
+        ...definition,
+        boss: { element: 'DARKNESS', physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
+        stages: definition.stages.map((stage) => ({ ...stage, miniboss: { element: 'WATER', physicalDefense: 11, magicalDefense: 12, critResistance: 13 } }))
+    };
+    const done = Campaign.fromProgress({ chapter: 1, stage: 3, encounter: CHAPTER_BOSS, phase: 1, completed: true, definition: farmDefinition });
+
+    it('a miniboss uses the health, stats and time limit of its stage and is labelled for the farm', () => {
+        expect(done.farmEncounter({ kind: MINIBOSS, stage: 2 })).toEqual({
+            kind: FARM,
+            boss: { kind: MINIBOSS, stage: 2 },
+            phase: 1,
+            health: 55,
+            stats: { element: 'WATER', physicalDefense: 11, magicalDefense: 12, critResistance: 13 },
+            timeLimitMs: 31000,
+            label: 'Rever chefe: Miniboss 2'
+        });
+    });
+
+    it('the chapter boss uses the boss health, stats and time limit', () => {
+        expect(done.farmEncounter({ kind: CHAPTER_BOSS })).toEqual({
+            kind: FARM,
+            boss: { kind: CHAPTER_BOSS },
+            phase: 1,
+            health: 300,
+            stats: { element: 'DARKNESS', physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
+            timeLimitMs: 60000,
+            label: 'Rever chefe: Chefe do capítulo'
+        });
+    });
+
+    it('a definition without enemy stats falls back to the default stats', () => {
+        expect(at(3, CHAPTER_BOSS).farmEncounter({ kind: MINIBOSS, stage: 1 }).stats).toEqual(DEFAULT_STATS);
+        expect(at(3, CHAPTER_BOSS).farmEncounter({ kind: CHAPTER_BOSS }).stats).toEqual(DEFAULT_STATS);
+    });
+
+    it('an unknown stage or kind throws', () => {
+        expect(() => done.farmEncounter({ kind: MINIBOSS, stage: 9 })).toThrow('Unknown stage');
+        expect(() => done.farmEncounter({ kind: PHASE })).toThrow('Unknown boss');
+    });
+
+    it('does not move the campaign', () => {
+        const before = state(done);
+
+        done.farmEncounter({ kind: MINIBOSS, stage: 1 });
+
+        expect(state(done)).toEqual(before);
     });
 });

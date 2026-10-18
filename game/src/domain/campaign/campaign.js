@@ -8,10 +8,14 @@
 //  where boss, monster and miniboss are { element, physicalDefense, magicalDefense, critResistance }; a payload
 //  without them (an older backend) means DEFAULT_STATS
 import { DEFAULT_STATS } from '../combat/monster';
+import { bossLabel } from '../heroes/heroes';
 
 export const PHASE = 'PHASE';
 export const MINIBOSS = 'MINIBOSS';
 export const CHAPTER_BOSS = 'CHAPTER_BOSS';
+
+//  The kind of an encounter that fights a defeated boss again; it never moves the campaign
+export const FARM = 'FARM';
 
 export class Campaign
 {
@@ -91,6 +95,39 @@ export class Campaign
             timeLimitMs: this.definition.bossTimeLimitMs,
             label: 'Chapter Boss'
         };
+    }
+
+    //  A boss already beaten, fought again: the numbers of the campaign boss, labelled for the farm and tagged with the boss it is
+    farmEncounter (boss)
+    {
+        const { kind, stage } = boss;
+        let health;
+        let stats;
+        let timeLimitMs;
+
+        if (kind === MINIBOSS)
+        {
+            const definition = this.stageDefinition(stage);
+
+            if (!definition)
+            {
+                throw new Error(`Unknown stage: ${stage}`);
+            }
+
+            ({ minibossHealth: health, minibossTimeLimitMs: timeLimitMs } = definition);
+            stats = definition.miniboss ?? DEFAULT_STATS;
+        }
+        else if (kind === CHAPTER_BOSS)
+        {
+            ({ bossHealth: health, bossTimeLimitMs: timeLimitMs } = this.definition);
+            stats = this.definition.boss ?? DEFAULT_STATS;
+        }
+        else
+        {
+            throw new Error(`Unknown boss: ${kind}`);
+        }
+
+        return { kind: FARM, boss, phase: 1, health, stats, timeLimitMs, label: `Rever chefe: ${bossLabel(boss)}` };
     }
 
     //  The encounter was won: the campaign after it

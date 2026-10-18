@@ -741,10 +741,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] A miniboss encounter has the stage's health, stats, time limit and the label `Rever chefe: Miniboss <stage>`; the chapter boss uses the boss health, stats, limit and the label `Rever chefe: Chefe do capítulo`; both have `kind: 'FARM'`
-- [ ] An unknown stage or kind throws
-- [ ] `campaign.test.js` passes; quick gate passes
+- [x] A miniboss encounter has the stage's health, stats, time limit and the label `Rever chefe: Miniboss <stage>`; the chapter boss uses the boss health, stats, limit and the label `Rever chefe: Chefe do capítulo`; both have `kind: 'FARM'`
+- [x] An unknown stage or kind throws
+- [x] `campaign.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
