@@ -130,11 +130,11 @@ T25
 
 **Done when**:
 
-- [ ] Codes are exactly `EQUIPMENT_NOT_FOUND`, `NOT_ENOUGH_COPPER`, `MAX_REFINE`, `REFINE_TOO_LOW`, `NO_AFFIX_LEFT`, `INVALID_AFFIX`
-- [ ] `Wallet.minus` below zero throws `NotEnoughCopperException` and leaves the wallet unchanged; `plus` clamps at `Long.MAX_VALUE`
-- [ ] `EquipmentExceptionsTest` and `WalletTest` additions pass; quick gate passes
+- [x] Codes are exactly `EQUIPMENT_NOT_FOUND`, `NOT_ENOUGH_COPPER`, `MAX_REFINE`, `REFINE_TOO_LOW`, `NO_AFFIX_LEFT`, `INVALID_AFFIX`
+- [x] `Wallet.minus` below zero throws `NotEnoughCopperException` and leaves the wallet unchanged; `plus` clamps at `Long.MAX_VALUE`
+- [x] `EquipmentExceptionsTest` and `WalletTest` additions pass; quick gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 

@@ -159,4 +159,24 @@ class WalletTest {
 
         assertEquals(Long.MAX_VALUE, result.wallet.copper)
     }
+
+    @Test
+    fun `plus adds copper and clamps at the 64-bit total`() {
+        assertEquals(150L, wallet(100).plus(50).copper)
+        assertEquals(Long.MAX_VALUE, wallet(Long.MAX_VALUE - 1).plus(5).copper)
+    }
+
+    @Test
+    fun `minus takes copper down to exactly zero`() {
+        assertEquals(100L, wallet(600).minus(500).copper)
+        assertEquals(0L, wallet(500).minus(500).copper)
+    }
+
+    @Test
+    fun `minus rejects an amount above the balance and leaves the wallet as it was`() {
+        val wallet = wallet(499)
+
+        assertFailsWith<NotEnoughCopperException> { wallet.minus(500) }
+        assertEquals(499L, wallet.copper)
+    }
 }

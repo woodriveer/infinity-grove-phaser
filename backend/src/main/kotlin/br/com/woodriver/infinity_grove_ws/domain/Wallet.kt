@@ -60,6 +60,15 @@ data class Wallet(
         return SyncResult(copy(copper = total, levels = updated), accepted)
     }
 
+    /** Adds [amount] copper, clamped at the 64-bit total. */
+    fun plus(amount: Long): Wallet = copy(copper = addClamped(copper, amount))
+
+    /** Takes [amount] copper; a wallet that holds less is rejected and nothing changes. */
+    fun minus(amount: Long): Wallet {
+        if (copper < amount) throw NotEnoughCopperException(amount)
+        return copy(copper = copper - amount)
+    }
+
     private fun addClamped(
         total: Long,
         amount: Long,
