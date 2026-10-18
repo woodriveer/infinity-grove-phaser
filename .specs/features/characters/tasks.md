@@ -560,13 +560,14 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `state` lists the miniboss of every stage below the current one (all stages when completed) and the chapter boss only when completed, with `chapterBossWinsLeft`
-- [ ] A `CLEARED` miniboss farm report rolls 1 %; a `CLEARED` chapter boss farm report rolls 10 % for the next chapter's hero and adds 1 to today's wins
-- [ ] `FAILED` rolls nothing and changes nothing; the progress position and completed flag never change
-- [ ] A boss not yet beaten throws `BossNotAvailableException`; the 11th chapter boss win of a UTC day throws `DailyLimitReachedException`; a win under 5 000 ms after the previous farm win throws `FarmTooFastException`; none of them rolls or changes anything
-- [ ] The count restarts the next UTC day
-- [ ] `FarmServiceTest` passes; quick gate passes
+- [x] `state` lists the miniboss of every stage below the current one (all stages when completed) and the chapter boss only when completed, with `chapterBossWinsLeft`
+- [x] A `CLEARED` miniboss farm report rolls 1 %; a `CLEARED` chapter boss farm report rolls 10 % for the next chapter's hero and adds 1 to today's wins
+- [x] `FAILED` rolls nothing and changes nothing; the progress position and completed flag never change
+- [x] A boss not yet beaten throws `BossNotAvailableException`; the 11th chapter boss win of a UTC day throws `DailyLimitReachedException`; a win under 5 000 ms after the previous farm win throws `FarmTooFastException`; none of them rolls or changes anything
+- [x] The count restarts the next UTC day
+- [x] `FarmServiceTest` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 

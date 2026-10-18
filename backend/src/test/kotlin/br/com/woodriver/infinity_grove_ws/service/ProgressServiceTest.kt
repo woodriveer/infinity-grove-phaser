@@ -42,7 +42,7 @@ class ProgressServiceTest {
     private val today = LocalDate.of(2026, 10, 18)
     private val clock = MutableClock(today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() + 10 * 3_600_000L)
     private var chance = SequenceChanceRoller(0.5)
-    private val service get() = ProgressService(progresses, chapters, users, playerCards, heroes, chance, rates, clock)
+    private val service get() = ProgressService(progresses, chapters, users, playerCards, CardRewards(heroes, chance, rates, clock))
 
     private val start = ProgressPosition(1, 1, Encounter.PHASE, 1)
 
@@ -264,7 +264,7 @@ class ProgressServiceTest {
             object : PlayerCardsRepositoryPort by playerCards {
                 override fun save(cards: PlayerCards): PlayerCards = error("cards store is down")
             }
-        val broken = ProgressService(progresses, chapters, users, failing, heroes, chance, rates, clock)
+        val broken = ProgressService(progresses, chapters, users, failing, CardRewards(heroes, chance, rates, clock))
 
         assertFailsWith<IllegalStateException> { broken.report("yan", miniboss, Outcome.CLEARED) }
     }
