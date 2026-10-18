@@ -17,10 +17,11 @@ class CardDropsTest {
         chapter: Int = 1,
         start: Element = Element.FIRE,
         first: Boolean = false,
-    ) = CardDropper.drop(encounter, chapter, start, first, rates, heroes) {
-        reads += 1
-        chance
-    }?.id
+    ) = CardDropper
+        .drop(encounter, chapter, start, first, rates, heroes) {
+            reads += 1
+            chance
+        }?.id
 
     @Test
     fun `a miniboss drops the hero of its chapter below one percent`() {
