@@ -536,12 +536,13 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `GET /heroes` answers 200 with five heroes, the leader id, chapter numbers per the starting element and `unlocked` flags
-- [ ] Fuse answers 200 with the updated hero; 409 `NOT_ENOUGH_CARDS`, 400 `INVALID_FUSION` for stars missing, -1 and 3, 404 `HERO_NOT_FOUND`
-- [ ] `PUT /leader` answers 200 for an owned hero, 409 `HERO_NOT_OWNED`, 404 `HERO_NOT_FOUND`
-- [ ] Every route answers 401 without a token and a player only touches their own bag
-- [ ] `HeroControllerIT` passes; full backend gate passes; phase build gate passes
+- [x] `GET /heroes` answers 200 with five heroes, the leader id, chapter numbers per the starting element and `unlocked` flags
+- [x] Fuse answers 200 with the updated hero; 409 `NOT_ENOUGH_CARDS`, 400 `INVALID_FUSION` for stars missing, -1 and 3, 404 `HERO_NOT_FOUND`
+- [x] `PUT /leader` answers 200 for an owned hero, 409 `HERO_NOT_OWNED`, 404 `HERO_NOT_FOUND`
+- [x] Every route answers 401 without a token and a player only touches their own bag
+- [x] `HeroControllerIT` passes; full backend gate passes; phase build gate passes
 
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend), then Build at the end of the phase
 
