@@ -514,12 +514,13 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `list` returns every catalog hero with chapter (1 to 5 from the starting element), copies per stars 0 to 3, owned, stars, unlocked skills (skill n unlocked when stars ≥ n) and the leader id
-- [ ] `fuse` applies the rule, saves and returns the hero; `NOT_ENOUGH_CARDS`, `INVALID_FUSION` and `HERO_NOT_FOUND` leave the bag unchanged
-- [ ] `setLeader` stores an owned hero; `HERO_NOT_OWNED` and `HERO_NOT_FOUND` keep the leader
-- [ ] A player without `PlayerCards` gets `PlayerCardsMissingException`
-- [ ] `HeroServiceTest` passes; quick gate passes
+- [x] `list` returns every catalog hero with chapter (1 to 5 from the starting element), copies per stars 0 to 3, owned, stars, unlocked skills (skill n unlocked when stars ≥ n) and the leader id
+- [x] `fuse` applies the rule, saves and returns the hero; `NOT_ENOUGH_CARDS`, `INVALID_FUSION` and `HERO_NOT_FOUND` leave the bag unchanged
+- [x] `setLeader` stores an owned hero; `HERO_NOT_OWNED` and `HERO_NOT_FOUND` keep the leader
+- [x] A player without `PlayerCards` gets `PlayerCardsMissingException`
+- [x] `HeroServiceTest` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
