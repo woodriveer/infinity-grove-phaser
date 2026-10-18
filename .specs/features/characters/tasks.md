@@ -701,9 +701,10 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `GET /farm` and `POST /farm/outcome { boss, outcome: 'CLEARED' }`, returning the data
-- [ ] `farmApi.test.js` passes; quick gate passes
+- [x] `GET /farm` and `POST /farm/outcome { boss, outcome: 'CLEARED' }`, returning the data
+- [x] `farmApi.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
