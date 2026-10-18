@@ -4,7 +4,8 @@ import { calculateDamage, formatDamage } from '../../domain/combat/damage';
 import { Monster } from '../../domain/combat/monster';
 import { HeroUi } from './HeroUi';
 
-const CHARACTER = { x: 300, y: 500, size: 100, color: 0x000000 };
+//  The leader hero stands on the ground line of the monster; y is its feet
+const CHARACTER = { x: 300, y: 600, height: 220 };
 const MONSTER = { x: 700, y: 500, width: 160, height: 200, color: 0xcc2222 };
 const HEALTH_BAR = { width: 120, height: 12, gap: 16, backColor: 0x222222, fillColor: 0x33cc33 };
 const DAMAGE_TEXT = { rise: 40, duration: 800 };
@@ -68,7 +69,7 @@ export class ClickerGame extends Scene
 
         this.add.image(512, 384, 'background');
 
-        this.add.rectangle(CHARACTER.x, CHARACTER.y, CHARACTER.size, CHARACTER.size, CHARACTER.color);
+        this.character = null;
         const body = this.add.rectangle(MONSTER.x, MONSTER.y, MONSTER.width, MONSTER.height, MONSTER.color);
 
         //  The bar is centred above the monster's head
@@ -155,7 +156,32 @@ export class ClickerGame extends Scene
             resume: () => this.resumeFromMenu(),
             startFarm: (boss) => this.startFarm(boss)
         });
+        this.heroes.onChange(() => this.showCharacter());
         this.loadHeroes();
+    }
+
+    //  The sprite of the leader hero replaces itself when the leader changes; nothing shows until the heroes load
+    showCharacter ()
+    {
+        const leader = this.heroes.leader();
+
+        if (!leader)
+        {
+            return;
+        }
+
+        const key = `hero_${leader.id}`;
+
+        if (this.character)
+        {
+            this.character.setTexture(key);
+        }
+        else
+        {
+            this.character = this.add.image(CHARACTER.x, CHARACTER.y, key).setOrigin(0.5, 1);
+        }
+
+        this.character.setScale(CHARACTER.height / this.character.height);
     }
 
     async loadHeroes ()

@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { HERO_IDS } from '../../domain/heroes/heroes';
 
 export class Preloader extends Scene
 {
@@ -35,6 +36,7 @@ export class Preloader extends Scene
         this.load.image('background', 'background.png');
         this.load.image('logo', 'cc-logo.png');
         this.load.atlas('coin', 'coin-copper.png', 'coin.json');
+        HERO_IDS.forEach((id) => this.load.image(`hero_${id}`, `heroes/${id}_sprite.png`));
     }
 
     create ()

@@ -14,7 +14,7 @@ const flush = () => new Promise((resolve) => setTimeout(resolve));
 const createScene = (data = {}) => {
     const registryData = { ...data, services: { session: sessionManager, users: userApi } };
     const doms = [];
-    const form = { destroy: vi.fn() };
+    const form = { destroy: vi.fn(), setVisible: vi.fn() };
     const logo = { width: 2760, setScale: vi.fn() };
     const inputHandlers = {};
 
@@ -31,7 +31,7 @@ const createScene = (data = {}) => {
             createFromHTML: (html) => {
                 const root = document.createElement('div');
                 root.innerHTML = html;
-                const element = html.includes('auth-form') ? form : { destroy: vi.fn() };
+                const element = html.includes('auth-form') ? form : { destroy: vi.fn(), setVisible: vi.fn() };
 
                 element.node = root; //  like Phaser, node is the wrapper div around the html
                 element.getChildByName = (name) => root.querySelector(`[name="${name}"]`);
@@ -54,7 +54,10 @@ const createScene = (data = {}) => {
 
     const logoutButton = () => doms.map((d) => d.node.querySelector('[name="logout"]')).find(Boolean);
 
-    return { scene, form, logo, doms, welcomeTitle, logoutButton, message, inputHandlers, registryData };
+    const path = () => doms.find((d) => d.node.querySelector('.path-choice'));
+    const pick = (element) => path().node.querySelector(`[data-element="${element}"]`).click();
+
+    return { scene, form, logo, doms, path, pick, welcomeTitle, logoutButton, message, inputHandlers, registryData };
 };
 
 const fill = (form, username, password) => {
@@ -140,39 +143,8 @@ describe('MainMenu authentication', () => {
         expect(scene.input.once).toHaveBeenCalledWith('pointerdown', expect.any(Function));
     });
 
-    const chooseHero = (form, element) => {
-        form.node.querySelector(`input[name="startingElement"][value="${element}"]`).checked = true;
-    };
-
-    it('offers fire, water and nature as the first hero, each with its portrait', async () => {
-        const { scene, form } = createScene({ highscore: 0 });
-        await open(scene);
-
-        const choices = [ ...form.node.querySelectorAll('.hero-choice') ];
-
-        expect(choices.map((choice) => choice.querySelector('input').value)).toEqual([ 'FIRE', 'WATER', 'NATURE' ]);
-        expect(choices.map((choice) => choice.querySelector('span').textContent)).toEqual([ 'Fogo - Kael', 'Água - Orina', 'Natureza - Lyra' ]);
-        expect(choices.map((choice) => choice.querySelector('img').getAttribute('src'))).toEqual([
-            'assets/heroes/kael_position.jpg', 'assets/heroes/orina_position.jpg', 'assets/heroes/lyra_position.jpg'
-        ]);
-        expect(choices.some((choice) => choice.querySelector('input').checked)).toBe(false);
-    });
-
-    it('signs up with the element of the chosen hero', async () => {
-        vi.mocked(userApi.signUp).mockResolvedValue(authResponse({ username: 'ana', createdAt: 1, lastLoginAt: 1 }));
-        const { scene, form } = createScene({ highscore: 0 });
-        await open(scene);
-        fill(form, 'ana', 'secret123');
-        chooseHero(form, 'WATER');
-
-        form.getChildByName('signup').click();
-        await flush();
-
-        expect(userApi.signUp).toHaveBeenCalledWith('ana', 'secret123', 'WATER');
-    });
-
-    it('signing up with no hero chosen shows the choice message, sends no request and re-enables the buttons', async () => {
-        const { scene, form, message } = createScene({ highscore: 0 });
+    it('Sign up asks for the first hero on its own screen and sends no request yet', async () => {
+        const { scene, form, path, message } = createScene({ highscore: 0 });
         await open(scene);
         fill(form, 'ana', 'secret123');
 
@@ -180,9 +152,90 @@ describe('MainMenu authentication', () => {
         await flush();
 
         expect(userApi.signUp).not.toHaveBeenCalled();
-        expect(message()).toEqual({ text: 'Escolha seu herói inicial.', isError: true });
+        expect(form.setVisible).toHaveBeenCalledWith(false);
+        expect(path().node.querySelector('.path-title').textContent).toBe('Escolha seu caminho');
+        expect(path().node.querySelector('.path-hint').textContent).toBe('Os outros personagens podem ser encontrados no decorrer do jogo.');
+        expect(message().text).toBe('');
+    });
+
+    it('offers fire, water and nature as the first hero, each with its sprite', async () => {
+        const { scene, form, path } = createScene({ highscore: 0 });
+        await open(scene);
+        fill(form, 'ana', 'secret123');
+        form.getChildByName('signup').click();
+
+        const options = [ ...path().node.querySelectorAll('.path-option') ];
+
+        expect(options.map((option) => option.dataset.element)).toEqual([ 'FIRE', 'WATER', 'NATURE' ]);
+        expect(options.map((option) => option.querySelector('span').textContent)).toEqual([ 'Fogo - Kael', 'Água - Orina', 'Natureza - Lyra' ]);
+        expect(options.map((option) => option.querySelector('img').getAttribute('src'))).toEqual([
+            'assets/heroes/kael_sprite.png', 'assets/heroes/orina_sprite.png', 'assets/heroes/lyra_sprite.png'
+        ]);
+    });
+
+    it('signs up with the element of the hero that was picked', async () => {
+        const user = { username: 'ana', createdAt: 1, lastLoginAt: 1 };
+        const response = authResponse(user);
+        vi.mocked(userApi.signUp).mockResolvedValue(response);
+        const { scene, form, path, pick, registryData, message } = createScene({ highscore: 0 });
+        await open(scene);
+        fill(form, 'ana', 'secret123');
+        form.getChildByName('signup').click();
+        const screen = path();
+
+        pick('WATER');
+        await flush();
+
+        expect(userApi.signUp).toHaveBeenCalledWith('ana', 'secret123', 'WATER');
+        expect(userApi.login).not.toHaveBeenCalled();
+        expect(sessionManager.start).toHaveBeenCalledWith(response);
+        expect(registryData.user).toEqual(user);
+        expect(message()).toEqual({ text: 'Account created, ana!', isError: false });
+        expect(screen.destroy).toHaveBeenCalled();
+    });
+
+    it('Sign up with an empty field shows the message and does not leave the form', async () => {
+        const { scene, form, doms, message } = createScene({ highscore: 0 });
+        await open(scene);
+        fill(form, 'ana', '');
+
+        form.getChildByName('signup').click();
+        await flush();
+
+        expect(message()).toEqual({ text: 'Enter username and password', isError: true });
+        expect(form.setVisible).not.toHaveBeenCalled();
+        expect(doms.some((d) => d.node.querySelector('.path-choice'))).toBe(false);
+    });
+
+    it('Voltar brings the form back without a request', async () => {
+        const { scene, form, path } = createScene({ highscore: 0 });
+        await open(scene);
+        fill(form, 'ana', 'secret123');
+        form.getChildByName('signup').click();
+        const screen = path();
+
+        screen.node.querySelector('.path-back').click();
+
+        expect(screen.destroy).toHaveBeenCalled();
+        expect(form.setVisible).toHaveBeenLastCalledWith(true);
+        expect(userApi.signUp).not.toHaveBeenCalled();
+    });
+
+    it('a failed sign up brings the form back with the error', async () => {
+        vi.mocked(userApi.signUp).mockRejectedValue(new Error("User 'ana' already exists"));
+        const { scene, form, path, pick, message } = createScene({ highscore: 0 });
+        await open(scene);
+        fill(form, 'ana', 'secret123');
+        form.getChildByName('signup').click();
+        const screen = path();
+
+        pick('FIRE');
+        await flush();
+
+        expect(message()).toEqual({ text: "User 'ana' already exists", isError: true });
+        expect(screen.destroy).toHaveBeenCalled();
+        expect(form.setVisible).toHaveBeenLastCalledWith(true);
         expect(form.getChildByName('signup').disabled).toBe(false);
-        expect(form.getChildByName('login').disabled).toBe(false);
     });
 
     it('logging in needs no hero', async () => {
@@ -196,25 +249,6 @@ describe('MainMenu authentication', () => {
 
         expect(userApi.login).toHaveBeenCalledWith('yan', 'secret123');
         expect(userApi.signUp).not.toHaveBeenCalled();
-    });
-
-    it('signs up through the sign up button', async () => {
-        const user = { username: 'newbie', createdAt: 1, lastLoginAt: 1 };
-        const response = authResponse(user);
-        vi.mocked(userApi.signUp).mockResolvedValue(response);
-        const { scene, form, registryData, message } = createScene({ highscore: 0 });
-        await open(scene);
-        fill(form, 'newbie', 'secret123');
-        chooseHero(form, 'FIRE');
-
-        form.getChildByName('signup').click();
-        await flush();
-
-        expect(userApi.signUp).toHaveBeenCalledWith('newbie', 'secret123', 'FIRE');
-        expect(userApi.login).not.toHaveBeenCalled();
-        expect(sessionManager.start).toHaveBeenCalledWith(response);
-        expect(registryData.user).toEqual(user);
-        expect(message()).toEqual({ text: 'Account created, newbie!', isError: false });
     });
 
     it('shows the error and re-enables the buttons when the request fails', async () => {

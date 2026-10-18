@@ -29,9 +29,11 @@ export async function openMainMenu (page, { state = 'form', random = 0.99 } = {}
         password: page.locator('.auth-form input[name="password"]'),
         loginButton: page.getByRole('button', { name: 'Login' }),
         signupButton: page.getByRole('button', { name: 'Sign up' }),
-        heroChoices: page.locator('.hero-choice'),
-        //  Picks the first hero of a new account: FIRE, WATER or NATURE
-        chooseHero: (element) => page.locator(`.hero-choice:has(input[value="${element}"])`).click(),
+        pathTitle: page.locator('.path-title'),
+        pathHint: page.locator('.path-hint'),
+        heroChoices: page.locator('.path-option'),
+        //  Picks the first hero on the screen after Sign up: FIRE, WATER or NATURE; the pick creates the account
+        chooseHero: (element) => page.locator(`.path-option[data-element="${element}"]`).click(),
         message: page.getByRole('alert'),
         welcomeTitle: page.locator('.welcome-title'),
         logoutButton: page.getByRole('button', { name: 'Logout' })

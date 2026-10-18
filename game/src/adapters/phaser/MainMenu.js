@@ -1,27 +1,32 @@
 import { Scene } from 'phaser';
 import { STARTING_CHOICES } from '../../domain/heroes/heroes';
 
-//  The first hero of a new account: one radio per starting element with the hero portrait
-const CHOICES_HTML = STARTING_CHOICES.map(({ element, heroId, label }) => `
-        <label class="hero-choice">
-            <input type="radio" name="startingElement" value="${element}" />
-            <img src="assets/heroes/${heroId}_position.jpg" alt="${label}" />
-            <span>${label}</span>
-        </label>`).join('');
-
-const CHOOSE_HERO_TEXT = 'Escolha seu herói inicial.';
+const CHOOSE_PATH_TEXT = 'Escolha seu caminho';
+const OTHER_HEROES_TEXT = 'Os outros personagens podem ser encontrados no decorrer do jogo.';
 
 const FORM_HTML = `
     <div class="auth-form">
         <input type="text" name="username" placeholder="Username" autocomplete="username" />
         <input type="password" name="password" placeholder="Password" autocomplete="current-password" />
-        <fieldset class="hero-choices">
-            <legend>${CHOOSE_HERO_TEXT}</legend>${CHOICES_HTML}
-        </fieldset>
         <div class="auth-actions">
             <button type="button" name="login">Login</button>
             <button type="button" name="signup">Sign up</button>
         </div>
+    </div>
+`;
+
+//  The screen after Sign up: the first hero of the new account, one button per starting element
+const PATH_HTML = `
+    <div class="path-choice">
+        <h2 class="path-title">${CHOOSE_PATH_TEXT}</h2>
+        <div class="path-options">${STARTING_CHOICES.map(({ element, heroId, label }) => `
+            <button type="button" class="path-option" data-element="${element}" data-testid="path-${element}">
+                <img src="assets/heroes/${heroId}_sprite.png" alt="${label}" />
+                <span>${label}</span>
+            </button>`).join('')}
+        </div>
+        <p class="path-hint">${OTHER_HEROES_TEXT}</p>
+        <button type="button" class="path-back" data-testid="path-back">Voltar</button>
     </div>
 `;
 
@@ -110,7 +115,7 @@ export class MainMenu extends Scene
             if (!username.value.trim() || !password.value)
             {
                 this.showMessage('Enter username and password', true);
-                return;
+                return false;
             }
 
             buttons.forEach((button) => { button.disabled = true; });
@@ -121,39 +126,41 @@ export class MainMenu extends Scene
                 const response = await request(username.value.trim(), password.value);
 
                 //  Scene may have been left while the request was in flight
-                if (!this.sys.isActive()) { return; }
+                if (!this.sys.isActive()) { return true; }
 
                 this.session.start(response);
                 this.registry.set('user', response.user);
                 this.showMessage(successMessage(response.user));
                 form.destroy();
                 this.showWelcome(response.user);
+
+                return true;
             }
             catch (error)
             {
-                if (!this.sys.isActive()) { return; }
+                if (!this.sys.isActive()) { return false; }
 
                 this.showMessage(error.message, true);
                 buttons.forEach((button) => { button.disabled = false; });
+
+                return false;
             }
         };
 
         buttons[0].addEventListener('click', () => submit(this.users.login, (u) => `Welcome back, ${u.username}!`));
-        //  A new account needs its first hero; the check runs after the credentials check and before any request
-        const signUp = (name, pass) => {
 
-            const chosen = form.node.querySelector('input[name="startingElement"]:checked');
+        //  Sign up first checks the credentials, then asks for the first hero on a screen of its own; the account is created by that choice
+        buttons[1].addEventListener('click', () => {
 
-            if (!chosen)
+            if (!username.value.trim() || !password.value)
             {
-                throw new Error(CHOOSE_HERO_TEXT);
+                this.showMessage('Enter username and password', true);
+                return;
             }
 
-            return this.users.signUp(name, pass, chosen.value);
-
-        };
-
-        buttons[1].addEventListener('click', () => submit(signUp, (u) => `Account created, ${u.username}!`));
+            this.showMessage('');
+            this.showPathChoice(form, (element) => submit((name, pass) => this.users.signUp(name, pass, element), (u) => `Account created, ${u.username}!`));
+        });
 
         //  Enter in either field logs in (click() is a no-op while the button is disabled)
         [ username, password ].forEach((input) => {
@@ -167,6 +174,44 @@ export class MainMenu extends Scene
 
         //  Phaser keyboard captures would swallow typing otherwise
         this.input.keyboard.disableGlobalCapture();
+    }
+
+    //  Hides the form while the player picks the first hero; a click on a hero runs `choose(element)`, Voltar or a failure brings the form back
+    showPathChoice (form, choose)
+    {
+        form.setVisible(false);
+
+        const path = this.add.dom(512, 470).createFromHTML(PATH_HTML);
+        const options = [ ...path.node.querySelectorAll('.path-option') ];
+        const back = () => {
+
+            path.destroy();
+            form.setVisible(true);
+
+        };
+
+        options.forEach((option) => option.addEventListener('click', async () => {
+
+            options.forEach((other) => { other.disabled = true; });
+
+            if (await choose(option.dataset.element))
+            {
+                path.destroy();
+                return;
+            }
+
+            if (this.sys.isActive())
+            {
+                back();
+            }
+        }));
+
+        path.node.querySelector('.path-back').addEventListener('click', () => {
+
+            back();
+            this.showMessage('');
+
+        });
     }
 
     showWelcome (user)

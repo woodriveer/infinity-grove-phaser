@@ -76,6 +76,7 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
     });
 
     const rectangles = [];
+    const images = [];
     const sprites = [];
     const doms = [];
     const texts = [];
@@ -87,7 +88,15 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
 
     const scene = new ClickerGame();
     scene.add = {
-        image: vi.fn(() => ({})),
+        image: vi.fn((x, y, key) => {
+            const image = { x, y, key, height: 400, scale: 1 };
+
+            image.setOrigin = () => image;
+            image.setTexture = (texture) => { image.key = texture; return image; };
+            image.setScale = (value) => { image.scale = value; return image; };
+            images.push(image);
+            return image;
+        }),
         rectangle: vi.fn((x, y, width, height, color) => {
             const rect = { x, y, width, height, color, originX: 0.5, originY: 0.5 };
 
@@ -154,18 +163,42 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
     const hud = (selector) => doms.map((d) => d.node.querySelector(selector)).find(Boolean);
     const walletElement = () => doms.find((d) => d.node.querySelector('.wallet'));
 
-    return { scene, rectangles, texts, tweens, timers, loops, eventHandlers, sprites, doms, click, monster, fill, back, byColor, walletText, walletElement, hud, control, handlers, dice };
+    return { scene, images, rectangles, texts, tweens, timers, loops, eventHandlers, sprites, doms, click, monster, fill, back, byColor, walletText, walletElement, hud, control, handlers, dice };
 };
 
 describe('ClickerGame scene', () => {
-    it('shows one black square character and one monster, and no coins yet', async () => {
-        const { scene, rectangles, byColor } = await createScene();
+    it('shows the leader hero and one monster, and no coins yet', async () => {
+        const { scene, rectangles, byColor, images } = await createScene();
 
-        expect(byColor(0x000000)).toHaveLength(1);
+        expect(byColor(0x000000)).toHaveLength(0);
         expect(byColor(0xcc2222)).toHaveLength(1);
-        expect(rectangles).toHaveLength(4); //  character, monster, health bar back, health bar fill
+        expect(rectangles).toHaveLength(3); //  monster, health bar back, health bar fill
+        expect(images.filter((image) => image.key.startsWith('hero_')).map((image) => image.key)).toEqual([ 'hero_kael' ]);
         expect(scene.add.text).not.toHaveBeenCalled();
         expect(scene.physics).toBeUndefined();
+    });
+
+    it('scales the hero to 220 px high and stands it on the ground line, left of the monster', async () => {
+        const { scene } = await createScene();
+
+        expect(scene.character).toMatchObject({ x: 300, y: 600, scale: 220 / 400 });
+    });
+
+    it('swaps the sprite when the leader changes', async () => {
+        const { scene, images } = await createScene();
+        heroesGateway.setLeader.mockResolvedValue({ leaderId: 'lyra' });
+
+        await scene.heroes.setLeader('lyra');
+
+        expect(scene.character.key).toBe('hero_lyra');
+        expect(images.filter((image) => image.key.startsWith('hero_') || image === scene.character)).toHaveLength(1);
+    });
+
+    it('shows no hero while the heroes cannot be loaded', async () => {
+        const { scene, images } = await createScene({ heroes: new Error('down') });
+
+        expect(scene.character).toBeNull();
+        expect(images.some((image) => image.key.startsWith('hero_'))).toBe(false);
     });
 
     it('lowers the monster health by 1 when the canvas is clicked', async () => {

@@ -170,48 +170,90 @@ body {
     font-size: 24px;
 }
 
-/* Hero cards: the choice at sign up, the HUD buttons, the panels, the skill bar and the card notice */
-.hero-choices {
-    display: flex;
-    gap: 8px;
-    margin: 0;
-    padding: 8px;
-    border: 2px solid #000;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.85);
-    color: #000;
-    font-family: 'Arial Black', sans-serif;
-}
-
-.hero-choices legend {
-    padding: 0 6px;
-    font-size: 14px;
-    background: #fff;
-    border-radius: 4px;
-}
-
-.hero-choice {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.hero-choice img {
-    width: 88px;
-    height: 56px;
-    object-fit: cover;
-    border-radius: 4px;
-}
-
+/* Hero cards: the HUD buttons, the panels, the skill bar and the card notice */
 .hero-hud {
     display: flex;
     flex-direction: column;
     gap: 8px;
     width: 130px;
+}
+
+.hero-hud button {
+    position: relative;
+}
+
+.hud-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #e02020;
+}
+
+.hud-badge[hidden] {
+    display: none;
+}
+
+.path-choice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #000;
+    font-family: 'Arial Black', sans-serif;
+}
+
+.path-title {
+    margin: 0;
+    font-size: 28px;
+}
+
+.path-options {
+    display: flex;
+    gap: 16px;
+}
+
+.path-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    font-family: inherit;
+    font-size: 15px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.path-option:hover:not(:disabled) {
+    background: #ffe9a8;
+}
+
+.path-option img {
+    height: 150px;
+    width: auto;
+}
+
+.path-hint {
+    margin: 0;
+    font-size: 14px;
+}
+
+.path-back {
+    padding: 6px 14px;
+    font-family: inherit;
+    border: 2px solid #000;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
 .hero-hud button,

@@ -8,8 +8,8 @@ test.describe('Sign up', () => {
         const menu = await openMainMenu(page);
 
         await fillCredentials(menu, 'newbie', 'secret123');
-        await menu.chooseHero('WATER');
         await menu.signupButton.click();
+        await menu.chooseHero('WATER');
 
         await expect(menu.message).toHaveText('Account created, newbie!');
         await expect(menu.message).not.toHaveClass(/error/);
@@ -26,32 +26,24 @@ test.describe('Sign up', () => {
         const menu = await openMainMenu(page);
 
         await fillCredentials(menu, 'yan', 'another-pass');
-        await menu.chooseHero('FIRE');
         await menu.signupButton.click();
+        await menu.chooseHero('FIRE');
 
         await expect(menu.message).toHaveText("User 'yan' already exists");
         await expect(menu.signupButton).toBeEnabled();
         expect(await registryValue(page, 'user')).toBeUndefined();
     });
 
-    test('offers fire, water and nature as the first hero', async ({ page }) => {
-        await mockBackend(page);
-        const menu = await openMainMenu(page);
-
-        await expect(menu.heroChoices).toHaveText([ 'Fogo - Kael', 'Água - Orina', 'Natureza - Lyra' ]);
-        await expect(page.locator('.hero-choice input:checked')).toHaveCount(0);
-    });
-
-    test('asks for a hero and sends no request when none is chosen', async ({ page }) => {
+    test('Sign up opens the path screen with fire, water and nature and sends no request', async ({ page }) => {
         const backend = await mockBackend(page);
         const menu = await openMainMenu(page);
 
         await fillCredentials(menu, 'newbie', 'secret123');
         await menu.signupButton.click();
 
-        await expect(menu.message).toHaveText('Escolha seu herói inicial.');
-        await expect(menu.message).toHaveClass(/error/);
-        await expect(menu.signupButton).toBeEnabled();
+        await expect(menu.pathTitle).toHaveText('Escolha seu caminho');
+        await expect(menu.pathHint).toHaveText('Os outros personagens podem ser encontrados no decorrer do jogo.');
+        await expect(menu.heroChoices).toHaveText([ 'Fogo - Kael', 'Água - Orina', 'Natureza - Lyra' ]);
         expect(backend.calls).toEqual([]);
         expect(await registryValue(page, 'user')).toBeUndefined();
     });
@@ -61,8 +53,8 @@ test.describe('Sign up', () => {
         const menu = await openMainMenu(page);
 
         await fillCredentials(menu, 'newbie', 'short');
-        await menu.chooseHero('NATURE');
         await menu.signupButton.click();
+        await menu.chooseHero('NATURE');
 
         await expect(menu.message).toHaveText('Password must have at least 8 characters');
         expect(await registryValue(page, 'user')).toBeUndefined();
@@ -148,8 +140,8 @@ test.describe('Sign up then login', () => {
         let menu = await openMainMenu(page);
 
         await fillCredentials(menu, 'newbie', 'secret123');
-        await menu.chooseHero('FIRE');
         await menu.signupButton.click();
+        await menu.chooseHero('FIRE');
         await expect(menu.message).toHaveText('Account created, newbie!');
 
         //  The session now persists across reloads (persistent-session); drop it to get the form back
