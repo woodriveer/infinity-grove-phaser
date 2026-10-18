@@ -804,10 +804,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `load` keeps the bosses and wins left
-- [ ] `win` sends one request, updates `winsLeft` from the response and resolves with it; a rejection rethrows and keeps the state
-- [ ] `farmSession.test.js` passes; quick gate passes
+- [x] `load` keeps the bosses and wins left
+- [x] `win` sends one request, updates `winsLeft` from the response and resolves with it; a rejection rethrows and keeps the state
+- [x] `farmSession.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
