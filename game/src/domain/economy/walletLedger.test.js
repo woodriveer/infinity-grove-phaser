@@ -316,3 +316,33 @@ describe('WalletLedger failing a sync', () => {
         expect(ledger.takeDrop(1).value).toBe(1);
     });
 });
+
+describe('WalletLedger setBase', () => {
+    it('replaces the shown wallet with the one the backend answered', () => {
+        const ledger = loaded(wallet(2, 14, 37));
+
+        ledger.setBase(wallet(2, 9, 37));
+
+        expect(ledger.display()).toEqual(wallet(2, 9, 37));
+    });
+
+    it('keeps the coins that landed and are not confirmed yet on top of it', () => {
+        const ledger = loaded(wallet(0, 0, 10));
+        const drop = ledger.takeDrop(1);
+
+        landAll(ledger, drop);
+        ledger.setBase(wallet(0, 0, 4));
+
+        expect(ledger.display()).toEqual(wallet(0, 0, 4 + drop.value));
+    });
+
+    it('does not alias the object it was given', () => {
+        const ledger = loaded();
+        const coins = wallet(0, 0, 5);
+
+        ledger.setBase(coins);
+        coins.copper = 99;
+
+        expect(ledger.display()).toEqual(wallet(0, 0, 5));
+    });
+});

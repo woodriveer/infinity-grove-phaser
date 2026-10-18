@@ -505,13 +505,13 @@ T25
 
 **Done when**:
 
-- [ ] `load` keeps the pieces and notifies; a failed load keeps the previous pieces and `loaded` false
-- [ ] equip, unequip, refine, reroll and sell update the pieces from the response; refine, reroll and sell pass the returned wallet to `onWallet`
-- [ ] `applyDrop(piece)` adds a dropped piece unless `sold`
-- [ ] `setBase` replaces the ledger base wallet and keeps landed unreported copper in `display()`
-- [ ] collection and ledger tests pass; `npm test` passes
+- [x] `load` keeps the pieces and notifies; a failed load keeps the previous pieces and `loaded` false
+- [x] equip, unequip, refine, reroll and sell update the pieces from the response; refine, reroll and sell pass the returned wallet to `onWallet`
+- [x] `applyDrop(piece)` adds a dropped piece unless `sold`
+- [x] `setBase` replaces the ledger base wallet and keeps landed unreported copper in `display()`
+- [x] collection and ledger tests pass; `npm test` passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 

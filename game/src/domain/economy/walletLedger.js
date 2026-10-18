@@ -24,6 +24,13 @@ export class WalletLedger
         this.loaded = true;
     }
 
+    //  The backend changed the wallet outside a sync (a refine, a reroll or a sale): its total replaces the base; coins that landed
+    //  and were not confirmed yet stay on top of it
+    setBase (wallet)
+    {
+        this.base = { ...wallet };
+    }
+
     //  Takes the next queued value of the level for a kill; null when there is nothing to drop
     takeDrop (level)
     {

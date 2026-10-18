@@ -61,6 +61,9 @@ export const createWalletSync = ({ gateway }) =>
 
         display: () => ledger.display(),
 
+        //  The wallet the backend answered after an action outside the sync (a refine, a reroll or a sale)
+        setWallet: (coins) => ledger.setBase(coins),
+
         takeDrop: (level) => ledger.takeDrop(level),
 
         land: (id) => ledger.land(id),

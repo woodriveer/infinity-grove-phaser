@@ -250,4 +250,24 @@ describe('walletSync', () => {
             expect(gateway.sync).not.toHaveBeenCalled();
         });
     });
+
+    describe('setWallet', () => {
+        it('shows the wallet the backend answered after an action outside the sync', async () => {
+            await loaded();
+
+            wallet.setWallet({ gold: 2, silver: 9, copper: 37 });
+
+            expect(wallet.display()).toEqual({ gold: 2, silver: 9, copper: 37 });
+        });
+
+        it('keeps the landed coins of an unreported drop on top of it', async () => {
+            await loaded();
+            const drop = wallet.takeDrop(1);
+            wallet.land(drop.id);
+
+            wallet.setWallet({ gold: 0, silver: 0, copper: 10 });
+
+            expect(wallet.display()).toEqual({ gold: 0, silver: 0, copper: 11 });
+        });
+    });
 });
