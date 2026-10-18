@@ -178,10 +178,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] FIRE gives FIRE, NATURE, WATER, DARKNESS, LIGHT; NATURE gives NATURE, WATER, FIRE, DARKNESS, LIGHT; WATER gives WATER, FIRE, NATURE, DARKNESS, LIGHT
-- [ ] A LIGHT or DARKNESS start throws `InvalidStartingElementException` (defined in T3)
-- [ ] `ChapterOrderTest` passes; quick gate passes
+- [x] FIRE gives FIRE, NATURE, WATER, DARKNESS, LIGHT; NATURE gives NATURE, WATER, FIRE, DARKNESS, LIGHT; WATER gives WATER, FIRE, NATURE, DARKNESS, LIGHT
+- [x] A LIGHT or DARKNESS start throws `InvalidStartingElementException` (defined in T3)
+- [x] `ChapterOrderTest` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
