@@ -1559,6 +1559,21 @@ describe('ClickerGame elements', () => {
         expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 0.05);
     });
 
+    it('hits with the element of the leader: nature on a fire monster deals half, water deals double', async () => {
+        const asLeader = (element) => ({
+            leaderId: 'kael',
+            heroes: [ { ...heroEntry('kael', { 0: 1 }), element }, heroEntry('lyra'), heroEntry('orina') ]
+        });
+        const nature = await createScene({ start: withStats(stats('FIRE')), heroes: asLeader('NATURE') });
+        const water = await createScene({ start: withStats(stats('FIRE')), heroes: asLeader('WATER') });
+
+        nature.click();
+        water.click();
+
+        expect(nature.scene.monster.health).toBe(nature.scene.monster.maxHealth - 0.5);
+        expect(water.scene.monster.health).toBe(water.scene.monster.maxHealth - 2);
+    });
+
     it('applies the physical defense of the monster', async () => {
         const ctx = await createScene({ start: withStats(stats('FIRE', 50, 10)) });
 

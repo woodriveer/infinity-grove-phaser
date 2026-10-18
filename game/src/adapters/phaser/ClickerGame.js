@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
-import { calculateDamage, formatDamage } from '../../domain/combat/damage';
+import { calculateDamage, formatDamage, PLAYER } from '../../domain/combat/damage';
 import { Monster } from '../../domain/combat/monster';
 import { HeroUi } from './HeroUi';
 import { el } from './views/dom';
@@ -536,7 +536,10 @@ export class ClickerGame extends Scene
             return;
         }
 
-        const { damage, critical } = calculateDamage({ defender: this.monster.stats, random: this.random });
+        //  The click hits with the element of the leader; until the heroes load it keeps the default attacker
+        const leader = this.heroes.leader();
+        const attacker = leader ? { ...PLAYER, element: leader.element } : PLAYER;
+        const { damage, critical } = calculateDamage({ attacker, defender: this.monster.stats, random: this.random });
 
         this.monster.hit(damage);
         this.updateHealthBar();
