@@ -220,12 +220,13 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `MINIBOSS` drops the hero of the report's chapter when `chance < 0.01` and nothing at 0.01 or more
-- [ ] `CHAPTER_BOSS` of chapter c below 5 drops the hero of chapter c + 1 with certainty on a first win without reading `chance`, and when `chance < 0.10` otherwise (nothing at 0.10 or more)
-- [ ] `CHAPTER_BOSS` of chapter 5 drops the hero of chapter 5 by the same rules
-- [ ] `PHASE` never drops and never reads `chance`
-- [ ] `CardDropsTest` covers the boundaries 0.0, 0.0099, 0.01, 0.0999, 0.10 and the three starting elements; quick gate passes
+- [x] `MINIBOSS` drops the hero of the report's chapter when `chance < 0.01` and nothing at 0.01 or more
+- [x] `CHAPTER_BOSS` of chapter c below 5 drops the hero of chapter c + 1 with certainty on a first win without reading `chance`, and when `chance < 0.10` otherwise (nothing at 0.10 or more)
+- [x] `CHAPTER_BOSS` of chapter 5 drops the hero of chapter 5 by the same rules
+- [x] `PHASE` never drops and never reads `chance`
+- [x] `CardDropsTest` covers the boundaries 0.0, 0.0099, 0.01, 0.0999, 0.10 and the three starting elements; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
