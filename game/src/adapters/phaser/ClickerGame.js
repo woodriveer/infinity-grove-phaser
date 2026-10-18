@@ -355,6 +355,8 @@ export class ClickerGame extends Scene
             return;
         }
 
+        //  A new encounter replaces any message, the completion of the previous chapter included
+        this.stageMessage.textContent = '';
         this.monster = new Monster(encounter.health, 1, encounter.stats);
         this.updateHealthBar();
         this.monsterParts.forEach((part) => part.setAlpha(1));
@@ -387,6 +389,9 @@ export class ClickerGame extends Scene
         this.monsterParts.forEach((part) => part.setAlpha(0));
         this.stageHud.textContent = '';
         this.stageMessage.textContent = COMPLETED_TEXT;
+
+        //  The chapter boss report goes at once, not on the next tick: its answer opens the next chapter, if there is one
+        this.session.flush();
     }
 
     showCountdown ()

@@ -1046,6 +1046,23 @@ describe('ClickerGame stages', () => {
         expect(timer(ctx)).toBe('');
     });
 
+    it('sends the chapter boss win at once and plays the next chapter the backend opens, without the completion message', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1) });
+        campaignGateway.report.mockResolvedValue({ ...progress(1, 'PHASE', 1), chapter: 2 });
+
+        killAll(ctx);
+        advance(ctx);
+
+        expect(campaignGateway.report).toHaveBeenCalledWith({ chapter: 1, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1 }, 'CLEARED');
+
+        await flush();
+
+        expect(message(ctx)).toBe('');
+        expect(label(ctx)).toBe('Stage 1/10  Phase 1/5');
+        expect(ctx.scene.monster.dead).toBe(false);
+        expect(ctx.monster.alpha).toBe(1);
+    });
+
     it('ignores clicks once the chapter is complete', async () => {
         const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1) });
         killAll(ctx);
