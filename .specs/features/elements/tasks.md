@@ -172,10 +172,10 @@ T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Defense, critical chance, critical resistance 100 and the formula behave as in the spec (ELEM-03 AC1-7)
-- [ ] Fire vs darkness gives 0.9 and fire vs nature gives 2 (ELEM-01 AC7-8)
-- [ ] `formatDamage` shows at most 1 decimal without a trailing zero (ELEM-01 AC11)
-- [ ] Gate passes
+- [x] Defense, critical chance, critical resistance 100 and the formula behave as in the spec (ELEM-03 AC1-7)
+- [x] Fire vs darkness gives 0.9 and fire vs nature gives 2 (ELEM-01 AC7-8)
+- [x] `formatDamage` shows at most 1 decimal without a trailing zero (ELEM-01 AC11)
+- [x] Gate passes
 
 **Tests**: unit
 **Gate**: quick
