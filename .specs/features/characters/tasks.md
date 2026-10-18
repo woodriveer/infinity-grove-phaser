@@ -925,11 +925,12 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] A row with 2 copies has a disabled button; with 3 copies it is enabled and calls the callback with `(heroId, stars)`
-- [ ] A preselected entry is highlighted
-- [ ] The result card shows the hero and the new stars
-- [ ] `fusionView.test.js` passes; quick gate passes
+- [x] A row with 2 copies has a disabled button; with 3 copies it is enabled and calls the callback with `(heroId, stars)`
+- [x] A preselected entry is highlighted
+- [x] The result card shows the hero and the new stars
+- [x] `fusionView.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
