@@ -1117,11 +1117,12 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Heróis shows Kael in colour and four grey heroes; a grey hero's detail shows three locked skills
-- [ ] 3 blank copies in Mochila, Fundir in Fusão, the bag shows 1 one-star copy and the skill bar unlocks slot 1
-- [ ] Changing the leader replaces the skill bar and a failed fuse shows the Portuguese error
-- [ ] Full game gate passes
+- [x] Heróis shows Kael in colour and four grey heroes; a grey hero's detail shows three locked skills
+- [x] 3 blank copies in Mochila, Fundir in Fusão, the bag shows 1 one-star copy and the skill bar unlocks slot 1
+- [x] Changing the leader replaces the skill bar and a failed fuse shows the Portuguese error
+- [x] Full game gate passes
 
+**Status**: Done
 **Tests**: e2e
 **Gate**: Full (game)
 

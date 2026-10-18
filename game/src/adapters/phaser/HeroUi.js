@@ -66,7 +66,8 @@ export class HeroUi
         this.backButton.addEventListener('click', () => this.goBack());
         this.goBack = () => {};
 
-        this.barHost = this.createDom(SKILL_BAR, BAR_HTML, false).querySelector('.skill-bar-host');
+        //  Not click-through: a click on a skill slot must not reach the canvas and hit the monster
+        this.barHost = this.createDom(SKILL_BAR, BAR_HTML).querySelector('.skill-bar-host');
         this.notice = this.createDom(NOTICE, NOTICE_HTML, false).querySelector('.card-notice');
 
         heroes.onChange(() => this.updateSkillBar());

@@ -433,7 +433,6 @@ body {
     gap: 10px;
     font-family: 'Arial Black', sans-serif;
     color: #ffffff;
-    pointer-events: none;
 }
 
 .skill-slot {
