@@ -682,9 +682,10 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `GET /heroes`, `POST /heroes/{id}/fuse { stars }`, `PUT /leader { heroId }`, returning the response data
-- [ ] `heroesApi.test.js` passes; quick gate passes
+- [x] `GET /heroes`, `POST /heroes/{id}/fuse { stars }`, `PUT /leader { heroId }`, returning the response data
+- [x] `heroesApi.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
