@@ -326,10 +326,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] An empty table gets five heroes
-- [ ] A second run changes nothing, and an edited hero name survives
-- [ ] `HeroSeederIT` passes; full backend gate passes
+- [x] An empty table gets five heroes
+- [x] A second run changes nothing, and an edited hero name survives
+- [x] `HeroSeederIT` passes; full backend gate passes
 
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 
