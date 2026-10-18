@@ -236,11 +236,11 @@ T25
 
 **Done when**:
 
-- [ ] Saved pieces come back equal from `findAll`, only for their username, with affix order kept
-- [ ] `delete` removes one piece; `deleteByUsername` removes all of a player and no other
-- [ ] `EquipmentRepositoryIT` passes; full backend gate passes
+- [x] Saved pieces come back equal from `findAll`, only for their username, with affix order kept
+- [x] `delete` removes one piece; `deleteByUsername` removes all of a player and no other
+- [x] `EquipmentRepositoryIT` passes; full backend gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 

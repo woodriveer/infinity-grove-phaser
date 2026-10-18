@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws
 
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaCardCopyRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaChapterRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaPieceRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaProgressRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaRefreshTokenRepository
@@ -94,6 +95,9 @@ abstract class IntegrationTestBase {
     protected lateinit var jpaCardCopyRepository: JpaCardCopyRepository
 
     @Autowired
+    protected lateinit var jpaPieceRepository: JpaPieceRepository
+
+    @Autowired
     protected lateinit var chance: ControllableChanceRoller
 
     @Autowired
@@ -113,6 +117,7 @@ abstract class IntegrationTestBase {
         chance.value = ControllableChanceRoller.NO_DROP
         jpaRefreshTokenRepository.deleteAll()
         jpaProgressRepository.deleteAll()
+        jpaPieceRepository.deleteAll()
         jpaCardCopyRepository.deleteAll()
         jpaPlayerCardsRepository.deleteAll()
         jpaWalletLevelRepository.deleteAll()
