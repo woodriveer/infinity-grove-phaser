@@ -39,6 +39,11 @@ class ChapterSeederIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `application start seeds all five chapters`() {
+        (1..5).forEach { assertEquals(ChapterDefinition.of(it), repository.findByNumber(it)) }
+    }
+
+    @Test
     fun `seeding again keeps values edited in the database`() {
         val edited = ChapterDefinition.first().copy(bossHealth = 1234)
         repository.save(edited)

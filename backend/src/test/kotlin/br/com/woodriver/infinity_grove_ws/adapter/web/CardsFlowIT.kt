@@ -72,7 +72,10 @@ class CardsFlowIT : IntegrationTestBase() {
             .then()
             .statusCode(200)
             .body("drop.heroId", equalTo("lyra"))
-            .body("completed", equalTo(true))
+            .body("chapter", equalTo(2))
+            .body("completed", equalTo(false))
+        // the farm lists the bosses of the chapter the player is in; put the player back as if chapter 1 were the last
+        jpaProgressRepository.save(ProgressEntity("yan", 1, 10, "CHAPTER_BOSS", 1, true))
         asUser(token)
             .get("/heroes")
             .then()

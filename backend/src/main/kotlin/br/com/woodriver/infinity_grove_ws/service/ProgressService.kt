@@ -47,7 +47,7 @@ class ProgressService(
         val next = progress.report(position, outcome, chapter)
         progressRepository.save(next)
         val drop = if (outcome == Outcome.CLEARED) awardCards(username, position) else null
-        return OutcomeResult(next.view(chapter), drop)
+        return OutcomeResult(next.view(chapterOf(next)), drop)
     }
 
     /** Rolls the card of a won boss under the cards row lock, records a chapter boss win, and stores what changed. */
@@ -72,10 +72,17 @@ class ProgressService(
             logger.warn("Progress request rejected, user not found username={}", username)
             throw UserNotFoundException(username)
         }
-        return progressRepository.findForUpdate(username) ?: run {
-            progressRepository.createIfAbsent(Progress.start(username))
-            progressRepository.findForUpdate(username) ?: error("Progress for '$username' vanished after creation")
+        val stored =
+            progressRepository.findForUpdate(username) ?: run {
+                progressRepository.createIfAbsent(Progress.start(username))
+                progressRepository.findForUpdate(username) ?: error("Progress for '$username' vanished after creation")
+            }
+        val open = stored.withNextChapterOpen()
+        if (open != stored) {
+            logger.info("Opening the next chapter username={} chapter={}", username, open.position.chapter)
+            progressRepository.save(open)
         }
+        return open
     }
 
     private fun chapterOf(progress: Progress): ChapterDefinition =

@@ -27,7 +27,7 @@ app:
   cards:
     # chance a miniboss win drops a hero card, chance a repeated chapter boss win does (the first win always does),
     # chapter boss wins counted per UTC day, and the shortest time between two farm wins
-    miniboss-rate: 0.01
-    chapter-boss-rate: 0.10
+    miniboss-rate: 1.0
+    chapter-boss-rate: 1.0
     chapter-boss-daily-limit: 10
     farm-min-interval-ms: 5000

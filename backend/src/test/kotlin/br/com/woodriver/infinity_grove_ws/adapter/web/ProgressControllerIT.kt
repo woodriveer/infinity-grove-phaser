@@ -135,12 +135,12 @@ class ProgressControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `clearing every encounter walks 10 stages of 5 phases, 10 minibosses and the chapter boss to completion`() {
+    fun `clearing every encounter walks 10 stages of 5 phases, 10 minibosses and the chapter boss into chapter 2`() {
         user()
         var current = getProgress()
         var clears = 0
 
-        while (!current.path<Boolean>("completed")) {
+        while (current.path<Int>("chapter") == 1) {
             current =
                 report(body(current.path("stage"), current.path("encounter"), current.path("phase"), "CLEARED"))
                     .then()
@@ -154,7 +154,24 @@ class ProgressControllerIT : IntegrationTestBase() {
         }
 
         assertEquals(61, clears)
-        assertEquals(listOf(10, "CHAPTER_BOSS", 1, true), position(current))
+        assertEquals(2, current.path<Int>("chapter"))
+        assertEquals(listOf(1, "PHASE", 1, false), position(current))
+        assertEquals(600, current.path<Int>("definition.bossHealth"))
+    }
+
+    @Test
+    fun `a progress stored as completed in chapter 1 opens chapter 2 on GET`() {
+        user()
+        store(10, "CHAPTER_BOSS", 1, completed = true)
+
+        getProgress()
+            .then()
+            .statusCode(200)
+            .body("chapter", equalTo(2))
+            .body("stage", equalTo(1))
+            .body("encounter", equalTo("PHASE"))
+            .body("completed", equalTo(false))
+        assertEquals(2, jpaProgressRepository.findById("yan").get().chapter)
     }
 
     @Test
@@ -240,12 +257,12 @@ class ProgressControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `every report on a completed progress is 409 and the progress stays completed`() {
+    fun `every report on the completed last chapter is 409 and the progress stays completed`() {
         user()
-        store(10, "CHAPTER_BOSS", 1, completed = true)
+        jpaProgressRepository.save(ProgressEntity("yan", 5, 10, "CHAPTER_BOSS", 1, true))
 
         listOf("CLEARED", "FAILED").forEach { outcome ->
-            report(body(10, "CHAPTER_BOSS", 1, outcome))
+            report(body(10, "CHAPTER_BOSS", 1, outcome, chapter = 5))
                 .then()
                 .statusCode(409)
                 .body("code", equalTo("PROGRESS_CONFLICT"))
@@ -395,6 +412,7 @@ class ProgressControllerIT : IntegrationTestBase() {
             .then()
             .statusCode(200)
             .body("drop.heroId", equalTo("lyra"))
-            .body("completed", equalTo(true))
+            .body("chapter", equalTo(2))
+            .body("completed", equalTo(false))
     }
 }

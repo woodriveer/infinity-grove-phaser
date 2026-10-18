@@ -111,4 +111,23 @@ class ChapterTest {
         assertEquals(300, first.bossHealth)
         assertEquals(60_000L, first.bossTimeLimitMs)
     }
+
+    @Test
+    fun `chapter 1 is the first chapter and later chapters have more health and defense`() {
+        assertEquals(ChapterDefinition.first(), ChapterDefinition.of(1))
+        (2..ChapterOrder.MAX_CHAPTER).forEach {
+            val chapter = ChapterDefinition.of(it)
+            val before = ChapterDefinition.of(it - 1)
+
+            assertEquals(it, chapter.number)
+            assertTrue(chapter.bossHealth > before.bossHealth)
+            assertTrue(chapter.stage(1).monsterHealth > before.stage(1).monsterHealth)
+            assertTrue(chapter.boss.physicalDefense > before.boss.physicalDefense)
+        }
+    }
+
+    @Test
+    fun `a chapter past the last one cannot be built`() {
+        assertFailsWith<IllegalArgumentException> { ChapterDefinition.of(ChapterOrder.MAX_CHAPTER + 1) }
+    }
 }

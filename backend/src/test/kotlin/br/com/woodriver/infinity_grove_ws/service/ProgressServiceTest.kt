@@ -36,7 +36,7 @@ class ProgressServiceTest {
     private val users = InMemoryUserRepository()
     private val progresses = InMemoryProgressRepository()
     private val chapter = ChapterDefinition.first()
-    private val chapters = InMemoryChapterRepository(chapter)
+    private val chapters = InMemoryChapterRepository(*(1..5).map(ChapterDefinition::of).toTypedArray())
     private val heroes = InMemoryHeroRepository(*HeroSeed.heroes().toTypedArray())
     private val playerCards = InMemoryPlayerCardsRepository()
     private val rates = CardDropRates(minibossRate = 0.01, chapterBossRate = 0.10, chapterBossDailyLimit = 10, farmMinIntervalMs = 5000)
@@ -79,7 +79,7 @@ class ProgressServiceTest {
     @Test
     fun `get fails when the stored chapter does not exist`() {
         existingUser()
-        progresses.save(Progress("yan", ProgressPosition(2, 1, Encounter.PHASE, 1)))
+        progresses.save(Progress("yan", ProgressPosition(6, 1, Encounter.PHASE, 1)))
 
         assertFailsWith<ChapterNotFoundException> { service.get("yan") }
     }
@@ -226,6 +226,39 @@ class ProgressServiceTest {
 
         assertEquals("orina", result.drop?.heroId)
         assertEquals(2, blankCopies("orina"))
+    }
+
+    @Test
+    fun `clearing the chapter boss answers with the first stage of the next chapter and its definition`() {
+        playerAt(chapterBoss)
+
+        val result = service.report("yan", chapterBoss, Outcome.CLEARED)
+
+        assertEquals(ProgressPosition(2, 1, Encounter.PHASE, 1), result.view.progress.position)
+        assertEquals(false, result.view.progress.completed)
+        assertEquals(ChapterDefinition.of(2), result.view.chapter)
+        assertEquals(ProgressPosition(2, 1, Encounter.PHASE, 1), progresses.progresses.getValue("yan").position)
+    }
+
+    @Test
+    fun `get opens the next chapter of a progress stored as completed before it existed`() {
+        existingUser()
+        progresses.save(Progress("yan", chapterBoss, completed = true))
+
+        val view = service.get("yan")
+
+        assertEquals(ProgressPosition(2, 1, Encounter.PHASE, 1), view.progress.position)
+        assertEquals(ChapterDefinition.of(2), view.chapter)
+        assertEquals(false, progresses.progresses.getValue("yan").completed)
+    }
+
+    @Test
+    fun `the progress of the last chapter stays completed`() {
+        existingUser()
+        val last = Progress("yan", ProgressPosition(5, 10, Encounter.CHAPTER_BOSS, 1), completed = true)
+        progresses.save(last)
+
+        assertEquals(last, service.get("yan").progress)
     }
 
     @Test

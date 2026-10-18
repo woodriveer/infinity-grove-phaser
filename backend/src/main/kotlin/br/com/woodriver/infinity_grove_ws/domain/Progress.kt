@@ -64,8 +64,15 @@ data class Progress(
                 } else {
                     copy(position = position.copy(encounter = Encounter.CHAPTER_BOSS, phase = 1))
                 }
-            Encounter.CHAPTER_BOSS -> copy(completed = true)
+            Encounter.CHAPTER_BOSS -> if (hasNextChapter()) nextChapter() else copy(completed = true)
         }
+
+    private fun hasNextChapter() = position.chapter < ChapterOrder.MAX_CHAPTER
+
+    private fun nextChapter() = copy(position = ProgressPosition(position.chapter + 1, 1, Encounter.PHASE, 1), completed = false)
+
+    /** A progress stored as completed before the next chapter existed moves on to it; anything else is returned as it is. */
+    fun withNextChapterOpen(): Progress = if (completed && hasNextChapter()) nextChapter() else this
 
     private fun failed(chapter: ChapterDefinition): Progress {
         if (position.encounter == Encounter.PHASE) conflict("fail on a phase", Outcome.FAILED, chapter)

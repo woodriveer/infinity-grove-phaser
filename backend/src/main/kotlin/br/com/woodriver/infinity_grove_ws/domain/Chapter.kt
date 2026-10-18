@@ -77,20 +77,30 @@ data class ChapterDefinition(
         private const val MINIBOSS_CRIT_RESISTANCE_PER_STAGE = 2
         private const val BOSS_DEFENSE = 30
         private const val BOSS_CRIT_RESISTANCE = 30
+        private const val DEFENSE_PER_CHAPTER = 5
 
         /** Chapter 1 as seeded: reachable with 1 damage per click, tunable in the database afterwards. */
-        fun first() =
-            ChapterDefinition(
-                number = 1,
-                bossHealth = BOSS_HEALTH,
+        fun first() = of(1)
+
+        /**
+         * Chapter [number] as seeded: the same shape as chapter 1 with the health and the defenses growing each chapter, and the
+         * stage elements shifted by one per chapter. Which enemies belong to which chapter is still open (AD-006).
+         */
+        fun of(number: Int): ChapterDefinition {
+            require(number in 1..ChapterOrder.MAX_CHAPTER) { "Chapter $number must be between 1 and ${ChapterOrder.MAX_CHAPTER}" }
+            val defenseBonus = DEFENSE_PER_CHAPTER * (number - 1)
+            return ChapterDefinition(
+                number = number,
+                bossHealth = BOSS_HEALTH * number,
                 bossTimeLimitMs = BOSS_TIME_LIMIT_MS,
                 stages =
                     (1..FIRST_CHAPTER_STAGES).map { n ->
-                        val monsterHealth = BASE_MONSTER_HEALTH + n - 1
+                        val monsterHealth = (BASE_MONSTER_HEALTH + n - 1) * number
                         // the elements take turns by stage, so every multiplier shows up in the chapter
-                        val element = Element.entries[(n - 1) % Element.entries.size]
-                        val defense = MINIBOSS_BASE_DEFENSE + n
-                        val critResistance = MINIBOSS_BASE_CRIT_RESISTANCE + MINIBOSS_CRIT_RESISTANCE_PER_STAGE * n
+                        val element = Element.entries[(n - 1 + number - 1) % Element.entries.size]
+                        val defense = minOf(MINIBOSS_BASE_DEFENSE + n + defenseBonus, EnemyStats.MAX_DEFENSE)
+                        val critResistance =
+                            minOf(MINIBOSS_BASE_CRIT_RESISTANCE + MINIBOSS_CRIT_RESISTANCE_PER_STAGE * n + defenseBonus, EnemyStats.MAX_CRIT_RESISTANCE)
                         StageDefinition(
                             number = n,
                             phasesPerStage = PHASES_PER_STAGE,
@@ -101,7 +111,14 @@ data class ChapterDefinition(
                             miniboss = EnemyStats(element, defense, defense, critResistance),
                         )
                     },
-                boss = EnemyStats(Element.DARKNESS, BOSS_DEFENSE, BOSS_DEFENSE, BOSS_CRIT_RESISTANCE),
+                boss =
+                    EnemyStats(
+                        Element.entries[(number + 3) % Element.entries.size],
+                        minOf(BOSS_DEFENSE + defenseBonus, EnemyStats.MAX_DEFENSE),
+                        minOf(BOSS_DEFENSE + defenseBonus, EnemyStats.MAX_DEFENSE),
+                        minOf(BOSS_CRIT_RESISTANCE + defenseBonus, EnemyStats.MAX_CRIT_RESISTANCE),
+                    ),
             )
+        }
     }
 }

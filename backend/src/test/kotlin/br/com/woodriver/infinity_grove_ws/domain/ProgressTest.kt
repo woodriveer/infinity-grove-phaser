@@ -65,11 +65,30 @@ class ProgressTest {
     }
 
     @Test
-    fun `clearing the chapter boss completes the progress and keeps the position`() {
-        val done = at(3, Encounter.CHAPTER_BOSS).cleared()
+    fun `clearing the chapter boss opens stage 1 of the next chapter`() {
+        val next = at(3, Encounter.CHAPTER_BOSS).cleared()
+
+        assertFalse(next.completed)
+        assertEquals(ProgressPosition(2, 1, Encounter.PHASE, 1), next.position)
+    }
+
+    @Test
+    fun `clearing the boss of the last chapter completes the progress and keeps the position`() {
+        val last = Progress("yan", ProgressPosition(ChapterOrder.MAX_CHAPTER, 3, Encounter.CHAPTER_BOSS, 1))
+        val done = last.cleared()
 
         assertTrue(done.completed)
-        assertEquals(ProgressPosition(1, 3, Encounter.CHAPTER_BOSS, 1), done.position)
+        assertEquals(last.position, done.position)
+    }
+
+    @Test
+    fun `a progress completed before the next chapter existed opens it`() {
+        val stuck = at(10, Encounter.CHAPTER_BOSS, completed = true)
+
+        assertEquals(Progress("yan", ProgressPosition(2, 1, Encounter.PHASE, 1)), stuck.withNextChapterOpen())
+
+        val last = stuck.copy(position = stuck.position.copy(chapter = ChapterOrder.MAX_CHAPTER))
+        assertEquals(last, last.withNextChapterOpen())
     }
 
     @Test
@@ -126,18 +145,17 @@ class ProgressTest {
     }
 
     @Test
-    fun `the seeded chapter takes 61 clears from the start to completion`() {
-        val seeded = ChapterDefinition.first()
+    fun `each seeded chapter takes 61 clears and the fifth one completes the progress`() {
         var progress = Progress.start("yan")
         var clears = 0
 
         while (!progress.completed) {
-            progress = progress.report(progress.position, Outcome.CLEARED, seeded)
+            progress = progress.report(progress.position, Outcome.CLEARED, ChapterDefinition.of(progress.position.chapter))
             clears++
         }
 
-        assertEquals(61, clears)
-        assertEquals(ProgressPosition(1, 10, Encounter.CHAPTER_BOSS, 1), progress.position)
+        assertEquals(61 * ChapterOrder.MAX_CHAPTER, clears)
+        assertEquals(ProgressPosition(ChapterOrder.MAX_CHAPTER, 10, Encounter.CHAPTER_BOSS, 1), progress.position)
     }
 
     @Test
