@@ -1,5 +1,7 @@
+import { dropLabel } from '../../domain/equipment/equipment';
 import { renderBag, renderBagEntry } from './views/bagView';
 import { renderCatalog, renderHeroDetail } from './views/catalogView';
+import { renderEquipment, renderEquipmentUnavailable, renderPieceDetail } from './views/equipmentView';
 import { renderFarm } from './views/farmView';
 import { renderFusion, renderFusionResult } from './views/fusionView';
 import { renderLeaderPicker } from './views/leaderView';
@@ -20,6 +22,7 @@ const ICONS = {
     bag: icon('<path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"></path><path d="M8 10h8"></path><path d="M8 18h8"></path><path d="M8 22v-6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v6"></path><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>'),
     fusion: icon('<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>'),
     leader: icon('<path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path><path d="M5 21h14"></path>'),
+    equipment: icon('<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>'),
     farm: icon('<path d="M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z"></path><circle cx="15" cy="12" r="1"></circle><circle cx="9" cy="12" r="1"></circle>')
 };
 
@@ -28,12 +31,14 @@ const SCREENS = [
     { id: 'bag', label: 'Mochila', title: 'Mochila' },
     { id: 'fusion', label: 'Fusão', title: 'Fusão' },
     { id: 'leader', label: 'Líder', title: 'Líder' },
+    { id: 'equipment', label: 'Equipamento', title: 'Equipamento' },
     { id: 'farm', label: 'Rever chefes', title: 'Rever chefes' }
 ];
 
 const LOAD_FAILED = 'Não foi possível carregar.';
 const FUSE_FAILED = 'Não foi possível fundir as cartas.';
 const LEADER_FAILED = 'Não foi possível trocar o líder.';
+const EQUIPMENT_FAILED = 'Não foi possível concluir a ação.';
 
 //  The bag button carries a red dot while the bag holds a card the player has not looked at yet
 const BAG_BADGE_HTML = '<span class="hud-badge" data-testid="bag-badge" hidden></span>';
@@ -49,19 +54,22 @@ const BAR_HTML = '<div class="skill-bar-host"></div>';
 const LEADER_HTML = '<div class="leader-host"></div>';
 const NOTICE_HTML = '<div class="hud-box hud-notice"><div class="card-notice" data-testid="card-notice" hidden></div></div>';
 
-//  The hero screens on top of the combat scene: five HUD buttons, one panel that shows the screen that was opened (Heróis, Mochila, Fusão,
-//  Líder, Rever chefes), the skill bar of the leader and the "Carta: <nome>" notice. It is plain DOM placed with scene.add.dom.
-//  Collaborators: heroes (heroCollection), farm (farmSession) and the scene hooks
+//  The hero screens on top of the combat scene: six HUD buttons, one panel that shows the screen that was opened (Heróis, Mochila, Fusão,
+//  Líder, Equipamento, Rever chefes), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
+//  It is plain DOM placed with scene.add.dom.
+//  Collaborators: heroes (heroCollection), equipment (equipmentCollection), farm (farmSession) and the scene hooks
+//    walletCopper() -> the copper the player holds, to disable what costs more;
 //    pause() -> true when it paused the fight, false when the fight was already paused; resume() undoes a pause that pause() made;
 //    startFarm(boss) starts the farm fight of the chosen boss.
 export class HeroUi
 {
-    constructor (scene, { heroes, farm, pause, resume, startFarm })
+    constructor (scene, { heroes, equipment, farm, pause, resume, startFarm, walletCopper })
     {
         this.scene = scene;
         this.heroes = heroes;
+        this.equipment = equipment;
         this.farm = farm;
-        this.hooks = { pause, resume, startFarm };
+        this.hooks = { pause, resume, startFarm, walletCopper };
         this.open = false;
         this.pausedByUs = false;
         this.view = 0;
@@ -143,6 +151,10 @@ export class HeroUi
             {
                 await this.farm.load();
             }
+            else if (screen === 'equipment')
+            {
+                await Promise.all([ this.heroes.load(), this.equipment.load() ]);
+            }
             else
             {
                 await this.heroes.load();
@@ -152,7 +164,15 @@ export class HeroUi
         {
             if (view === this.view)
             {
-                this.setError(LOAD_FAILED);
+                //  The equipment screen says so in the body: the fight keeps the attacker it had
+                if (screen === 'equipment')
+                {
+                    this.body.replaceChildren(renderEquipmentUnavailable());
+                }
+                else
+                {
+                    this.setError(LOAD_FAILED);
+                }
             }
 
             return;
@@ -288,6 +308,55 @@ export class HeroUi
         }
     }
 
+    //  The slots of every hero and the bag, or one piece with its actions (`selected` is a piece id)
+    render_equipment ({ selected = null } = {})
+    {
+        const piece = this.equipment.pieces().find((candidate) => candidate.id === selected);
+        const owned = this.heroes.heroes();
+
+        if (!piece)
+        {
+            this.body.replaceChildren(renderEquipment(this.equipment.pieces(), owned, {
+                onSelect: (picked) => this.render_equipment({ selected: picked.id })
+            }));
+            this.backButton.hidden = true;
+
+            return;
+        }
+
+        this.showDetail(renderPieceDetail(piece, owned, this.hooks.walletCopper(), {
+            onEquip: (heroId) => this.act(() => this.equipment.equip(piece.id, heroId), piece.id),
+            onUnequip: () => this.act(() => this.equipment.unequip(piece.id), piece.id),
+            onRefine: () => this.act(() => this.equipment.refine(piece.id), piece.id),
+            onReroll: (affix) => this.act(() => this.equipment.reroll(piece.id, affix), piece.id),
+            onSell: () => this.act(() => this.equipment.sell(piece.id), piece.id)
+        }), () => this.render_equipment());
+    }
+
+    //  Runs an equipment action and shows the piece again (the list when the piece is gone); a refusal shows an error line
+    async act (task, pieceId)
+    {
+        const view = this.view;
+
+        try
+        {
+            await task();
+
+            if (view === this.view)
+            {
+                this.setError('');
+                this.render_equipment({ selected: pieceId });
+            }
+        }
+        catch
+        {
+            if (view === this.view)
+            {
+                this.setError(EQUIPMENT_FAILED);
+            }
+        }
+    }
+
     render_farm ()
     {
         this.setError('');
@@ -310,11 +379,22 @@ export class HeroUi
     //  "Carta: <nome>" for 3 s; a newer card replaces it and restarts the 3 s
     showDrop (drop)
     {
-        const id = ++this.noticeId;
-
         //  A card that lands while the bag is open is seen at once
         this.bagBadge.hidden = this.open && this.screen === 'bag';
-        this.notice.textContent = `Carta: ${drop.heroName}`;
+        this.showNotice(`Carta: ${drop.heroName}`);
+    }
+
+    //  "Equipamento encontrado: Raro Arma" for 3 s, in the same place as the card notice
+    showEquipmentDrop (drop)
+    {
+        this.showNotice(`Equipamento encontrado: ${dropLabel(drop.piece)}`);
+    }
+
+    showNotice (text)
+    {
+        const id = ++this.noticeId;
+
+        this.notice.textContent = text;
         this.notice.hidden = false;
         this.scene.time.delayedCall(NOTICE_MS, () =>
         {

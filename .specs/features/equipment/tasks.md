@@ -569,11 +569,11 @@ T25
 
 **Done when**:
 
-- [ ] The button opens the screen, pausing the fight like the others; failures show the error line
-- [ ] The notice text for a dropped RARE WEAPON is exactly `Equipamento encontrado: Raro Arma` and hides after 3 s
-- [ ] `HeroUi.test.js` additions pass; build and `npm test` pass; the HUD still fits (checked in the browser by T24)
+- [x] The button opens the screen, pausing the fight like the others; failures show the error line
+- [x] The notice text for a dropped RARE WEAPON is exactly `Equipamento encontrado: Raro Arma` and hides after 3 s
+- [x] `HeroUi.test.js` additions pass; build and `npm test` pass; the HUD still fits (checked in the browser by T24)
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 

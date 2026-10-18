@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HeroUi } from './HeroUi';
 import { ApiError } from '../../application/ApiError';
+import { createEquipmentCollection } from '../../application/equipment/equipmentCollection';
 import { createFarmSession } from '../../application/farm/farmSession';
 import { createHeroCollection } from '../../application/heroes/heroCollection';
 
@@ -27,11 +28,19 @@ const catalog = () => ({
 
 const farmState = () => ({ bosses: [ { kind: 'MINIBOSS', stage: 1 }, { kind: 'CHAPTER_BOSS' } ], chapterBossWinsLeft: 10 });
 
-const createUi = ({ list = catalog(), farmGet = farmState(), pause = true } = {}) => {
+const createUi = ({ list = catalog(), farmGet = farmState(), pause = true, equipmentList = { capacity: 100, pieces: [] }, wallet = 1_000_000 } = {}) => {
     const heroesGateway = {
         list: vi.fn(() => (list instanceof Error ? Promise.reject(list) : Promise.resolve(list))),
         fuse: vi.fn(),
         setLeader: vi.fn()
+    };
+    const equipmentGateway = {
+        list: vi.fn(() => (equipmentList instanceof Error ? Promise.reject(equipmentList) : Promise.resolve(equipmentList))),
+        equip: vi.fn(),
+        unequip: vi.fn(),
+        refine: vi.fn(),
+        reroll: vi.fn(),
+        sell: vi.fn()
     };
     const farmGateway = { get: vi.fn(() => (farmGet instanceof Error ? Promise.reject(farmGet) : Promise.resolve(farmGet))), win: vi.fn() };
     const timers = [];
@@ -54,15 +63,16 @@ const createUi = ({ list = catalog(), farmGet = farmState(), pause = true } = {}
         },
         time: { delayedCall: vi.fn((delay, callback) => { timers.push({ delay, callback }); }) }
     };
-    const hooks = { pause: vi.fn(() => pause), resume: vi.fn(), startFarm: vi.fn() };
+    const hooks = { pause: vi.fn(() => pause), resume: vi.fn(), startFarm: vi.fn(), walletCopper: vi.fn(() => wallet) };
     const heroes = createHeroCollection({ gateway: heroesGateway });
     const farm = createFarmSession({ gateway: farmGateway });
-    const ui = new HeroUi(scene, { heroes, farm, ...hooks });
+    const equipment = createEquipmentCollection({ gateway: equipmentGateway });
+    const ui = new HeroUi(scene, { heroes, equipment, farm, ...hooks });
     const root = scene.add.dom.mock.results.map((result) => result.value.node);
     const query = (selector) => root.map((node) => node.querySelector(selector)).find(Boolean) ?? null;
     const testid = (id) => query(`[data-testid="${id}"]`);
 
-    return { ui, scene, heroes, farm, heroesGateway, farmGateway, hooks, timers, query, testid, root };
+    return { ui, scene, heroes, equipment, farm, heroesGateway, equipmentGateway, farmGateway, hooks, timers, query, testid, root };
 };
 
 const open = async (ctx, screen) => {
@@ -71,11 +81,11 @@ const open = async (ctx, screen) => {
 };
 
 describe('HeroUi HUD', () => {
-    it('shows the five buttons Heróis, Mochila, Fusão, Líder and Rever chefes', () => {
+    it('shows the six buttons Heróis, Mochila, Fusão, Líder, Equipamento and Rever chefes', () => {
         const { testid } = createUi();
 
-        expect([ 'heroes', 'bag', 'fusion', 'leader', 'farm' ].map((id) => testid(`hud-${id}`).textContent)).toEqual([
-            'Heróis', 'Mochila', 'Fusão', 'Líder', 'Rever chefes'
+        expect([ 'heroes', 'bag', 'fusion', 'leader', 'equipment', 'farm' ].map((id) => testid(`hud-${id}`).textContent)).toEqual([
+            'Heróis', 'Mochila', 'Fusão', 'Líder', 'Equipamento', 'Rever chefes'
         ]);
     });
 
@@ -408,6 +418,190 @@ describe('HeroUi card notice', () => {
         timers[1].callback();
 
         expect(testid('card-notice').hidden).toBe(true);
+    });
+});
+
+const piece = (extra = {}) => ({
+    id: 'r1', slot: 'RING', rarity: 'COMMON', refine: 0, heroId: null, sellPrice: 100, refineCost: 500, rerollCost: null,
+    affixes: [ { type: 'CLICK_DAMAGE_PCT', value: 7 } ], ...extra
+});
+
+describe('HeroUi Equipamento', () => {
+    it('loads the heroes and the pieces, pauses the fight and lists the slots and the bag', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece(), piece({ id: 'w1', slot: 'WEAPON', clickDamage: 3, heroId: 'kael' }) ] } });
+
+        await open(ctx, 'equipment');
+
+        expect(ctx.hooks.pause).toHaveBeenCalledTimes(1);
+        expect(ctx.equipmentGateway.list).toHaveBeenCalledTimes(1);
+        expect(ctx.query('.hero-title').textContent).toBe('Equipamento');
+        expect(ctx.testid('equip-hero-kael')).not.toBeNull();
+        expect(ctx.testid('equip-slot-kael-WEAPON').textContent).toBe('ArmaComum Arma +0');
+        expect(ctx.testid('equip-piece-r1').textContent).toBe('Comum Anel +0');
+    });
+
+    it('says there is no equipment yet', async () => {
+        const ctx = createUi();
+
+        await open(ctx, 'equipment');
+
+        expect(ctx.testid('equipment-empty').textContent).toBe('Nenhum equipamento ainda. Vença chefes para encontrar peças.');
+    });
+
+    it('says the equipment is unavailable when it cannot be loaded', async () => {
+        const ctx = createUi({ equipmentList: new ApiError('down', { status: 500 }) });
+
+        await open(ctx, 'equipment');
+
+        expect(ctx.testid('equipment-unavailable').textContent).toBe('Equipamento indisponível');
+        expect(ctx.testid('equip-hero-kael')).toBeNull();
+    });
+
+    it('shows the detail of a piece with a way back to the list', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece() ] } });
+
+        await open(ctx, 'equipment');
+        ctx.testid('equip-piece-r1').click();
+
+        expect(ctx.testid('piece-detail')).not.toBeNull();
+        expect(ctx.testid('piece-refine').textContent).toBe('Refinar (5 prata)');
+        expect(ctx.testid('hero-back').hidden).toBe(false);
+
+        ctx.testid('hero-back').click();
+
+        expect(ctx.testid('equipment-list')).not.toBeNull();
+        expect(ctx.testid('hero-back').hidden).toBe(true);
+    });
+
+    it('equips the piece on a hero and shows it worn', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece() ] } });
+        ctx.equipmentGateway.equip.mockResolvedValue({ capacity: 100, pieces: [ piece({ heroId: 'lyra' }) ] });
+
+        await open(ctx, 'equipment');
+        ctx.testid('equip-piece-r1').click();
+        ctx.testid('piece-equip-lyra').click();
+        await flush();
+
+        expect(ctx.equipmentGateway.equip).toHaveBeenCalledWith('r1', 'lyra');
+        expect(ctx.testid('piece-worn').textContent).toBe('Equipado em Hero lyra');
+    });
+
+    it('refines the piece and shows the new level and cost', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece() ] } });
+        ctx.equipmentGateway.refine.mockResolvedValue({
+            equipment: { capacity: 100, pieces: [ piece({ refine: 1, refineCost: 850 }) ] }, wallet: { gold: 0, silver: 1, copper: 0 }
+        });
+
+        await open(ctx, 'equipment');
+        ctx.testid('equip-piece-r1').click();
+        ctx.testid('piece-refine').click();
+        await flush();
+
+        expect(ctx.equipmentGateway.refine).toHaveBeenCalledWith('r1');
+        expect(ctx.query('.hero-name').textContent).toBe('Comum Anel +1');
+        expect(ctx.testid('piece-refine').textContent).toBe('Refinar (8 prata 50 cobre)');
+    });
+
+    it('disables Refinar when the wallet of the scene holds less than the cost', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece() ] }, wallet: 499 });
+
+        await open(ctx, 'equipment');
+        ctx.testid('equip-piece-r1').click();
+
+        expect(ctx.testid('piece-refine').disabled).toBe(true);
+    });
+
+    it('rerolls an affix of a piece at plus 5', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece({ refine: 5, rerollCost: 5000 }) ] } });
+        ctx.equipmentGateway.reroll.mockResolvedValue({
+            equipment: { capacity: 100, pieces: [ piece({ refine: 5, rerollCost: 5000, affixes: [ { type: 'CRIT_CHANCE', value: 3 } ] }) ] },
+            wallet: { gold: 0, silver: 0, copper: 0 }
+        });
+
+        await open(ctx, 'equipment');
+        ctx.testid('equip-piece-r1').click();
+        ctx.testid('piece-reroll-0').click();
+        await flush();
+
+        expect(ctx.equipmentGateway.reroll).toHaveBeenCalledWith('r1', 0);
+        expect(ctx.testid('piece-line-0').textContent).toBe('Chance de crítico +3%');
+    });
+
+    it('sells the piece and goes back to the list without it', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece(), piece({ id: 'r2' }) ] } });
+        ctx.equipmentGateway.sell.mockResolvedValue({ equipment: { capacity: 100, pieces: [ piece({ id: 'r2' }) ] }, wallet: { gold: 0, silver: 1, copper: 0 } });
+
+        await open(ctx, 'equipment');
+        ctx.testid('equip-piece-r1').click();
+        ctx.testid('piece-sell').click();
+        await flush();
+
+        expect(ctx.equipmentGateway.sell).toHaveBeenCalledWith('r1');
+        expect(ctx.testid('equipment-list')).not.toBeNull();
+        expect(ctx.testid('equip-piece-r1')).toBeNull();
+        expect(ctx.testid('equip-piece-r2')).not.toBeNull();
+    });
+
+    it('shows a Portuguese error line and keeps the piece when an action is refused', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece() ] } });
+        ctx.equipmentGateway.refine.mockRejectedValue(new ApiError('no copper', { status: 409, code: 'NOT_ENOUGH_COPPER' }));
+
+        await open(ctx, 'equipment');
+        ctx.testid('equip-piece-r1').click();
+        ctx.testid('piece-refine').click();
+        await flush();
+
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível concluir a ação.');
+        expect(ctx.query('.hero-error').hidden).toBe(false);
+        expect(ctx.testid('piece-detail')).not.toBeNull();
+    });
+
+    it('ignores an answer that arrives after the panel was closed', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece() ] } });
+        ctx.equipmentGateway.sell.mockResolvedValue({ equipment: { capacity: 100, pieces: [] }, wallet: { gold: 0, silver: 0, copper: 0 } });
+
+        await open(ctx, 'equipment');
+        ctx.testid('equip-piece-r1').click();
+        ctx.testid('piece-sell').click();
+        ctx.ui.close();
+        await flush();
+
+        expect(ctx.query('.hero-body').childElementCount).toBe(0);
+    });
+});
+
+describe('HeroUi equipment notice', () => {
+    it('shows "Equipamento encontrado: <raridade> <slot>" for 3 s', () => {
+        const { ui, testid, timers } = createUi();
+
+        ui.showEquipmentDrop({ piece: piece({ rarity: 'RARE', slot: 'WEAPON' }), sold: false });
+
+        expect(testid('card-notice').textContent).toBe('Equipamento encontrado: Raro Arma');
+        expect(testid('card-notice').hidden).toBe(false);
+        expect(timers.map((timer) => timer.delay)).toEqual([ 3000 ]);
+
+        timers[0].callback();
+
+        expect(testid('card-notice').hidden).toBe(true);
+    });
+
+    it('a newer notice replaces it and the older timer does not hide it', () => {
+        const { ui, testid, timers } = createUi();
+
+        ui.showEquipmentDrop({ piece: piece({ rarity: 'RARE', slot: 'WEAPON' }), sold: false });
+        ui.showDrop({ heroId: 'lyra', heroName: 'Lyra Folhaveloz', stars: 0 });
+        timers[0].callback();
+
+        expect(testid('card-notice').textContent).toBe('Carta: Lyra Folhaveloz');
+        expect(testid('card-notice').hidden).toBe(false);
+    });
+
+    it('does not light the bag red dot', () => {
+        const { ui, testid } = createUi();
+
+        ui.showEquipmentDrop({ piece: piece(), sold: false });
+
+        expect(testid('bag-badge').hidden).toBe(true);
     });
 });
 
