@@ -1097,11 +1097,12 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Sign up with Água - Orina sends `startingElement: 'WATER'` and reaches the welcome screen
-- [ ] Sign up with no hero shows `Escolha seu herói inicial.` and the fake backend records no `POST /users`
-- [ ] The other existing auth scenarios pass
-- [ ] Full game gate passes
+- [x] Sign up with Água - Orina sends `startingElement: 'WATER'` and reaches the welcome screen
+- [x] Sign up with no hero shows `Escolha seu herói inicial.` and the fake backend records no `POST /users`
+- [x] The other existing auth scenarios pass
+- [x] Full game gate passes
 
+**Status**: Done
 **Tests**: e2e
 **Gate**: Full (game)
 

@@ -8,6 +8,7 @@ test.describe('Sign up', () => {
         const menu = await openMainMenu(page);
 
         await fillCredentials(menu, 'newbie', 'secret123');
+        await menu.chooseHero('WATER');
         await menu.signupButton.click();
 
         await expect(menu.message).toHaveText('Account created, newbie!');
@@ -15,7 +16,8 @@ test.describe('Sign up', () => {
         await expect(page.locator('.auth-form')).toHaveCount(0);
         await expect(menu.welcomeTitle).toHaveText('Hello, newbie!');
         expect(await registryValue(page, 'user')).toMatchObject({ username: 'newbie' });
-        expect(backend.calls).toEqual([{ method: 'POST', path: '/users', body: { username: 'newbie', password: 'secret123' } }]);
+        expect(backend.calls).toEqual([{ method: 'POST', path: '/users', body: { username: 'newbie', password: 'secret123', startingElement: 'WATER' } }]);
+        expect(backend.cardsOf('newbie')).toMatchObject({ start: 'WATER', leader: 'orina', copies: { 'orina:0': 1 } });
         expect(backend.users.has('newbie')).toBe(true);
     });
 
@@ -24,10 +26,33 @@ test.describe('Sign up', () => {
         const menu = await openMainMenu(page);
 
         await fillCredentials(menu, 'yan', 'another-pass');
+        await menu.chooseHero('FIRE');
         await menu.signupButton.click();
 
         await expect(menu.message).toHaveText("User 'yan' already exists");
         await expect(menu.signupButton).toBeEnabled();
+        expect(await registryValue(page, 'user')).toBeUndefined();
+    });
+
+    test('offers fire, water and nature as the first hero', async ({ page }) => {
+        await mockBackend(page);
+        const menu = await openMainMenu(page);
+
+        await expect(menu.heroChoices).toHaveText([ 'Fogo - Kael', 'Água - Orina', 'Natureza - Lyra' ]);
+        await expect(page.locator('.hero-choice input:checked')).toHaveCount(0);
+    });
+
+    test('asks for a hero and sends no request when none is chosen', async ({ page }) => {
+        const backend = await mockBackend(page);
+        const menu = await openMainMenu(page);
+
+        await fillCredentials(menu, 'newbie', 'secret123');
+        await menu.signupButton.click();
+
+        await expect(menu.message).toHaveText('Escolha seu herói inicial.');
+        await expect(menu.message).toHaveClass(/error/);
+        await expect(menu.signupButton).toBeEnabled();
+        expect(backend.calls).toEqual([]);
         expect(await registryValue(page, 'user')).toBeUndefined();
     });
 
@@ -36,6 +61,7 @@ test.describe('Sign up', () => {
         const menu = await openMainMenu(page);
 
         await fillCredentials(menu, 'newbie', 'short');
+        await menu.chooseHero('NATURE');
         await menu.signupButton.click();
 
         await expect(menu.message).toHaveText('Password must have at least 8 characters');
@@ -122,6 +148,7 @@ test.describe('Sign up then login', () => {
         let menu = await openMainMenu(page);
 
         await fillCredentials(menu, 'newbie', 'secret123');
+        await menu.chooseHero('FIRE');
         await menu.signupButton.click();
         await expect(menu.message).toHaveText('Account created, newbie!');
 
