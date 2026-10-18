@@ -100,10 +100,10 @@ T6 → T7 → T8
 
 **Done when**:
 
-- [ ] A saved chapter reads back with its stats (ELEM-02 AC1)
-- [ ] An unknown stored element fails the load (ELEM-02 AC4)
-- [ ] Columns carry defaults FIRE and 0 for old rows (ELEM-02 AC6)
-- [ ] Gate passes
+- [x] A saved chapter reads back with its stats (ELEM-02 AC1)
+- [x] An unknown stored element fails the load (ELEM-02 AC4)
+- [x] Columns carry defaults FIRE and 0 for old rows (ELEM-02 AC6)
+- [x] Gate passes
 
 **Tests**: integration
 **Gate**: full
