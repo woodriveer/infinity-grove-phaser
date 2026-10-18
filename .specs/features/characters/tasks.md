@@ -1077,10 +1077,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Routes and codes match the backend ITs (400, 404, 409 and their `code`)
-- [ ] Existing e2e specs still pass untouched except where T48 changes them
-- [ ] Build gate passes
+- [x] Routes and codes match the backend ITs (400, 404, 409 and their `code`)
+- [x] Existing e2e specs still pass untouched except where T48 changes them
+- [x] Build gate passes
 
+**Status**: Done
 **Tests**: none (test support; exercised by T48 to T50)
 **Gate**: Build
 
