@@ -140,6 +140,64 @@ describe('MainMenu authentication', () => {
         expect(scene.input.once).toHaveBeenCalledWith('pointerdown', expect.any(Function));
     });
 
+    const chooseHero = (form, element) => {
+        form.node.querySelector(`input[name="startingElement"][value="${element}"]`).checked = true;
+    };
+
+    it('offers fire, water and nature as the first hero, each with its portrait', async () => {
+        const { scene, form } = createScene({ highscore: 0 });
+        await open(scene);
+
+        const choices = [ ...form.node.querySelectorAll('.hero-choice') ];
+
+        expect(choices.map((choice) => choice.querySelector('input').value)).toEqual([ 'FIRE', 'WATER', 'NATURE' ]);
+        expect(choices.map((choice) => choice.querySelector('span').textContent)).toEqual([ 'Fogo - Kael', 'Água - Orina', 'Natureza - Lyra' ]);
+        expect(choices.map((choice) => choice.querySelector('img').getAttribute('src'))).toEqual([
+            'assets/heroes/kael_position.jpg', 'assets/heroes/orina_position.jpg', 'assets/heroes/lyra_position.jpg'
+        ]);
+        expect(choices.some((choice) => choice.querySelector('input').checked)).toBe(false);
+    });
+
+    it('signs up with the element of the chosen hero', async () => {
+        vi.mocked(userApi.signUp).mockResolvedValue(authResponse({ username: 'ana', createdAt: 1, lastLoginAt: 1 }));
+        const { scene, form } = createScene({ highscore: 0 });
+        await open(scene);
+        fill(form, 'ana', 'secret123');
+        chooseHero(form, 'WATER');
+
+        form.getChildByName('signup').click();
+        await flush();
+
+        expect(userApi.signUp).toHaveBeenCalledWith('ana', 'secret123', 'WATER');
+    });
+
+    it('signing up with no hero chosen shows the choice message, sends no request and re-enables the buttons', async () => {
+        const { scene, form, message } = createScene({ highscore: 0 });
+        await open(scene);
+        fill(form, 'ana', 'secret123');
+
+        form.getChildByName('signup').click();
+        await flush();
+
+        expect(userApi.signUp).not.toHaveBeenCalled();
+        expect(message()).toEqual({ text: 'Escolha seu herói inicial.', isError: true });
+        expect(form.getChildByName('signup').disabled).toBe(false);
+        expect(form.getChildByName('login').disabled).toBe(false);
+    });
+
+    it('logging in needs no hero', async () => {
+        vi.mocked(userApi.login).mockResolvedValue(authResponse({ username: 'yan' }));
+        const { scene, form } = createScene({ highscore: 0 });
+        await open(scene);
+        fill(form, 'yan', 'secret123');
+
+        form.getChildByName('login').click();
+        await flush();
+
+        expect(userApi.login).toHaveBeenCalledWith('yan', 'secret123');
+        expect(userApi.signUp).not.toHaveBeenCalled();
+    });
+
     it('signs up through the sign up button', async () => {
         const user = { username: 'newbie', createdAt: 1, lastLoginAt: 1 };
         const response = authResponse(user);
@@ -147,11 +205,12 @@ describe('MainMenu authentication', () => {
         const { scene, form, registryData, message } = createScene({ highscore: 0 });
         await open(scene);
         fill(form, 'newbie', 'secret123');
+        chooseHero(form, 'FIRE');
 
         form.getChildByName('signup').click();
         await flush();
 
-        expect(userApi.signUp).toHaveBeenCalledWith('newbie', 'secret123');
+        expect(userApi.signUp).toHaveBeenCalledWith('newbie', 'secret123', 'FIRE');
         expect(userApi.login).not.toHaveBeenCalled();
         expect(sessionManager.start).toHaveBeenCalledWith(response);
         expect(registryData.user).toEqual(user);

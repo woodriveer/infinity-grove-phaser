@@ -846,11 +846,12 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Sign up with a hero calls `users.signUp(username, password, element)` with FIRE, WATER or NATURE
-- [ ] Sign up with no hero shows `Escolha seu herói inicial.` and sends no request
-- [ ] Login does not need a hero
-- [ ] `MainMenu.test.js` updated and passing; quick gate passes
+- [x] Sign up with a hero calls `users.signUp(username, password, element)` with FIRE, WATER or NATURE
+- [x] Sign up with no hero shows `Escolha seu herói inicial.` and sends no request
+- [x] Login does not need a hero
+- [x] `MainMenu.test.js` updated and passing; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 

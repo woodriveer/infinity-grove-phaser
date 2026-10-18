@@ -1,9 +1,23 @@
 import { Scene } from 'phaser';
+import { STARTING_CHOICES } from '../../domain/heroes/heroes';
+
+//  The first hero of a new account: one radio per starting element with the hero portrait
+const CHOICES_HTML = STARTING_CHOICES.map(({ element, heroId, label }) => `
+        <label class="hero-choice">
+            <input type="radio" name="startingElement" value="${element}" />
+            <img src="assets/heroes/${heroId}_position.jpg" alt="${label}" />
+            <span>${label}</span>
+        </label>`).join('');
+
+const CHOOSE_HERO_TEXT = 'Escolha seu herói inicial.';
 
 const FORM_HTML = `
     <div class="auth-form">
         <input type="text" name="username" placeholder="Username" autocomplete="username" />
         <input type="password" name="password" placeholder="Password" autocomplete="current-password" />
+        <fieldset class="hero-choices">
+            <legend>${CHOOSE_HERO_TEXT}</legend>${CHOICES_HTML}
+        </fieldset>
         <div class="auth-actions">
             <button type="button" name="login">Login</button>
             <button type="button" name="signup">Sign up</button>
@@ -125,7 +139,21 @@ export class MainMenu extends Scene
         };
 
         buttons[0].addEventListener('click', () => submit(this.users.login, (u) => `Welcome back, ${u.username}!`));
-        buttons[1].addEventListener('click', () => submit(this.users.signUp, (u) => `Account created, ${u.username}!`));
+        //  A new account needs its first hero; the check runs after the credentials check and before any request
+        const signUp = (name, pass) => {
+
+            const chosen = form.node.querySelector('input[name="startingElement"]:checked');
+
+            if (!chosen)
+            {
+                throw new Error(CHOOSE_HERO_TEXT);
+            }
+
+            return this.users.signUp(name, pass, chosen.value);
+
+        };
+
+        buttons[1].addEventListener('click', () => submit(signUp, (u) => `Account created, ${u.username}!`));
 
         //  Enter in either field logs in (click() is a no-op while the button is disabled)
         [ username, password ].forEach((input) => {
