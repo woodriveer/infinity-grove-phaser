@@ -663,9 +663,10 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] The request body is `{ username, password, startingElement }` and keeps `skipAuth`
-- [ ] `userApi.test.js` updated and passing; quick gate passes
+- [x] The request body is `{ username, password, startingElement }` and keeps `skipAuth`
+- [x] `userApi.test.js` updated and passing; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 

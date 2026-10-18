@@ -18,11 +18,11 @@ describe('userApi', () => {
         vi.mocked(httpClient.post).mockReset();
     });
 
-    it('signUp posts credentials to /users without auth and returns the auth response', async () => {
+    it('signUp posts credentials and the starting element to /users without auth and returns the auth response', async () => {
         vi.mocked(httpClient.post).mockResolvedValue({ data: authResponse });
 
-        await expect(userApi.signUp('yan', 'secret123')).resolves.toEqual(authResponse);
-        expect(httpClient.post).toHaveBeenCalledWith('/users', { username: 'yan', password: 'secret123' }, { skipAuth: true });
+        await expect(userApi.signUp('yan', 'secret123', 'WATER')).resolves.toEqual(authResponse);
+        expect(httpClient.post).toHaveBeenCalledWith('/users', { username: 'yan', password: 'secret123', startingElement: 'WATER' }, { skipAuth: true });
     });
 
     it('login posts credentials to /users/login without auth and returns the auth response', async () => {
@@ -36,6 +36,6 @@ describe('userApi', () => {
         const error = new Error('conflict');
         vi.mocked(httpClient.post).mockImplementation(async () => { throw error; });
 
-        await expect(userApi.signUp('yan', 'x')).rejects.toThrow('conflict');
+        await expect(userApi.signUp('yan', 'x', 'FIRE')).rejects.toThrow('conflict');
     });
 });
