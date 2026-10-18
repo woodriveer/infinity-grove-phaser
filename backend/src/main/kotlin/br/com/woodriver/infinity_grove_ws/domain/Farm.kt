@@ -43,8 +43,9 @@ data class FarmState(
     val chapterBossWinsLeft: Int,
 )
 
-/** The card a farm win dropped, if any, and the chapter boss wins left today. */
+/** The card and the piece of equipment a farm win dropped, if any, and the chapter boss wins left today. */
 data class FarmResult(
     val drop: CardDrop?,
     val chapterBossWinsLeft: Int,
+    val equipmentDrop: EquipmentDrop? = null,
 )

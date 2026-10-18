@@ -82,7 +82,7 @@ graph TD
   - `POST /equipment/{id}/reroll { affix }` → same
   - `POST /equipment/{id}/sell` → same
 - **Piece JSON**: `{ id, slot, rarity, refine, clickDamage (number or null), affixes: [{ type, value }], heroId (or null), refineCost (or null at +10), rerollCost (null below +5), sellPrice }`, values already refined by the server so the game never re-derives them.
-- **Drop JSON**: `equipmentDrop` = the piece JSON plus `sold`.
+- **Drop JSON**: `equipmentDrop` = `{ piece: <piece JSON>, sold }`.
 
 ### Persistence (`BE/adapter/repository/EquipmentEntities.kt`, `EquipmentRepository.kt`, port `EquipmentRepositoryPort`)
 

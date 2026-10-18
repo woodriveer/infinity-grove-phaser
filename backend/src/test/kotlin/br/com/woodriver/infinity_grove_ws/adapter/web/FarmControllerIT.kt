@@ -201,4 +201,45 @@ class FarmControllerIT : IntegrationTestBase() {
             .then()
             .statusCode(401)
     }
+
+    @Test
+    fun `a farmed chapter boss win returns the equipment drop and stores the piece`() {
+        val token = register()
+        finished()
+        chance.value = 0.5
+
+        win(token, chapterBoss)
+            .then()
+            .statusCode(200)
+            .body("equipmentDrop.sold", equalTo(false))
+            .body("equipmentDrop.piece.rarity", equalTo("RARE"))
+            .body("equipmentDrop.piece.slot", equalTo("RING"))
+
+        assertEquals(1, jpaPieceRepository.count())
+    }
+
+    @Test
+    fun `a farmed miniboss win drops a piece below 25 percent and none at 25 percent`() {
+        val token = register()
+        finished()
+        chance.value = 0.2499
+        win(token, miniboss3).then().statusCode(200).body("equipmentDrop.sold", equalTo(false))
+        chance.value = 0.25
+        Thread.sleep(5100)
+        win(token, miniboss3).then().statusCode(200).body("equipmentDrop", nullValue())
+
+        assertEquals(1, jpaPieceRepository.count())
+    }
+
+    @Test
+    fun `a failed farm fight and a refused win drop no piece`() {
+        val token = register()
+        progressAt(4, "PHASE")
+        chance.value = 0.0
+
+        win(token, miniboss3, "FAILED").then().statusCode(200).body("equipmentDrop", nullValue())
+        win(token, chapterBoss).then().statusCode(409)
+
+        assertEquals(0, jpaPieceRepository.count())
+    }
 }

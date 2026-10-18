@@ -320,10 +320,10 @@ T25
 
 **Done when**:
 
-- [ ] A farmed chapter boss win carries `equipmentDrop`; a `FAILED` farm report, a `FARM_TOO_FAST`, a `DAILY_LIMIT_REACHED` and a `BOSS_NOT_AVAILABLE` answer drop nothing and add no piece
-- [ ] Existing `FarmControllerIT` passes; full backend gate passes
+- [x] A farmed chapter boss win carries `equipmentDrop`; a `FAILED` farm report, a `FARM_TOO_FAST`, a `DAILY_LIMIT_REACHED` and a `BOSS_NOT_AVAILABLE` answer drop nothing and add no piece
+- [x] Existing `FarmControllerIT` passes; full backend gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 

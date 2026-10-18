@@ -1,20 +1,27 @@
 package br.com.woodriver.infinity_grove_ws.service
 
 import br.com.woodriver.infinity_grove_ws.InMemoryChapterRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryEquipmentRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryHeroRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
 import br.com.woodriver.infinity_grove_ws.MutableClock
 import br.com.woodriver.infinity_grove_ws.SequenceChanceRoller
+import br.com.woodriver.infinity_grove_ws.SequenceDropRoller
+import br.com.woodriver.infinity_grove_ws.SequenceIds
 import br.com.woodriver.infinity_grove_ws.domain.BossNotAvailableException
 import br.com.woodriver.infinity_grove_ws.domain.BossRecord
 import br.com.woodriver.infinity_grove_ws.domain.CardDrop
 import br.com.woodriver.infinity_grove_ws.domain.CardDropRates
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.DailyLimitReachedException
+import br.com.woodriver.infinity_grove_ws.domain.DropRule
+import br.com.woodriver.infinity_grove_ws.domain.DropTable
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.Encounter
+import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.FarmBoss
 import br.com.woodriver.infinity_grove_ws.domain.FarmTooFastException
 import br.com.woodriver.infinity_grove_ws.domain.HeroSeed
@@ -31,6 +38,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class FarmServiceTest {
     private val progresses = InMemoryProgressRepository()
@@ -41,6 +49,8 @@ class FarmServiceTest {
     private val today = LocalDate.of(2026, 10, 18)
     private val clock = MutableClock(today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() + 10 * 3_600_000L)
     private var chance = SequenceChanceRoller(0.5)
+    private val equipment = InMemoryEquipmentRepository()
+    private var equipmentChance = SequenceChanceRoller(0.5)
     private val heroes = InMemoryHeroRepository(*HeroSeed.heroes().toTypedArray())
     private val service get() =
         FarmService(
@@ -49,6 +59,13 @@ class FarmServiceTest {
             users,
             playerCards,
             CardRewards(heroes, chance, rates, clock),
+            EquipmentRewards(
+                equipment,
+                WalletAccess(InMemoryWalletRepository(), DropTable(listOf(DropRule(1, 1, 5, 1500))), SequenceDropRoller(1), clock),
+                equipmentChance,
+                SequenceIds(),
+                EquipmentRules(),
+            ),
         )
 
     private val completed = Progress("yan", ProgressPosition(1, 10, Encounter.CHAPTER_BOSS, 1), completed = true)
@@ -283,5 +300,61 @@ class FarmServiceTest {
         assertFailsWith<IllegalArgumentException> { FarmBoss(Encounter.MINIBOSS) }
         assertFailsWith<IllegalArgumentException> { FarmBoss(Encounter.CHAPTER_BOSS, 1) }
         assertFailsWith<IllegalArgumentException> { FarmBoss(Encounter.PHASE) }
+    }
+
+    @Test
+    fun `a miniboss farm win whose equipment roll passes returns the piece and stores it`() {
+        player()
+        equipmentChance = SequenceChanceRoller(0.2, 0.0)
+
+        val result = service.report("yan", miniboss3, Outcome.CLEARED)
+
+        val drop = result.equipmentDrop!!
+        assertEquals(false, drop.sold)
+        assertEquals(listOf(drop.piece), equipment.findAll("yan"))
+    }
+
+    @Test
+    fun `a miniboss farm win whose equipment roll fails returns no piece`() {
+        player()
+        equipmentChance = SequenceChanceRoller(0.25)
+
+        assertNull(service.report("yan", miniboss3, Outcome.CLEARED).equipmentDrop)
+        assertTrue(equipment.pieces.isEmpty())
+    }
+
+    @Test
+    fun `a chapter boss farm win always returns a piece`() {
+        player()
+        equipmentChance = SequenceChanceRoller(0.99)
+
+        val result = service.report("yan", chapterBoss, Outcome.CLEARED)
+
+        assertEquals(equipment.findAll("yan").single(), result.equipmentDrop?.piece)
+    }
+
+    @Test
+    fun `a failed farm fight and every refused farm win drop no piece`() {
+        player(at(3, Encounter.PHASE))
+        equipmentChance = SequenceChanceRoller(0.0)
+        assertNull(service.report("yan", miniboss3.copy(stage = 2), Outcome.FAILED).equipmentDrop)
+        assertFailsWith<BossNotAvailableException> { service.report("yan", FarmBoss(Encounter.MINIBOSS, 5), Outcome.CLEARED) }
+        player()
+        service.report("yan", miniboss3, Outcome.CLEARED)
+        val stored = equipment.pieces.size
+        clock.millis += 4999
+        assertFailsWith<FarmTooFastException> { service.report("yan", chapterBoss, Outcome.CLEARED) }
+
+        assertEquals(stored, equipment.pieces.size)
+    }
+
+    @Test
+    fun `the refused eleventh chapter boss win drops no piece`() {
+        player(bosses = BossRecord(setOf(1), today, 10, null))
+        equipmentChance = SequenceChanceRoller(0.0)
+
+        assertFailsWith<DailyLimitReachedException> { service.report("yan", chapterBoss, Outcome.CLEARED) }
+
+        assertTrue(equipment.pieces.isEmpty())
     }
 }

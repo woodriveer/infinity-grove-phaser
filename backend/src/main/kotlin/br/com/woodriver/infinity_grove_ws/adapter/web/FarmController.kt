@@ -1,6 +1,7 @@
 package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.domain.Encounter
+import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.FarmBoss
 import br.com.woodriver.infinity_grove_ws.domain.FarmResult
 import br.com.woodriver.infinity_grove_ws.domain.FarmState
@@ -37,9 +38,17 @@ data class FarmStateResponse(
 data class FarmResultResponse(
     val drop: DropResponse?,
     val chapterBossWinsLeft: Int,
+    val equipmentDrop: EquipmentDropResponse?,
 ) {
     companion object {
-        fun from(result: FarmResult) = FarmResultResponse(result.drop?.let(DropResponse::from), result.chapterBossWinsLeft)
+        fun from(
+            result: FarmResult,
+            rules: EquipmentRules,
+        ) = FarmResultResponse(
+            result.drop?.let(DropResponse::from),
+            result.chapterBossWinsLeft,
+            result.equipmentDrop?.let { EquipmentDropResponse.from(it, rules) },
+        )
     }
 }
 
@@ -48,6 +57,7 @@ data class FarmResultResponse(
 class FarmController(
     private val getFarm: GetFarmUseCase,
     private val reportFarm: ReportFarmUseCase,
+    private val equipmentRules: EquipmentRules,
 ) {
     @GetMapping
     fun get(principal: Principal) = FarmStateResponse.from(getFarm.state(principal.name))
@@ -59,7 +69,7 @@ class FarmController(
     ): FarmResultResponse {
         val boss = parseBoss(body["boss"])
         val outcome = parseOutcome(body["outcome"])
-        return FarmResultResponse.from(reportFarm.report(principal.name, boss, outcome))
+        return FarmResultResponse.from(reportFarm.report(principal.name, boss, outcome), equipmentRules)
     }
 
     private fun parseBoss(value: Any?): FarmBoss {

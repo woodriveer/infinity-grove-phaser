@@ -30,6 +30,7 @@ class FarmService(
     private val userRepository: UserRepositoryPort,
     private val playerCardsRepository: PlayerCardsRepositoryPort,
     private val rewards: CardRewards,
+    private val equipmentRewards: EquipmentRewards,
 ) : GetFarmUseCase,
     ReportFarmUseCase {
     override fun state(username: String): FarmState {
@@ -59,7 +60,7 @@ class FarmService(
         // A farmed miniboss rolls the chance of its own stage; the chapter boss has no stage
         val (updated, drop) = rewards.award(spaced, boss.kind, progress.position.chapter, boss.stage ?: 0)
         playerCardsRepository.save(updated)
-        return FarmResult(drop, winsLeft(updated))
+        return FarmResult(drop, winsLeft(updated), equipmentRewards.award(username, boss.kind))
     }
 
     private fun winsLeft(cards: PlayerCards) = cards.bosses.winsLeft(rewards.today(), rewards.rates().chapterBossDailyLimit)
