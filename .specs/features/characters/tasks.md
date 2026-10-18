@@ -905,10 +905,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Only pairs with copies appear, with their counts
-- [ ] The detail shows the copies out of 3, all three skills with lock state and a `Fundir` shortcut that calls the given callback with the entry
-- [ ] `bagView.test.js` passes; quick gate passes
+- [x] Only pairs with copies appear, with their counts
+- [x] The detail shows the copies out of 3, all three skills with lock state and an `Ir para a fusão` shortcut (none for a three star card) that calls the given callback with the entry
+- [x] `bagView.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
