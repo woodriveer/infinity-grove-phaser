@@ -15,6 +15,13 @@ data class CardDropRates(
     }
 }
 
+/** The card a won boss dropped: the hero's id and name, and its stars (always 0, a blank card). */
+data class CardDrop(
+    val heroId: String,
+    val heroName: String,
+    val stars: Int = 0,
+)
+
 object CardDropper {
     /**
      * The hero whose blank card drops for a won [encounter] of [chapter], or null. A miniboss drops the hero of its chapter; the chapter

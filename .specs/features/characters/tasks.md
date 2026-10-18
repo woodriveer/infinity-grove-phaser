@@ -449,10 +449,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `POST /users` with `startingElement` WATER answers 201 and the bag holds one blank Orina card (read through the repository in the IT)
-- [ ] A missing value, `"LIGHT"`, `"DARKNESS"` and `"plasma"` answer 400 with `code` `INVALID_STARTING_ELEMENT` and create no user
-- [ ] All other backend ITs that register users pass with the new field; full backend gate passes
+- [x] `POST /users` with `startingElement` WATER answers 201 and the bag holds one blank Orina card (read through the repository in the IT)
+- [x] A missing value, `"LIGHT"`, `"DARKNESS"` and `"plasma"` answer 400 with `code` `INVALID_STARTING_ELEMENT` and create no user
+- [x] All other backend ITs that register users pass with the new field; full backend gate passes
 
+**Status**: Done (delivered in the T16 commit `9416481`: the use case signature change forced the controller change to compile, so the two tasks share one commit)
 **Tests**: integration
 **Gate**: Full (backend)
 
@@ -468,15 +469,16 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Miniboss `CLEARED` with chance 0.0 adds a blank card of the chapter's hero and returns it; with 0.5 adds none
-- [ ] First chapter boss win adds the next chapter's hero without reading the chance; a second win rolls 10 %
-- [ ] Phase `CLEARED` and any `FAILED` add nothing and read no chance
-- [ ] A rejected report (conflict) reads no chance and adds nothing
-- [ ] A cards save failure propagates (the progress move is in the same transaction)
-- [ ] A player without `PlayerCards` gets no drop and the report is still accepted
-- [ ] A chapter boss win adds 1 to today's wins (UTC clock)
-- [ ] `ProgressServiceTest` updated and passing; quick gate passes
+- [x] Miniboss `CLEARED` with chance 0.0 adds a blank card of the chapter's hero and returns it; with 0.5 adds none
+- [x] First chapter boss win adds the next chapter's hero without reading the chance; a second win rolls 10 %
+- [x] Phase `CLEARED` and any `FAILED` add nothing and read no chance
+- [x] A rejected report (conflict) reads no chance and adds nothing
+- [x] A cards save failure propagates (the progress move is in the same transaction)
+- [x] A player without `PlayerCards` gets no drop and the report is still accepted
+- [x] A chapter boss win adds 1 to today's wins (UTC clock)
+- [x] `ProgressServiceTest` updated and passing; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 

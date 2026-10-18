@@ -110,7 +110,7 @@ class ProgressController(
     ): ProgressResponse {
         val position = parsePosition(body)
         val outcome = parseOutcome(body)
-        return ProgressResponse.from(reportOutcome.report(principal.name, position, outcome))
+        return ProgressResponse.from(reportOutcome.report(principal.name, position, outcome).view)
     }
 
     private fun parsePosition(body: Map<String, Any?>) =
