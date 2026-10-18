@@ -10,6 +10,7 @@ import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaUserRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletLevelRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletRepository
 import br.com.woodriver.infinity_grove_ws.adapter.security.JwtAccessTokenIssuer
+import br.com.woodriver.infinity_grove_ws.port.ChanceRollerPort
 import io.restassured.RestAssured
 import io.restassured.specification.RequestSpecification
 import org.junit.jupiter.api.BeforeEach
@@ -20,6 +21,7 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Primary
 import org.testcontainers.postgresql.PostgreSQLContainer
 
 @TestConfiguration(proxyBeanMethods = false)
@@ -29,13 +31,32 @@ class PostgresTestConfiguration {
     fun postgres(): PostgreSQLContainer = PostgreSQLContainer("postgres:17")
 }
 
+/** The chance every card roll reads in integration tests; 0.5 drops nothing, a test sets 0.0 to force a drop. */
+class ControllableChanceRoller : ChanceRollerPort {
+    @Volatile
+    var value: Double = NO_DROP
+
+    override fun roll() = value
+
+    companion object {
+        const val NO_DROP = 0.5
+    }
+}
+
+@TestConfiguration(proxyBeanMethods = false)
+class ChanceTestConfiguration {
+    @Bean
+    @Primary
+    fun controllableChanceRoller() = ControllableChanceRoller()
+}
+
 const val TEST_JWT_SECRET = "integration-test-secret-0123456789-abcdef"
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = ["app.security.jwt-secret=$TEST_JWT_SECRET"],
 )
-@Import(PostgresTestConfiguration::class)
+@Import(PostgresTestConfiguration::class, ChanceTestConfiguration::class)
 abstract class IntegrationTestBase {
     @LocalServerPort
     private var port: Int = 0
@@ -68,6 +89,9 @@ abstract class IntegrationTestBase {
     protected lateinit var jpaCardCopyRepository: JpaCardCopyRepository
 
     @Autowired
+    protected lateinit var chance: ControllableChanceRoller
+
+    @Autowired
     private lateinit var accessTokenIssuer: JwtAccessTokenIssuer
 
     /** A valid `Bearer` header value for [username]; the user does not need to exist, the access token is stateless. */
@@ -81,6 +105,7 @@ abstract class IntegrationTestBase {
     fun setUpRestAssured() {
         RestAssured.port = port
         RestAssured.basePath = ""
+        chance.value = ControllableChanceRoller.NO_DROP
         jpaRefreshTokenRepository.deleteAll()
         jpaProgressRepository.deleteAll()
         jpaCardCopyRepository.deleteAll()

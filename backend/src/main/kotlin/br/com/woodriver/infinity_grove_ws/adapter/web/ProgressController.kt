@@ -1,5 +1,6 @@
 package br.com.woodriver.infinity_grove_ws.adapter.web
 
+import br.com.woodriver.infinity_grove_ws.domain.CardDrop
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.Encounter
 import br.com.woodriver.infinity_grove_ws.domain.EnemyStats
@@ -9,7 +10,9 @@ import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
 import br.com.woodriver.infinity_grove_ws.domain.ProgressView
 import br.com.woodriver.infinity_grove_ws.domain.StageDefinition
 import br.com.woodriver.infinity_grove_ws.usecase.GetProgressUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.OutcomeResult
 import br.com.woodriver.infinity_grove_ws.usecase.ReportOutcomeUseCase
+import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -71,6 +74,16 @@ data class ChapterResponse(
     }
 }
 
+data class DropResponse(
+    val heroId: String,
+    val heroName: String,
+    val stars: Int,
+) {
+    companion object {
+        fun from(drop: CardDrop) = DropResponse(drop.heroId, drop.heroName, drop.stars)
+    }
+}
+
 data class ProgressResponse(
     val chapter: Int,
     val stage: Int,
@@ -78,8 +91,13 @@ data class ProgressResponse(
     val phase: Int,
     val completed: Boolean,
     val definition: ChapterResponse,
+    /** The card the reported win dropped; present only on an outcome response that dropped one. */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val drop: DropResponse? = null,
 ) {
     companion object {
+        fun from(result: OutcomeResult) = from(result.view).copy(drop = result.drop?.let(DropResponse::from))
+
         fun from(view: ProgressView): ProgressResponse {
             val position = view.progress.position
             return ProgressResponse(
@@ -110,7 +128,7 @@ class ProgressController(
     ): ProgressResponse {
         val position = parsePosition(body)
         val outcome = parseOutcome(body)
-        return ProgressResponse.from(reportOutcome.report(principal.name, position, outcome).view)
+        return ProgressResponse.from(reportOutcome.report(principal.name, position, outcome))
     }
 
     private fun parsePosition(body: Map<String, Any?>) =

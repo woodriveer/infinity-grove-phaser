@@ -494,10 +494,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `POST /progress/outcome` answers `drop` null when nothing dropped and the card object when one did (test seeds the cards row and uses a controllable chance bean)
-- [ ] `GET /progress` is unchanged
-- [ ] `ProgressControllerIT` passes; full backend gate passes
+- [x] `POST /progress/outcome` answers `drop` null when nothing dropped and the card object when one did (test seeds the cards row and uses a controllable chance bean)
+- [x] `GET /progress` is unchanged
+- [x] `ProgressControllerIT` passes; full backend gate passes
 
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 

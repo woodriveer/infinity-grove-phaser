@@ -1,14 +1,20 @@
 package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
+import br.com.woodriver.infinity_grove_ws.adapter.repository.CardCopyEntity
+import br.com.woodriver.infinity_grove_ws.adapter.repository.PlayerCardsEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.ProgressEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.UserEntity
+import br.com.woodriver.infinity_grove_ws.domain.Element
+import br.com.woodriver.infinity_grove_ws.domain.HeroSeed
+import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.response.Response
 import io.restassured.specification.RequestSpecification
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasSize
+import org.hamcrest.Matchers.nullValue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -328,5 +334,67 @@ class ProgressControllerIT : IntegrationTestBase() {
 
         assertFalse(jpaProgressRepository.existsById("yan"))
         assertEquals(true, jpaProgressRepository.existsById("ana"))
+    }
+
+    /** The cards a registered player holds: one blank card of the starting hero. */
+    private fun cards(
+        name: String = "yan",
+        start: Element = Element.FIRE,
+    ) {
+        val started = PlayerCards.start(name, start, HeroSeed.heroes())
+        jpaPlayerCardsRepository.save(PlayerCardsEntity.from(started))
+        started.copies.forEach { (key, count) -> jpaCardCopyRepository.save(CardCopyEntity.from(name, key, count)) }
+    }
+
+    @Test
+    fun `POST outcome answers the dropped card when a miniboss win rolls one`() {
+        user()
+        cards()
+        store(1, "MINIBOSS", 1)
+        chance.value = 0.0
+
+        report(body(1, "MINIBOSS", 1, "CLEARED"))
+            .then()
+            .statusCode(200)
+            .body("drop.heroId", equalTo("kael"))
+            .body("drop.heroName", equalTo("Kael Raizférrea"))
+            .body("drop.stars", equalTo(0))
+
+        assertEquals(2, jpaCardCopyRepository.findAllByUsername("yan").single { it.stars == 0 }.copies)
+    }
+
+    @Test
+    fun `POST outcome has no drop when the roll misses and GET progress never has one`() {
+        user()
+        cards()
+        store(1, "MINIBOSS", 1)
+
+        report(body(1, "MINIBOSS", 1, "CLEARED")).then().statusCode(200).body("drop", nullValue())
+        getProgress().then().statusCode(200).body("drop", nullValue())
+    }
+
+    @Test
+    fun `a rejected report answers 409 and drops nothing even when the roll would hit`() {
+        user()
+        cards()
+        store(1, "MINIBOSS", 1)
+        chance.value = 0.0
+
+        report(body(1, "PHASE", 1, "CLEARED")).then().statusCode(409)
+
+        assertEquals(1, jpaCardCopyRepository.findAllByUsername("yan").single { it.stars == 0 }.copies)
+    }
+
+    @Test
+    fun `the first chapter boss win drops the next chapter hero whatever the roll`() {
+        user()
+        cards()
+        store(10, "CHAPTER_BOSS", 1)
+
+        report(body(10, "CHAPTER_BOSS", 1, "CLEARED"))
+            .then()
+            .statusCode(200)
+            .body("drop.heroId", equalTo("lyra"))
+            .body("completed", equalTo(true))
     }
 }
