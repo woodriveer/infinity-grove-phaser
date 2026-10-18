@@ -782,12 +782,13 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `load` stores the payload and fires `onChange`; a rejection leaves the previous state and rethrows
-- [ ] `fuse` replaces that hero with the response and fires `onChange`; a rejection leaves the bag unchanged
-- [ ] `setLeader` updates the leader after the server answers; a rejection keeps the old leader
-- [ ] `applyDrop` adds the blank copy locally and fires `onChange`
-- [ ] `heroCollection.test.js` passes; quick gate passes
+- [x] `load` stores the payload and fires `onChange`; a rejection leaves the previous state and rethrows
+- [x] `fuse` replaces that hero with the response and fires `onChange`; a rejection leaves the bag unchanged
+- [x] `setLeader` updates the leader after the server answers; a rejection keeps the old leader
+- [x] `applyDrop` adds the blank copy locally and fires `onChange`
+- [x] `heroCollection.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
