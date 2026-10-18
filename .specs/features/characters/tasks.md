@@ -1137,12 +1137,13 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] With a completed campaign, `Rever chefes` lists the minibosses and the chapter boss with 10 wins left
-- [ ] A won farm fight sends `POST /farm/outcome`, shows `Carta: Kael` when the fake drops and restarts the boss
-- [ ] At 0 wins left the chapter boss button is disabled
-- [ ] The campaign position is unchanged after farming
-- [ ] Full game gate passes
+- [x] With a completed campaign, `Rever chefes` lists the minibosses and the chapter boss with 10 wins left
+- [x] A won farm fight sends `POST /farm/outcome`, shows `Carta: Kael` when the fake drops and restarts the boss
+- [x] At 0 wins left the chapter boss button is disabled
+- [x] The campaign position is unchanged after farming
+- [x] Full game gate passes
 
+**Status**: Done
 **Tests**: e2e
 **Gate**: Full (game)
 
