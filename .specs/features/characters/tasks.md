@@ -242,13 +242,14 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `start(username, FIRE|WATER|NATURE)` holds one 0-star copy of that element's hero and makes it the leader; LIGHT or DARKNESS is rejected
-- [ ] `starsOf` is the highest stars with a copy (0 with only blank copies); `owned` is true with any copy
-- [ ] `fuse(heroId, stars 0..2)` removes 3 copies and adds 1 at stars + 1, leaving every other copy untouched; fewer than 3 copies throws `NotEnoughCardsException`; stars outside 0..2 throws `InvalidFusionException`; 4 blank copies leave 1 blank and 1 one-star copy
-- [ ] A fusion to stars 3 gives the hero stars 3; stars 3 cannot be fused
-- [ ] `withLeader` accepts an owned hero and throws `HeroNotOwnedException` otherwise
-- [ ] `PlayerCardsTest` covers each bullet; quick gate passes; the phase build gate passes (`./gradlew --offline build`)
+- [x] `start(username, FIRE|WATER|NATURE)` holds one 0-star copy of that element's hero and makes it the leader; LIGHT or DARKNESS is rejected
+- [x] `starsOf` is the highest stars with a copy (0 with only blank copies); `owned` is true with any copy
+- [x] `fuse(heroId, stars 0..2)` removes 3 copies and adds 1 at stars + 1, leaving every other copy untouched; fewer than 3 copies throws `NotEnoughCardsException`; stars outside 0..2 throws `InvalidFusionException`; 4 blank copies leave 1 blank and 1 one-star copy
+- [x] A fusion to stars 3 gives the hero stars 3; stars 3 cannot be fused
+- [x] `withLeader` accepts an owned hero and throws `HeroNotOwnedException` otherwise
+- [x] `PlayerCardsTest` covers each bullet; quick gate passes; the phase build gate passes (`./gradlew --offline build`)
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend), then Build at the end of the phase
 
