@@ -58,6 +58,8 @@ describe('renderBagEntry', () => {
         const onFuse = vi.fn();
         const detail = renderBagEntry(entry, hero('kael', { 0: 2 }), { onFuse });
 
+        expect(detail.querySelector('[data-testid="bag-go-fusion"]').textContent).toBe('Ir para a fusão');
+
         detail.querySelector('[data-testid="bag-go-fusion"]').click();
 
         expect(onFuse).toHaveBeenCalledWith(entry);
