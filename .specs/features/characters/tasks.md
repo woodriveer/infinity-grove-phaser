@@ -198,12 +198,13 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `afterChapterBossWin(chapter, today)` adds the chapter and adds 1 to today's wins, starting from 0 when the date changed
-- [ ] `winsLeft(today, limit)` is `limit - winsToday` for the same date, `limit` for another date, never below 0
-- [ ] `requireWinsLeft` throws `DailyLimitReachedException` at 10 wins and passes at 9
-- [ ] `afterFarmWin(now, minIntervalMs)` throws `FarmTooFastException` when `now - last < 5000` and accepts exactly 5000
-- [ ] `BossRecordTest` covers each bullet (including the date change); quick gate passes
+- [x] `afterChapterBossWin(chapter, today)` adds the chapter and adds 1 to today's wins, starting from 0 when the date changed
+- [x] `winsLeft(today, limit)` is `limit - winsToday` for the same date, `limit` for another date, never below 0
+- [x] `requireWinsLeft` throws `DailyLimitReachedException` at 10 wins and passes at 9
+- [x] `afterFarmWin(now, minIntervalMs)` throws `FarmTooFastException` when `now - last < 5000` and accepts exactly 5000
+- [x] `BossRecordTest` covers each bullet (including the date change); quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
