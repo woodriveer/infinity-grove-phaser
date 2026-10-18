@@ -1005,14 +1005,15 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] The five HUD buttons exist in the HUD and none is in the pause menu
-- [ ] Each panel loads its data on open, shows an error line (`Não foi possível carregar.` or the fuse failure) and no grid on a failed load
-- [ ] Opening a panel calls `pauseForMenu`, closing it calls `resumeFromMenu`
-- [ ] A successful fuse updates the screen and the skill bar; changing the leader replaces the three slots
-- [ ] `showDrop(drop)` shows `Carta: <hero name>` and removes it after 3 s
-- [ ] Choosing a boss in the farm list calls `startFarm(boss)` and closes the panel
-- [ ] `HeroUi.test.js` passes; quick gate passes; phase build gate passes
+- [x] The five HUD buttons exist in the HUD and none is in the pause menu
+- [x] Each panel loads its data on open, shows an error line (`Não foi possível carregar.` or the fuse failure) and no grid on a failed load
+- [x] Opening a panel calls `pauseForMenu`, closing it calls `resumeFromMenu`
+- [x] A successful fuse updates the screen and the skill bar; changing the leader replaces the three slots
+- [x] `showDrop(drop)` shows `Carta: <hero name>` and removes it after 3 s
+- [x] Choosing a boss in the farm list calls `startFarm(boss)` and closes the panel
+- [x] `HeroUi.test.js` passes; quick gate passes; phase build gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game), then Build at the end of the phase
 
