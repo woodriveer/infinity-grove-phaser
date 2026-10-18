@@ -102,3 +102,47 @@ describe('formatDamage', () => {
         expect(formatDamage(0.0450000001)).toBe('0');
     });
 });
+
+describe('armor pierce', () => {
+    it('ignores the given percent of the physical defense: 50 % of a 50 defense leaves 25', () => {
+        const attacker = { ...PLAYER, armorPierce: 50 };
+
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 50), random: never }).damage).toBe(0.75);
+    });
+
+    it('ignores the whole defense at 100 % and never goes past it', () => {
+        expect(calculateDamage({ attacker: { ...PLAYER, armorPierce: 100 }, defender: enemy('FIRE', 50), random: never }).damage).toBe(1);
+        expect(calculateDamage({ attacker: { ...PLAYER, armorPierce: 150 }, defender: enemy('FIRE', 50), random: never }).damage).toBe(1);
+    });
+
+    it('applies to the magical defense for magical damage', () => {
+        const attacker = { ...PLAYER, damageType: MAGICAL, armorPierce: 50 };
+
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 40), random: never }).damage).toBe(0.8);
+    });
+
+    it('changes nothing when the attacker has none', () => {
+        expect(calculateDamage({ defender: enemy('FIRE', 50), random: never }).damage).toBe(0.5);
+    });
+});
+
+describe('boss damage', () => {
+    const attacker = { ...PLAYER, bossDamage: 20 };
+
+    it('adds the percent against a boss', () => {
+        expect(calculateDamage({ attacker, defender: enemy('FIRE'), random: never, boss: true }).damage).toBe(1.2);
+    });
+
+    it('adds nothing against any other monster', () => {
+        expect(calculateDamage({ attacker, defender: enemy('FIRE'), random: never }).damage).toBe(1);
+        expect(calculateDamage({ attacker, defender: enemy('FIRE'), random: never, boss: false }).damage).toBe(1);
+    });
+
+    it('does nothing for an attacker without it, even against a boss', () => {
+        expect(calculateDamage({ defender: enemy('FIRE'), random: never, boss: true }).damage).toBe(1);
+    });
+
+    it('multiplies with the critical hit', () => {
+        expect(calculateDamage({ attacker, defender: enemy('FIRE'), random: always, boss: true })).toEqual({ damage: 2.4, critical: true });
+    });
+});

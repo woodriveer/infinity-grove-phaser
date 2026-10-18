@@ -445,11 +445,11 @@ T25
 
 **Done when**:
 
-- [ ] Defense is multiplied by `1 - min(100, armorPierce)/100`; damage by `1 + bossDamage/100` only when `boss` is true
-- [ ] Missing fields leave the result identical to today (defaults 0)
-- [ ] `damage.test.js` additions pass; `npm test` passes
+- [x] Defense is multiplied by `1 - min(100, armorPierce)/100`; damage by `1 + bossDamage/100` only when `boss` is true
+- [x] Missing fields leave the result identical to today (defaults 0)
+- [x] `damage.test.js` additions pass; `npm test` passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
