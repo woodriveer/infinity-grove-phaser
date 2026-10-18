@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/elements/design.md`
-**Status**: In Progress
+**Status**: Done
 
 Execution notes: 8 tasks, one batch, executed inline. `CLAUDE.md` makes `git push` part of every commit. Unrelated working-tree changes (`game/src/adapters/phaser/Preloader.js`, `game/public/assets/coin-*.png`) are never staged.
 
@@ -248,8 +248,8 @@ T6 → T7 → T8
 
 **Done when**:
 
-- [ ] E2E shows the element of the first monster in the HUD
-- [ ] Full game test suite and e2e pass
+- [x] E2E shows the element of the first monster in the HUD
+- [x] Full game test suite and e2e pass
 
 **Tests**: e2e
 **Gate**: full

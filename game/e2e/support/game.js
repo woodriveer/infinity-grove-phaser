@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 
 //  Boots the game through Boot -> Preloader and waits until MainMenu has rendered its DOM form
 //  (state 'form', default) or the welcome block of a restored session (state 'welcome').
-export async function openMainMenu (page, { state = 'form' } = {}) {
+export async function openMainMenu (page, { state = 'form', random = 0.99 } = {}) {
     await page.goto('/');
 
     const canvas = page.locator('#game-container canvas');
@@ -10,6 +10,9 @@ export async function openMainMenu (page, { state = 'form' } = {}) {
 
     //  Boot only listens for the click once its create() ran; an earlier click would be lost
     await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
+
+    //  The critical roll is fixed (0.99 never crits a default monster) so click counts are deterministic
+    await page.evaluate((roll) => { window.__PHASER_GAME__.registry.get('services').random = () => roll; }, random);
     await canvas.click();
 
     await expect(page.locator(state === 'welcome' ? '.welcome' : '.auth-form')).toBeVisible({ timeout: 15_000 });

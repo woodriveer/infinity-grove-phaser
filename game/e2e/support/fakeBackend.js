@@ -21,12 +21,21 @@ const coins = (copper) => ({ gold: Math.floor(copper / 10_000), silver: Math.flo
 
 //  Progress contract (ProgressController): chapter 1 as seeded by the backend, the transition table of Progress.kt,
 //  and a 409 carrying the stored progress when a report does not start from the stored position.
+const SEED_ELEMENTS = [ 'FIRE', 'WATER', 'NATURE', 'LIGHT', 'DARKNESS' ];
+
 const seededDefinition = () => ({
     bossHealth: 300,
     bossTimeLimitMs: 60_000,
-    stages: Array.from({ length: 10 }, (_, i) => ({
-        number: i + 1, phasesPerStage: 5, monsterHealth: 10 + i, minibossHealth: 5 * (10 + i), minibossTimeLimitMs: 30_000
-    }))
+    boss: { element: 'DARKNESS', physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
+    stages: Array.from({ length: 10 }, (_, i) => {
+        const element = SEED_ELEMENTS[i % SEED_ELEMENTS.length];
+
+        return {
+            number: i + 1, phasesPerStage: 5, monsterHealth: 10 + i, minibossHealth: 5 * (10 + i), minibossTimeLimitMs: 30_000,
+            monster: { element, physicalDefense: 0, magicalDefense: 0, critResistance: 0 },
+            miniboss: { element, physicalDefense: 11 + i, magicalDefense: 11 + i, critResistance: 12 + 2 * i }
+        };
+    })
 });
 
 const startOfCampaign = () => ({ stage: 1, encounter: 'PHASE', phase: 1, completed: false });
