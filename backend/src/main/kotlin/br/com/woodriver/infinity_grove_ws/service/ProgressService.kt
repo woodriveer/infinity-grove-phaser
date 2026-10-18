@@ -4,6 +4,7 @@ import br.com.woodriver.infinity_grove_ws.domain.CardDrop
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.ChapterNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.Encounter
+import br.com.woodriver.infinity_grove_ws.domain.EquipmentDrop
 import br.com.woodriver.infinity_grove_ws.domain.Outcome
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
@@ -28,6 +29,7 @@ class ProgressService(
     private val userRepository: UserRepositoryPort,
     private val playerCardsRepository: PlayerCardsRepositoryPort,
     private val rewards: CardRewards,
+    private val equipmentRewards: EquipmentRewards,
 ) : GetProgressUseCase,
     ReportOutcomeUseCase {
     override fun get(username: String): ProgressView {
@@ -46,24 +48,27 @@ class ProgressService(
         val chapter = chapterOf(progress)
         val next = progress.report(position, outcome, chapter)
         progressRepository.save(next)
-        val drop = if (outcome == Outcome.CLEARED) awardCards(username, position) else null
-        return OutcomeResult(next.view(chapterOf(next)), drop)
+        val (drop, equipmentDrop) = if (outcome == Outcome.CLEARED) awardBoss(username, position) else NO_REWARDS
+        return OutcomeResult(next.view(chapterOf(next)), drop, equipmentDrop)
     }
 
-    /** Rolls the card of a won boss under the cards row lock, records a chapter boss win, and stores what changed. */
-    private fun awardCards(
+    /**
+     * Rolls the card and the equipment of a won boss under the cards row lock (the player lock), records a chapter boss win, and stores
+     * what changed. A player with no cards row gets neither.
+     */
+    private fun awardBoss(
         username: String,
         position: ProgressPosition,
-    ): CardDrop? {
-        if (position.encounter == Encounter.PHASE) return null
+    ): Pair<CardDrop?, EquipmentDrop?> {
+        if (position.encounter == Encounter.PHASE) return NO_REWARDS
         val cards =
             playerCardsRepository.findForUpdate(username) ?: run {
                 logger.warn("No cards to award username={} encounter={}", username, position.encounter)
-                return null
+                return NO_REWARDS
             }
         val (updated, drop) = rewards.award(cards, position.encounter, position.chapter, position.stage)
         if (updated != cards) playerCardsRepository.save(updated)
-        return drop
+        return drop to equipmentRewards.award(username, position.encounter)
     }
 
     /** Returns the locked progress, creating it first when the player has none. */
@@ -92,6 +97,7 @@ class ProgressService(
         }
 
     private companion object {
+        private val NO_REWARDS: Pair<CardDrop?, EquipmentDrop?> = null to null
         private val logger = LoggerFactory.getLogger(ProgressService::class.java)
     }
 }

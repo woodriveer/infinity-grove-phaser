@@ -299,12 +299,12 @@ T25
 
 **Done when**:
 
-- [ ] `CLEARED` miniboss (roll 0.0) and chapter boss responses carry `equipmentDrop` and the piece is in `GET /equipment` storage (checked through the repository)
-- [ ] A `CLEARED` phase, a `FAILED` report and a 409 mismatch drop nothing and leave the bag unchanged
-- [ ] A failure while storing the piece rolls the progress move back
-- [ ] `EquipmentDropFlowIT` and the existing `ProgressControllerIT` / `CardsFlowIT` pass; full backend gate passes
+- [x] `CLEARED` miniboss (roll 0.0) and chapter boss responses carry `equipmentDrop` and the piece is in `GET /equipment` storage (checked through the repository)
+- [x] A `CLEARED` phase, a `FAILED` report and a 409 mismatch drop nothing and leave the bag unchanged
+- [x] A failure while storing the piece rolls the progress move back
+- [x] `EquipmentDropFlowIT` and the existing `ProgressControllerIT` / `CardsFlowIT` pass; full backend gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 

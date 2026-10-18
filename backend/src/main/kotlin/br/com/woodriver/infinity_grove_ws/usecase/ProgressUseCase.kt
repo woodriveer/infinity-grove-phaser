@@ -1,6 +1,7 @@
 package br.com.woodriver.infinity_grove_ws.usecase
 
 import br.com.woodriver.infinity_grove_ws.domain.CardDrop
+import br.com.woodriver.infinity_grove_ws.domain.EquipmentDrop
 import br.com.woodriver.infinity_grove_ws.domain.Outcome
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
 import br.com.woodriver.infinity_grove_ws.domain.ProgressView
@@ -10,16 +11,17 @@ interface GetProgressUseCase {
     fun get(username: String): ProgressView
 }
 
-/** The progress after a report and the card the won boss dropped, if any. */
+/** The progress after a report, the card the won boss dropped and the piece of equipment it dropped, if any. */
 data class OutcomeResult(
     val view: ProgressView,
     val drop: CardDrop?,
+    val equipmentDrop: EquipmentDrop? = null,
 )
 
 interface ReportOutcomeUseCase {
     /**
      * Applies [outcome] reported from [position]; a position that is not the stored one is a conflict.
-     * A `CLEARED` miniboss or chapter boss may drop a hero card, rolled here in the same transaction.
+     * A `CLEARED` miniboss or chapter boss may drop a hero card and a piece of equipment, rolled here in the same transaction.
      */
     fun report(
         username: String,

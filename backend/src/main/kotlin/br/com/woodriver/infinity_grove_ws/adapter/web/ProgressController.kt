@@ -4,6 +4,7 @@ import br.com.woodriver.infinity_grove_ws.domain.CardDrop
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.Encounter
 import br.com.woodriver.infinity_grove_ws.domain.EnemyStats
+import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.InvalidOutcomeException
 import br.com.woodriver.infinity_grove_ws.domain.Outcome
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
@@ -94,9 +95,18 @@ data class ProgressResponse(
     /** The card the reported win dropped; present only on an outcome response that dropped one. */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     val drop: DropResponse? = null,
+    /** The piece of equipment the reported win dropped; present only on an outcome response that dropped one. */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val equipmentDrop: EquipmentDropResponse? = null,
 ) {
     companion object {
-        fun from(result: OutcomeResult) = from(result.view).copy(drop = result.drop?.let(DropResponse::from))
+        fun from(
+            result: OutcomeResult,
+            rules: EquipmentRules,
+        ) = from(result.view).copy(
+            drop = result.drop?.let(DropResponse::from),
+            equipmentDrop = result.equipmentDrop?.let { EquipmentDropResponse.from(it, rules) },
+        )
 
         fun from(view: ProgressView): ProgressResponse {
             val position = view.progress.position
@@ -117,6 +127,7 @@ data class ProgressResponse(
 class ProgressController(
     private val getProgress: GetProgressUseCase,
     private val reportOutcome: ReportOutcomeUseCase,
+    private val equipmentRules: EquipmentRules,
 ) {
     @GetMapping
     fun get(principal: Principal) = ProgressResponse.from(getProgress.get(principal.name))
@@ -128,7 +139,7 @@ class ProgressController(
     ): ProgressResponse {
         val position = parsePosition(body)
         val outcome = parseOutcome(body)
-        return ProgressResponse.from(reportOutcome.report(principal.name, position, outcome))
+        return ProgressResponse.from(reportOutcome.report(principal.name, position, outcome), equipmentRules)
     }
 
     private fun parsePosition(body: Map<String, Any?>) =

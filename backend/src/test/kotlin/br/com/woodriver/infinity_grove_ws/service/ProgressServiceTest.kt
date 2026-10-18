@@ -1,20 +1,27 @@
 package br.com.woodriver.infinity_grove_ws.service
 
 import br.com.woodriver.infinity_grove_ws.InMemoryChapterRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryEquipmentRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryHeroRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
 import br.com.woodriver.infinity_grove_ws.LogCapture
 import br.com.woodriver.infinity_grove_ws.MutableClock
 import br.com.woodriver.infinity_grove_ws.SequenceChanceRoller
+import br.com.woodriver.infinity_grove_ws.SequenceDropRoller
+import br.com.woodriver.infinity_grove_ws.SequenceIds
 import br.com.woodriver.infinity_grove_ws.domain.BossRecord
 import br.com.woodriver.infinity_grove_ws.domain.CardDrop
 import br.com.woodriver.infinity_grove_ws.domain.CardDropRates
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.ChapterNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.DropRule
+import br.com.woodriver.infinity_grove_ws.domain.DropTable
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.Encounter
+import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.HeroSeed
 import br.com.woodriver.infinity_grove_ws.domain.Outcome
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
@@ -23,6 +30,7 @@ import br.com.woodriver.infinity_grove_ws.domain.ProgressConflictException
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
+import br.com.woodriver.infinity_grove_ws.port.EquipmentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -44,7 +52,20 @@ class ProgressServiceTest {
     private val today = LocalDate.of(2026, 10, 18)
     private val clock = MutableClock(today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() + 10 * 3_600_000L)
     private var chance = SequenceChanceRoller(0.5)
-    private val service get() = ProgressService(progresses, chapters, users, playerCards, CardRewards(heroes, chance, rates, clock))
+    private val equipment = InMemoryEquipmentRepository()
+    private var equipmentChance = SequenceChanceRoller(0.5)
+
+    private fun equipmentRewards(pieces: EquipmentRepositoryPort = equipment) =
+        EquipmentRewards(
+            pieces,
+            WalletAccess(InMemoryWalletRepository(), DropTable(listOf(DropRule(1, 1, 5, 1500))), SequenceDropRoller(1), clock),
+            equipmentChance,
+            SequenceIds(),
+            EquipmentRules(),
+        )
+
+    private val service get() =
+        ProgressService(progresses, chapters, users, playerCards, CardRewards(heroes, chance, rates, clock), equipmentRewards())
 
     private val start = ProgressPosition(1, 1, Encounter.PHASE, 1)
 
@@ -343,7 +364,7 @@ class ProgressServiceTest {
             object : PlayerCardsRepositoryPort by playerCards {
                 override fun save(cards: PlayerCards): PlayerCards = error("cards store is down")
             }
-        val broken = ProgressService(progresses, chapters, users, failing, CardRewards(heroes, chance, rates, clock))
+        val broken = ProgressService(progresses, chapters, users, failing, CardRewards(heroes, chance, rates, clock), equipmentRewards())
 
         assertFailsWith<IllegalStateException> { broken.report("yan", miniboss, Outcome.CLEARED) }
     }
@@ -358,5 +379,74 @@ class ProgressServiceTest {
 
         assertNull(result.drop)
         assertEquals(ProgressPosition(1, 2, Encounter.PHASE, 1), result.view.progress.position)
+    }
+
+    @Test
+    fun `a cleared miniboss whose equipment roll passes returns the piece and stores it`() {
+        playerAt(miniboss)
+        equipmentChance = SequenceChanceRoller(0.2, 0.0)
+
+        val result = service.report("yan", miniboss, Outcome.CLEARED)
+
+        val drop = result.equipmentDrop!!
+        assertEquals(false, drop.sold)
+        assertEquals(listOf(drop.piece), equipment.findAll("yan"))
+    }
+
+    @Test
+    fun `a cleared miniboss whose equipment roll fails returns no piece`() {
+        playerAt(miniboss)
+        equipmentChance = SequenceChanceRoller(0.25)
+
+        assertNull(service.report("yan", miniboss, Outcome.CLEARED).equipmentDrop)
+        assertTrue(equipment.pieces.isEmpty())
+    }
+
+    @Test
+    fun `a cleared chapter boss always returns a piece`() {
+        playerAt(chapterBoss)
+        equipmentChance = SequenceChanceRoller(0.99)
+
+        val result = service.report("yan", chapterBoss, Outcome.CLEARED)
+
+        assertEquals(1, equipment.findAll("yan").size)
+        assertEquals(equipment.findAll("yan").single(), result.equipmentDrop?.piece)
+    }
+
+    @Test
+    fun `a phase win a failed boss and a rejected report drop no equipment`() {
+        playerAt(miniboss)
+        equipmentChance = SequenceChanceRoller(0.0)
+        service.report("yan", miniboss, Outcome.FAILED)
+        progresses.save(Progress("yan", start))
+        assertNull(service.report("yan", start, Outcome.CLEARED).equipmentDrop)
+        playerAt(miniboss)
+        assertFailsWith<ProgressConflictException> { service.report("yan", start, Outcome.CLEARED) }
+
+        assertEquals(0, equipmentChance.reads)
+        assertTrue(equipment.pieces.isEmpty())
+    }
+
+    @Test
+    fun `a player without cards gets no equipment either`() {
+        existingUser()
+        progresses.save(Progress("yan", miniboss))
+        equipmentChance = SequenceChanceRoller(0.0)
+
+        assertNull(service.report("yan", miniboss, Outcome.CLEARED).equipmentDrop)
+        assertTrue(equipment.pieces.isEmpty())
+    }
+
+    @Test
+    fun `a failure storing the piece propagates so the transaction rolls the progress back`() {
+        playerAt(chapterBoss)
+        val failing =
+            object : EquipmentRepositoryPort by equipment {
+                override fun save(piece: br.com.woodriver.infinity_grove_ws.domain.Piece) = error("equipment store is down")
+            }
+        val broken =
+            ProgressService(progresses, chapters, users, playerCards, CardRewards(heroes, chance, rates, clock), equipmentRewards(failing))
+
+        assertFailsWith<IllegalStateException> { broken.report("yan", chapterBoss, Outcome.CLEARED) }
     }
 }
