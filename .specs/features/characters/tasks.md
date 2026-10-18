@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/characters/design.md`
-**Status**: In Progress (approved by the owner: "pode seguir no loop até concluí-la"; executed inline, no sub-agents)
+**Status**: Done, Verifier PASS in iteration 2 (approved by the owner: "pode seguir no loop até concluí-la"; executed inline, no sub-agents)
 
 Paths: `BE` = `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws`, `BT` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws`, `GS` = `game/src`.
 
@@ -1223,6 +1223,7 @@ Phase 5:  T26 → T27 → T28 → T29 → T30 → T31 → T32 → T33 → T34 �
 Phase 6:  T36 → T37 → T38 → T39 → T40 → T41 → T42 → T43 → T44
 Phase 7:  T45 → T46
 Phase 8:  T47 → T48 → T49 → T50 → T51
+Phase 9:  T52 → T53
 ```
 
 Execution is strictly sequential, inline in the main session (the owner asked to run the feature to completion; no sub-agents are spawned). The Verifier runs once after T51.

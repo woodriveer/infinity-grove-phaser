@@ -37,7 +37,7 @@ class HeroService(
         heroId: String,
         stars: Int,
     ): HeroView {
-        logger.info("Fusing cards username={} hero={} stars={}", username, heroId, stars)
+        logger.info("Fusion requested username={} hero={} stars={}", username, heroId, stars)
         val hero = requireHero(heroId)
         val fused = load(username).fuse(heroId, stars)
         playerCardsRepository.save(fused)

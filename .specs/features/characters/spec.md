@@ -162,7 +162,7 @@ The player is a fixed fire attacker and nothing drops from bosses except coins. 
 5. WHEN the player clicks a bag entry THEN the game SHALL show the hero name, the stars, the copy count, the copies needed to fuse, the hero's three skills with their lock state (locked skills included), and a button that opens Fusão with that entry selected (labelled "Ir para a fusão"; a three star card has none).  <!-- event-driven -->
 6. WHEN the player opens Fusão THEN the game SHALL list every (hero, stars 0 to 2) pair with its copy count out of 3, and enable that row's "Fundir" button only when the count is 3 or more.  <!-- event-driven -->
 7. WHEN the player presses an enabled "Fundir" button THEN the game SHALL call the fuse request, update the screen from the response and show the resulting card.  <!-- event-driven -->
-8. IF a screen request fails THEN the game SHALL show an error line in Portuguese on that screen, keep the screen open and leave the bag unchanged.  <!-- unwanted-behavior -->
+8. IF a screen request fails THEN the game SHALL show an error line in Portuguese on that screen ("Não foi possível carregar.", "Não foi possível fundir as cartas." or "Não foi possível trocar o líder."), keep the screen open and leave the bag unchanged.  <!-- unwanted-behavior -->
 9. WHILE any of these screens is open the game SHALL pause play as the pause menu does.  <!-- state-driven -->
 10. WHEN an outcome response carries a dropped card THEN the game SHALL show the notice "Carta: <hero name>" for 3 s.  <!-- event-driven -->
 11. The game SHALL render these screens as DOM elements with stable test ids.  <!-- ubiquitous -->
@@ -242,22 +242,22 @@ The player is a fixed fire attacker and nothing drops from bosses except coins. 
 
 | Requirement ID | Story                                                | Phase  | Status  |
 | -------------- | ---------------------------------------------------- | ------ | ------- |
-| CHAR-01        | P1: Choose a starting hero at registration           | -      | Pending |
-| CHAR-02        | P1: Choose a starting hero at registration           | -      | Pending |
-| CHAR-03        | P1: Choose a starting hero at registration           | -      | Pending |
-| CHAR-04        | P1: Bosses drop hero cards                           | -      | Pending |
-| CHAR-05        | P1: Bosses drop hero cards                           | -      | Pending |
-| CHAR-06        | P1: The bag and fusion rules                         | -      | Pending |
-| CHAR-07        | P1: The bag and fusion rules                         | -      | Pending |
-| CHAR-08        | P1: Heroes, Mochila and Fusão screens                | -      | Pending |
-| CHAR-09        | P1: Heroes, Mochila and Fusão screens                | -      | Pending |
-| CHAR-10        | P2: Leader and skill bar                             | -      | Pending |
-| CHAR-11        | P2: Fight defeated bosses again (farm)               | -      | Pending |
-| CHAR-12        | P2: Fight defeated bosses again (farm)               | -      | Pending |
+| CHAR-01        | P1: Choose a starting hero at registration           | -      | Verified |
+| CHAR-02        | P1: Choose a starting hero at registration           | -      | Verified |
+| CHAR-03        | P1: Choose a starting hero at registration           | -      | Verified |
+| CHAR-04        | P1: Bosses drop hero cards                           | -      | Verified |
+| CHAR-05        | P1: Bosses drop hero cards                           | -      | Verified |
+| CHAR-06        | P1: The bag and fusion rules                         | -      | Verified |
+| CHAR-07        | P1: The bag and fusion rules                         | -      | Verified |
+| CHAR-08        | P1: Heroes, Mochila and Fusão screens                | -      | Verified |
+| CHAR-09        | P1: Heroes, Mochila and Fusão screens                | -      | Verified |
+| CHAR-10        | P2: Leader and skill bar                             | -      | Verified |
+| CHAR-11        | P2: Fight defeated bosses again (farm)               | -      | Verified |
+| CHAR-12        | P2: Fight defeated bosses again (farm)               | -      | Verified |
 
 CHAR-01 hero catalog, seed and chapter order; CHAR-02 registration with a starting hero; CHAR-03 registration form choice; CHAR-04 drop rolls and the first-win guarantee; CHAR-05 drop response, atomicity and logging; CHAR-06 bag read and skill unlock; CHAR-07 fusion; CHAR-08 catalog and detail screens; CHAR-09 bag and fusion screens and the drop notice; CHAR-10 leader choice and skill bar; CHAR-11 farm state, drops, daily limit and throttle; CHAR-12 farm menu and loop.
 
-**Coverage:** 12 total, 0 mapped to tasks, 12 unmapped ⚠️
+**Coverage:** 12 total, 12 mapped to tasks, 0 unmapped
 
 ---
 
