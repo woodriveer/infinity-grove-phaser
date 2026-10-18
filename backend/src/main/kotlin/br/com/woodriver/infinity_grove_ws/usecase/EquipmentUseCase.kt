@@ -36,3 +36,12 @@ interface RefinePieceUseCase {
         pieceId: String,
     ): EquipmentChange
 }
+
+interface RerollAffixUseCase {
+    /** Replaces affix [affixIndex] of [pieceId] with a new type and value for the copper it costs, in one transaction with the wallet. */
+    fun reroll(
+        username: String,
+        pieceId: String,
+        affixIndex: Int,
+    ): EquipmentChange
+}

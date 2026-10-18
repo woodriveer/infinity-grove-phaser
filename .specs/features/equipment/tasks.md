@@ -383,11 +383,11 @@ T25
 
 **Done when**:
 
-- [ ] A +5 piece with 5000 copper rerolls affix 0 to another type, keeps affix 1 and the level, and the wallet drops by 5000
-- [ ] Below +5 is 409 `REFINE_TOO_LOW`; under 5000 copper 409 `NOT_ENOUGH_COPPER`; a bad index 400 `INVALID_AFFIX`; all types held 409 `NO_AFFIX_LEFT`; each leaves piece and wallet unchanged
-- [ ] `EquipmentServiceTest` additions and `EquipmentRerollIT` pass; full backend gate passes
+- [x] A +5 piece with 5000 copper rerolls affix 0 to another type, keeps affix 1 and the level, and the wallet drops by 5000
+- [x] Below +5 is 409 `REFINE_TOO_LOW`; under 5000 copper 409 `NOT_ENOUGH_COPPER`; a bad index 400 `INVALID_AFFIX`; all types held 409 `NO_AFFIX_LEFT`; each leaves piece and wallet unchanged
+- [x] `EquipmentServiceTest` additions and `EquipmentRerollIT` pass; full backend gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 

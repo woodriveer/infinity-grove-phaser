@@ -7,6 +7,7 @@ import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCardsMissingException
 import br.com.woodriver.infinity_grove_ws.domain.PlayerEquipment
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
+import br.com.woodriver.infinity_grove_ws.port.ChanceRollerPort
 import br.com.woodriver.infinity_grove_ws.port.EquipmentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
@@ -14,6 +15,7 @@ import br.com.woodriver.infinity_grove_ws.usecase.EquipPieceUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.EquipmentChange
 import br.com.woodriver.infinity_grove_ws.usecase.ListEquipmentUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.RefinePieceUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.RerollAffixUseCase
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -26,10 +28,12 @@ class EquipmentService(
     private val playerCardsRepository: PlayerCardsRepositoryPort,
     private val userRepository: UserRepositoryPort,
     private val walletAccess: WalletAccess,
+    private val chanceRoller: ChanceRollerPort,
     private val rules: EquipmentRules,
 ) : ListEquipmentUseCase,
     EquipPieceUseCase,
-    RefinePieceUseCase {
+    RefinePieceUseCase,
+    RerollAffixUseCase {
     override fun list(username: String): PlayerEquipment {
         logger.info("Listing equipment username={}", username)
         requireUser(username)
@@ -76,6 +80,23 @@ class EquipmentService(
         walletAccess.save(wallet)
         logger.info("Refined username={} piece={} level={} copper={}", username, pieceId, piece.refine + 1, cost)
         return EquipmentChange(store(before, after), wallet)
+    }
+
+    override fun reroll(
+        username: String,
+        pieceId: String,
+        affixIndex: Int,
+    ): EquipmentChange {
+        logger.info("Reroll requested username={} piece={} affix={}", username, pieceId, affixIndex)
+        lockPlayer(username)
+        val before = load(username)
+        val piece = before.find(pieceId)
+        val rerolled = piece.rerolled(affixIndex, chanceRoller::roll)
+        val cost = piece.rerollCost(rules) ?: error("A piece that can be rerolled has a reroll cost")
+        val wallet = walletAccess.lock(username).minus(cost)
+        walletAccess.save(wallet)
+        logger.info("Rerolled username={} piece={} affix={} copper={}", username, pieceId, affixIndex, cost)
+        return EquipmentChange(store(before, before.replace(rerolled)), wallet)
     }
 
     /** Writes the pieces [after] changed or removed compared to [before]. */

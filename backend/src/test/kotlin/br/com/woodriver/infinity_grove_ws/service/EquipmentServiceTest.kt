@@ -5,6 +5,7 @@ import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
 import br.com.woodriver.infinity_grove_ws.MutableClock
+import br.com.woodriver.infinity_grove_ws.SequenceChanceRoller
 import br.com.woodriver.infinity_grove_ws.SequenceDropRoller
 import br.com.woodriver.infinity_grove_ws.domain.Affix
 import br.com.woodriver.infinity_grove_ws.domain.AffixType
@@ -15,12 +16,14 @@ import br.com.woodriver.infinity_grove_ws.domain.EquipmentNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.HeroNotOwnedException
 import br.com.woodriver.infinity_grove_ws.domain.HeroSeed
+import br.com.woodriver.infinity_grove_ws.domain.InvalidAffixException
 import br.com.woodriver.infinity_grove_ws.domain.MaxRefineException
 import br.com.woodriver.infinity_grove_ws.domain.NotEnoughCopperException
 import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCardsMissingException
 import br.com.woodriver.infinity_grove_ws.domain.Rarity
+import br.com.woodriver.infinity_grove_ws.domain.RefineTooLowException
 import br.com.woodriver.infinity_grove_ws.domain.Slot
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
@@ -38,7 +41,8 @@ class EquipmentServiceTest {
     private val wallets = InMemoryWalletRepository()
     private val table = DropTable(listOf(DropRule(1, 1, 5, 1500)))
     private val walletAccess = WalletAccess(wallets, table, SequenceDropRoller(1), MutableClock(1_000L))
-    private val service get() = EquipmentService(pieces, playerCards, users, walletAccess, rules)
+    private var chance = SequenceChanceRoller(0.0)
+    private val service get() = EquipmentService(pieces, playerCards, users, walletAccess, chance, rules)
 
     private fun player() {
         users.save(User("yan", "hash", 1L, 1L))
@@ -233,5 +237,82 @@ class EquipmentServiceTest {
 
         assertEquals(10_000L, wallets.wallets.getValue("yan").copper)
         assertEquals(0, pieces.pieces.getValue("theirs").refine)
+    }
+
+    private fun rerollable(
+        id: String = "w",
+        refine: Int = 5,
+    ) = Piece(
+        id,
+        "yan",
+        Slot.WEAPON,
+        Rarity.UNCOMMON,
+        3,
+        refine,
+        listOf(Affix(AffixType.CRIT_CHANCE, 2), Affix(AffixType.BOSS_DAMAGE_PCT, 6)),
+    ).also { pieces.save(it) }
+
+    @Test
+    fun `reroll replaces the chosen affix, keeps the other and the level and spends 5000`() {
+        player()
+        rerollable()
+        funded(6_000)
+
+        val change = service.reroll("yan", "w", 0)
+
+        val piece = change.equipment.find("w")
+        assertEquals(Affix(AffixType.CRIT_DAMAGE_PCT, 12), piece.affixes[0])
+        assertEquals(Affix(AffixType.BOSS_DAMAGE_PCT, 6), piece.affixes[1])
+        assertEquals(5, piece.refine)
+        assertEquals(piece, pieces.pieces.getValue("w"))
+        assertEquals(1_000L, change.wallet.copper)
+        assertEquals(1_000L, wallets.wallets.getValue("yan").copper)
+    }
+
+    @Test
+    fun `reroll below level 5 is refused and changes nothing`() {
+        player()
+        val before = rerollable(refine = 4)
+        funded(6_000)
+
+        assertFailsWith<RefineTooLowException> { service.reroll("yan", "w", 0) }
+
+        assertEquals(before, pieces.pieces.getValue("w"))
+        assertEquals(6_000L, wallets.wallets.getValue("yan").copper)
+    }
+
+    @Test
+    fun `reroll with less than 5000 copper is refused and changes nothing`() {
+        player()
+        val before = rerollable()
+        funded(4_999)
+
+        assertFailsWith<NotEnoughCopperException> { service.reroll("yan", "w", 0) }
+
+        assertEquals(before, pieces.pieces.getValue("w"))
+        assertEquals(4_999L, wallets.wallets.getValue("yan").copper)
+    }
+
+    @Test
+    fun `reroll of an affix the piece does not have is refused and changes nothing`() {
+        player()
+        val before = rerollable()
+        funded(6_000)
+
+        assertFailsWith<InvalidAffixException> { service.reroll("yan", "w", 2) }
+        assertFailsWith<InvalidAffixException> { service.reroll("yan", "w", -1) }
+
+        assertEquals(before, pieces.pieces.getValue("w"))
+        assertEquals(6_000L, wallets.wallets.getValue("yan").copper)
+    }
+
+    @Test
+    fun `reroll of a missing piece is not found and spends nothing`() {
+        player()
+        funded(6_000)
+
+        assertFailsWith<EquipmentNotFoundException> { service.reroll("yan", "ghost", 0) }
+
+        assertEquals(6_000L, wallets.wallets.getValue("yan").copper)
     }
 }
