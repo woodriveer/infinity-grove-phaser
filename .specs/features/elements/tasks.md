@@ -125,8 +125,8 @@ T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `GET /progress` returns `monster`, `miniboss` per stage and `boss` with the four values (ELEM-02 AC2)
-- [ ] Gate passes
+- [x] `GET /progress` returns `monster`, `miniboss` per stage and `boss` with the four values (ELEM-02 AC2)
+- [x] Gate passes
 
 **Tests**: integration
 **Gate**: full

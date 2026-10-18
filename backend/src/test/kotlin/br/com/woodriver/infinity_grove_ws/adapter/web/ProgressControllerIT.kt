@@ -78,6 +78,29 @@ class ProgressControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `GET progress carries the enemy stats of the phase monster, the miniboss and the chapter boss`() {
+        user()
+
+        getProgress()
+            .then()
+            .statusCode(200)
+            .body("definition.boss.element", equalTo("DARKNESS"))
+            .body("definition.boss.physicalDefense", equalTo(30))
+            .body("definition.boss.magicalDefense", equalTo(30))
+            .body("definition.boss.critResistance", equalTo(30))
+            .body("definition.stages[0].monster.element", equalTo("FIRE"))
+            .body("definition.stages[0].monster.physicalDefense", equalTo(0))
+            .body("definition.stages[0].monster.magicalDefense", equalTo(0))
+            .body("definition.stages[0].monster.critResistance", equalTo(0))
+            .body("definition.stages[0].miniboss.element", equalTo("FIRE"))
+            .body("definition.stages[0].miniboss.physicalDefense", equalTo(11))
+            .body("definition.stages[0].miniboss.magicalDefense", equalTo(11))
+            .body("definition.stages[0].miniboss.critResistance", equalTo(12))
+            .body("definition.stages[4].monster.element", equalTo("DARKNESS"))
+            .body("definition.stages[9].miniboss.critResistance", equalTo(30))
+    }
+
+    @Test
     fun `GET progress twice returns the same position`() {
         user()
 

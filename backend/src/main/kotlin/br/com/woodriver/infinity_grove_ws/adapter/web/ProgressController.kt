@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.Encounter
+import br.com.woodriver.infinity_grove_ws.domain.EnemyStats
 import br.com.woodriver.infinity_grove_ws.domain.InvalidOutcomeException
 import br.com.woodriver.infinity_grove_ws.domain.Outcome
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
@@ -16,28 +17,56 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.security.Principal
 
+data class EnemyStatsResponse(
+    val element: String,
+    val physicalDefense: Int,
+    val magicalDefense: Int,
+    val critResistance: Int,
+) {
+    companion object {
+        fun from(stats: EnemyStats) =
+            EnemyStatsResponse(
+                element = stats.element.name,
+                physicalDefense = stats.physicalDefense,
+                magicalDefense = stats.magicalDefense,
+                critResistance = stats.critResistance,
+            )
+    }
+}
+
 data class StageResponse(
     val number: Int,
     val phasesPerStage: Int,
     val monsterHealth: Int,
     val minibossHealth: Int,
     val minibossTimeLimitMs: Long,
+    val monster: EnemyStatsResponse,
+    val miniboss: EnemyStatsResponse,
 ) {
     companion object {
         fun from(stage: StageDefinition) =
-            StageResponse(stage.number, stage.phasesPerStage, stage.monsterHealth, stage.minibossHealth, stage.minibossTimeLimitMs)
+            StageResponse(
+                number = stage.number,
+                phasesPerStage = stage.phasesPerStage,
+                monsterHealth = stage.monsterHealth,
+                minibossHealth = stage.minibossHealth,
+                minibossTimeLimitMs = stage.minibossTimeLimitMs,
+                monster = EnemyStatsResponse.from(stage.monster),
+                miniboss = EnemyStatsResponse.from(stage.miniboss),
+            )
     }
 }
 
 data class ChapterResponse(
     val bossHealth: Int,
     val bossTimeLimitMs: Long,
+    val boss: EnemyStatsResponse,
     val stages: List<StageResponse>,
 ) {
     companion object {
         fun from(chapter: ChapterDefinition): ChapterResponse {
             val stages = chapter.stages.map(StageResponse::from)
-            return ChapterResponse(chapter.bossHealth, chapter.bossTimeLimitMs, stages)
+            return ChapterResponse(chapter.bossHealth, chapter.bossTimeLimitMs, EnemyStatsResponse.from(chapter.boss), stages)
         }
     }
 }
