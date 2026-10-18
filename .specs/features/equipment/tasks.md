@@ -589,13 +589,13 @@ T25
 
 **Done when**:
 
-- [ ] A click uses the leader's attacker (weapon +3 click damage hits for 4 against a 0-defense monster of the same element rules); without pieces the click is unchanged
-- [ ] A boss countdown starts at the encounter limit plus the leader's `BOSS_TIME_SECONDS`
-- [ ] An `equipmentDrop` from a report shows the notice and joins the collection; a refine's wallet updates the displayed wallet
-- [ ] If the equipment fails to load the fight uses the base attacker
-- [ ] `ClickerGame.test.js` additions pass; `npm run build` and `npm test` pass; the screen is checked once in the browser
+- [x] A click uses the leader's attacker (weapon +3 click damage hits for 4 against a 0-defense monster of the same element rules); without pieces the click is unchanged
+- [x] A boss countdown starts at the encounter limit plus the leader's `BOSS_TIME_SECONDS`
+- [x] An `equipmentDrop` from a report shows the notice and joins the collection; a refine's wallet updates the displayed wallet
+- [x] If the equipment fails to load the fight uses the base attacker
+- [x] `ClickerGame.test.js` additions pass; `npm run build` and `npm test` pass; the screen is checked once in the browser
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Build
 

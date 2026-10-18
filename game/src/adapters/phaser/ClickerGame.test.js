@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClickerGame } from './ClickerGame';
 import { ApiError } from '../../application/ApiError';
 import { createCampaignSession } from '../../application/campaign/campaignSession';
+import { createEquipmentCollection } from '../../application/equipment/equipmentCollection';
 import { createFarmSession } from '../../application/farm/farmSession';
 import { createHeroCollection } from '../../application/heroes/heroCollection';
 import { createWalletSync } from '../../application/wallet/walletSync';
@@ -18,6 +19,7 @@ const campaignGateway = { get: vi.fn(), report: vi.fn() };
 //  The real hero collection and farm session over mocked gateways; by default the player owns Kael with one blank card
 const heroesGateway = { list: vi.fn(), fuse: vi.fn(), setLeader: vi.fn() };
 const farmGateway = { get: vi.fn(), win: vi.fn() };
+const equipmentGateway = { list: vi.fn(), equip: vi.fn(), unequip: vi.fn(), refine: vi.fn(), reroll: vi.fn(), sell: vi.fn() };
 //  The critical roll: 0.99 never crits a monster of the default stats (10 % chance); a test sets `dice.value` to force one
 const dice = { value: 0.99 };
 const services = {
@@ -25,6 +27,7 @@ const services = {
     createWalletSync: () => createWalletSync({ gateway: walletApi }),
     createCampaignSession: () => createCampaignSession({ gateway: campaignGateway }),
     createHeroCollection: () => createHeroCollection({ gateway: heroesGateway }),
+    createEquipmentCollection: () => createEquipmentCollection({ gateway: equipmentGateway }),
     createFarmSession: () => createFarmSession({ gateway: farmGateway })
 };
 
@@ -56,8 +59,10 @@ const walletResponse = (coins = { gold: 2, silver: 14, copper: 37 }, drops = { 1
 
 //  Minimal Phaser stand-in: records what ClickerGame adds and exposes the click handler and tweens.
 //  `wallet` is what GET /wallet answers: a response object, an Error to reject with, or omitted to never answer.
-const createScene = async ({ wallet, start = progress(), heroes = heroesResponse() } = {}) => {
+const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] } } = {}) => {
     dice.value = 0.99;
+    Object.values(equipmentGateway).forEach((mock) => mock.mockReset());
+    equipmentGateway.list.mockImplementation(() => (equipment instanceof Error ? Promise.reject(equipment) : Promise.resolve(equipment)));
     heroesGateway.list.mockReset();
     heroesGateway.fuse.mockReset();
     heroesGateway.setLeader.mockReset();
@@ -1997,5 +2002,214 @@ describe('ClickerGame farm mode', () => {
         ctx.scene.startFarm(miniboss);
 
         expect(ctx.scene.tweens.killTweensOf).toHaveBeenCalledWith(ctx.scene.monsterParts);
+    });
+});
+
+describe('ClickerGame equipment', () => {
+    const stats = (element, physicalDefense = 0) => ({ element, physicalDefense, magicalDefense: 0, critResistance: 0 });
+    const monsterOf = (monster, miniboss = monster) => ({
+        ...progress(),
+        definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monster, miniboss })) }
+    });
+    const piece = (extra = {}) => ({
+        id: 'p1', slot: 'RING', rarity: 'COMMON', refine: 0, heroId: 'kael', sellPrice: 100, refineCost: 500, rerollCost: null, affixes: [], ...extra
+    });
+    const weapon = (clickDamage = 3, extra = {}) => piece({ id: 'w1', slot: 'WEAPON', clickDamage, ...extra });
+    const affixPiece = (type, value, extra = {}) => piece({ id: `a-${type}`, affixes: [ { type, value } ], ...extra });
+    const list = (...pieces) => ({ capacity: 100, pieces });
+    const fire = () => monsterOf(stats('FIRE'));
+    const miniboss = (boss) => ({ ...progress(1, 'MINIBOSS', 1), definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, miniboss: boss })) } });
+    const killAll = (ctx) => {
+        while (ctx.scene.monster && !ctx.scene.monster.dead)
+        {
+            ctx.click();
+        }
+    };
+    const advance = (ctx) => {
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+    };
+    const tick = (ctx) => ctx.loops[0].callback();
+    const testid = (ctx, id) => ctx.doms.map((d) => d.node.querySelector(`[data-testid="${id}"]`)).find(Boolean);
+
+    it('loads the equipment once when the scene starts', async () => {
+        await createScene();
+
+        expect(equipmentGateway.list).toHaveBeenCalledTimes(1);
+    });
+
+    it('hits for 1 plus the click damage of the weapon the leader wears: a weapon of 3 hits for 4', async () => {
+        const ctx = await createScene({ start: fire(), equipment: list(weapon(3)) });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 4);
+        expect(ctx.texts[0].text).toBe('4');
+    });
+
+    it('multiplies by the click damage percent of the other pieces: a ring of 10 % makes 4.4', async () => {
+        const ctx = await createScene({ start: fire(), equipment: list(weapon(3), affixPiece('CLICK_DAMAGE_PCT', 10)) });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBeCloseTo(ctx.scene.monster.maxHealth - 4.4, 10);
+        expect(ctx.texts[0].text).toBe('4.4');
+    });
+
+    it('ignores the pieces worn by another hero and the pieces in the bag', async () => {
+        const ctx = await createScene({
+            start: fire(),
+            equipment: list(weapon(3, { heroId: 'lyra' }), weapon(5, { id: 'w2', heroId: null }))
+        });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 1);
+    });
+
+    it('uses the pieces of the new leader after the leader changes', async () => {
+        const ctx = await createScene({ start: fire(), equipment: list(weapon(3, { heroId: 'lyra' })) });
+        heroesGateway.setLeader.mockResolvedValue({ leaderId: 'lyra' });
+
+        await ctx.scene.heroes.setLeader('lyra');
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 4);
+    });
+
+    it('adds the critical chance of the pieces', async () => {
+        const ctx = await createScene({ start: fire(), equipment: list(affixPiece('CRIT_CHANCE', 5)) });
+        ctx.dice.value = 0.1499;
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 2);
+    });
+
+    it('ignores part of the monster defense with armor pierce: 50 % of a 50 defense leaves 25', async () => {
+        const ctx = await createScene({ start: monsterOf(stats('FIRE', 50)), equipment: list(affixPiece('ARMOR_PIERCE_PCT', 50)) });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 0.75);
+    });
+
+    it('adds the boss damage only against a boss', async () => {
+        const phase = await createScene({ start: fire(), equipment: list(affixPiece('BOSS_DAMAGE_PCT', 20)) });
+        const boss = await createScene({ start: miniboss(stats('FIRE')), equipment: list(affixPiece('BOSS_DAMAGE_PCT', 20)) });
+
+        phase.click();
+        boss.click();
+
+        expect(phase.scene.monster.health).toBe(phase.scene.monster.maxHealth - 1);
+        expect(boss.scene.monster.health).toBeCloseTo(boss.scene.monster.maxHealth - 1.2, 10);
+    });
+
+    it('adds the extra boss seconds of the pieces to the countdown of a boss', async () => {
+        const ctx = await createScene({ start: progress(1, 'PHASE', 5), equipment: list(affixPiece('BOSS_TIME_SECONDS', 5)) });
+
+        killAll(ctx);
+        advance(ctx);
+
+        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 35');
+    });
+
+    it('keeps the plain countdown without the extra seconds', async () => {
+        const ctx = await createScene({ start: progress(1, 'PHASE', 5) });
+
+        killAll(ctx);
+        advance(ctx);
+
+        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
+    });
+
+    it('fights with the base attacker when the equipment cannot be loaded, and tries again on the next tick', async () => {
+        const ctx = await createScene({ start: fire(), equipment: new ApiError('down', { status: 500 }) });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 1);
+        expect(equipmentGateway.list).toHaveBeenCalledTimes(1);
+
+        equipmentGateway.list.mockResolvedValue(list(weapon(3)));
+        tick(ctx);
+        await flush();
+        ctx.click();
+
+        expect(equipmentGateway.list).toHaveBeenCalledTimes(2);
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 5);
+    });
+
+    it('shows the notice and joins the list for a piece dropped by an accepted report', async () => {
+        const ctx = await createScene({ start: progress(1, 'MINIBOSS', 1) });
+        campaignGateway.report.mockResolvedValue({
+            ...progress(2, 'PHASE', 1), equipmentDrop: { piece: piece({ id: 'new', rarity: 'RARE', slot: 'WEAPON', heroId: null }), sold: false }
+        });
+
+        killAll(ctx);
+        tick(ctx);
+        await flush();
+
+        expect(testid(ctx, 'card-notice').textContent).toBe('Equipamento encontrado: Raro Arma');
+        expect(testid(ctx, 'card-notice').hidden).toBe(false);
+        expect(ctx.scene.equipment.pieces().map(({ id }) => id)).toEqual([ 'new' ]);
+    });
+
+    it('shows the notice but adds no piece when the bag was full and the piece was sold', async () => {
+        const ctx = await createScene({ start: progress(1, 'MINIBOSS', 1) });
+        campaignGateway.report.mockResolvedValue({
+            ...progress(2, 'PHASE', 1), equipmentDrop: { piece: piece({ id: 'new', rarity: 'EPIC', slot: 'AMULET', heroId: null }), sold: true }
+        });
+
+        killAll(ctx);
+        tick(ctx);
+        await flush();
+
+        expect(testid(ctx, 'card-notice').textContent).toBe('Equipamento encontrado: Épico Amuleto');
+        expect(ctx.scene.equipment.pieces()).toEqual([]);
+    });
+
+    it('shows no equipment notice for a report that dropped no piece', async () => {
+        const ctx = await createScene({ start: progress(1, 'MINIBOSS', 1) });
+
+        killAll(ctx);
+        tick(ctx);
+        await flush();
+
+        expect(testid(ctx, 'card-notice').hidden).toBe(true);
+    });
+
+    it('shows the notice for a piece dropped by a farm win', async () => {
+        const ctx = await createScene();
+        const boss = { kind: 'MINIBOSS', stage: 1 };
+        farmGateway.win.mockResolvedValue({
+            drop: null, chapterBossWinsLeft: 10, equipmentDrop: { piece: piece({ id: 'farm', rarity: 'COMMON', slot: 'RING', heroId: null }), sold: false }
+        });
+
+        await ctx.scene.reportFarmWin(boss);
+
+        expect(testid(ctx, 'card-notice').textContent).toBe('Equipamento encontrado: Comum Anel');
+        expect(ctx.scene.equipment.pieces().map(({ id }) => id)).toEqual([ 'farm' ]);
+    });
+
+    it('shows the wallet the backend answered after a refine', async () => {
+        const ctx = await createScene({ wallet: walletResponse(), equipment: list(weapon(3, { heroId: null })) });
+        equipmentGateway.refine.mockResolvedValue({ equipment: list(weapon(3.3, { heroId: null, refine: 1 })), wallet: { gold: 2, silver: 9, copper: 37 } });
+
+        await ctx.scene.equipment.refine('w1');
+
+        expect(ctx.walletText().querySelector('.coin-silver').textContent).toBe('9');
+        expect(ctx.walletText().querySelector('.coin-copper').textContent).toBe('37');
+    });
+
+    it('opens the equipment screen from the HUD and tells it how much copper the wallet holds', async () => {
+        const ctx = await createScene({ wallet: walletResponse({ gold: 0, silver: 4, copper: 99 }), equipment: list(weapon(3, { heroId: null, refineCost: 500 })) });
+        await flush();
+
+        testid(ctx, 'hud-equipment').click();
+        await flush();
+        testid(ctx, 'equip-piece-w1').click();
+
+        expect(testid(ctx, 'piece-refine').disabled).toBe(true);
     });
 });

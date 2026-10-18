@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
 import { calculateDamage, formatDamage, PLAYER } from '../../domain/combat/damage';
+import { attackerFor, bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/equipment';
 import { Monster } from '../../domain/combat/monster';
 import { HeroUi } from './HeroUi';
 import { el } from './views/dom';
@@ -75,9 +76,12 @@ export class ClickerGame extends Scene
         this.paused = false;
         this.farmBoss = null;
         this.heroes = services.createHeroCollection();
+        this.equipment = services.createEquipmentCollection();
         this.farm = services.createFarmSession();
         this.session.onRealign((encounter) => this.realign(encounter));
         this.session.onDrop((drop) => this.receiveDrop(drop));
+        this.session.onEquipmentDrop((drop) => this.receiveEquipmentDrop(drop));
+        this.equipment.onWallet((coins) => this.receiveWallet(coins));
 
         this.add.image(512, 384, 'background');
 
@@ -171,13 +175,16 @@ export class ClickerGame extends Scene
     {
         this.heroUi = new HeroUi(this, {
             heroes: this.heroes,
+            equipment: this.equipment,
             farm: this.farm,
+            walletCopper: () => walletCopper(this.wallet.display()),
             pause: () => this.pauseForMenu(),
             resume: () => this.resumeFromMenu(),
             startFarm: (boss) => this.startFarm(boss)
         });
         this.heroes.onChange(() => this.showCharacter());
         this.loadHeroes();
+        this.loadEquipment();
     }
 
     //  The sprite of the leader hero replaces itself when the leader changes; nothing shows until the heroes load
@@ -213,6 +220,44 @@ export class ClickerGame extends Scene
         catch
         {
             //  The skill bar stays empty; the next tick tries again
+        }
+    }
+
+    async loadEquipment ()
+    {
+        try
+        {
+            await this.equipment.load();
+        }
+        catch
+        {
+            //  The click keeps the attacker it had; the next tick tries again
+        }
+    }
+
+    //  The pieces worn by the leader; none while the heroes or the equipment have not loaded
+    leaderPieces ()
+    {
+        const leader = this.heroes.leader();
+
+        return leader ? wornBy(this.equipment.pieces(), leader.id) : [];
+    }
+
+    //  A piece the backend dropped for a won boss: into the list at once, and shown for 3 s
+    receiveEquipmentDrop (drop)
+    {
+        this.equipment.applyDrop(drop);
+        this.heroUi.showEquipmentDrop(drop);
+    }
+
+    //  The wallet the backend answered after a refine, a reroll or a sale
+    receiveWallet (coins)
+    {
+        this.wallet.setWallet(coins);
+
+        if (this.wallet.loaded)
+        {
+            this.refreshWalletText();
         }
     }
 
@@ -365,7 +410,7 @@ export class ClickerGame extends Scene
 
         if (encounter.timeLimitMs)
         {
-            this.countdown = new BossCountdown(encounter.timeLimitMs);
+            this.countdown = new BossCountdown(encounter.timeLimitMs + bossTimeBonusMs(this.leaderPieces()));
             this.showCountdown();
         }
     }
@@ -476,6 +521,11 @@ export class ClickerGame extends Scene
         {
             this.loadHeroes();
         }
+
+        if (!this.equipment.loaded)
+        {
+            this.loadEquipment();
+        }
     }
 
     //  One last, best-effort sync when the scene ends; a failure is not retried
@@ -536,10 +586,12 @@ export class ClickerGame extends Scene
             return;
         }
 
-        //  The click hits with the element of the leader; until the heroes load it keeps the default attacker
+        //  The click hits with the element of the leader and the pieces it wears; until the heroes and the equipment load it keeps the
+        //  default attacker. A countdown means the monster is a boss.
         const leader = this.heroes.leader();
-        const attacker = leader ? { ...PLAYER, element: leader.element } : PLAYER;
-        const { damage, critical } = calculateDamage({ attacker, defender: this.monster.stats, random: this.random });
+        const base = leader ? { ...PLAYER, element: leader.element } : PLAYER;
+        const attacker = attackerFor(base, this.leaderPieces());
+        const { damage, critical } = calculateDamage({ attacker, defender: this.monster.stats, random: this.random, boss: this.countdown !== null });
 
         this.monster.hit(damage);
         this.updateHealthBar();
@@ -615,6 +667,11 @@ export class ClickerGame extends Scene
             if (result.drop)
             {
                 this.receiveDrop(result.drop);
+            }
+
+            if (result.equipmentDrop)
+            {
+                this.receiveEquipmentDrop(result.equipmentDrop);
             }
 
             if (boss.kind === 'CHAPTER_BOSS' && result.chapterBossWinsLeft <= 0 && this.farmBoss === boss)
