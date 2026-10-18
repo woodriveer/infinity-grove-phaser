@@ -290,6 +290,79 @@ describe('campaignSession', () => {
         });
     });
 
+    describe('equipment drops', () => {
+        const equipmentDrop = { piece: { id: 'p1', slot: 'WEAPON', rarity: 'RARE' }, sold: false };
+
+        it('onEquipmentDrop fires with the piece of an accepted report, after it left the queue', async () => {
+            const received = [];
+
+            await loaded();
+            session.onEquipmentDrop((drop) => received.push(drop));
+            gateway.report.mockResolvedValue({ ...progress(1, 'PHASE', 2), equipmentDrop });
+            session.clear();
+
+            await session.flush();
+
+            expect(received).toEqual([ equipmentDrop ]);
+        });
+
+        it('fires once per report that dropped a piece and not for the others', async () => {
+            const received = [];
+
+            await loaded();
+            session.onEquipmentDrop((drop) => received.push(drop));
+            gateway.report
+                .mockResolvedValueOnce({ ...progress(1, 'PHASE', 2) })
+                .mockResolvedValueOnce({ ...progress(1, 'PHASE', 2), equipmentDrop: null })
+                .mockResolvedValueOnce({ ...progress(1, 'MINIBOSS'), equipmentDrop });
+            session.clear();
+            session.clear();
+            session.clear();
+
+            await session.flush();
+
+            expect(gateway.report).toHaveBeenCalledTimes(3);
+            expect(received).toEqual([ equipmentDrop ]);
+        });
+
+        it('fires next to the card drop of the same report', async () => {
+            const cards = [];
+            const pieces = [];
+
+            await loaded();
+            session.onDrop((card) => cards.push(card));
+            session.onEquipmentDrop((drop) => pieces.push(drop));
+            gateway.report.mockResolvedValue({ ...progress(1, 'PHASE', 2), drop: { heroId: 'kael', heroName: 'Kael', stars: 0 }, equipmentDrop });
+            session.clear();
+
+            await session.flush();
+
+            expect(cards).toHaveLength(1);
+            expect(pieces).toEqual([ equipmentDrop ]);
+        });
+
+        it('a failed report fires nothing', async () => {
+            const received = [];
+
+            await loaded();
+            session.onEquipmentDrop((drop) => received.push(drop));
+            gateway.report.mockRejectedValueOnce(new ApiError('Cannot reach the server. Try again later.'));
+            session.clear();
+
+            await session.flush();
+
+            expect(received).toEqual([]);
+        });
+
+        it('a win with no callback registered is not an error', async () => {
+            await loaded();
+            gateway.report.mockResolvedValue({ ...progress(1, 'PHASE', 2), equipmentDrop });
+            session.clear();
+
+            await expect(session.flush()).resolves.toBeUndefined();
+        });
+    });
+
     describe('card drops', () => {
         const drop = { heroId: 'kael', heroName: 'Kael Raizférrea', stars: 0 };
 

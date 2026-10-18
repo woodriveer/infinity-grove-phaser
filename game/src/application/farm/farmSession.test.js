@@ -47,6 +47,16 @@ describe('farmSession', () => {
         expect(farm.winsLeft()).toBe(6);
     });
 
+    it('win keeps the equipment drop of the answer', async () => {
+        await farm.load();
+        const answer = { drop: null, chapterBossWinsLeft: 6, equipmentDrop: { piece: { id: 'p1', slot: 'RING', rarity: 'COMMON' }, sold: false } };
+        gateway.win.mockResolvedValue(answer);
+
+        const result = await farm.win({ kind: 'CHAPTER_BOSS' });
+
+        expect(result.equipmentDrop).toEqual(answer.equipmentDrop);
+    });
+
     it('a refused win rejects with the error and keeps the wins left', async () => {
         await farm.load();
         const refusal = new ApiError('The chapter boss was already won 10 times today', { status: 409, code: 'DAILY_LIMIT_REACHED' });

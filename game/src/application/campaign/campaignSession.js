@@ -5,6 +5,7 @@ import { Campaign } from '../../domain/campaign/campaign';
 //  Port (ADR 0007):
 //    gateway  { get(), report(position, outcome) }  the backend /progress calls. get -> progress payload.
 //             report resolves with the new progress (the first stage of the next chapter after a chapter boss), plus `drop` ({ heroId, heroName, stars }) when the win dropped a card,
+//             `equipmentDrop` ({ piece, sold }) when it dropped a piece of equipment,
 //             or rejects with an ApiError: status 409 carries the stored progress in `body.progress`, anything else is a
 //             failure that is retried.
 export const createCampaignSession = ({ gateway }) =>
@@ -15,6 +16,7 @@ export const createCampaignSession = ({ gateway }) =>
     let loading = null;
     let realigned = () => {};
     let dropped = () => {};
+    let equipmentDropped = () => {};
 
     const enqueue = (outcome) =>
     {
@@ -119,6 +121,12 @@ export const createCampaignSession = ({ gateway }) =>
             return campaign.encounter();
         },
 
+        //  Fired with the piece of equipment ({ piece, sold }) of each accepted report that dropped one
+        onEquipmentDrop: (callback) =>
+        {
+            equipmentDropped = callback;
+        },
+
         //  Sends the queued reports in order, one request at a time. A failed report stays first for the next flush.
         flush: async () =>
         {
@@ -155,6 +163,11 @@ export const createCampaignSession = ({ gateway }) =>
                     if (response?.drop)
                     {
                         dropped(response.drop);
+                    }
+
+                    if (response?.equipmentDrop)
+                    {
+                        equipmentDropped(response.equipmentDrop);
                     }
 
                     //  The chapter boss was the last report and the backend opened the next chapter: play it

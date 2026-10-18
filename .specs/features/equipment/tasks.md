@@ -527,10 +527,10 @@ T25
 
 **Done when**:
 
-- [ ] An accepted report with `equipmentDrop` fires the callback once with it; a report without it fires nothing
-- [ ] `campaignSession.test.js` and `farmSession.test.js` additions pass; `npm test` passes
+- [x] An accepted report with `equipmentDrop` fires the callback once with it; a report without it fires nothing
+- [x] `campaignSession.test.js` and `farmSession.test.js` additions pass; `npm test` passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
