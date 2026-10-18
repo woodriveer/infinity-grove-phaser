@@ -644,9 +644,10 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Every portrait and skill name of the seed has its `.jpg` in the folder
-- [ ] Build gate passes
+- [x] Every portrait and skill name of the seed has its `.jpg` in the folder
+- [x] Build gate passes
 
+**Status**: Done
 **Tests**: none (static assets)
 **Gate**: Build
 
