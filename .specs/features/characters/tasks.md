@@ -137,11 +137,12 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Five heroes with ids `kael`, `lyra`, `orina`, `seraphine`, `vex`, elements FIRE, NATURE, WATER, LIGHT, DARKNESS, in README order
-- [ ] Cooldowns match the README (Kael 20, 25, 30; Lyra 8, 30, 40; Orina 18, 35, 45; Seraphine 30, 25, 45; Vex 15, 35, 20) and every skill has an image name
-- [ ] Skill art names are the ones of the spec (`kael_dimensional_cut`, `kael_charge`, `kael_screen`, ..., `vex_bleeding_blow`) and portraits are the `*_position` names
-- [ ] `HeroSeedTest` passes; quick gate passes
+- [x] Five heroes with ids `kael`, `lyra`, `orina`, `seraphine`, `vex`, elements FIRE, NATURE, WATER, LIGHT, DARKNESS, in README order
+- [x] Cooldowns match the README (Kael 20, 25, 30; Lyra 8, 30, 40; Orina 18, 35, 45; Seraphine 30, 25, 45; Vex 15, 35, 20) and every skill has an image name
+- [x] Skill art names are the ones of the spec (`kael_dimensional_cut`, `kael_charge`, `kael_screen`, ..., `vex_bleeding_blow`) and portraits are the `*_position` names
+- [x] `HeroSeedTest` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
