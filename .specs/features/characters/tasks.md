@@ -984,11 +984,12 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Stars 0 gives three locked slots; stars 1 unlocks slot 1; stars 3 unlocks all
-- [ ] Each slot shows art, name and `<n>s`
-- [ ] Clicking a slot does not throw and does not call any callback
-- [ ] `skillBar.test.js` passes; quick gate passes
+- [x] Stars 0 gives three locked slots; stars 1 unlocks slot 1; stars 3 unlocks all
+- [x] Each slot shows art, name and `<n>s`
+- [x] Clicking a slot does not throw and does not call any callback
+- [x] `skillBar.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
