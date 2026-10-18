@@ -158,10 +158,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Codes are exactly `INVALID_STARTING_ELEMENT`, `INVALID_FUSION`, `HERO_NOT_FOUND`, `NOT_ENOUGH_CARDS`, `HERO_NOT_OWNED`, `DAILY_LIMIT_REACHED`, `BOSS_NOT_AVAILABLE`, `FARM_TOO_FAST`, `PLAYER_WITHOUT_HEROES`
-- [ ] `InvalidStartingElementException` lives in this file (T4 uses it)
-- [ ] `HeroExceptionsTest` asserts every code and base type; quick gate passes
+- [x] Codes are exactly `INVALID_STARTING_ELEMENT`, `INVALID_FUSION`, `HERO_NOT_FOUND`, `NOT_ENOUGH_CARDS`, `HERO_NOT_OWNED`, `DAILY_LIMIT_REACHED`, `BOSS_NOT_AVAILABLE`, `FARM_TOO_FAST`, `PLAYER_WITHOUT_HEROES`
+- [x] `InvalidStartingElementException` lives in this file (T4 uses it)
+- [x] `HeroExceptionsTest` asserts every code and base type; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
