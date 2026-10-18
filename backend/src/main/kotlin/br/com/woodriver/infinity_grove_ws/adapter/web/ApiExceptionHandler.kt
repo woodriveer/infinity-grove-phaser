@@ -1,6 +1,9 @@
 package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.domain.BusinessException
+import br.com.woodriver.infinity_grove_ws.domain.EquipmentConflictException
+import br.com.woodriver.infinity_grove_ws.domain.EquipmentNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.EquipmentRequestException
 import br.com.woodriver.infinity_grove_ws.domain.HeroConflictException
 import br.com.woodriver.infinity_grove_ws.domain.HeroNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.HeroRequestException
@@ -54,6 +57,15 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(HeroConflictException::class)
     fun heroConflict(e: HeroConflictException) = problem(HttpStatus.CONFLICT, e)
+
+    @ExceptionHandler(EquipmentRequestException::class)
+    fun equipmentRequest(e: EquipmentRequestException) = problem(HttpStatus.BAD_REQUEST, e)
+
+    @ExceptionHandler(EquipmentNotFoundException::class)
+    fun equipmentNotFound(e: EquipmentNotFoundException) = problem(HttpStatus.NOT_FOUND, e)
+
+    @ExceptionHandler(EquipmentConflictException::class)
+    fun equipmentConflict(e: EquipmentConflictException) = problem(HttpStatus.CONFLICT, e)
 
     @ExceptionHandler(BusinessException::class)
     fun business(e: BusinessException) = problem(HttpStatus.UNPROCESSABLE_CONTENT, e)

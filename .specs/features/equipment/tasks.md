@@ -341,12 +341,12 @@ T25
 
 **Done when**:
 
-- [ ] `GET /equipment` returns the pieces with refined values, `clickDamage`, `refineCost`, `rerollCost`, `sellPrice` and `heroId`, plus the capacity
-- [ ] Equip puts the piece on the hero, replaces the previous one and moves it from another hero; unequip empties the slot but keeps the piece
-- [ ] Unknown piece or another account's piece is 404 `EQUIPMENT_NOT_FOUND`; an unowned hero 409 `HERO_NOT_OWNED`; no token 401; nothing changes on an error
-- [ ] `EquipmentServiceTest` and `EquipmentControllerIT` pass; full backend gate passes
+- [x] `GET /equipment` returns the pieces with refined values, `clickDamage`, `refineCost`, `rerollCost`, `sellPrice` and `heroId`, plus the capacity
+- [x] Equip puts the piece on the hero, replaces the previous one and moves it from another hero; unequip empties the slot but keeps the piece
+- [x] Unknown piece or another account's piece is 404 `EQUIPMENT_NOT_FOUND`; an unowned hero 409 `HERO_NOT_OWNED`; no token 401; nothing changes on an error
+- [x] `EquipmentServiceTest` and `EquipmentControllerIT` pass; full backend gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 
