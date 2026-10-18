@@ -174,51 +174,51 @@ IDs follow the order of the criteria: EQP-01 to EQP-11 for "Boss drops equipment
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| EQP-01 | P1: Boss drops equipment | - | Pending |
-| EQP-02 | P1: Boss drops equipment | - | Pending |
-| EQP-03 | P1: Boss drops equipment | - | Pending |
-| EQP-04 | P1: Boss drops equipment | - | Pending |
-| EQP-05 | P1: Boss drops equipment | - | Pending |
-| EQP-06 | P1: Boss drops equipment | - | Pending |
-| EQP-07 | P1: Boss drops equipment | - | Pending |
-| EQP-08 | P1: Boss drops equipment | - | Pending |
-| EQP-09 | P1: Boss drops equipment | - | Pending |
-| EQP-10 | P1: Boss drops equipment | - | Pending |
-| EQP-11 | P1: Boss drops equipment | - | Pending |
-| EQP-12 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-13 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-14 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-15 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-16 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-17 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-18 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-19 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-20 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-21 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-22 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-23 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-24 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-25 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-26 | P1: Equip pieces and fight with them | - | Pending |
-| EQP-27 | P2: Refine with gold | - | Pending |
-| EQP-28 | P2: Refine with gold | - | Pending |
-| EQP-29 | P2: Refine with gold | - | Pending |
-| EQP-30 | P2: Refine with gold | - | Pending |
-| EQP-31 | P2: Refine with gold | - | Pending |
-| EQP-32 | P2: Refine with gold | - | Pending |
-| EQP-33 | P2: Refine with gold | - | Pending |
-| EQP-34 | P2: Reroll one affix | - | Pending |
-| EQP-35 | P2: Reroll one affix | - | Pending |
-| EQP-36 | P2: Reroll one affix | - | Pending |
-| EQP-37 | P2: Reroll one affix | - | Pending |
-| EQP-38 | P2: Reroll one affix | - | Pending |
-| EQP-39 | P2: Reroll one affix | - | Pending |
-| EQP-40 | P3: Sell a piece | - | Pending |
-| EQP-41 | P3: Sell a piece | - | Pending |
-| EQP-42 | P3: Sell a piece | - | Pending |
-| EQP-43 | P3: Sell a piece | - | Pending |
+| EQP-01 | P1: Boss drops equipment | T1-T25 | Verified |
+| EQP-02 | P1: Boss drops equipment | T1-T25 | Verified |
+| EQP-03 | P1: Boss drops equipment | T1-T25 | Verified |
+| EQP-04 | P1: Boss drops equipment | T1-T25 | Verified |
+| EQP-05 | P1: Boss drops equipment | T1-T25 | Verified |
+| EQP-06 | P1: Boss drops equipment | T1-T25 | Verified |
+| EQP-07 | P1: Boss drops equipment | T1-T25 | Verified |
+| EQP-08 | P1: Boss drops equipment | T1-T25 | Verified |
+| EQP-09 | P1: Boss drops equipment | T1-T25 | Verified |
+| EQP-10 | P1: Boss drops equipment | T1-T25 | Verified |
+| EQP-11 | P1: Boss drops equipment | T1-T25 | Verified |
+| EQP-12 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-13 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-14 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-15 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-16 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-17 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-18 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-19 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-20 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-21 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-22 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-23 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-24 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-25 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-26 | P1: Equip pieces and fight with them | T1-T25 | Verified |
+| EQP-27 | P2: Refine with gold | T1-T25 | Verified |
+| EQP-28 | P2: Refine with gold | T1-T25 | Verified |
+| EQP-29 | P2: Refine with gold | T1-T25 | Verified |
+| EQP-30 | P2: Refine with gold | T1-T25 | Verified |
+| EQP-31 | P2: Refine with gold | T1-T25 | Verified |
+| EQP-32 | P2: Refine with gold | T1-T25 | Verified |
+| EQP-33 | P2: Refine with gold | T1-T25 | Verified |
+| EQP-34 | P2: Reroll one affix | T1-T25 | Verified |
+| EQP-35 | P2: Reroll one affix | T1-T25 | Verified |
+| EQP-36 | P2: Reroll one affix | T1-T25 | Verified |
+| EQP-37 | P2: Reroll one affix | T1-T25 | Verified |
+| EQP-38 | P2: Reroll one affix | T1-T25 | Verified |
+| EQP-39 | P2: Reroll one affix | T1-T25 | Verified |
+| EQP-40 | P3: Sell a piece | T1-T25 | Verified |
+| EQP-41 | P3: Sell a piece | T1-T25 | Verified |
+| EQP-42 | P3: Sell a piece | T1-T25 | Verified |
+| EQP-43 | P3: Sell a piece | T1-T25 | Verified |
 
-**Coverage:** 43 total, 0 mapped to tasks, 43 unmapped ⚠️
+**Coverage:** 43 total, 43 mapped to tasks, 0 unmapped (Verifier PASS, `validation.md`)
 
 ---
 

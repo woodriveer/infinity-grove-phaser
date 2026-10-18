@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 18,
+  "next_id": 21,
   "lessons": [
     {
       "id": "L-001",
@@ -312,6 +312,60 @@
       ],
       "created": "2026-10-18T11:47:41Z",
       "last_seen": "2026-10-18T11:47:41Z"
+    },
+    {
+      "id": "L-018",
+      "key": "spec_precision_gap::state whether an absent field and an explicit null mean the same in a response or tests pin a serialization the spec never chose",
+      "text": "State whether an absent field and an explicit null mean the same in a response, or tests pin a serialization the spec never chose",
+      "signal": "spec_precision_gap",
+      "scope": "backend-api",
+      "status": "candidate",
+      "features": [
+        "equipment"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "EQP-07 EquipmentDropFlowIT.kt:74 (backend-api)"
+      ],
+      "created": "2026-10-18T20:27:08Z",
+      "last_seen": "2026-10-18T20:27:08Z"
+    },
+    {
+      "id": "L-019",
+      "key": "spec_precision_gap::say whether a random value is drawn and then scaled or drawn inside the scaled range or the roll is not reproducible from the spec",
+      "text": "Say whether a random value is drawn and then scaled or drawn inside the scaled range, or the roll is not reproducible from the spec",
+      "signal": "spec_precision_gap",
+      "scope": "backend-domain",
+      "status": "candidate",
+      "features": [
+        "equipment"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "EQP-03 PieceRollerTest.kt:121 (backend-domain)"
+      ],
+      "created": "2026-10-18T20:27:09Z",
+      "last_seen": "2026-10-18T20:27:09Z"
+    },
+    {
+      "id": "L-020",
+      "key": "spec_precision_gap::check that the catalog can reach the condition of an error criterion before writing it or the guard stays without a behavior test",
+      "text": "Check that the catalog can reach the condition of an error criterion before writing it, or the guard stays without a behavior test",
+      "signal": "spec_precision_gap",
+      "scope": "backend-domain",
+      "status": "candidate",
+      "features": [
+        "equipment"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "EQP-38 EquipmentExceptionsTest.kt (backend-domain)"
+      ],
+      "created": "2026-10-18T20:27:10Z",
+      "last_seen": "2026-10-18T20:27:10Z"
     }
   ]
 }

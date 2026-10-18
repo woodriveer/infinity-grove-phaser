@@ -76,11 +76,11 @@
 
 ## Handoff
 
-- **Feature**: .specs/features/characters (hero cards, bag, fusion, leader, farm; builds on stages, drops and elements)
-- **Phase / Task**: Done - T1 to T53 committed and pushed; Verifier PASS in iteration 2 (`validation.md`)
-- **Completed**: backend (hero catalog and seed, chapter order, `PlayerCards`, drops in the outcome transaction, `GET /heroes`, fuse, `PUT /leader`, `GET /farm`, `POST /farm/outcome`, registration with `startingElement`), game (hero screens, skill bar, card notice, farm mode, sign up choice), e2e (registration, heroes, farm), ADRs backend 0007 and game 0009, AD-005 to AD-007
+- **Feature**: .specs/features/equipment (server-rolled equipment, equip per hero, refine, reroll and sell with copper; builds on characters, drops and wallet)
+- **Phase / Task**: Done - T1 to T26 committed and pushed; Verifier PASS (`validation.md`)
+- **Completed**: backend (item model, roll, `PlayerEquipment`, `equipment_pieces`, drops in the campaign and farm reports, `GET /equipment`, equip, unequip, refine, reroll, sell, ADR 0008, AD-009), game (damage with pierce and boss damage, attacker from worn pieces, boss time bonus, equipment screen and notice, wallet update after actions), e2e (`equipment.spec.js` and the equipment routes of the fake backend)
 - **In-progress** (file:line): none
-- **Next step**: `hero-combat` (execute the skills, leader bonus, hero stats) and TD-001 (translate the existing English text)
+- **Next step**: account level / prestige and the talent tree (each its own spec; out of scope of equipment), then `hero-combat`; known lag: the wallet text does not refresh after a drop sold into a full bag until the next kill sync
 - **Blockers**: none
 - **Uncommitted files**: `game/public/assets/coin-*.png` (the owner coin art, never staged)
 - **Branch**: main

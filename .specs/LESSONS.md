@@ -114,6 +114,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: mutant G7 game/src/adapters/phaser/views/bagView.js:45; Screens AC 5 label (game-ui)
 - last seen: 2026-10-18T11:47:41Z
 
+### L-018 - State whether an absent field and an explicit null mean the same in a response, or tests pin a serialization the spec never chose
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `backend-api` · harmful: 0
+- features: equipment
+- evidence: EQP-07 EquipmentDropFlowIT.kt:74 (backend-api)
+- last seen: 2026-10-18T20:27:08Z
+
+### L-019 - Say whether a random value is drawn and then scaled or drawn inside the scaled range, or the roll is not reproducible from the spec
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `backend-domain` · harmful: 0
+- features: equipment
+- evidence: EQP-03 PieceRollerTest.kt:121 (backend-domain)
+- last seen: 2026-10-18T20:27:09Z
+
+### L-020 - Check that the catalog can reach the condition of an error criterion before writing it, or the guard stays without a behavior test
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `backend-domain` · harmful: 0
+- features: equipment
+- evidence: EQP-38 EquipmentExceptionsTest.kt (backend-domain)
+- last seen: 2026-10-18T20:27:10Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

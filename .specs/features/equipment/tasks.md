@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/equipment/design.md`
-**Status**: In Progress (approved by the owner: "Pode seguir com a implementação"; executed inline, no sub-agents)
+**Status**: Done, Verifier PASS (`validation.md`; approved by the owner: "Pode seguir com a implementação"; executed inline, no sub-agents)
 
 Paths: `BE` = `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws`, `BT` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws`, `GS` = `game/src`.
 
@@ -626,7 +626,7 @@ T25 → T26
 
 ### T26: Feature documentation
 
-**What**: Close traceability in `spec.md`, mark the tasks done, update the game readme.
+**What**: Close traceability in `spec.md`, mark the tasks done, record the game ADR 0010, the handoff and the Verifier report.
 **Where**: `.specs/features/equipment/spec.md` (modify)
 **Depends on**: T25
 **Reuses**: n/a
@@ -634,9 +634,9 @@ T25 → T26
 
 **Done when**:
 
-- [ ] Every requirement is `Verified` in the traceability table and the coverage line says 43 mapped
-- [ ] Build gates of backend and game pass
+- [x] Every requirement is `Verified` in the traceability table and the coverage line says 43 mapped
+- [x] Build gates of backend and game pass
 
-**Status**: Pending
+**Status**: Done
 **Tests**: none
 **Gate**: Build
