@@ -1,6 +1,9 @@
 package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.domain.BusinessException
+import br.com.woodriver.infinity_grove_ws.domain.HeroConflictException
+import br.com.woodriver.infinity_grove_ws.domain.HeroNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.HeroRequestException
 import br.com.woodriver.infinity_grove_ws.domain.InvalidRefreshTokenException
 import br.com.woodriver.infinity_grove_ws.domain.LoginException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
@@ -42,6 +45,15 @@ class ApiExceptionHandler {
     @ExceptionHandler(ProgressConflictException::class)
     fun progressConflict(e: ProgressConflictException) =
         problem(HttpStatus.CONFLICT, e).apply { setProperty("progress", ProgressResponse.from(e.current)) }
+
+    @ExceptionHandler(HeroRequestException::class)
+    fun heroRequest(e: HeroRequestException) = problem(HttpStatus.BAD_REQUEST, e)
+
+    @ExceptionHandler(HeroNotFoundException::class)
+    fun heroNotFound(e: HeroNotFoundException) = problem(HttpStatus.NOT_FOUND, e)
+
+    @ExceptionHandler(HeroConflictException::class)
+    fun heroConflict(e: HeroConflictException) = problem(HttpStatus.CONFLICT, e)
 
     @ExceptionHandler(BusinessException::class)
     fun business(e: BusinessException) = problem(HttpStatus.UNPROCESSABLE_CONTENT, e)

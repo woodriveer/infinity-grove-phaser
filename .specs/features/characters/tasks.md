@@ -408,9 +408,10 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Each base maps to its status and carries the exception `code` property
-- [ ] `ApiExceptionHandlerTest` passes; quick gate passes
+- [x] Each base maps to its status and carries the exception `code` property
+- [x] `ApiExceptionHandlerTest` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
