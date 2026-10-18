@@ -548,12 +548,12 @@ T25
 
 **Done when**:
 
-- [ ] Lists each piece with slot, rarity, `+n`, affixes (label and refined value) and, for a weapon, `Dano de clique: <1 decimal>`
-- [ ] An empty bag shows `Nenhum equipamento ainda. Vença chefes para encontrar peças.`; a failed load shows `Equipamento indisponível`
-- [ ] The detail shows the next refine cost in gold, silver and copper and disables Refinar when the wallet is lower; at +10 there is no Refinar; from +5 each affix has Rerrolar with the cost; Vender shows the price
-- [ ] `equipmentView.test.js` passes; `npm test` passes
+- [x] Lists each piece with slot, rarity, `+n`, affixes (label and refined value) and, for a weapon, `Dano de clique: <1 decimal>`
+- [x] An empty bag shows `Nenhum equipamento ainda. Vença chefes para encontrar peças.`; a failed load shows `Equipamento indisponível`
+- [x] The detail shows the next refine cost in gold, silver and copper and disables Refinar when the wallet is lower; at +10 there is no Refinar; from +5 each affix has Rerrolar with the cost; Vender shows the price
+- [x] `equipmentView.test.js` passes; `npm test` passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
