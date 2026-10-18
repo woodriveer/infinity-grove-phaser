@@ -209,18 +209,18 @@ T25
 ### T6: Equipment port and entity
 
 **What**: `EquipmentRepositoryPort` and the JPA entity `equipment_pieces` with domain mapping.
-**Where**: `BE/adapter/repository/EquipmentEntities.kt`
+**Where**: `BE/adapter/repository/PieceEntity.kt`
 **Depends on**: T5
 **Reuses**: `PlayerCardsEntities.kt`, `HeroPorts.kt`
 **Requirement**: EQP-01
 
 **Done when**:
 
-- [ ] The port exposes `findAll(username)`, `save(piece)`, `delete(id)`, `deleteByUsername(username)`
-- [ ] The entity maps every `Piece` field, affixes as `TYPE:base` joined by commas, both ways
-- [ ] Build gate passes
+- [x] The port exposes `findAll(username)`, `save(piece)`, `delete(id)`, `deleteByUsername(username)`
+- [x] The entity maps every `Piece` field, affixes as `TYPE:base` joined by commas, both ways
+- [x] Build gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: none
 **Gate**: Build
 
