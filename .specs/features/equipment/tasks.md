@@ -150,13 +150,13 @@ T25
 
 **Done when**:
 
-- [ ] A miniboss roll drops only when `chance() < 0.25`; a chapter boss at `1.0`; a `PHASE` encounter never rolls (and reads no chance)
-- [ ] Rarity follows the weights (miniboss 60/30/10, chapter boss 40/40/15/5) at the boundary rolls of a scripted `chance`
-- [ ] A weapon gets a base click damage in 2..5 times the rarity multiplier (floored) and no `CLICK_DAMAGE_PCT`; other slots get none and may roll it
-- [ ] Each piece has as many distinct affix types as its rarity allows, each base inside the type's range times the multiplier, floored
-- [ ] `PieceRollerTest` passes; quick gate passes
+- [x] A miniboss roll drops only when `chance() < 0.25`; a chapter boss at `1.0`; a `PHASE` encounter never rolls (and reads no chance)
+- [x] Rarity follows the weights (miniboss 60/30/10, chapter boss 40/40/15/5) at the boundary rolls of a scripted `chance`
+- [x] A weapon gets a base click damage in 2..5 times the rarity multiplier (floored) and no `CLICK_DAMAGE_PCT`; other slots get none and may roll it
+- [x] Each piece has as many distinct affix types as its rarity allows, each base inside the type's range times the multiplier, floored
+- [x] `PieceRollerTest` passes; quick gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 

@@ -19,6 +19,14 @@ enum class Rarity(
     RARE(3, 3, 1.5, 3),
     EPIC(4, 4, 1.8, 5),
     LEGENDARY(5, 4, 2.2, 8),
+    ;
+
+    /** [value] times the rarity multiplier, rounded down (whole tenths, so no floating point rounding decides the result). */
+    fun scale(value: Int): Int = value * Math.round(valueMultiplier * TENTHS).toInt() / TENTHS
+
+    private companion object {
+        const val TENTHS = 10
+    }
 }
 
 /** A kind of attribute a piece can carry, rolled between [min] and [max] before the rarity multiplier. The weapon has its own click damage. */
