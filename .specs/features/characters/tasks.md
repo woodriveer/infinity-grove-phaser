@@ -583,11 +583,12 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `GET /farm` answers the bosses and wins left; 401 without a token
-- [ ] A valid farm win answers 200 with `drop` and `chapterBossWinsLeft`
-- [ ] 409 with `code` `DAILY_LIMIT_REACHED`, `BOSS_NOT_AVAILABLE` and `FARM_TOO_FAST`; 400 for a malformed body
-- [ ] `FarmControllerIT` passes; full backend gate passes
+- [x] `GET /farm` answers the bosses and wins left; 401 without a token
+- [x] A valid farm win answers 200 with `drop` and `chapterBossWinsLeft`
+- [x] 409 with `code` `DAILY_LIMIT_REACHED`, `BOSS_NOT_AVAILABLE` and `FARM_TOO_FAST`; 400 for a malformed body
+- [x] `FarmControllerIT` passes; full backend gate passes
 
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 
