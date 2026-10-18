@@ -28,17 +28,22 @@ class CardRewards(
 
     fun rates() = dropRates
 
-    /** Rolls the card of a won [encounter] of [chapter] and returns the cards with it added and the chapter boss win recorded. */
+    /**
+     * Rolls the card of a won [encounter] at [stage] of [chapter] and returns the cards with it added and the chapter boss win recorded.
+     * The [stage] sets the miniboss chance; the chapter boss ignores it.
+     */
     fun award(
         cards: PlayerCards,
         encounter: Encounter,
         chapter: Int,
+        stage: Int,
     ): Pair<PlayerCards, CardDrop?> {
         val chapterBoss = encounter == Encounter.CHAPTER_BOSS
         val hero =
             CardDropper.drop(
                 encounter,
                 chapter,
+                stage,
                 cards.startingElement,
                 firstChapterBossWin = chapterBoss && !cards.bosses.hasWon(chapter),
                 rates = dropRates,

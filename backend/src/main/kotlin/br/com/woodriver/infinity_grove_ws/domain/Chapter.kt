@@ -100,7 +100,10 @@ data class ChapterDefinition(
                         val element = Element.entries[(n - 1 + number - 1) % Element.entries.size]
                         val defense = minOf(MINIBOSS_BASE_DEFENSE + n + defenseBonus, EnemyStats.MAX_DEFENSE)
                         val critResistance =
-                            minOf(MINIBOSS_BASE_CRIT_RESISTANCE + MINIBOSS_CRIT_RESISTANCE_PER_STAGE * n + defenseBonus, EnemyStats.MAX_CRIT_RESISTANCE)
+                            minOf(
+                                MINIBOSS_BASE_CRIT_RESISTANCE + MINIBOSS_CRIT_RESISTANCE_PER_STAGE * n + defenseBonus,
+                                EnemyStats.MAX_CRIT_RESISTANCE,
+                            )
                         StageDefinition(
                             number = n,
                             phasesPerStage = PHASES_PER_STAGE,

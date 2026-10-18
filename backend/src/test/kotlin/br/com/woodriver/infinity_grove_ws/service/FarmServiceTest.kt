@@ -36,7 +36,8 @@ class FarmServiceTest {
     private val progresses = InMemoryProgressRepository()
     private val playerCards = InMemoryPlayerCardsRepository()
     private val users = InMemoryUserRepository()
-    private val rates = CardDropRates(minibossRate = 0.01, chapterBossRate = 0.10, chapterBossDailyLimit = 10, farmMinIntervalMs = 5000)
+    private val rates =
+        CardDropRates(minibossRatePerStage = 0.02, chapterBossRate = 0.30, chapterBossDailyLimit = 10, farmMinIntervalMs = 5000)
     private val today = LocalDate.of(2026, 10, 18)
     private val clock = MutableClock(today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() + 10 * 3_600_000L)
     private var chance = SequenceChanceRoller(0.5)
@@ -114,7 +115,7 @@ class FarmServiceTest {
     }
 
     @Test
-    fun `a miniboss farm win with a roll below one percent drops a blank card of the chapter hero`() {
+    fun `a stage 3 miniboss farm win with a roll below six percent drops a blank card of the chapter hero`() {
         player()
         chance = SequenceChanceRoller(0.0)
 
@@ -125,9 +126,9 @@ class FarmServiceTest {
     }
 
     @Test
-    fun `a miniboss farm win with a roll of one percent or more drops nothing`() {
+    fun `a stage 3 miniboss farm win with a roll of six percent or more drops nothing`() {
         player()
-        chance = SequenceChanceRoller(0.01)
+        chance = SequenceChanceRoller(0.06)
 
         assertNull(service.report("yan", miniboss3, Outcome.CLEARED).drop)
         assertEquals(1, blank("kael"))
@@ -141,9 +142,9 @@ class FarmServiceTest {
     }
 
     @Test
-    fun `a chapter boss farm win rolls ten percent for the next chapter hero and counts for today`() {
+    fun `a chapter boss farm win rolls thirty percent for the next chapter hero and counts for today`() {
         player()
-        chance = SequenceChanceRoller(0.0999)
+        chance = SequenceChanceRoller(0.2999)
 
         val result = service.report("yan", chapterBoss, Outcome.CLEARED)
 
@@ -154,9 +155,9 @@ class FarmServiceTest {
     }
 
     @Test
-    fun `a chapter boss farm win with a roll of ten percent or more drops nothing but still counts`() {
+    fun `a chapter boss farm win with a roll of thirty percent or more drops nothing but still counts`() {
         player()
-        chance = SequenceChanceRoller(0.10)
+        chance = SequenceChanceRoller(0.30)
 
         val result = service.report("yan", chapterBoss, Outcome.CLEARED)
 

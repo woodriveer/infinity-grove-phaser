@@ -6,7 +6,8 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 class CardDropsTest {
-    private val rates = CardDropRates(minibossRate = 0.01, chapterBossRate = 0.10, chapterBossDailyLimit = 10, farmMinIntervalMs = 5000)
+    private val rates =
+        CardDropRates(minibossRatePerStage = 0.02, chapterBossRate = 0.30, chapterBossDailyLimit = 10, farmMinIntervalMs = 5000)
     private val heroes = HeroSeed.heroes()
 
     private var reads = 0
@@ -15,24 +16,44 @@ class CardDropsTest {
         encounter: Encounter,
         chance: Double,
         chapter: Int = 1,
+        stage: Int = 1,
         start: Element = Element.FIRE,
         first: Boolean = false,
     ) = CardDropper
-        .drop(encounter, chapter, start, first, rates, heroes) {
+        .drop(encounter, chapter, stage, start, first, rates, heroes) {
             reads += 1
             chance
         }?.id
 
     @Test
-    fun `a miniboss drops the hero of its chapter below one percent`() {
+    fun `the stage 1 miniboss drops the hero of its chapter below two percent`() {
         assertEquals("kael", drop(Encounter.MINIBOSS, 0.0))
-        assertEquals("kael", drop(Encounter.MINIBOSS, 0.0099))
+        assertEquals("kael", drop(Encounter.MINIBOSS, 0.0199))
     }
 
     @Test
-    fun `a miniboss drops nothing from one percent up`() {
-        assertNull(drop(Encounter.MINIBOSS, 0.01))
+    fun `the stage 1 miniboss drops nothing from two percent up`() {
+        assertNull(drop(Encounter.MINIBOSS, 0.02))
         assertNull(drop(Encounter.MINIBOSS, 0.99))
+    }
+
+    @Test
+    fun `the miniboss chance grows two percent a stage up to twenty percent on stage 10`() {
+        assertEquals("kael", drop(Encounter.MINIBOSS, 0.0599, stage = 3))
+        assertNull(drop(Encounter.MINIBOSS, 0.06, stage = 3))
+        assertEquals("kael", drop(Encounter.MINIBOSS, 0.1999, stage = 10))
+        assertNull(drop(Encounter.MINIBOSS, 0.20, stage = 10))
+    }
+
+    @Test
+    fun `the miniboss chance restarts with the stage of every chapter`() {
+        assertEquals("lyra", drop(Encounter.MINIBOSS, 0.0199, chapter = 2, stage = 1))
+        assertNull(drop(Encounter.MINIBOSS, 0.02, chapter = 2, stage = 1))
+    }
+
+    @Test
+    fun `the miniboss chance never goes above one`() {
+        assertEquals(1.0, CardDropRates(0.5, 0.3, 10, 5000).minibossRate(3))
     }
 
     @Test
@@ -49,10 +70,10 @@ class CardDropsTest {
     }
 
     @Test
-    fun `later chapter boss wins drop the next chapter hero below ten percent`() {
+    fun `later chapter boss wins drop the next chapter hero below thirty percent whatever the stage`() {
         assertEquals("lyra", drop(Encounter.CHAPTER_BOSS, 0.0))
-        assertEquals("lyra", drop(Encounter.CHAPTER_BOSS, 0.0999))
-        assertNull(drop(Encounter.CHAPTER_BOSS, 0.10))
+        assertEquals("lyra", drop(Encounter.CHAPTER_BOSS, 0.2999, stage = 0))
+        assertNull(drop(Encounter.CHAPTER_BOSS, 0.30))
         assertNull(drop(Encounter.CHAPTER_BOSS, 0.99))
     }
 
@@ -67,7 +88,7 @@ class CardDropsTest {
     fun `the last chapter boss drops the hero of chapter five`() {
         assertEquals("seraphine", drop(Encounter.CHAPTER_BOSS, 0.0, chapter = 5, first = true))
         assertEquals("seraphine", drop(Encounter.CHAPTER_BOSS, 0.05, chapter = 5))
-        assertNull(drop(Encounter.CHAPTER_BOSS, 0.10, chapter = 5))
+        assertNull(drop(Encounter.CHAPTER_BOSS, 0.30, chapter = 5))
     }
 
     @Test

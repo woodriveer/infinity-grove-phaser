@@ -39,7 +39,8 @@ class ProgressServiceTest {
     private val chapters = InMemoryChapterRepository(*(1..5).map(ChapterDefinition::of).toTypedArray())
     private val heroes = InMemoryHeroRepository(*HeroSeed.heroes().toTypedArray())
     private val playerCards = InMemoryPlayerCardsRepository()
-    private val rates = CardDropRates(minibossRate = 0.01, chapterBossRate = 0.10, chapterBossDailyLimit = 10, farmMinIntervalMs = 5000)
+    private val rates =
+        CardDropRates(minibossRatePerStage = 0.02, chapterBossRate = 0.30, chapterBossDailyLimit = 10, farmMinIntervalMs = 5000)
     private val today = LocalDate.of(2026, 10, 18)
     private val clock = MutableClock(today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() + 10 * 3_600_000L)
     private var chance = SequenceChanceRoller(0.5)
@@ -162,7 +163,7 @@ class ProgressServiceTest {
     private fun blankCopies(heroId: String) = playerCards.cards.getValue("yan").copiesOf(heroId, 0)
 
     @Test
-    fun `a won miniboss with a roll below one percent drops a blank card of the chapter hero`() {
+    fun `a won stage 1 miniboss with a roll below two percent drops a blank card of the chapter hero`() {
         playerAt(miniboss)
         chance = SequenceChanceRoller(0.0)
 
@@ -207,14 +208,23 @@ class ProgressServiceTest {
     }
 
     @Test
-    fun `a won miniboss with a roll of one percent or more drops nothing`() {
+    fun `a won stage 1 miniboss with a roll of two percent or more drops nothing`() {
         playerAt(miniboss)
-        chance = SequenceChanceRoller(0.01)
+        chance = SequenceChanceRoller(0.02)
 
         val result = service.report("yan", miniboss, Outcome.CLEARED)
 
         assertNull(result.drop)
         assertEquals(1, blankCopies("kael"))
+    }
+
+    @Test
+    fun `a won stage 5 miniboss rolls ten percent`() {
+        val stage5 = ProgressPosition(1, 5, Encounter.MINIBOSS, 1)
+        playerAt(stage5)
+        chance = SequenceChanceRoller(0.0999)
+
+        assertEquals("kael", service.report("yan", stage5, Outcome.CLEARED).drop?.heroId)
     }
 
     @Test
@@ -278,18 +288,18 @@ class ProgressServiceTest {
     }
 
     @Test
-    fun `a later chapter boss win rolls ten percent for the next chapter hero`() {
+    fun `a later chapter boss win rolls thirty percent for the next chapter hero`() {
         playerAt(chapterBoss, bosses = BossRecord(clearedChapters = setOf(1)))
-        chance = SequenceChanceRoller(0.0999)
+        chance = SequenceChanceRoller(0.2999)
 
         assertEquals("lyra", service.report("yan", chapterBoss, Outcome.CLEARED).drop?.heroId)
         assertEquals(1, chance.reads)
     }
 
     @Test
-    fun `a later chapter boss win with a roll of ten percent or more drops nothing but still counts`() {
+    fun `a later chapter boss win with a roll of thirty percent or more drops nothing but still counts`() {
         playerAt(chapterBoss, bosses = BossRecord(clearedChapters = setOf(1)))
-        chance = SequenceChanceRoller(0.10)
+        chance = SequenceChanceRoller(0.30)
 
         val result = service.report("yan", chapterBoss, Outcome.CLEARED)
 

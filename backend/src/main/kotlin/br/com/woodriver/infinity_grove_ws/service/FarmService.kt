@@ -56,7 +56,8 @@ class FarmService(
         val rates = rewards.rates()
         if (boss.kind == Encounter.CHAPTER_BOSS) cards.bosses.requireWinsLeft(rewards.today(), rates.chapterBossDailyLimit)
         val spaced = cards.withBosses(cards.bosses.afterFarmWin(rewards.now(), rates.farmMinIntervalMs))
-        val (updated, drop) = rewards.award(spaced, boss.kind, progress.position.chapter)
+        // A farmed miniboss rolls the chance of its own stage; the chapter boss has no stage
+        val (updated, drop) = rewards.award(spaced, boss.kind, progress.position.chapter, boss.stage ?: 0)
         playerCardsRepository.save(updated)
         return FarmResult(drop, winsLeft(updated))
     }

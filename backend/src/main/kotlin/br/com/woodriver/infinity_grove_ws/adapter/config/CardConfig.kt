@@ -8,11 +8,14 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.concurrent.ThreadLocalRandom
 
-/** Card settings bound from `app.cards.*`: a miniboss drops a card 1 %, the chapter boss 10 %, at most 10 chapter boss wins a day. */
+/**
+ * Card settings bound from `app.cards.*`: the miniboss of stage n drops a card at 2 % times n (2 % to 20 % over a chapter), a repeated
+ * chapter boss win at 30 % (10 % above the last miniboss), at most 10 chapter boss wins a day.
+ */
 @ConfigurationProperties("app.cards")
 data class CardProperties(
-    val minibossRate: Double = 0.01,
-    val chapterBossRate: Double = 0.10,
+    val minibossRatePerStage: Double = 0.02,
+    val chapterBossRate: Double = 0.30,
     val chapterBossDailyLimit: Int = 10,
     val farmMinIntervalMs: Long = 5000,
 )
@@ -23,7 +26,12 @@ class CardConfig {
     /** Values are validated when [CardDropRates] is built, so startup fails on a bad setting. */
     @Bean
     fun cardDropRates(properties: CardProperties) =
-        CardDropRates(properties.minibossRate, properties.chapterBossRate, properties.chapterBossDailyLimit, properties.farmMinIntervalMs)
+        CardDropRates(
+            properties.minibossRatePerStage,
+            properties.chapterBossRate,
+            properties.chapterBossDailyLimit,
+            properties.farmMinIntervalMs,
+        )
 
     @Bean
     fun chanceRoller(): ChanceRollerPort = RandomChanceRoller()

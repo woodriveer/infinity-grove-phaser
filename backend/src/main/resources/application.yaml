@@ -25,9 +25,9 @@ app:
         max-copper: 5
         kill-interval-ms: 1500
   cards:
-    # chance a miniboss win drops a hero card, chance a repeated chapter boss win does (the first win always does),
-    # chapter boss wins counted per UTC day, and the shortest time between two farm wins
-    miniboss-rate: 1.0
-    chapter-boss-rate: 1.0
+    # miniboss chance per stage (stage n drops a hero card at n times it: 2 % to 20 % over a chapter), chance a repeated chapter
+    # boss win does (the first win always does), chapter boss wins counted per UTC day, and the shortest time between two farm wins
+    miniboss-rate-per-stage: 0.02
+    chapter-boss-rate: 0.30
     chapter-boss-daily-limit: 10
     farm-min-interval-ms: 5000

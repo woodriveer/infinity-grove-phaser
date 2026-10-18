@@ -57,8 +57,8 @@ const val TEST_JWT_SECRET = "integration-test-secret-0123456789-abcdef"
     properties = [
         "app.security.jwt-secret=$TEST_JWT_SECRET",
         // the tests roll against the original chances; the shipped yaml makes every boss win drop a card
-        "app.cards.miniboss-rate=0.01",
-        "app.cards.chapter-boss-rate=0.10",
+        "app.cards.miniboss-rate-per-stage=0.02",
+        "app.cards.chapter-boss-rate=0.30",
     ],
 )
 @Import(PostgresTestConfiguration::class, ChanceTestConfiguration::class)
