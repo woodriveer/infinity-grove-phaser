@@ -193,12 +193,12 @@ T25
 
 **Done when**:
 
-- [ ] `add` stores a piece below capacity and reports `stored false` at 100 pieces
-- [ ] `equip` puts the piece on the hero's slot, unwears the previous piece of that slot, and moves a piece worn by another hero leaving that slot empty
-- [ ] `unequip` keeps the piece; `remove` of a worn piece unwears it first; an unknown id throws `EquipmentNotFoundException`
-- [ ] `PlayerEquipmentTest` passes; quick gate passes
+- [x] `add` stores a piece below capacity and reports `stored false` at 100 pieces
+- [x] `equip` puts the piece on the hero's slot, unwears the previous piece of that slot, and moves a piece worn by another hero leaving that slot empty
+- [x] `unequip` keeps the piece; `remove` of a worn piece unwears it first; an unknown id throws `EquipmentNotFoundException`
+- [x] `PlayerEquipmentTest` passes; quick gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
