@@ -74,6 +74,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: STG-19, STG-22 (validation.md G1, G2) (game)
 - last seen: 2026-10-17T19:41:03Z
 
+### L-011 - Assert an error requirement at the layer the spec names (HTTP status and no spawn), not only at the repository that raises it
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `backend` · harmful: 0
+- features: elements
+- evidence: ELEM-02 AC4 / ChapterRepositoryIT.kt:108 (backend)
+- last seen: 2026-10-18T01:57:12Z
+
+### L-012 - Write the rounding precision into the spec when a rule says exact but the implementation must round to avoid float dust
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `domain` · harmful: 0
+- features: elements
+- evidence: ELEM-01 AC9 vs monster.js:93 (domain)
+- last seen: 2026-10-18T01:57:12Z
+
+### L-013 - Define the exact visual marker or text format in the spec when an AC says mark or show, so tests pin a spec value
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `scene` · harmful: 0
+- features: elements
+- evidence: ELEM-03 AC8 / ELEM-04 AC1 (scene)
+- last seen: 2026-10-18T01:57:13Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

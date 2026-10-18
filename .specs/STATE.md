@@ -36,11 +36,11 @@
 
 ## Handoff
 
-- **Feature**: .specs/features/stages (builds on wallet and drops)
-- **Phase / Task**: Done - stages T1-T23 committed and pushed, Verifier-style report PASS (`validation.md`, 28/28 ACs, 10/10 mutants killed)
-- **Completed**: stages T1-T23 (backend domain, service, persistence, seeder, endpoints; game refactor to ADR 0007; campaign domain, session, http adapter, scene flow, saving, e2e); earlier wallet T1-T17 and drops T1-T10
+- **Feature**: .specs/features/elements (builds on stages)
+- **Phase / Task**: Done - elements T1-T8 committed and pushed, Verifier report PASS (`validation.md`, 30/30 mutants killed)
+- **Completed**: elements T1-T8 (backend EnemyStats and columns, `/progress` payload, game element table, damage formula, scene HUD, e2e); earlier stages, wallet and drops; pause menu and farm toggle (`26e1ccb`)
 - **In-progress** (file:line): none
-- **Next step**: Run the backend (port 8080, `JWT_SECRET` set) and `npm run dev` together once by hand to see the real `/progress` flow (gap G4: the two sides are verified separately); decide the wording of the countdown (`Time: N`) and the completion message (`Chapter complete!`) (gaps G1, G2); the persistent-session gap G-3 (401-after-refresh from an in-game call) now also applies to `GET /progress` and `POST /progress/outcome`
+- **Next step**: characters with their own element, damage type and critical stats (the player is fire, physical, 10 % critical until then); decide the HUD wording of the enemy line and the critical mark (spec-precision gaps in `validation.md`)
 - **Blockers**: none
-- **Uncommitted files**: `game/src/adapters/phaser/Preloader.js` (the owner's switch of the coin atlas image to `coin-copper.png`) and `game/public/assets/coin-*.png`; they predate this feature and were never staged
+- **Uncommitted files**: `game/src/adapters/phaser/Preloader.js` (the owner's coin atlas switch) and `game/public/assets/coin-*.png`; they predate this feature and were never staged
 - **Branch**: main

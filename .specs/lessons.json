@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 11,
+  "next_id": 14,
   "lessons": [
     {
       "id": "L-001",
@@ -184,6 +184,60 @@
       ],
       "created": "2026-10-17T19:41:03Z",
       "last_seen": "2026-10-17T19:41:03Z"
+    },
+    {
+      "id": "L-011",
+      "key": "ac_gap::assert an error requirement at the layer the spec names http status and no spawn not only at the repository that raises it",
+      "text": "Assert an error requirement at the layer the spec names (HTTP status and no spawn), not only at the repository that raises it",
+      "signal": "ac_gap",
+      "scope": "backend",
+      "status": "candidate",
+      "features": [
+        "elements"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "ELEM-02 AC4 / ChapterRepositoryIT.kt:108 (backend)"
+      ],
+      "created": "2026-10-18T01:57:12Z",
+      "last_seen": "2026-10-18T01:57:12Z"
+    },
+    {
+      "id": "L-012",
+      "key": "spec_precision_gap::write the rounding precision into the spec when a rule says exact but the implementation must round to avoid float dust",
+      "text": "Write the rounding precision into the spec when a rule says exact but the implementation must round to avoid float dust",
+      "signal": "spec_precision_gap",
+      "scope": "domain",
+      "status": "candidate",
+      "features": [
+        "elements"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "ELEM-01 AC9 vs monster.js:93 (domain)"
+      ],
+      "created": "2026-10-18T01:57:12Z",
+      "last_seen": "2026-10-18T01:57:12Z"
+    },
+    {
+      "id": "L-013",
+      "key": "spec_precision_gap::define the exact visual marker or text format in the spec when an ac says mark or show so tests pin a spec value",
+      "text": "Define the exact visual marker or text format in the spec when an AC says mark or show, so tests pin a spec value",
+      "signal": "spec_precision_gap",
+      "scope": "scene",
+      "status": "candidate",
+      "features": [
+        "elements"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "ELEM-03 AC8 / ELEM-04 AC1 (scene)"
+      ],
+      "created": "2026-10-18T01:57:13Z",
+      "last_seen": "2026-10-18T01:57:13Z"
     }
   ]
 }
