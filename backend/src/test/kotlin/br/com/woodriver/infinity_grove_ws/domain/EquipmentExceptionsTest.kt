@@ -3,6 +3,7 @@ package br.com.woodriver.infinity_grove_ws.domain
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class EquipmentExceptionsTest {
     @Test
@@ -18,7 +19,7 @@ class EquipmentExceptionsTest {
         val e = EquipmentNotFoundException("p1")
 
         assertEquals("EQUIPMENT_NOT_FOUND", e.code)
-        assertEquals(BusinessException::class.java, e.javaClass.superclass)
+        assertTrue(e.javaClass.superclass == BusinessException::class.java)
     }
 
     @Test
