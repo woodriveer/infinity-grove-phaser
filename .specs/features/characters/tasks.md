@@ -964,11 +964,12 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Names read `Miniboss <stage>` and `Chefe do capítulo`, the latter with `<n> vitórias restantes hoje`
-- [ ] The chapter boss button is disabled at 0 wins left
-- [ ] Picking a boss calls the callback with `{ kind, stage }`
-- [ ] `farmView.test.js` passes; quick gate passes
+- [x] Names read `Miniboss <stage>` and `Chefe do capítulo`, the latter with `<n> vitórias restantes hoje`
+- [x] The chapter boss button is disabled at 0 wins left
+- [x] Picking a boss calls the callback with `{ kind, stage }`
+- [x] `farmView.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
