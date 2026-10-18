@@ -824,10 +824,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `services` has `createHeroCollection` and `createFarmSession` returning fresh services
-- [ ] `composition.test.js` asserts the keys; architecture test still passes
-- [ ] Build gate passes
+- [x] `services` has `createHeroCollection` and `createFarmSession` returning fresh services
+- [x] `composition.test.js` asserts the keys; architecture test still passes
+- [x] Build gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Build
 
