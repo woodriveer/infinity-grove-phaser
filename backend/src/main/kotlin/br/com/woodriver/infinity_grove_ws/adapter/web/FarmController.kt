@@ -67,7 +67,7 @@ class FarmController(
         val kind = Encounter.entries.firstOrNull { it.name == fields["kind"] } ?: throw IllegalArgumentException("boss kind is unknown")
         val stage = fields["stage"]
         require(stage == null || stage is Int) { "boss stage must be an integer" }
-        return FarmBoss(kind, stage as Int?)
+        return FarmBoss(kind, stage)
     }
 
     private fun parseOutcome(value: Any?): Outcome =

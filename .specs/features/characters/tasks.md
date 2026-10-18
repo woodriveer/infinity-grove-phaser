@@ -604,10 +604,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] A player registers with FIRE, receives Kael, wins a miniboss with a forced drop, holds 2 blank Kael cards, receives a second blank card at the next forced drop and a third, fuses stars 0 and reads 1 one-star copy
-- [ ] The scenario reads the state only through the HTTP routes
-- [ ] `CardsFlowIT` passes; full backend gate passes
+- [x] A player registers with FIRE, receives Kael, wins a miniboss with a forced drop, holds 2 blank Kael cards, receives a second blank card at the next forced drop and a third, fuses stars 0 and reads 1 one-star copy
+- [x] The scenario reads the state only through the HTTP routes
+- [x] `CardsFlowIT` passes; full backend gate passes
 
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 
