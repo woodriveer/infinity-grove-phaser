@@ -1,9 +1,13 @@
 package br.com.woodriver.infinity_grove_ws.service
 
+import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
+import br.com.woodriver.infinity_grove_ws.port.HeroRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PasswordHasherPort
+import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
@@ -25,6 +29,8 @@ class UserService(
     private val refreshTokenRepository: RefreshTokenRepositoryPort,
     private val walletRepository: WalletRepositoryPort,
     private val progressRepository: ProgressRepositoryPort,
+    private val heroRepository: HeroRepositoryPort,
+    private val playerCardsRepository: PlayerCardsRepositoryPort,
 ) : CreateUserUseCase,
     GetUserUseCase,
     UpdateUserUseCase,
@@ -33,11 +39,14 @@ class UserService(
     override fun create(
         username: String,
         rawPassword: String,
+        startingElement: Element,
     ): User {
-        logger.info("Creating user username={}", username)
-        return User
-            .register(username, rawPassword, passwordHasher, userRepository, System.currentTimeMillis())
-            .save(userRepository)
+        logger.info("Creating user username={} startingElement={}", username, startingElement)
+        val user = User.register(username, rawPassword, passwordHasher, userRepository, System.currentTimeMillis())
+        val cards = PlayerCards.start(user.username, startingElement, heroRepository.findAll())
+        user.save(userRepository)
+        playerCardsRepository.save(cards)
+        return user
     }
 
     @Transactional(readOnly = true)
@@ -72,6 +81,7 @@ class UserService(
         refreshTokenRepository.deleteAllByUsername(username)
         walletRepository.deleteByUsername(username)
         progressRepository.deleteByUsername(username)
+        playerCardsRepository.deleteByUsername(username)
     }
 
     override fun login(

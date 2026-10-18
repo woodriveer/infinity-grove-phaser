@@ -20,7 +20,7 @@ class AuthControllerIT : IntegrationTestBase() {
     ) = given().contentType(ContentType.JSON).body(body).post(path)
 
     private fun signUp(username: String = "yan"): Response =
-        post("/users", """{"username":"$username","password":"password123"}""")
+        post("/users", """{"username":"$username","password":"password123","startingElement":"FIRE"}""")
             .then()
             .statusCode(201)
             .extract()

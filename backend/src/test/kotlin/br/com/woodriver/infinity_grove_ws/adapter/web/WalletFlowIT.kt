@@ -76,7 +76,7 @@ class WalletFlowIT : IntegrationTestBase() {
         val created =
             given()
                 .contentType(ContentType.JSON)
-                .body("""{"username":"yan","password":"password123"}""")
+                .body("""{"username":"yan","password":"password123","startingElement":"FIRE"}""")
                 .post("/users")
                 .then()
                 .statusCode(201)

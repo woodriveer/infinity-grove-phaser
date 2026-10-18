@@ -1,6 +1,8 @@
 package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.domain.AuthTokens
+import br.com.woodriver.infinity_grove_ws.domain.Element
+import br.com.woodriver.infinity_grove_ws.domain.InvalidStartingElementException
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.usecase.CreateUserUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.DeleteUserUseCase
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController
 data class CreateUserRequest(
     val username: String,
     val password: String,
+    val startingElement: String? = null,
 )
 
 data class UpdatePasswordRequest(
@@ -76,7 +79,9 @@ class UserController(
     @ResponseStatus(HttpStatus.CREATED)
     fun create(
         @RequestBody request: CreateUserRequest,
-    ) = AuthResponse.from(startSession.start(createUser.create(request.username, request.password)))
+    ) = AuthResponse.from(
+        startSession.start(createUser.create(request.username, request.password, parseStartingElement(request.startingElement))),
+    )
 
     @GetMapping
     fun list() = getUser.list().map(UserResponse::from)
@@ -102,4 +107,7 @@ class UserController(
     fun login(
         @RequestBody request: LoginRequest,
     ) = AuthResponse.from(startSession.start(loginUser.login(request.username, request.password)))
+
+    private fun parseStartingElement(value: String?): Element =
+        Element.entries.firstOrNull { it.name == value } ?: throw InvalidStartingElementException(value)
 }

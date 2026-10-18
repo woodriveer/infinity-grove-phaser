@@ -1,6 +1,8 @@
 package br.com.woodriver.infinity_grove_ws.service
 
 import br.com.woodriver.infinity_grove_ws.FakePasswordHasher
+import br.com.woodriver.infinity_grove_ws.InMemoryHeroRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryRefreshTokenRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
@@ -8,7 +10,10 @@ import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
 import br.com.woodriver.infinity_grove_ws.SequenceDropRoller
 import br.com.woodriver.infinity_grove_ws.domain.DropRule
 import br.com.woodriver.infinity_grove_ws.domain.DropTable
+import br.com.woodriver.infinity_grove_ws.domain.Element
+import br.com.woodriver.infinity_grove_ws.domain.HeroSeed
 import br.com.woodriver.infinity_grove_ws.domain.InvalidPasswordException
+import br.com.woodriver.infinity_grove_ws.domain.InvalidStartingElementException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
@@ -28,7 +33,9 @@ class UserServiceTest {
     private val refreshTokens = InMemoryRefreshTokenRepository()
     private val wallets = InMemoryWalletRepository()
     private val progresses = InMemoryProgressRepository()
-    private val service = UserService(repository, hasher, refreshTokens, wallets, progresses)
+    private val heroes = InMemoryHeroRepository(*HeroSeed.heroes().toTypedArray())
+    private val playerCards = InMemoryPlayerCardsRepository()
+    private val service = UserService(repository, hasher, refreshTokens, wallets, progresses, heroes, playerCards)
 
     private fun wallet(username: String) =
         Wallet.open(username, DropTable(listOf(DropRule(1, 1, 5, 1500))), SequenceDropRoller(1, 2, 3, 4, 5), now = 0)
@@ -40,23 +47,65 @@ class UserServiceTest {
 
     @Test
     fun `create persists user with hashed password`() {
-        val user = service.create("yan", "password123")
+        val user = service.create("yan", "password123", Element.FIRE)
 
         assertNotEquals("password123", repository.users.getValue("yan").password)
         assertEquals("yan", user.username)
     }
 
     @Test
-    fun `create fails for existing username`() {
-        service.create("yan", "password123")
+    fun `create with fire, water or nature stores one blank card of that hero, who leads`() {
+        service.create("yan", "password123", Element.FIRE)
+        service.create("ana", "password123", Element.WATER)
+        service.create("bia", "password123", Element.NATURE)
 
-        assertFailsWith<UserAlreadyExistsException> { service.create("yan", "password123") }
+        assertEquals(mapOf("yan" to "kael", "ana" to "orina", "bia" to "lyra"), playerCards.cards.mapValues { it.value.leaderId })
+        playerCards.cards.values.forEach { cards ->
+            assertEquals(1, cards.copiesOf(cards.leaderId, 0))
+            assertEquals(1, cards.copies.size)
+        }
+        assertEquals(Element.WATER, playerCards.cards.getValue("ana").startingElement)
+    }
+
+    @Test
+    fun `create with light or darkness fails and stores no user and no cards`() {
+        assertFailsWith<InvalidStartingElementException> { service.create("yan", "password123", Element.LIGHT) }
+        assertFailsWith<InvalidStartingElementException> { service.create("ana", "password123", Element.DARKNESS) }
+
+        assertTrue(repository.users.isEmpty())
+        assertTrue(playerCards.cards.isEmpty())
+    }
+
+    @Test
+    fun `create fails and stores nothing when the catalog has no hero for the element`() {
+        val service = UserService(repository, hasher, refreshTokens, wallets, progresses, InMemoryHeroRepository(), playerCards)
+
+        assertFailsWith<IllegalStateException> { service.create("yan", "password123", Element.FIRE) }
+
+        assertTrue(repository.users.isEmpty())
+        assertTrue(playerCards.cards.isEmpty())
+    }
+
+    @Test
+    fun `create for an existing username keeps the first cards`() {
+        service.create("yan", "password123", Element.FIRE)
+
+        assertFailsWith<UserAlreadyExistsException> { service.create("yan", "password123", Element.WATER) }
+
+        assertEquals("kael", playerCards.cards.getValue("yan").leaderId)
+    }
+
+    @Test
+    fun `create fails for existing username`() {
+        service.create("yan", "password123", Element.FIRE)
+
+        assertFailsWith<UserAlreadyExistsException> { service.create("yan", "password123", Element.FIRE) }
     }
 
     @Test
     fun `get and list return stored users`() {
-        service.create("yan", "password123")
-        service.create("ana", "password123")
+        service.create("yan", "password123", Element.FIRE)
+        service.create("ana", "password123", Element.FIRE)
 
         assertEquals("yan", service.get("yan").username)
         assertEquals(2, service.list().size)
@@ -69,7 +118,7 @@ class UserServiceTest {
 
     @Test
     fun `updatePassword stores the new hash`() {
-        service.create("yan", "password123")
+        service.create("yan", "password123", Element.FIRE)
 
         service.updatePassword("yan", "newpassword1")
 
@@ -83,11 +132,21 @@ class UserServiceTest {
 
     @Test
     fun `delete removes the user`() {
-        service.create("yan", "password123")
+        service.create("yan", "password123", Element.FIRE)
 
         service.delete("yan")
 
         assertFalse(repository.existsByUsername("yan"))
+    }
+
+    @Test
+    fun `delete removes that user's cards and leaves other cards`() {
+        service.create("yan", "password123", Element.FIRE)
+        service.create("ana", "password123", Element.WATER)
+
+        service.delete("yan")
+
+        assertEquals(setOf("ana"), playerCards.cards.keys)
     }
 
     @Test
@@ -97,7 +156,7 @@ class UserServiceTest {
 
     @Test
     fun `login succeeds and persists lastLoginAt`() {
-        val created = service.create("yan", "password123")
+        val created = service.create("yan", "password123", Element.FIRE)
 
         val user = service.login("yan", "password123")
 
@@ -107,7 +166,7 @@ class UserServiceTest {
 
     @Test
     fun `login fails with wrong password`() {
-        service.create("yan", "password123")
+        service.create("yan", "password123", Element.FIRE)
 
         assertFailsWith<InvalidPasswordException> { service.login("yan", "wrong-password") }
     }
@@ -119,7 +178,7 @@ class UserServiceTest {
 
     @Test
     fun `delete removes all of that user's tokens and leaves other users' tokens`() {
-        service.create("yan", "password123")
+        service.create("yan", "password123", Element.FIRE)
         refreshTokens.save(token("y1", "yan"))
         refreshTokens.save(token("y2", "yan"))
         refreshTokens.save(token("a1", "ana"))
@@ -131,7 +190,7 @@ class UserServiceTest {
 
     @Test
     fun `updatePassword revokes all of that user's tokens and leaves other users' tokens`() {
-        service.create("yan", "password123")
+        service.create("yan", "password123", Element.FIRE)
         refreshTokens.save(token("y1", "yan"))
         refreshTokens.save(token("y2", "yan"))
         refreshTokens.save(token("a1", "ana"))
@@ -163,7 +222,7 @@ class UserServiceTest {
 
     @Test
     fun `failed password update for an invalid password revokes no tokens`() {
-        service.create("yan", "password123")
+        service.create("yan", "password123", Element.FIRE)
         refreshTokens.save(token("y1", "yan"))
 
         assertFailsWith<IllegalArgumentException> { service.updatePassword("yan", "short") }
@@ -173,8 +232,8 @@ class UserServiceTest {
 
     @Test
     fun `delete removes that user's wallet and leaves other wallets`() {
-        service.create("yan", "password123")
-        service.create("ana", "password123")
+        service.create("yan", "password123", Element.FIRE)
+        service.create("ana", "password123", Element.FIRE)
         wallets.save(wallet("yan"))
         wallets.save(wallet("ana"))
 
@@ -185,8 +244,8 @@ class UserServiceTest {
 
     @Test
     fun `delete removes that user's progress and leaves other progress`() {
-        service.create("yan", "password123")
-        service.create("ana", "password123")
+        service.create("yan", "password123", Element.FIRE)
+        service.create("ana", "password123", Element.FIRE)
         progresses.save(Progress.start("yan"))
         progresses.save(Progress.start("ana"))
 

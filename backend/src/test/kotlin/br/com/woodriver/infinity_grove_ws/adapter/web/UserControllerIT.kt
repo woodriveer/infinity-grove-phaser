@@ -22,7 +22,12 @@ class UserControllerIT : IntegrationTestBase() {
     private fun createUser(
         username: String = "yan",
         password: String = "password123",
-    ) = request(json("username" to username, "password" to password)).post("/users")
+        startingElement: String? = "FIRE",
+    ) = request(
+        json(
+            *listOfNotNull("username" to username, "password" to password, startingElement?.let { "startingElement" to it }).toTypedArray(),
+        ),
+    ).post("/users")
 
     @Test
     fun `POST users creates user, hides password and stores a hash`() {
@@ -36,6 +41,43 @@ class UserControllerIT : IntegrationTestBase() {
         val stored = jpaUserRepository.findById("yan").get()
         assertNotEquals("password123", stored.password)
         assertTrue(stored.password.startsWith("\$2"), "expected a BCrypt hash")
+    }
+
+    @Test
+    fun `POST users with water stores one blank Orina card as leader`() {
+        createUser(startingElement = "WATER").then().statusCode(201)
+
+        val cards = jpaPlayerCardsRepository.findById("yan").get()
+        assertEquals("WATER", cards.startingElement)
+        assertEquals("orina", cards.leaderId)
+        val copies = jpaCardCopyRepository.findAllByUsername("yan")
+        assertEquals(1, copies.size)
+        assertEquals("orina", copies.single().heroId)
+        assertEquals(0, copies.single().stars)
+        assertEquals(1, copies.single().copies)
+    }
+
+    @Test
+    fun `POST users with fire or nature gives Kael or Lyra`() {
+        createUser("yan", startingElement = "FIRE").then().statusCode(201)
+        createUser("ana", startingElement = "NATURE").then().statusCode(201)
+
+        assertEquals("kael", jpaPlayerCardsRepository.findById("yan").get().leaderId)
+        assertEquals("lyra", jpaPlayerCardsRepository.findById("ana").get().leaderId)
+    }
+
+    @Test
+    fun `POST users returns 400 INVALID_STARTING_ELEMENT and creates no user for a missing or unknown element`() {
+        listOf(null, "LIGHT", "DARKNESS", "plasma").forEach { element ->
+            createUser(startingElement = element)
+                .then()
+                .statusCode(400)
+                .body("code", equalTo("INVALID_STARTING_ELEMENT"))
+        }
+
+        assertEquals(0, jpaUserRepository.count())
+        assertEquals(0, jpaPlayerCardsRepository.count())
+        assertEquals(0, jpaCardCopyRepository.count())
     }
 
     @Test

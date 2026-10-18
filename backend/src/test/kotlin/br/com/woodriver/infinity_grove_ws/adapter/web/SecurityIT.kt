@@ -44,7 +44,7 @@ class SecurityIT : IntegrationTestBase() {
     private fun signUp(username: String = "yan") =
         given()
             .contentType(ContentType.JSON)
-            .body("""{"username":"$username","password":"password123"}""")
+            .body("""{"username":"$username","password":"password123","startingElement":"FIRE"}""")
             .post("/users")
 
     private val otherKeyIssuer =

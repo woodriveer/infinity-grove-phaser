@@ -427,12 +427,13 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `create` with FIRE, WATER or NATURE stores the user and a `PlayerCards` with one blank copy of that element's hero and that hero as leader
-- [ ] `create` with LIGHT or DARKNESS throws `InvalidStartingElementException` and stores no user
-- [ ] A failing cards save leaves no user (the exception propagates from the one transaction)
-- [ ] `delete` removes the user's cards
-- [ ] `UserServiceTest` updated and passing; quick gate passes
+- [x] `create` with FIRE, WATER or NATURE stores the user and a `PlayerCards` with one blank copy of that element's hero and that hero as leader
+- [x] `create` with LIGHT or DARKNESS throws `InvalidStartingElementException` and stores no user
+- [x] A failing cards save leaves no user (the exception propagates from the one transaction)
+- [x] `delete` removes the user's cards
+- [x] `UserServiceTest` updated and passing; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
