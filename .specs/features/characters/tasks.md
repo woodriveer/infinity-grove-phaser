@@ -117,10 +117,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] A hero without exactly three skills, with repeated or out-of-range slots, a blank name or a cooldown below 1 is rejected with `IllegalArgumentException`
-- [ ] A valid hero exposes `skills` ordered by slot
-- [ ] `HeroTest` passes; quick gate passes
+- [x] A hero without exactly three skills, with repeated or out-of-range slots, a blank name or a cooldown below 1 is rejected with `IllegalArgumentException`
+- [x] A valid hero exposes `skills` ordered by slot
+- [x] `HeroTest` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
