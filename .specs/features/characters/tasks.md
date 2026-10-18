@@ -720,11 +720,12 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] `bagEntries` lists only (hero, stars) pairs with copies ≥ 1; `fusionRows` has one row per hero and stars 0 to 2 with `canFuse` true from 3 copies
-- [ ] `applyDrop` adds one blank copy and marks the hero owned without mutating its input
-- [ ] Labels `Fogo`, `Água`, `Natureza`, `Luz`, `Escuridão`; starting choices `Fogo - Kael`, `Água - Orina`, `Natureza - Lyra`
-- [ ] `heroes.test.js` passes; quick gate passes
+- [x] `bagEntries` lists only (hero, stars) pairs with copies ≥ 1; `fusionRows` has one row per hero and stars 0 to 2 with `canFuse` true from 3 copies
+- [x] `applyDrop` adds one blank copy and marks the hero owned without mutating its input
+- [x] Labels `Fogo`, `Água`, `Natureza`, `Luz`, `Escuridão`; starting choices `Fogo - Kael`, `Água - Orina`, `Natureza - Lyra`
+- [x] `heroes.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
