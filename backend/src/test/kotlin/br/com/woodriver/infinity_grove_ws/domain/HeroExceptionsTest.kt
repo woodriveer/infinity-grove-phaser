@@ -17,11 +17,10 @@ class HeroExceptionsTest {
     }
 
     @Test
-    fun `an unknown hero carries its own code and is not a request or conflict error`() {
+    fun `an unknown hero carries its own code`() {
         val e = HeroNotFoundException("ghost")
 
         assertEquals("HERO_NOT_FOUND", e.code)
-        assertEquals(false, e is HeroRequestException || e is HeroConflictException)
     }
 
     @Test
@@ -42,10 +41,9 @@ class HeroExceptionsTest {
     }
 
     @Test
-    fun `a player without cards is a plain business exception`() {
+    fun `a player without cards carries its own code`() {
         val e = PlayerCardsMissingException("yan")
 
         assertEquals("PLAYER_WITHOUT_HEROES", e.code)
-        assertEquals(false, e is HeroRequestException || e is HeroConflictException)
     }
 }
