@@ -108,13 +108,13 @@ T25
 
 **Done when**:
 
-- [ ] `Rarity` affix counts are 1, 2, 3, 4, 4 and value multipliers 1.0, 1.2, 1.5, 1.8, 2.2; cost multipliers 1, 2, 3, 5, 8
-- [ ] `Piece.value(affix)` is `floor(base * (1 + 0.1 * refine))`; `clickDamage()` is the weapon base times `1 + 0.1 * refine` to one decimal (null for other slots)
-- [ ] `refineCost()` is `floor(500 * 1.7^refine)` times the rarity cost multiplier, null at +10; `sellPrice()` is `100 * rarity index * (1 + 0.5 * refine)` rounded down
-- [ ] A weapon without base click damage, a non-weapon with one, a repeated affix type, a `CLICK_DAMAGE_PCT` on a weapon, more affixes than the rarity allows, or refine outside 0..10 is rejected with `IllegalArgumentException`
-- [ ] `EquipmentTest` passes; quick gate passes
+- [x] `Rarity` affix counts are 1, 2, 3, 4, 4 and value multipliers 1.0, 1.2, 1.5, 1.8, 2.2; cost multipliers 1, 2, 3, 5, 8
+- [x] `Piece.value(affix)` is `floor(base * (1 + 0.1 * refine))`; `clickDamage()` is the weapon base times `1 + 0.1 * refine` to one decimal (null for other slots)
+- [x] `refineCost()` is `floor(500 * 1.7^refine)` times the rarity cost multiplier, null at +10; `sellPrice()` is `100 * rarity index * (1 + 0.5 * refine)` rounded down
+- [x] A weapon without base click damage, a non-weapon with one, a repeated affix type, a `CLICK_DAMAGE_PCT` on a weapon, more affixes than the rarity allows, or refine outside 0..10 is rejected with `IllegalArgumentException`
+- [x] `EquipmentTest` passes; quick gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
