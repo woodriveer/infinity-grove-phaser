@@ -423,11 +423,11 @@ T25
 
 **Done when**:
 
-- [ ] After deleting a user, `findAll(username)` is empty
-- [ ] `backend/docs/adr/0008-equipment.md` records the decisions and `.specs/STATE.md` has AD-009
-- [ ] `UserServiceTest` addition passes; full backend gate and build gate pass
+- [x] After deleting a user, `findAll(username)` is empty
+- [x] `backend/docs/adr/0008-equipment.md` records the decisions and `.specs/STATE.md` has AD-009
+- [x] `UserServiceTest` addition passes; full backend gate and build gate pass
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Full (backend)
 

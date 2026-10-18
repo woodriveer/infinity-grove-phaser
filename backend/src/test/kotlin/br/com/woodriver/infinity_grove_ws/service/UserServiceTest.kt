@@ -1,6 +1,7 @@
 package br.com.woodriver.infinity_grove_ws.service
 
 import br.com.woodriver.infinity_grove_ws.FakePasswordHasher
+import br.com.woodriver.infinity_grove_ws.InMemoryEquipmentRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryHeroRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
@@ -15,8 +16,11 @@ import br.com.woodriver.infinity_grove_ws.domain.HeroSeed
 import br.com.woodriver.infinity_grove_ws.domain.InvalidPasswordException
 import br.com.woodriver.infinity_grove_ws.domain.InvalidStartingElementException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.Progress
+import br.com.woodriver.infinity_grove_ws.domain.Rarity
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
+import br.com.woodriver.infinity_grove_ws.domain.Slot
 import br.com.woodriver.infinity_grove_ws.domain.UserAlreadyExistsException
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
@@ -35,7 +39,8 @@ class UserServiceTest {
     private val progresses = InMemoryProgressRepository()
     private val heroes = InMemoryHeroRepository(*HeroSeed.heroes().toTypedArray())
     private val playerCards = InMemoryPlayerCardsRepository()
-    private val service = UserService(repository, hasher, refreshTokens, wallets, progresses, heroes, playerCards)
+    private val equipment = InMemoryEquipmentRepository()
+    private val service = UserService(repository, hasher, refreshTokens, wallets, progresses, heroes, playerCards, equipment)
 
     private fun wallet(username: String) =
         Wallet.open(username, DropTable(listOf(DropRule(1, 1, 5, 1500))), SequenceDropRoller(1, 2, 3, 4, 5), now = 0)
@@ -78,7 +83,7 @@ class UserServiceTest {
 
     @Test
     fun `create fails and stores nothing when the catalog has no hero for the element`() {
-        val service = UserService(repository, hasher, refreshTokens, wallets, progresses, InMemoryHeroRepository(), playerCards)
+        val service = UserService(repository, hasher, refreshTokens, wallets, progresses, InMemoryHeroRepository(), playerCards, equipment)
 
         assertFailsWith<IllegalStateException> { service.create("yan", "password123", Element.FIRE) }
 
@@ -270,5 +275,25 @@ class UserServiceTest {
         assertFailsWith<UserNotFoundException> { service.delete("ghost") }
 
         assertEquals(setOf("yan"), wallets.wallets.keys)
+    }
+
+    @Test
+    fun `delete removes that user pieces and leaves other pieces`() {
+        service.create("yan", "password123", Element.FIRE)
+        equipment.save(Piece("mine", "yan", Slot.RING, Rarity.COMMON, null, 0, emptyList()))
+        equipment.save(Piece("theirs", "other", Slot.RING, Rarity.COMMON, null, 0, emptyList()))
+
+        service.delete("yan")
+
+        assertEquals(listOf("theirs"), equipment.pieces.keys.toList())
+    }
+
+    @Test
+    fun `failed delete touches no pieces`() {
+        equipment.save(Piece("theirs", "other", Slot.RING, Rarity.COMMON, null, 0, emptyList()))
+
+        assertFailsWith<UserNotFoundException> { service.delete("ghost") }
+
+        assertEquals(listOf("theirs"), equipment.pieces.keys.toList())
     }
 }

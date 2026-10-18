@@ -66,6 +66,14 @@
 - **Date**: 2026-10-18
 - **Status**: active
 
+### AD-009
+- **Decision**: Equipment is server-authoritative like the cards: pieces are rolled by the backend in the boss report transaction, stored one row each in `equipment_pieces`, and refined, rerolled and sold with copper under the `player_cards` row lock (lock order `progress`, `player_cards`, `wallets`). The game computes damage from the pieces the server returns.
+- **Reason**: A client-chosen drop or cost is trivial to forge (AD-005), and per-piece state does not fit the `PlayerCards` row.
+- **Trade-off**: Damage is still computed in the browser (AD-002), so equipment raises the value of forging clicks, not the ease; `NO_AFFIX_LEFT` is unreachable with the current catalog.
+- **Scope**: `backend` equipment code (ADR 0008), `game/src/domain/equipment`, `game/src/application/equipment`, `ClickerGame`
+- **Date**: 2026-10-18
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: .specs/features/characters (hero cards, bag, fusion, leader, farm; builds on stages, drops and elements)

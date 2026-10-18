@@ -5,6 +5,7 @@ import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
+import br.com.woodriver.infinity_grove_ws.port.EquipmentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.HeroRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PasswordHasherPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
@@ -31,6 +32,7 @@ class UserService(
     private val progressRepository: ProgressRepositoryPort,
     private val heroRepository: HeroRepositoryPort,
     private val playerCardsRepository: PlayerCardsRepositoryPort,
+    private val equipmentRepository: EquipmentRepositoryPort,
 ) : CreateUserUseCase,
     GetUserUseCase,
     UpdateUserUseCase,
@@ -82,6 +84,7 @@ class UserService(
         walletRepository.deleteByUsername(username)
         progressRepository.deleteByUsername(username)
         playerCardsRepository.deleteByUsername(username)
+        equipmentRepository.deleteByUsername(username)
     }
 
     override fun login(
