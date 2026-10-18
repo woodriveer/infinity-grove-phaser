@@ -885,10 +885,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Owned heroes are not grey; not owned heroes carry `is-grey`; every hero shows name, element label and stars
-- [ ] The detail shows three skills for any hero, each marked locked or unlocked from the stars, with stable test ids
-- [ ] `catalogView.test.js` passes; quick gate passes
+- [x] Owned heroes are not grey; not owned heroes carry `is-grey`; every hero shows name, element label and stars
+- [x] The detail shows three skills for any hero, each marked locked or unlocked from the stars, with stable test ids
+- [x] `catalogView.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
