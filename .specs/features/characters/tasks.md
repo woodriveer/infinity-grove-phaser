@@ -287,9 +287,10 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Entities map every `Hero` and `Skill` field both ways
-- [ ] Build gate passes
+- [x] Entities map every `Hero` and `Skill` field both ways
+- [x] Build gate passes
 
+**Status**: Done
 **Tests**: none (entity; covered by T10)
 **Gate**: Build
 
