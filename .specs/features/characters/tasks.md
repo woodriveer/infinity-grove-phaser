@@ -866,9 +866,10 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Classes used by the views exist (`.hero-hud`, `.hero-panel`, `.hero-card.is-grey`, `.skill-row.is-locked`, `.skill-bar`, `.skill-slot.is-locked`, `.card-notice`, `.hero-choice`)
-- [ ] Build gate passes
+- [x] Classes used by the views exist (`.hero-hud`, `.hero-panel`, `.hero-card.is-grey`, `.skill-row.is-locked`, `.skill-bar`, `.skill-slot.is-locked`, `.card-notice`, `.hero-choice`)
+- [x] Build gate passes
 
+**Status**: Done
 **Tests**: none (CSS)
 **Gate**: Build
 
