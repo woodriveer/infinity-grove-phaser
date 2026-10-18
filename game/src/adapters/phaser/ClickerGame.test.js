@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClickerGame } from './ClickerGame';
 import { ApiError } from '../../application/ApiError';
 import { createCampaignSession } from '../../application/campaign/campaignSession';
+import { createFarmSession } from '../../application/farm/farmSession';
+import { createHeroCollection } from '../../application/heroes/heroCollection';
 import { createWalletSync } from '../../application/wallet/walletSync';
 
 vi.mock('phaser', () => ({
@@ -13,12 +15,17 @@ const walletApi = { get: vi.fn(), sync: vi.fn() };
 
 //  The real campaign session over a mocked backend gateway, started on stage 1 phase 1 of a seeded-like chapter
 const campaignGateway = { get: vi.fn(), report: vi.fn() };
+//  The real hero collection and farm session over mocked gateways; by default the player owns Kael with one blank card
+const heroesGateway = { list: vi.fn(), fuse: vi.fn(), setLeader: vi.fn() };
+const farmGateway = { get: vi.fn(), win: vi.fn() };
 //  The critical roll: 0.99 never crits a monster of the default stats (10 % chance); a test sets `dice.value` to force one
 const dice = { value: 0.99 };
 const services = {
     random: () => dice.value,
     createWalletSync: () => createWalletSync({ gateway: walletApi }),
-    createCampaignSession: () => createCampaignSession({ gateway: campaignGateway })
+    createCampaignSession: () => createCampaignSession({ gateway: campaignGateway }),
+    createHeroCollection: () => createHeroCollection({ gateway: heroesGateway }),
+    createFarmSession: () => createFarmSession({ gateway: farmGateway })
 };
 
 const definition = {
@@ -33,12 +40,31 @@ const progress = (stage = 1, encounter = 'PHASE', phase = 1, completed = false) 
 
 const flush = () => new Promise((resolve) => setTimeout(resolve));
 
+const heroSkills = (...unlocked) => unlocked.map((open, index) => ({
+    slot: index + 1, name: `Skill ${index + 1}`, type: 'Ataque', effect: 'Effect', cooldownSeconds: 10, image: `art_${index + 1}`, unlocked: open
+}));
+
+const heroEntry = (id, copies = {}, stars = 0) => ({
+    id, name: `Hero ${id}`, heroClass: 'Guerreiro', element: 'FIRE', leaderBonus: 'Bonus', portrait: `${id}_position`, chapter: 1,
+    owned: Object.values(copies).some((n) => n > 0), stars, copies: { 0: 0, 1: 0, 2: 0, 3: 0, ...copies },
+    skills: heroSkills(stars >= 1, stars >= 2, stars >= 3)
+});
+
+const heroesResponse = () => ({ leaderId: 'kael', heroes: [ heroEntry('kael', { 0: 1 }), heroEntry('lyra'), heroEntry('orina') ] });
+
 const walletResponse = (coins = { gold: 2, silver: 14, copper: 37 }, drops = { 1: [3, 1, 5, 2, 4] }) => ({ wallet: coins, drops });
 
 //  Minimal Phaser stand-in: records what ClickerGame adds and exposes the click handler and tweens.
 //  `wallet` is what GET /wallet answers: a response object, an Error to reject with, or omitted to never answer.
-const createScene = async ({ wallet, start = progress() } = {}) => {
+const createScene = async ({ wallet, start = progress(), heroes = heroesResponse() } = {}) => {
     dice.value = 0.99;
+    heroesGateway.list.mockReset();
+    heroesGateway.fuse.mockReset();
+    heroesGateway.setLeader.mockReset();
+    heroesGateway.list.mockImplementation(() => (heroes instanceof Error ? Promise.reject(heroes) : Promise.resolve(heroes)));
+    farmGateway.get.mockReset();
+    farmGateway.win.mockReset();
+    farmGateway.get.mockResolvedValue({ bosses: [ { kind: 'MINIBOSS', stage: 1 } ], chapterBossWinsLeft: 10 });
     campaignGateway.get.mockReset();
     campaignGateway.report.mockReset();
     campaignGateway.get.mockImplementation(() => (start instanceof Error ? Promise.reject(start) : Promise.resolve(start)));
@@ -1592,5 +1618,130 @@ describe('ClickerGame elements', () => {
         ctx.timers.at(-1).callback();
 
         expect(enemyText(ctx)).toBe('Light  Physical def 4%  Magical def 5%  Crit res 6%');
+    });
+});
+
+describe('ClickerGame hero screens', () => {
+    const bossStart = () => progress(1, 'MINIBOSS', 1);
+    const killAll = (ctx) => {
+        while (ctx.scene.monster && !ctx.scene.monster.dead)
+        {
+            ctx.click();
+        }
+    };
+    const tick = (ctx) => ctx.loops[0].callback();
+    const testid = (ctx, id) => ctx.control(`[data-testid="${id}"]`);
+    const openPanel = async (ctx, screen) => {
+        testid(ctx, `hud-${screen}`).click();
+        await flush();
+    };
+
+    it('shows the five hero buttons in the HUD and none of them in the pause menu', async () => {
+        const ctx = await createScene();
+
+        expect([ 'heroes', 'bag', 'fusion', 'leader', 'farm' ].map((id) => testid(ctx, `hud-${id}`)?.textContent)).toEqual([
+            'Heróis', 'Mochila', 'Fusão', 'Líder', 'Rever chefes'
+        ]);
+        expect(ctx.control('.pause-menu').querySelector('[data-testid^="hud-"]')).toBeNull();
+    });
+
+    it('shows the three skill slots of the leader, all locked at 0 stars, once the heroes load', async () => {
+        const ctx = await createScene();
+
+        expect(ctx.doms.flatMap((d) => [ ...d.node.querySelectorAll('.skill-slot') ])).toHaveLength(3);
+        expect(ctx.doms.flatMap((d) => [ ...d.node.querySelectorAll('.skill-slot.is-locked') ])).toHaveLength(3);
+        expect(testid(ctx, 'skill-slot-1').querySelector('.skill-slot-cooldown').textContent).toBe('10s');
+    });
+
+    it('opening a hero screen freezes the fight and closing it resumes', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        await openPanel(ctx, 'heroes');
+        ctx.click();
+        ctx.scene.update(0, 30000);
+
+        expect(ctx.scene.time.paused).toBe(true);
+        expect(ctx.scene.tweens.paused).toBe(true);
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth);
+        expect(ctx.scene.monster).not.toBeNull();
+
+        testid(ctx, 'hero-close').click();
+        ctx.click();
+
+        expect(ctx.scene.time.paused).toBe(false);
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 1);
+    });
+
+    it('closing a hero screen does not resume a fight the player paused with Esc', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.handlers['keydown-ESC']();
+        await openPanel(ctx, 'bag');
+        testid(ctx, 'hero-close').click();
+
+        expect(ctx.scene.paused).toBe(true);
+        expect(ctx.control('.pause-menu').hidden).toBe(false);
+    });
+
+    it('Esc closes an open hero screen first and does not open the pause menu', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        await openPanel(ctx, 'fusion');
+        ctx.handlers['keydown-ESC']();
+
+        expect(ctx.scene.heroUi.isOpen).toBe(false);
+        expect(ctx.scene.paused).toBe(false);
+        expect(ctx.control('.pause-menu').hidden).toBe(true);
+
+        ctx.handlers['keydown-ESC']();
+
+        expect(ctx.control('.pause-menu').hidden).toBe(false);
+    });
+
+    it('a card dropped by an accepted report shows the notice and joins the bag at once', async () => {
+        const ctx = await createScene({ start: bossStart() });
+        campaignGateway.report.mockResolvedValue({ ...progress(2, 'PHASE', 1), drop: { heroId: 'kael', heroName: 'Hero kael', stars: 0 } });
+
+        killAll(ctx);
+        tick(ctx);
+        await flush();
+
+        expect(testid(ctx, 'card-notice').textContent).toBe('Carta: Hero kael');
+        expect(testid(ctx, 'card-notice').hidden).toBe(false);
+        expect(ctx.scene.heroes.heroes()[0].copies[0]).toBe(2);
+    });
+
+    it('a report with no drop shows no notice', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        killAll(ctx);
+        tick(ctx);
+        await flush();
+
+        expect(testid(ctx, 'card-notice').hidden).toBe(true);
+    });
+
+    it('stays playable with no skill bar when the heroes cannot be loaded, and tries again on the next tick', async () => {
+        const ctx = await createScene({ heroes: new ApiError('Cannot reach the server. Try again later.') });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(9);
+        expect(ctx.doms.flatMap((d) => [ ...d.node.querySelectorAll('.skill-slot') ])).toHaveLength(0);
+        expect(heroesGateway.list).toHaveBeenCalledTimes(1);
+
+        tick(ctx);
+        await flush();
+
+        expect(heroesGateway.list).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not reload the heroes on a tick once they have loaded', async () => {
+        const ctx = await createScene();
+
+        tick(ctx);
+        await flush();
+
+        expect(heroesGateway.list).toHaveBeenCalledTimes(1);
     });
 });

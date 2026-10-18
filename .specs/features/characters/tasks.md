@@ -1031,12 +1031,13 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] The scene shows the HUD buttons and, once the heroes load, the skill bar of the leader
-- [ ] Opening a panel freezes the fight like the pause menu (no damage, countdown stopped) and closing it resumes, and never resumes a fight the player paused with Esc
-- [ ] An accepted report with a drop shows the notice and adds the blank copy to the bag
-- [ ] A failed heroes load leaves the scene playable
-- [ ] `ClickerGame.test.js` updated (services gain the new factories) and passing with no existing assertion weakened; quick gate passes
+- [x] The scene shows the HUD buttons and, once the heroes load, the skill bar of the leader
+- [x] Opening a panel freezes the fight like the pause menu (no damage, countdown stopped) and closing it resumes, and never resumes a fight the player paused with Esc
+- [x] An accepted report with a drop shows the notice and adds the blank copy to the bag
+- [x] A failed heroes load leaves the scene playable
+- [x] `ClickerGame.test.js` updated (services gain the new factories) and passing with no existing assertion weakened; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 

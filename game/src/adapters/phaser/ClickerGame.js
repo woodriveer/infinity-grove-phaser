@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
 import { calculateDamage, formatDamage } from '../../domain/combat/damage';
 import { Monster } from '../../domain/combat/monster';
+import { HeroUi } from './HeroUi';
 
 const CHARACTER = { x: 300, y: 500, size: 100, color: 0x000000 };
 const MONSTER = { x: 700, y: 500, width: 160, height: 200, color: 0xcc2222 };
@@ -59,7 +60,10 @@ export class ClickerGame extends Scene
         this.random = services.random ?? Math.random;
         this.loadingCampaign = false;
         this.paused = false;
+        this.heroes = services.createHeroCollection();
+        this.farm = services.createFarmSession();
         this.session.onRealign((encounter) => this.realign(encounter));
+        this.session.onDrop((drop) => this.receiveDrop(drop));
 
         this.add.image(512, 384, 'background');
 
@@ -90,6 +94,7 @@ export class ClickerGame extends Scene
         this.enemyStats = this.createHtml(ENEMY_STATS, ENEMY_STATS_HTML, '.enemy-stats');
         this.stageMessage = this.createHtml(STAGE_MESSAGE, STAGE_MESSAGE_HTML, '.stage-message');
         this.createControls();
+        this.createHeroUi();
         this.loadCampaign();
 
         //  Kills reach the backend in batches, never one request per kill
@@ -124,7 +129,71 @@ export class ClickerGame extends Scene
         this.pauseMenu.querySelector('.pause-confirm-yes').addEventListener('click', () => this.leaveFight());
         this.pauseMenu.querySelector('.pause-confirm-no').addEventListener('click', () => this.showPauseOptions());
 
-        this.input.keyboard.on('keydown-ESC', () => (this.paused ? this.resumeFight() : this.pauseFight()));
+        this.input.keyboard.on('keydown-ESC', () => this.escape());
+    }
+
+    //  Esc closes an open hero screen first; otherwise it opens or closes the pause menu
+    escape ()
+    {
+        if (this.heroUi.isOpen)
+        {
+            this.heroUi.close();
+            return;
+        }
+
+        this.paused ? this.resumeFight() : this.pauseFight();
+    }
+
+    //  The hero buttons, screens, skill bar and card notice; the heroes load in the background and a failure leaves the fight playable
+    createHeroUi ()
+    {
+        this.heroUi = new HeroUi(this, {
+            heroes: this.heroes,
+            farm: this.farm,
+            pause: () => this.pauseForMenu(),
+            resume: () => this.resumeFromMenu(),
+            startFarm: (boss) => this.startFarm(boss)
+        });
+        this.loadHeroes();
+    }
+
+    async loadHeroes ()
+    {
+        try
+        {
+            await this.heroes.load();
+        }
+        catch
+        {
+            //  The skill bar stays empty; the next tick tries again
+        }
+    }
+
+    //  A card the backend dropped for a won boss: into the bag at once, and shown for 3 s
+    receiveDrop (drop)
+    {
+        this.heroes.applyDrop(drop);
+        this.heroUi.showDrop(drop);
+    }
+
+    //  A hero screen freezes the fight like the pause menu; returns false when the player had already paused it (Esc)
+    pauseForMenu ()
+    {
+        if (this.paused)
+        {
+            return false;
+        }
+
+        this.paused = true;
+        this.time.paused = true;
+        this.tweens.paused = true;
+
+        return true;
+    }
+
+    resumeFromMenu ()
+    {
+        this.resumeFight();
     }
 
     //  Freezes the fight: clicks, the boss countdown, timers and tweens all stop until the player resumes
@@ -337,6 +406,11 @@ export class ClickerGame extends Scene
         else
         {
             this.loadCampaign();
+        }
+
+        if (!this.heroes.loaded)
+        {
+            this.loadHeroes();
         }
     }
 
