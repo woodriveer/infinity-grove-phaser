@@ -34,6 +34,30 @@
 - **Date**: 2026-10-17
 - **Status**: active
 
+### AD-005
+- **Decision**: Hero cards are server-authoritative. The backend rolls a drop in the same transaction that accepts a `CLEARED` miniboss or chapter boss report (campaign or farm), stores the bag, and answers `drop`; the game never chooses or reports a card.
+- **Reason**: A client-chosen 1 % drop is trivial to forge, and queues of pre-rolled cards (like coins) would let the client see the next card and skip fights.
+- **Trade-off**: The server still cannot see a kill (AD-002), so a client can claim wins it did not make; farm wins are spaced by 5 s and the chapter boss pays 10 wins per UTC day.
+- **Scope**: `backend` card code (ADR 0007), `game/src/application/campaign`, `game/src/application/farm`
+- **Date**: 2026-10-18
+- **Status**: active
+
+### AD-006
+- **Decision**: The hero of a chapter depends on the player: the starting element (FIRE, WATER or NATURE) chosen at registration, then the element it hits hardest, the remaining one, DARKNESS and LIGHT give the chapter order. The catalog stores elements, not chapter numbers; each chapter boss releases the hero of the next chapter.
+- **Reason**: The story changes with the first choice (user decision).
+- **Trade-off**: A hero's chapter is not static data; enemy elements per chapter are a separate, still undecided feature.
+- **Scope**: `backend` `ChapterOrder`, `CardDropper`, `HeroService`; future chapter content
+- **Date**: 2026-10-18
+- **Status**: active
+
+### AD-007
+- **Decision**: New player-facing text is Portuguese; the text that already exists stays English as technical debt TD-001 (`.specs/features/characters/spec.md`) until a dedicated translation task.
+- **Reason**: User decision: everything in Portuguese, existing text recorded as debt.
+- **Trade-off**: The game is mixed-language until TD-001 is done; there is no translation layer.
+- **Scope**: all of `game/src` and `game/e2e`
+- **Date**: 2026-10-18
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: .specs/features/elements (builds on stages)

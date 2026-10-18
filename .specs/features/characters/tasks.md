@@ -623,10 +623,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] The ADR states the aggregate, the lock order, the drop-in-transaction rule, the chapter order rule, the farm limits and their trade-offs, in the style of ADR 0005
-- [ ] `STATE.md` has the three active decisions
-- [ ] Build gate passes
+- [x] The ADR states the aggregate, the lock order, the drop-in-transaction rule, the chapter order rule, the farm limits and their trade-offs, in the style of ADR 0005
+- [x] `STATE.md` has the three active decisions
+- [x] Build gate passes
 
+**Status**: Done
 **Tests**: none (documentation)
 **Gate**: Build
 
