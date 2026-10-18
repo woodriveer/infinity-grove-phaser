@@ -267,10 +267,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Ports compile with the methods of the design
-- [ ] `InMemoryHeroRepository`, `InMemoryPlayerCardsRepository` and `SequenceChanceRoller` exist in `BT/Fakes.kt`
-- [ ] Build gate passes
+- [x] Ports compile with the methods of the design
+- [x] `InMemoryHeroRepository`, `InMemoryPlayerCardsRepository` and `SequenceChanceRoller` exist in `BT/Fakes.kt`
+- [x] Build gate passes
 
+**Status**: Done
 **Tests**: none (interfaces and fakes; exercised by the next tasks)
 **Gate**: Build
 

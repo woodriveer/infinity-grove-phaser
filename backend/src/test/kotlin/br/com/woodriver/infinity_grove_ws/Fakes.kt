@@ -1,15 +1,20 @@
 package br.com.woodriver.infinity_grove_ws
 
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
+import br.com.woodriver.infinity_grove_ws.domain.Hero
+import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import br.com.woodriver.infinity_grove_ws.port.AccessToken
 import br.com.woodriver.infinity_grove_ws.port.AccessTokenIssuerPort
+import br.com.woodriver.infinity_grove_ws.port.ChanceRollerPort
 import br.com.woodriver.infinity_grove_ws.port.ChapterRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.DropRollerPort
+import br.com.woodriver.infinity_grove_ws.port.HeroRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PasswordHasherPort
+import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenSecretPort
@@ -146,6 +151,57 @@ class SequenceDropRoller(
     ): Int {
         val value = values[next++ % values.size]
         require(value in min..max) { "Scripted value $value is outside $min..$max" }
+        return value
+    }
+}
+
+class InMemoryHeroRepository(
+    vararg heroes: Hero,
+) : HeroRepositoryPort {
+    private val ordered = sortedMapOf<Int, Hero>().also { map -> heroes.forEachIndexed { index, hero -> map[index] = hero } }
+
+    override fun findAll() = ordered.values.toList()
+
+    override fun findById(id: String) = ordered.values.firstOrNull { it.id == id }
+
+    override fun existsById(id: String) = findById(id) != null
+
+    override fun save(
+        hero: Hero,
+        order: Int,
+    ) {
+        ordered.values.removeIf { it.id == hero.id }
+        ordered[order] = hero
+    }
+}
+
+class InMemoryPlayerCardsRepository : PlayerCardsRepositoryPort {
+    val cards = linkedMapOf<String, PlayerCards>()
+
+    override fun findForUpdate(username: String) = cards[username]
+
+    override fun createIfAbsent(cards: PlayerCards) {
+        this.cards.putIfAbsent(cards.username, cards)
+    }
+
+    override fun save(cards: PlayerCards): PlayerCards = cards.also { this.cards[it.username] = it }
+
+    override fun deleteByUsername(username: String) {
+        cards.remove(username)
+    }
+}
+
+/** Rolls the scripted chances in order, cycling; counts how many were read. */
+class SequenceChanceRoller(
+    private vararg val values: Double,
+) : ChanceRollerPort {
+    var reads = 0
+        private set
+
+    override fun roll(): Double {
+        val value = values[reads % values.size]
+        reads += 1
+        require(value >= 0.0 && value < 1.0) { "Scripted chance $value is outside 0 (inclusive) to 1 (exclusive)" }
         return value
     }
 }
