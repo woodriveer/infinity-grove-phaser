@@ -365,12 +365,13 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] A saved aggregate reads back equal (copies, leader, boss record)
-- [ ] `save` deletes a copy row whose count dropped to 0 and updates changed counts
-- [ ] `createIfAbsent` twice keeps the first row
-- [ ] `deleteByUsername` removes the aggregate and its copy rows
-- [ ] `PlayerCardsRepositoryIT` passes; full backend gate passes
+- [x] A saved aggregate reads back equal (copies, leader, boss record)
+- [x] `save` deletes a copy row whose count dropped to 0 and updates changed counts
+- [x] `createIfAbsent` twice keeps the first row
+- [x] `deleteByUsername` removes the aggregate and its copy rows
+- [x] `PlayerCardsRepositoryIT` passes; full backend gate passes
 
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 

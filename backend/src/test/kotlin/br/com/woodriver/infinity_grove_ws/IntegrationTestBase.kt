@@ -1,6 +1,8 @@
 package br.com.woodriver.infinity_grove_ws
 
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaCardCopyRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaChapterRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaProgressRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaRefreshTokenRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaStageRepository
@@ -60,6 +62,12 @@ abstract class IntegrationTestBase {
     protected lateinit var jpaStageRepository: JpaStageRepository
 
     @Autowired
+    protected lateinit var jpaPlayerCardsRepository: JpaPlayerCardsRepository
+
+    @Autowired
+    protected lateinit var jpaCardCopyRepository: JpaCardCopyRepository
+
+    @Autowired
     private lateinit var accessTokenIssuer: JwtAccessTokenIssuer
 
     /** A valid `Bearer` header value for [username]; the user does not need to exist, the access token is stateless. */
@@ -75,6 +83,8 @@ abstract class IntegrationTestBase {
         RestAssured.basePath = ""
         jpaRefreshTokenRepository.deleteAll()
         jpaProgressRepository.deleteAll()
+        jpaCardCopyRepository.deleteAll()
+        jpaPlayerCardsRepository.deleteAll()
         jpaWalletLevelRepository.deleteAll()
         jpaWalletRepository.deleteAll()
         jpaUserRepository.deleteAll()
