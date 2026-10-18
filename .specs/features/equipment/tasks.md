@@ -465,12 +465,12 @@ T25
 
 **Done when**:
 
-- [ ] `attackerFor(base, pieces)` gives damage `(1 + weapon clickDamage) * (1 + sum CLICK_DAMAGE_PCT/100)`, crit chance `min(100, 10 + sum)`, crit multiplier `2 + sum/100`, pierce and boss damage sums; a +0 weapon of 3 gives 4, plus a ring of 10 % gives 4.4
-- [ ] With no pieces it returns the base attacker unchanged; `bossTimeBonusMs` is `1000 * sum BOSS_TIME_SECONDS`
-- [ ] Labels: Comum, Incomum, Raro, Épico, Lendário; Arma, Armadura, Anel, Amuleto; one Portuguese label per affix type
-- [ ] `equipment.test.js` passes; `npm test` passes
+- [x] `attackerFor(base, pieces)` gives damage `(1 + weapon clickDamage) * (1 + sum CLICK_DAMAGE_PCT/100)`, crit chance `min(100, 10 + sum)`, crit multiplier `2 + sum/100`, pierce and boss damage sums; a +0 weapon of 3 gives 4, plus a ring of 10 % gives 4.4
+- [x] With no pieces it returns the base attacker unchanged; `bossTimeBonusMs` is `1000 * sum BOSS_TIME_SECONDS`
+- [x] Labels: Comum, Incomum, Raro, Épico, Lendário; Arma, Armadura, Anel, Amuleto; one Portuguese label per affix type
+- [x] `equipment.test.js` passes; `npm test` passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
