@@ -4,7 +4,11 @@
 //
 //  Built from the backend progress payload:
 //  { chapter, stage, encounter, phase, completed,
-//    definition: { bossHealth, bossTimeLimitMs, stages: [{ number, phasesPerStage, monsterHealth, minibossHealth, minibossTimeLimitMs }] } }
+//    definition: { bossHealth, bossTimeLimitMs, boss, stages: [{ number, phasesPerStage, monsterHealth, minibossHealth, minibossTimeLimitMs, monster, miniboss }] } }
+//  where boss, monster and miniboss are { element, physicalDefense, magicalDefense, critResistance }; a payload
+//  without them (an older backend) means DEFAULT_STATS
+import { DEFAULT_STATS } from '../combat/monster';
+
 export const PHASE = 'PHASE';
 export const MINIBOSS = 'MINIBOSS';
 export const CHAPTER_BOSS = 'CHAPTER_BOSS';
@@ -59,6 +63,7 @@ export class Campaign
                 stage: this.stage,
                 phase: this.phase,
                 health: stage.monsterHealth,
+                stats: stage.monster ?? DEFAULT_STATS,
                 timeLimitMs: null,
                 label: `Stage ${this.stage}/${this.stageCount}  Phase ${this.phase}/${stage.phasesPerStage}`
             };
@@ -71,6 +76,7 @@ export class Campaign
                 stage: this.stage,
                 phase: 1,
                 health: stage.minibossHealth,
+                stats: stage.miniboss ?? DEFAULT_STATS,
                 timeLimitMs: stage.minibossTimeLimitMs,
                 label: `Stage ${this.stage}/${this.stageCount}  Miniboss`
             };
@@ -81,6 +87,7 @@ export class Campaign
             stage: this.stage,
             phase: 1,
             health: this.definition.bossHealth,
+            stats: this.definition.boss ?? DEFAULT_STATS,
             timeLimitMs: this.definition.bossTimeLimitMs,
             label: 'Chapter Boss'
         };

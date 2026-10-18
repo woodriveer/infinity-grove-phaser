@@ -197,10 +197,10 @@ T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Fractional damage is subtracted exactly and health stops at 0 (ELEM-01 AC9-10, edge case)
-- [ ] Phase, miniboss and chapter boss encounters carry the stats of the payload (ELEM-02 AC3)
-- [ ] A payload without stats falls back to fire, 0, 0, 0
-- [ ] Gate passes
+- [x] Fractional damage is subtracted exactly and health stops at 0 (ELEM-01 AC9-10, edge case)
+- [x] Phase, miniboss and chapter boss encounters carry the stats of the payload (ELEM-02 AC3)
+- [x] A payload without stats falls back to fire, 0, 0, 0
+- [x] Gate passes
 
 **Tests**: unit
 **Gate**: quick

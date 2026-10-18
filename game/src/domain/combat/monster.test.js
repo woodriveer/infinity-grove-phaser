@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DAMAGE_PER_CLICK, MONSTER_MAX_HEALTH, Monster } from './monster';
+import { DAMAGE_PER_CLICK, DEFAULT_STATS, MONSTER_MAX_HEALTH, Monster } from './monster';
 
 describe('Monster', () => {
     it('starts at 10 health and alive', () => {
@@ -81,5 +81,54 @@ describe('Monster', () => {
 
         expect(monster.level).toBe(3);
         expect(monster.health).toBe(10);
+    });
+
+    it('subtracts a fractional hit exactly', () => {
+        const monster = new Monster();
+
+        monster.hit(0.9);
+
+        expect(monster.health).toBe(9.1);
+        expect(monster.dead).toBe(false);
+    });
+
+    it('reaches exactly 0 after many fractional hits instead of stopping at float dust', () => {
+        const monster = new Monster(10);
+
+        for (let i = 0; i < 100; i++)
+        {
+            monster.hit(0.1);
+        }
+
+        expect(monster.health).toBe(0);
+        expect(monster.dead).toBe(true);
+    });
+
+    it('is dead when a fractional hit takes more than the remaining health', () => {
+        const monster = new Monster(1);
+
+        monster.hit(0.6);
+        monster.hit(0.6);
+
+        expect(monster.health).toBe(0);
+        expect(monster.dead).toBe(true);
+    });
+
+    it('carries the stats it was given, fire without defense by default', () => {
+        const stats = { element: 'WATER', physicalDefense: 5, magicalDefense: 6, critResistance: 7 };
+
+        expect(new Monster(10, 1, stats).stats).toBe(stats);
+        expect(new Monster().stats).toEqual(DEFAULT_STATS);
+        expect(DEFAULT_STATS).toEqual({ element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 });
+    });
+
+    it('keeps its stats when it respawns', () => {
+        const stats = { element: 'NATURE', physicalDefense: 5, magicalDefense: 6, critResistance: 7 };
+        const monster = new Monster(10, 1, stats);
+
+        monster.hit(10);
+        monster.respawn();
+
+        expect(monster.stats).toBe(stats);
     });
 });
