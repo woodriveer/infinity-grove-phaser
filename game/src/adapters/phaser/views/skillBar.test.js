@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { renderSkillBar } from './skillBar';
+import { renderLeaderCard, renderSkillBar } from './skillBar';
 
 const leader = (...unlocked) => ({
     id: 'kael',
@@ -55,5 +55,19 @@ describe('renderSkillBar', () => {
         slots(bar).forEach((slot) => slot.click());
 
         expect(bar.innerHTML).toBe(before);
+    });
+});
+
+describe('renderLeaderCard', () => {
+    it('shows the sprite, the name and the leader bonus of the leader', () => {
+        const card = renderLeaderCard({ ...leader(true), name: 'Kael Raizférrea', leaderBonus: '+25% contra chefes' });
+
+        expect(card.querySelector('img').getAttribute('src')).toBe('assets/heroes/kael_sprite.png');
+        expect(card.querySelector('.leader-name').textContent).toBe('Kael Raizférrea');
+        expect(card.querySelector('.leader-bonus').textContent).toBe('Líder · +25% contra chefes');
+    });
+
+    it('is empty without a leader', () => {
+        expect(renderLeaderCard(null).children).toHaveLength(0);
     });
 });

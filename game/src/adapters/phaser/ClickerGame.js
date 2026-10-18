@@ -3,31 +3,41 @@ import { BossCountdown } from '../../domain/campaign/bossCountdown';
 import { calculateDamage, formatDamage } from '../../domain/combat/damage';
 import { Monster } from '../../domain/combat/monster';
 import { HeroUi } from './HeroUi';
+import { el } from './views/dom';
 
 //  The leader hero stands on the ground line of the monster; y is its feet
-const CHARACTER = { x: 300, y: 600, height: 220 };
-const MONSTER = { x: 700, y: 500, width: 160, height: 200, color: 0xcc2222 };
-const HEALTH_BAR = { width: 120, height: 12, gap: 16, backColor: 0x222222, fillColor: 0x33cc33 };
+const CHARACTER = { x: 230, y: 612, height: 320 };
+//  The monster is a translucent cream placeholder until its art arrives
+const MONSTER = { x: 670, y: 460, width: 220, height: 250, color: 0xf5ead8, fillAlpha: 0.35 };
+const HEALTH_BAR = { width: 240, height: 16, gap: 18, backColor: 0xdcd3c4, fillColor: 0xc67139 };
 const DAMAGE_TEXT = { rise: 40, duration: 800 };
 const DEATH = { fadeDuration: 500, respawnDelay: 1000 };
-const WALLET = { x: 180, y: 32 };
+const LOGO = { x: 82, y: 44, width: 136 };
+//  The wallet pill sits in the top-right corner; coins fly to its centre
+const WALLET = { x: 890, y: 44 };
+const COINS = [ [ 'gold', 'Gold' ], [ 'silver', 'Silver' ], [ 'copper', 'Copper' ] ];
 const COIN = { duration: 600, stagger: 100 };
 const WALLET_SYNC_MS = 10000;
-const WALLET_HTML = '<div class="wallet"></div>';
-const STAGE_HUD = { x: 512, y: 32 };
-const BOSS_TIMER = { x: 512, y: 72 };
-const ENEMY_STATS = { x: 512, y: 108 };
-const CRITICAL_TEXT = { color: '#ffd700', fontSize: 52 };
-const NORMAL_TEXT = { color: '#ffffff', fontSize: 38 };
+//  Phaser measures a DOM element once, when it is added, and centres it on that size: every element whose content changes sits in a
+//  fixed-size box (style.css) so it stays where it was placed
+const WALLET_HTML = '<div class="hud-box hud-wallet"><div class="wallet"></div></div>';
+const STAGE_HUD = { x: 356, y: 44 };
+const BOSS_TIMER = { x: 670, y: 186 };
+const ENEMY_STATS = { x: 670, y: 250 };
+const DAMAGE_FONT = { fontFamily: 'Caprasimo', stroke: '#2e2b25', strokeThickness: 8 };
+const CRITICAL_TEXT = { color: '#ffc6a5', fontSize: 48 };
+const NORMAL_TEXT = { color: '#f5ead8', fontSize: 32 };
 const STAGE_MESSAGE = { x: 512, y: 384 };
-const STAGE_HUD_HTML = '<div class="stage-hud"></div>';
-const BOSS_TIMER_HTML = '<div class="boss-timer"></div>';
-const ENEMY_STATS_HTML = '<div class="enemy-stats"></div>';
-const STAGE_MESSAGE_HTML = '<div class="stage-message"></div>';
-const FARM_TOGGLE = { x: 512, y: 730 };
+const BATTLE_BAR = { x: 512, y: 686 };
+const BATTLE_BAR_HTML = '<div class="battle-bar"></div>';
+const STAGE_HUD_HTML = '<div class="hud-box hud-stage"><div class="stage-hud"></div></div>';
+const BOSS_TIMER_HTML = '<div class="hud-box hud-timer"><div class="boss-timer"></div></div>';
+const ENEMY_STATS_HTML = '<div class="hud-box hud-enemy"><div class="enemy-stats"></div></div>';
+const STAGE_MESSAGE_HTML = '<div class="hud-box hud-message"><div class="stage-message"></div></div>';
+const FARM_TOGGLE = { x: 918, y: 686 };
 const PAUSE_MENU = { x: 512, y: 384 };
-const FARM_TOGGLE_HTML = '<label class="farm-toggle"><input type="checkbox"> Farm boss</label>';
-const PAUSE_MENU_HTML = '<div class="pause-menu" hidden>'
+const FARM_TOGGLE_HTML = '<div class="hud-box hud-farm"><label class="farm-toggle"><input type="checkbox"> Farm boss</label></div>';
+const PAUSE_MENU_HTML = '<div class="pause-menu" hidden><div class="pause-card">'
     + '<div class="pause-title">Paused</div>'
     + '<div class="pause-options">'
     + '<button class="pause-continue">1. Continue</button>'
@@ -38,7 +48,7 @@ const PAUSE_MENU_HTML = '<div class="pause-menu" hidden>'
     + '<button class="pause-confirm-yes">Yes, leave</button>'
     + '<button class="pause-confirm-no">No, stay</button>'
     + '</div>'
-    + '</div>';
+    + '</div></div>';
 const LOAD_FAILED_TEXT = 'Could not load progress';
 const COMPLETED_TEXT = 'Chapter complete!';
 
@@ -69,8 +79,12 @@ export class ClickerGame extends Scene
 
         this.add.image(512, 384, 'background');
 
+        const logo = this.add.image(LOGO.x, LOGO.y, 'logo');
+
+        logo.setScale(LOGO.width / logo.width);
+
         this.character = null;
-        const body = this.add.rectangle(MONSTER.x, MONSTER.y, MONSTER.width, MONSTER.height, MONSTER.color);
+        const body = this.add.rectangle(MONSTER.x, MONSTER.y, MONSTER.width, MONSTER.height, MONSTER.color, MONSTER.fillAlpha);
 
         //  The bar is centred above the monster's head
         const barX = MONSTER.x - HEALTH_BAR.width / 2;
@@ -89,6 +103,9 @@ export class ClickerGame extends Scene
         this.walletText = this.add.dom(WALLET.x, WALLET.y).createFromHTML(WALLET_HTML).setVisible(false);
         this.walletText.pointerEvents = 'none';
         this.loadWallet();
+
+        //  The cream bar under the leader, the skills and the farm switch; added first so they sit on top of it
+        this.add.dom(BATTLE_BAR.x, BATTLE_BAR.y).createFromHTML(BATTLE_BAR_HTML).pointerEvents = 'none';
 
         //  Stage position, boss countdown and messages are real HTML too, click-through like the wallet text
         this.stageHud = this.createHtml(STAGE_HUD, STAGE_HUD_HTML, '.stage-hud');
@@ -121,7 +138,8 @@ export class ClickerGame extends Scene
     createControls ()
     {
         this.farmToggle = this.createHtml(FARM_TOGGLE, FARM_TOGGLE_HTML, '.farm-toggle input', true);
-        this.pauseElement = this.add.dom(PAUSE_MENU.x, PAUSE_MENU.y).createFromHTML(PAUSE_MENU_HTML);
+        //  Above the hero buttons and the skill bar, which are added after it
+        this.pauseElement = this.add.dom(PAUSE_MENU.x, PAUSE_MENU.y).createFromHTML(PAUSE_MENU_HTML).setDepth(1);
         this.pauseMenu = this.pauseElement.node.querySelector('.pause-menu');
         this.pauseOptions = this.pauseMenu.querySelector('.pause-options');
         this.pauseConfirm = this.pauseMenu.querySelector('.pause-confirm');
@@ -348,12 +366,16 @@ export class ClickerGame extends Scene
         }
     }
 
-    //  "Water  Physical def 10%  Magical def 10%  Crit res 12%"
+    //  "Water  Physical def 10%  Magical def 10%  Crit res 12%", one tag each; the double spaces are hidden between the tags
     showEnemyStats ({ element, physicalDefense, magicalDefense, critResistance })
     {
         const name = element.charAt(0) + element.slice(1).toLowerCase();
+        const tags = [
+            el('span', 'tag tag-element', name),
+            ...[ `Physical def ${physicalDefense}%`, `Magical def ${magicalDefense}%`, `Crit res ${critResistance}%` ].map((text) => el('span', 'tag', text))
+        ];
 
-        this.enemyStats.textContent = `${name}  Physical def ${physicalDefense}%  Magical def ${magicalDefense}%  Crit res ${critResistance}%`;
+        this.enemyStats.replaceChildren(...tags.flatMap((tag, index) => (index ? [ el('span', 'gap', '  '), tag ] : [ tag ])));
     }
 
     completeChapter ()
@@ -488,11 +510,16 @@ export class ClickerGame extends Scene
         this.walletText.setVisible(true);
     }
 
+    //  "Gold: 2  Silver: 14  Copper: 37": a coin disc and the amount each, the names kept for assistive tech
     refreshWalletText ()
     {
-        const { gold, silver, copper } = this.wallet.display();
+        const amounts = this.wallet.display();
 
-        this.walletText.node.querySelector('.wallet').textContent = `Gold: ${gold}  Silver: ${silver}  Copper: ${copper}`;
+        this.walletText.node.querySelector('.wallet').replaceChildren(...COINS.flatMap(([ key, label ], index) => [
+            ...(index ? [ el('span', 'sr-only', '  ') ] : []),
+            el('span', 'sr-only', `${label}: `),
+            el('span', `coin coin-${key}`, String(amounts[key]))
+        ]));
     }
 
     hitMonster (pointer)
@@ -668,10 +695,10 @@ export class ClickerGame extends Scene
         return onMonster ? pointer.x : MONSTER.x;
     }
 
-    //  A critical hit is bigger and gold
+    //  A critical hit is bigger and peach
     showDamage (damage, x, critical = false)
     {
-        const textStyle = { fontFamily: 'Arial Black', ...(critical ? CRITICAL_TEXT : NORMAL_TEXT), stroke: '#000000', strokeThickness: 8 };
+        const textStyle = { ...DAMAGE_FONT, ...(critical ? CRITICAL_TEXT : NORMAL_TEXT) };
 
         const text = this.add.text(x, this.damageTextY, damage, textStyle).setOrigin(0.5, 1).setDepth(1);
 

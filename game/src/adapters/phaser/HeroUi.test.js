@@ -48,6 +48,7 @@ const createUi = ({ list = catalog(), farmGet = farmState(), pause = true } = {}
                     return element;
                 };
                 element.updateSize = vi.fn();
+                element.setDepth = vi.fn(() => element);
                 return element;
             })
         },

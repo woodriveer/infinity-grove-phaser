@@ -18,7 +18,7 @@ describe('renderCatalog', () => {
 
         expect(grid.querySelectorAll('.hero-card')).toHaveLength(2);
         expect(kael.classList.contains('is-grey')).toBe(false);
-        expect(kael.querySelector('img').getAttribute('src')).toBe('assets/heroes/kael_position.jpg');
+        expect(kael.querySelector('img').getAttribute('src')).toBe('assets/heroes/kael_sprite.png');
         expect(kael.querySelector('.hero-name').textContent).toBe('Hero kael');
         expect(kael.querySelector('.hero-meta').textContent).toBe('Fogo');
         expect(kael.querySelector('.hero-stars').textContent).toBe('1★');
@@ -73,7 +73,7 @@ describe('renderHeroDetail', () => {
     it('shows the portrait, class, element, stars, leader bonus and three skills', () => {
         const detail = renderHeroDetail(hero('kael'));
 
-        expect(detail.querySelector('.hero-detail-portrait').getAttribute('src')).toBe('assets/heroes/kael_position.jpg');
+        expect(detail.querySelector('.hero-detail-portrait').getAttribute('src')).toBe('assets/heroes/kael_sprite.png');
         expect(detail.querySelector('.hero-name').textContent).toBe('Hero kael');
         expect(detail.querySelector('.hero-class').textContent).toBe('Classe: Guerreiro');
         expect(detail.querySelector('.hero-element').textContent).toBe('Elemento: Fogo');

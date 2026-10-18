@@ -25,7 +25,15 @@ const createScene = (data = {}) => {
         remove: vi.fn((key) => { delete registryData[key]; })
     };
     scene.add = {
-        image: vi.fn((x, y, key) => (key === 'logo' ? logo : {})),
+        image: vi.fn((x, y, key) => {
+            if (key === 'logo') { return logo; }
+
+            const image = { height: 300, setScale: vi.fn() };
+
+            image.setOrigin = () => image;
+            return image;
+        }),
+        ellipse: vi.fn(() => ({})),
         text: vi.fn(() => ({})),
         dom: vi.fn(() => ({
             createFromHTML: (html) => {

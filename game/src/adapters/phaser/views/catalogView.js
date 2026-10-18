@@ -1,5 +1,5 @@
 import { ELEMENT_LABELS } from '../../../domain/heroes/heroes';
-import { art, el, starsText } from './dom';
+import { art, el, sprite, starsText } from './dom';
 
 //  One skill with its art, name, type, effect and cooldown, marked unlocked or locked. Locked skills are shown all the same.
 export const renderSkillRow = (skill) =>
@@ -41,7 +41,7 @@ export const renderCatalog = (heroes, { onSelect }) =>
         const card = el('button', `hero-card${hero.owned ? '' : ' is-grey'}`, '', { type: 'button', testid: `hero-card-${hero.id}` });
 
         card.append(
-            art(hero.portrait, hero.name, 'hero-portrait'),
+            sprite(hero.id, hero.name, 'hero-portrait'),
             el('span', 'hero-name', hero.name),
             el('span', 'hero-meta', ELEMENT_LABELS[hero.element]),
             el('span', 'hero-stars', hero.owned ? starsText(hero.stars) : 'Não obtido')
@@ -53,7 +53,7 @@ export const renderCatalog = (heroes, { onSelect }) =>
     return grid;
 };
 
-//  One hero in full: portrait, class, element, leader bonus and the three skills
+//  One hero in full: sprite, class, element, leader bonus and the three skills
 export const renderHeroDetail = (hero) =>
 {
     const detail = el('div', 'hero-detail', '', { testid: 'hero-detail' });
@@ -66,7 +66,7 @@ export const renderHeroDetail = (hero) =>
         el('div', 'hero-stars', hero.owned ? `Estrelas: ${starsText(hero.stars)}` : 'Não obtido'),
         el('div', 'hero-bonus', `Bônus de líder: ${hero.leaderBonus}`)
     );
-    detail.append(art(hero.portrait, hero.name, 'hero-detail-portrait'), text, renderSkillList(hero));
+    detail.append(sprite(hero.id, hero.name, 'hero-detail-portrait'), text, renderSkillList(hero));
 
     return detail;
 };

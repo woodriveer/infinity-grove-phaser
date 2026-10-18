@@ -2,6 +2,20 @@ import { Scene } from 'phaser';
 import { STARTING_CHOICES } from '../../domain/heroes/heroes';
 
 const CHOOSE_PATH_TEXT = 'Escolha seu caminho';
+const TAGLINE_TEXT = 'Defenda a Grande Árvore das hordas do Submundo.';
+
+//  Everything the player reads or clicks sits in a cream oval on the left; x is the centre of that column
+const COLUMN_X = 216;
+const OVAL = { x: 170, y: 380, width: 700, height: 1040, color: 0xf5ead8, shadow: 0x2e2b25 };
+
+//  The five heroes stand on the right, back to front; x is the centre of the feet, y the ground line
+const LINEUP = [
+    { id: 'vex', x: 570, y: 734, height: 340 },
+    { id: 'seraphine', x: 680, y: 738, height: 360 },
+    { id: 'lyra', x: 940, y: 734, height: 370 },
+    { id: 'orina', x: 850, y: 746, height: 350 },
+    { id: 'kael', x: 740, y: 754, height: 360 }
+];
 const OTHER_HEROES_TEXT = 'Os outros personagens podem ser encontrados no decorrer do jogo.';
 
 const FORM_HTML = `
@@ -30,16 +44,21 @@ const PATH_HTML = `
     </div>
 `;
 
+const TAGLINE_HTML = `<p class="menu-tagline">${TAGLINE_TEXT}</p>`;
+
 const MESSAGE_HTML = '<p class="auth-message" role="alert"></p>';
+
+const PLAY_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2.75" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>';
+const LOGOUT_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg>';
 
 const WELCOME_HTML = `
     <div class="welcome">
         <p class="welcome-title"></p>
-        <p>Click to Start!</p>
+        <p class="welcome-start">Click to Start!${PLAY_ICON}</p>
     </div>
 `;
 
-const LOGOUT_HTML = '<button type="button" class="logout" name="logout">Logout</button>';
+const LOGOUT_HTML = `<button type="button" class="logout" name="logout">${LOGOUT_ICON}Logout</button>`;
 
 export class MainMenu extends Scene
 {
@@ -53,9 +72,14 @@ export class MainMenu extends Scene
         ({ session: this.session, users: this.users } = this.registry.get('services'));
 
         this.add.image(512, 384, 'background');
+        this.addLineup();
 
-        //  Source art is 2760 px wide; start above the canvas, rest at y = 150
-        const logo = this.add.image(512, -150, 'logo');
+        //  The oval drops a soft shadow on the forest
+        this.add.ellipse(OVAL.x + 6, OVAL.y + 12, OVAL.width, OVAL.height, OVAL.shadow, 0.22);
+        this.add.ellipse(OVAL.x, OVAL.y, OVAL.width, OVAL.height, OVAL.color);
+
+        //  Scaled to 400 px wide; start above the canvas, rest at y = 150
+        const logo = this.add.image(COLUMN_X, -150, 'logo');
         logo.setScale(400 / logo.width);
 
         this.tweens.add({
@@ -66,7 +90,9 @@ export class MainMenu extends Scene
         });
 
         //  Status line is real HTML (not canvas text) so it is visible to assistive tech and e2e locators
-        const message = this.add.dom(512, 700).createFromHTML(MESSAGE_HTML);
+        this.add.dom(COLUMN_X + 20, 300).createFromHTML(TAGLINE_HTML).pointerEvents = 'none';
+
+        const message = this.add.dom(COLUMN_X + 10, 560).createFromHTML(MESSAGE_HTML);
         message.pointerEvents = 'none';
         this.message = message.node.querySelector('.auth-message');
 
@@ -80,6 +106,18 @@ export class MainMenu extends Scene
         {
             this.restoreSession();
         }
+    }
+
+    //  The heroes of the game in a group on the ground, each scaled to its height
+    addLineup ()
+    {
+        LINEUP.forEach(({ id, x, y, height }) => {
+
+            const hero = this.add.image(x, y, `hero_${id}`).setOrigin(0.5, 1);
+
+            hero.setScale(height / hero.height);
+
+        });
     }
 
     async restoreSession ()
@@ -105,7 +143,7 @@ export class MainMenu extends Scene
 
     showAuthForm ()
     {
-        const form = this.add.dom(512, 540).createFromHTML(FORM_HTML);
+        const form = this.add.dom(COLUMN_X, 430).createFromHTML(FORM_HTML);
         const username = form.getChildByName('username');
         const password = form.getChildByName('password');
         const buttons = [ form.getChildByName('login'), form.getChildByName('signup') ];
@@ -216,12 +254,12 @@ export class MainMenu extends Scene
 
     showWelcome (user)
     {
-        const welcome = this.add.dom(512, 550).createFromHTML(WELCOME_HTML);
+        const welcome = this.add.dom(COLUMN_X + 10, 420).createFromHTML(WELCOME_HTML);
         welcome.pointerEvents = 'none';
         welcome.node.querySelector('.welcome-title').textContent = `Hello, ${user.username}!`;
 
         //  Own DOM element: the welcome block is click-through, the button must receive clicks
-        const logout = this.add.dom(512, 640).createFromHTML(LOGOUT_HTML);
+        const logout = this.add.dom(COLUMN_X, 515).createFromHTML(LOGOUT_HTML);
 
         const start = () => {
 

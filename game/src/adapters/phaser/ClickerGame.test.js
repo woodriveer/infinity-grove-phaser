@@ -133,6 +133,7 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
                 return element;
             };
             element.updateSize = vi.fn(() => element);
+            element.setDepth = vi.fn(() => element);
             element.setVisible = (visible) => { element.visible = visible; return element; };
             doms.push(element);
             return element;
@@ -154,9 +155,9 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
     //  Default pointer is off the monster
     const click = (pointer = { x: 100, y: 100 }) => handlers.pointerdown(pointer);
     const byColor = (color) => rectangles.filter((r) => r.color === color);
-    const monster = byColor(0xcc2222)[0];
-    const fill = byColor(0x33cc33)[0];
-    const back = byColor(0x222222)[0];
+    const monster = byColor(0xf5ead8)[0];
+    const fill = byColor(0xc67139)[0];
+    const back = byColor(0xdcd3c4)[0];
 
     const walletText = () => doms.map((d) => d.node.querySelector('.wallet')).find(Boolean);
     const control = (selector) => doms.map((d) => d.node.querySelector(selector)).find(Boolean);
@@ -171,17 +172,17 @@ describe('ClickerGame scene', () => {
         const { scene, rectangles, byColor, images } = await createScene();
 
         expect(byColor(0x000000)).toHaveLength(0);
-        expect(byColor(0xcc2222)).toHaveLength(1);
+        expect(byColor(0xf5ead8)).toHaveLength(1);
         expect(rectangles).toHaveLength(3); //  monster, health bar back, health bar fill
         expect(images.filter((image) => image.key.startsWith('hero_')).map((image) => image.key)).toEqual([ 'hero_kael' ]);
         expect(scene.add.text).not.toHaveBeenCalled();
         expect(scene.physics).toBeUndefined();
     });
 
-    it('scales the hero to 220 px high and stands it on the ground line, left of the monster', async () => {
+    it('scales the hero to 320 px high and stands it on the ground line, left of the monster', async () => {
         const { scene } = await createScene();
 
-        expect(scene.character).toMatchObject({ x: 300, y: 600, scale: 220 / 400 });
+        expect(scene.character).toMatchObject({ x: 230, y: 612, scale: 320 / 400 });
     });
 
     it('swaps the sprite when the leader changes', async () => {
@@ -249,23 +250,23 @@ describe('ClickerGame scene', () => {
 });
 
 describe('ClickerGame health bar', () => {
-    it('is centred above the monster and 120 px wide at full health', async () => {
+    it('is centred above the monster and 240 px wide at full health', async () => {
         const { monster, fill, back } = await createScene();
 
         expect(back.x + back.width / 2).toBe(monster.x);
         expect(fill.x).toBe(back.x);
         expect(fill.y).toBe(back.y);
-        expect(fill.width).toBe(120);
-        expect(back.width).toBe(120);
-        expect(back.y + back.height).toBe(monster.y - monster.height / 2 - 16);
+        expect(fill.width).toBe(240);
+        expect(back.width).toBe(240);
+        expect(back.y + back.height).toBe(monster.y - monster.height / 2 - 18);
     });
 
-    it('shrinks the fill to 108 px after one click', async () => {
+    it('shrinks the fill to 216 px after one click', async () => {
         const { fill, click } = await createScene();
 
         click();
 
-        expect(fill.width).toBe(108);
+        expect(fill.width).toBe(216);
     });
 });
 
@@ -348,7 +349,7 @@ describe('ClickerGame monster death', () => {
         expect(ctx.scene.monster.health).toBe(0);
     });
 
-    it('spawns a monster with health 10, alpha 1 and a 120 px bar when the wait ends', async () => {
+    it('spawns a monster with health 10, alpha 1 and a 240 px bar when the wait ends', async () => {
         const ctx = await createScene();
         kill(ctx);
         fadeTween(ctx).onComplete();
@@ -358,7 +359,7 @@ describe('ClickerGame monster death', () => {
 
         expect(ctx.scene.monster.health).toBe(10);
         expect([ ctx.monster.alpha, ctx.back.alpha, ctx.fill.alpha ]).toEqual([ 1, 1, 1 ]);
-        expect(ctx.fill.width).toBe(120);
+        expect(ctx.fill.width).toBe(240);
     });
 
     it('takes 1 damage per click again after the respawn', async () => {
@@ -370,7 +371,7 @@ describe('ClickerGame monster death', () => {
         ctx.click();
 
         expect(ctx.scene.monster.health).toBe(9);
-        expect(ctx.fill.width).toBe(108);
+        expect(ctx.fill.width).toBe(216);
         expect(ctx.texts).toHaveLength(11);
     });
 });
@@ -426,13 +427,13 @@ describe('ClickerGame wallet text', () => {
         expect(walletElement().visible).toBe(false);
     });
 
-    it('shows "Gold: G  Silver: S  Copper: C" in the top-left corner once the wallet has loaded', async () => {
+    it('shows "Gold: G  Silver: S  Copper: C" in the top-right corner once the wallet has loaded', async () => {
         const { walletText, walletElement } = await createScene({ wallet: walletResponse() });
         await flush();
 
         expect(walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
         expect(walletElement().visible).toBe(true);
-        expect(walletElement().x).toBeLessThan(512);
+        expect(walletElement().x).toBeGreaterThan(512);
         expect(walletElement().y).toBeLessThan(100);
     });
 
@@ -502,7 +503,7 @@ describe('ClickerGame coin drops', () => {
 
         expect(ctx.sprites).toHaveLength(3);
         ctx.sprites.forEach((coin) => {
-            expect([ coin.x, coin.y, coin.key, coin.anim ]).toEqual([ 700, 500, 'coin', 'rotate' ]);
+            expect([ coin.x, coin.y, coin.key, coin.anim ]).toEqual([ 670, 460, 'coin', 'rotate' ]);
         });
     });
 
@@ -1549,7 +1550,7 @@ describe('ClickerGame elements', () => {
         expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 0.5);
     });
 
-    it('doubles the damage on a critical click and draws that number bigger and gold', async () => {
+    it('doubles the damage on a critical click and draws that number bigger and peach', async () => {
         const ctx = await createScene({ start: withStats(stats('FIRE')) });
         ctx.dice.value = 0;
 
@@ -1557,15 +1558,15 @@ describe('ClickerGame elements', () => {
 
         expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 2);
         expect(ctx.texts[0].text).toBe('2');
-        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ color: '#ffd700', fontSize: 52 }));
+        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ color: '#ffc6a5', fontSize: 48 }));
     });
 
-    it('draws a normal click white and 38 px', async () => {
+    it('draws a normal click cream and 32 px', async () => {
         const ctx = await createScene({ start: withStats(stats('FIRE')) });
 
         ctx.click();
 
-        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ color: '#ffffff', fontSize: 38 }));
+        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ color: '#f5ead8', fontSize: 32 }));
     });
 
     it('never crits a monster with critical resistance 100', async () => {

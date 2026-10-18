@@ -26,4 +26,7 @@ export const el = (tag, className = '', text = '', attributes = {}) =>
 
 export const art = (name, alt, className) => el('img', className, '', { src: `${ART_PATH}/${name}.jpg`, alt, loading: 'lazy' });
 
+//  The standing hero on a transparent background (the portrait art still carries its chroma-key backdrop)
+export const sprite = (heroId, alt, className = '') => el('img', className, '', { src: `${ART_PATH}/${heroId}_sprite.png`, alt, loading: 'lazy' });
+
 export const starsText = (stars) => `${stars}★`;
