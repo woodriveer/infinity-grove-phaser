@@ -60,11 +60,11 @@
 
 ## Handoff
 
-- **Feature**: .specs/features/elements (builds on stages)
-- **Phase / Task**: Done - elements T1-T8 committed and pushed, Verifier report PASS (`validation.md`, 30/30 mutants killed)
-- **Completed**: elements T1-T8 (backend EnemyStats and columns, `/progress` payload, game element table, damage formula, scene HUD, e2e); earlier stages, wallet and drops; pause menu and farm toggle (`26e1ccb`)
+- **Feature**: .specs/features/characters (hero cards, bag, fusion, leader, farm; builds on stages, drops and elements)
+- **Phase / Task**: Execute done - T1 to T51 committed and pushed; the Verifier has not run yet
+- **Completed**: backend (hero catalog and seed, chapter order, `PlayerCards`, drops in the outcome transaction, `GET /heroes`, fuse, `PUT /leader`, `GET /farm`, `POST /farm/outcome`, registration with `startingElement`), game (hero screens, skill bar, card notice, farm mode, sign up choice), e2e (registration, heroes, farm), ADRs backend 0007 and game 0009, AD-005 to AD-007
 - **In-progress** (file:line): none
-- **Next step**: characters with their own element, damage type and critical stats (the player is fire, physical, 10 % critical until then); decide the HUD wording of the enemy line and the critical mark (spec-precision gaps in `validation.md`)
+- **Next step**: run the Verifier on `characters` (writes `validation.md`), then `hero-combat` (execute the skills, leader bonus, hero stats) and TD-001 (translate the existing English text)
 - **Blockers**: none
-- **Uncommitted files**: `game/src/adapters/phaser/Preloader.js` (the owner's coin atlas switch) and `game/public/assets/coin-*.png`; they predate this feature and were never staged
+- **Uncommitted files**: `game/public/assets/coin-*.png` (the owner coin art, never staged)
 - **Branch**: main

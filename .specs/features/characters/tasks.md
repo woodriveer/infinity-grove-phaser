@@ -1158,10 +1158,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] The ADR describes the services, `HeroUi`, farm mode, the art files and their size, and the Portuguese rule with TD-001
-- [ ] `STATE.md` handoff names this feature as done pending the Verifier
-- [ ] Build gate passes
+- [x] The ADR describes the services, `HeroUi`, farm mode, the art files and their size, and the Portuguese rule with TD-001
+- [x] `STATE.md` handoff names this feature as done pending the Verifier
+- [x] Build gate passes
 
+**Status**: Done
 **Tests**: none (documentation)
 **Gate**: Build
 
