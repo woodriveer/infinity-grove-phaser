@@ -387,9 +387,10 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Defaults are 0.01, 0.10, 10 and 5000; a rate outside 0..1, a limit below 1 or an interval below 0 is rejected at construction
-- [ ] `CardConfigTest` passes; quick gate passes; phase build gate passes
+- [x] Defaults are 0.01, 0.10, 10 and 5000; a rate outside 0..1, a limit below 1 or an interval below 0 is rejected at construction
+- [x] `CardConfigTest` passes; quick gate passes; phase build gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend), then Build at the end of the phase
 
