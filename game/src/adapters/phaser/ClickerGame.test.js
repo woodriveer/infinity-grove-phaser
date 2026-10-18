@@ -93,6 +93,7 @@ const createScene = async ({ wallet, start = progress() } = {}) => {
                 element.node = root; //  like Phaser, node is the wrapper div around the html
                 return element;
             };
+            element.updateSize = vi.fn(() => element);
             element.setVisible = (visible) => { element.visible = visible; return element; };
             doms.push(element);
             return element;
@@ -1308,6 +1309,16 @@ describe('ClickerGame pause and leave fight', () => {
         expect(ctx.scene.tweens.paused).toBe(true);
         expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth);
         expect(ctx.scene.monster).not.toBeNull();
+    });
+
+    it('measures the menu again when it opens so it stays centred', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.handlers['keydown-ESC']();
+
+        expect(ctx.scene.pauseElement.updateSize).toHaveBeenCalledTimes(1);
+        expect(ctx.scene.pauseElement.x).toBe(512);
+        expect(ctx.scene.pauseElement.y).toBe(384);
     });
 
     it('continues on the Continue button and on a second Esc', async () => {

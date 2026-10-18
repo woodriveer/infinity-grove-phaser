@@ -107,7 +107,8 @@ export class ClickerGame extends Scene
     createControls ()
     {
         this.farmToggle = this.createHtml(FARM_TOGGLE, FARM_TOGGLE_HTML, '.farm-toggle input', true);
-        this.pauseMenu = this.createHtml(PAUSE_MENU, PAUSE_MENU_HTML, '.pause-menu', true);
+        this.pauseElement = this.add.dom(PAUSE_MENU.x, PAUSE_MENU.y).createFromHTML(PAUSE_MENU_HTML);
+        this.pauseMenu = this.pauseElement.node.querySelector('.pause-menu');
         this.pauseOptions = this.pauseMenu.querySelector('.pause-options');
         this.pauseConfirm = this.pauseMenu.querySelector('.pause-confirm');
 
@@ -132,6 +133,9 @@ export class ClickerGame extends Scene
         this.tweens.paused = true;
         this.showPauseOptions();
         this.pauseMenu.hidden = false;
+
+        //  The menu was hidden when Phaser measured it, so the size it centres on is 0 until measured again
+        this.pauseElement.updateSize();
     }
 
     resumeFight ()

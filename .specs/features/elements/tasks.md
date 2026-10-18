@@ -148,9 +148,9 @@ T6 → T7 → T8
 
 **Done when**:
 
-- [ ] All 25 pairs return the multiplier of the spec (ELEM-01 AC1-6)
-- [ ] An unknown element throws
-- [ ] Gate passes
+- [x] All 25 pairs return the multiplier of the spec (ELEM-01 AC1-6)
+- [x] An unknown element throws
+- [x] Gate passes
 
 **Tests**: unit
 **Gate**: quick
