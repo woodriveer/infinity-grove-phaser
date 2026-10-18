@@ -1053,13 +1053,14 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Picking a boss shows its encounter with the farm label and its time limit; the saved campaign position and the report queue are untouched
-- [ ] A win sends one farm request, shows the drop notice when `drop` is set and starts the boss again
-- [ ] A timeout restarts the same boss with no request; Leave fight returns to the campaign encounter
-- [ ] When `chapterBossWinsLeft` reaches 0 the loop ends, the campaign view returns and the farm list shows 0 wins left
-- [ ] A rejected win (409) ends the attempt without a notice and reloads the farm state
-- [ ] `ClickerGame.test.js` passes; quick gate passes; phase build gate passes
+- [x] Picking a boss shows its encounter with the farm label and its time limit; the saved campaign position and the report queue are untouched
+- [x] A win sends one farm request, shows the drop notice when `drop` is set and starts the boss again
+- [x] A timeout restarts the same boss with no request; Leave fight returns to the campaign encounter
+- [x] When `chapterBossWinsLeft` reaches 0 the loop ends, the campaign view returns and the farm list shows 0 wins left
+- [x] A rejected win (409) ends the attempt without a notice and reloads the farm state
+- [x] `ClickerGame.test.js` passes; quick gate passes; phase build gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game), then Build at the end of the phase
 

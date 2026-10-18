@@ -131,7 +131,7 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
     };
     scene.registry = { get: vi.fn(() => services) };
     scene.sys = { isActive: vi.fn(() => true) };
-    scene.tweens = { add: vi.fn((config) => { tweens.push(config); }) };
+    scene.tweens = { add: vi.fn((config) => { tweens.push(config); }), killTweensOf: vi.fn() };
     scene.time = {
         delayedCall: vi.fn((delay, callback) => { timers.push({ delay, callback }); }),
         addEvent: vi.fn((config) => { loops.push(config); })
@@ -1743,5 +1743,193 @@ describe('ClickerGame hero screens', () => {
         await flush();
 
         expect(heroesGateway.list).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('ClickerGame farm mode', () => {
+    //  The player is on stage 3, so the miniboss of stages 1 and 2 are beaten
+    const midCampaign = () => progress(3, 'PHASE', 1);
+    const miniboss = { kind: 'MINIBOSS', stage: 1 };
+    const chapterBoss = { kind: 'CHAPTER_BOSS' };
+    const label = (ctx) => ctx.hud('.stage-hud').textContent;
+    const testid = (ctx, id) => ctx.control(`[data-testid="${id}"]`);
+    const killAll = (ctx) => {
+        while (ctx.scene.monster && !ctx.scene.monster.dead)
+        {
+            ctx.click();
+        }
+    };
+    const advance = (ctx) => {
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+    };
+    const farmWin = (drop = null, chapterBossWinsLeft = 10) => ({ drop, chapterBossWinsLeft });
+
+    it('fights the beaten boss with its numbers and the farm label, and touches nothing of the campaign', async () => {
+        const ctx = await createScene({ start: midCampaign() });
+
+        ctx.scene.startFarm(miniboss);
+
+        expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
+        expect(ctx.scene.monster.maxHealth).toBe(50);
+        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
+        expect(ctx.scene.session.encounter()).toMatchObject({ kind: 'PHASE', stage: 3, phase: 1 });
+        expect(campaignGateway.report).not.toHaveBeenCalled();
+    });
+
+    it('a win sends one farm request with the boss, shows the drop and brings the same boss back', async () => {
+        const ctx = await createScene({ start: midCampaign() });
+        farmGateway.win.mockResolvedValue(farmWin({ heroId: 'kael', heroName: 'Hero kael', stars: 0 }));
+        ctx.scene.startFarm(miniboss);
+
+        killAll(ctx);
+        await flush();
+
+        expect(farmGateway.win).toHaveBeenCalledTimes(1);
+        expect(farmGateway.win).toHaveBeenCalledWith(miniboss);
+        expect(testid(ctx, 'card-notice').textContent).toBe('Carta: Hero kael');
+        expect(ctx.scene.heroes.heroes()[0].copies[0]).toBe(2);
+
+        advance(ctx);
+
+        expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
+        expect(ctx.scene.monster.health).toBe(50);
+        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
+    });
+
+    it('a win reports nothing to the campaign and drops no coins', async () => {
+        const ctx = await createScene({ start: midCampaign(), wallet: walletResponse() });
+        farmGateway.win.mockResolvedValue(farmWin());
+        ctx.scene.startFarm(miniboss);
+
+        killAll(ctx);
+        ctx.loops[0].callback();
+        await flush();
+
+        expect(ctx.sprites).toHaveLength(0);
+        expect(campaignGateway.report).not.toHaveBeenCalled();
+        expect(ctx.scene.session.encounter()).toMatchObject({ kind: 'PHASE', stage: 3, phase: 1 });
+    });
+
+    it('a boss that survives its time limit comes back with no request and no campaign move', async () => {
+        const ctx = await createScene({ start: midCampaign() });
+        ctx.scene.startFarm(miniboss);
+
+        ctx.scene.update(0, 30000);
+        ctx.timers.at(-1).callback();
+
+        expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
+        expect(ctx.scene.monster.health).toBe(50);
+        expect(farmGateway.win).not.toHaveBeenCalled();
+        expect(campaignGateway.report).not.toHaveBeenCalled();
+    });
+
+    it('Leave fight in a farm fight returns to the campaign encounter without a failed report', async () => {
+        const ctx = await createScene({ start: midCampaign() });
+        ctx.scene.startFarm(miniboss);
+
+        ctx.handlers['keydown-ESC']();
+        ctx.control('.pause-leave').click();
+        ctx.control('.pause-confirm-yes').click();
+
+        expect(label(ctx)).toBe('Stage 3/10  Phase 1/5');
+        expect(ctx.scene.farmBoss).toBeNull();
+        expect(ctx.scene.paused).toBe(false);
+        expect(campaignGateway.report).not.toHaveBeenCalled();
+    });
+
+    it('a chapter boss win that leaves 0 wins today ends the farm and shows the list with 0 left', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1, true) });
+        farmGateway.win.mockResolvedValue(farmWin(null, 0));
+        farmGateway.get.mockResolvedValue({ bosses: [ miniboss, chapterBoss ], chapterBossWinsLeft: 0 });
+        ctx.scene.startFarm(chapterBoss);
+
+        killAll(ctx);
+        await flush();
+
+        expect(ctx.scene.farmBoss).toBeNull();
+        expect(ctx.hud('.stage-message').textContent).toBe('Chapter complete!');
+        expect(ctx.scene.heroUi.isOpen).toBe(true);
+        expect(testid(ctx, 'farm-entry-chapter-boss').disabled).toBe(true);
+        expect(testid(ctx, 'farm-entry-chapter-boss').textContent).toContain('0 vitórias restantes hoje');
+    });
+
+    it('a chapter boss win with wins left keeps the loop going', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1, true) });
+        farmGateway.win.mockResolvedValue(farmWin(null, 9));
+        ctx.scene.startFarm(chapterBoss);
+
+        killAll(ctx);
+        await flush();
+        advance(ctx);
+
+        expect(ctx.scene.farmBoss).toBe(chapterBoss);
+        expect(label(ctx)).toBe('Rever chefe: Chefe do capítulo');
+        expect(ctx.scene.heroUi.isOpen).toBe(false);
+    });
+
+    it('a refused win ends the farm without a notice and reloads the farm state', async () => {
+        const ctx = await createScene({ start: midCampaign() });
+        farmGateway.win.mockRejectedValue(new ApiError('Too fast', { status: 409, code: 'FARM_TOO_FAST' }));
+        ctx.scene.startFarm(miniboss);
+        const loads = farmGateway.get.mock.calls.length;
+
+        killAll(ctx);
+        await flush();
+
+        expect(ctx.scene.farmBoss).toBeNull();
+        expect(label(ctx)).toBe('Stage 3/10  Phase 1/5');
+        expect(testid(ctx, 'card-notice').hidden).toBe(true);
+        expect(farmGateway.get.mock.calls.length).toBe(loads + 1);
+    });
+
+    it('a win lost to a network failure keeps the loop going', async () => {
+        const ctx = await createScene({ start: midCampaign() });
+        farmGateway.win.mockRejectedValue(new ApiError('Cannot reach the server. Try again later.'));
+        ctx.scene.startFarm(miniboss);
+
+        killAll(ctx);
+        await flush();
+        advance(ctx);
+
+        expect(ctx.scene.farmBoss).toBe(miniboss);
+        expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
+    });
+
+    it('a realignment of the campaign during a farm fight does not replace the farm fight', async () => {
+        const ctx = await createScene({ start: midCampaign() });
+        ctx.scene.startFarm(miniboss);
+
+        ctx.scene.realign({ kind: 'PHASE', stage: 5, phase: 1, health: 14, stats: undefined, timeLimitMs: null, label: 'Stage 5/10  Phase 1/5' });
+
+        expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
+    });
+
+    it('picking a boss in Rever chefes closes the panel, resumes and starts the farm fight', async () => {
+        const ctx = await createScene({ start: midCampaign() });
+        testid(ctx, 'hud-farm').click();
+        await flush();
+
+        testid(ctx, 'farm-entry-miniboss-1').click();
+
+        expect(ctx.scene.heroUi.isOpen).toBe(false);
+        expect(ctx.scene.paused).toBe(false);
+        expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
+    });
+
+    it('does nothing before the campaign has loaded', async () => {
+        const ctx = await createScene({ start: new ApiError('Cannot reach the server. Try again later.') });
+
+        ctx.scene.startFarm(miniboss);
+
+        expect(ctx.scene.farmBoss).toBeNull();
+    });
+
+    it('stops the fade of the old monster so the next fight is visible', async () => {
+        const ctx = await createScene({ start: midCampaign() });
+
+        ctx.scene.startFarm(miniboss);
+
+        expect(ctx.scene.tweens.killTweensOf).toHaveBeenCalledWith(ctx.scene.monsterParts);
     });
 });

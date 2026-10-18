@@ -60,6 +60,7 @@ export class ClickerGame extends Scene
         this.random = services.random ?? Math.random;
         this.loadingCampaign = false;
         this.paused = false;
+        this.farmBoss = null;
         this.heroes = services.createHeroCollection();
         this.farm = services.createFarmSession();
         this.session.onRealign((encounter) => this.realign(encounter));
@@ -250,6 +251,13 @@ export class ClickerGame extends Scene
         }
 
         this.resumeFight();
+
+        if (this.farmBoss)
+        {
+            this.leaveFarm();
+            return;
+        }
+
         this.bossTimedOut();
     }
 
@@ -366,7 +374,8 @@ export class ClickerGame extends Scene
         this.enemyStats.textContent = '';
         this.monsterParts.forEach((part) => part.setAlpha(0));
 
-        this.showAfterDelay(this.session.fail());
+        //  A farmed boss that survives its time limit just comes back; nothing is reported and the campaign does not move
+        this.showAfterDelay(this.farmBoss ? this.session.farmEncounter(this.farmBoss) : this.session.fail());
     }
 
     //  Shows `next` after the respawn delay unless a realignment replaced the position in the meantime
@@ -424,6 +433,12 @@ export class ClickerGame extends Scene
     //  The backend holds another position than ours (a lost report, or another tab): play that one now
     realign (encounter)
     {
+        //  The session already adopted the stored position; leaving the farm shows it
+        if (this.farmBoss)
+        {
+            return;
+        }
+
         this.generation += 1;
         this.resumeFight();
         this.hideCountdown();
@@ -470,7 +485,13 @@ export class ClickerGame extends Scene
         if (this.monster.dead)
         {
             this.enemyStats.textContent = '';
-            this.dropCoins();
+
+            //  A farm fight drops no coins: kills are only reported for the campaign
+            if (!this.farmBoss)
+            {
+                this.dropCoins();
+            }
+
             this.fadeOutMonster(this.clearEncounter());
         }
     }
@@ -478,11 +499,85 @@ export class ClickerGame extends Scene
     //  Farming a boss replays it without reporting a win, so the stored position stays on that boss
     clearEncounter ()
     {
+        if (this.farmBoss)
+        {
+            return this.winFarm();
+        }
+
         const farming = this.countdown && this.farmToggle.checked;
 
         this.hideCountdown();
 
         return farming ? this.session.encounter() : this.session.clear();
+    }
+
+    //  Fights a boss the player already beat again and again; the campaign position and its report queue are never touched
+    startFarm (boss)
+    {
+        if (!this.session.loaded)
+        {
+            return;
+        }
+
+        this.farmBoss = boss;
+        this.generation += 1;
+        this.hideCountdown();
+        this.tweens.killTweensOf(this.monsterParts);
+        this.showEncounter(this.session.farmEncounter(boss));
+    }
+
+    //  A farm win is reported at once (one request); the same boss comes back for the next fight
+    winFarm ()
+    {
+        const boss = this.farmBoss;
+
+        this.hideCountdown();
+        this.reportFarmWin(boss);
+
+        return this.session.farmEncounter(boss);
+    }
+
+    //  The card of the win joins the bag; the chapter boss at 0 wins left today ends the farm and shows the list. A refusal ends it too.
+    async reportFarmWin (boss)
+    {
+        try
+        {
+            const result = await this.farm.win(boss);
+
+            if (!this.sys.isActive())
+            {
+                return;
+            }
+
+            if (result.drop)
+            {
+                this.receiveDrop(result.drop);
+            }
+
+            if (boss.kind === 'CHAPTER_BOSS' && result.chapterBossWinsLeft <= 0 && this.farmBoss === boss)
+            {
+                this.leaveFarm();
+                this.heroUi.show('farm');
+            }
+        }
+        catch (error)
+        {
+            if (this.sys.isActive() && error?.status === 409 && this.farmBoss === boss)
+            {
+                this.leaveFarm();
+                this.farm.load().catch(() => {});
+            }
+        }
+    }
+
+    //  Back to the campaign position the player left
+    leaveFarm ()
+    {
+        this.farmBoss = null;
+        this.generation += 1;
+        this.hideCountdown();
+        this.tweens.killTweensOf(this.monsterParts);
+        this.showEncounter(this.session.encounter());
     }
 
     //  One coin per copper of the next queued drop flies from the monster to the wallet text; each landing counts 1 copper
