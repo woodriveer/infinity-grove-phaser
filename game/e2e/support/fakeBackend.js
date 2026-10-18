@@ -136,6 +136,29 @@ const beatenBosses = (progress, definition) => {
     return progress.completed ? [ ...minibosses, { kind: 'CHAPTER_BOSS' } ] : minibosses;
 };
 
+//  Equipment contract (EquipmentController, the equipmentDrop of ProgressController and FarmController): a bag per player of raw pieces
+//  { id, slot, rarity, baseClick?, refine, affixes: [ { type, base } ], heroId? } shown the way the backend shows them (values refined, costs in copper).
+const RARITY = { COMMON: { index: 1, cost: 1 }, UNCOMMON: { index: 2, cost: 2 }, RARE: { index: 3, cost: 3 }, EPIC: { index: 4, cost: 5 }, LEGENDARY: { index: 5, cost: 8 } };
+const AFFIX_TYPES = [ 'CLICK_DAMAGE_PCT', 'CRIT_CHANCE', 'CRIT_DAMAGE_PCT', 'BOSS_DAMAGE_PCT', 'BOSS_TIME_SECONDS', 'ARMOR_PIERCE_PCT' ];
+const MAX_REFINE = 10;
+const REROLL_MIN_REFINE = 5;
+const REROLL_COST = 5000;
+
+const refineCostOf = (piece) => (piece.refine >= MAX_REFINE ? null : Math.floor(500 * 17 ** piece.refine / 10 ** piece.refine) * RARITY[piece.rarity].cost);
+
+const pieceView = (piece) => ({
+    id: piece.id,
+    slot: piece.slot,
+    rarity: piece.rarity,
+    refine: piece.refine,
+    ...(piece.baseClick != null && { clickDamage: piece.baseClick * (10 + piece.refine) / 10 }),
+    affixes: piece.affixes.map(({ type, base }) => ({ type, value: Math.floor(base * (10 + piece.refine) / 10) })),
+    ...(piece.heroId && { heroId: piece.heroId }),
+    ...(refineCostOf(piece) !== null && { refineCost: refineCostOf(piece) }),
+    ...(piece.refine >= REROLL_MIN_REFINE && { rerollCost: REROLL_COST }),
+    sellPrice: Math.floor(100 * RARITY[piece.rarity].index * (2 + piece.refine) / 2)
+});
+
 const isPublic = (method, path) => method === 'POST' && (path === '/users' || path === '/users/login');
 
 //  Options: users {name: password}, delayMs, accessTtlMs (default 24 h), refreshTtlMs (default 30 days),
@@ -143,11 +166,12 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  progress {name: {stage, encounter, phase, completed}} (starting positions, default stage 1 phase 1) and
 //  definition (the chapter every player plays, default the backend seed),
 //  cards {name: { start, leader, copies: { 'kael:0': 3 }, cleared: [1], winsDay, winsToday }} (starting bags; a player not listed holds one blank Kael card),
-//  chances (the repeating list the drop rolls read, default never drops) and farmMinIntervalMs (default 0, the backend has 5000).
+//  chances (the repeating list the drop rolls read, default never drops) and farmMinIntervalMs (default 0, the backend has 5000),
+//  equipment {name: [raw pieces]} (starting bags, default empty) and equipmentDrops (the pieces the next won bosses drop, one each, in order).
 //  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens.
 export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
-    cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0
+    cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = []
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -177,6 +201,28 @@ export async function mockBackend (page, {
         }
 
         return cardsByUser.get(username);
+    };
+
+    const equipmentByUser = new Map();
+    const equipmentOf = (username) => {
+        if (!equipmentByUser.has(username)) {
+            equipmentByUser.set(username, (startingEquipment[username] ?? []).map((piece) => ({ ...piece, affixes: [ ...piece.affixes ] })));
+        }
+
+        return equipmentByUser.get(username);
+    };
+    const equipmentBody = (username) => ({ capacity: 100, pieces: equipmentOf(username).map(pieceView) });
+    const pendingEquipmentDrops = [ ...startingEquipmentDrops ];
+
+    //  The next scripted piece joins the bag of a player whose boss win was accepted
+    const awardEquipment = (username, encounter) => {
+        if (encounter === 'PHASE' || pendingEquipmentDrops.length === 0) { return null; }
+
+        const piece = { heroId: null, ...pendingEquipmentDrops.shift() };
+
+        equipmentOf(username).push(piece);
+
+        return { piece: pieceView(piece), sold: false };
     };
 
     const progresses = new Map();
@@ -321,6 +367,67 @@ export async function mockBackend (page, {
         return route.fulfill(problem(404, 'Not found'));
     };
 
+    const handleEquipment = (route, method, path, body, now) => {
+        const username = authenticated(route, now);
+
+        if (!username) { return null; }
+
+        const pieces = equipmentOf(username);
+
+        if (method === 'GET' && path === '/equipment') {
+            return route.fulfill({ json: equipmentBody(username) });
+        }
+
+        const action = path.match(/^\/equipment\/([^/]+)\/(equip|unequip|refine|reroll|sell)$/);
+        const piece = action && pieces.find((candidate) => candidate.id === decodeURIComponent(action[1]));
+
+        if (method !== 'POST' || !action) { return route.fulfill(problem(404, 'Not found')); }
+        if (!piece) { return route.fulfill(problem(404, `Piece '${action[1]}' not found`, 'EQUIPMENT_NOT_FOUND')); }
+
+        const wallet = walletOf(username);
+        const change = () => ({ equipment: equipmentBody(username), wallet: coins(wallet.copper) });
+
+        if (action[2] === 'equip') {
+            const hero = HEROES.find((candidate) => candidate.id === body.heroId);
+
+            if (!hero || !heroView(cardsOf(username), hero).owned) { return route.fulfill(problem(409, `Hero '${body.heroId}' is not owned`, 'HERO_NOT_OWNED')); }
+
+            pieces.filter((candidate) => candidate.heroId === hero.id && candidate.slot === piece.slot).forEach((candidate) => { candidate.heroId = null; });
+            piece.heroId = hero.id;
+            return route.fulfill({ json: equipmentBody(username) });
+        }
+
+        if (action[2] === 'unequip') {
+            piece.heroId = null;
+            return route.fulfill({ json: equipmentBody(username) });
+        }
+
+        if (action[2] === 'sell') {
+            wallet.copper += pieceView(piece).sellPrice;
+            pieces.splice(pieces.indexOf(piece), 1);
+            return route.fulfill({ json: change() });
+        }
+
+        if (action[2] === 'refine') {
+            const cost = refineCostOf(piece);
+
+            if (cost === null) { return route.fulfill(problem(409, 'The piece is already at the maximum refine level', 'MAX_REFINE')); }
+            if (wallet.copper < cost) { return route.fulfill(problem(409, 'Not enough copper', 'NOT_ENOUGH_COPPER')); }
+
+            wallet.copper -= cost;
+            piece.refine += 1;
+            return route.fulfill({ json: change() });
+        }
+
+        if (piece.refine < REROLL_MIN_REFINE) { return route.fulfill(problem(409, 'Rerolling needs a higher refine level', 'REFINE_TOO_LOW')); }
+        if (!Number.isInteger(body.affix) || !piece.affixes[body.affix]) { return route.fulfill(problem(400, 'Affix does not exist', 'INVALID_AFFIX')); }
+        if (wallet.copper < REROLL_COST) { return route.fulfill(problem(409, 'Not enough copper', 'NOT_ENOUGH_COPPER')); }
+
+        wallet.copper -= REROLL_COST;
+        piece.affixes[body.affix] = { type: AFFIX_TYPES.find((type) => !piece.affixes.some((affix) => affix.type === type)), base: 10 };
+        return route.fulfill({ json: change() });
+    };
+
     const handleFarm = (route, method, path, body, now) => {
         const username = authenticated(route, now);
 
@@ -347,7 +454,7 @@ export async function mockBackend (page, {
 
             const drop = awardCards(cards, boss.kind, 1);
 
-            return route.fulfill({ json: { drop, chapterBossWinsLeft: winsLeft(cards) } });
+            return route.fulfill({ json: { drop, chapterBossWinsLeft: winsLeft(cards), equipmentDrop: awardEquipment(username, boss.kind) } });
         }
 
         return route.fulfill(problem(404, 'Not found'));
@@ -388,7 +495,9 @@ export async function mockBackend (page, {
 
             const drop = body.outcome === 'CLEARED' ? awardCards(cardsOf(username), body.encounter, body.chapter) : null;
 
-            return route.fulfill({ json: { ...progressBody(next), ...(drop && { drop }) } });
+            const equipmentDrop = body.outcome === 'CLEARED' ? awardEquipment(username, body.encounter) : null;
+
+            return route.fulfill({ json: { ...progressBody(next), ...(drop && { drop }), ...(equipmentDrop && { equipmentDrop }) } });
         }
 
         return route.fulfill(problem(404, 'Not found'));
@@ -465,6 +574,7 @@ export async function mockBackend (page, {
         if (path === '/progress' || path === '/progress/outcome') { return handleProgress(route, method, path, body, now); }
         if (path === '/heroes' || path.startsWith('/heroes/') || path === '/leader') { return handleHeroes(route, method, path, body, now); }
         if (path === '/farm' || path === '/farm/outcome') { return handleFarm(route, method, path, body, now); }
+        if (path === '/equipment' || path.startsWith('/equipment/')) { return handleEquipment(route, method, path, body, now); }
 
         if (path.startsWith('/users') && !isPublic(method, path)) {
             if (!hasValidBearer(request, now)) { return route.fulfill(unauthenticated()); }
@@ -490,6 +600,8 @@ export async function mockBackend (page, {
     await page.route('**/api/leader', handler);
     await page.route('**/api/farm', handler);
     await page.route('**/api/farm/**', handler);
+    await page.route('**/api/equipment', handler);
+    await page.route('**/api/equipment/**', handler);
 
     return {
         calls,
@@ -498,6 +610,7 @@ export async function mockBackend (page, {
         progresses,
         cards: cardsByUser,
         cardsOf,
+        equipmentOf,
         //  Replaces the list the drop rolls read, e.g. [ 0 ] drops every time
         setChances: (values) => {
             chances = [ ...values ];

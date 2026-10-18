@@ -86,10 +86,10 @@ T17 → T18 → T19 → T20 → T21
 T22 → T23 → T24
 ```
 
-### Phase 7: Closing
+### Phase 7: End to end and closing
 
 ```
-T25
+T25 → T26
 ```
 
 ---
@@ -601,13 +601,34 @@ T25
 
 ---
 
-## Phase 7 tasks: Closing
+## Phase 7 tasks: End to end and closing
 
-### T25: Feature documentation
+### T25: Style the equipment screen and cover it end to end
+
+**What**: CSS for the equipment screen (slots, bag, piece detail, action buttons), equipment support in the e2e fake backend and `equipment.spec.js` (HUD fit, equip and click damage, refine and wallet, sell, drop notice).
+**Where**: `game/e2e/equipment.spec.js`
+**Depends on**: T24
+**Reuses**: `game/e2e/support/fakeBackend.js`, `game/e2e/heroes.spec.js`
+**Requirement**: EQP-12, EQP-18, EQP-27, EQP-40, EQP-10
+
+**Done when**:
+
+- [x] The six HUD buttons fit inside the canvas and the screen lists the slots of the owned hero and the bag
+- [x] A weapon of 3 worn by the leader makes a click hit for 4 in a real browser
+- [x] A refine with 600 copper leaves the wallet at 1 silver and the piece at +1; a sale adds its price; a drop shows `Equipamento encontrado: Raro Arma`
+- [x] The whole e2e suite passes: `cd game && npm run test:e2e`
+
+**Status**: Done
+**Tests**: none
+**Gate**: Build
+
+---
+
+### T26: Feature documentation
 
 **What**: Close traceability in `spec.md`, mark the tasks done, update the game readme.
 **Where**: `.specs/features/equipment/spec.md` (modify)
-**Depends on**: T24
+**Depends on**: T25
 **Reuses**: n/a
 **Requirement**: EQP-01
 
