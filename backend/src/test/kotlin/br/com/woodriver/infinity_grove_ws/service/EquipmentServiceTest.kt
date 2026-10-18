@@ -3,13 +3,20 @@ package br.com.woodriver.infinity_grove_ws.service
 import br.com.woodriver.infinity_grove_ws.InMemoryEquipmentRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
+import br.com.woodriver.infinity_grove_ws.MutableClock
+import br.com.woodriver.infinity_grove_ws.SequenceDropRoller
 import br.com.woodriver.infinity_grove_ws.domain.Affix
 import br.com.woodriver.infinity_grove_ws.domain.AffixType
+import br.com.woodriver.infinity_grove_ws.domain.DropRule
+import br.com.woodriver.infinity_grove_ws.domain.DropTable
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.HeroNotOwnedException
 import br.com.woodriver.infinity_grove_ws.domain.HeroSeed
+import br.com.woodriver.infinity_grove_ws.domain.MaxRefineException
+import br.com.woodriver.infinity_grove_ws.domain.NotEnoughCopperException
 import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCardsMissingException
@@ -17,6 +24,7 @@ import br.com.woodriver.infinity_grove_ws.domain.Rarity
 import br.com.woodriver.infinity_grove_ws.domain.Slot
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -27,7 +35,10 @@ class EquipmentServiceTest {
     private val playerCards = InMemoryPlayerCardsRepository()
     private val pieces = InMemoryEquipmentRepository()
     private val rules = EquipmentRules()
-    private val service get() = EquipmentService(pieces, playerCards, users, rules)
+    private val wallets = InMemoryWalletRepository()
+    private val table = DropTable(listOf(DropRule(1, 1, 5, 1500)))
+    private val walletAccess = WalletAccess(wallets, table, SequenceDropRoller(1), MutableClock(1_000L))
+    private val service get() = EquipmentService(pieces, playerCards, users, walletAccess, rules)
 
     private fun player() {
         users.save(User("yan", "hash", 1L, 1L))
@@ -140,5 +151,87 @@ class EquipmentServiceTest {
         users.save(User("yan", "hash", 1L, 1L))
         assertFailsWith<PlayerCardsMissingException> { service.equip("yan", "a", "kael") }
         assertFailsWith<PlayerCardsMissingException> { service.unequip("yan", "a") }
+    }
+
+    private fun funded(copper: Long) {
+        wallets.save(Wallet.open("yan", table, SequenceDropRoller(1), 0).copy(copper = copper))
+    }
+
+    private fun weapon(
+        id: String,
+        refine: Int = 0,
+        rarity: Rarity = Rarity.COMMON,
+    ) = Piece(id, "yan", Slot.WEAPON, rarity, 3, refine, emptyList()).also { pieces.save(it) }
+
+    @Test
+    fun `refine spends the cost, raises the level by one and returns the new wallet`() {
+        player()
+        weapon("w")
+        funded(600)
+
+        val change = service.refine("yan", "w")
+
+        assertEquals(1, change.equipment.find("w").refine)
+        assertEquals(1, pieces.pieces.getValue("w").refine)
+        assertEquals(100L, change.wallet.copper)
+        assertEquals(100L, wallets.wallets.getValue("yan").copper)
+    }
+
+    @Test
+    fun `refine charges the rarity multiplied cost of the current level`() {
+        player()
+        weapon("w", refine = 3, rarity = Rarity.RARE)
+        funded(10_000)
+
+        val change = service.refine("yan", "w")
+
+        assertEquals(10_000L - 7368L, change.wallet.copper)
+    }
+
+    @Test
+    fun `refine with too little copper is refused and changes neither the piece nor the wallet`() {
+        player()
+        weapon("w")
+        funded(499)
+
+        assertFailsWith<NotEnoughCopperException> { service.refine("yan", "w") }
+
+        assertEquals(0, pieces.pieces.getValue("w").refine)
+        assertEquals(499L, wallets.wallets.getValue("yan").copper)
+    }
+
+    @Test
+    fun `refine of a piece at plus 10 is refused and changes nothing`() {
+        player()
+        weapon("w", refine = 10)
+        funded(1_000_000)
+
+        assertFailsWith<MaxRefineException> { service.refine("yan", "w") }
+
+        assertEquals(1_000_000L, wallets.wallets.getValue("yan").copper)
+        assertEquals(10, pieces.pieces.getValue("w").refine)
+    }
+
+    @Test
+    fun `refine creates the missing wallet and refuses for lack of copper`() {
+        player()
+        weapon("w")
+
+        assertFailsWith<NotEnoughCopperException> { service.refine("yan", "w") }
+
+        assertEquals(0L, wallets.wallets.getValue("yan").copper)
+    }
+
+    @Test
+    fun `refine of a missing piece or a piece of another account is not found and spends nothing`() {
+        player()
+        funded(10_000)
+        Piece("theirs", "other", Slot.WEAPON, Rarity.COMMON, 3, 0, emptyList()).also { pieces.save(it) }
+
+        assertFailsWith<EquipmentNotFoundException> { service.refine("yan", "ghost") }
+        assertFailsWith<EquipmentNotFoundException> { service.refine("yan", "theirs") }
+
+        assertEquals(10_000L, wallets.wallets.getValue("yan").copper)
+        assertEquals(0, pieces.pieces.getValue("theirs").refine)
     }
 }

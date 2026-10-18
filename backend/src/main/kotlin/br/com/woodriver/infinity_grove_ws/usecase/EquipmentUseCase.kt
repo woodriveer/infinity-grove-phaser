@@ -1,6 +1,7 @@
 package br.com.woodriver.infinity_grove_ws.usecase
 
 import br.com.woodriver.infinity_grove_ws.domain.PlayerEquipment
+import br.com.woodriver.infinity_grove_ws.domain.Wallet
 
 interface ListEquipmentUseCase {
     /** Returns every piece the player owns, worn or in the bag, and the bag capacity. */
@@ -20,4 +21,18 @@ interface EquipPieceUseCase {
         username: String,
         pieceId: String,
     ): PlayerEquipment
+}
+
+/** The pieces and the wallet of the player after an action that spent or earned copper. */
+data class EquipmentChange(
+    val equipment: PlayerEquipment,
+    val wallet: Wallet,
+)
+
+interface RefinePieceUseCase {
+    /** Raises [pieceId] by one refine level for the copper it costs, in one transaction with the wallet. */
+    fun refine(
+        username: String,
+        pieceId: String,
+    ): EquipmentChange
 }

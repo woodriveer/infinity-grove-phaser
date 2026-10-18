@@ -362,12 +362,12 @@ T25
 
 **Done when**:
 
-- [ ] A wallet of 600 copper and a COMMON +0 piece: refine answers +1 and wallet 100 copper; the next refine is 409 `NOT_ENOUGH_COPPER` and nothing changes
-- [ ] +10 answers 409 `MAX_REFINE`
-- [ ] Two parallel refines on a wallet that pays one leave the wallet at zero or above and the level raised once
-- [ ] `EquipmentServiceTest` additions and `EquipmentRefineIT` pass; full backend gate passes
+- [x] A wallet of 600 copper and a COMMON +0 piece: refine answers +1 and wallet 100 copper; the next refine is 409 `NOT_ENOUGH_COPPER` and nothing changes
+- [x] +10 answers 409 `MAX_REFINE`
+- [x] Two parallel refines on a wallet that pays one leave the wallet at zero or above and the level raised once
+- [x] `EquipmentServiceTest` additions and `EquipmentRefineIT` pass; full backend gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 

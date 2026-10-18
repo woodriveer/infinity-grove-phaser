@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws.service
 
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.HeroNotOwnedException
+import br.com.woodriver.infinity_grove_ws.domain.MaxRefineException
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCardsMissingException
 import br.com.woodriver.infinity_grove_ws.domain.PlayerEquipment
@@ -10,7 +11,9 @@ import br.com.woodriver.infinity_grove_ws.port.EquipmentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.usecase.EquipPieceUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.EquipmentChange
 import br.com.woodriver.infinity_grove_ws.usecase.ListEquipmentUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.RefinePieceUseCase
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,9 +25,11 @@ class EquipmentService(
     private val equipmentRepository: EquipmentRepositoryPort,
     private val playerCardsRepository: PlayerCardsRepositoryPort,
     private val userRepository: UserRepositoryPort,
+    private val walletAccess: WalletAccess,
     private val rules: EquipmentRules,
 ) : ListEquipmentUseCase,
-    EquipPieceUseCase {
+    EquipPieceUseCase,
+    RefinePieceUseCase {
     override fun list(username: String): PlayerEquipment {
         logger.info("Listing equipment username={}", username)
         requireUser(username)
@@ -55,6 +60,22 @@ class EquipmentService(
         lockPlayer(username)
         val before = load(username)
         return store(before, before.unequip(pieceId))
+    }
+
+    override fun refine(
+        username: String,
+        pieceId: String,
+    ): EquipmentChange {
+        logger.info("Refine requested username={} piece={}", username, pieceId)
+        lockPlayer(username)
+        val before = load(username)
+        val piece = before.find(pieceId)
+        val cost = piece.refineCost(rules) ?: throw MaxRefineException()
+        val wallet = walletAccess.lock(username).minus(cost)
+        val after = before.replace(piece.refined())
+        walletAccess.save(wallet)
+        logger.info("Refined username={} piece={} level={} copper={}", username, pieceId, piece.refine + 1, cost)
+        return EquipmentChange(store(before, after), wallet)
     }
 
     /** Writes the pieces [after] changed or removed compared to [before]. */

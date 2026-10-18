@@ -3,7 +3,9 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.PlayerEquipment
 import br.com.woodriver.infinity_grove_ws.usecase.EquipPieceUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.EquipmentChange
 import br.com.woodriver.infinity_grove_ws.usecase.ListEquipmentUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.RefinePieceUseCase
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,11 +27,25 @@ data class EquipmentResponse(
     }
 }
 
+/** The pieces and the wallet after an action that spent or earned copper. */
+data class EquipmentChangeResponse(
+    val equipment: EquipmentResponse,
+    val wallet: CoinsResponse,
+) {
+    companion object {
+        fun from(
+            change: EquipmentChange,
+            rules: EquipmentRules,
+        ) = EquipmentChangeResponse(EquipmentResponse.from(change.equipment, rules), CoinsResponse.from(change.wallet.coins()))
+    }
+}
+
 @RestController
 @RequestMapping("/equipment")
 class EquipmentController(
     private val listEquipment: ListEquipmentUseCase,
     private val equipPiece: EquipPieceUseCase,
+    private val refinePiece: RefinePieceUseCase,
     private val rules: EquipmentRules,
 ) {
     @GetMapping
@@ -51,4 +67,10 @@ class EquipmentController(
         principal: Principal,
         @PathVariable id: String,
     ) = EquipmentResponse.from(equipPiece.unequip(principal.name, id), rules)
+
+    @PostMapping("/{id}/refine")
+    fun refine(
+        principal: Principal,
+        @PathVariable id: String,
+    ) = EquipmentChangeResponse.from(refinePiece.refine(principal.name, id), rules)
 }
