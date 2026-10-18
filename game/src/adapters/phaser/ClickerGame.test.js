@@ -13,7 +13,10 @@ const walletApi = { get: vi.fn(), sync: vi.fn() };
 
 //  The real campaign session over a mocked backend gateway, started on stage 1 phase 1 of a seeded-like chapter
 const campaignGateway = { get: vi.fn(), report: vi.fn() };
+//  The critical roll: 0.99 never crits a monster of the default stats (10 % chance); a test sets `dice.value` to force one
+const dice = { value: 0.99 };
 const services = {
+    random: () => dice.value,
     createWalletSync: () => createWalletSync({ gateway: walletApi }),
     createCampaignSession: () => createCampaignSession({ gateway: campaignGateway })
 };
@@ -35,6 +38,7 @@ const walletResponse = (coins = { gold: 2, silver: 14, copper: 37 }, drops = { 1
 //  Minimal Phaser stand-in: records what ClickerGame adds and exposes the click handler and tweens.
 //  `wallet` is what GET /wallet answers: a response object, an Error to reject with, or omitted to never answer.
 const createScene = async ({ wallet, start = progress() } = {}) => {
+    dice.value = 0.99;
     campaignGateway.get.mockReset();
     campaignGateway.report.mockReset();
     campaignGateway.get.mockImplementation(() => (start instanceof Error ? Promise.reject(start) : Promise.resolve(start)));
@@ -68,8 +72,8 @@ const createScene = async ({ wallet, start = progress() } = {}) => {
             rectangles.push(rect);
             return rect;
         }),
-        text: vi.fn((x, y, text) => {
-            const obj = { x, y, text, alpha: 1, destroy: vi.fn() };
+        text: vi.fn((x, y, text, style) => {
+            const obj = { x, y, text, style, alpha: 1, destroy: vi.fn() };
 
             obj.setOrigin = () => obj;
             obj.setDepth = () => obj;
@@ -124,7 +128,7 @@ const createScene = async ({ wallet, start = progress() } = {}) => {
     const hud = (selector) => doms.map((d) => d.node.querySelector(selector)).find(Boolean);
     const walletElement = () => doms.find((d) => d.node.querySelector('.wallet'));
 
-    return { scene, rectangles, texts, tweens, timers, loops, eventHandlers, sprites, doms, click, monster, fill, back, byColor, walletText, walletElement, hud, control, handlers };
+    return { scene, rectangles, texts, tweens, timers, loops, eventHandlers, sprites, doms, click, monster, fill, back, byColor, walletText, walletElement, hud, control, handlers, dice };
 };
 
 describe('ClickerGame scene', () => {
@@ -1433,5 +1437,160 @@ describe('ClickerGame pause and leave fight', () => {
         killAll(ctx);
         advance(ctx);
         expect(label(ctx)).toBe('Stage 1/10  Miniboss');
+    });
+});
+
+describe('ClickerGame elements', () => {
+    const stats = (element, physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element, physicalDefense, magicalDefense, critResistance });
+    const withStats = (monster, miniboss = monster, boss = monster) => ({
+        ...progress(),
+        definition: { ...definition, boss, stages: definition.stages.map((stage) => ({ ...stage, monster, miniboss })) }
+    });
+    const enemyText = (ctx) => ctx.hud('.enemy-stats').textContent;
+    const killAll = (ctx) => {
+        while (ctx.scene.monster && !ctx.scene.monster.dead)
+        {
+            ctx.click();
+        }
+    };
+    const fade = (ctx) => ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1);
+
+    it('lowers a nature monster by 2 per click (fire against nature) and shows "2"', async () => {
+        const ctx = await createScene({ start: withStats(stats('NATURE')) });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 2);
+        expect(ctx.texts[0].text).toBe('2');
+    });
+
+    it('lowers a darkness monster by 0.9 per click and shows "0.9"', async () => {
+        const ctx = await createScene({ start: withStats(stats('DARKNESS')) });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 0.9);
+        expect(ctx.texts[0].text).toBe('0.9');
+    });
+
+    it('shows the damage with at most one decimal while subtracting the exact amount', async () => {
+        const ctx = await createScene({ start: withStats(stats('WATER', 90)) });
+
+        ctx.click();
+
+        expect(ctx.texts[0].text).toBe('0');
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 0.05);
+    });
+
+    it('applies the physical defense of the monster', async () => {
+        const ctx = await createScene({ start: withStats(stats('FIRE', 50, 10)) });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 0.5);
+    });
+
+    it('doubles the damage on a critical click and draws that number bigger and gold', async () => {
+        const ctx = await createScene({ start: withStats(stats('FIRE')) });
+        ctx.dice.value = 0;
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 2);
+        expect(ctx.texts[0].text).toBe('2');
+        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ color: '#ffd700', fontSize: 52 }));
+    });
+
+    it('draws a normal click white and 38 px', async () => {
+        const ctx = await createScene({ start: withStats(stats('FIRE')) });
+
+        ctx.click();
+
+        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ color: '#ffffff', fontSize: 38 }));
+    });
+
+    it('never crits a monster with critical resistance 100', async () => {
+        const ctx = await createScene({ start: withStats(stats('FIRE', 0, 0, 100)) });
+        ctx.dice.value = 0;
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 1);
+    });
+
+    it('kills a monster that takes fractional damage once its health reaches 0', async () => {
+        const ctx = await createScene({ start: withStats(stats('DARKNESS')) });
+
+        killAll(ctx);
+
+        expect(ctx.scene.monster.dead).toBe(true);
+        expect(ctx.fill.width).toBe(0);
+    });
+
+    it('shows the element and the three values of the monster on screen', async () => {
+        const ctx = await createScene({ start: withStats(stats('WATER', 11, 22, 33)) });
+
+        expect(enemyText(ctx)).toBe('Water  Physical def 11%  Magical def 22%  Crit res 33%');
+    });
+
+    it('shows the miniboss attributes when the miniboss spawns', async () => {
+        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT', 1, 2, 3)), encounter: 'MINIBOSS' } });
+
+        expect(enemyText(ctx)).toBe('Light  Physical def 1%  Magical def 2%  Crit res 3%');
+    });
+
+    it('shows the chapter boss attributes', async () => {
+        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
+
+        expect(enemyText(ctx)).toBe('Darkness  Physical def 30%  Magical def 30%  Crit res 30%');
+    });
+
+    it('shows fire with no defense for a payload without stats', async () => {
+        const ctx = await createScene();
+
+        expect(enemyText(ctx)).toBe('Fire  Physical def 0%  Magical def 0%  Crit res 0%');
+    });
+
+    it('clears the attributes when the monster dies and shows the next ones when it spawns', async () => {
+        const ctx = await createScene({ start: withStats(stats('NATURE')) });
+
+        killAll(ctx);
+        expect(enemyText(ctx)).toBe('');
+
+        fade(ctx).onComplete();
+        ctx.timers.at(-1).callback();
+        expect(enemyText(ctx)).toBe('Nature  Physical def 0%  Magical def 0%  Crit res 0%');
+    });
+
+    it('clears the attributes when the boss runs out of time', async () => {
+        const ctx = await createScene({ start: { ...withStats(stats('NATURE')), encounter: 'MINIBOSS' } });
+
+        ctx.scene.update(0, 30000);
+
+        expect(enemyText(ctx)).toBe('');
+    });
+
+    it('clears the attributes when the chapter is complete', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1, true) });
+
+        expect(enemyText(ctx)).toBe('');
+    });
+
+    it('lets clicks through the attribute text', async () => {
+        const ctx = await createScene();
+        const element = ctx.doms.find((d) => d.node.querySelector('.enemy-stats'));
+
+        expect(element.pointerEvents).toBe('none');
+    });
+
+    it('keeps the attributes on a farmed boss that respawns', async () => {
+        const ctx = await createScene({ start: { ...withStats(stats('NATURE'), stats('LIGHT', 4, 5, 6)), encounter: 'MINIBOSS' } });
+
+        ctx.control('.farm-toggle input').checked = true;
+        killAll(ctx);
+        fade(ctx).onComplete();
+        ctx.timers.at(-1).callback();
+
+        expect(enemyText(ctx)).toBe('Light  Physical def 4%  Magical def 5%  Crit res 6%');
     });
 });

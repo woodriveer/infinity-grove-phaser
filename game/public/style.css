@@ -95,6 +95,7 @@ body {
 
 .stage-hud,
 .boss-timer,
+.enemy-stats,
 .stage-message {
     font-family: 'Arial Black', sans-serif;
     color: #ffffff;
@@ -109,6 +110,10 @@ body {
 
 .boss-timer {
     font-size: 30px;
+}
+
+.enemy-stats {
+    font-size: 18px;
 }
 
 .stage-message {

@@ -222,11 +222,11 @@ T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Clicks deal the computed damage and the number shows the formatted value (ELEM-01 AC9, AC11)
-- [ ] A critical click is marked (ELEM-03 AC8)
-- [ ] The HUD shows, replaces and clears the attributes and is click-through (ELEM-04 AC1-4)
-- [ ] All earlier scene tests still pass unchanged
-- [ ] Gate passes
+- [x] Clicks deal the computed damage and the number shows the formatted value (ELEM-01 AC9, AC11)
+- [x] A critical click is marked (ELEM-03 AC8)
+- [x] The HUD shows, replaces and clears the attributes and is click-through (ELEM-04 AC1-4)
+- [x] All earlier scene tests still pass unchanged
+- [x] Gate passes
 
 **Tests**: unit
 **Gate**: quick

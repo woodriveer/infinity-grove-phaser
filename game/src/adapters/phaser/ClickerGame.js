@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
-import { DAMAGE_PER_CLICK, Monster } from '../../domain/combat/monster';
+import { calculateDamage, formatDamage } from '../../domain/combat/damage';
+import { Monster } from '../../domain/combat/monster';
 
 const CHARACTER = { x: 300, y: 500, size: 100, color: 0x000000 };
 const MONSTER = { x: 700, y: 500, width: 160, height: 200, color: 0xcc2222 };
@@ -13,9 +14,13 @@ const WALLET_SYNC_MS = 10000;
 const WALLET_HTML = '<div class="wallet"></div>';
 const STAGE_HUD = { x: 512, y: 32 };
 const BOSS_TIMER = { x: 512, y: 72 };
+const ENEMY_STATS = { x: 512, y: 108 };
+const CRITICAL_TEXT = { color: '#ffd700', fontSize: 52 };
+const NORMAL_TEXT = { color: '#ffffff', fontSize: 38 };
 const STAGE_MESSAGE = { x: 512, y: 384 };
 const STAGE_HUD_HTML = '<div class="stage-hud"></div>';
 const BOSS_TIMER_HTML = '<div class="boss-timer"></div>';
+const ENEMY_STATS_HTML = '<div class="enemy-stats"></div>';
 const STAGE_MESSAGE_HTML = '<div class="stage-message"></div>';
 const FARM_TOGGLE = { x: 512, y: 730 };
 const PAUSE_MENU = { x: 512, y: 384 };
@@ -51,6 +56,7 @@ export class ClickerGame extends Scene
         this.monster = null;
         this.countdown = null;
         this.generation = 0;
+        this.random = services.random ?? Math.random;
         this.loadingCampaign = false;
         this.paused = false;
         this.session.onRealign((encounter) => this.realign(encounter));
@@ -81,6 +87,7 @@ export class ClickerGame extends Scene
         //  Stage position, boss countdown and messages are real HTML too, click-through like the wallet text
         this.stageHud = this.createHtml(STAGE_HUD, STAGE_HUD_HTML, '.stage-hud');
         this.bossTimer = this.createHtml(BOSS_TIMER, BOSS_TIMER_HTML, '.boss-timer');
+        this.enemyStats = this.createHtml(ENEMY_STATS, ENEMY_STATS_HTML, '.enemy-stats');
         this.stageMessage = this.createHtml(STAGE_MESSAGE, STAGE_MESSAGE_HTML, '.stage-message');
         this.createControls();
         this.loadCampaign();
@@ -225,10 +232,11 @@ export class ClickerGame extends Scene
             return;
         }
 
-        this.monster = new Monster(encounter.health);
+        this.monster = new Monster(encounter.health, 1, encounter.stats);
         this.updateHealthBar();
         this.monsterParts.forEach((part) => part.setAlpha(1));
         this.stageHud.textContent = encounter.label;
+        this.showEnemyStats(encounter.stats);
 
         if (encounter.timeLimitMs)
         {
@@ -237,9 +245,18 @@ export class ClickerGame extends Scene
         }
     }
 
+    //  "Water  Physical def 10%  Magical def 10%  Crit res 12%"
+    showEnemyStats ({ element, physicalDefense, magicalDefense, critResistance })
+    {
+        const name = element.charAt(0) + element.slice(1).toLowerCase();
+
+        this.enemyStats.textContent = `${name}  Physical def ${physicalDefense}%  Magical def ${magicalDefense}%  Crit res ${critResistance}%`;
+    }
+
     completeChapter ()
     {
         this.monster = null;
+        this.enemyStats.textContent = '';
         this.monsterParts.forEach((part) => part.setAlpha(0));
         this.stageHud.textContent = '';
         this.stageMessage.textContent = COMPLETED_TEXT;
@@ -277,6 +294,7 @@ export class ClickerGame extends Scene
     {
         this.hideCountdown();
         this.monster = null;
+        this.enemyStats.textContent = '';
         this.monsterParts.forEach((part) => part.setAlpha(0));
 
         this.showAfterDelay(this.session.fail());
@@ -364,16 +382,20 @@ export class ClickerGame extends Scene
 
     hitMonster (pointer)
     {
-        if (this.paused || !this.monster || !this.monster.hit())
+        if (this.paused || !this.monster || this.monster.dead)
         {
             return;
         }
 
+        const { damage, critical } = calculateDamage({ defender: this.monster.stats, random: this.random });
+
+        this.monster.hit(damage);
         this.updateHealthBar();
-        this.showDamage(DAMAGE_PER_CLICK, this.damageTextX(pointer));
+        this.showDamage(formatDamage(damage), this.damageTextX(pointer), critical);
 
         if (this.monster.dead)
         {
+            this.enemyStats.textContent = '';
             this.dropCoins();
             this.fadeOutMonster(this.clearEncounter());
         }
@@ -451,11 +473,12 @@ export class ClickerGame extends Scene
         return onMonster ? pointer.x : MONSTER.x;
     }
 
-    showDamage (damage, x)
+    //  A critical hit is bigger and gold
+    showDamage (damage, x, critical = false)
     {
-        const textStyle = { fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff', stroke: '#000000', strokeThickness: 8 };
+        const textStyle = { fontFamily: 'Arial Black', ...(critical ? CRITICAL_TEXT : NORMAL_TEXT), stroke: '#000000', strokeThickness: 8 };
 
-        const text = this.add.text(x, this.damageTextY, String(damage), textStyle).setOrigin(0.5, 1).setDepth(1);
+        const text = this.add.text(x, this.damageTextY, damage, textStyle).setOrigin(0.5, 1).setDepth(1);
 
         this.tweens.add({
             targets: text,
