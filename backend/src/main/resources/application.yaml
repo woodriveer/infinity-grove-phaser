@@ -31,3 +31,11 @@ app:
     chapter-boss-rate: 0.30
     chapter-boss-daily-limit: 10
     farm-min-interval-ms: 5000
+  equipment:
+    # chance a won miniboss / chapter boss drops a piece, pieces the bag holds, copper to refine a COMMON piece from +0 (grows 1.7x per
+    # level, times the rarity) and copper to reroll one affix
+    miniboss-rate: 0.25
+    chapter-boss-rate: 1.0
+    bag-capacity: 100
+    refine-base-cost: 500
+    reroll-cost: 5000

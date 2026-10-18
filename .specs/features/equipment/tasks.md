@@ -256,11 +256,11 @@ T25
 
 **Done when**:
 
-- [ ] Defaults are miniboss rate 0.25, chapter boss rate 1.0, bag 100, refine base cost 500, reroll cost 5000
-- [ ] A rate outside 0..1, a capacity below 1 or a negative cost fails to build the rules
-- [ ] `EquipmentConfigTest` passes; quick gate passes
+- [x] Defaults are miniboss rate 0.25, chapter boss rate 1.0, bag 100, refine base cost 500, reroll cost 5000
+- [x] A rate outside 0..1, a capacity below 1 or a negative cost fails to build the rules
+- [x] `EquipmentConfigTest` passes; quick gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 
