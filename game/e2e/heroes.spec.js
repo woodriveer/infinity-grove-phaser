@@ -72,12 +72,13 @@ test.describe('Hero screens', () => {
 
         await expect(page.getByTestId('fusion-row-kael-0')).toHaveClass(/is-selected/);
         await expect(page.getByTestId('fusion-button-kael-0')).toBeEnabled();
-        await expect(page.getByTestId('fusion-button-kael-1')).toBeDisabled();
+        await expect(page.getByTestId('fusion-row-kael-1')).toHaveCount(0);
 
         await page.getByTestId('fusion-button-kael-0').click();
 
         await expect(page.getByTestId('fusion-result')).toHaveText('Nova carta: Kael Raizférrea 1★');
-        await expect(page.getByTestId('fusion-row-kael-0').locator('.fusion-copies')).toHaveText('0/3');
+        await expect(page.getByTestId('fusion-row-kael-0')).toHaveCount(0);
+        await expect(page.getByTestId('fusion-empty')).toHaveText('Nenhuma fusão disponível');
         await expect(page.getByTestId('skill-slot-1')).toHaveAttribute('data-unlocked', 'true');
         await expect(page.getByTestId('skill-slot-2')).toHaveAttribute('data-unlocked', 'false');
 
@@ -97,7 +98,16 @@ test.describe('Hero screens', () => {
         const fuseAll = async (stars, copies) => {
             for (let left = copies - 3; left >= 0; left -= 3) {
                 await page.getByTestId(`fusion-button-kael-${stars}`).click();
-                await expect(page.getByTestId(`fusion-row-kael-${stars}`).locator('.fusion-copies')).toHaveText(`${left}/3`);
+
+                //  a row with fewer than 3 cards left is no longer a fusion
+                if (left >= 3)
+                {
+                    await expect(page.getByTestId(`fusion-row-kael-${stars}`).locator('.fusion-copies')).toHaveText(`${left}/3`);
+                }
+                else
+                {
+                    await expect(page.getByTestId(`fusion-row-kael-${stars}`)).toHaveCount(0);
+                }
             }
         };
 
@@ -122,7 +132,7 @@ test.describe('Hero screens', () => {
         const backend = await mockBackend(page, { users: { yan: 'secret123' }, cards: { yan: { copies: { 'kael:0': 3 } } } });
         await startGame(page);
         await page.getByTestId('hud-fusion').click();
-        await expect(page.getByTestId('fusion-button-kael-0')).toBeEnabled();
+        await expect(page.getByTestId('fusion-button-kael-0')).toBeVisible();
 
         //  The backend lost two cards (another tab fused them) since the screen loaded
         backend.cardsOf('yan').copies['kael:0'] = 1;

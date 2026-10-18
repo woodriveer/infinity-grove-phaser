@@ -4,23 +4,29 @@ import { renderFusion, renderFusionResult } from './fusionView';
 const hero = (id, copies = {}) => ({ id, name: `Hero ${id}`, copies: { 0: 0, 1: 0, 2: 0, 3: 0, ...copies } });
 
 describe('renderFusion', () => {
-    it('has one row per hero and stars 0 to 2 with the copies out of 3', () => {
-        const list = renderFusion([ hero('kael', { 0: 2, 1: 3 }), hero('lyra') ], { onFuse: vi.fn() });
+    it('has one row per fusion the bag can do now, with the copies out of 3', () => {
+        const list = renderFusion([ hero('kael', { 0: 2, 1: 3, 2: 9 }), hero('lyra', { 0: 3 }) ], { onFuse: vi.fn() });
         const rows = [ ...list.querySelectorAll('.fusion-row') ];
 
-        expect(rows.map((row) => row.getAttribute('data-testid'))).toEqual([
-            'fusion-row-kael-0', 'fusion-row-kael-1', 'fusion-row-kael-2', 'fusion-row-lyra-0', 'fusion-row-lyra-1', 'fusion-row-lyra-2'
-        ]);
-        expect(rows[0].querySelector('.fusion-name').textContent).toBe('Hero kael 0★ → 1★');
-        expect(rows.slice(0, 3).map((row) => row.querySelector('.fusion-copies').textContent)).toEqual([ '2/3', '3/3', '0/3' ]);
+        expect(rows.map((row) => row.getAttribute('data-testid'))).toEqual([ 'fusion-row-kael-1', 'fusion-row-kael-2', 'fusion-row-lyra-0' ]);
+        expect(rows[0].querySelector('.fusion-name').textContent).toBe('Hero kael 1★ → 2★');
+        expect(rows.map((row) => row.querySelector('.fusion-copies').textContent)).toEqual([ '3/3', '9/3', '3/3' ]);
     });
 
-    it('enables the Fundir button only from 3 copies', () => {
+    it('every row has an enabled Fundir button', () => {
         const list = renderFusion([ hero('kael', { 0: 2, 1: 3, 2: 9 }) ], { onFuse: vi.fn() });
         const buttons = [ ...list.querySelectorAll('.fusion-button') ];
 
-        expect(buttons.map((button) => button.textContent)).toEqual([ 'Fundir', 'Fundir', 'Fundir' ]);
-        expect(buttons.map((button) => button.disabled)).toEqual([ true, false, false ]);
+        expect(buttons.map((button) => button.textContent)).toEqual([ 'Fundir', 'Fundir' ]);
+        expect(buttons.some((button) => button.disabled)).toBe(false);
+    });
+
+    it('says there is no fusion available when no hero has 3 copies', () => {
+        const view = renderFusion([ hero('kael', { 0: 2, 3: 5 }), hero('lyra') ], { onFuse: vi.fn() });
+
+        expect(view.getAttribute('data-testid')).toBe('fusion-empty');
+        expect(view.textContent).toBe('Nenhuma fusão disponível');
+        expect(view.querySelector('.fusion-button')).toBeNull();
     });
 
     it('calls onFuse with the hero and the stars when an enabled button is clicked', () => {
@@ -32,24 +38,15 @@ describe('renderFusion', () => {
         expect(onFuse).toHaveBeenCalledWith('kael', 1);
     });
 
-    it('does not call onFuse for a disabled button', () => {
-        const onFuse = vi.fn();
-        const list = renderFusion([ hero('kael', { 0: 2 }) ], { onFuse });
-
-        list.querySelector('[data-testid="fusion-button-kael-0"]').click();
-
-        expect(onFuse).not.toHaveBeenCalled();
-    });
-
     it('highlights the selected entry and no other', () => {
-        const list = renderFusion([ hero('kael'), hero('lyra') ], { onFuse: vi.fn(), selected: { heroId: 'lyra', stars: 1 } });
+        const list = renderFusion([ hero('kael', { 0: 3 }), hero('lyra', { 1: 3 }) ], { onFuse: vi.fn(), selected: { heroId: 'lyra', stars: 1 } });
         const selected = [ ...list.querySelectorAll('.fusion-row.is-selected') ];
 
         expect(selected.map((row) => row.getAttribute('data-testid'))).toEqual([ 'fusion-row-lyra-1' ]);
     });
 
     it('highlights nothing without a selection', () => {
-        expect(renderFusion([ hero('kael') ], { onFuse: vi.fn() }).querySelectorAll('.is-selected')).toHaveLength(0);
+        expect(renderFusion([ hero('kael', { 0: 3 }) ], { onFuse: vi.fn() }).querySelectorAll('.is-selected')).toHaveLength(0);
     });
 });
 

@@ -119,6 +119,40 @@ describe('campaignSession', () => {
         });
     });
 
+    describe('next chapter', () => {
+        const nextChapter = { ...progress(1, 'PHASE', 1), chapter: 2 };
+
+        it('plays the first stage of the next chapter once the backend answers the chapter boss report', async () => {
+            gateway.get.mockResolvedValue(progress(2, 'CHAPTER_BOSS'));
+            gateway.report.mockResolvedValue(nextChapter);
+            const realigned = vi.fn();
+            await loaded();
+            session.onRealign(realigned);
+
+            session.clear();
+            await session.flush();
+
+            expect(realigned).toHaveBeenCalledWith(expect.objectContaining({ kind: 'PHASE', stage: 1, phase: 1 }));
+            expect(session.completed).toBe(false);
+
+            session.clear();
+            await session.flush();
+
+            expect(gateway.report).toHaveBeenLastCalledWith({ chapter: 2, stage: 1, encounter: 'PHASE', phase: 1 }, 'CLEARED');
+        });
+
+        it('stays completed while the chapter boss report has not been answered', async () => {
+            gateway.get.mockResolvedValue(progress(2, 'CHAPTER_BOSS'));
+            gateway.report.mockRejectedValue(new ApiError('down', { status: 503 }));
+            await loaded();
+
+            session.clear();
+            await session.flush();
+
+            expect(session.completed).toBe(true);
+        });
+    });
+
     describe('flush', () => {
         it('sends the queued reports in order, one request at a time', async () => {
             await loaded();

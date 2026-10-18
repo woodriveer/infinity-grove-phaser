@@ -214,7 +214,7 @@ describe('HeroUi Fusão', () => {
         const fused = hero('kael', { 1: 1 });
         ctx.heroesGateway.fuse.mockResolvedValue(fused);
         await open(ctx, 'fusion');
-        expect(ctx.testid('fusion-button-kael-0').disabled).toBe(false);
+        expect(ctx.testid('fusion-button-kael-0')).not.toBeNull();
         expect(ctx.root[2].querySelectorAll('.skill-slot.is-locked')).toHaveLength(3);
 
         ctx.testid('fusion-button-kael-0').click();
@@ -222,8 +222,8 @@ describe('HeroUi Fusão', () => {
 
         expect(ctx.heroesGateway.fuse).toHaveBeenCalledWith('kael', 0);
         expect(ctx.testid('fusion-result').textContent).toBe('Nova carta: Hero kael 1★');
-        expect(ctx.testid('fusion-row-kael-0').querySelector('.fusion-copies').textContent).toBe('0/3');
-        expect(ctx.testid('fusion-button-kael-0').disabled).toBe(true);
+        expect(ctx.testid('fusion-row-kael-0')).toBeNull();
+        expect(ctx.testid('fusion-empty').textContent).toBe('Nenhuma fusão disponível');
         expect(ctx.testid('skill-slot-1').getAttribute('data-unlocked')).toBe('true');
         expect(ctx.testid('skill-slot-2').getAttribute('data-unlocked')).toBe('false');
     });
@@ -326,6 +326,56 @@ describe('HeroUi skill bar', () => {
         await ctx.heroes.fuse('kael', 1);
 
         expect(ctx.root[2].querySelectorAll('.skill-slot.is-locked')).toHaveLength(1);
+    });
+});
+
+describe('HeroUi Fusão without fusions', () => {
+    it('says no fusion is available when no hero has 3 copies', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 2 }), hero('lyra') ] } });
+
+        await open(ctx, 'fusion');
+
+        expect(ctx.testid('fusion-empty').textContent).toBe('Nenhuma fusão disponível');
+        expect(ctx.testid('fusion-list')).toBeNull();
+    });
+});
+
+describe('HeroUi bag badge', () => {
+    it('has no red dot until a card drops', () => {
+        const { testid } = createUi();
+
+        expect(testid('bag-badge').hidden).toBe(true);
+    });
+
+    it('a dropped card lights the red dot on the bag button and opening the bag clears it', async () => {
+        const ctx = createUi();
+
+        ctx.ui.showDrop({ heroId: 'lyra', heroName: 'Lyra Folhaveloz', stars: 0 });
+
+        expect(ctx.testid('bag-badge').hidden).toBe(false);
+        expect(ctx.testid('hud-bag').contains(ctx.testid('bag-badge'))).toBe(true);
+
+        await open(ctx, 'bag');
+
+        expect(ctx.testid('bag-badge').hidden).toBe(true);
+    });
+
+    it('a card that drops while the bag is open leaves the dot off', async () => {
+        const ctx = createUi();
+        await open(ctx, 'bag');
+
+        ctx.ui.showDrop({ heroId: 'lyra', heroName: 'Lyra Folhaveloz', stars: 0 });
+
+        expect(ctx.testid('bag-badge').hidden).toBe(true);
+    });
+
+    it('a card that drops over another screen lights the dot', async () => {
+        const ctx = createUi();
+        await open(ctx, 'heroes');
+
+        ctx.ui.showDrop({ heroId: 'lyra', heroName: 'Lyra Folhaveloz', stars: 0 });
+
+        expect(ctx.testid('bag-badge').hidden).toBe(false);
     });
 });
 

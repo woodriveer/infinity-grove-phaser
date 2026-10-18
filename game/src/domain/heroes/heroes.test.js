@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyDrop, bagEntries, bossLabel, copiesOf, ELEMENT_LABELS, fusionRows, STARTING_CHOICES, unlockedSlots } from './heroes';
+import { applyDrop, availableFusions, bagEntries, bossLabel, copiesOf, ELEMENT_LABELS, fusionRows, STARTING_CHOICES, unlockedSlots } from './heroes';
 
 const hero = (id, copies = {}, extra = {}) => ({
     id, name: `Hero ${id}`, element: 'FIRE', owned: Object.values(copies).some((n) => n > 0), stars: 0,
@@ -110,5 +110,17 @@ describe('labels', () => {
     it('names the bosses of the farm list', () => {
         expect(bossLabel({ kind: 'MINIBOSS', stage: 3 })).toBe('Miniboss 3');
         expect(bossLabel({ kind: 'CHAPTER_BOSS' })).toBe('Chefe do capítulo');
+    });
+});
+
+describe('availableFusions', () => {
+    it('keeps only the (hero, stars) pairs with 3 or more copies', () => {
+        const rows = availableFusions([ hero('kael', { 0: 2, 1: 3, 2: 4, 3: 9 }), hero('lyra', { 0: 3 }) ]);
+
+        expect(rows.map(({ heroId, stars }) => `${heroId}:${stars}`)).toEqual([ 'kael:1', 'kael:2', 'lyra:0' ]);
+    });
+
+    it('is empty when no pair has 3 copies', () => {
+        expect(availableFusions([ hero('kael', { 0: 2 }), hero('lyra') ])).toEqual([]);
     });
 });

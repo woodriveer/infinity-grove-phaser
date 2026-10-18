@@ -16,6 +16,9 @@ export const STARTING_CHOICES = [
     { element: 'NATURE', heroId: 'lyra', label: 'Natureza - Lyra' }
 ];
 
+//  Every hero of the game; the combat scene loads one standing sprite (assets/heroes/<id>_sprite.png) per id
+export const HERO_IDS = [ 'kael', 'orina', 'lyra', 'seraphine', 'vex' ];
+
 export const copiesOf = (hero, stars) => hero.copies?.[stars] ?? 0;
 
 //  Every (hero, stars) pair the bag holds at least one card of
@@ -30,6 +33,9 @@ export const fusionRows = (heroes) => heroes.flatMap((hero) => FUSIBLE_STARS.map
 
     return { heroId: hero.id, heroName: hero.name, stars, copies, canFuse: copies >= FUSION_SIZE };
 }));
+
+//  The fusions the bag can do now
+export const availableFusions = (heroes) => fusionRows(heroes).filter((row) => row.canFuse);
 
 //  The skill slots a hero with `stars` stars has unlocked: slot n opens at n stars
 export const unlockedSlots = (stars) => [ 1, 2, 3 ].filter((slot) => stars >= slot);

@@ -1,19 +1,26 @@
-import { FUSION_SIZE, fusionRows } from '../../../domain/heroes/heroes';
+import { availableFusions, FUSION_SIZE } from '../../../domain/heroes/heroes';
 import { el, starsText } from './dom';
 
-//  The fusion screen: one row per (hero, stars 0 to 2) with the copies out of 3 and a Fundir button that works from 3 copies.
+//  The fusion screen: one row per fusion the bag can do now (3 copies of a hero and stars), each with a Fundir button;
+//  "Nenhuma fusão disponível" when there is none.
 //  `onFuse(heroId, stars)` fires on a click of an enabled button; `selected` ({ heroId, stars }) highlights one row.
 export const renderFusion = (heroes, { onFuse, selected = null }) =>
 {
+    const rows = availableFusions(heroes);
+
+    if (rows.length === 0)
+    {
+        return el('p', 'hero-empty', 'Nenhuma fusão disponível', { testid: 'fusion-empty' });
+    }
+
     const list = el('div', 'fusion-list', '', { testid: 'fusion-list' });
 
-    fusionRows(heroes).forEach((row) =>
+    rows.forEach((row) =>
     {
         const isSelected = selected?.heroId === row.heroId && selected?.stars === row.stars;
         const node = el('div', `fusion-row${isSelected ? ' is-selected' : ''}`, '', { testid: `fusion-row-${row.heroId}-${row.stars}` });
         const button = el('button', 'fusion-button', 'Fundir', { type: 'button', testid: `fusion-button-${row.heroId}-${row.stars}` });
 
-        button.disabled = !row.canFuse;
         button.addEventListener('click', () => onFuse(row.heroId, row.stars));
         node.append(
             el('span', 'fusion-name', `${row.heroName} ${starsText(row.stars)} → ${starsText(row.stars + 1)}`),

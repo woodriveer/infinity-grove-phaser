@@ -54,15 +54,22 @@ describe('renderBagEntry', () => {
         expect(detail.querySelectorAll('.skill-row.is-locked')).toHaveLength(3);
     });
 
-    it('opens the fusion screen with this entry through the button', () => {
+    it('has no way to the fusion screen while there are fewer than 3 copies', () => {
+        const detail = renderBagEntry(entry, hero('kael', { 0: 2 }), { onFuse: vi.fn() });
+
+        expect(detail.querySelector('[data-testid="bag-go-fusion"]')).toBeNull();
+    });
+
+    it('opens the fusion screen with this entry through the button once 3 copies are there', () => {
         const onFuse = vi.fn();
-        const detail = renderBagEntry(entry, hero('kael', { 0: 2 }), { onFuse });
+        const ready = { ...entry, copies: 3 };
+        const detail = renderBagEntry(ready, hero('kael', { 0: 3 }), { onFuse });
 
         expect(detail.querySelector('[data-testid="bag-go-fusion"]').textContent).toBe('Ir para a fusão');
 
         detail.querySelector('[data-testid="bag-go-fusion"]').click();
 
-        expect(onFuse).toHaveBeenCalledWith(entry);
+        expect(onFuse).toHaveBeenCalledWith(ready);
     });
 
     it('has no way to the fusion screen for a three star card, which cannot be fused', () => {

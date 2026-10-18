@@ -32,6 +32,7 @@ export const renderBagEntry = (entry, hero, { onFuse }) =>
     const detail = el('div', 'hero-detail', '', { testid: 'bag-entry-detail' });
     const text = el('div', 'hero-detail-text');
     const fusible = entry.stars < MAX_STARS;
+    const ready = fusible && entry.copies >= FUSION_SIZE;
 
     text.append(
         el('strong', 'hero-name', entry.heroName),
@@ -40,7 +41,7 @@ export const renderBagEntry = (entry, hero, { onFuse }) =>
         el('div', 'bag-needed', fusible ? `Para fundir: ${entry.copies}/${FUSION_SIZE}` : 'Estrela máxima: não pode ser fundida')
     );
 
-    if (fusible)
+    if (ready)
     {
         const button = el('button', 'bag-fuse', 'Ir para a fusão', { type: 'button', testid: 'bag-go-fusion' });
 

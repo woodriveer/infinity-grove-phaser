@@ -4,7 +4,7 @@ import { Campaign } from '../../domain/campaign/campaign';
 //  The position moves at once; reports go out one at a time, in order (ADR 0006).
 //  Port (ADR 0007):
 //    gateway  { get(), report(position, outcome) }  the backend /progress calls. get -> progress payload.
-//             report resolves with the new progress, plus `drop` ({ heroId, heroName, stars }) when the win dropped a card,
+//             report resolves with the new progress (the first stage of the next chapter after a chapter boss), plus `drop` ({ heroId, heroName, stars }) when the win dropped a card,
 //             or rejects with an ApiError: status 409 carries the stored progress in `body.progress`, anything else is a
 //             failure that is retried.
 export const createCampaignSession = ({ gateway }) =>
@@ -155,6 +155,12 @@ export const createCampaignSession = ({ gateway }) =>
                     if (response?.drop)
                     {
                         dropped(response.drop);
+                    }
+
+                    //  The chapter boss was the last report and the backend opened the next chapter: play it
+                    if (queue.length === 0 && campaign.completed && response?.chapter > campaign.chapter)
+                    {
+                        adopt(response);
                     }
                 }
             }

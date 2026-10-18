@@ -23,7 +23,9 @@ const LOAD_FAILED = 'Não foi possível carregar.';
 const FUSE_FAILED = 'Não foi possível fundir as cartas.';
 const LEADER_FAILED = 'Não foi possível trocar o líder.';
 
-const HUD_HTML = `<div class="hero-hud">${SCREENS.map(({ id, label }) => `<button type="button" data-testid="hud-${id}">${label}</button>`).join('')}</div>`;
+//  The bag button carries a red dot while the bag holds a card the player has not looked at yet
+const BAG_BADGE_HTML = '<span class="hud-badge" data-testid="bag-badge" hidden></span>';
+const HUD_HTML = `<div class="hero-hud">${SCREENS.map(({ id, label }) => `<button type="button" data-testid="hud-${id}">${label}${id === 'bag' ? BAG_BADGE_HTML : ''}</button>`).join('')}</div>`;
 
 const PANEL_HTML = '<div class="hero-panel" hidden><div class="hero-window">'
     + '<div class="hero-header"><span class="hero-title"></span><span>'
@@ -53,6 +55,9 @@ export class HeroUi
         this.noticeId = 0;
 
         const hud = this.createDom(HUD, HUD_HTML);
+
+        this.bagBadge = hud.querySelector('.hud-badge');
+        this.screen = null;
 
         SCREENS.forEach(({ id }) => hud.querySelector(`[data-testid="hud-${id}"]`).addEventListener('click', () => this.show(id)));
 
@@ -106,8 +111,14 @@ export class HeroUi
             this.panelElement.updateSize?.();
         }
 
+        this.screen = screen;
         this.title.textContent = title;
         this.setError('');
+
+        if (screen === 'bag')
+        {
+            this.bagBadge.hidden = true;
+        }
         this.body.replaceChildren();
         this.backButton.hidden = true;
 
@@ -149,6 +160,7 @@ export class HeroUi
 
         this.view += 1;
         this.open = false;
+        this.screen = null;
         this.panel.hidden = true;
         this.body.replaceChildren();
 
@@ -284,6 +296,8 @@ export class HeroUi
     {
         const id = ++this.noticeId;
 
+        //  A card that lands while the bag is open is seen at once
+        this.bagBadge.hidden = this.open && this.screen === 'bag';
         this.notice.textContent = `Carta: ${drop.heroName}`;
         this.notice.hidden = false;
         this.scene.time.delayedCall(NOTICE_MS, () =>
