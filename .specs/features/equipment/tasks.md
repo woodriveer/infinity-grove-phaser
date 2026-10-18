@@ -486,10 +486,10 @@ T25
 
 **Done when**:
 
-- [ ] Each call hits the URL and body of the design and resolves with the response data
-- [ ] `equipmentApi.test.js` passes; `npm test` passes
+- [x] Each call hits the URL and body of the design and resolves with the response data
+- [x] `equipmentApi.test.js` passes; `npm test` passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
