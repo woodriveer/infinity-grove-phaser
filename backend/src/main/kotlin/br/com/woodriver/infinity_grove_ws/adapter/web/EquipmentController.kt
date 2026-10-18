@@ -7,6 +7,7 @@ import br.com.woodriver.infinity_grove_ws.usecase.EquipmentChange
 import br.com.woodriver.infinity_grove_ws.usecase.ListEquipmentUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.RefinePieceUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.RerollAffixUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.SellPieceUseCase
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -48,6 +49,7 @@ class EquipmentController(
     private val equipPiece: EquipPieceUseCase,
     private val refinePiece: RefinePieceUseCase,
     private val rerollAffix: RerollAffixUseCase,
+    private val sellPiece: SellPieceUseCase,
     private val rules: EquipmentRules,
 ) {
     @GetMapping
@@ -85,4 +87,10 @@ class EquipmentController(
         val affix = body["affix"] as? Int ?: throw IllegalArgumentException("affix must be an integer")
         return EquipmentChangeResponse.from(rerollAffix.reroll(principal.name, id, affix), rules)
     }
+
+    @PostMapping("/{id}/sell")
+    fun sell(
+        principal: Principal,
+        @PathVariable id: String,
+    ) = EquipmentChangeResponse.from(sellPiece.sell(principal.name, id), rules)
 }

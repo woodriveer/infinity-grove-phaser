@@ -45,3 +45,11 @@ interface RerollAffixUseCase {
         affixIndex: Int,
     ): EquipmentChange
 }
+
+interface SellPieceUseCase {
+    /** Removes [pieceId] (taking it off its hero first) and credits its sell price, in one transaction with the wallet. */
+    fun sell(
+        username: String,
+        pieceId: String,
+    ): EquipmentChange
+}

@@ -403,11 +403,11 @@ T25
 
 **Done when**:
 
-- [ ] Selling a COMMON +0 piece credits 100 copper and removes it
-- [ ] A worn piece is unequipped and sold; an unknown or foreign piece is 404 with nothing changed
-- [ ] `EquipmentServiceTest` additions and `EquipmentSellIT` pass; full backend gate passes
+- [x] Selling a COMMON +0 piece credits 100 copper and removes it
+- [x] A worn piece is unequipped and sold; an unknown or foreign piece is 404 with nothing changed
+- [x] `EquipmentServiceTest` additions and `EquipmentSellIT` pass; full backend gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 

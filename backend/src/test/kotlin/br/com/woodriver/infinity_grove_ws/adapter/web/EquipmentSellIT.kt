@@ -21,14 +21,14 @@ class EquipmentSellIT : IntegrationTestBase() {
     fun registerPlayer() {
         token =
             "Bearer " +
-                given()
-                    .contentType(ContentType.JSON)
-                    .body("""{"username":"yan","password":"password123","startingElement":"FIRE"}""")
-                    .post("/users")
-                    .then()
-                    .statusCode(201)
-                    .extract()
-                    .path<String>("accessToken")
+            given()
+                .contentType(ContentType.JSON)
+                .body("""{"username":"yan","password":"password123","startingElement":"FIRE"}""")
+                .post("/users")
+                .then()
+                .statusCode(201)
+                .extract()
+                .path<String>("accessToken")
     }
 
     private fun piece(
@@ -61,7 +61,11 @@ class EquipmentSellIT : IntegrationTestBase() {
         piece("w1", heroId = "kael")
         jpaWalletRepository.save(WalletEntity("yan", 5))
 
-        asUser().post("/equipment/w1/sell").then().statusCode(200).body("equipment.pieces", hasSize<Any>(0))
+        asUser()
+            .post("/equipment/w1/sell")
+            .then()
+            .statusCode(200)
+            .body("equipment.pieces", hasSize<Any>(0))
 
         assertEquals(0, jpaPieceRepository.count())
         assertEquals(105L, copper())
@@ -81,7 +85,11 @@ class EquipmentSellIT : IntegrationTestBase() {
         jpaWalletRepository.save(WalletEntity("yan", 10))
         piece("theirs", username = "other")
 
-        asUser().post("/equipment/ghost/sell").then().statusCode(404).body("code", equalTo("EQUIPMENT_NOT_FOUND"))
+        asUser()
+            .post("/equipment/ghost/sell")
+            .then()
+            .statusCode(404)
+            .body("code", equalTo("EQUIPMENT_NOT_FOUND"))
         asUser().post("/equipment/theirs/sell").then().statusCode(404)
 
         assertEquals(10L, copper())

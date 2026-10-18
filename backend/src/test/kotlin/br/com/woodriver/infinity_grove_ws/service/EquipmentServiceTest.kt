@@ -315,4 +315,62 @@ class EquipmentServiceTest {
 
         assertEquals(6_000L, wallets.wallets.getValue("yan").copper)
     }
+
+    @Test
+    fun `sell removes the piece and credits its sell price`() {
+        player()
+        weapon("w")
+        funded(50)
+
+        val change = service.sell("yan", "w")
+
+        assertEquals(0, change.equipment.pieces.size)
+        assertEquals(0, pieces.pieces.size)
+        assertEquals(150L, change.wallet.copper)
+        assertEquals(150L, wallets.wallets.getValue("yan").copper)
+    }
+
+    @Test
+    fun `sell prices a refined rare piece by its level`() {
+        player()
+        weapon("w", refine = 4, rarity = Rarity.RARE)
+        funded(0)
+
+        assertEquals(900L, service.sell("yan", "w").wallet.copper)
+    }
+
+    @Test
+    fun `sell of a worn piece takes it off the hero and sells it`() {
+        player()
+        weapon("w")
+        service.equip("yan", "w", "kael")
+        funded(0)
+
+        val change = service.sell("yan", "w")
+
+        assertEquals(100L, change.wallet.copper)
+        assertEquals(emptyList(), change.equipment.worn("kael"))
+        assertEquals(0, pieces.pieces.size)
+    }
+
+    @Test
+    fun `sell creates the missing wallet before crediting`() {
+        player()
+        weapon("w")
+
+        assertEquals(100L, service.sell("yan", "w").wallet.copper)
+    }
+
+    @Test
+    fun `sell of a missing piece or of a piece of another account is not found and credits nothing`() {
+        player()
+        funded(10)
+        Piece("theirs", "other", Slot.WEAPON, Rarity.COMMON, 3, 0, emptyList()).also { pieces.save(it) }
+
+        assertFailsWith<EquipmentNotFoundException> { service.sell("yan", "ghost") }
+        assertFailsWith<EquipmentNotFoundException> { service.sell("yan", "theirs") }
+
+        assertEquals(10L, wallets.wallets.getValue("yan").copper)
+        assertEquals(1, pieces.pieces.size)
+    }
 }

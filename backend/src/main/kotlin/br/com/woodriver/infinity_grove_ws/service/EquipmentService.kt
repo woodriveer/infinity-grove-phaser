@@ -16,6 +16,7 @@ import br.com.woodriver.infinity_grove_ws.usecase.EquipmentChange
 import br.com.woodriver.infinity_grove_ws.usecase.ListEquipmentUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.RefinePieceUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.RerollAffixUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.SellPieceUseCase
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,7 +34,8 @@ class EquipmentService(
 ) : ListEquipmentUseCase,
     EquipPieceUseCase,
     RefinePieceUseCase,
-    RerollAffixUseCase {
+    RerollAffixUseCase,
+    SellPieceUseCase {
     override fun list(username: String): PlayerEquipment {
         logger.info("Listing equipment username={}", username)
         requireUser(username)
@@ -97,6 +99,20 @@ class EquipmentService(
         walletAccess.save(wallet)
         logger.info("Rerolled username={} piece={} affix={} copper={}", username, pieceId, affixIndex, cost)
         return EquipmentChange(store(before, before.replace(rerolled)), wallet)
+    }
+
+    override fun sell(
+        username: String,
+        pieceId: String,
+    ): EquipmentChange {
+        logger.info("Sell requested username={} piece={}", username, pieceId)
+        lockPlayer(username)
+        val before = load(username)
+        val piece = before.find(pieceId)
+        val wallet = walletAccess.lock(username).plus(piece.sellPrice())
+        walletAccess.save(wallet)
+        logger.info("Sold username={} piece={} copper={}", username, pieceId, piece.sellPrice())
+        return EquipmentChange(store(before, before.remove(pieceId)), wallet)
     }
 
     /** Writes the pieces [after] changed or removed compared to [before]. */
