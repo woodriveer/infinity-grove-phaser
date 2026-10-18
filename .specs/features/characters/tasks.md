@@ -346,9 +346,10 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Entities round-trip `PlayerCards` including the boss record (comma-separated cleared chapters, day as ISO text)
-- [ ] Build gate passes
+- [x] Entities round-trip `PlayerCards` including the boss record (comma-separated cleared chapters, day as ISO text)
+- [x] Build gate passes
 
+**Status**: Done
 **Tests**: none (entity; covered by T13)
 **Gate**: Build
 
