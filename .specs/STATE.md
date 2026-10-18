@@ -58,6 +58,14 @@
 - **Date**: 2026-10-18
 - **Status**: active
 
+### AD-008
+- **Decision**: Every boss win drops a card (rates 1.0), the chapter boss opens the next chapter (1 to 5, only chapter 5 completes), and the farm lists only the bosses of the current chapter.
+- **Reason**: User decision after playing: the game stopped after the chapter 1 boss and drops were too rare to test the bag.
+- **Trade-off**: A player cannot replay the bosses of earlier chapters; farming a miniboss every 5 s at 100 % makes cards cheap. Chapters 2 to 5 reuse the chapter 1 shape with scaled numbers (enemy design per chapter is still open, AD-006).
+- **Scope**: `backend` `Progress`, `ChapterDefinition.of`, `ChapterSeeder`, `application.yaml`; `game` `campaignSession`
+- **Date**: 2026-10-18
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: .specs/features/characters (hero cards, bag, fusion, leader, farm; builds on stages, drops and elements)
