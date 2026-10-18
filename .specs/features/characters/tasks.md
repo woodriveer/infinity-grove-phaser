@@ -945,10 +945,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Only owned heroes are listed; the leader has `is-current`
-- [ ] Picking another hero calls the callback with its id
-- [ ] `leaderView.test.js` passes; quick gate passes
+- [x] Only owned heroes are listed; the leader has `is-current`
+- [x] Picking another hero calls the callback with its id
+- [x] `leaderView.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
