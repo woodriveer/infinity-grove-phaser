@@ -306,10 +306,11 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] Saved heroes come back equal, with skills ordered by slot and heroes in README order
-- [ ] `findById` returns null for an unknown id
-- [ ] `HeroRepositoryIT` passes; full backend gate passes
+- [x] Saved heroes come back equal, with skills ordered by slot and heroes in README order
+- [x] `findById` returns null for an unknown id
+- [x] `HeroRepositoryIT` passes; full backend gate passes
 
+**Status**: Done
 **Tests**: integration
 **Gate**: Full (backend)
 
