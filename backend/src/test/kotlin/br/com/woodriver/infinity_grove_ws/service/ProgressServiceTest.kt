@@ -5,6 +5,7 @@ import br.com.woodriver.infinity_grove_ws.InMemoryHeroRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
+import br.com.woodriver.infinity_grove_ws.LogCapture
 import br.com.woodriver.infinity_grove_ws.MutableClock
 import br.com.woodriver.infinity_grove_ws.SequenceChanceRoller
 import br.com.woodriver.infinity_grove_ws.domain.BossRecord
@@ -172,6 +173,40 @@ class ProgressServiceTest {
     }
 
     @Test
+    fun `a dropped card is logged with the player, the hero and the source`() {
+        playerAt(miniboss)
+        chance = SequenceChanceRoller(0.0)
+
+        LogCapture(CardRewards::class.java).use { logs ->
+            service.report("yan", miniboss, Outcome.CLEARED)
+
+            assertEquals(listOf("Card dropped username=yan hero=kael source=MINIBOSS"), logs.infos)
+        }
+    }
+
+    @Test
+    fun `a chapter boss drop is logged with its own source`() {
+        playerAt(chapterBoss)
+
+        LogCapture(CardRewards::class.java).use { logs ->
+            service.report("yan", chapterBoss, Outcome.CLEARED)
+
+            assertEquals(listOf("Card dropped username=yan hero=lyra source=CHAPTER_BOSS"), logs.infos)
+        }
+    }
+
+    @Test
+    fun `no drop logs nothing`() {
+        playerAt(miniboss)
+
+        LogCapture(CardRewards::class.java).use { logs ->
+            service.report("yan", miniboss, Outcome.CLEARED)
+
+            assertEquals(emptyList(), logs.infos)
+        }
+    }
+
+    @Test
     fun `a won miniboss with a roll of one percent or more drops nothing`() {
         playerAt(miniboss)
         chance = SequenceChanceRoller(0.01)
@@ -202,6 +237,7 @@ class ProgressServiceTest {
 
         assertEquals("lyra", result.drop?.heroId)
         assertEquals(1, blankCopies("lyra"))
+        assertEquals("kael", playerCards.cards.getValue("yan").leaderId)
         assertEquals(0, chance.reads)
         val bosses = playerCards.cards.getValue("yan").bosses
         assertTrue(bosses.hasWon(1))

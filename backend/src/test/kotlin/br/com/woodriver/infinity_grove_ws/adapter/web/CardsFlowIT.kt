@@ -76,6 +76,7 @@ class CardsFlowIT : IntegrationTestBase() {
         asUser(token)
             .get("/heroes")
             .then()
+            .body("leaderId", equalTo("kael"))
             .body("heroes[1].owned", equalTo(true))
             .body("heroes[1].copies.0", equalTo(1))
 

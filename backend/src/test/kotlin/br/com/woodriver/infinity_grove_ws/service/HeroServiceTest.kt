@@ -3,6 +3,7 @@ package br.com.woodriver.infinity_grove_ws.service
 import br.com.woodriver.infinity_grove_ws.InMemoryHeroRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
+import br.com.woodriver.infinity_grove_ws.LogCapture
 import br.com.woodriver.infinity_grove_ws.domain.CopyKey
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.HeroNotFoundException
@@ -100,6 +101,17 @@ class HeroServiceTest {
         assertEquals(1, hero.stars)
         assertEquals(mapOf(0 to 0, 1 to 1, 2 to 0, 3 to 0), hero.copies)
         assertEquals(mapOf(CopyKey("kael", 1) to 1), cards.cards.getValue("yan").copies)
+    }
+
+    @Test
+    fun `a fusion is logged with the player, the hero and the stars`() {
+        player(extra = mapOf(CopyKey("kael", 1) to 3))
+
+        LogCapture(PlayerCards::class.java).use { logs ->
+            service.fuse("yan", "kael", 1)
+
+            assertEquals(listOf("Fusing cards username=yan hero=kael stars=1"), logs.infos)
+        }
     }
 
     @Test

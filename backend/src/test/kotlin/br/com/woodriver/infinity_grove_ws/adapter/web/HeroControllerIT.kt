@@ -9,6 +9,9 @@ import io.restassured.response.Response
 import io.restassured.specification.RequestSpecification
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasSize
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -173,6 +176,32 @@ class HeroControllerIT : IntegrationTestBase() {
             .put("/leader")
             .then()
             .statusCode(401)
+    }
+
+    @Test
+    fun `two simultaneous fusions of the same three cards give exactly one 200 and one 409`() {
+        val token = register()
+        give("yan", "kael", 0, 3)
+        val pool = Executors.newFixedThreadPool(2)
+        val start = CountDownLatch(1)
+
+        val calls =
+            (1..2).map {
+                pool.submit<Int> {
+                    start.await(5, TimeUnit.SECONDS)
+                    fuse(token, "kael", """{"stars":0}""").statusCode()
+                }
+            }
+        start.countDown()
+        val statuses = calls.map { it.get(15, TimeUnit.SECONDS) }.sorted()
+        pool.shutdown()
+
+        assertEquals(listOf(200, 409), statuses)
+        assertEquals(
+            mapOf(1 to 1),
+            jpaCardCopyRepository.findAllByUsername("yan").associate { it.stars to it.copies }.filterKeys { it == 1 },
+        )
+        assertEquals(0, jpaCardCopyRepository.findAllByUsername("yan").count { it.stars == 0 })
     }
 
     @Test

@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 14,
+  "next_id": 18,
   "lessons": [
     {
       "id": "L-001",
@@ -173,17 +173,19 @@
       "text": "State the exact on-screen text of every message and countdown a criterion adds, or tests pin a wording the spec never chose",
       "signal": "spec_precision_gap",
       "scope": "game",
-      "status": "candidate",
+      "status": "confirmed",
       "features": [
-        "stages"
+        "stages",
+        "characters"
       ],
-      "recurrence": 1,
+      "recurrence": 2,
       "harmful": 0,
       "evidence": [
-        "STG-19, STG-22 (validation.md G1, G2) (game)"
+        "STG-19, STG-22 (validation.md G1, G2) (game)",
+        "validation.md Screens AC 8 (error line text not fixed by spec) (game)"
       ],
       "created": "2026-10-17T19:41:03Z",
-      "last_seen": "2026-10-17T19:41:03Z"
+      "last_seen": "2026-10-18T11:47:40Z"
     },
     {
       "id": "L-011",
@@ -238,6 +240,78 @@
       ],
       "created": "2026-10-18T01:57:13Z",
       "last_seen": "2026-10-18T01:57:13Z"
+    },
+    {
+      "id": "L-014",
+      "key": "ac_gap::do not write log output as an acceptance criterion unless a test can assert it state it as a convention instead",
+      "text": "Do not write log output as an acceptance criterion unless a test can assert it; state it as a convention instead",
+      "signal": "ac_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "characters"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md Drop AC 11 / Fusion AC 11, mutant M12 service/CardRewards.kt:52 (spec)"
+      ],
+      "created": "2026-10-18T11:47:40Z",
+      "last_seen": "2026-10-18T11:47:40Z"
+    },
+    {
+      "id": "L-015",
+      "key": "surviving_mutant::prove an atomicity or locking requirement with a test that fails the second write or races two requests not by trusting the transaction or lock annotation",
+      "text": "Prove an atomicity or locking requirement with a test that fails the second write or races two requests, not by trusting the transaction or lock annotation",
+      "signal": "surviving_mutant",
+      "scope": "backend",
+      "status": "candidate",
+      "features": [
+        "characters"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "mutants M14 service/UserService.kt:25, M15 adapter/repository/PlayerCardsRepository.kt:15; Reg AC 5, Fusion AC 9 (backend)"
+      ],
+      "created": "2026-10-18T11:47:40Z",
+      "last_seen": "2026-10-18T11:47:40Z"
+    },
+    {
+      "id": "L-016",
+      "key": "surviving_mutant::when the spec says an action leaves a value unchanged assert that value after the action",
+      "text": "When the spec says an action leaves a value unchanged, assert that value after the action",
+      "signal": "surviving_mutant",
+      "scope": "backend",
+      "status": "candidate",
+      "features": [
+        "characters"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "mutant M11 service/CardRewards.kt:51; edge case leader stays unchanged (backend)"
+      ],
+      "created": "2026-10-18T11:47:41Z",
+      "last_seen": "2026-10-18T11:47:41Z"
+    },
+    {
+      "id": "L-017",
+      "key": "surviving_mutant::assert every exact label the spec names button text included",
+      "text": "Assert every exact label the spec names, button text included",
+      "signal": "surviving_mutant",
+      "scope": "game-ui",
+      "status": "candidate",
+      "features": [
+        "characters"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "mutant G7 game/src/adapters/phaser/views/bagView.js:45; Screens AC 5 label (game-ui)"
+      ],
+      "created": "2026-10-18T11:47:41Z",
+      "last_seen": "2026-10-18T11:47:41Z"
     }
   ]
 }

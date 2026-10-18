@@ -1168,6 +1168,48 @@ T47 → T48 → T49 → T50 → T51
 
 ---
 
+## Phase 9 tasks: Verifier fixes (iteration 1)
+
+### T52: Prove atomicity, locking, leader, rollback and logs in the backend
+
+**What**: Tests for Verifier gaps 1 to 5: registration and outcome rollback when the cards store fails (`CardsAtomicityIT`), two simultaneous fusions (`HeroControllerIT`), the leader unchanged after a drop (`ProgressServiceTest`, `CardsFlowIT`), and the INFO logs of a drop and a fusion (`LogCapture`).
+**Where**: `BT/adapter/web/CardsAtomicityIT.kt`
+**Depends on**: T51
+**Requirement**: CHAR-02, CHAR-04, CHAR-06, CHAR-07
+
+**Done when**:
+
+- [x] A failing cards save leaves no user and no cards after a registration, and leaves the stored progress and the bag unchanged after an outcome report
+- [x] Two simultaneous fusions of 3 cards give one 200 and one 409 and exactly one one-star card
+- [x] The leader is still Kael after the first chapter boss drops Lyra
+- [x] The drop log and the fusion log carry the player, the hero and the source or stars
+- [x] Full backend gate passes
+
+**Status**: Done
+**Tests**: integration
+**Gate**: Full (backend)
+
+---
+
+### T53: Assert the fusion shortcut label and the 27-card path to three stars
+
+**What**: Tests for Verifier gaps 6 and 7: the exact `Ir para a fusão` label (`bagView.test.js`) and an e2e that fuses 27 blank cards up to a 3-star hero with all skills unlocked.
+**Where**: `game/e2e/heroes.spec.js`
+**Depends on**: T52
+**Requirement**: CHAR-09
+
+**Done when**:
+
+- [x] The bag entry shortcut text is asserted
+- [x] The e2e reaches 3 stars with slot 3 unlocked and no way to fuse the 3-star card
+- [x] Full game gate passes
+
+**Status**: Done
+**Tests**: e2e
+**Gate**: Full (game)
+
+---
+
 ## Phase Execution Map
 
 ```

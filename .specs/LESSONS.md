@@ -8,7 +8,11 @@
 
 Corroborated across multiple features. Safe to apply as guidance.
 
-_none_
+### L-010 - State the exact on-screen text of every message and countdown a criterion adds, or tests pin a wording the spec never chose
+- signal: `spec_precision_gap` · recurrence: 2 feature(s) · scope: `game` · harmful: 0
+- features: stages, characters
+- evidence: STG-19, STG-22 (validation.md G1, G2) (game) (+1 more)
+- last seen: 2026-10-18T11:47:40Z
 
 ## Candidates (under observation - do NOT load as guidance yet)
 
@@ -68,12 +72,6 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: G2 click-through wallet text (spec)
 - last seen: 2026-10-17T17:20:35Z
 
-### L-010 - State the exact on-screen text of every message and countdown a criterion adds, or tests pin a wording the spec never chose
-- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
-- features: stages
-- evidence: STG-19, STG-22 (validation.md G1, G2) (game)
-- last seen: 2026-10-17T19:41:03Z
-
 ### L-011 - Assert an error requirement at the layer the spec names (HTTP status and no spawn), not only at the repository that raises it
 - signal: `ac_gap` · recurrence: 1 feature(s) · scope: `backend` · harmful: 0
 - features: elements
@@ -91,6 +89,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - features: elements
 - evidence: ELEM-03 AC8 / ELEM-04 AC1 (scene)
 - last seen: 2026-10-18T01:57:13Z
+
+### L-014 - Do not write log output as an acceptance criterion unless a test can assert it; state it as a convention instead
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: characters
+- evidence: validation.md Drop AC 11 / Fusion AC 11, mutant M12 service/CardRewards.kt:52 (spec)
+- last seen: 2026-10-18T11:47:40Z
+
+### L-015 - Prove an atomicity or locking requirement with a test that fails the second write or races two requests, not by trusting the transaction or lock annotation
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `backend` · harmful: 0
+- features: characters
+- evidence: mutants M14 service/UserService.kt:25, M15 adapter/repository/PlayerCardsRepository.kt:15; Reg AC 5, Fusion AC 9 (backend)
+- last seen: 2026-10-18T11:47:40Z
+
+### L-016 - When the spec says an action leaves a value unchanged, assert that value after the action
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `backend` · harmful: 0
+- features: characters
+- evidence: mutant M11 service/CardRewards.kt:51; edge case leader stays unchanged (backend)
+- last seen: 2026-10-18T11:47:41Z
+
+### L-017 - Assert every exact label the spec names, button text included
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game-ui` · harmful: 0
+- features: characters
+- evidence: mutant G7 game/src/adapters/phaser/views/bagView.js:45; Screens AC 5 label (game-ui)
+- last seen: 2026-10-18T11:47:41Z
 
 ## Quarantined (failed when applied - ignore)
 
