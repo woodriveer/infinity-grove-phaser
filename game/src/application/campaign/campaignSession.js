@@ -4,8 +4,9 @@ import { Campaign } from '../../domain/campaign/campaign';
 //  The position moves at once; reports go out one at a time, in order (ADR 0006).
 //  Port (ADR 0007):
 //    gateway  { get(), report(position, outcome) }  the backend /progress calls. get -> progress payload.
-//             report resolves with the new progress, or rejects with an ApiError: status 409 carries the stored
-//             progress in `body.progress`, anything else is a failure that is retried.
+//             report resolves with the new progress, plus `drop` ({ heroId, heroName, stars }) when the win dropped a card,
+//             or rejects with an ApiError: status 409 carries the stored progress in `body.progress`, anything else is a
+//             failure that is retried.
 export const createCampaignSession = ({ gateway }) =>
 {
     let campaign = null;
@@ -13,6 +14,7 @@ export const createCampaignSession = ({ gateway }) =>
     let sending = false;
     let loading = null;
     let realigned = () => {};
+    let dropped = () => {};
 
     const enqueue = (outcome) =>
     {
@@ -66,6 +68,12 @@ export const createCampaignSession = ({ gateway }) =>
             realigned = callback;
         },
 
+        //  Fired with the card of each accepted report that dropped one
+        onDrop: (callback) =>
+        {
+            dropped = callback;
+        },
+
         //  Resolves with the first encounter; rejects when the backend cannot be reached (the scene retries)
         load: () =>
         {
@@ -85,6 +93,13 @@ export const createCampaignSession = ({ gateway }) =>
         },
 
         encounter: () => campaign?.encounter() ?? null,
+
+        //  The encounter of a boss the player already beat, to fight it again; the position and the queue are untouched
+        farmEncounter: (boss) =>
+        {
+            requireCampaign();
+            return campaign.farmEncounter(boss);
+        },
 
         //  The encounter was won: move on and queue the report. Returns the next encounter (null once completed).
         clear: () =>
@@ -119,10 +134,11 @@ export const createCampaignSession = ({ gateway }) =>
                 while (queue.length > 0)
                 {
                     const [ report ] = queue;
+                    let response;
 
                     try
                     {
-                        await gateway.report(report.position, report.outcome);
+                        response = await gateway.report(report.position, report.outcome);
                     }
                     catch (error)
                     {
@@ -135,6 +151,11 @@ export const createCampaignSession = ({ gateway }) =>
                     }
 
                     queue.shift();
+
+                    if (response?.drop)
+                    {
+                        dropped(response.drop);
+                    }
                 }
             }
             finally

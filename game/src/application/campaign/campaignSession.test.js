@@ -256,6 +256,85 @@ describe('campaignSession', () => {
         });
     });
 
+    describe('card drops', () => {
+        const drop = { heroId: 'kael', heroName: 'Kael Raizférrea', stars: 0 };
+
+        it('onDrop fires with the card of an accepted report, after it left the queue', async () => {
+            const received = [];
+
+            await loaded();
+            session.onDrop((card) => received.push(card));
+            gateway.report.mockResolvedValue({ ...progress(1, 'PHASE', 2), drop });
+            session.clear();
+
+            await session.flush();
+
+            expect(received).toEqual([ drop ]);
+        });
+
+        it('fires once per report that dropped a card and not for the others', async () => {
+            const received = [];
+
+            await loaded();
+            session.onDrop((card) => received.push(card));
+            gateway.report
+                .mockResolvedValueOnce({ ...progress(1, 'PHASE', 2) })
+                .mockResolvedValueOnce({ ...progress(1, 'PHASE', 2), drop: null })
+                .mockResolvedValueOnce({ ...progress(1, 'MINIBOSS'), drop });
+            session.clear();
+            session.clear();
+            session.clear();
+
+            await session.flush();
+
+            expect(gateway.report).toHaveBeenCalledTimes(3);
+            expect(received).toEqual([ drop ]);
+        });
+
+        it('a failed report fires nothing and stays first in the queue', async () => {
+            const received = [];
+
+            await loaded();
+            session.onDrop((card) => received.push(card));
+            gateway.report.mockRejectedValueOnce(new ApiError('Cannot reach the server. Try again later.'));
+            session.clear();
+
+            await session.flush();
+            expect(received).toEqual([]);
+
+            gateway.report.mockResolvedValueOnce({ ...progress(1, 'PHASE', 2), drop });
+            await session.flush();
+
+            expect(received).toEqual([ drop ]);
+        });
+
+        it('a win with no callback registered is not an error', async () => {
+            await loaded();
+            gateway.report.mockResolvedValue({ ...progress(1, 'PHASE', 2), drop });
+            session.clear();
+
+            await expect(session.flush()).resolves.toBeUndefined();
+        });
+    });
+
+    describe('farm encounters', () => {
+        it('builds the encounter of a beaten boss without touching the position or the queue', async () => {
+            gateway.get.mockResolvedValue(progress(2, 'PHASE', 1));
+            await session.load();
+
+            const encounter = session.farmEncounter({ kind: 'MINIBOSS', stage: 1 });
+
+            expect(encounter).toMatchObject({ kind: 'FARM', health: 50, timeLimitMs: 30000, label: 'Rever chefe: Miniboss 1' });
+            expect(session.encounter()).toMatchObject({ kind: 'PHASE', stage: 2, phase: 1 });
+            await session.flush();
+            expect(gateway.report).not.toHaveBeenCalled();
+        });
+
+        it('throws before the campaign has loaded', () => {
+            expect(() => session.farmEncounter({ kind: 'CHAPTER_BOSS' })).toThrow('The campaign has not loaded');
+        });
+    });
+
     describe('flushOnExit', () => {
         it('sends every queued report once, in order', async () => {
             await loaded();

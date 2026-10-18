@@ -761,11 +761,12 @@ T47 → T48 → T49 → T50 → T51
 
 **Done when**:
 
-- [ ] A report response with a `drop` calls the callback once, after the report left the queue; `drop: null` calls nothing
-- [ ] A failed report calls nothing and keeps its place in the queue
-- [ ] `farmEncounter` returns the farm encounter without touching the queue or the position
-- [ ] `campaignSession.test.js` passes; quick gate passes
+- [x] A report response with a `drop` calls the callback once, after the report left the queue; `drop: null` calls nothing
+- [x] A failed report calls nothing and keeps its place in the queue
+- [x] `farmEncounter` returns the farm encounter without touching the queue or the position
+- [x] `campaignSession.test.js` passes; quick gate passes
 
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (game)
 
