@@ -278,12 +278,12 @@ T25
 
 **Done when**:
 
-- [ ] A won boss with a passing roll stores the piece and returns it with `sold false`; a failing roll returns null and stores nothing
-- [ ] With 100 pieces in the bag it stores nothing, credits the sell price to the wallet and returns the piece with `sold true`
-- [ ] A missing wallet is created before the credit
-- [ ] `EquipmentRewardsTest` passes with in-memory fakes; quick gate passes
+- [x] A won boss with a passing roll stores the piece and returns it with `sold false`; a failing roll returns null and stores nothing
+- [x] With 100 pieces in the bag it stores nothing, credits the sell price to the wallet and returns the piece with `sold true`
+- [x] A missing wallet is created before the credit
+- [x] `EquipmentRewardsTest` passes with in-memory fakes; quick gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 

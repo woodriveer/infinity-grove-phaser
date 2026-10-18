@@ -1,10 +1,12 @@
 package br.com.woodriver.infinity_grove_ws.adapter.config
 
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
+import br.com.woodriver.infinity_grove_ws.port.IdGeneratorPort
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.util.UUID
 
 /**
  * Equipment settings bound from `app.equipment.*`: a miniboss win drops a piece at 25 %, the chapter boss at 100 %, the bag holds 100
@@ -32,4 +34,11 @@ class EquipmentConfig {
             refineBaseCost = properties.refineBaseCost,
             rerollCost = properties.rerollCost,
         )
+
+    @Bean
+    fun idGenerator(): IdGeneratorPort = UuidIdGenerator()
+}
+
+class UuidIdGenerator : IdGeneratorPort {
+    override fun next(): String = UUID.randomUUID().toString()
 }

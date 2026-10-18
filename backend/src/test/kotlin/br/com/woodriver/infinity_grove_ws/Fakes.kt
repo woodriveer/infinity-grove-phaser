@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws
 
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.Hero
+import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
@@ -12,7 +13,9 @@ import br.com.woodriver.infinity_grove_ws.port.AccessTokenIssuerPort
 import br.com.woodriver.infinity_grove_ws.port.ChanceRollerPort
 import br.com.woodriver.infinity_grove_ws.port.ChapterRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.DropRollerPort
+import br.com.woodriver.infinity_grove_ws.port.EquipmentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.HeroRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.IdGeneratorPort
 import br.com.woodriver.infinity_grove_ws.port.PasswordHasherPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
@@ -204,4 +207,27 @@ class SequenceChanceRoller(
         require(value >= 0.0 && value < 1.0) { "Scripted chance $value is outside 0 (inclusive) to 1 (exclusive)" }
         return value
     }
+}
+
+class InMemoryEquipmentRepository : EquipmentRepositoryPort {
+    val pieces = linkedMapOf<String, Piece>()
+
+    override fun findAll(username: String) = pieces.values.filter { it.username == username }
+
+    override fun save(piece: Piece): Piece = piece.also { pieces[it.id] = it }
+
+    override fun delete(id: String) {
+        pieces.remove(id)
+    }
+
+    override fun deleteByUsername(username: String) {
+        pieces.values.removeIf { it.username == username }
+    }
+}
+
+/** Hands out `piece-1`, `piece-2`, ... */
+class SequenceIds : IdGeneratorPort {
+    private var count = 0
+
+    override fun next() = "piece-${++count}"
 }
