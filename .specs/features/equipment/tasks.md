@@ -172,12 +172,12 @@ T25
 
 **Done when**:
 
-- [ ] `refined()` raises the level by 1 and throws `MaxRefineException` at +10
-- [ ] `rerolled(index)` at level 5 or more replaces that affix with a type the piece lacks (not `CLICK_DAMAGE_PCT` on a weapon) and a new base, leaving the others and the level
-- [ ] Below level 5 it throws `RefineTooLowException`; an index outside the affixes `InvalidAffixException`; no type left `NoAffixLeftException`
-- [ ] `EquipmentTest` additions pass; quick gate passes
+- [x] `refined()` raises the level by 1 and throws `MaxRefineException` at +10
+- [x] `rerolled(index)` at level 5 or more replaces that affix with a type the piece lacks (not `CLICK_DAMAGE_PCT` on a weapon) and a new base, leaving the others and the level
+- [x] Below level 5 it throws `RefineTooLowException`; an index outside the affixes `InvalidAffixException`; no type left `NoAffixLeftException`
+- [x] `EquipmentTest` additions pass; quick gate passes
 
-**Status**: Pending
+**Status**: Done
 **Tests**: unit
 **Gate**: Quick (backend)
 

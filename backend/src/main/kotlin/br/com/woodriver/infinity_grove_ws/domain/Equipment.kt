@@ -125,6 +125,29 @@ data class Piece(
     /** Copper the piece sells for: `100 * rarity index * (1 + 0.5 * refine)`, rounded down. */
     fun sellPrice(): Long = SELL_BASE * rarity.index * (2 + refine) / 2
 
+    /** The piece one refine level higher; a piece at the maximum level is rejected. */
+    fun refined(): Piece {
+        if (refine >= EquipmentRules.MAX_REFINE) throw MaxRefineException()
+        return copy(refine = refine + 1)
+    }
+
+    /**
+     * The piece with affix [index] replaced by a type it does not carry and a fresh roll; the other affixes and the refine level stay.
+     * [chance] picks the new type, then its value. Needs a refine level of at least [EquipmentRules.REROLL_MIN_REFINE].
+     */
+    fun rerolled(
+        index: Int,
+        chance: () -> Double,
+    ): Piece {
+        if (index !in affixes.indices) throw InvalidAffixException(index, affixes.size)
+        if (refine < EquipmentRules.REROLL_MIN_REFINE) throw RefineTooLowException(EquipmentRules.REROLL_MIN_REFINE)
+        val held = affixes.map { it.type }.toSet()
+        val candidates = AffixType.allowedOn(slot).filter { it !in held }
+        if (candidates.isEmpty()) throw NoAffixLeftException()
+        val replacement = PieceRoller.affix(candidates[PieceRoller.pick(candidates.size, chance)], rarity, chance)
+        return copy(affixes = affixes.mapIndexed { i, affix -> if (i == index) replacement else affix })
+    }
+
     private companion object {
         const val REFINE_STEPS = 10
         val GROWTH_NUMERATOR: BigInteger = BigInteger.valueOf(17)

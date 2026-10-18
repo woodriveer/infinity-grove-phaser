@@ -129,4 +129,78 @@ class EquipmentTest {
         assertFailsWith<IllegalArgumentException> { EquipmentRules(refineBaseCost = -1) }
         assertFailsWith<IllegalArgumentException> { EquipmentRules(rerollCost = -1) }
     }
+
+    private val zero: () -> Double = { 0.0 }
+
+    @Test
+    fun `refined raises the level by one and keeps everything else`() {
+        val piece = weapon(refine = 4)
+
+        assertEquals(5, piece.refined().refine)
+        assertEquals(piece.copy(refine = 5), piece.refined())
+    }
+
+    @Test
+    fun `refined rejects a piece at the maximum level`() {
+        assertFailsWith<MaxRefineException> { weapon(refine = 10).refined() }
+        assertEquals(10, weapon(refine = 9).refined().refine)
+    }
+
+    @Test
+    fun `a reroll at level 5 replaces only the chosen affix with a type the piece lacked`() {
+        val piece =
+            weapon(Rarity.UNCOMMON, refine = 5, affixes = listOf(Affix(AffixType.CRIT_CHANCE, 2), Affix(AffixType.BOSS_DAMAGE_PCT, 6)))
+
+        val rerolled = piece.rerolled(0, zero)
+
+        assertEquals(AffixType.CRIT_DAMAGE_PCT, rerolled.affixes[0].type)
+        assertEquals(Affix(AffixType.BOSS_DAMAGE_PCT, 6), rerolled.affixes[1])
+        assertEquals(5, rerolled.refine)
+        assertEquals(piece.baseClick, rerolled.baseClick)
+    }
+
+    @Test
+    fun `a reroll rolls the new base inside the range of the new type scaled by the rarity`() {
+        val piece = weapon(Rarity.UNCOMMON, refine = 5, affixes = listOf(Affix(AffixType.CRIT_CHANCE, 2)))
+
+        val low = piece.rerolled(0, zero)
+        val high = piece.rerolled(0, scripted(0.0, 0.999))
+
+        assertEquals(AffixType.CRIT_DAMAGE_PCT, low.affixes[0].type)
+        assertEquals(12, low.affixes[0].base)
+        assertEquals(36, high.affixes[0].base)
+    }
+
+    @Test
+    fun `a reroll on a weapon never lands on click damage percent`() {
+        val piece = weapon(Rarity.LEGENDARY, refine = 5, affixes = listOf(Affix(AffixType.CRIT_CHANCE, 2)))
+
+        (0..9).forEach { step ->
+            val rerolled = piece.rerolled(0, scripted(step / 10.0, 0.5))
+            assertEquals(false, rerolled.affixes[0].type == AffixType.CLICK_DAMAGE_PCT)
+        }
+    }
+
+    @Test
+    fun `a reroll on another slot may land on click damage percent`() {
+        val piece = ring(refine = 5, affixes = listOf(Affix(AffixType.CRIT_CHANCE, 2)))
+
+        assertEquals(AffixType.CLICK_DAMAGE_PCT, piece.rerolled(0, zero).affixes[0].type)
+    }
+
+    @Test
+    fun `a reroll below level 5 is rejected and changes nothing`() {
+        assertFailsWith<RefineTooLowException> { weapon(refine = 4).rerolled(0, zero) }
+    }
+
+    @Test
+    fun `a reroll of an affix the piece does not have is rejected`() {
+        assertFailsWith<InvalidAffixException> { weapon(refine = 5).rerolled(1, zero) }
+        assertFailsWith<InvalidAffixException> { weapon(refine = 5).rerolled(-1, zero) }
+    }
+
+    private fun scripted(vararg values: Double): () -> Double {
+        val queue = values.toMutableList()
+        return { if (queue.isEmpty()) 0.0 else queue.removeAt(0) }
+    }
 }
