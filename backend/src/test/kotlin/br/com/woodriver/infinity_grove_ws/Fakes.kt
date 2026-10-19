@@ -1,6 +1,8 @@
 package br.com.woodriver.infinity_grove_ws
 
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
+import br.com.woodriver.infinity_grove_ws.domain.DropRule
+import br.com.woodriver.infinity_grove_ws.domain.DropTable
 import br.com.woodriver.infinity_grove_ws.domain.Hero
 import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
@@ -13,6 +15,7 @@ import br.com.woodriver.infinity_grove_ws.port.AccessTokenIssuerPort
 import br.com.woodriver.infinity_grove_ws.port.ChanceRollerPort
 import br.com.woodriver.infinity_grove_ws.port.ChapterRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.DropRollerPort
+import br.com.woodriver.infinity_grove_ws.port.DropRuleRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.EquipmentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.HeroRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.IdGeneratorPort
@@ -111,6 +114,21 @@ class InMemoryWalletRepository : WalletRepositoryPort {
 
     override fun deleteByUsername(username: String) {
         wallets.remove(username)
+    }
+}
+
+/** Drop rules by id; a test changes or adds rules between calls to act as an operator tuning the table. */
+class InMemoryDropRuleRepository(
+    vararg rules: DropRule,
+) : DropRuleRepositoryPort {
+    val rules = sortedMapOf<Int, DropRule>().apply { rules.forEach { put(it.id, it) } }
+
+    override fun findAll() = DropTable(rules.values.toList())
+
+    override fun existsById(id: Int) = id in rules
+
+    override fun save(rule: DropRule) {
+        rules[rule.id] = rule
     }
 }
 

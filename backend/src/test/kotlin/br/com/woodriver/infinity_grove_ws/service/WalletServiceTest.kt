@@ -1,5 +1,6 @@
 package br.com.woodriver.infinity_grove_ws.service
 
+import br.com.woodriver.infinity_grove_ws.InMemoryDropRuleRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
 import br.com.woodriver.infinity_grove_ws.MutableClock
@@ -10,6 +11,7 @@ import br.com.woodriver.infinity_grove_ws.domain.UnknownDropRuleException
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
+import br.com.woodriver.infinity_grove_ws.port.DropRollerPort
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -20,8 +22,19 @@ class WalletServiceTest {
     private val wallets = InMemoryWalletRepository()
     private val clock = MutableClock(1_000_000L)
     private val table = DropTable(listOf(DropRule(1, 1, 5, 1500)))
+    private val rules = InMemoryDropRuleRepository(DropRule(1, 1, 5, 1500))
     private val roller = SequenceDropRoller(1, 2, 3, 4, 5)
-    private val service = WalletService(wallets, users, table, roller, clock)
+    private val service = WalletService(wallets, users, rules, roller, clock)
+
+    /** Rolls the top of each range, so a queue shows which rule rolled it. */
+    private val topRoller =
+        object : DropRollerPort {
+            override fun roll(
+                min: Int,
+                max: Int,
+            ) = max
+        }
+    private val tuned = WalletService(wallets, users, rules, topRoller, clock)
 
     private fun existingUser(name: String = "yan") = users.save(User(name, "hash", 1L, 1L))
 
@@ -66,6 +79,51 @@ class WalletServiceTest {
 
         assertTrue(wallet.dropsFor(table).getValue(1).all { it in 1..5 })
         assertEquals(wallet, wallets.wallets["yan"])
+    }
+
+    @Test
+    fun `get re-rolls a queue whose drop rule range was changed in the database`() {
+        existingUser()
+        tuned.get("yan")
+        rules.save(DropRule(1, 10, 12, 1500))
+
+        val wallet = tuned.get("yan")
+
+        assertEquals(List(20) { 12 }, wallet.queues.getValue(1).queue)
+        assertEquals(wallet, wallets.wallets["yan"])
+    }
+
+    @Test
+    fun `get opens a full queue for a drop rule added in the database`() {
+        existingUser()
+        tuned.get("yan")
+        rules.save(DropRule(2, 5, 15, 1500))
+
+        val wallet = tuned.get("yan")
+
+        assertEquals(List(20) { 15 }, wallet.queues.getValue(2).queue)
+        assertEquals(20, wallet.queues.getValue(2).allowance)
+        assertEquals(List(20) { 5 }, wallet.queues.getValue(1).queue)
+        assertEquals(wallet, wallets.wallets["yan"])
+    }
+
+    @Test
+    fun `sync credits kills of a drop rule added in the database within its range`() {
+        existingUser()
+        tuned.get("yan")
+        rules.save(DropRule(2, 5, 15, 1500))
+
+        val result = tuned.sync("yan", mapOf(2 to 3))
+
+        assertEquals(mapOf(2 to 3), result.accepted)
+        assertEquals(45L, result.wallet.copper)
+    }
+
+    @Test
+    fun `dropTable returns the rules as they are stored now`() {
+        rules.save(DropRule(2, 5, 15, 1500))
+
+        assertEquals(listOf(DropRule(1, 1, 5, 1500), DropRule(2, 5, 15, 1500)), service.dropTable().rules)
     }
 
     @Test

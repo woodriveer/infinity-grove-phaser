@@ -17,13 +17,6 @@ spring:
 app:
   security:
     jwt-secret: ${JWT_SECRET}
-  wallet:
-    # one entry per monster level: copper per kill (min..max) and the fastest honest time between kills
-    drop-table:
-      - level: 1
-        min-copper: 1
-        max-copper: 5
-        kill-interval-ms: 1500
   cards:
     # miniboss chance per stage (stage n drops a hero card at n times it: 2 % to 20 % over a chapter), chance a repeated chapter
     # boss win does (the first win always does), chapter boss wins counted per UTC day, and the shortest time between two farm wins

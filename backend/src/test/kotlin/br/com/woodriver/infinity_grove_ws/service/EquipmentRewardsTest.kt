@@ -1,5 +1,6 @@
 package br.com.woodriver.infinity_grove_ws.service
 
+import br.com.woodriver.infinity_grove_ws.InMemoryDropRuleRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryEquipmentRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
 import br.com.woodriver.infinity_grove_ws.MutableClock
@@ -26,7 +27,8 @@ class EquipmentRewardsTest {
     private val pieces = InMemoryEquipmentRepository()
     private val wallets = InMemoryWalletRepository()
     private val table = DropTable(listOf(DropRule(1, 1, 5, 1500)))
-    private val walletAccess = WalletAccess(wallets, table, SequenceDropRoller(1), MutableClock(1_000L))
+    private val walletAccess =
+        WalletAccess(wallets, InMemoryDropRuleRepository(*table.rules.toTypedArray()), SequenceDropRoller(1), MutableClock(1_000L))
 
     /** Every scripted chance is 0.0: the drop passes, the rarity is the lowest the encounter allows and every pick takes the first option. */
     private fun rewards(

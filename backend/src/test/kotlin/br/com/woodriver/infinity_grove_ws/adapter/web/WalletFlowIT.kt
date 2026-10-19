@@ -68,7 +68,8 @@ class WalletFlowIT : IntegrationTestBase() {
         getWallet().then().statusCode(200).body("wallet.copper", equalTo(0))
 
         assertEquals(1, jpaWalletRepository.count())
-        assertEquals(1, jpaWalletDropQueueRepository.count())
+        // one queue per seeded drop rule: 3 per chapter, 5 chapters
+        assertEquals(15, jpaWalletDropQueueRepository.count())
     }
 
     @Test

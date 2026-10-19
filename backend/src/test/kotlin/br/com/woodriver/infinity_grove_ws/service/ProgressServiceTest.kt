@@ -1,6 +1,7 @@
 package br.com.woodriver.infinity_grove_ws.service
 
 import br.com.woodriver.infinity_grove_ws.InMemoryChapterRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryDropRuleRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryEquipmentRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryHeroRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
@@ -18,7 +19,6 @@ import br.com.woodriver.infinity_grove_ws.domain.CardDropRates
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.ChapterNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.DropRule
-import br.com.woodriver.infinity_grove_ws.domain.DropTable
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.Encounter
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
@@ -58,7 +58,7 @@ class ProgressServiceTest {
     private fun equipmentRewards(pieces: EquipmentRepositoryPort = equipment) =
         EquipmentRewards(
             pieces,
-            WalletAccess(InMemoryWalletRepository(), DropTable(listOf(DropRule(1, 1, 5, 1500))), SequenceDropRoller(1), clock),
+            WalletAccess(InMemoryWalletRepository(), InMemoryDropRuleRepository(DropRule(1, 1, 5, 1500)), SequenceDropRoller(1), clock),
             equipmentChance,
             SequenceIds(),
             EquipmentRules(),

@@ -321,13 +321,15 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `WalletServiceTest` (in-memory rule fake): a rule whose range changed re-rolls its queue on the next read; a new rule opens a full queue
-- [ ] `WalletControllerIT`: `GET /wallet` returns 15 queues of 20 values keyed `"1".."15"`, each inside its seed range; `POST /wallet/sync` with kills on rule `"2"` credits values in 5..15
-- [ ] `application.yaml` has no `app.wallet`
-- [ ] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
+- [x] `WalletServiceTest` (in-memory rule fake): a rule whose range changed re-rolls its queue on the next read; a new rule opens a full queue
+- [x] `WalletControllerIT`: `GET /wallet` returns 15 queues of 20 values keyed `"1".."15"`, each inside its seed range; `POST /wallet/sync` with kills on rule `"2"` credits values in 5..15
+- [x] `application.yaml` has no `app.wallet`
+- [x] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Done (WalletService and WalletAccess read the DropTable from DropRuleRepositoryPort per operation; WalletProperties, DropRuleProperties, the dropTable bean, WalletConfigTest (6 tests of the removed yaml binding) and app.wallet removed; 628 tests pass (629 - 6 + 5). WalletController lost its DropTable bean, so it reads the table through a new GetDropTableUseCase implemented by WalletService. Rewritten for the 15 seeded rules: WalletControllerIT "level 1 only" became one queue per seeded rule inside its range, the "stored levels the table lacks" test uses rule 99, the unknown-rule test uses 99 instead of 9 (9 is now a seeded rule); WalletFlowIT counts 15 queue rows instead of 1)
 
 **Commit**: `feat(wallet): read the drop rules from the database`
 

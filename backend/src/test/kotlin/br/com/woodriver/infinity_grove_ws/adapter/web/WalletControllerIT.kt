@@ -8,14 +8,11 @@ import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.response.Response
 import io.restassured.specification.RequestSpecification
-import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.everyItem
-import org.hamcrest.Matchers.greaterThanOrEqualTo
-import org.hamcrest.Matchers.hasSize
-import org.hamcrest.Matchers.lessThanOrEqualTo
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class WalletControllerIT : IntegrationTestBase() {
     private fun user(name: String = "yan") = jpaUserRepository.save(UserEntity(name, "hash", 1L, 1L))
@@ -31,30 +28,65 @@ class WalletControllerIT : IntegrationTestBase() {
 
     private fun drops(response: Response): List<Int> = response.path("drops.1")
 
+    private val seedRuleIds = (1..15).map(Int::toString)
+
+    /** The seed range of drop rule [id]: chapter c owns 3c-2 (c..5c), 3c-1 (5c..15c) and 3c (20c..50c). */
+    private fun seedRange(id: Int): IntRange {
+        val chapter = (id + 2) / 3
+        return when (id - 3 * (chapter - 1)) {
+            1 -> chapter..5 * chapter
+            2 -> 5 * chapter..15 * chapter
+            else -> 20 * chapter..50 * chapter
+        }
+    }
+
     @Test
-    fun `GET wallet creates a zero wallet with 20 drops of 1 to 5 copper for level 1 only`() {
+    fun `GET wallet creates a zero wallet with one queue of 20 drops per seeded drop rule inside its range`() {
         user()
 
-        getWallet()
+        val response = getWallet()
+
+        response
             .then()
             .statusCode(200)
             .body("wallet.gold", equalTo(0))
             .body("wallet.silver", equalTo(0))
             .body("wallet.copper", equalTo(0))
-            .body("drops.keySet()", contains("1"))
-            .body("drops.1", hasSize<Int>(20))
-            .body("drops.1", everyItem(greaterThanOrEqualTo(1)))
-            .body("drops.1", everyItem(lessThanOrEqualTo(5)))
+            .body("drops.keySet()", containsInAnyOrder(*seedRuleIds.toTypedArray()))
+        (1..15).forEach { id ->
+            val queue: List<Int> = response.path("drops.$id")
+            assertEquals(20, queue.size, "rule $id")
+            assertTrue(queue.all { it in seedRange(id) }, "rule $id queue $queue is inside ${seedRange(id)}")
+        }
     }
 
     @Test
-    fun `GET wallet lists only the levels of the drop table, not stored levels the table lacks`() {
+    fun `GET wallet lists only the rules of drop_rules, not stored queues of rules the table lacks`() {
         user()
         getWallet()
-        jpaWalletDropQueueRepository.save(WalletDropQueueEntity("yan/9", "yan", 9, "1,2,3", 20, 0))
+        jpaWalletDropQueueRepository.save(WalletDropQueueEntity("yan/99", "yan", 99, "1,2,3", 20, 0))
 
-        getWallet().then().statusCode(200).body("drops.keySet()", contains("1"))
-        sync("""{"kills":{"1":1}}""").then().statusCode(200).body("drops.keySet()", contains("1"))
+        getWallet().then().statusCode(200).body("drops.keySet()", containsInAnyOrder(*seedRuleIds.toTypedArray()))
+        sync("""{"kills":{"1":1}}""")
+            .then()
+            .statusCode(200)
+            .body("drops.keySet()", containsInAnyOrder(*seedRuleIds.toTypedArray()))
+    }
+
+    @Test
+    fun `POST sync credits kills of the miniboss rule 2 from its 5 to 15 copper queue`() {
+        user()
+        val before: List<Int> = getWallet().path("drops.2")
+
+        val response = sync("""{"kills":{"2":2}}""")
+
+        response
+            .then()
+            .statusCode(200)
+            .body("accepted.2", equalTo(2))
+            .body("wallet.copper", equalTo(before.take(2).sum()))
+        assertTrue(before.take(2).all { it in 5..15 }, "credited values ${before.take(2)} are inside 5..15")
+        assertEquals(before.drop(2), response.path<List<Int>>("drops.2").take(18))
     }
 
     @Test
@@ -183,7 +215,7 @@ class WalletControllerIT : IntegrationTestBase() {
         user()
         val before = drops(getWallet())
 
-        sync("""{"kills":{"1":3,"9":1}}""").then().statusCode(400).body("code", equalTo("WALLET_UNKNOWN_DROP_RULE"))
+        sync("""{"kills":{"1":3,"99":1}}""").then().statusCode(400).body("code", equalTo("WALLET_UNKNOWN_DROP_RULE"))
         sync("""{"kills":{"abc":1}}""").then().statusCode(400).body("code", equalTo("WALLET_UNKNOWN_DROP_RULE"))
 
         val after = getWallet()
