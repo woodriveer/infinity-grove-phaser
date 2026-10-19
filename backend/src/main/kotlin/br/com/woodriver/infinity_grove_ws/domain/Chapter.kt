@@ -24,7 +24,7 @@ data class EnemyStats(
     }
 }
 
-/** The numbers of one stage: its phase monsters, its miniboss and the miniboss time limit. */
+/** The numbers of one stage: its phase monsters, its miniboss, the miniboss time limit and the drop rule each one pays. */
 data class StageDefinition(
     val number: Int,
     val phasesPerStage: Int,
@@ -33,6 +33,8 @@ data class StageDefinition(
     val minibossTimeLimitMs: Long,
     val monster: EnemyStats = EnemyStats.DEFAULT,
     val miniboss: EnemyStats = EnemyStats.DEFAULT,
+    val monsterDropRuleId: Int = 1,
+    val minibossDropRuleId: Int = 1,
 ) {
     init {
         require(number >= 1) { "Stage number $number must be at least 1" }
@@ -43,13 +45,14 @@ data class StageDefinition(
     }
 }
 
-/** A chapter: its stages in order and the chapter boss that closes it. */
+/** A chapter: its stages in order, the chapter boss that closes it and the drop rule the boss pays. */
 data class ChapterDefinition(
     val number: Int,
     val bossHealth: Int,
     val bossTimeLimitMs: Long,
     val stages: List<StageDefinition>,
     val boss: EnemyStats = EnemyStats.DEFAULT,
+    val bossDropRuleId: Int = 1,
 ) {
     init {
         require(number >= 1) { "Chapter number $number must be at least 1" }
@@ -78,6 +81,31 @@ data class ChapterDefinition(
         private const val BOSS_DEFENSE = 30
         private const val BOSS_CRIT_RESISTANCE = 30
         private const val DEFENSE_PER_CHAPTER = 5
+        private const val RULES_PER_CHAPTER = 3
+        private const val MONSTER_MIN_COPPER = 1
+        private const val MONSTER_MAX_COPPER = 5
+        private const val MINIBOSS_MIN_COPPER = 5
+        private const val MINIBOSS_MAX_COPPER = 15
+        private const val BOSS_MIN_COPPER = 20
+        private const val BOSS_MAX_COPPER = 50
+        private const val KILL_INTERVAL_MS = 1500L
+
+        /**
+         * The three drop rules seeded for chapter [number]: the phase monster (id 3c-2), the miniboss (3c-1) and the chapter boss
+         * (3c), each range growing with the chapter. Tunable in the database afterwards.
+         */
+        fun dropRules(number: Int): List<DropRule> =
+            listOf(
+                DropRule(monsterRuleId(number), MONSTER_MIN_COPPER * number, MONSTER_MAX_COPPER * number, KILL_INTERVAL_MS),
+                DropRule(minibossRuleId(number), MINIBOSS_MIN_COPPER * number, MINIBOSS_MAX_COPPER * number, KILL_INTERVAL_MS),
+                DropRule(bossRuleId(number), BOSS_MIN_COPPER * number, BOSS_MAX_COPPER * number, KILL_INTERVAL_MS),
+            )
+
+        private fun bossRuleId(number: Int) = RULES_PER_CHAPTER * number
+
+        private fun minibossRuleId(number: Int) = bossRuleId(number) - 1
+
+        private fun monsterRuleId(number: Int) = bossRuleId(number) - 2
 
         /** Chapter 1 as seeded: reachable with 1 damage per click, tunable in the database afterwards. */
         fun first() = of(1)
@@ -112,6 +140,8 @@ data class ChapterDefinition(
                             minibossTimeLimitMs = MINIBOSS_TIME_LIMIT_MS,
                             monster = EnemyStats(element, 0, 0, 0),
                             miniboss = EnemyStats(element, defense, defense, critResistance),
+                            monsterDropRuleId = monsterRuleId(number),
+                            minibossDropRuleId = minibossRuleId(number),
                         )
                     },
                 boss =
@@ -121,6 +151,7 @@ data class ChapterDefinition(
                         minOf(BOSS_DEFENSE + defenseBonus, EnemyStats.MAX_DEFENSE),
                         minOf(BOSS_CRIT_RESISTANCE + defenseBonus, EnemyStats.MAX_CRIT_RESISTANCE),
                     ),
+                bossDropRuleId = bossRuleId(number),
             )
         }
     }

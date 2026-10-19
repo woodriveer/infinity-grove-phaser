@@ -158,11 +158,13 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `ChapterTest` asserts the three rules of chapters 1 and 5 (ids, ranges, 1500 ms), that all 15 ids of chapters 1..5 are distinct, and that every stage of `of(c)` references `3c-2`/`3c-1` and the chapter references `3c`
-- [ ] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test --tests "*Test"`
+- [x] `ChapterTest` asserts the three rules of chapters 1 and 5 (ids, ranges, 1500 ms), that all 15 ids of chapters 1..5 are distinct, and that every stage of `of(c)` references `3c-2`/`3c-1` and the chapter references `3c`
+- [x] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test --tests "*Test"`
 
 **Tests**: unit
 **Gate**: build
+
+**Status**: ✅ Done (drop rule ids in StageDefinition/ChapterDefinition and dropRules(c); 620 tests pass. Deviation: the three drop rule id columns were added to StageEntity/ChapterEntity here (default 1, like the attribute columns) instead of in T6, because ChapterSeederIT compares the stored chapters with of(n) and would fail until T6)
 
 **Commit**: `feat(stages): give each stage and chapter its drop rules`
 

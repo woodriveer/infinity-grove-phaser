@@ -13,6 +13,7 @@ import jakarta.persistence.Table
 // the column defaults let `ddl-auto: update` add the columns to rows that predate the enemy attributes
 private const val ELEMENT_COLUMN = "varchar(255) not null default 'FIRE'"
 private const val NUMBER_COLUMN = "integer not null default 0"
+private const val DROP_RULE_COLUMN = "integer not null default 1"
 
 /** Reads the stored columns; an element name outside the five fails the load instead of dealing a wrong multiplier. */
 private fun statsOf(
@@ -40,11 +41,13 @@ class ChapterEntity(
     var bossMagicalDefense: Int = 0,
     @Column(nullable = false, columnDefinition = NUMBER_COLUMN)
     var bossCritResistance: Int = 0,
+    @Column(nullable = false, columnDefinition = DROP_RULE_COLUMN)
+    var bossDropRuleId: Int,
 ) {
     fun toDomain(stages: List<StageEntity>): ChapterDefinition {
         val ordered = stages.sortedBy { it.number }.map { it.toDomain() }
         val boss = statsOf(bossElement, bossPhysicalDefense, bossMagicalDefense, bossCritResistance)
-        return ChapterDefinition(number, bossHealth, bossTimeLimitMs, ordered, boss)
+        return ChapterDefinition(number, bossHealth, bossTimeLimitMs, ordered, boss, bossDropRuleId)
     }
 
     companion object {
@@ -57,6 +60,7 @@ class ChapterEntity(
                 bossPhysicalDefense = chapter.boss.physicalDefense,
                 bossMagicalDefense = chapter.boss.magicalDefense,
                 bossCritResistance = chapter.boss.critResistance,
+                bossDropRuleId = chapter.bossDropRuleId,
             )
     }
 }
@@ -96,6 +100,10 @@ class StageEntity(
     var minibossMagicalDefense: Int = 0,
     @Column(nullable = false, columnDefinition = NUMBER_COLUMN)
     var minibossCritResistance: Int = 0,
+    @Column(nullable = false, columnDefinition = DROP_RULE_COLUMN)
+    var monsterDropRuleId: Int,
+    @Column(nullable = false, columnDefinition = DROP_RULE_COLUMN)
+    var minibossDropRuleId: Int,
 ) {
     fun toDomain() =
         StageDefinition(
@@ -112,6 +120,8 @@ class StageEntity(
                     minibossMagicalDefense,
                     minibossCritResistance,
                 ),
+            monsterDropRuleId = monsterDropRuleId,
+            minibossDropRuleId = minibossDropRuleId,
         )
 
     companion object {
@@ -139,6 +149,8 @@ class StageEntity(
             minibossPhysicalDefense = stage.miniboss.physicalDefense,
             minibossMagicalDefense = stage.miniboss.magicalDefense,
             minibossCritResistance = stage.miniboss.critResistance,
+            monsterDropRuleId = stage.monsterDropRuleId,
+            minibossDropRuleId = stage.minibossDropRuleId,
         )
     }
 }

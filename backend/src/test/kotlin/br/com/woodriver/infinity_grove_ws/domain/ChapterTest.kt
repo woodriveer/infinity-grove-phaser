@@ -130,4 +130,50 @@ class ChapterTest {
     fun `a chapter past the last one cannot be built`() {
         assertFailsWith<IllegalArgumentException> { ChapterDefinition.of(ChapterOrder.MAX_CHAPTER + 1) }
     }
+
+    @Test
+    fun `chapter 1 seeds a monster rule of 1 to 5, a miniboss rule of 5 to 15 and a boss rule of 20 to 50 copper`() {
+        assertEquals(
+            listOf(DropRule(1, 1, 5, 1500), DropRule(2, 5, 15, 1500), DropRule(3, 20, 50, 1500)),
+            ChapterDefinition.dropRules(1),
+        )
+    }
+
+    @Test
+    fun `chapter 5 seeds its rules as ids 13 to 15 with five times the chapter 1 ranges`() {
+        assertEquals(
+            listOf(DropRule(13, 5, 25, 1500), DropRule(14, 25, 75, 1500), DropRule(15, 100, 250, 1500)),
+            ChapterDefinition.dropRules(5),
+        )
+    }
+
+    @Test
+    fun `the 15 seed rules of chapters 1 to 5 have distinct ids`() {
+        val ids = (1..5).flatMap { c -> ChapterDefinition.dropRules(c).map { it.id } }
+
+        assertEquals(15, ids.size)
+        assertEquals((1..15).toSet(), ids.toSet())
+    }
+
+    @Test
+    fun `every seeded stage pays the chapter monster and miniboss rules and the boss pays the chapter boss rule`() {
+        (1..5).forEach { c ->
+            val chapter = ChapterDefinition.of(c)
+
+            chapter.stages.forEach { stage ->
+                assertEquals(3 * c - 2, stage.monsterDropRuleId, "chapter $c stage ${stage.number} monster")
+                assertEquals(3 * c - 1, stage.minibossDropRuleId, "chapter $c stage ${stage.number} miniboss")
+            }
+            assertEquals(3 * c, chapter.bossDropRuleId, "chapter $c boss")
+        }
+    }
+
+    @Test
+    fun `a hand-built stage and chapter default to drop rule 1`() {
+        val chapter = chapter(stages = listOf(stage(1)))
+
+        assertEquals(1, chapter.bossDropRuleId)
+        assertEquals(1, chapter.stages.single().monsterDropRuleId)
+        assertEquals(1, chapter.stages.single().minibossDropRuleId)
+    }
 }

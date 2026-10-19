@@ -147,8 +147,8 @@ The database has no foreign keys: a `username`, `hero_id`, chapter or stage can 
 | SCHEMA-15 | P1: Enemy catalog - chapter read matches `ChapterDefinition.of` (AC 6) | Design | Pending |
 | SCHEMA-16 | P1: Enemy catalog - attribute bounds `CHECK` (AC 7) | Design | Pending |
 | SCHEMA-17 | P1: Drops per stage - no drop table in yaml (AC 1) | Design | Pending |
-| SCHEMA-18 | P1: Drops per stage - seeded rule values (AC 2) | Design | Pending |
-| SCHEMA-19 | P1: Drops per stage - stage/chapter rule FKs seeded (AC 3) | Design | Pending |
+| SCHEMA-18 | P1: Drops per stage - seeded rule values (AC 2) | Design | Implementing |
+| SCHEMA-19 | P1: Drops per stage - stage/chapter rule FKs seeded (AC 3) | Design | Implementing |
 | SCHEMA-20 | P1: Drops per stage - rule bounds `CHECK` (AC 4) | Design | Pending |
 | SCHEMA-21 | P1: Drops per stage - rule ids in progress response (AC 5) | Design | Pending |
 | SCHEMA-22 | P1: Drops per stage - wallet queues per rule (AC 6) | Design | Implementing |
