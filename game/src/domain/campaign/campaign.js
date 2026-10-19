@@ -4,9 +4,10 @@
 //
 //  Built from the backend progress payload:
 //  { chapter, stage, encounter, phase, completed,
-//    definition: { bossHealth, bossTimeLimitMs, boss, stages: [{ number, phasesPerStage, monsterHealth, minibossHealth, minibossTimeLimitMs, monster, miniboss }] } }
+//    definition: { bossHealth, bossTimeLimitMs, boss, bossDropRuleId,
+//                  stages: [{ number, phasesPerStage, monsterHealth, minibossHealth, minibossTimeLimitMs, monster, miniboss, monsterDropRuleId, minibossDropRuleId }] } }
 //  where boss, monster and miniboss are { element, physicalDefense, magicalDefense, critResistance }; a payload
-//  without them (an older backend) means DEFAULT_STATS
+//  without them (an older backend) means DEFAULT_STATS. The drop rule ids name the wallet queue a kill takes its copper from
 import { DEFAULT_STATS } from '../combat/monster';
 import { bossLabel } from '../heroes/heroes';
 
@@ -50,7 +51,7 @@ export class Campaign
         return { chapter: this.chapter, stage: this.stage, encounter: this.kind, phase: this.phase };
     }
 
-    //  What to spawn now: its health, its time limit (null for a phase monster) and the HUD label. Null once completed.
+    //  What to spawn now: its health, its drop rule, its time limit (null for a phase monster) and the HUD label. Null once completed.
     encounter ()
     {
         if (this.completed)
@@ -68,6 +69,7 @@ export class Campaign
                 phase: this.phase,
                 health: stage.monsterHealth,
                 stats: stage.monster ?? DEFAULT_STATS,
+                dropRuleId: stage.monsterDropRuleId ?? null,
                 timeLimitMs: null,
                 label: `Stage ${this.stage}/${this.stageCount}  Phase ${this.phase}/${stage.phasesPerStage}`
             };
@@ -81,6 +83,7 @@ export class Campaign
                 phase: 1,
                 health: stage.minibossHealth,
                 stats: stage.miniboss ?? DEFAULT_STATS,
+                dropRuleId: stage.minibossDropRuleId ?? null,
                 timeLimitMs: stage.minibossTimeLimitMs,
                 label: `Stage ${this.stage}/${this.stageCount}  Miniboss`
             };
@@ -92,12 +95,14 @@ export class Campaign
             phase: 1,
             health: this.definition.bossHealth,
             stats: this.definition.boss ?? DEFAULT_STATS,
+            dropRuleId: this.definition.bossDropRuleId ?? null,
             timeLimitMs: this.definition.bossTimeLimitMs,
             label: 'Chapter Boss'
         };
     }
 
-    //  A boss already beaten, fought again: the numbers of the campaign boss, labelled for the farm and tagged with the boss it is
+    //  A boss already beaten, fought again: the numbers of the campaign boss, labelled for the farm and tagged with the boss it is.
+    //  It has no drop rule: farm fights drop no copper
     farmEncounter (boss)
     {
         const { kind, stage } = boss;
@@ -127,7 +132,7 @@ export class Campaign
             throw new Error(`Unknown boss: ${kind}`);
         }
 
-        return { kind: FARM, boss, phase: 1, health, stats, timeLimitMs, label: `Rever chefe: ${bossLabel(boss)}` };
+        return { kind: FARM, boss, phase: 1, health, stats, dropRuleId: null, timeLimitMs, label: `Rever chefe: ${bossLabel(boss)}` };
     }
 
     //  The encounter was won: the campaign after it

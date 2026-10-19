@@ -432,11 +432,13 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `campaign.test.js` asserts the rule id of a phase, a miniboss, a chapter boss and `null` for a farm encounter
-- [ ] Gate check passes: `cd game && npm test`
+- [x] `campaign.test.js` asserts the rule id of a phase, a miniboss, a chapter boss and `null` for a farm encounter
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ✅ Done (encounter() carries dropRuleId from monsterDropRuleId/minibossDropRuleId/bossDropRuleId, null when the payload has none; farmEncounter carries null; 669 tests pass (665 + 4). The campaign test fixture gained distinct rule ids per stage and kind, and the whole-encounter toEqual assertions now include dropRuleId)
 
 **Commit**: `feat(game): give each encounter its drop rule`
 

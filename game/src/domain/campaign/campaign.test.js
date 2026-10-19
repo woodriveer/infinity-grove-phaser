@@ -3,13 +3,15 @@ import { CHAPTER_BOSS, Campaign, FARM, MINIBOSS, PHASE } from './campaign';
 import { DEFAULT_STATS } from '../combat/monster';
 
 //  3 stages; stage 2 has 3 phases so rules must use the current stage's phase count
+//  Drop rule ids differ per stage and per kind so a rule taken from the wrong place shows
 const definition = {
     bossHealth: 300,
     bossTimeLimitMs: 60000,
+    bossDropRuleId: 30,
     stages: [
-        { number: 1, phasesPerStage: 2, monsterHealth: 10, minibossHealth: 50, minibossTimeLimitMs: 30000 },
-        { number: 2, phasesPerStage: 3, monsterHealth: 11, minibossHealth: 55, minibossTimeLimitMs: 31000 },
-        { number: 3, phasesPerStage: 2, monsterHealth: 12, minibossHealth: 60, minibossTimeLimitMs: 32000 }
+        { number: 1, phasesPerStage: 2, monsterHealth: 10, minibossHealth: 50, minibossTimeLimitMs: 30000, monsterDropRuleId: 11, minibossDropRuleId: 21 },
+        { number: 2, phasesPerStage: 3, monsterHealth: 11, minibossHealth: 55, minibossTimeLimitMs: 31000, monsterDropRuleId: 12, minibossDropRuleId: 22 },
+        { number: 3, phasesPerStage: 2, monsterHealth: 12, minibossHealth: 60, minibossTimeLimitMs: 32000, monsterDropRuleId: 13, minibossDropRuleId: 23 }
     ]
 };
 
@@ -90,7 +92,30 @@ describe('Campaign transitions (same table as the backend)', () => {
 describe('Campaign encounter', () => {
     it('a phase monster has the health of its stage, no time limit and the Stage/Phase label', () => {
         expect(at(2, PHASE, 3).encounter()).toEqual({
-            kind: PHASE, stage: 2, phase: 3, health: 11, stats: DEFAULT_STATS, timeLimitMs: null, label: 'Stage 2/3  Phase 3/3'
+            kind: PHASE, stage: 2, phase: 3, health: 11, stats: DEFAULT_STATS, dropRuleId: 12, timeLimitMs: null, label: 'Stage 2/3  Phase 3/3'
+        });
+    });
+
+    describe('drop rule', () => {
+        it('a phase monster carries the monster drop rule of its stage', () => {
+            expect(at(2, PHASE, 3).encounter().dropRuleId).toBe(12);
+            expect(at(3, PHASE, 1).encounter().dropRuleId).toBe(13);
+        });
+
+        it('a miniboss carries the miniboss drop rule of its stage', () => {
+            expect(at(2, MINIBOSS).encounter().dropRuleId).toBe(22);
+            expect(at(1, MINIBOSS).encounter().dropRuleId).toBe(21);
+        });
+
+        it('the chapter boss carries the boss drop rule of the chapter', () => {
+            expect(at(3, CHAPTER_BOSS).encounter().dropRuleId).toBe(30);
+        });
+
+        it('a farm encounter carries no drop rule', () => {
+            const done = at(3, CHAPTER_BOSS, 1, true);
+
+            expect(done.farmEncounter({ kind: MINIBOSS, stage: 2 }).dropRuleId).toBeNull();
+            expect(done.farmEncounter({ kind: CHAPTER_BOSS }).dropRuleId).toBeNull();
         });
     });
 
@@ -164,6 +189,7 @@ describe('Campaign farm encounters', () => {
             phase: 1,
             health: 55,
             stats: { element: 'WATER', physicalDefense: 11, magicalDefense: 12, critResistance: 13 },
+            dropRuleId: null,
             timeLimitMs: 31000,
             label: 'Rever chefe: Miniboss 2'
         });
@@ -176,6 +202,7 @@ describe('Campaign farm encounters', () => {
             phase: 1,
             health: 300,
             stats: { element: 'DARKNESS', physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
+            dropRuleId: null,
             timeLimitMs: 60000,
             label: 'Rever chefe: Chefe do capítulo'
         });
