@@ -3,6 +3,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.repository
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.domain.DropQueue
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
+import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.PlatformTransactionManager
@@ -18,6 +19,10 @@ import kotlin.test.assertNull
 class WalletRepositoryIT : IntegrationTestBase() {
     @Autowired
     private lateinit var repository: WalletRepository
+
+    // every row here references a player through a foreign key
+    @BeforeEach
+    fun players() = users("yan", "ana")
 
     @Autowired
     private lateinit var transactionManager: PlatformTransactionManager

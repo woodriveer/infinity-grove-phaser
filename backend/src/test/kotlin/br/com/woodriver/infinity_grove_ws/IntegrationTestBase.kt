@@ -11,6 +11,7 @@ import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaStageRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaUserRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletDropQueueRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.UserEntity
 import br.com.woodriver.infinity_grove_ws.adapter.security.JwtAccessTokenIssuer
 import br.com.woodriver.infinity_grove_ws.port.ChanceRollerPort
 import io.restassured.RestAssured
@@ -110,6 +111,9 @@ abstract class IntegrationTestBase {
     /** A valid `Bearer` header value for [username]; the user does not need to exist, the access token is stateless. */
     protected fun bearerToken(username: String = "test-caller") =
         "Bearer " + accessTokenIssuer.issue(username, System.currentTimeMillis()).value
+
+    /** Stores a `users` row per name, so rows that reference a player satisfy their foreign key. */
+    protected fun users(vararg names: String) = names.forEach { jpaUserRepository.save(UserEntity(it, "hash", 1L, 1L)) }
 
     /** A request specification that carries a valid access token. */
     protected fun authenticated(): RequestSpecification = RestAssured.given().header("Authorization", bearerToken())

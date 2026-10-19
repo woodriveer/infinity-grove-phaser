@@ -83,6 +83,7 @@ class EquipmentSellIT : IntegrationTestBase() {
     @Test
     fun `a missing piece and a piece of another account are 404 and credit nothing`() {
         jpaWalletRepository.save(WalletEntity("yan", 10))
+        users("other")
         piece("theirs", username = "other")
 
         asUser()

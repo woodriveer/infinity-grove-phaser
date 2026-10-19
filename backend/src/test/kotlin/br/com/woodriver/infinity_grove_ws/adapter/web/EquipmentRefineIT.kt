@@ -96,6 +96,7 @@ class EquipmentRefineIT : IntegrationTestBase() {
     @Test
     fun `a missing piece and a piece of another account are 404`() {
         funded(10_000)
+        users("other")
         piece("theirs", username = "other")
 
         asUser()

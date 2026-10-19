@@ -6,6 +6,7 @@ import br.com.woodriver.infinity_grove_ws.domain.AffixType
 import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.Rarity
 import br.com.woodriver.infinity_grove_ws.domain.Slot
+import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -14,6 +15,10 @@ import kotlin.test.assertTrue
 class EquipmentRepositoryIT : IntegrationTestBase() {
     @Autowired
     private lateinit var repository: EquipmentRepository
+
+    // every row here references a player through a foreign key
+    @BeforeEach
+    fun players() = users("yan", "other")
 
     private fun weapon(
         id: String = "w1",

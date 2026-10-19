@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.repository
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
+import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -13,6 +14,10 @@ import kotlin.test.assertTrue
 class RefreshTokenRepositoryIT : IntegrationTestBase() {
     @Autowired
     private lateinit var repository: RefreshTokenRepository
+
+    // every row here references a player through a foreign key
+    @BeforeEach
+    fun players() = users("yan", "ana")
 
     private fun token(
         hash: String,

@@ -6,7 +6,9 @@ import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.EnemyStats
 import br.com.woodriver.infinity_grove_ws.domain.StageDefinition
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.jdbc.core.JdbcTemplate
+import java.sql.SQLException
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -117,14 +119,19 @@ class ChapterRepositoryIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `a stored element that is not one of the five fails the load`() {
+    fun `an element that is not one of the five cannot be stored, so the load keeps the stored element`() {
         repository.save(chapter())
-        jdbc.update("update enemies set element = 'PLASMA' where id = (select monster_enemy_id from stages where id = ?)", "$number/1")
 
-        // the repository is transactional, so Spring wraps the enum error
-        val e = assertFailsWith<RuntimeException> { repository.findByNumber(number) }
+        val e =
+            assertFailsWith<DataIntegrityViolationException> {
+                jdbc.update(
+                    "update enemies set element = 'PLASMA' where id = (select monster_enemy_id from stages where id = ?)",
+                    "$number/1",
+                )
+            }
 
-        assertTrue(e.message!!.contains("PLASMA"), e.message)
+        assertEquals("23514", (e.mostSpecificCause as SQLException).sqlState)
+        assertEquals(chapter(), repository.findByNumber(number))
     }
 
     @Test

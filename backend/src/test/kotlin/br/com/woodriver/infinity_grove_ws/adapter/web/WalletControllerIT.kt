@@ -11,7 +11,9 @@ import io.restassured.specification.RequestSpecification
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.springframework.dao.DataIntegrityViolationException
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class WalletControllerIT : IntegrationTestBase() {
@@ -61,10 +63,13 @@ class WalletControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `GET wallet lists only the rules of drop_rules, not stored queues of rules the table lacks`() {
+    fun `GET wallet lists only the rules of drop_rules, and a queue of a rule the table lacks cannot be stored`() {
         user()
         getWallet()
-        jpaWalletDropQueueRepository.save(WalletDropQueueEntity("yan/99", "yan", 99, "1,2,3", 20, 0))
+
+        assertFailsWith<DataIntegrityViolationException> {
+            jpaWalletDropQueueRepository.save(WalletDropQueueEntity("yan/99", "yan", 99, "1,2,3", 20, 0))
+        }
 
         getWallet().then().statusCode(200).body("drops.keySet()", containsInAnyOrder(*seedRuleIds.toTypedArray()))
         sync("""{"kills":{"1":1}}""")

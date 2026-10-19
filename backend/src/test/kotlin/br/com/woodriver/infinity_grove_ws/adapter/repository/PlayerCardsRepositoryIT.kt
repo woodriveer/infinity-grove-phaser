@@ -5,6 +5,7 @@ import br.com.woodriver.infinity_grove_ws.domain.BossRecord
 import br.com.woodriver.infinity_grove_ws.domain.CopyKey
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
+import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import kotlin.test.Test
@@ -14,6 +15,10 @@ import kotlin.test.assertNull
 class PlayerCardsRepositoryIT : IntegrationTestBase() {
     @Autowired
     private lateinit var repository: PlayerCardsRepository
+
+    // every row here references a player through a foreign key
+    @BeforeEach
+    fun players() = users("yan", "ana")
 
     private fun cards(
         username: String = "yan",

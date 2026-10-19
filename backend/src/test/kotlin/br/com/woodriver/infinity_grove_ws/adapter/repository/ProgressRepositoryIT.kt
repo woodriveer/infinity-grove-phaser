@@ -4,6 +4,7 @@ import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.domain.Encounter
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
+import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
@@ -18,6 +19,10 @@ import kotlin.test.assertNull
 class ProgressRepositoryIT : IntegrationTestBase() {
     @Autowired
     private lateinit var repository: ProgressRepository
+
+    // every row here references a player through a foreign key
+    @BeforeEach
+    fun players() = users("yan", "ana", "player-0", "player-1", "player-2")
 
     @Autowired
     private lateinit var transactionManager: PlatformTransactionManager

@@ -377,12 +377,14 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `SchemaConstraintsIT` (JDBC on the migrated container): `flyway_schema_history` holds `V1`; an orphan insert fails with SQLState `23503` for each of the 20 FK columns; deleting a user removes its rows in the 7 player tables; deleting a referenced hero, chapter, stage, enemy and drop rule fails with `23503`; a duplicate enemy fails with `23505`; each CHECK (defenses 91, crit 101, min 0, max < min, interval 0, unknown element) fails with `23514`
-- [ ] Every existing `*IT` passes on the migrated schema with `validate`
-- [ ] Gate check passes: `cd backend && ./gradlew ktlintCheck test` (first run online)
+- [x] `SchemaConstraintsIT` (JDBC on the migrated container): `flyway_schema_history` holds `V1`; an orphan insert fails with SQLState `23503` for each of the 20 FK columns; deleting a user removes its rows in the 7 player tables; deleting a referenced hero, chapter, stage, enemy and drop rule fails with `23503`; a duplicate enemy fails with `23505`; each CHECK (defenses 91, crit 101, min 0, max < min, interval 0, unknown element) fails with `23514`
+- [x] Every existing `*IT` passes on the migrated schema with `validate`
+- [x] Gate check passes: `cd backend && ./gradlew ktlintCheck test` (first run online)
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Done (spring-boot-starter-flyway + flyway-database-postgresql, V1__schema.sql with every table, 20 FKs, uniques and CHECKs, ddl-auto: validate; SchemaConstraintsIT adds 12 tests, 641 pass. Test setups changed for the FKs: IntegrationTestBase gains users(...), and EquipmentRepositoryIT, PlayerCardsRepositoryIT, ProgressRepositoryIT, RefreshTokenRepositoryIT and WalletRepositoryIT create the players their rows reference; EquipmentRefineIT and EquipmentSellIT create the user "other" before storing its piece. Rewritten because the CHECK and FK make the old state impossible: ChapterRepositoryIT and ProgressControllerIT "stored element PLASMA fails the load / GET is 400" now assert the write is rejected (23514 / DataIntegrityViolationException) and the stored element still reads back; WalletControllerIT "stored queue of a rule the table lacks" now asserts that queue cannot be stored and GET still lists the 15 seeded rules)
 
 **Commit**: `feat(schema): let flyway own the schema with foreign keys`
 

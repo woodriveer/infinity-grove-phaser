@@ -15,11 +15,13 @@ import io.restassured.specification.RequestSpecification
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasSize
 import org.hamcrest.Matchers.nullValue
+import org.springframework.dao.DataIntegrityViolationException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 
 class ProgressControllerIT : IntegrationTestBase() {
@@ -119,17 +121,13 @@ class ProgressControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `GET progress fails with 400 when a stored element is not one of the five`() {
+    fun `an element that is not one of the five cannot be stored, so GET progress keeps answering the stored element`() {
         user()
         val enemy = jpaEnemyRepository.findById(jpaStageRepository.findById("1/1").get().monsterEnemyId).get()
-        val original = enemy.element
-        jpaEnemyRepository.save(enemy.apply { element = "PLASMA" })
 
-        try {
-            getProgress().then().statusCode(400)
-        } finally {
-            jpaEnemyRepository.save(enemy.apply { element = original })
-        }
+        assertFailsWith<DataIntegrityViolationException> { jpaEnemyRepository.save(enemy.apply { element = "PLASMA" }) }
+
+        getProgress().then().statusCode(200).body("definition.stages[0].monster.element", equalTo("FIRE"))
     }
 
     @Test
