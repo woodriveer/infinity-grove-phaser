@@ -130,12 +130,14 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `WalletTest` asserts the exception for an unknown id and that nothing is credited
-- [ ] `WalletControllerIT` asserts `400` and `code = WALLET_UNKNOWN_DROP_RULE` for an unknown id and for a non-numeric key, with the copper unchanged
-- [ ] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
+- [x] `WalletTest` asserts the exception for an unknown id and that nothing is credited
+- [x] `WalletControllerIT` asserts `400` and `code = WALLET_UNKNOWN_DROP_RULE` for an unknown id and for a non-numeric key, with the copper unchanged
+- [x] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Done (UnknownDropRuleException with WALLET_UNKNOWN_DROP_RULE; 615 tests pass)
 
 **Commit**: `feat(wallet): reject kills of an unknown drop rule`
 

@@ -179,12 +179,12 @@ class WalletControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `POST sync returns 400 WALLET_UNKNOWN_LEVEL and credits nothing, not even the valid level`() {
+    fun `POST sync returns 400 WALLET_UNKNOWN_DROP_RULE and credits nothing, not even the valid rule`() {
         user()
         val before = drops(getWallet())
 
-        sync("""{"kills":{"1":3,"9":1}}""").then().statusCode(400).body("code", equalTo("WALLET_UNKNOWN_LEVEL"))
-        sync("""{"kills":{"abc":1}}""").then().statusCode(400).body("code", equalTo("WALLET_UNKNOWN_LEVEL"))
+        sync("""{"kills":{"1":3,"9":1}}""").then().statusCode(400).body("code", equalTo("WALLET_UNKNOWN_DROP_RULE"))
+        sync("""{"kills":{"abc":1}}""").then().statusCode(400).body("code", equalTo("WALLET_UNKNOWN_DROP_RULE"))
 
         val after = getWallet()
         after.then().body("wallet.copper", equalTo(0))

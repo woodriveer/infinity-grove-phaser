@@ -153,7 +153,7 @@ The database has no foreign keys: a `username`, `hero_id`, chapter or stage can 
 | SCHEMA-21 | P1: Drops per stage - rule ids in progress response (AC 5) | Design | Pending |
 | SCHEMA-22 | P1: Drops per stage - wallet queues per rule (AC 6) | Design | Implementing |
 | SCHEMA-23 | P1: Drops per stage - sync per rule (AC 7) | Design | Implementing |
-| SCHEMA-24 | P1: Drops per stage - unknown rule rejected (AC 8) | Design | Pending |
+| SCHEMA-24 | P1: Drops per stage - unknown rule rejected (AC 8) | Design | Implementing |
 | SCHEMA-25 | P1: Drops per stage - game uses the encounter's rule (AC 9) | Design | Pending |
 | SCHEMA-26 | P1: Drops per stage - farm drops no copper (AC 10) | Design | Pending |
 | SCHEMA-27 | P1: Drops per stage - missing queue drops nothing (AC 11) | Design | Pending |

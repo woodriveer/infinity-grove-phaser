@@ -38,9 +38,9 @@ class InvalidKillsException(
     reason: String,
 ) : WalletRequestException("WALLET_INVALID_KILLS", "Kills are invalid: $reason")
 
-class UnknownLevelException(
-    level: String,
-) : WalletRequestException("WALLET_UNKNOWN_LEVEL", "Monster level '$level' is unknown")
+class UnknownDropRuleException(
+    ruleId: String,
+) : WalletRequestException("WALLET_UNKNOWN_DROP_RULE", "Drop rule '$ruleId' is unknown")
 
 /** Base type for a progress request the client built wrongly. */
 open class ProgressRequestException(

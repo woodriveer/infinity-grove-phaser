@@ -148,9 +148,10 @@ class WalletTest {
 
     @Test
     fun `credit rejects an unknown rule and credits nothing even for the valid ones`() {
-        val e = assertFailsWith<UnknownLevelException> { wallet().credit(mapOf(1 to 3, 7 to 1), twoRules, minRoller, now = 0) }
+        val e = assertFailsWith<UnknownDropRuleException> { wallet().credit(mapOf(1 to 3, 7 to 1), twoRules, minRoller, now = 0) }
 
-        assertEquals("WALLET_UNKNOWN_LEVEL", e.code)
+        assertEquals("WALLET_UNKNOWN_DROP_RULE", e.code)
+        assertEquals("Drop rule '7' is unknown", e.message)
     }
 
     @Test

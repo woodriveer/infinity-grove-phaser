@@ -40,7 +40,7 @@ data class Wallet(
     ): SyncResult {
         kills.keys.firstOrNull { table.ruleFor(it) == null }?.let {
             logger.warn("Sync rejected, unknown drop rule username={} ruleId={}", username, it)
-            throw UnknownLevelException(it.toString())
+            throw UnknownDropRuleException(it.toString())
         }
         var total = copper
         var updated = queues

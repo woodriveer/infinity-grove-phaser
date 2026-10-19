@@ -3,7 +3,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 import br.com.woodriver.infinity_grove_ws.domain.Coins
 import br.com.woodriver.infinity_grove_ws.domain.DropTable
 import br.com.woodriver.infinity_grove_ws.domain.InvalidKillsException
-import br.com.woodriver.infinity_grove_ws.domain.UnknownLevelException
+import br.com.woodriver.infinity_grove_ws.domain.UnknownDropRuleException
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import br.com.woodriver.infinity_grove_ws.usecase.GetWalletUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.SyncKillsUseCase
@@ -68,8 +68,8 @@ class WalletController(
     private fun parseKills(body: Map<String, Any?>): Map<Int, Int> {
         val kills = body["kills"] as? Map<*, *> ?: throw InvalidKillsException("kills must be an object of counts keyed by level")
         return kills.entries.associate { (key, count) ->
-            val level = key.toString().toIntOrNull() ?: throw UnknownLevelException(key.toString())
-            level to parseCount(key.toString(), count)
+            val ruleId = key.toString().toIntOrNull() ?: throw UnknownDropRuleException(key.toString())
+            ruleId to parseCount(key.toString(), count)
         }
     }
 

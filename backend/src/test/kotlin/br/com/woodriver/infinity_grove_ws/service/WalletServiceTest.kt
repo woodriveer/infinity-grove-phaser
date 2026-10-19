@@ -6,7 +6,7 @@ import br.com.woodriver.infinity_grove_ws.MutableClock
 import br.com.woodriver.infinity_grove_ws.SequenceDropRoller
 import br.com.woodriver.infinity_grove_ws.domain.DropRule
 import br.com.woodriver.infinity_grove_ws.domain.DropTable
-import br.com.woodriver.infinity_grove_ws.domain.UnknownLevelException
+import br.com.woodriver.infinity_grove_ws.domain.UnknownDropRuleException
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
@@ -125,11 +125,11 @@ class WalletServiceTest {
     }
 
     @Test
-    fun `sync with an unknown level stores nothing`() {
+    fun `sync with an unknown drop rule stores nothing`() {
         existingUser()
         val before: Wallet = service.get("yan")
 
-        assertFailsWith<UnknownLevelException> { service.sync("yan", mapOf(1 to 3, 9 to 1)) }
+        assertFailsWith<UnknownDropRuleException> { service.sync("yan", mapOf(1 to 3, 9 to 1)) }
 
         assertEquals(before, wallets.wallets["yan"])
     }
