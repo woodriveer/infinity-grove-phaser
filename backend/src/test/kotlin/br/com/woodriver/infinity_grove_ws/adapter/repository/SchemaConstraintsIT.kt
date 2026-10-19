@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import java.sql.SQLException
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -172,15 +173,150 @@ class SchemaConstraintsIT : IntegrationTestBase() {
         tables.forEach { assertEquals(1, count(it, "ana"), "$it rows of the other user") }
     }
 
-    @Test
-    fun `deleting a referenced hero, chapter, stage, enemy or drop rule is rejected`() {
-        jdbc.update("insert into progress (username, chapter, stage, encounter, phase, completed) values ('yan', 1, 1, 'PHASE', 1, false)")
+    /**
+     * Catalog rows that only the row under test references, so a cascading foreign key would let the delete through instead of
+     * failing further down a chain: chapter 99 (boss enemy and boss rule, no stages), chapter 98 with stage `98/1` (its own
+     * monster and miniboss enemies and rules) and a wallet queue of rule 904. No progress row points at them.
+     */
+    private class Probe(
+        val bossEnemy: Long,
+        val monsterEnemy: Long,
+        val minibossEnemy: Long,
+    )
 
-        assertRejected("23503", "delete from heroes where id = 'kael'")
-        assertRejected("23503", "delete from chapters where number = 1")
-        assertRejected("23503", "delete from stages where id = '1/1'")
-        assertRejected("23503", "delete from enemies where id = ?", enemy)
-        assertRejected("23503", "delete from drop_rules where id = 1")
+    private fun probeEnemy(critResistance: Int) =
+        jdbc.queryForObject(
+            "insert into enemies (element, physical_defense, magical_defense, crit_resistance) values ('DARKNESS', 3, 77, ?) returning id",
+            Long::class.java,
+            critResistance,
+        )!!
+
+    private fun probeCatalog(): Probe {
+        PROBE_RULES.forEach {
+            jdbc.update(
+                "insert into drop_rules (id, min_copper, max_copper, kill_interval_ms) values (?, 1, 5, 1500)",
+                it,
+            )
+        }
+        val probe = Probe(probeEnemy(11), probeEnemy(12), probeEnemy(13))
+        jdbc.update(
+            "insert into chapters (number, boss_health, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) values (99, 300, 60000, ?, 901)",
+            probe.bossEnemy,
+        )
+        jdbc.update(
+            "insert into chapters (number, boss_health, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) values (98, 300, 60000, ?, 3)",
+            enemy,
+        )
+        jdbc.update(
+            "insert into stages (id, chapter, number, phases_per_stage, monster_health, miniboss_health, miniboss_time_limit_ms, " +
+                "monster_enemy_id, miniboss_enemy_id, monster_drop_rule_id, miniboss_drop_rule_id) " +
+                "values ('98/1', 98, 1, 5, 10, 50, 30000, ?, ?, 902, 903)",
+            probe.monsterEnemy,
+            probe.minibossEnemy,
+        )
+        jdbc.update(
+            "insert into wallet_drop_queues (id, username, drop_rule_id, drops, allowance, allowance_updated_at) " +
+                "values ('yan/904', 'yan', 904, '1', 20, 0)",
+        )
+        return probe
+    }
+
+    private fun rows(
+        table: String,
+        where: String,
+        vararg args: Any,
+    ) = jdbc.queryForObject("select count(*) from $table where $where", Int::class.java, *args)
+
+    @AfterTest
+    fun removeProbes() {
+        jdbc.update("delete from progress where chapter = 98")
+        jdbc.update("delete from wallet_drop_queues where drop_rule_id between 901 and 904")
+        jdbc.update("delete from player_cards where leader_id like 'probe-%'")
+        jdbc.update("delete from card_copies where hero_id like 'probe-%'")
+        jdbc.update("delete from equipment_pieces where hero_id like 'probe-%'")
+        jdbc.update("delete from hero_skills where hero_id like 'probe-%'")
+        jdbc.update("delete from stages where chapter = 98")
+        jdbc.update("delete from chapters where number in (98, 99)")
+        jdbc.update("delete from enemies where element = 'DARKNESS' and physical_defense = 3 and magical_defense = 77")
+        jdbc.update("delete from drop_rules where id between 901 and 904")
+        jdbc.update("delete from heroes where id like 'probe-%'")
+    }
+
+    @Test
+    fun `deleting a hero referenced by a skill, card copy, leader or piece is rejected and keeps that row`() {
+        listOf("probe-skill", "probe-copy", "probe-leader", "probe-piece").forEachIndexed { i, id ->
+            jdbc.update(
+                "insert into heroes (id, name, hero_class, element, leader_bonus, portrait, sort_order) values (?, ?, 'c', 'FIRE', 'b', 'p', ?)",
+                id,
+                id,
+                900 + i,
+            )
+        }
+        jdbc.update(
+            "insert into hero_skills (id, hero_id, slot, name, skill_type, effect, cooldown_seconds, image) " +
+                "values ('probe-skill/1', 'probe-skill', 1, 'n', 'ACTIVE', 'e', 1, 'i')",
+        )
+        jdbc.update("insert into card_copies (id, username, hero_id, stars, copies) values ('yan/probe-copy/0', 'yan', 'probe-copy', 0, 1)")
+        jdbc.update(
+            "insert into player_cards (username, starting_element, leader_id, cleared_chapters, wins_today) values ('yan', 'FIRE', 'probe-leader', '', 0)",
+        )
+        jdbc.update(
+            "insert into equipment_pieces (id, username, slot, rarity, refine, affixes, hero_id, created_at) " +
+                "values ('probe-piece-1', 'yan', 'RING', 'COMMON', 0, '', 'probe-piece', 0)",
+        )
+
+        listOf(
+            Triple("probe-skill", "hero_skills", "hero_id"),
+            Triple("probe-copy", "card_copies", "hero_id"),
+            Triple("probe-leader", "player_cards", "leader_id"),
+            Triple("probe-piece", "equipment_pieces", "hero_id"),
+        ).forEach { (hero, table, column) ->
+            assertRejected("23503", "delete from heroes where id = ?", hero)
+            assertEquals(1, rows(table, "$column = ?", hero), "$table row of $hero")
+        }
+    }
+
+    @Test
+    fun `deleting a drop rule referenced by a chapter, a stage or a wallet queue is rejected and keeps that row`() {
+        probeCatalog()
+
+        assertRejected("23503", "delete from drop_rules where id = 901")
+        assertEquals(1, rows("chapters", "boss_drop_rule_id = 901"))
+        assertRejected("23503", "delete from drop_rules where id = 902")
+        assertEquals(1, rows("stages", "monster_drop_rule_id = 902"))
+        assertRejected("23503", "delete from drop_rules where id = 903")
+        assertEquals(1, rows("stages", "miniboss_drop_rule_id = 903"))
+        assertRejected("23503", "delete from drop_rules where id = 904")
+        assertEquals(1, rows("wallet_drop_queues", "drop_rule_id = 904"))
+    }
+
+    @Test
+    fun `deleting an enemy referenced by a chapter boss or a stage is rejected and keeps that row`() {
+        val probe = probeCatalog()
+
+        assertRejected("23503", "delete from enemies where id = ?", probe.bossEnemy)
+        assertEquals(1, rows("chapters", "boss_enemy_id = ?", probe.bossEnemy))
+        assertRejected("23503", "delete from enemies where id = ?", probe.monsterEnemy)
+        assertEquals(1, rows("stages", "monster_enemy_id = ?", probe.monsterEnemy))
+        assertRejected("23503", "delete from enemies where id = ?", probe.minibossEnemy)
+        assertEquals(1, rows("stages", "miniboss_enemy_id = ?", probe.minibossEnemy))
+    }
+
+    @Test
+    fun `deleting a chapter that has stages is rejected and keeps its stages`() {
+        probeCatalog()
+
+        assertRejected("23503", "delete from chapters where number = 98")
+        assertEquals(1, rows("stages", "chapter = 98"))
+    }
+
+    @Test
+    fun `deleting a stage a progress points at is rejected and keeps that progress`() {
+        probeCatalog()
+        jdbc.update("insert into progress (username, chapter, stage, encounter, phase, completed) values ('yan', 98, 1, 'PHASE', 1, false)")
+
+        assertRejected("23503", "delete from stages where id = '98/1'")
+        assertEquals(1, rows("progress", "username = 'yan' and chapter = 98 and stage = 1"))
     }
 
     @Test
@@ -200,6 +336,9 @@ class SchemaConstraintsIT : IntegrationTestBase() {
         assertRejected("23514", insert, "FIRE", 91, 0, 0)
         assertRejected("23514", insert, "FIRE", 0, 91, 0)
         assertRejected("23514", insert, "FIRE", 0, 0, 101)
+        assertRejected("23514", insert, "FIRE", -1, 0, 0)
+        assertRejected("23514", insert, "FIRE", 0, -1, 0)
+        assertRejected("23514", insert, "FIRE", 0, 0, -1)
         assertRejected("23514", insert, "PLASMA", 1, 2, 3)
     }
 
@@ -210,5 +349,9 @@ class SchemaConstraintsIT : IntegrationTestBase() {
         assertRejected("23514", insert, 0, 5, 1500L)
         assertRejected("23514", insert, 5, 4, 1500L)
         assertRejected("23514", insert, 1, 5, 0L)
+    }
+
+    private companion object {
+        val PROBE_RULES = 901..904
     }
 }
