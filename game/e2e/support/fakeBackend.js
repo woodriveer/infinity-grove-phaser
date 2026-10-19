@@ -13,13 +13,15 @@ const problem = (status, detail, code) => ({
 const unauthenticated = () => problem(401, 'Authentication is required', 'AUTH_UNAUTHENTICATED');
 const invalidRefreshToken = () => problem(401, 'Refresh token is invalid', 'AUTH_INVALID_REFRESH_TOKEN');
 
-//  Wallet contract (WalletController): level 1 only, a queue of 20 pre-rolled drops, the first k are credited per sync
+//  Wallet contract (WalletController): one queue of 20 pre-rolled drops per seeded drop rule (ids 1 to 15, keyed by the id
+//  as a decimal string), the first k of a rule's queue are credited per sync, an unknown rule rejects the whole sync
 const QUEUE_SIZE = 20;
+const DROP_RULE_IDS = Array.from({ length: 15 }, (_, i) => String(i + 1));
 const DEFAULT_DROPS = [ 3, 1, 5, 2, 4 ];
 
 const coins = (copper) => ({ gold: Math.floor(copper / 10_000), silver: Math.floor(copper / 100) % 100, copper: copper % 100 });
 
-//  Progress contract (ProgressController): chapter 1 as seeded by the backend, the transition table of Progress.kt,
+//  Progress contract (ProgressController): chapter 1 as seeded by the backend (drop rules: monster 1, miniboss 2, boss 3), the transition table of Progress.kt,
 //  and a 409 carrying the stored progress when a report does not start from the stored position.
 const SEED_ELEMENTS = [ 'FIRE', 'WATER', 'NATURE', 'LIGHT', 'DARKNESS' ];
 
@@ -27,13 +29,16 @@ const seededDefinition = () => ({
     bossHealth: 300,
     bossTimeLimitMs: 60_000,
     boss: { element: 'DARKNESS', physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
+    bossDropRuleId: 3,
     stages: Array.from({ length: 10 }, (_, i) => {
         const element = SEED_ELEMENTS[i % SEED_ELEMENTS.length];
 
         return {
             number: i + 1, phasesPerStage: 5, monsterHealth: 10 + i, minibossHealth: 5 * (10 + i), minibossTimeLimitMs: 30_000,
             monster: { element, physicalDefense: 0, magicalDefense: 0, critResistance: 0 },
-            miniboss: { element, physicalDefense: 11 + i, magicalDefense: 11 + i, critResistance: 12 + 2 * i }
+            miniboss: { element, physicalDefense: 11 + i, magicalDefense: 11 + i, critResistance: 12 + 2 * i },
+            monsterDropRuleId: 1,
+            minibossDropRuleId: 2
         };
     })
 });
@@ -162,7 +167,8 @@ const pieceView = (piece) => ({
 const isPublic = (method, path) => method === 'POST' && (path === '/users' || path === '/users/login');
 
 //  Options: users {name: password}, delayMs, accessTtlMs (default 24 h), refreshTtlMs (default 30 days),
-//  wallets {name: copper} (starting totals), drops (the repeating list the wallet queues are rolled from),
+//  wallets {name: copper} (starting totals), drops (the repeating list every rule's queue is rolled from, or
+//  {ruleId: list} to roll each listed rule from its own list and the others from the default list),
 //  progress {name: {stage, encounter, phase, completed}} (starting positions, default stage 1 phase 1) and
 //  definition (the chapter every player plays, default the backend seed),
 //  cards {name: { start, leader, copies: { 'kael:0': 3 }, cleared: [1], winsDay, winsToday }} (starting bags; a player not listed holds one blank Kael card),
@@ -178,12 +184,24 @@ export async function mockBackend (page, {
     const sessions = { access: new Map(), refresh: new Map() };
     let counter = 0;
     const wallets = new Map();
-    let rolled = 0;
+    const rolled = new Map();
 
-    const nextDrop = () => drops[rolled++ % drops.length];
+    const dropsOf = (ruleId) => (Array.isArray(drops) ? drops : drops[ruleId] ?? DEFAULT_DROPS);
+    const nextDrop = (ruleId) => {
+        const list = dropsOf(ruleId);
+        const index = rolled.get(ruleId) ?? 0;
+
+        rolled.set(ruleId, index + 1);
+
+        return list[index % list.length];
+    };
+    const rollQueue = (ruleId, length) => Array.from({ length }, () => nextDrop(ruleId));
+    const queuesBody = (queues) => Object.fromEntries(DROP_RULE_IDS.map((ruleId) => [ ruleId, [ ...queues[ruleId] ] ]));
     const walletOf = (username) => {
         if (!wallets.has(username)) {
-            wallets.set(username, { copper: startingWallets[username] ?? 0, queue: Array.from({ length: QUEUE_SIZE }, nextDrop) });
+            const queues = Object.fromEntries(DROP_RULE_IDS.map((ruleId) => [ ruleId, rollQueue(ruleId, QUEUE_SIZE) ]));
+
+            wallets.set(username, { copper: startingWallets[username] ?? 0, queues });
         }
 
         return wallets.get(username);
@@ -269,7 +287,7 @@ export async function mockBackend (page, {
         const wallet = walletOf(username);
 
         if (method === 'GET' && path === '/wallet') {
-            return route.fulfill({ json: { wallet: coins(wallet.copper), drops: { 1: [ ...wallet.queue ] } } });
+            return route.fulfill({ json: { wallet: coins(wallet.copper), drops: queuesBody(wallet.queues) } });
         }
 
         if (method === 'POST' && path === '/wallet/sync') {
@@ -279,17 +297,24 @@ export async function mockBackend (page, {
             if (!entries || entries.some(([ , count ]) => !Number.isInteger(count) || count < 0)) {
                 return route.fulfill(problem(400, 'Kills are invalid', 'WALLET_INVALID_KILLS'));
             }
-            if (entries.some(([ level ]) => level !== '1')) {
-                return route.fulfill(problem(400, 'Monster level is unknown', 'WALLET_UNKNOWN_LEVEL'));
+            const unknown = entries.find(([ ruleId ]) => !DROP_RULE_IDS.includes(ruleId));
+
+            if (unknown) {
+                return route.fulfill(problem(400, `Drop rule '${unknown[0]}' is unknown`, 'WALLET_UNKNOWN_DROP_RULE'));
             }
 
-            const accepted = Math.min(Number(kills['1'] ?? 0), QUEUE_SIZE);
-            const credited = wallet.queue.splice(0, accepted);
+            const accepted = {};
 
-            wallet.copper += credited.reduce((sum, value) => sum + value, 0);
-            wallet.queue.push(...Array.from({ length: accepted }, nextDrop));
+            entries.forEach(([ ruleId, count ]) => {
+                const taken = Math.min(count, QUEUE_SIZE);
+                const credited = wallet.queues[ruleId].splice(0, taken);
 
-            return route.fulfill({ json: { wallet: coins(wallet.copper), accepted: { 1: accepted }, drops: { 1: [ ...wallet.queue ] } } });
+                wallet.copper += credited.reduce((sum, value) => sum + value, 0);
+                wallet.queues[ruleId].push(...rollQueue(ruleId, taken));
+                accepted[ruleId] = taken;
+            });
+
+            return route.fulfill({ json: { wallet: coins(wallet.copper), accepted, drops: queuesBody(wallet.queues) } });
         }
 
         return route.fulfill(problem(404, 'Not found'));

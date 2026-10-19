@@ -486,11 +486,13 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `drops.spec.js` passes with distinct queues per rule; `equipment.spec.js` and `heroes.spec.js` still pass
-- [ ] Gate check passes: `cd game && npm test && npm run test:e2e && npm run build`
+- [x] `drops.spec.js` passes with distinct queues per rule; `equipment.spec.js` and `heroes.spec.js` still pass
+- [x] Gate check passes: `cd game && npm test && npm run test:e2e && npm run build`
 
 **Tests**: e2e
 **Gate**: full
+
+**Status**: ✅ Done (fakeBackend serves monsterDropRuleId 1, minibossDropRuleId 2 and bossDropRuleId 3 in the seeded chapter, 15 queues keyed "1".."15" each rolled from its own list (`drops` takes a list for every rule or {ruleId: list}), credits sync kills per rule and answers 400 WALLET_UNKNOWN_DROP_RULE for an unknown rule; new drops.spec.js scenario kills a monster (rule 4) and its miniboss (rule 5) and checks the wallet grows 3 then 12 to 15, server side included, with kills reported under 4 and 5; 673 unit tests, 50 e2e (49 + 1), build passes)
 
 **Commit**: `test(game): cover drops keyed by drop rule end to end`
 
