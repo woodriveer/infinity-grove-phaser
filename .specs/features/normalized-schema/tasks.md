@@ -185,11 +185,13 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `DropRuleRepositoryIT`: a saved rule is returned by `findAll` with its values, ordered by id; `existsById` is true/false accordingly
-- [ ] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
+- [x] `DropRuleRepositoryIT`: a saved rule is returned by `findAll` with its values, ordered by id; `existsById` is true/false accordingly
+- [x] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Done (DropRuleEntity, DropRuleRepository and DropRuleRepositoryPort; findAll on an empty table fails with IllegalStateException because the seeder fills it at startup; 622 tests pass)
 
 **Commit**: `feat(wallet): store drop rules in the database`
 
