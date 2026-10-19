@@ -17,24 +17,24 @@ class WalletEntity(
     @Column(nullable = false)
     var copper: Long,
 ) {
-    fun toDomain(levels: List<WalletLevelEntity>) = Wallet(username, copper, levels.associate { it.level to it.toDomain() })
+    fun toDomain(queues: List<WalletDropQueueEntity>) = Wallet(username, copper, queues.associate { it.dropRuleId to it.toDomain() })
 
     companion object {
         fun from(wallet: Wallet) = WalletEntity(wallet.username, wallet.copper)
     }
 }
 
-/** One row per player and monster level: the drop queue (comma-separated) and the allowance bucket. */
+/** One row per player and drop rule: the drop queue (comma-separated) and the allowance bucket. */
 @Entity
-@Table(name = "wallet_levels", indexes = [Index(name = "idx_wallet_levels_username", columnList = "username")])
-class WalletLevelEntity(
+@Table(name = "wallet_drop_queues", indexes = [Index(name = "idx_wallet_drop_queues_username", columnList = "username")])
+class WalletDropQueueEntity(
     @Id
     @Column(nullable = false, updatable = false)
     var id: String,
     @Column(nullable = false, updatable = false)
     var username: String,
-    @Column(nullable = false, updatable = false)
-    var level: Int,
+    @Column(name = "drop_rule_id", nullable = false, updatable = false)
+    var dropRuleId: Int,
     @Column(nullable = false, length = 512)
     var drops: String,
     @Column(nullable = false)
@@ -43,21 +43,21 @@ class WalletLevelEntity(
     var allowanceUpdatedAt: Long,
 ) {
     fun toDomain() =
-        DropQueue(level, if (drops.isEmpty()) emptyList() else drops.split(",").map(String::toInt), allowance, allowanceUpdatedAt)
+        DropQueue(dropRuleId, if (drops.isEmpty()) emptyList() else drops.split(",").map(String::toInt), allowance, allowanceUpdatedAt)
 
     companion object {
         fun idOf(
             username: String,
-            level: Int,
-        ) = "$username/$level"
+            ruleId: Int,
+        ) = "$username/$ruleId"
 
         fun from(
             username: String,
             drops: DropQueue,
-        ) = WalletLevelEntity(
+        ) = WalletDropQueueEntity(
             id = idOf(username, drops.ruleId),
             username = username,
-            level = drops.ruleId,
+            dropRuleId = drops.ruleId,
             drops = drops.queue.joinToString(","),
             allowance = drops.allowance,
             allowanceUpdatedAt = drops.allowanceUpdatedAt,

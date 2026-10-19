@@ -29,27 +29,27 @@ interface JpaWalletRepository : JpaRepository<WalletEntity, String> {
     ): Int
 }
 
-interface JpaWalletLevelRepository : JpaRepository<WalletLevelEntity, String> {
-    fun findAllByUsername(username: String): List<WalletLevelEntity>
+interface JpaWalletDropQueueRepository : JpaRepository<WalletDropQueueEntity, String> {
+    fun findAllByUsername(username: String): List<WalletDropQueueEntity>
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(
         value =
-            "insert into wallet_levels (id, username, level, drops, allowance, allowance_updated_at) " +
-                "values (:id, :username, :level, :drops, :allowance, :allowanceUpdatedAt) on conflict (id) do nothing",
+            "insert into wallet_drop_queues (id, username, drop_rule_id, drops, allowance, allowance_updated_at) " +
+                "values (:id, :username, :dropRuleId, :drops, :allowance, :allowanceUpdatedAt) on conflict (id) do nothing",
         nativeQuery = true,
     )
     fun insertIfAbsent(
         @Param("id") id: String,
         @Param("username") username: String,
-        @Param("level") level: Int,
+        @Param("dropRuleId") dropRuleId: Int,
         @Param("drops") drops: String,
         @Param("allowance") allowance: Int,
         @Param("allowanceUpdatedAt") allowanceUpdatedAt: Long,
     ): Int
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("delete from WalletLevelEntity l where l.username = :username")
+    @Query("delete from WalletDropQueueEntity q where q.username = :username")
     fun deleteAllByUsername(
         @Param("username") username: String,
     ): Int
@@ -58,33 +58,40 @@ interface JpaWalletLevelRepository : JpaRepository<WalletLevelEntity, String> {
 @Repository
 class WalletRepository(
     private val jpaWalletRepository: JpaWalletRepository,
-    private val jpaWalletLevelRepository: JpaWalletLevelRepository,
+    private val jpaWalletDropQueueRepository: JpaWalletDropQueueRepository,
 ) : WalletRepositoryPort {
     @Transactional
     override fun findForUpdate(username: String): Wallet? {
         val wallet = jpaWalletRepository.findForUpdate(username) ?: return null
-        return wallet.toDomain(jpaWalletLevelRepository.findAllByUsername(username))
+        return wallet.toDomain(jpaWalletDropQueueRepository.findAllByUsername(username))
     }
 
     @Transactional
     override fun createIfAbsent(wallet: Wallet) {
         jpaWalletRepository.insertIfAbsent(wallet.username, wallet.copper)
         wallet.queues.values.forEach {
-            val row = WalletLevelEntity.from(wallet.username, it)
-            jpaWalletLevelRepository.insertIfAbsent(row.id, row.username, row.level, row.drops, row.allowance, row.allowanceUpdatedAt)
+            val row = WalletDropQueueEntity.from(wallet.username, it)
+            jpaWalletDropQueueRepository.insertIfAbsent(
+                row.id,
+                row.username,
+                row.dropRuleId,
+                row.drops,
+                row.allowance,
+                row.allowanceUpdatedAt,
+            )
         }
     }
 
     @Transactional
     override fun save(wallet: Wallet): Wallet {
         jpaWalletRepository.save(WalletEntity.from(wallet))
-        jpaWalletLevelRepository.saveAll(wallet.queues.values.map { WalletLevelEntity.from(wallet.username, it) })
+        jpaWalletDropQueueRepository.saveAll(wallet.queues.values.map { WalletDropQueueEntity.from(wallet.username, it) })
         return wallet
     }
 
     @Transactional
     override fun deleteByUsername(username: String) {
-        jpaWalletLevelRepository.deleteAllByUsername(username)
+        jpaWalletDropQueueRepository.deleteAllByUsername(username)
         jpaWalletRepository.deleteById(username)
     }
 }

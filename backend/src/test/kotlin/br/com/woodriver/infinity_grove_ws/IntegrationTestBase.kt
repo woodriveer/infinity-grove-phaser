@@ -9,7 +9,7 @@ import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaProgressReposito
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaRefreshTokenRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaStageRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaUserRepository
-import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletLevelRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletDropQueueRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletRepository
 import br.com.woodriver.infinity_grove_ws.adapter.security.JwtAccessTokenIssuer
 import br.com.woodriver.infinity_grove_ws.port.ChanceRollerPort
@@ -78,7 +78,7 @@ abstract class IntegrationTestBase {
     protected lateinit var jpaWalletRepository: JpaWalletRepository
 
     @Autowired
-    protected lateinit var jpaWalletLevelRepository: JpaWalletLevelRepository
+    protected lateinit var jpaWalletDropQueueRepository: JpaWalletDropQueueRepository
 
     @Autowired
     protected lateinit var jpaProgressRepository: JpaProgressRepository
@@ -124,7 +124,7 @@ abstract class IntegrationTestBase {
         jpaPieceRepository.deleteAll()
         jpaCardCopyRepository.deleteAll()
         jpaPlayerCardsRepository.deleteAll()
-        jpaWalletLevelRepository.deleteAll()
+        jpaWalletDropQueueRepository.deleteAll()
         jpaWalletRepository.deleteAll()
         jpaUserRepository.deleteAll()
     }

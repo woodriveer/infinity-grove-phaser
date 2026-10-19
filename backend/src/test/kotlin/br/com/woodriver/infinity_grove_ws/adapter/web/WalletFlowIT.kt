@@ -68,7 +68,7 @@ class WalletFlowIT : IntegrationTestBase() {
         getWallet().then().statusCode(200).body("wallet.copper", equalTo(0))
 
         assertEquals(1, jpaWalletRepository.count())
-        assertEquals(1, jpaWalletLevelRepository.count())
+        assertEquals(1, jpaWalletDropQueueRepository.count())
     }
 
     @Test
@@ -93,6 +93,6 @@ class WalletFlowIT : IntegrationTestBase() {
             .statusCode(204)
 
         assertEquals(0, jpaWalletRepository.count())
-        assertEquals(0, jpaWalletLevelRepository.count())
+        assertEquals(0, jpaWalletDropQueueRepository.count())
     }
 }

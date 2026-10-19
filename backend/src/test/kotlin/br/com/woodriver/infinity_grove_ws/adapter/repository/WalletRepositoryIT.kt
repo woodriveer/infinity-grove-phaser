@@ -4,6 +4,7 @@ import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.domain.DropQueue
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 import java.util.concurrent.CountDownLatch
@@ -21,6 +22,9 @@ class WalletRepositoryIT : IntegrationTestBase() {
     @Autowired
     private lateinit var transactionManager: PlatformTransactionManager
 
+    @Autowired
+    private lateinit var jdbcTemplate: JdbcTemplate
+
     private fun wallet(
         username: String = "yan",
         copper: Long = 1_234_567,
@@ -36,7 +40,7 @@ class WalletRepositoryIT : IntegrationTestBase() {
     @Test
     fun `tables are empty at the start of each test`() {
         assertEquals(0, jpaWalletRepository.count())
-        assertEquals(0, jpaWalletLevelRepository.count())
+        assertEquals(0, jpaWalletDropQueueRepository.count())
     }
 
     @Test
@@ -44,6 +48,22 @@ class WalletRepositoryIT : IntegrationTestBase() {
         repository.createIfAbsent(wallet())
 
         assertEquals(wallet(), repository.findForUpdate("yan"))
+    }
+
+    @Test
+    fun `each queue is stored in wallet_drop_queues under its drop rule id`() {
+        repository.createIfAbsent(wallet())
+
+        val rows =
+            jdbcTemplate.queryForList(
+                "select id, drop_rule_id from wallet_drop_queues where username = 'yan' order by drop_rule_id",
+            )
+
+        assertEquals(
+            listOf(mapOf("id" to "yan/1", "drop_rule_id" to 1), mapOf("id" to "yan/2", "drop_rule_id" to 2)),
+            rows,
+        )
+        assertEquals(setOf(1, 2), repository.findForUpdate("yan")!!.queues.keys)
     }
 
     @Test
@@ -91,7 +111,7 @@ class WalletRepositoryIT : IntegrationTestBase() {
 
         assertNull(repository.findForUpdate("yan"))
         assertNotNull(repository.findForUpdate("ana"))
-        assertEquals(2, jpaWalletLevelRepository.count())
+        assertEquals(2, jpaWalletDropQueueRepository.count())
     }
 
     @Test

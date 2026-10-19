@@ -294,11 +294,13 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `WalletRepositoryIT` stores and reads queues keyed by rule id
-- [ ] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
+- [x] `WalletRepositoryIT` stores and reads queues keyed by rule id
+- [x] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Done (WalletDropQueueEntity on wallet_drop_queues with drop_rule_id and idx_wallet_drop_queues_username, JpaWalletDropQueueRepository; 629 tests pass)
 
 **Commit**: `refactor(wallet): store drop queues per drop rule`
 

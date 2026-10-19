@@ -2,8 +2,8 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.adapter.repository.UserEntity
+import br.com.woodriver.infinity_grove_ws.adapter.repository.WalletDropQueueEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.WalletEntity
-import br.com.woodriver.infinity_grove_ws.adapter.repository.WalletLevelEntity
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.response.Response
@@ -51,7 +51,7 @@ class WalletControllerIT : IntegrationTestBase() {
     fun `GET wallet lists only the levels of the drop table, not stored levels the table lacks`() {
         user()
         getWallet()
-        jpaWalletLevelRepository.save(WalletLevelEntity("yan/9", "yan", 9, "1,2,3", 20, 0))
+        jpaWalletDropQueueRepository.save(WalletDropQueueEntity("yan/9", "yan", 9, "1,2,3", 20, 0))
 
         getWallet().then().statusCode(200).body("drops.keySet()", contains("1"))
         sync("""{"kills":{"1":1}}""").then().statusCode(200).body("drops.keySet()", contains("1"))
