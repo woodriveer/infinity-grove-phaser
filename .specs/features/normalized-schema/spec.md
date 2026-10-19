@@ -137,7 +137,7 @@ The database has no foreign keys: a `username`, `hero_id`, chapter or stage can 
 | SCHEMA-06 | P1: Referential integrity - progress → stage FK (AC 6) | Design | Pending |
 | SCHEMA-07 | P1: Referential integrity - user delete cascades (AC 7) | Design | Pending |
 | SCHEMA-08 | P1: Referential integrity - catalog delete restricted (AC 8) | Design | Pending |
-| SCHEMA-09 | P1: Referential integrity - migrate and seed an empty database (AC 9) | Design | Pending |
+| SCHEMA-09 | P1: Referential integrity - migrate and seed an empty database (AC 9) | Design | Implementing |
 | SCHEMA-28 | P1: Referential integrity - enemy and drop rule FKs (AC 10) | Design | Pending |
 | SCHEMA-10 | P1: Enemy catalog - attributes only in `enemies` (AC 1) | Design | Implementing |
 | SCHEMA-11 | P1: Enemy catalog - stage/chapter enemy FKs (AC 2) | Design | Implementing |

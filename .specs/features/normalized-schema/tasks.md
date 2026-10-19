@@ -267,11 +267,13 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `ChapterSeederIT`: after startup `drop_rules` holds the 15 seed rules with the spec values; seeding again inserts nothing and keeps a rule whose range was changed in the database
-- [ ] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
+- [x] `ChapterSeederIT`: after startup `drop_rules` holds the 15 seed rules with the spec values; seeding again inserts nothing and keeps a rule whose range was changed in the database
+- [x] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
 
 **Tests**: integration
 **Gate**: build
+
+**Status**: ✅ Done (ChapterSeeder saves each missing rule of dropRules(n) before the chapter, never overwriting; 628 tests pass)
 
 **Commit**: `feat(stages): seed the drop rules of each chapter`
 
