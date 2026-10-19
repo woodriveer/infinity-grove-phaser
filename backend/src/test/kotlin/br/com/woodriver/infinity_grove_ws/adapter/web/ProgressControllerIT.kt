@@ -109,14 +109,14 @@ class ProgressControllerIT : IntegrationTestBase() {
     @Test
     fun `GET progress fails with 400 when a stored element is not one of the five`() {
         user()
-        val stage = jpaStageRepository.findById("1/1").get()
-        val original = stage.monsterElement
-        jpaStageRepository.save(stage.apply { monsterElement = "PLASMA" })
+        val enemy = jpaEnemyRepository.findById(jpaStageRepository.findById("1/1").get().monsterEnemyId).get()
+        val original = enemy.element
+        jpaEnemyRepository.save(enemy.apply { element = "PLASMA" })
 
         try {
             getProgress().then().statusCode(400)
         } finally {
-            jpaStageRepository.save(stage.apply { monsterElement = original })
+            jpaEnemyRepository.save(enemy.apply { element = original })
         }
     }
 

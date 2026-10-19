@@ -239,12 +239,14 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `ChapterRepositoryIT`: saving `of(1..5)` and reading each back equals `ChapterDefinition.of(n)` (enemy stats and drop rule ids included); `enemies` holds exactly 5 rows with defenses and crit resistance 0, one per element
-- [ ] `StageEntity` and `ChapterEntity` declare no element/defense/crit column
-- [ ] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
+- [x] `ChapterRepositoryIT`: saving `of(1..5)` and reading each back equals `ChapterDefinition.of(n)` (enemy stats and drop rule ids included); `enemies` holds exactly 5 rows with defenses and crit resistance 0, one per element
+- [x] `StageEntity` and `ChapterEntity` declare no element/defense/crit column
+- [x] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Done (stages and chapters hold enemy and drop rule ids, unique (chapter, number), ChapterRepository resolves and joins enemies; 626 tests pass. The ChapterRepositoryIT test for rows predating the attribute columns now writes rows by SQL with enemy and drop rule ids, since those columns and their defaults are gone)
 
 **Commit**: `feat(stages): point stages and chapters at the enemy catalog`
 

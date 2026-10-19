@@ -139,12 +139,12 @@ The database has no foreign keys: a `username`, `hero_id`, chapter or stage can 
 | SCHEMA-08 | P1: Referential integrity - catalog delete restricted (AC 8) | Design | Pending |
 | SCHEMA-09 | P1: Referential integrity - migrate and seed an empty database (AC 9) | Design | Pending |
 | SCHEMA-28 | P1: Referential integrity - enemy and drop rule FKs (AC 10) | Design | Pending |
-| SCHEMA-10 | P1: Enemy catalog - attributes only in `enemies` (AC 1) | Design | Pending |
-| SCHEMA-11 | P1: Enemy catalog - stage/chapter enemy FKs (AC 2) | Design | Pending |
+| SCHEMA-10 | P1: Enemy catalog - attributes only in `enemies` (AC 1) | Design | Implementing |
+| SCHEMA-11 | P1: Enemy catalog - stage/chapter enemy FKs (AC 2) | Design | Implementing |
 | SCHEMA-12 | P1: Enemy catalog - unique attribute set (AC 3) | Design | Implementing |
 | SCHEMA-13 | P1: Enemy catalog - seeder reuses rows (AC 4) | Design | Implementing |
-| SCHEMA-14 | P1: Enemy catalog - 5 shared phase monsters (AC 5) | Design | Pending |
-| SCHEMA-15 | P1: Enemy catalog - chapter read matches `ChapterDefinition.of` (AC 6) | Design | Pending |
+| SCHEMA-14 | P1: Enemy catalog - 5 shared phase monsters (AC 5) | Design | Implementing |
+| SCHEMA-15 | P1: Enemy catalog - chapter read matches `ChapterDefinition.of` (AC 6) | Design | Implementing |
 | SCHEMA-16 | P1: Enemy catalog - attribute bounds `CHECK` (AC 7) | Design | Pending |
 | SCHEMA-17 | P1: Drops per stage - no drop table in yaml (AC 1) | Design | Implementing |
 | SCHEMA-18 | P1: Drops per stage - seeded rule values (AC 2) | Design | Implementing |

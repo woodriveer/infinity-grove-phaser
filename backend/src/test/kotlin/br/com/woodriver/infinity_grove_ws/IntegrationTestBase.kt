@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws
 
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaCardCopyRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaChapterRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaEnemyRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaPieceRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaProgressRepository
@@ -87,6 +88,9 @@ abstract class IntegrationTestBase {
 
     @Autowired
     protected lateinit var jpaStageRepository: JpaStageRepository
+
+    @Autowired
+    protected lateinit var jpaEnemyRepository: JpaEnemyRepository
 
     @Autowired
     protected lateinit var jpaPlayerCardsRepository: JpaPlayerCardsRepository

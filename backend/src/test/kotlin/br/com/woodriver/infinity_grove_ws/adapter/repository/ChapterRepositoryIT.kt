@@ -43,14 +43,26 @@ class ChapterRepositoryIT : IntegrationTestBase() {
                     minibossTimeLimitMs = 31_000L + it,
                     monster = EnemyStats(Element.WATER, it, it + 1, it + 2),
                     miniboss = EnemyStats(Element.LIGHT, 20 + it, 30 + it, 40 + it),
+                    monsterDropRuleId = 2,
+                    minibossDropRuleId = 3,
                 )
             },
         boss = EnemyStats(Element.DARKNESS, 55, 66, 77),
+        bossDropRuleId = 4,
     )
 
     private fun clean() {
         jpaStageRepository.deleteAll(jpaStageRepository.findAllByChapterOrderByNumber(number))
         jpaChapterRepository.deleteById(number)
+        removeUnusedEnemies()
+    }
+
+    // the enemies these tests add are referenced by no seeded stage or chapter
+    private fun removeUnusedEnemies() {
+        jdbc.update(
+            "delete from enemies e where not exists (select 1 from stages s where e.id in (s.monster_enemy_id, s.miniboss_enemy_id)) " +
+                "and not exists (select 1 from chapters c where c.boss_enemy_id = e.id)",
+        )
     }
 
     @BeforeTest
@@ -107,7 +119,7 @@ class ChapterRepositoryIT : IntegrationTestBase() {
     @Test
     fun `a stored element that is not one of the five fails the load`() {
         repository.save(chapter())
-        jdbc.update("update stages set monster_element = 'PLASMA' where id = ?", "$number/1")
+        jdbc.update("update enemies set element = 'PLASMA' where id = (select monster_enemy_id from stages where id = ?)", "$number/1")
 
         // the repository is transactional, so Spring wraps the enum error
         val e = assertFailsWith<RuntimeException> { repository.findByNumber(number) }
@@ -116,19 +128,71 @@ class ChapterRepositoryIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `rows written without the attribute columns read as fire with no defense and no resistance`() {
-        jdbc.update("insert into chapters (number, boss_health, boss_time_limit_ms) values (?, 5, 1000)", number)
+    fun `rows written by SQL read the enemies and drop rules they point at`() {
+        val boss =
+            jdbc.queryForObject(
+                "insert into enemies (element, physical_defense, magical_defense, crit_resistance) values ('NATURE', 85, 86, 87) returning id",
+                Long::class.java,
+            )
+        val monster =
+            jdbc.queryForObject(
+                "insert into enemies (element, physical_defense, magical_defense, crit_resistance) values ('LIGHT', 88, 89, 90) returning id",
+                Long::class.java,
+            )
         jdbc.update(
-            "insert into stages (id, chapter, number, phases_per_stage, monster_health, miniboss_health, miniboss_time_limit_ms) " +
-                "values (?, ?, 1, 1, 1, 1, 1000)",
+            "insert into chapters (number, boss_health, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) values (?, 5, 1000, ?, 3)",
+            number,
+            boss,
+        )
+        jdbc.update(
+            "insert into stages (id, chapter, number, phases_per_stage, monster_health, miniboss_health, miniboss_time_limit_ms, " +
+                "monster_enemy_id, miniboss_enemy_id, monster_drop_rule_id, miniboss_drop_rule_id) " +
+                "values (?, ?, 1, 1, 1, 1, 1000, ?, ?, 1, 2)",
             "$number/1",
             number,
+            monster,
+            boss,
         )
 
         val read = repository.findByNumber(number)!!
 
-        assertEquals(EnemyStats.DEFAULT, read.boss)
-        assertEquals(EnemyStats.DEFAULT, read.stage(1).monster)
-        assertEquals(EnemyStats.DEFAULT, read.stage(1).miniboss)
+        assertEquals(EnemyStats(Element.NATURE, 85, 86, 87), read.boss)
+        assertEquals(EnemyStats(Element.LIGHT, 88, 89, 90), read.stage(1).monster)
+        assertEquals(EnemyStats(Element.NATURE, 85, 86, 87), read.stage(1).miniboss)
+        assertEquals(3, read.bossDropRuleId)
+        assertEquals(1, read.stage(1).monsterDropRuleId)
+        assertEquals(2, read.stage(1).minibossDropRuleId)
+    }
+
+    @Test
+    fun `saving the five seed chapters reads each back equal to its definition`() {
+        (1..5).forEach { repository.save(ChapterDefinition.of(it)) }
+
+        (1..5).forEach { assertEquals(ChapterDefinition.of(it), repository.findByNumber(it)) }
+    }
+
+    @Test
+    fun `the 50 seeded stages share 5 phase monsters, one per element with no defense and no resistance`() {
+        (1..5).forEach { repository.save(ChapterDefinition.of(it)) }
+
+        val monsters =
+            jdbc.queryForList(
+                "select distinct e.element, e.physical_defense, e.magical_defense, e.crit_resistance " +
+                    "from enemies e join stages s on s.monster_enemy_id = e.id where s.chapter between 1 and 5",
+            )
+        val zeroRows =
+            jdbc.queryForList(
+                "select element from enemies where physical_defense = 0 and magical_defense = 0 and crit_resistance = 0",
+                String::class.java,
+            )
+
+        assertEquals(5, monsters.size)
+        assertEquals(Element.entries.map { it.name }.toSet(), zeroRows.toSet())
+        assertEquals(5, zeroRows.size)
+        monsters.forEach {
+            assertEquals(0, it["physical_defense"])
+            assertEquals(0, it["magical_defense"])
+            assertEquals(0, it["crit_resistance"])
+        }
     }
 }
