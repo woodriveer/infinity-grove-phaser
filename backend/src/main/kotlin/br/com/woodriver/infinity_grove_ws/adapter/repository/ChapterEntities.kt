@@ -6,9 +6,12 @@ import br.com.woodriver.infinity_grove_ws.domain.EnemyStats
 import br.com.woodriver.infinity_grove_ws.domain.StageDefinition
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 
 // the column defaults let `ddl-auto: update` add the columns to rows that predate the enemy attributes
 private const val ELEMENT_COLUMN = "varchar(255) not null default 'FIRE'"
@@ -22,6 +25,31 @@ private fun statsOf(
     magicalDefense: Int,
     critResistance: Int,
 ) = EnemyStats(Element.valueOf(element), physicalDefense, magicalDefense, critResistance)
+
+/** One row per distinct enemy attribute set; stages and chapters point at it by id. */
+@Entity
+@Table(
+    name = "enemies",
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "uk_enemies_attributes",
+            columnNames = ["element", "physical_defense", "magical_defense", "crit_resistance"],
+        ),
+    ],
+)
+class EnemyEntity(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+    @Column(nullable = false, length = 32)
+    var element: String,
+    @Column(nullable = false)
+    var physicalDefense: Int,
+    @Column(nullable = false)
+    var magicalDefense: Int,
+    @Column(nullable = false)
+    var critResistance: Int,
+)
 
 @Entity
 @Table(name = "chapters")

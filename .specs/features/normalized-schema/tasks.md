@@ -212,11 +212,13 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `EnemyRepositoryIT`: the same stats twice return the same id and leave one row; stats differing in any one attribute return a new id
-- [ ] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
+- [x] `EnemyRepositoryIT`: the same stats twice return the same id and leave one row; stats differing in any one attribute return a new id
+- [x] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Done (EnemyEntity (enemies, unique on the four attributes) and EnemyRepository.idOf find-or-insert; 624 tests pass)
 
 **Commit**: `feat(stages): store each distinct enemy once`
 
