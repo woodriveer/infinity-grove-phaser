@@ -46,6 +46,8 @@ data class StageResponse(
     val minibossTimeLimitMs: Long,
     val monster: EnemyStatsResponse,
     val miniboss: EnemyStatsResponse,
+    val monsterDropRuleId: Int,
+    val minibossDropRuleId: Int,
 ) {
     companion object {
         fun from(stage: StageDefinition) =
@@ -57,6 +59,8 @@ data class StageResponse(
                 minibossTimeLimitMs = stage.minibossTimeLimitMs,
                 monster = EnemyStatsResponse.from(stage.monster),
                 miniboss = EnemyStatsResponse.from(stage.miniboss),
+                monsterDropRuleId = stage.monsterDropRuleId,
+                minibossDropRuleId = stage.minibossDropRuleId,
             )
     }
 }
@@ -65,12 +69,19 @@ data class ChapterResponse(
     val bossHealth: Int,
     val bossTimeLimitMs: Long,
     val boss: EnemyStatsResponse,
+    val bossDropRuleId: Int,
     val stages: List<StageResponse>,
 ) {
     companion object {
         fun from(chapter: ChapterDefinition): ChapterResponse {
             val stages = chapter.stages.map(StageResponse::from)
-            return ChapterResponse(chapter.bossHealth, chapter.bossTimeLimitMs, EnemyStatsResponse.from(chapter.boss), stages)
+            return ChapterResponse(
+                bossHealth = chapter.bossHealth,
+                bossTimeLimitMs = chapter.bossTimeLimitMs,
+                boss = EnemyStatsResponse.from(chapter.boss),
+                bossDropRuleId = chapter.bossDropRuleId,
+                stages = stages,
+            )
         }
     }
 }

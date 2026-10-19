@@ -150,7 +150,7 @@ The database has no foreign keys: a `username`, `hero_id`, chapter or stage can 
 | SCHEMA-18 | P1: Drops per stage - seeded rule values (AC 2) | Design | Implementing |
 | SCHEMA-19 | P1: Drops per stage - stage/chapter rule FKs seeded (AC 3) | Design | Implementing |
 | SCHEMA-20 | P1: Drops per stage - rule bounds `CHECK` (AC 4) | Design | Pending |
-| SCHEMA-21 | P1: Drops per stage - rule ids in progress response (AC 5) | Design | Pending |
+| SCHEMA-21 | P1: Drops per stage - rule ids in progress response (AC 5) | Design | Implementing |
 | SCHEMA-22 | P1: Drops per stage - wallet queues per rule (AC 6) | Design | Implementing |
 | SCHEMA-23 | P1: Drops per stage - sync per rule (AC 7) | Design | Implementing |
 | SCHEMA-24 | P1: Drops per stage - unknown rule rejected (AC 8) | Design | Implementing |

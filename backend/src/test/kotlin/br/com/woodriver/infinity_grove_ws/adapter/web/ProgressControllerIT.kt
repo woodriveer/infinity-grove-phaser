@@ -107,6 +107,18 @@ class ProgressControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `GET progress names the drop rule of every stage monster, every miniboss and the chapter boss`() {
+        user()
+
+        getProgress()
+            .then()
+            .statusCode(200)
+            .body("definition.bossDropRuleId", equalTo(3))
+            .body("definition.stages.monsterDropRuleId", equalTo(List(10) { 1 }))
+            .body("definition.stages.minibossDropRuleId", equalTo(List(10) { 2 }))
+    }
+
+    @Test
     fun `GET progress fails with 400 when a stored element is not one of the five`() {
         user()
         val enemy = jpaEnemyRepository.findById(jpaStageRepository.findById("1/1").get().monsterEnemyId).get()

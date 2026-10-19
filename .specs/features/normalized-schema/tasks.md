@@ -350,11 +350,13 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] `ProgressControllerIT`: `GET /progress` of a new player shows `monsterDropRuleId = 1`, `minibossDropRuleId = 2` on every stage and `bossDropRuleId = 3`
-- [ ] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
+- [x] `ProgressControllerIT`: `GET /progress` of a new player shows `monsterDropRuleId = 1`, `minibossDropRuleId = 2` on every stage and `bossDropRuleId = 3`
+- [x] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
 
 **Tests**: integration
 **Gate**: build
+
+**Status**: ✅ Done (StageResponse.monsterDropRuleId/minibossDropRuleId and ChapterResponse.bossDropRuleId; no other controller reuses these responses; build gate passes, 629 tests)
 
 **Commit**: `feat(stages): send the drop rule of each encounter`
 
