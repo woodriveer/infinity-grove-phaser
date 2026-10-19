@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/normalized-schema/design.md`
-**Status**: Approved (owner: "aprovado, pode seguir para as tasks"; executed by 3 batch sub-agents)
+**Status**: Done, Verifier PASS (`validation.md`, iteration 2; approved by the owner: "aprovado, pode seguir para as tasks"; executed by 3 batch sub-agents)
 
 Paths: `BE` = `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws`, `BT` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws`, `BR` = `backend/src/main/resources`, `GS` = `game/src`.
 
@@ -495,6 +495,12 @@ T13 → T14 → T15
 **Status**: ✅ Done (fakeBackend serves monsterDropRuleId 1, minibossDropRuleId 2 and bossDropRuleId 3 in the seeded chapter, 15 queues keyed "1".."15" each rolled from its own list (`drops` takes a list for every rule or {ruleId: list}), credits sync kills per rule and answers 400 WALLET_UNKNOWN_DROP_RULE for an unknown rule; new drops.spec.js scenario kills a monster (rule 4) and its miniboss (rule 5) and checks the wallet grows 3 then 12 to 15, server side included, with kills reported under 4 and 5; 673 unit tests, 50 e2e (49 + 1), build passes)
 
 **Commit**: `test(game): cover drops keyed by drop rule end to end`
+
+---
+
+## Verifier Fix (iteration 1 → 2)
+
+Iteration 1 FAILed on SCHEMA-01/02 (nothing pinned `ddl-auto: validate`), SCHEMA-08 (restricted deletes reached `progress`, so a cascade FK still failed) and SCHEMA-16 (no lower-bound cases). Fixed with tests only in `528ac3a` (`SchemaConstraintsIT` per-catalog probe rows and `-1` cases, new `SchemaValidationIT`); iteration 2 PASS, 14/14 mutants killed.
 
 ---
 

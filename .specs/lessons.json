@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 21,
+  "next_id": 24,
   "lessons": [
     {
       "id": "L-001",
@@ -366,6 +366,60 @@
       ],
       "created": "2026-10-18T20:27:10Z",
       "last_seen": "2026-10-18T20:27:10Z"
+    },
+    {
+      "id": "L-021",
+      "key": "surviving_mutant::test on delete restrict by deleting a row whose only dependents are its direct children so a cascade cannot be masked by a restrict further down the chain",
+      "text": "Test ON DELETE RESTRICT by deleting a row whose only dependents are its direct children, so a cascade cannot be masked by a restrict further down the chain",
+      "signal": "surviving_mutant",
+      "scope": "migration",
+      "status": "candidate",
+      "features": [
+        "normalized-schema"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md B2; SchemaConstraintsIT.kt:176-184 (migration)"
+      ],
+      "created": "2026-10-19T23:20:05Z",
+      "last_seen": "2026-10-19T23:20:05Z"
+    },
+    {
+      "id": "L-022",
+      "key": "surviving_mutant::assert both the lower and the upper bound of every range check constraint",
+      "text": "Assert both the lower and the upper bound of every range CHECK constraint",
+      "signal": "surviving_mutant",
+      "scope": "migration",
+      "status": "candidate",
+      "features": [
+        "normalized-schema"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md B7; SchemaConstraintsIT.kt:200-203 (migration)"
+      ],
+      "created": "2026-10-19T23:20:05Z",
+      "last_seen": "2026-10-19T23:20:05Z"
+    },
+    {
+      "id": "L-023",
+      "key": "surviving_mutant::cover a required configuration mode such as ddl auto validate with a test that fails when the mode changes",
+      "text": "Cover a required configuration mode such as ddl-auto validate with a test that fails when the mode changes",
+      "signal": "surviving_mutant",
+      "scope": "config",
+      "status": "candidate",
+      "features": [
+        "normalized-schema"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md B8; SCHEMA-01/SCHEMA-02 (config)"
+      ],
+      "created": "2026-10-19T23:20:06Z",
+      "last_seen": "2026-10-19T23:20:06Z"
     }
   ]
 }

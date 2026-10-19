@@ -84,11 +84,11 @@
 
 ## Handoff
 
-- **Feature**: .specs/features/equipment (server-rolled equipment, equip per hero, refine, reroll and sell with copper; builds on characters, drops and wallet)
-- **Phase / Task**: Done - T1 to T26 committed and pushed; Verifier PASS (`validation.md`)
-- **Completed**: backend (item model, roll, `PlayerEquipment`, `equipment_pieces`, drops in the campaign and farm reports, `GET /equipment`, equip, unequip, refine, reroll, sell, ADR 0008, AD-009), game (damage with pierce and boss damage, attacker from worn pieces, boss time bonus, equipment screen and notice, wallet update after actions), e2e (`equipment.spec.js` and the equipment routes of the fake backend)
+- **Feature**: .specs/features/normalized-schema (foreign keys on every reference, `enemies` catalog, copper drops per stage through `drop_rules`, Flyway owns the schema)
+- **Phase / Task**: Done - T1 to T15 committed and pushed, Verifier fix `528ac3a`; Verifier PASS (`validation.md`, iteration 2)
+- **Completed**: backend (`DropQueue` rename, `WALLET_UNKNOWN_DROP_RULE`, `drop_rules` and `enemies` tables, stages/chapters referencing them, seeder of the 15 rules, `wallet_drop_queues`, wallet reading rules from the database, rule ids in `/progress`, `V1__schema.sql` with 20 FKs and checks, `ddl-auto: validate`, ADR 0009, AD-010), game (`dropRuleId` on encounters and monsters, e2e with rule-keyed drops)
 - **In-progress** (file:line): none
-- **Next step**: account level / prestige and the talent tree (each its own spec; out of scope of equipment), then `hero-combat`; known lag: the wallet text does not refresh after a drop sold into a full bag until the next kill sync
-- **Blockers**: none
-- **Uncommitted files**: `game/public/assets/coin-*.png` (the owner coin art, never staged)
+- **Next step**: deploy (`./publish.sh`) after the one-time local reset `docker compose down -v` in `backend/`; then account level / prestige and the talent tree, then `hero-combat`
+- **Blockers**: the owner's uncommitted `application.yaml` rates (cards 0.07/0.80, equipment miniboss 0.5) fail `EquipmentDropFlowIT` and `FarmControllerIT`; gates ran with `APP_EQUIPMENT_MINIBOSSRATE=0.25 APP_CARDS_MINIBOSSRATEPERSTAGE=0.02 APP_CARDS_CHAPTERBOSSRATE=0.30`
+- **Uncommitted files**: `backend/src/main/resources/application.yaml` (owner rate edits), `.idea/`, `game/public/assets/coin-*.png`, `game/src/scenes/` (owner work, never staged)
 - **Branch**: main

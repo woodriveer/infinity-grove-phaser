@@ -129,40 +129,40 @@ The database has no foreign keys: a `username`, `hero_id`, chapter or stage can 
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| SCHEMA-01 | P1: Referential integrity - Flyway `V1`, `ddl-auto: validate` (AC 1) | Design | Implementing |
-| SCHEMA-02 | P1: Referential integrity - startup fails on mismatch (AC 2) | Design | Implementing |
-| SCHEMA-03 | P1: Referential integrity - `username` FKs (AC 3) | Design | Implementing |
-| SCHEMA-04 | P1: Referential integrity - hero FKs (AC 4) | Design | Implementing |
-| SCHEMA-05 | P1: Referential integrity - stage → chapter FK (AC 5) | Design | Implementing |
-| SCHEMA-06 | P1: Referential integrity - progress → stage FK (AC 6) | Design | Implementing |
-| SCHEMA-07 | P1: Referential integrity - user delete cascades (AC 7) | Design | Implementing |
-| SCHEMA-08 | P1: Referential integrity - catalog delete restricted (AC 8) | Design | Implementing |
-| SCHEMA-09 | P1: Referential integrity - migrate and seed an empty database (AC 9) | Design | Implementing |
-| SCHEMA-28 | P1: Referential integrity - enemy and drop rule FKs (AC 10) | Design | Implementing |
-| SCHEMA-10 | P1: Enemy catalog - attributes only in `enemies` (AC 1) | Design | Implementing |
-| SCHEMA-11 | P1: Enemy catalog - stage/chapter enemy FKs (AC 2) | Design | Implementing |
-| SCHEMA-12 | P1: Enemy catalog - unique attribute set (AC 3) | Design | Implementing |
-| SCHEMA-13 | P1: Enemy catalog - seeder reuses rows (AC 4) | Design | Implementing |
-| SCHEMA-14 | P1: Enemy catalog - 5 shared phase monsters (AC 5) | Design | Implementing |
-| SCHEMA-15 | P1: Enemy catalog - chapter read matches `ChapterDefinition.of` (AC 6) | Design | Implementing |
-| SCHEMA-16 | P1: Enemy catalog - attribute bounds `CHECK` (AC 7) | Design | Implementing |
-| SCHEMA-17 | P1: Drops per stage - no drop table in yaml (AC 1) | Design | Implementing |
-| SCHEMA-18 | P1: Drops per stage - seeded rule values (AC 2) | Design | Implementing |
-| SCHEMA-19 | P1: Drops per stage - stage/chapter rule FKs seeded (AC 3) | Design | Implementing |
-| SCHEMA-20 | P1: Drops per stage - rule bounds `CHECK` (AC 4) | Design | Implementing |
-| SCHEMA-21 | P1: Drops per stage - rule ids in progress response (AC 5) | Design | Implementing |
-| SCHEMA-22 | P1: Drops per stage - wallet queues per rule (AC 6) | Design | Implementing |
-| SCHEMA-23 | P1: Drops per stage - sync per rule (AC 7) | Design | Implementing |
-| SCHEMA-24 | P1: Drops per stage - unknown rule rejected (AC 8) | Design | Implementing |
-| SCHEMA-25 | P1: Drops per stage - game uses the encounter's rule (AC 9) | Design | Implementing |
-| SCHEMA-26 | P1: Drops per stage - farm drops no copper (AC 10) | Design | Implementing |
-| SCHEMA-27 | P1: Drops per stage - missing queue drops nothing (AC 11) | Design | Implementing |
+| SCHEMA-01 | P1: Referential integrity - Flyway `V1`, `ddl-auto: validate` (AC 1) | Execute | Verified |
+| SCHEMA-02 | P1: Referential integrity - startup fails on mismatch (AC 2) | Execute | Verified |
+| SCHEMA-03 | P1: Referential integrity - `username` FKs (AC 3) | Execute | Verified |
+| SCHEMA-04 | P1: Referential integrity - hero FKs (AC 4) | Execute | Verified |
+| SCHEMA-05 | P1: Referential integrity - stage → chapter FK (AC 5) | Execute | Verified |
+| SCHEMA-06 | P1: Referential integrity - progress → stage FK (AC 6) | Execute | Verified |
+| SCHEMA-07 | P1: Referential integrity - user delete cascades (AC 7) | Execute | Verified |
+| SCHEMA-08 | P1: Referential integrity - catalog delete restricted (AC 8) | Execute | Verified |
+| SCHEMA-09 | P1: Referential integrity - migrate and seed an empty database (AC 9) | Execute | Verified |
+| SCHEMA-28 | P1: Referential integrity - enemy and drop rule FKs (AC 10) | Execute | Verified |
+| SCHEMA-10 | P1: Enemy catalog - attributes only in `enemies` (AC 1) | Execute | Verified |
+| SCHEMA-11 | P1: Enemy catalog - stage/chapter enemy FKs (AC 2) | Execute | Verified |
+| SCHEMA-12 | P1: Enemy catalog - unique attribute set (AC 3) | Execute | Verified |
+| SCHEMA-13 | P1: Enemy catalog - seeder reuses rows (AC 4) | Execute | Verified |
+| SCHEMA-14 | P1: Enemy catalog - 5 shared phase monsters (AC 5) | Execute | Verified |
+| SCHEMA-15 | P1: Enemy catalog - chapter read matches `ChapterDefinition.of` (AC 6) | Execute | Verified |
+| SCHEMA-16 | P1: Enemy catalog - attribute bounds `CHECK` (AC 7) | Execute | Verified |
+| SCHEMA-17 | P1: Drops per stage - no drop table in yaml (AC 1) | Execute | Verified |
+| SCHEMA-18 | P1: Drops per stage - seeded rule values (AC 2) | Execute | Verified |
+| SCHEMA-19 | P1: Drops per stage - stage/chapter rule FKs seeded (AC 3) | Execute | Verified |
+| SCHEMA-20 | P1: Drops per stage - rule bounds `CHECK` (AC 4) | Execute | Verified |
+| SCHEMA-21 | P1: Drops per stage - rule ids in progress response (AC 5) | Execute | Verified |
+| SCHEMA-22 | P1: Drops per stage - wallet queues per rule (AC 6) | Execute | Verified |
+| SCHEMA-23 | P1: Drops per stage - sync per rule (AC 7) | Execute | Verified |
+| SCHEMA-24 | P1: Drops per stage - unknown rule rejected (AC 8) | Execute | Verified |
+| SCHEMA-25 | P1: Drops per stage - game uses the encounter's rule (AC 9) | Execute | Verified |
+| SCHEMA-26 | P1: Drops per stage - farm drops no copper (AC 10) | Execute | Verified |
+| SCHEMA-27 | P1: Drops per stage - missing queue drops nothing (AC 11) | Execute | Verified |
 
 **ID format:** `[CATEGORY]-[NUMBER]` (e.g., `AUTH-01`, `CART-03`, `NOTIF-02`)
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 28 total, 0 mapped to tasks, 28 unmapped ⚠️ (mapped in the Tasks phase)
+**Coverage:** 28 total, 28 mapped to tasks, 0 unmapped
 
 ---
 

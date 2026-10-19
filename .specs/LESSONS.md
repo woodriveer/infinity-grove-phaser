@@ -132,6 +132,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: EQP-38 EquipmentExceptionsTest.kt (backend-domain)
 - last seen: 2026-10-18T20:27:10Z
 
+### L-021 - Test ON DELETE RESTRICT by deleting a row whose only dependents are its direct children, so a cascade cannot be masked by a restrict further down the chain
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `migration` · harmful: 0
+- features: normalized-schema
+- evidence: validation.md B2; SchemaConstraintsIT.kt:176-184 (migration)
+- last seen: 2026-10-19T23:20:05Z
+
+### L-022 - Assert both the lower and the upper bound of every range CHECK constraint
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `migration` · harmful: 0
+- features: normalized-schema
+- evidence: validation.md B7; SchemaConstraintsIT.kt:200-203 (migration)
+- last seen: 2026-10-19T23:20:05Z
+
+### L-023 - Cover a required configuration mode such as ddl-auto validate with a test that fails when the mode changes
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `config` · harmful: 0
+- features: normalized-schema
+- evidence: validation.md B8; SCHEMA-01/SCHEMA-02 (config)
+- last seen: 2026-10-19T23:20:06Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
