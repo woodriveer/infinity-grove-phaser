@@ -405,11 +405,13 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] ADR 0009 states the decision, consequences and alternatives of the design
-- [ ] Gate check passes: `cd backend && ./gradlew --offline build`
+- [x] ADR 0009 states the decision, consequences and alternatives of the design
+- [x] Gate check passes: `cd backend && ./gradlew --offline build`
 
 **Tests**: none
 **Gate**: build
+
+**Status**: ✅ Done (ADR 0009, AD-010 in STATE.md, pointers to 0009 in ADR 0005 and 0006; `backend/readme.md` did not exist and was created with the database section and the one-time `docker compose down -v`; build gate passes, 641 tests)
 
 **Commit**: `docs(schema): record flyway and foreign keys as the schema rule`
 

@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-10-17
+- Superseded in part by [ADR 0009](0009-normalized-schema.md): the drop table moved from `app.wallet.drop-table` to the `drop_rules` table, queues are keyed by drop rule id in `wallet_drop_queues`, and Flyway owns the schema.
 
 ## Context
 

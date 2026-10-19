@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-10-17
+- Superseded in part by [ADR 0009](0009-normalized-schema.md): enemy attributes moved from `stages`/`chapters` columns to the `enemies` catalog, stages and chapters reference drop rules, and Flyway creates the tables (`ddl-auto: validate`).
 
 ## Context
 

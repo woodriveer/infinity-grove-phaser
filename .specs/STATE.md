@@ -74,6 +74,14 @@
 - **Date**: 2026-10-18
 - **Status**: active
 
+### AD-010
+- **Decision**: Flyway owns the schema (`V1__schema.sql` onward, `ddl-auto: validate`); every reference is a SQL foreign key, with entities holding plain id columns. Player rows cascade with the user, catalog references restrict; enemies and drop rules are catalogs that stages and chapters reference.
+- **Reason**: `ddl-auto: update` cannot add constraints, drop columns or move data, so rows could point at players, heroes or stages that did not exist.
+- **Trade-off**: A schema change needs a migration file plus the entity change; the local pre-Flyway database is recreated once (`docker compose down -v`) and its players are lost.
+- **Scope**: `backend/src/main/resources/db/migration`, every `backend` entity and repository (ADR 0009)
+- **Date**: 2026-10-19
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: .specs/features/equipment (server-rolled equipment, equip per hero, refine, reroll and sell with copper; builds on characters, drops and wallet)
