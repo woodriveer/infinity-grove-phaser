@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class WalletTest {
-    /** Always rolls the lowest value, so level 1 drops 1 copper and level 2 drops 10. */
+    /** Always rolls the lowest value, so rule 1 drops 1 copper and rule 2 drops 10. */
     private val minRoller =
         object : DropRollerPort {
             override fun roll(
@@ -15,27 +15,27 @@ class WalletTest {
             ) = min
         }
 
-    private val levelOne = DropRule(1, 1, 5, 1500)
-    private val levelTwo = DropRule(2, 10, 12, 3000)
-    private val oneLevel = DropTable(listOf(levelOne))
-    private val twoLevels = DropTable(listOf(levelOne, levelTwo))
+    private val ruleOne = DropRule(1, 1, 5, 1500)
+    private val ruleTwo = DropRule(2, 10, 12, 3000)
+    private val oneRule = DropTable(listOf(ruleOne))
+    private val twoRules = DropTable(listOf(ruleOne, ruleTwo))
 
     private fun wallet(
         copper: Long = 0,
-        table: DropTable = twoLevels,
+        table: DropTable = twoRules,
     ) = Wallet.open("yan", table, minRoller, now = 0).copy(copper = copper)
 
     @Test
-    fun `open starts at zero copper with a fresh state for every level`() {
-        val wallet = Wallet.open("yan", twoLevels, minRoller, now = 500)
+    fun `open starts at zero copper with a fresh queue for every rule`() {
+        val wallet = Wallet.open("yan", twoRules, minRoller, now = 500)
 
         assertEquals("yan", wallet.username)
         assertEquals(0L, wallet.copper)
-        assertEquals(setOf(1, 2), wallet.levels.keys)
-        assertEquals(List(20) { 1 }, wallet.levels.getValue(1).queue)
-        assertEquals(List(20) { 10 }, wallet.levels.getValue(2).queue)
-        assertEquals(20, wallet.levels.getValue(2).allowance)
-        assertEquals(500L, wallet.levels.getValue(2).allowanceUpdatedAt)
+        assertEquals(setOf(1, 2), wallet.queues.keys)
+        assertEquals(List(20) { 1 }, wallet.queues.getValue(1).queue)
+        assertEquals(List(20) { 10 }, wallet.queues.getValue(2).queue)
+        assertEquals(20, wallet.queues.getValue(2).allowance)
+        assertEquals(500L, wallet.queues.getValue(2).allowanceUpdatedAt)
     }
 
     @Test
@@ -54,108 +54,108 @@ class WalletTest {
     }
 
     @Test
-    fun `refreshed adds a level that is new to the table and keeps the others`() {
-        val old = wallet(table = oneLevel)
+    fun `refreshed adds a rule that is new to the table and keeps the others`() {
+        val old = wallet(table = oneRule)
 
-        val refreshed = old.refreshed(twoLevels, minRoller, now = 900)
+        val refreshed = old.refreshed(twoRules, minRoller, now = 900)
 
-        assertEquals(old.levels.getValue(1), refreshed.levels.getValue(1))
-        assertEquals(LevelDrops.fresh(levelTwo, minRoller, 900), refreshed.levels.getValue(2))
+        assertEquals(old.queues.getValue(1), refreshed.queues.getValue(1))
+        assertEquals(DropQueue.fresh(ruleTwo, minRoller, 900), refreshed.queues.getValue(2))
     }
 
     @Test
-    fun `refreshed re-rolls a queue that left the level range`() {
+    fun `refreshed re-rolls a queue that left the rule range`() {
         val narrowed = DropTable(listOf(DropRule(1, 3, 4, 1500)))
 
-        val refreshed = wallet(table = oneLevel).refreshed(narrowed, minRoller, now = 0)
+        val refreshed = wallet(table = oneRule).refreshed(narrowed, minRoller, now = 0)
 
-        assertEquals(List(20) { 3 }, refreshed.levels.getValue(1).queue)
+        assertEquals(List(20) { 3 }, refreshed.queues.getValue(1).queue)
     }
 
     @Test
-    fun `refreshed keeps the stored state of a level missing from the table`() {
-        val old = wallet(table = twoLevels)
+    fun `refreshed keeps the stored queue of a rule missing from the table`() {
+        val old = wallet(table = twoRules)
 
-        val refreshed = old.refreshed(oneLevel, minRoller, now = 0)
+        val refreshed = old.refreshed(oneRule, minRoller, now = 0)
 
-        assertEquals(old.levels.getValue(2), refreshed.levels.getValue(2))
+        assertEquals(old.queues.getValue(2), refreshed.queues.getValue(2))
     }
 
     @Test
     fun `refreshed twice returns the same drops in the same order`() {
-        val once = wallet().refreshed(twoLevels, minRoller, now = 10)
+        val once = wallet().refreshed(twoRules, minRoller, now = 10)
 
-        val twice = once.refreshed(twoLevels, minRoller, now = 20)
+        val twice = once.refreshed(twoRules, minRoller, now = 20)
 
-        assertEquals(once.dropsFor(twoLevels), twice.dropsFor(twoLevels))
+        assertEquals(once.dropsFor(twoRules), twice.dropsFor(twoRules))
     }
 
     @Test
-    fun `dropsFor returns the queues of table levels only`() {
-        val full = wallet(table = twoLevels)
+    fun `dropsFor returns the queues of table rules only`() {
+        val full = wallet(table = twoRules)
 
-        assertEquals(setOf(1), full.dropsFor(oneLevel).keys)
-        assertEquals(List(20) { 1 }, full.dropsFor(oneLevel).getValue(1))
+        assertEquals(setOf(1), full.dropsFor(oneRule).keys)
+        assertEquals(List(20) { 1 }, full.dropsFor(oneRule).getValue(1))
     }
 
     @Test
-    fun `credit adds the queued values of every level and reports accepted kills per level`() {
-        val result = wallet().credit(mapOf(1 to 3, 2 to 2), twoLevels, minRoller, now = 0)
+    fun `credit adds the queued values of every rule and reports accepted kills per rule`() {
+        val result = wallet().credit(mapOf(1 to 3, 2 to 2), twoRules, minRoller, now = 0)
 
         assertEquals(3 * 1 + 2 * 10L, result.wallet.copper)
         assertEquals(mapOf(1 to 3, 2 to 2), result.accepted)
     }
 
     @Test
-    fun `credit discards kills above the allowance of each level`() {
-        val result = wallet().credit(mapOf(1 to 500, 2 to 7), twoLevels, minRoller, now = 0)
+    fun `credit discards kills above the allowance of each rule`() {
+        val result = wallet().credit(mapOf(1 to 500, 2 to 7), twoRules, minRoller, now = 0)
 
         assertEquals(mapOf(1 to 20, 2 to 7), result.accepted)
         assertEquals(20 * 1 + 7 * 10L, result.wallet.copper)
     }
 
     @Test
-    fun `credit refills each queue and keeps the levels it was not asked about unchanged`() {
+    fun `credit refills each queue and keeps the queues it was not asked about unchanged`() {
         val old = wallet()
 
-        val result = old.credit(mapOf(1 to 5), twoLevels, minRoller, now = 0)
+        val result = old.credit(mapOf(1 to 5), twoRules, minRoller, now = 0)
 
         assertEquals(
             20,
-            result.wallet.levels
+            result.wallet.queues
                 .getValue(1)
                 .queue.size,
         )
         assertEquals(
             15,
-            result.wallet.levels
+            result.wallet.queues
                 .getValue(1)
                 .allowance,
         )
-        assertEquals(old.levels.getValue(2), result.wallet.levels.getValue(2))
+        assertEquals(old.queues.getValue(2), result.wallet.queues.getValue(2))
     }
 
     @Test
     fun `credit with no kills or only zero counts leaves the wallet unchanged`() {
         val old = wallet(copper = 42)
 
-        assertEquals(old, old.credit(emptyMap(), twoLevels, minRoller, now = 99).wallet)
+        assertEquals(old, old.credit(emptyMap(), twoRules, minRoller, now = 99).wallet)
 
-        val zeros = old.credit(mapOf(1 to 0, 2 to 0), twoLevels, minRoller, now = 99)
+        val zeros = old.credit(mapOf(1 to 0, 2 to 0), twoRules, minRoller, now = 99)
         assertEquals(old, zeros.wallet)
         assertEquals(mapOf(1 to 0, 2 to 0), zeros.accepted)
     }
 
     @Test
-    fun `credit rejects an unknown level and credits nothing even for the valid ones`() {
-        val e = assertFailsWith<UnknownLevelException> { wallet().credit(mapOf(1 to 3, 7 to 1), twoLevels, minRoller, now = 0) }
+    fun `credit rejects an unknown rule and credits nothing even for the valid ones`() {
+        val e = assertFailsWith<UnknownLevelException> { wallet().credit(mapOf(1 to 3, 7 to 1), twoRules, minRoller, now = 0) }
 
         assertEquals("WALLET_UNKNOWN_LEVEL", e.code)
     }
 
     @Test
     fun `credit clamps the total at the largest 64-bit value`() {
-        val result = wallet(copper = Long.MAX_VALUE - 2).credit(mapOf(2 to 1), twoLevels, minRoller, now = 0)
+        val result = wallet(copper = Long.MAX_VALUE - 2).credit(mapOf(2 to 1), twoRules, minRoller, now = 0)
 
         assertEquals(Long.MAX_VALUE, result.wallet.copper)
     }

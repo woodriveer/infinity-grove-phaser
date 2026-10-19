@@ -1,7 +1,7 @@
 package br.com.woodriver.infinity_grove_ws.adapter.repository
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
-import br.com.woodriver.infinity_grove_ws.domain.LevelDrops
+import br.com.woodriver.infinity_grove_ws.domain.DropQueue
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.PlatformTransactionManager
@@ -28,8 +28,8 @@ class WalletRepositoryIT : IntegrationTestBase() {
         username,
         copper,
         mapOf(
-            1 to LevelDrops(1, List(20) { it % 5 + 1 }, allowance = 7, allowanceUpdatedAt = 123_456),
-            2 to LevelDrops(2, List(20) { 10 + it % 3 }, allowance = 20, allowanceUpdatedAt = 9),
+            1 to DropQueue(1, List(20) { it % 5 + 1 }, allowance = 7, allowanceUpdatedAt = 123_456),
+            2 to DropQueue(2, List(20) { 10 + it % 3 }, allowance = 20, allowanceUpdatedAt = 9),
         ),
     )
 
@@ -71,15 +71,15 @@ class WalletRepositoryIT : IntegrationTestBase() {
     fun `save replaces the copper total, queues and allowances`() {
         repository.createIfAbsent(wallet(copper = 10))
         val changed =
-            Wallet("yan", 77, mapOf(1 to LevelDrops(1, List(20) { 5 }, allowance = 3, allowanceUpdatedAt = 5_000)))
+            Wallet("yan", 77, mapOf(1 to DropQueue(1, List(20) { 5 }, allowance = 3, allowanceUpdatedAt = 5_000)))
 
         assertEquals(changed, repository.save(changed))
 
         val stored = repository.findForUpdate("yan")!!
         assertEquals(77L, stored.copper)
-        assertEquals(List(20) { 5 }, stored.levels.getValue(1).queue)
-        assertEquals(3, stored.levels.getValue(1).allowance)
-        assertEquals(5_000L, stored.levels.getValue(1).allowanceUpdatedAt)
+        assertEquals(List(20) { 5 }, stored.queues.getValue(1).queue)
+        assertEquals(3, stored.queues.getValue(1).allowance)
+        assertEquals(5_000L, stored.queues.getValue(1).allowanceUpdatedAt)
     }
 
     @Test

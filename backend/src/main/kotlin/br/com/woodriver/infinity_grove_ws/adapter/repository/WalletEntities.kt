@@ -1,6 +1,6 @@
 package br.com.woodriver.infinity_grove_ws.adapter.repository
 
-import br.com.woodriver.infinity_grove_ws.domain.LevelDrops
+import br.com.woodriver.infinity_grove_ws.domain.DropQueue
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -43,7 +43,7 @@ class WalletLevelEntity(
     var allowanceUpdatedAt: Long,
 ) {
     fun toDomain() =
-        LevelDrops(level, if (drops.isEmpty()) emptyList() else drops.split(",").map(String::toInt), allowance, allowanceUpdatedAt)
+        DropQueue(level, if (drops.isEmpty()) emptyList() else drops.split(",").map(String::toInt), allowance, allowanceUpdatedAt)
 
     companion object {
         fun idOf(
@@ -53,11 +53,11 @@ class WalletLevelEntity(
 
         fun from(
             username: String,
-            drops: LevelDrops,
+            drops: DropQueue,
         ) = WalletLevelEntity(
-            id = idOf(username, drops.level),
+            id = idOf(username, drops.ruleId),
             username = username,
-            level = drops.level,
+            level = drops.ruleId,
             drops = drops.queue.joinToString(","),
             allowance = drops.allowance,
             allowanceUpdatedAt = drops.allowanceUpdatedAt,

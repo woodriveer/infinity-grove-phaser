@@ -59,7 +59,7 @@ class WalletServiceTest {
     fun `get re-rolls a stored queue that is outside the configured range`() {
         existingUser()
         val stored = service.get("yan")
-        val stale = stored.copy(levels = mapOf(1 to stored.levels.getValue(1).copy(queue = List(20) { 9 })))
+        val stale = stored.copy(queues = mapOf(1 to stored.queues.getValue(1).copy(queue = List(20) { 9 })))
         wallets.save(stale)
 
         val wallet = service.get("yan")

@@ -101,13 +101,15 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] No `LevelDrops` or `DropRule.level` remains in `backend/src`
-- [ ] Every assertion keeps its expected value (rename only)
-- [ ] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
-- [ ] Test count: same as before the task (no silent deletions)
+- [x] No `LevelDrops` or `DropRule.level` remains in `backend/src`
+- [x] Every assertion keeps its expected value (rename only)
+- [x] Gate check passes: `cd backend && ./gradlew --offline ktlintCheck test`
+- [x] Test count: same as before the task (no silent deletions)
 
 **Tests**: unit
 **Gate**: full
+
+**Status**: ✅ Done (rename `LevelDrops` to `DropQueue` and `level` to rule id; 615 tests before and after)
 
 **Commit**: `refactor(wallet): name drop queues by drop rule instead of level`
 

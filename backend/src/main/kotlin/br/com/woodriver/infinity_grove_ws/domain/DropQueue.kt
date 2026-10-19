@@ -3,20 +3,20 @@ package br.com.woodriver.infinity_grove_ws.domain
 import br.com.woodriver.infinity_grove_ws.port.DropRollerPort
 import org.slf4j.LoggerFactory
 
-/** One player's drops for one monster level: the pre-rolled queue and the kill allowance bucket. */
-data class LevelDrops(
-    val level: Int,
+/** One player's drops for one drop rule: the pre-rolled queue and the kill allowance bucket. */
+data class DropQueue(
+    val ruleId: Int,
     val queue: List<Int>,
     val allowance: Int,
     val allowanceUpdatedAt: Long,
 ) {
-    /** Re-rolls the whole queue when it is not 20 values inside the level's current range. */
+    /** Re-rolls the whole queue when it is not 20 values inside the rule's current range. */
     fun refreshed(
         rule: DropRule,
         roller: DropRollerPort,
-    ): LevelDrops {
+    ): DropQueue {
         if (queue.size == QUEUE_SIZE && queue.all(rule::accepts)) return this
-        logger.info("Re-rolling drop queue level={}", level)
+        logger.info("Re-rolling drop queue ruleId={}", ruleId)
         return copy(queue = rollQueue(rule, roller))
     }
 
@@ -32,14 +32,14 @@ data class LevelDrops(
         val count = minOf(requested, current.allowance)
         val credited = current.queue.take(count).sumOf { it.toLong() }
         val queue = current.queue.drop(count) + List(count) { rule.roll(roller) }
-        logger.debug("Accepted kills level={} requested={} accepted={}", level, requested, count)
+        logger.debug("Accepted kills ruleId={} requested={} accepted={}", ruleId, requested, count)
         return AcceptedKills(current.copy(queue = queue, allowance = current.allowance - count), count, credited)
     }
 
     private fun withAllowanceAt(
         rule: DropRule,
         now: Long,
-    ): LevelDrops {
+    ): DropQueue {
         if (allowance >= MAX_ALLOWANCE) return copy(allowance = MAX_ALLOWANCE, allowanceUpdatedAt = now)
         val steps = ((now - allowanceUpdatedAt) / rule.killIntervalMs).coerceAtLeast(0)
         val grown = minOf(MAX_ALLOWANCE.toLong(), allowance + steps).toInt()
@@ -48,7 +48,7 @@ data class LevelDrops(
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(LevelDrops::class.java)
+        private val logger = LoggerFactory.getLogger(DropQueue::class.java)
         const val QUEUE_SIZE = 20
         const val MAX_ALLOWANCE = 20
 
@@ -56,7 +56,7 @@ data class LevelDrops(
             rule: DropRule,
             roller: DropRollerPort,
             now: Long,
-        ) = LevelDrops(rule.level, rollQueue(rule, roller), MAX_ALLOWANCE, now)
+        ) = DropQueue(rule.id, rollQueue(rule, roller), MAX_ALLOWANCE, now)
 
         private fun rollQueue(
             rule: DropRule,
@@ -67,7 +67,7 @@ data class LevelDrops(
 
 /** The outcome of accepting kills: the new state, how many kills counted, and the copper they credit. */
 data class AcceptedKills(
-    val drops: LevelDrops,
+    val drops: DropQueue,
     val count: Int,
     val copper: Long,
 )

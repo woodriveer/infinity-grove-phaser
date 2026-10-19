@@ -69,7 +69,7 @@ class WalletRepository(
     @Transactional
     override fun createIfAbsent(wallet: Wallet) {
         jpaWalletRepository.insertIfAbsent(wallet.username, wallet.copper)
-        wallet.levels.values.forEach {
+        wallet.queues.values.forEach {
             val row = WalletLevelEntity.from(wallet.username, it)
             jpaWalletLevelRepository.insertIfAbsent(row.id, row.username, row.level, row.drops, row.allowance, row.allowanceUpdatedAt)
         }
@@ -78,7 +78,7 @@ class WalletRepository(
     @Transactional
     override fun save(wallet: Wallet): Wallet {
         jpaWalletRepository.save(WalletEntity.from(wallet))
-        jpaWalletLevelRepository.saveAll(wallet.levels.values.map { WalletLevelEntity.from(wallet.username, it) })
+        jpaWalletLevelRepository.saveAll(wallet.queues.values.map { WalletLevelEntity.from(wallet.username, it) })
         return wallet
     }
 

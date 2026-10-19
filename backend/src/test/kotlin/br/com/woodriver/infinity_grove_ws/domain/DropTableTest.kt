@@ -10,29 +10,29 @@ import kotlin.test.assertTrue
 
 class DropTableTest {
     private fun rule(
-        level: Int = 1,
+        id: Int = 1,
         min: Int = 1,
         max: Int = 5,
         interval: Long = 1500,
-    ) = DropRule(level, min, max, interval)
+    ) = DropRule(id, min, max, interval)
 
     @Test
     fun `rule rejects a level below 1 and names the level`() {
-        val e = assertFailsWith<IllegalArgumentException> { rule(level = 0) }
+        val e = assertFailsWith<IllegalArgumentException> { rule(id = 0) }
 
         assertTrue(e.message!!.contains("level 0"), e.message)
     }
 
     @Test
     fun `rule rejects a minimum below 1 and names the level`() {
-        val e = assertFailsWith<IllegalArgumentException> { rule(level = 2, min = 0) }
+        val e = assertFailsWith<IllegalArgumentException> { rule(id = 2, min = 0) }
 
         assertTrue(e.message!!.contains("level 2"), e.message)
     }
 
     @Test
     fun `rule rejects a maximum below the minimum and names the level`() {
-        val e = assertFailsWith<IllegalArgumentException> { rule(level = 3, min = 5, max = 4) }
+        val e = assertFailsWith<IllegalArgumentException> { rule(id = 3, min = 5, max = 4) }
 
         assertTrue(e.message!!.contains("level 3"), e.message)
     }
@@ -44,7 +44,7 @@ class DropTableTest {
 
     @Test
     fun `rule rejects a kill interval below 1 and names the level`() {
-        val e = assertFailsWith<IllegalArgumentException> { rule(level = 4, interval = 0) }
+        val e = assertFailsWith<IllegalArgumentException> { rule(id = 4, interval = 0) }
 
         assertTrue(e.message!!.contains("level 4"), e.message)
     }
@@ -86,16 +86,16 @@ class DropTableTest {
 
     @Test
     fun `table rejects a duplicate level and names it`() {
-        val e = assertFailsWith<IllegalArgumentException> { DropTable(listOf(rule(level = 1), rule(level = 1, max = 9))) }
+        val e = assertFailsWith<IllegalArgumentException> { DropTable(listOf(rule(id = 1), rule(id = 1, max = 9))) }
 
         assertTrue(e.message!!.contains("level 1"), e.message)
     }
 
     @Test
-    fun `table finds a rule by level and lists its levels`() {
-        val table = DropTable(listOf(rule(level = 1), rule(level = 2, min = 10, max = 12)))
+    fun `table finds a rule by id and lists its ids`() {
+        val table = DropTable(listOf(rule(id = 1), rule(id = 2, min = 10, max = 12)))
 
-        assertEquals(listOf(1, 2), table.levels)
+        assertEquals(listOf(1, 2), table.ids)
         assertEquals(10, table.ruleFor(2)!!.minCopper)
         assertNull(table.ruleFor(3))
     }

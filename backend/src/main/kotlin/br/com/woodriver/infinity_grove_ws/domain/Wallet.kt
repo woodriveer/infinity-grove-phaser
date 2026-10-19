@@ -3,11 +3,11 @@ package br.com.woodriver.infinity_grove_ws.domain
 import br.com.woodriver.infinity_grove_ws.port.DropRollerPort
 import org.slf4j.LoggerFactory
 
-/** A player's money and their per-level drop state. [copper] is the whole total; coins are derived from it. */
+/** A player's money and their per-rule drop queues. [copper] is the whole total; coins are derived from it. */
 data class Wallet(
     val username: String,
     val copper: Long,
-    val levels: Map<Int, LevelDrops>,
+    val queues: Map<Int, DropQueue>,
 ) {
     fun coins() =
         Coins(
@@ -16,7 +16,7 @@ data class Wallet(
             copper = (copper % COPPER_PER_SILVER).toInt(),
         )
 
-    /** Adds levels that are new to the table and re-rolls queues the table no longer allows. Hidden levels stay as stored. */
+    /** Adds queues for rules new to the table and re-rolls queues the table no longer allows. Hidden queues stay as stored. */
     fun refreshed(
         table: DropTable,
         roller: DropRollerPort,
@@ -24,14 +24,14 @@ data class Wallet(
     ): Wallet {
         val updated =
             table.rules.associate { rule ->
-                rule.level to (levels[rule.level]?.refreshed(rule, roller) ?: LevelDrops.fresh(rule, roller, now))
+                rule.id to (queues[rule.id]?.refreshed(rule, roller) ?: DropQueue.fresh(rule, roller, now))
             }
-        return copy(levels = levels + updated)
+        return copy(queues = queues + updated)
     }
 
-    fun dropsFor(table: DropTable): Map<Int, List<Int>> = table.levels.associateWith { level -> levels.getValue(level).queue }
+    fun dropsFor(table: DropTable): Map<Int, List<Int>> = table.ids.associateWith { id -> queues.getValue(id).queue }
 
-    /** Credits the queued values for the kills the allowance accepts; rejects the whole request if any level is unknown. */
+    /** Credits the queued values for the kills the allowance accepts; rejects the whole request if any rule is unknown. */
     fun credit(
         kills: Map<Int, Int>,
         table: DropTable,
@@ -39,25 +39,25 @@ data class Wallet(
         now: Long,
     ): SyncResult {
         kills.keys.firstOrNull { table.ruleFor(it) == null }?.let {
-            logger.warn("Sync rejected, unknown level username={} level={}", username, it)
+            logger.warn("Sync rejected, unknown drop rule username={} ruleId={}", username, it)
             throw UnknownLevelException(it.toString())
         }
         var total = copper
-        var updated = levels
+        var updated = queues
         val accepted = linkedMapOf<Int, Int>()
-        kills.forEach { (level, requested) ->
-            val rule = table.ruleFor(level)!!
-            val current = levels[level] ?: LevelDrops.fresh(rule, roller, now)
+        kills.forEach { (ruleId, requested) ->
+            val rule = table.ruleFor(ruleId)!!
+            val current = queues[ruleId] ?: DropQueue.fresh(rule, roller, now)
             val result = current.accept(requested, rule, roller, now)
             total = addClamped(total, result.copper)
-            updated = updated + (level to result.drops)
-            accepted[level] = result.count
-            logger.info("Credited kills username={} level={} requested={} accepted={}", username, level, requested, result.count)
+            updated = updated + (ruleId to result.drops)
+            accepted[ruleId] = result.count
+            logger.info("Credited kills username={} ruleId={} requested={} accepted={}", username, ruleId, requested, result.count)
             if (result.count < requested) {
-                logger.warn("Discarded kills username={} level={} discarded={}", username, level, requested - result.count)
+                logger.warn("Discarded kills username={} ruleId={} discarded={}", username, ruleId, requested - result.count)
             }
         }
-        return SyncResult(copy(copper = total, levels = updated), accepted)
+        return SyncResult(copy(copper = total, queues = updated), accepted)
     }
 
     /** Adds [amount] copper, clamped at the 64-bit total. */
@@ -87,7 +87,7 @@ data class Wallet(
             now: Long,
         ): Wallet {
             logger.info("Opening Wallet username={}", username)
-            return Wallet(username, 0, table.rules.associate { it.level to LevelDrops.fresh(it, roller, now) })
+            return Wallet(username, 0, table.rules.associate { it.id to DropQueue.fresh(it, roller, now) })
         }
     }
 }

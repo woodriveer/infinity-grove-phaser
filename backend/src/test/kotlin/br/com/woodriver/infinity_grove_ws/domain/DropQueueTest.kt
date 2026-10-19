@@ -4,8 +4,8 @@ import br.com.woodriver.infinity_grove_ws.SequenceDropRoller
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class LevelDropsTest {
-    private val rule = DropRule(level = 1, minCopper = 1, maxCopper = 5, killIntervalMs = 1500)
+class DropQueueTest {
+    private val rule = DropRule(id = 1, minCopper = 1, maxCopper = 5, killIntervalMs = 1500)
     private val firstTwenty = (0 until 20).map { it % 5 + 1 }
 
     private fun roller() = SequenceDropRoller(1, 2, 3, 4, 5)
@@ -14,11 +14,11 @@ class LevelDropsTest {
         allowance: Int,
         updatedAt: Long,
         queue: List<Int> = firstTwenty,
-    ) = LevelDrops(1, queue, allowance, updatedAt)
+    ) = DropQueue(1, queue, allowance, updatedAt)
 
     @Test
     fun `fresh holds 20 rolled values and a full allowance starting now`() {
-        val drops = LevelDrops.fresh(rule, roller(), now = 1_000)
+        val drops = DropQueue.fresh(rule, roller(), now = 1_000)
 
         assertEquals(firstTwenty, drops.queue)
         assertEquals(20, drops.allowance)
@@ -28,7 +28,7 @@ class LevelDropsTest {
     @Test
     fun `accept credits the first values, removes them and refills the queue to 20`() {
         val roller = SequenceDropRoller(1, 2, 3, 4, 5)
-        val drops = LevelDrops.fresh(rule, roller, now = 0)
+        val drops = DropQueue.fresh(rule, roller, now = 0)
 
         val result = drops.accept(3, rule, roller, now = 0)
 
@@ -41,7 +41,7 @@ class LevelDropsTest {
     @Test
     fun `accepting all 20 kills of a full allowance credits all 20 and returns a fresh queue of 20`() {
         val roller = roller()
-        val drops = LevelDrops.fresh(rule, roller, now = 0)
+        val drops = DropQueue.fresh(rule, roller, now = 0)
 
         val result = drops.accept(20, rule, roller, now = 0)
 
@@ -53,7 +53,7 @@ class LevelDropsTest {
     @Test
     fun `accept spends one allowance per accepted kill`() {
         val roller = roller()
-        val drops = LevelDrops.fresh(rule, roller, now = 0)
+        val drops = DropQueue.fresh(rule, roller, now = 0)
 
         val result = drops.accept(3, rule, roller, now = 0)
 
@@ -63,7 +63,7 @@ class LevelDropsTest {
     @Test
     fun `accept takes at most the allowance and discards the excess`() {
         val roller = roller()
-        val drops = LevelDrops.fresh(rule, roller, now = 0)
+        val drops = DropQueue.fresh(rule, roller, now = 0)
 
         val result = drops.accept(500, rule, roller, now = 0)
 
@@ -75,7 +75,7 @@ class LevelDropsTest {
     @Test
     fun `an immediate second batch is accepted only up to what the allowance regained`() {
         val roller = roller()
-        val first = LevelDrops.fresh(rule, roller, now = 0).accept(20, rule, roller, now = 0)
+        val first = DropQueue.fresh(rule, roller, now = 0).accept(20, rule, roller, now = 0)
 
         val second = first.drops.accept(500, rule, roller, now = 1_499)
 
@@ -115,7 +115,7 @@ class LevelDropsTest {
     @Test
     fun `leaving the full allowance starts the timer at the moment of the spend`() {
         val roller = roller()
-        val full = LevelDrops.fresh(rule, roller, now = 0)
+        val full = DropQueue.fresh(rule, roller, now = 0)
 
         val emptied = full.accept(20, rule, roller, now = 10_000)
 
