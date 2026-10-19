@@ -9,10 +9,11 @@ const HEALTH_PRECISION = 1e6;
 
 export class Monster
 {
-    constructor (maxHealth = MONSTER_MAX_HEALTH, level = 1, stats = DEFAULT_STATS)
+    //  dropRuleId names the wallet queue its kill takes copper from; null means the kill drops nothing
+    constructor (maxHealth = MONSTER_MAX_HEALTH, dropRuleId = null, stats = DEFAULT_STATS)
     {
         this.maxHealth = maxHealth;
-        this.level = level;
+        this.dropRuleId = dropRuleId;
         this.stats = stats;
         this.health = maxHealth;
     }

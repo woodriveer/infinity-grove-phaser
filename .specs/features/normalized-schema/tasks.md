@@ -459,11 +459,13 @@ T13 → T14 → T15
 
 **Done when**:
 
-- [ ] Scene/monster tests: a miniboss kill takes from the miniboss rule's queue; a kill whose rule has no queue drops nothing
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Scene/monster tests: a miniboss kill takes from the miniboss rule's queue; a kill whose rule has no queue drops nothing
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ✅ Done (Monster(maxHealth, dropRuleId = null, stats) replaces level; ClickerGame builds it from encounter.dropRuleId and takes the drop of monster.dropRuleId; farm fights still drop nothing; 673 tests pass (669 + 4). The ClickerGame test definition now carries the chapter 1 rule ids (monster 1, miniboss 2, boss 3). Rewritten for the removed level: the monster.test.js level tests now assert dropRuleId (null by default, kept through respawn); "reads the queue of the level of the monster" sets monster.dropRuleId; "still takes the level 1 drop when a boss dies" became "a miniboss kill takes from the queue of the miniboss drop rule". Added: phase monster rule, chapter boss rule, miniboss rule without a queue, encounter without a rule)
 
 **Commit**: `feat(game): drop copper from the encounter's drop rule`
 

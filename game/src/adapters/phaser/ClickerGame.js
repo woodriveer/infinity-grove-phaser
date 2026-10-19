@@ -402,7 +402,7 @@ export class ClickerGame extends Scene
 
         //  A new encounter replaces any message, the completion of the previous chapter included
         this.stageMessage.textContent = '';
-        this.monster = new Monster(encounter.health, 1, encounter.stats);
+        this.monster = new Monster(encounter.health, encounter.dropRuleId, encounter.stats);
         this.updateHealthBar();
         this.monsterParts.forEach((part) => part.setAlpha(1));
         this.stageHud.textContent = encounter.label;
@@ -700,10 +700,11 @@ export class ClickerGame extends Scene
         this.showEncounter(this.session.encounter());
     }
 
-    //  One coin per copper of the next queued drop flies from the monster to the wallet text; each landing counts 1 copper
+    //  One coin per copper of the next drop queued for the monster's drop rule flies from the monster to the wallet text;
+    //  each landing counts 1 copper
     dropCoins ()
     {
-        const drop = this.wallet.takeDrop(this.monster.level);
+        const drop = this.wallet.takeDrop(this.monster.dropRuleId);
 
         if (!drop)
         {

@@ -156,7 +156,7 @@ The database has no foreign keys: a `username`, `hero_id`, chapter or stage can 
 | SCHEMA-24 | P1: Drops per stage - unknown rule rejected (AC 8) | Design | Implementing |
 | SCHEMA-25 | P1: Drops per stage - game uses the encounter's rule (AC 9) | Design | Implementing |
 | SCHEMA-26 | P1: Drops per stage - farm drops no copper (AC 10) | Design | Implementing |
-| SCHEMA-27 | P1: Drops per stage - missing queue drops nothing (AC 11) | Design | Pending |
+| SCHEMA-27 | P1: Drops per stage - missing queue drops nothing (AC 11) | Design | Implementing |
 
 **ID format:** `[CATEGORY]-[NUMBER]` (e.g., `AUTH-01`, `CART-03`, `NOTIF-02`)
 

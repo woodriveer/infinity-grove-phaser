@@ -31,11 +31,14 @@ const services = {
     createFarmSession: () => createFarmSession({ gateway: farmGateway })
 };
 
+//  The drop rules of chapter 1: monster 1, miniboss 2, boss 3
 const definition = {
     bossHealth: 300,
     bossTimeLimitMs: 60000,
+    bossDropRuleId: 3,
     stages: Array.from({ length: 10 }, (_, i) => ({
-        number: i + 1, phasesPerStage: 5, monsterHealth: 10 + i, minibossHealth: 50 + 5 * i, minibossTimeLimitMs: 30000
+        number: i + 1, phasesPerStage: 5, monsterHealth: 10 + i, minibossHealth: 50 + 5 * i, minibossTimeLimitMs: 30000,
+        monsterDropRuleId: 1, minibossDropRuleId: 2
     }))
 };
 
@@ -589,7 +592,7 @@ describe('ClickerGame coin drops', () => {
         expect(ctx.sprites).toHaveLength(0);
     });
 
-    it('drops nothing when the queue of the monster level is empty', async () => {
+    it('drops nothing when the queue of the drop rule of the encounter is empty', async () => {
         const ctx = await loadedScene(walletResponse(undefined, { 1: [] }));
 
         kill(ctx);
@@ -598,7 +601,7 @@ describe('ClickerGame coin drops', () => {
         expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
     });
 
-    it('drops nothing when the backend sent no queue for the monster level', async () => {
+    it('drops nothing when the backend sent no queue for the drop rule of the encounter', async () => {
         const ctx = await loadedScene(walletResponse(undefined, { 2: [5] }));
 
         kill(ctx);
@@ -606,13 +609,35 @@ describe('ClickerGame coin drops', () => {
         expect(ctx.sprites).toHaveLength(0);
     });
 
-    it('reads the queue of the level of the monster', async () => {
+    it('reads the queue of the drop rule of the monster', async () => {
         const ctx = await loadedScene(walletResponse(undefined, { 1: [3], 2: [2] }));
-        ctx.scene.monster.level = 2;
+        ctx.scene.monster.dropRuleId = 2;
 
         kill(ctx);
 
         expect(ctx.sprites).toHaveLength(2);
+    });
+
+    it('a phase monster takes from the queue of the monster drop rule of its stage', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 1: [3], 2: [7], 3: [9] }));
+
+        kill(ctx);
+
+        expect(ctx.sprites).toHaveLength(3);
+    });
+
+    it('drops nothing when the encounter has no drop rule', async () => {
+        const stages = definition.stages.map(({ monsterDropRuleId, minibossDropRuleId, ...stage }) => stage);
+        const ctx = await createScene({
+            start: { ...progress(), definition: { bossHealth: 300, bossTimeLimitMs: 60000, stages } },
+            wallet: walletResponse(undefined, { 1: [3], 2: [7], 3: [9] })
+        });
+        await flush();
+
+        kill(ctx);
+
+        expect(ctx.sprites).toHaveLength(0);
+        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
     });
 
     it('takes the next queued value on the next kill after the respawn', async () => {
@@ -1111,13 +1136,31 @@ describe('ClickerGame stages', () => {
         expect(label(ctx)).toBe('');
     });
 
-    it('still takes the level 1 drop when a boss dies', async () => {
+    it('a miniboss kill takes from the queue of the miniboss drop rule', async () => {
+        const ctx = await createScene({ start: bossStart(), wallet: walletResponse(undefined, { 1: [ 4, 1, 5 ], 2: [ 7, 6 ], 3: [ 9 ] }) });
+        await flush();
+
+        killAll(ctx);
+
+        expect(ctx.sprites).toHaveLength(7);
+    });
+
+    it('a chapter boss kill takes from the queue of the boss drop rule', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1), wallet: walletResponse(undefined, { 1: [ 4 ], 2: [ 7 ], 3: [ 9, 2 ] }) });
+        await flush();
+
+        killAll(ctx);
+
+        expect(ctx.sprites).toHaveLength(9);
+    });
+
+    it('a miniboss kill drops nothing when its drop rule has no queue', async () => {
         const ctx = await createScene({ start: bossStart(), wallet: walletResponse(undefined, { 1: [ 4, 1, 5 ] }) });
         await flush();
 
         killAll(ctx);
 
-        expect(ctx.sprites).toHaveLength(4);
+        expect(ctx.sprites).toHaveLength(0);
     });
 });
 
