@@ -364,6 +364,25 @@ describe('ClickerGame chapter and health text', () => {
     });
 });
 
+describe('ClickerGame element wheel', () => {
+    it('shows the element wheel without blocking clicks', async () => {
+        const ctx = await createScene();
+        const element = ctx.doms.find((dom) => dom.node.querySelector('[data-testid="element-wheel"]'));
+
+        expect(element).toBeDefined();
+        expect(element.pointerEvents).toBe('none');
+    });
+
+    it('keeps the wheel on screen while a hero screen is open', async () => {
+        const ctx = await createScene();
+
+        await ctx.scene.heroUi.show('heroes');
+
+        expect(ctx.hud('[data-testid="element-wheel"]')).not.toBeNull();
+        expect(ctx.hud('[data-testid="element-wheel"]').closest('[hidden]')).toBeNull();
+    });
+});
+
 describe('ClickerGame monster death', () => {
     const kill = (ctx) => {
         for (let i = 0; i < 10; i++)

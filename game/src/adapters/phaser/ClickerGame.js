@@ -6,6 +6,7 @@ import { healthText, Monster } from '../../domain/combat/monster';
 import { SkillCombat } from '../../domain/skills/skillCombat';
 import { HeroUi } from './HeroUi';
 import { el } from './views/dom';
+import { renderElementWheel } from './views/elementWheel';
 import { renderEffectTags } from './views/skillEffects';
 
 //  The leader hero stands on the ground line of the monster; y is its feet
@@ -27,6 +28,9 @@ const WALLET_HTML = '<div class="hud-box hud-wallet"><div class="wallet"></div><
 const STAGE_HUD = { x: 356, y: 44 };
 //  Under the logo, top left
 const CHAPTER_HUD = { x: 82, y: 96 };
+//  Above the leader's head, left of the monster
+const ELEMENT_WHEEL = { x: 108, y: 224 };
+const ELEMENT_WHEEL_HTML = '<div class="hud-box hud-wheel"></div>';
 //  Top centre of the screen, in the row of the stage and wallet pills
 const BOSS_TIMER = { x: 512, y: 44 };
 //  Under the monster, clear of the damage numbers that rise above its health bar
@@ -131,6 +135,7 @@ export class ClickerGame extends Scene
         //  Stage position, boss countdown and messages are real HTML too, click-through like the wallet text
         this.stageHud = this.createHtml(STAGE_HUD, STAGE_HUD_HTML, '.stage-hud');
         this.chapterHud = this.createHtml(CHAPTER_HUD, CHAPTER_HUD_HTML, '.chapter-hud');
+        this.createHtml(ELEMENT_WHEEL, ELEMENT_WHEEL_HTML, '.hud-wheel').append(renderElementWheel());
         this.bossTimer = this.createHtml(BOSS_TIMER, BOSS_TIMER_HTML, '.boss-timer');
         this.enemyStats = this.createHtml(ENEMY_STATS, ENEMY_STATS_HTML, '.enemy-stats');
         this.effectTags = this.createHtml(EFFECTS, EFFECTS_HTML, '.effect-tags');

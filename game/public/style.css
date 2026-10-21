@@ -419,6 +419,11 @@ button:disabled {
     height: 16px;
 }
 
+.hud-wheel {
+    width: 204px;
+    height: 206px;
+}
+
 .hud-wallet {
     width: 228px;
     height: 56px;
@@ -1321,4 +1326,144 @@ button:disabled {
 
 .equip-button[data-testid="piece-refine"]:hover:not(:disabled) {
     background: var(--color-accent-600);
+}
+
+/* ══ Element wheel: the triad fire > nature > water > fire, and the light and darkness pair ══ */
+
+.element-wheel {
+    position: relative;
+    box-sizing: border-box;
+    width: 204px;
+    height: 206px;
+    padding: 6px 8px 8px;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+    box-shadow: var(--shadow-lg);
+    pointer-events: none;
+}
+
+.wheel-title {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    text-align: center;
+    color: var(--color-neutral-800);
+}
+
+.wheel-triad {
+    position: relative;
+    width: 150px;
+    height: 100px;
+    margin: 2px auto 0;
+}
+
+.wheel-badge {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border-radius: 50%;
+    box-shadow: inset 0 -4px 6px rgb(0 0 0 / 0.25), 0 2px 4px rgb(0 0 0 / 0.3);
+}
+
+.wheel-glyph {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.wheel-name {
+    position: absolute;
+    top: 31px;
+    font-size: 9px;
+    font-weight: 800;
+    white-space: nowrap;
+    color: var(--color-neutral-900);
+}
+
+.wheel-fire { background: radial-gradient(circle at 35% 30%, #ffc27a, #e8643c 70%); }
+.wheel-nature { background: radial-gradient(circle at 35% 30%, #c8f08a, #4f9a3c 70%); }
+.wheel-water { background: radial-gradient(circle at 35% 30%, #a8e0ff, #3f8fd1 70%); }
+.wheel-light { background: radial-gradient(circle at 35% 30%, #fffbe0, #f2c94c 70%); }
+.wheel-darkness { background: radial-gradient(circle at 35% 30%, #a99bd6, #4a3a7a 70%); }
+
+/* The arrows are lines turned to the angle JS gives them; the head is a CSS triangle at the end */
+.wheel-arrow {
+    position: absolute;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-accent-700));
+    transform-origin: center;
+}
+
+.wheel-arrow::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: -4px;
+    border: 5.5px solid transparent;
+    border-left: 8px solid var(--color-accent-700);
+    border-right: 0;
+}
+
+.wheel-arrow-label {
+    position: absolute;
+    padding: 0 4px;
+    font-family: var(--font-heading);
+    font-size: 11px;
+    line-height: 14px;
+    color: var(--color-bg);
+    border-radius: 999px;
+    background: var(--color-accent-700);
+    transform: translate(-50%, -50%);
+}
+
+.wheel-pair {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 30px;
+    margin-top: 8px;
+}
+
+.wheel-pair .wheel-badge {
+    position: relative;
+    margin: 0;
+}
+
+.wheel-pair .wheel-name {
+    top: 31px;
+}
+
+.wheel-pair-link,
+.wheel-vs-triad {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    color: var(--color-neutral-800);
+}
+
+.wheel-vs-triad {
+    position: absolute;
+    right: 2px;
+    top: 4px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--color-surface);
+}
+
+.wheel-vs-triad::after {
+    content: ' vs trio';
+    font-family: var(--font-body);
+    font-size: 8.5px;
+    font-weight: 700;
+}
+
+.wheel-rule {
+    margin: 18px 0 0;
+    font-size: 9px;
+    line-height: 1.15;
+    text-align: center;
+    color: var(--color-neutral-700);
 }
