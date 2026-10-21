@@ -100,10 +100,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Rows keyed by (username, talent id) with a foreign key to `users` that cascades on delete
-- [ ] `findAll` returns only the player's levels; `save` inserts then updates
-- [ ] `ddl-auto: validate` still passes with the new entity
-- [ ] Gate check passes: `cd backend && ./gradlew test --tests '*Talent*' --tests '*SchemaValidationIT'`
+- [x] Rows keyed by (username, talent id) with a foreign key to `users` that cascades on delete
+- [x] `findAll` returns only the player's levels; `save` inserts then updates
+- [x] `ddl-auto: validate` still passes with the new entity
+- [x] Gate check passes: `cd backend && ./gradlew test --tests '*Talent*' --tests '*SchemaValidationIT'`
 
 **Tests**: integration
 **Gate**: full
