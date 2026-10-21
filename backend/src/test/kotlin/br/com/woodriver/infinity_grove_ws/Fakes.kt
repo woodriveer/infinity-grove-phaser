@@ -24,6 +24,7 @@ import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenSecretPort
+import br.com.woodriver.infinity_grove_ws.port.TalentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.WalletRepositoryPort
 import java.time.Clock
@@ -240,6 +241,24 @@ class InMemoryEquipmentRepository : EquipmentRepositoryPort {
 
     override fun deleteByUsername(username: String) {
         pieces.values.removeIf { it.username == username }
+    }
+}
+
+class InMemoryTalentRepository : TalentRepositoryPort {
+    val levels = linkedMapOf<Pair<String, String>, Int>()
+
+    override fun findAll(username: String) = levels.filterKeys { it.first == username }.mapKeys { it.key.second }
+
+    override fun save(
+        username: String,
+        talentId: String,
+        level: Int,
+    ) {
+        levels[username to talentId] = level
+    }
+
+    override fun deleteByUsername(username: String) {
+        levels.keys.removeIf { it.first == username }
     }
 }
 

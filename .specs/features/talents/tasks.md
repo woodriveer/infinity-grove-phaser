@@ -127,9 +127,9 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] An upgrade takes the copper and raises the level in one transaction
-- [ ] A wrong `fromLevel`, a max level, a short wallet and an unknown talent leave the level and the wallet unchanged
-- [ ] Gate check passes: `cd backend && ./gradlew test --tests '*Talent*'`
+- [x] An upgrade takes the copper and raises the level in one transaction
+- [x] A wrong `fromLevel`, a max level, a short wallet and an unknown talent leave the level and the wallet unchanged
+- [x] Gate check passes: `cd backend && ./gradlew test --tests '*Talent*'`
 
 **Tests**: unit
 **Gate**: quick
