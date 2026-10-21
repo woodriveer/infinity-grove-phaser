@@ -315,9 +315,9 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Tag text `Ventos Ligeiros 12s`; Poison `Bomba de Veneno x2 5s`
-- [ ] Order preserved; empty list renders nothing
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Tag text `Ventos Ligeiros 12s`; Poison `Bomba de Veneno x2 5s`
+- [x] Order preserved; empty list renders nothing
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
