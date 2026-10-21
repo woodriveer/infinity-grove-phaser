@@ -95,9 +95,9 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] With `forceCritical` a defender with crit resistance 100 still takes the critical multiplier
-- [ ] Without it, behavior and existing tests are unchanged
-- [ ] Gate check passes: `cd game && npm test`
+- [x] With `forceCritical` a defender with crit resistance 100 still takes the critical multiplier
+- [x] Without it, behavior and existing tests are unchanged
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick

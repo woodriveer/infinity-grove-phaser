@@ -146,3 +146,16 @@ describe('boss damage', () => {
         expect(calculateDamage({ attacker, defender: enemy('FIRE'), random: always, boss: true })).toEqual({ damage: 2.4, critical: true });
     });
 });
+
+describe('calculateDamage with a forced critical', () => {
+    it('is critical against a defender with critical resistance 100, which never crits otherwise', () => {
+        const defender = enemy('FIRE', 0, 0, 100);
+
+        expect(calculateDamage({ defender, random: always }).critical).toBe(false);
+        expect(calculateDamage({ defender, random: never, forceCritical: true })).toEqual({ damage: 2, critical: true });
+    });
+
+    it('leaves the roll in charge when it is not forced', () => {
+        expect(calculateDamage({ defender: enemy('FIRE'), random: never, forceCritical: false })).toEqual({ damage: 1, critical: false });
+    });
+});
