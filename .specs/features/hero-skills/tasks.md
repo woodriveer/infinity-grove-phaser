@@ -176,11 +176,11 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Use applies the hits to the monster and starts the cooldown per (hero, slot)
-- [ ] Locked, cooling or no living monster: nothing changes
-- [ ] Flecha Dupla rolls twice and its second arrow does not land if the first kills
-- [ ] Cooldown state `ready`/`cooling` with seconds rounded up; survives a leader change
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Use applies the hits to the monster and starts the cooldown per (hero, slot)
+- [x] Locked, cooling or no living monster: nothing changes
+- [x] Flecha Dupla rolls twice and its second arrow does not land if the first kills
+- [x] Cooldown state `ready`/`cooling` with seconds rounded up; survives a leader change
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
