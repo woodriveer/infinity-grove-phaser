@@ -235,9 +235,9 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] With the talents unloaded the fight has no talent effect
-- [ ] A click, a skill hit and a tick use the break; a miniboss and the chapter boss get their own time bonus
-- [ ] Gate check passes: `cd game && npm test && npm run test:e2e`
+- [x] With the talents unloaded the fight has no talent effect
+- [x] A click, a skill hit and a tick use the break; a miniboss and the chapter boss get their own time bonus
+- [x] Gate check passes: `cd game && npm test && npm run test:e2e`
 
 **Tests**: unit, e2e
 **Gate**: full

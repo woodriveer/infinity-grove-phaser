@@ -5,6 +5,7 @@ import { createCampaignSession } from '../../application/campaign/campaignSessio
 import { createEquipmentCollection } from '../../application/equipment/equipmentCollection';
 import { createFarmSession } from '../../application/farm/farmSession';
 import { createHeroCollection } from '../../application/heroes/heroCollection';
+import { createTalentCollection } from '../../application/talents/talentCollection';
 import { createWalletSync } from '../../application/wallet/walletSync';
 
 vi.mock('phaser', () => ({
@@ -19,6 +20,7 @@ const campaignGateway = { get: vi.fn(), report: vi.fn() };
 //  The real hero collection and farm session over mocked gateways; by default the player owns Kael with one blank card
 const heroesGateway = { list: vi.fn(), fuse: vi.fn(), setLeader: vi.fn() };
 const farmGateway = { get: vi.fn(), win: vi.fn() };
+const talentGateway = { list: vi.fn(), upgrade: vi.fn() };
 const equipmentGateway = { list: vi.fn(), equip: vi.fn(), unequip: vi.fn(), refine: vi.fn(), reroll: vi.fn(), sell: vi.fn() };
 //  The critical roll: 0.99 never crits a monster of the default stats (10 % chance); a test sets `dice.value` to force one
 const dice = { value: 0.99 };
@@ -28,6 +30,7 @@ const services = {
     createCampaignSession: () => createCampaignSession({ gateway: campaignGateway }),
     createHeroCollection: () => createHeroCollection({ gateway: heroesGateway }),
     createEquipmentCollection: () => createEquipmentCollection({ gateway: equipmentGateway }),
+    createTalentCollection: () => createTalentCollection({ gateway: talentGateway }),
     createFarmSession: () => createFarmSession({ gateway: farmGateway })
 };
 
@@ -62,10 +65,13 @@ const walletResponse = (coins = { gold: 2, silver: 14, copper: 37 }, drops = { 1
 
 //  Minimal Phaser stand-in: records what ClickerGame adds and exposes the click handler and tweens.
 //  `wallet` is what GET /wallet answers: a response object, an Error to reject with, or omitted to never answer.
-const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] } } = {}) => {
+const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] }, talents = [] } = {}) => {
     dice.value = 0.99;
     Object.values(equipmentGateway).forEach((mock) => mock.mockReset());
     equipmentGateway.list.mockImplementation(() => (equipment instanceof Error ? Promise.reject(equipment) : Promise.resolve(equipment)));
+    talentGateway.list.mockReset();
+    talentGateway.upgrade.mockReset();
+    talentGateway.list.mockImplementation(() => (talents instanceof Error ? Promise.reject(talents) : Promise.resolve({ talents })));
     heroesGateway.list.mockReset();
     heroesGateway.fuse.mockReset();
     heroesGateway.setLeader.mockReset();
@@ -2918,6 +2924,140 @@ describe('ClickerGame star bonus', () => {
         ctx.click();
 
         expect(ctx.texts.at(-1).text).toBe('1');
+    });
+});
+
+describe('ClickerGame talents in combat', () => {
+    const tree = (levels = {}) => [
+        [ 'MINIBOSS_TIME', 2 ], [ 'BOSS_TIME', 3 ], [ 'PHYSICAL_BREAK', 1 ], [ 'MAGICAL_BREAK', 1 ], [ 'CRIT_RESIST_BREAK', 1 ],
+        [ 'CLICK_DAMAGE', 3 ], [ 'CRIT_CHANCE', 1 ], [ 'CRIT_DAMAGE', 5 ]
+    ].map(([ id, perLevel ]) => ({ id, perLevel, maxLevel: 10, level: levels[id] ?? 0, value: (levels[id] ?? 0) * perLevel, nextCost: 300 }));
+    const bigMonsters = (monster, extra = {}) => ({
+        ...progress(1, 'PHASE', 1),
+        definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000, monster, ...extra })) }
+    });
+    const fire = (physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element: 'FIRE', physicalDefense, magicalDefense, critResistance });
+
+    it('adds CLICK_DAMAGE 5 (+15 %) to the click: 1.15 damage', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire()), talents: tree({ CLICK_DAMAGE: 5 }) });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBeCloseTo(1000 - 1.15, 10);
+    });
+
+    it('adds CRIT_CHANCE 4 to the 10 % base: a roll of 13 crits and a roll of 14 does not', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire()), talents: tree({ CRIT_CHANCE: 4 }) });
+
+        ctx.dice.value = 0.13;
+        ctx.click();
+        expect(ctx.texts.at(-1).text).toBe('2');
+
+        ctx.dice.value = 0.14;
+        ctx.click();
+        expect(ctx.texts.at(-1).text).toBe('1');
+    });
+
+    it('adds CRIT_DAMAGE 6 (+30 %) to the critical multiplier: a critical click deals 2.3', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire()), talents: tree({ CRIT_DAMAGE: 6 }) });
+
+        ctx.dice.value = 0;
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBeCloseTo(1000 - 2.3, 10);
+    });
+
+    it('lowers the physical defense by 5 points with PHYSICAL_BREAK 5: a click against defense 20 deals 0.85, not 0.8', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire(20)), talents: tree({ PHYSICAL_BREAK: 5 }) });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBeCloseTo(1000 - 0.85, 10);
+    });
+
+    it('shows the lowered defenses on the enemy tags and keeps the stats of the monster itself', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire(20, 20, 20)), talents: tree({ PHYSICAL_BREAK: 5, MAGICAL_BREAK: 3, CRIT_RESIST_BREAK: 8 }) });
+
+        expect(ctx.hud('.enemy-stats').textContent).toContain('Physical def 15%');
+        expect(ctx.hud('.enemy-stats').textContent).toContain('Magical def 17%');
+        expect(ctx.hud('.enemy-stats').textContent).toContain('Crit res 12%');
+        expect(ctx.scene.monster.stats.physicalDefense).toBe(20);
+    });
+
+    it('lowers the critical resistance by 8 points: resistance 20 and CRIT_RESIST_BREAK 8 make a roll of 9 crit at 10 %', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire(0, 0, 20)), talents: tree({ CRIT_RESIST_BREAK: 20 }) });
+
+        ctx.dice.value = 0.09;
+        ctx.click();
+
+        expect(ctx.texts.at(-1).text).toBe('2');
+    });
+
+    it('adds 10 s to the limit of a miniboss with MINIBOSS_TIME 5 and nothing to a chapter boss', async () => {
+        const miniboss = await createScene({ start: progress(1, 'MINIBOSS', 1), talents: tree({ MINIBOSS_TIME: 5 }) });
+        const boss = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1), talents: tree({ MINIBOSS_TIME: 5 }) });
+
+        expect(miniboss.scene.countdown.limitMs).toBe(40_000);
+        expect(boss.scene.countdown.limitMs).toBe(60_000);
+    });
+
+    it('adds 12 s to the limit of the chapter boss with BOSS_TIME 4 and nothing to a miniboss', async () => {
+        const boss = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1), talents: tree({ BOSS_TIME: 4 }) });
+        const miniboss = await createScene({ start: progress(1, 'MINIBOSS', 1), talents: tree({ BOSS_TIME: 4 }) });
+
+        expect(boss.scene.countdown.limitMs).toBe(72_000);
+        expect(miniboss.scene.countdown.limitMs).toBe(30_000);
+    });
+
+    it('adds the time talents to the time of the equipment', async () => {
+        const piece = { id: 'p', slot: 'RING', rarity: 'COMMON', refine: 0, affixes: [ { type: 'BOSS_TIME_SECONDS', value: 5 } ], sellPrice: 100, heroId: 'kael' };
+        const ctx = await createScene({ start: progress(1, 'MINIBOSS', 1), equipment: { capacity: 100, pieces: [ piece ] }, talents: tree({ MINIBOSS_TIME: 5 }) });
+
+        //  The equipment loads in the background too; the encounter starts after both
+        ctx.scene.showEncounter(ctx.scene.session.encounter());
+
+        expect(ctx.scene.countdown.limitMs).toBe(45_000);
+    });
+
+    it('fights with no talent effect while they cannot be loaded, and tries again on the next tick', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire(20)), talents: new ApiError('down', { status: 500 }) });
+
+        ctx.click();
+        expect(ctx.scene.monster.health).toBeCloseTo(1000 - 0.8, 10);
+        expect(talentGateway.list).toHaveBeenCalledTimes(1);
+
+        talentGateway.list.mockResolvedValue({ talents: tree({ PHYSICAL_BREAK: 5 }) });
+        ctx.loops[0].callback();
+        await flush();
+        ctx.dice.value = 0.99;
+        const before = ctx.scene.monster.health;
+
+        ctx.scene.update(0, 2000);
+        ctx.click();
+
+        expect(talentGateway.list).toHaveBeenCalledTimes(2);
+        expect(before - ctx.scene.monster.health).toBeCloseTo(0.85, 10);
+    });
+
+    it('uses an upgraded talent on the next click and shows the wallet the backend answered', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire()), talents: tree() });
+
+        talentGateway.upgrade.mockResolvedValue({ talents: tree({ CLICK_DAMAGE: 1 }), wallet: { gold: 0, silver: 7, copper: 0 } });
+        await ctx.scene.talents.upgrade('CLICK_DAMAGE', 0);
+        ctx.click();
+
+        expect(talentGateway.upgrade).toHaveBeenCalledWith('CLICK_DAMAGE', 0);
+        expect(ctx.scene.monster.health).toBeCloseTo(1000 - 1.03, 10);
+        expect(ctx.scene.wallet.display()).toEqual({ gold: 0, silver: 7, copper: 0 });
+    });
+
+    it('updates the enemy tags when a break talent is upgraded', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire(20)), talents: tree() });
+
+        talentGateway.upgrade.mockResolvedValue({ talents: tree({ PHYSICAL_BREAK: 1 }), wallet: { gold: 0, silver: 0, copper: 0 } });
+        await ctx.scene.talents.upgrade('PHYSICAL_BREAK', 0);
+
+        expect(ctx.hud('.enemy-stats').textContent).toContain('Physical def 19%');
     });
 });
 

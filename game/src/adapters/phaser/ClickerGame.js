@@ -7,6 +7,7 @@ import { bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/eq
 import { healthText, Monster } from '../../domain/combat/monster';
 import { clickHits } from '../../domain/heroes/leaderBonus';
 import { SkillCombat } from '../../domain/skills/skillCombat';
+import { monsterAfterBreak, talentTimeBonusMs } from '../../domain/talents/talents';
 import { HeroUi } from './HeroUi';
 import { el } from './views/dom';
 import { renderElementWheel } from './views/elementWheel';
@@ -95,7 +96,8 @@ export class ClickerGame extends Scene
         this.countdown = null;
         this.generation = 0;
         this.random = services.random ?? Math.random;
-        this.skills = new SkillCombat({ random: this.random });
+        //  The break talents lower the stats of the monster at the moment of every hit, so an upgrade counts from the next click
+        this.skills = new SkillCombat({ random: this.random, statsOf: (monster) => monsterAfterBreak(monster.stats, this.talents.talents()) });
         this.combo = new Combo();
         this.effectsKey = '';
         this.loadingCampaign = false;
@@ -103,11 +105,14 @@ export class ClickerGame extends Scene
         this.farmBoss = null;
         this.heroes = services.createHeroCollection();
         this.equipment = services.createEquipmentCollection();
+        this.talents = services.createTalentCollection();
         this.farm = services.createFarmSession();
         this.session.onRealign((encounter) => this.realign(encounter));
         this.session.onDrop((drop) => this.receiveDrop(drop));
         this.session.onEquipmentDrop((drop) => this.receiveEquipmentDrop(drop));
         this.equipment.onWallet((coins) => this.receiveWallet(coins));
+        this.talents.onWallet((coins) => this.receiveWallet(coins));
+        this.talents.onChange(() => this.refreshEnemyStats());
 
         this.add.image(512, 384, 'background');
 
@@ -221,6 +226,7 @@ export class ClickerGame extends Scene
         this.heroes.onChange(() => this.showCharacter());
         this.loadHeroes();
         this.loadEquipment();
+        this.loadTalents();
     }
 
     //  The sprite of the leader hero replaces itself when the leader changes; nothing shows until the heroes load
@@ -268,6 +274,18 @@ export class ClickerGame extends Scene
         catch
         {
             //  The click keeps the attacker it had; the next tick tries again
+        }
+    }
+
+    async loadTalents ()
+    {
+        try
+        {
+            await this.talents.load();
+        }
+        catch
+        {
+            //  The fight has no talent effect; the next tick tries again
         }
     }
 
@@ -443,12 +461,22 @@ export class ClickerGame extends Scene
         this.monsterParts.forEach((part) => part.setAlpha(1));
         this.stageHud.textContent = encounter.label;
         this.chapterHud.textContent = `Capítulo ${this.session.chapter}`;
-        this.showEnemyStats(encounter.stats);
+        this.monsterStats = encounter.stats;
+        this.showEnemyStats(monsterAfterBreak(encounter.stats, this.talents.talents()));
 
         if (encounter.timeLimitMs)
         {
-            this.countdown = new BossCountdown(encounter.timeLimitMs + bossTimeBonusMs(this.leaderPieces()));
+            this.countdown = new BossCountdown(encounter.timeLimitMs + bossTimeBonusMs(this.leaderPieces()) + talentTimeBonusMs(this.talents.talents(), encounter));
             this.showCountdown();
+        }
+    }
+
+    //  The tags follow the break talents: the defenses the monster has now
+    refreshEnemyStats ()
+    {
+        if (this.monster && !this.monster.dead && this.monsterStats)
+        {
+            this.showEnemyStats(monsterAfterBreak(this.monsterStats, this.talents.talents()));
         }
     }
 
@@ -569,7 +597,7 @@ export class ClickerGame extends Scene
     //  load it keeps the default attacker
     leaderAttacker ()
     {
-        return leaderAttacker({ leader: this.heroes.leader(), pieces: this.leaderPieces() });
+        return leaderAttacker({ leader: this.heroes.leader(), pieces: this.leaderPieces(), talents: this.talents.talents() });
     }
 
     //  The leader uses the skill of `slot` (a click on its slot or the key 1, 2 or 3) on the monster on screen. A countdown means a boss.
@@ -672,6 +700,11 @@ export class ClickerGame extends Scene
         if (!this.equipment.loaded)
         {
             this.loadEquipment();
+        }
+
+        if (!this.talents.loaded)
+        {
+            this.loadTalents();
         }
     }
 
