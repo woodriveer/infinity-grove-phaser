@@ -118,10 +118,10 @@ T1 → T2 → T3
 
 **Done when**:
 
-- [ ] e2e: at stage 4 with 3 minibosses beaten the states read 3 defeated, 1 current and the rest locked, and a click on stop 2 starts the farm
-- [ ] The existing farm e2e follow the map
-- [ ] A test reads `PROMPTS_ASSETS_UI.md` and finds `boss-map.jpg` and the 11 positions of the layout table
-- [ ] Gate check passes: `cd game && npm test && npm run build && npm run test:e2e`
+- [x] e2e: at stage 4 with 3 minibosses beaten the states read 3 defeated, 1 current and the rest locked, and a click on stop 2 starts the farm
+- [x] The existing farm e2e follow the map
+- [x] A test reads `PROMPTS_ASSETS_UI.md` and finds `boss-map.jpg` and the 11 positions of the layout table
+- [x] Gate check passes: `cd game && npm test && npm run build && npm run test:e2e`
 
 **Tests**: unit, e2e
 **Gate**: build

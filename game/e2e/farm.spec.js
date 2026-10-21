@@ -42,8 +42,10 @@ test.describe('Rever chefes', () => {
 
         await openFarm(page);
 
-        await expect(page.getByTestId('farm-entry-miniboss-1')).toHaveText('Miniboss 1');
-        await expect(page.getByTestId('farm-entry-chapter-boss')).toContainText('Chefe do capítulo');
+        await expect(page.getByTestId('farm-entry-miniboss-1')).toHaveAttribute('aria-label', 'Miniboss 1');
+        await expect(page.getByTestId('farm-entry-miniboss-1')).toHaveText('1');
+        await expect(page.getByTestId('farm-entry-chapter-boss')).toHaveAttribute('aria-label', 'Chefe do capítulo');
+        await expect(page.getByTestId('farm-entry-chapter-boss')).toContainText('Chefe');
         await expect(page.getByTestId('farm-entry-chapter-boss')).toContainText('10 vitórias restantes hoje');
         await expect(page.getByTestId('farm-entry-chapter-boss')).toBeEnabled();
     });
