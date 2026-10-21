@@ -734,8 +734,10 @@ describe('HeroUi Equipamento', () => {
         expect(ctx.equipmentGateway.list).toHaveBeenCalledTimes(1);
         expect(ctx.query('.hero-title').textContent).toBe('Equipamento');
         expect(ctx.testid('equip-hero-kael')).not.toBeNull();
-        expect(ctx.testid('equip-slot-kael-WEAPON').textContent).toBe('ArmaComum Arma +0');
-        expect(ctx.testid('equip-piece-r1').textContent).toBe('Comum Anel +0');
+        //  The pieces are tiles now: the title is the accessible name, the tooltip shows it on hover
+        expect(ctx.testid('equip-slot-kael-WEAPON').getAttribute('aria-label')).toBe('Comum Arma +0');
+        expect(ctx.testid('equip-piece-r1').getAttribute('aria-label')).toBe('Comum Anel +0');
+        expect(ctx.testid('equip-slot-kael-RING').textContent).toBe('vazio');
     });
 
     it('says there is no equipment yet', async () => {

@@ -141,10 +141,10 @@ T1 → T2 → T3 → T4 → T5 → T6
 
 **Done when**:
 
-- [ ] Hover shows the title, the weapon line, one line per affix and `Equipado em <nome>` or `Na mochila`, with no button; leaving hides it
-- [ ] A click opens the piece detail with its actions; an empty slot is a dashed tile `vazio` without a click
-- [ ] The bag title reads `Mochila (<n>)` and the empty text is unchanged
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Hover shows the title, the weapon line, one line per affix and `Equipado em <nome>` or `Na mochila`, with no button; leaving hides it
+- [x] A click opens the piece detail with its actions; an empty slot is a dashed tile `vazio` without a click
+- [x] The bag title reads `Mochila (<n>)` and the empty text is unchanged
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick

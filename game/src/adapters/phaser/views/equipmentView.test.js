@@ -37,8 +37,10 @@ describe('renderEquipment', () => {
     it('names the piece worn in a slot and marks the others as empty', () => {
         const screen = renderEquipment([ weapon({ heroId: 'kael' }) ], heroes, { onSelect: vi.fn() });
 
-        expect(text(screen, 'equip-slot-kael-WEAPON')).toBe('ArmaRaro Arma +3');
-        expect(text(screen, 'equip-slot-kael-RING')).toBe('Anelvazio');
+        expect(screen.querySelector('[data-testid="equip-slot-kael-WEAPON"]').getAttribute('aria-label')).toBe('Raro Arma +3');
+        expect(text(screen, 'equip-slot-kael-WEAPON')).toBe('+3');
+        expect(text(screen, 'equip-slot-kael-RING')).toBe('vazio');
+        expect(screen.querySelector('[data-testid="equip-slot-kael-RING"]').classList.contains('is-empty')).toBe(true);
         expect(screen.querySelector('[data-testid="equip-slot-kael-RING"]').disabled).toBe(true);
         expect(screen.querySelector('[data-testid="equip-slot-kael-WEAPON"]').disabled).toBe(false);
     });
@@ -47,7 +49,7 @@ describe('renderEquipment', () => {
         const screen = renderEquipment([ weapon({ heroId: 'kael' }), ring() ], heroes, { onSelect: vi.fn() });
 
         expect(screen.querySelector('[data-testid="equip-piece-w1"]')).toBeNull();
-        expect(text(screen, 'equip-piece-r1')).toBe('Comum Anel +0');
+        expect(screen.querySelector('[data-testid="equip-piece-r1"]').getAttribute('aria-label')).toBe('Comum Anel +0');
         expect(screen.querySelector('.equip-bag-title').textContent).toBe('Mochila (1)');
     });
 
@@ -93,6 +95,83 @@ describe('renderLeaderStats', () => {
 
     it('shows no panel without a leader', () => {
         expect(renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), stats: null }).querySelector('[data-testid="leader-stats"]')).toBeNull();
+    });
+});
+
+describe('renderEquipment tiles and tooltip', () => {
+    const enter = (node) => node.dispatchEvent(new Event('pointerenter'));
+    const leave = (node) => node.dispatchEvent(new Event('pointerleave'));
+    const tile = (screen, id) => screen.querySelector(`[data-testid="${id}"]`);
+
+    it('shows each bag piece as a tile with the class and the attributes of its rarity, in a grid', () => {
+        const screen = renderEquipment([ ring(), weapon({ id: 'w2' }) ], heroes, { onSelect: vi.fn() });
+
+        expect(screen.querySelector('[data-testid="equipment-bag"]').classList.contains('bag-grid')).toBe(true);
+        expect(tile(screen, 'equip-piece-r1').getAttribute('data-rarity')).toBe('COMMON');
+        expect(tile(screen, 'equip-piece-w2').classList.contains('rarity-rare')).toBe(true);
+    });
+
+    it('shows the tooltip of a bag tile on hover: title, weapon line, affixes and Na mochila, with no button', () => {
+        const screen = renderEquipment([ weapon({ id: 'w2' }) ], heroes, { onSelect: vi.fn() });
+
+        enter(tile(screen, 'equip-piece-w2'));
+
+        const tooltip = screen.querySelector('[data-testid="piece-tooltip"]');
+
+        expect(tooltip.querySelector('.piece-tooltip-title').textContent).toBe('Raro Arma +3');
+        expect([ ...tooltip.querySelectorAll('.piece-tooltip-line') ].map((line) => line.textContent)).toEqual([ 'Dano de clique: 5.2', 'Dano crítico +27%', 'Tempo extra de chefe +2s' ]);
+        expect(tooltip.querySelector('.piece-tooltip-worn').textContent).toBe('Na mochila');
+        expect(tooltip.querySelector('button')).toBeNull();
+    });
+
+    it('names the hero in the tooltip of a worn tile: Equipado em Hero kael', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }) ], heroes, { onSelect: vi.fn() });
+
+        enter(tile(screen, 'equip-slot-kael-WEAPON'));
+
+        expect(screen.querySelector('.piece-tooltip-worn').textContent).toBe('Equipado em Hero kael');
+    });
+
+    it('has no weapon line for a ring: only its affix lines', () => {
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn() });
+
+        enter(tile(screen, 'equip-piece-r1'));
+
+        expect([ ...screen.querySelectorAll('.piece-tooltip-line') ].map((line) => line.textContent)).toEqual([ 'Dano de clique +7%' ]);
+    });
+
+    it('hides the tooltip when the pointer leaves the tile', () => {
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn() });
+
+        enter(tile(screen, 'equip-piece-r1'));
+        leave(tile(screen, 'equip-piece-r1'));
+
+        expect(screen.querySelector('[data-testid="piece-tooltip"]')).toBeNull();
+    });
+
+    it('opens the actions only on a click, not on hover', () => {
+        const onSelect = vi.fn();
+        const screen = renderEquipment([ ring() ], heroes, { onSelect });
+
+        enter(tile(screen, 'equip-piece-r1'));
+        expect(onSelect).not.toHaveBeenCalled();
+
+        tile(screen, 'equip-piece-r1').click();
+        expect(onSelect).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows a worn tile with its tooltip and a dashed empty tile without one', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }) ], heroes, { onSelect: vi.fn() });
+
+        enter(tile(screen, 'equip-slot-kael-RING'));
+
+        expect(screen.querySelector('[data-testid="piece-tooltip"]')).toBeNull();
+    });
+
+    it('keeps the slot names above the tiles of every hero', () => {
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn() });
+
+        expect([ ...screen.querySelectorAll('[data-testid="equip-hero-kael"] .equip-slot-name') ].map((name) => name.textContent)).toEqual([ 'Arma', 'Armadura', 'Anel', 'Amuleto' ]);
     });
 });
 

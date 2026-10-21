@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { PLAYER } from '../combat/damage';
 import {
-    applyEquipmentDrop, attackerFor, bossTimeBonusMs, describeAffix, describeClickDamage, dropLabel, formatCopper, pieceTitle, walletCopper, wornBy
+    applyEquipmentDrop, attackerFor, bossTimeBonusMs, describeAffix, describeClickDamage, dropLabel, formatCopper, pieceLines, pieceTitle, walletCopper, wornBy
 } from './equipment';
 
 const piece = (extra = {}) => ({
@@ -167,5 +167,21 @@ describe('pieceTitle', () => {
         expect(pieceTitle(piece({ slot: 'AMULET', rarity: 'LEGENDARY', refine: 10 }))).toBe('Lendário Amuleto +10');
         expect(pieceTitle(piece({ slot: 'ARMOR', rarity: 'EPIC', refine: 1 }))).toBe('Épico Armadura +1');
         expect(pieceTitle(piece({ slot: 'ARMOR', rarity: 'UNCOMMON', refine: 2 }))).toBe('Incomum Armadura +2');
+    });
+});
+
+describe('pieceLines', () => {
+    it('puts the weapon click damage first and then one line per affix', () => {
+        expect(pieceLines(weapon(3.3, [ affix('CRIT_DAMAGE_PCT', 27), affix('BOSS_TIME_SECONDS', 2) ]))).toEqual([
+            'Dano de clique: 3.3', 'Dano crítico +27%', 'Tempo extra de chefe +2s'
+        ]);
+    });
+
+    it('has no click damage line for a piece that is not a weapon', () => {
+        expect(pieceLines(piece({ affixes: [ affix('CLICK_DAMAGE_PCT', 7) ] }))).toEqual([ 'Dano de clique +7%' ]);
+    });
+
+    it('keeps one decimal with a trailing zero on a weapon', () => {
+        expect(pieceLines(weapon(3, []))).toEqual([ 'Dano de clique: 3.0' ]);
     });
 });

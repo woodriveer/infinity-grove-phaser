@@ -1,5 +1,7 @@
-import { describeAffix, describeClickDamage, formatCopper, pieceTitle, SLOT_LABELS, SLOTS } from '../../../domain/equipment/equipment';
+import { describeAffix, formatCopper, pieceLines, pieceTitle, SLOT_LABELS, SLOTS } from '../../../domain/equipment/equipment';
 import { el } from './dom';
+import { attachPieceTooltip } from './pieceTooltip';
+import { renderEmptyTile, renderPieceTile } from './pieceTile';
 
 export const EMPTY_TEXT = 'Nenhum equipamento ainda. Vença chefes para encontrar peças.';
 export const UNAVAILABLE_TEXT = 'Equipamento indisponível';
@@ -12,12 +14,6 @@ const button = (text, testid, onClick, disabled = false) =>
 
     return node;
 };
-
-//  The text lines of a piece: the weapon click damage first, then one line per affix
-const pieceLines = (piece) => [
-    ...(piece.clickDamage == null ? [] : [ describeClickDamage(piece) ]),
-    ...piece.affixes.map(describeAffix)
-];
 
 //  The attribute panel of the leader: `Atributos de <nome>` and one line per attribute ({ id, text } from `leaderStats`)
 export const renderLeaderStats = ({ name, lines }) =>
@@ -60,6 +56,16 @@ export const renderEquipment = (pieces, heroes, { onSelect, stats = null }) =>
         screen.append(renderLeaderStats(stats));
     }
 
+    //  A tile with the tooltip of its piece; a click opens the piece with its actions
+    const tileOf = (piece, testid) =>
+    {
+        const tile = renderPieceTile(piece, { testid, onClick: onSelect });
+
+        attachPieceTooltip(tile, piece, heroes);
+
+        return tile;
+    };
+
     heroes.filter((hero) => hero.owned).forEach((hero) =>
     {
         const block = el('div', 'equip-hero', '', { testid: `equip-hero-${hero.id}` });
@@ -68,37 +74,21 @@ export const renderEquipment = (pieces, heroes, { onSelect, stats = null }) =>
         SLOTS.forEach((slot) =>
         {
             const worn = pieces.find((piece) => piece.heroId === hero.id && piece.slot === slot);
-            const row = el('button', worn ? 'equip-slot' : 'equip-slot is-empty', '', { type: 'button', testid: `equip-slot-${hero.id}-${slot}` });
+            const testid = `equip-slot-${hero.id}-${slot}`;
+            const cell = el('div', 'equip-slot-cell');
 
-            row.append(el('span', 'equip-slot-name', SLOT_LABELS[slot]), el('span', 'equip-slot-piece', worn ? pieceTitle(worn) : 'vazio'));
-
-            if (worn)
-            {
-                row.addEventListener('click', () => onSelect(worn));
-            }
-            else
-            {
-                row.disabled = true;
-            }
-
-            block.append(row);
+            cell.append(el('span', 'equip-slot-name', SLOT_LABELS[slot]), worn ? tileOf(worn, testid) : renderEmptyTile(slot, { testid }));
+            block.append(cell);
         });
         screen.append(block);
     });
 
     const bag = pieces.filter((piece) => !piece.heroId);
-    const list = el('div', 'bag-list', '', { testid: 'equipment-bag' });
+    const grid = el('div', 'bag-grid', '', { testid: 'equipment-bag' });
 
     screen.append(el('strong', 'equip-bag-title', `Mochila (${bag.length})`));
-    bag.forEach((piece) =>
-    {
-        const row = el('button', 'bag-entry', '', { type: 'button', testid: `equip-piece-${piece.id}` });
-
-        row.append(el('span', 'bag-name', pieceTitle(piece)));
-        row.addEventListener('click', () => onSelect(piece));
-        list.append(row);
-    });
-    screen.append(list);
+    bag.forEach((piece) => grid.append(tileOf(piece, `equip-piece-${piece.id}`)));
+    screen.append(grid);
 
     return screen;
 };

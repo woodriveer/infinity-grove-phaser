@@ -640,6 +640,7 @@ button:disabled {
 
 .pause-menu,
 .hero-panel {
+    position: relative;
     width: 1024px;
     height: 768px;
     display: flex;
@@ -1842,4 +1843,47 @@ button:disabled {
         animation: none;
         box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px #d9a521, 0 0 12px 3px rgb(255 214 90 / 0.65);
     }
+}
+
+/* ══ Equipamento: the slots and the bag as tiles, and the tooltip of a piece ══ */
+
+.equip-slot-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.bag-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 8px 4px;
+}
+
+.piece-tooltip {
+    position: absolute;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 230px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--color-text);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    box-shadow: var(--shadow-lg);
+    pointer-events: none;
+}
+
+.piece-tooltip-title {
+    font-family: var(--font-heading);
+    font-size: 15px;
+}
+
+.piece-tooltip-worn {
+    margin-top: 2px;
+    font-weight: 800;
+    color: var(--color-neutral-700);
 }

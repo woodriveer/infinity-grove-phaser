@@ -23,6 +23,12 @@ export const describeAffix = ({ type, value }) => `${AFFIXES[type].label} +${val
 //  "Dano de clique: 3.3" for a weapon (one decimal, trailing zero kept so a refine always shows)
 export const describeClickDamage = (piece) => `Dano de clique: ${piece.clickDamage.toFixed(1)}`;
 
+//  The text lines of a piece: the weapon click damage first, then one line per affix
+export const pieceLines = (piece) => [
+    ...(piece.clickDamage == null ? [] : [ describeClickDamage(piece) ]),
+    ...piece.affixes.map(describeAffix)
+];
+
 //  "Raro Arma +3": the title of a piece on the screens
 export const pieceTitle = (piece) => `${RARITY_LABELS[piece.rarity]} ${SLOT_LABELS[piece.slot]} +${piece.refine}`;
 
