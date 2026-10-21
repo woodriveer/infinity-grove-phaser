@@ -186,6 +186,16 @@ describe('break talents', () => {
         expect(hits[0].damage).toBeCloseTo(100 * 2 * 0.85, 6);
     });
 
+    it('applies the break to the aimed shot when the cast lands: 3000 % critical of Base 100 against defense 20 - 5 deals 5100', () => {
+        const skills = withBreak({ PHYSICAL_BREAK: 5 });
+        const monster = monsterOf(1000000, stats('FIRE', 20));
+
+        use(skills, monster, 'lyra', 2, { attacker: base100 });
+        const { hits } = skills.advance(2000, { monster });
+
+        expect(hits[0].damage).toBeCloseTo(5100, 6);
+    });
+
     it('never takes the defense below 0 together with Brado Aterrador: defense 10, break 4 and Brado deal full damage', () => {
         const skills = withBreak({ PHYSICAL_BREAK: 4 });
         const monster = monsterOf(100000, stats('FIRE', 10));
