@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { renderLeaderCard, renderSkillBar } from './skillBar';
+import { refreshSkillBar, renderLeaderCard, renderSkillBar } from './skillBar';
 
 const leader = (...unlocked) => ({
     id: 'kael',
@@ -48,13 +48,64 @@ describe('renderSkillBar', () => {
         expect(slots(renderSkillBar(null))).toHaveLength(0);
     });
 
-    it('clicking a slot does not throw and changes nothing', () => {
-        const bar = renderSkillBar(leader(true, true, false));
-        const before = bar.innerHTML;
+    it('calls onUse with the slot number when an unlocked slot is clicked', () => {
+        const used = [];
+        const bar = renderSkillBar(leader(true, true, false), { onUse: (slot) => used.push(slot) });
 
         slots(bar).forEach((slot) => slot.click());
 
+        expect(used).toEqual([ 1, 2 ]);
+    });
+
+    it('does not call onUse for a locked slot, and clicking without onUse changes nothing', () => {
+        const used = [];
+        const locked = renderSkillBar(leader(false, false, false), { onUse: (slot) => used.push(slot) });
+        const bar = renderSkillBar(leader(true, true, false));
+        const before = bar.innerHTML;
+
+        slots(locked).forEach((slot) => slot.click());
+        slots(bar).forEach((slot) => slot.click());
+
+        expect(used).toEqual([]);
         expect(bar.innerHTML).toBe(before);
+    });
+
+    it('starts unlocked slots ready and locked slots locked', () => {
+        const bar = renderSkillBar(leader(true, false, false));
+
+        expect(slots(bar).map((slot) => slot.getAttribute('data-state'))).toEqual([ 'ready', 'locked', 'locked' ]);
+    });
+});
+
+describe('refreshSkillBar', () => {
+    const states = { 1: { state: 'cooling', seconds: 7 }, 2: { state: 'casting', seconds: 2 }, 3: { state: 'ready', seconds: 0 } };
+
+    it('shows a cooling slot with the whole seconds left and a casting slot as Mirando', () => {
+        const bar = renderSkillBar(leader(true, true, true));
+
+        refreshSkillBar(bar, (slot) => states[slot]);
+
+        expect(slots(bar).map((slot) => slot.getAttribute('data-state'))).toEqual([ 'cooling', 'casting', 'ready' ]);
+        expect(slots(bar).map((slot) => slot.querySelector('.skill-slot-cooldown').textContent)).toEqual([ '7s', 'Mirando', '30s' ]);
+    });
+
+    it('shows the cooldown seconds again when a slot is ready after cooling', () => {
+        const bar = renderSkillBar(leader(true, false, false));
+
+        refreshSkillBar(bar, () => ({ state: 'cooling', seconds: 3 }));
+        refreshSkillBar(bar, () => ({ state: 'ready', seconds: 0 }));
+
+        expect(slots(bar)[0].getAttribute('data-state')).toBe('ready');
+        expect(slots(bar)[0].querySelector('.skill-slot-cooldown').textContent).toBe('10s');
+    });
+
+    it('keeps a locked slot locked with its cooldown seconds', () => {
+        const bar = renderSkillBar(leader(true, false, false));
+
+        refreshSkillBar(bar, (slot) => (slot === 1 ? { state: 'ready', seconds: 0 } : { state: 'locked', seconds: 0 }));
+
+        expect(slots(bar)[1].getAttribute('data-state')).toBe('locked');
+        expect(slots(bar)[1].querySelector('.skill-slot-cooldown').textContent).toBe('20s');
     });
 });
 

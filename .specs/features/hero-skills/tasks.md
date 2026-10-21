@@ -288,10 +288,10 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Click on an unlocked slot calls `onUse(slot)`; a locked slot does not
-- [ ] States ready, cooling, casting render the exact texts
-- [ ] Existing skillBar tests still pass
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Click on an unlocked slot calls `onUse(slot)`; a locked slot does not
+- [x] States ready, cooling, casting render the exact texts
+- [x] Existing skillBar tests still pass
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
