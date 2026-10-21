@@ -5,7 +5,7 @@ import { renderEquipment, renderEquipmentUnavailable, renderPieceDetail } from '
 import { renderFarm } from './views/farmView';
 import { renderFusion, renderFusionResult } from './views/fusionView';
 import { renderLeaderPicker } from './views/leaderView';
-import { renderLeaderCard, renderSkillBar } from './views/skillBar';
+import { refreshSkillBar, renderLeaderCard, renderSkillBar } from './views/skillBar';
 
 const HUD = { x: 956, y: 370 };
 const PANEL = { x: 512, y: 384 };
@@ -60,16 +60,17 @@ const NOTICE_HTML = '<div class="hud-box hud-notice"><div class="card-notice" da
 //  Collaborators: heroes (heroCollection), equipment (equipmentCollection), farm (farmSession) and the scene hooks
 //    walletCopper() -> the copper the player holds, to disable what costs more;
 //    pause() -> true when it paused the fight, false when the fight was already paused; resume() undoes a pause that pause() made;
-//    startFarm(boss) starts the farm fight of the chosen boss.
+//    startFarm(boss) starts the farm fight of the chosen boss;
+//    useSkill(slot) uses a skill of the leader (optional); skillState(slot) -> { state, seconds } of a slot of the leader (optional).
 export class HeroUi
 {
-    constructor (scene, { heroes, equipment, farm, pause, resume, startFarm, walletCopper })
+    constructor (scene, { heroes, equipment, farm, pause, resume, startFarm, walletCopper, useSkill, skillState })
     {
         this.scene = scene;
         this.heroes = heroes;
         this.equipment = equipment;
         this.farm = farm;
-        this.hooks = { pause, resume, startFarm, walletCopper };
+        this.hooks = { pause, resume, startFarm, walletCopper, useSkill, skillState };
         this.open = false;
         this.pausedByUs = false;
         this.view = 0;
@@ -373,7 +374,19 @@ export class HeroUi
     updateSkillBar ()
     {
         this.leaderHost.replaceChildren(renderLeaderCard(this.heroes.leader()));
-        this.barHost.replaceChildren(renderSkillBar(this.heroes.leader()));
+        this.barHost.replaceChildren(renderSkillBar(this.heroes.leader(), { onUse: (slot) => this.hooks.useSkill?.(slot) }));
+        this.refreshSkills();
+    }
+
+    //  Writes the cooldown and cast state of each slot of the bar; the scene calls it every frame
+    refreshSkills ()
+    {
+        const bar = this.barHost.querySelector('.skill-bar');
+
+        if (bar && this.hooks.skillState)
+        {
+            refreshSkillBar(bar, this.hooks.skillState);
+        }
     }
 
     //  "Carta: <nome>" for 3 s; a newer card replaces it and restarts the 3 s

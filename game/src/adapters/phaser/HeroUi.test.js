@@ -28,7 +28,7 @@ const catalog = () => ({
 
 const farmState = () => ({ bosses: [ { kind: 'MINIBOSS', stage: 1 }, { kind: 'CHAPTER_BOSS' } ], chapterBossWinsLeft: 10 });
 
-const createUi = ({ list = catalog(), farmGet = farmState(), pause = true, equipmentList = { capacity: 100, pieces: [] }, wallet = 1_000_000 } = {}) => {
+const createUi = ({ list = catalog(), farmGet = farmState(), pause = true, equipmentList = { capacity: 100, pieces: [] }, wallet = 1_000_000, skillState } = {}) => {
     const heroesGateway = {
         list: vi.fn(() => (list instanceof Error ? Promise.reject(list) : Promise.resolve(list))),
         fuse: vi.fn(),
@@ -63,7 +63,7 @@ const createUi = ({ list = catalog(), farmGet = farmState(), pause = true, equip
         },
         time: { delayedCall: vi.fn((delay, callback) => { timers.push({ delay, callback }); }) }
     };
-    const hooks = { pause: vi.fn(() => pause), resume: vi.fn(), startFarm: vi.fn(), walletCopper: vi.fn(() => wallet) };
+    const hooks = { pause: vi.fn(() => pause), resume: vi.fn(), startFarm: vi.fn(), walletCopper: vi.fn(() => wallet), useSkill: vi.fn(), skillState };
     const heroes = createHeroCollection({ gateway: heroesGateway });
     const farm = createFarmSession({ gateway: farmGateway });
     const equipment = createEquipmentCollection({ gateway: equipmentGateway });
@@ -607,4 +607,48 @@ describe('HeroUi equipment notice', () => {
 
 beforeEach(() => {
     vi.restoreAllMocks();
+});
+
+describe('HeroUi skill bar hooks', () => {
+    const ownedKael = () => ({ leaderId: 'kael', heroes: [ hero('kael', { 2: 1 }), hero('lyra', { 1: 1 }) ] });
+
+    it('calls useSkill with the slot when an unlocked slot is clicked and not for a locked slot', async () => {
+        const ctx = createUi({ list: ownedKael() });
+        await ctx.heroes.load();
+
+        ctx.testid('skill-slot-1').click();
+        ctx.testid('skill-slot-2').click();
+        ctx.testid('skill-slot-3').click();
+
+        expect(ctx.hooks.useSkill.mock.calls).toEqual([ [ 1 ], [ 2 ] ]);
+    });
+
+    it('writes the state of each slot from skillState on refreshSkills', async () => {
+        const states = { 1: { state: 'cooling', seconds: 7 }, 2: { state: 'ready', seconds: 0 }, 3: { state: 'locked', seconds: 0 } };
+        const ctx = createUi({ list: ownedKael(), skillState: (slot) => states[slot] });
+        await ctx.heroes.load();
+
+        ctx.ui.refreshSkills();
+
+        expect(ctx.testid('skill-slot-1').getAttribute('data-state')).toBe('cooling');
+        expect(ctx.testid('skill-slot-1').querySelector('.skill-slot-cooldown').textContent).toBe('7s');
+        expect(ctx.testid('skill-slot-2').getAttribute('data-state')).toBe('ready');
+    });
+
+    it('shows the slots of a new leader with their states at once', async () => {
+        const ctx = createUi({ list: ownedKael(), skillState: (slot) => (slot === 1 ? { state: 'cooling', seconds: 4 } : { state: 'locked', seconds: 0 }) });
+        ctx.heroesGateway.setLeader.mockResolvedValue({ leaderId: 'lyra' });
+        await ctx.heroes.load();
+
+        await ctx.heroes.setLeader('lyra');
+
+        expect(ctx.testid('skill-slot-1').getAttribute('data-state')).toBe('cooling');
+        expect(ctx.testid('skill-slot-1').querySelector('.skill-slot-cooldown').textContent).toBe('4s');
+    });
+
+    it('refreshes nothing without a skillState hook or a leader', () => {
+        const ctx = createUi({ list: ownedKael() });
+
+        expect(() => ctx.ui.refreshSkills()).not.toThrow();
+    });
 });

@@ -326,13 +326,13 @@ T9 → T10 → T11 → T12 → T13
 
 ---
 
-### T11: Scene - use skills, keys, frame advance and kill path
+### T11: Hero UI hooks for the skill bar
 
-**What**: `ClickerGame` owns a `SkillCombat`, extracts `afterDamage()`, uses skills by slot and keys 1-3, and advances skills each unpaused frame.
-**Where**: `game/src/adapters/phaser/ClickerGame.js` (modify)
+**What**: `HeroUi` passes slot clicks to a `useSkill(slot)` hook and keeps the slot states current through a `skillState(slot)` hook and `refreshSkills()`.
+**Where**: `game/src/adapters/phaser/HeroUi.js` (modify)
 **Depends on**: T10
-**Reuses**: `hitMonster` kill branch, `BossCountdown`
-**Requirement**: SKILL-01, SKILL-02, SKILL-03, SKILL-07
+**Reuses**: `updateSkillBar`, `renderSkillBar`, `refreshSkillBar`
+**Requirement**: SKILL-01, SKILL-03
 
 **Tools**:
 
@@ -341,26 +341,25 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Guards of the Edge Cases (heroes not loaded, 0 stars, paused, hero screen open, no monster) tested
-- [ ] A skill kill pays coins and reports the outcome like a click kill; farm win too
-- [ ] Skills advance between bosses; the countdown advances only by `countdownMs`
-- [ ] Carrilhão extends the live countdown
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Clicking an unlocked slot calls `useSkill(slot)`; a locked slot does not
+- [x] `refreshSkills()` writes the states from `skillState` into the bar
+- [x] A leader change shows the new leader's slots with the states from `skillState` at once
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
 
-**Commit**: `feat(game): use the leader skills in the fight`
+**Commit**: `feat(game): wire the skill bar to skill hooks`
 
 ---
 
-### T12: Hero UI and effects row wiring
+### T12: Scene - use skills, keys, frame advance, kill path and effects row
 
-**What**: Pass `onUse` into the bar, refresh slot states every frame, and show the effects row.
-**Where**: `game/src/adapters/phaser/HeroUi.js` (modify)
+**What**: `ClickerGame` owns a `SkillCombat`, extracts `afterDamage()`, uses skills by slot and keys 1-3, advances skills each unpaused frame and shows the effects row.
+**Where**: `game/src/adapters/phaser/ClickerGame.js` (modify)
 **Depends on**: T11
-**Reuses**: `updateSkillBar`, `renderEffectTags`
-**Requirement**: SKILL-03, SKILL-06
+**Reuses**: `hitMonster` kill branch, `BossCountdown`, `renderEffectTags`
+**Requirement**: SKILL-01, SKILL-02, SKILL-03, SKILL-06, SKILL-07
 
 **Tools**:
 
@@ -369,15 +368,17 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Leader change shows the new leader's cooldowns
-- [ ] Effects row shows tags and clears when empty
-- [ ] Slot and tag CSS added in `game/public/style.css`
+- [ ] Guards of the Edge Cases (heroes not loaded, 0 stars, paused, hero screen open, no monster) tested
+- [ ] A skill kill pays coins and reports the outcome like a click kill; farm win too
+- [ ] Skills advance between bosses; the countdown advances only by `countdownMs`
+- [ ] Carrilhão extends the live countdown
+- [ ] The effects row shows the tags and slot and tag CSS is added in `game/public/style.css`
 - [ ] Gate check passes: `cd game && npm test && npm run build`
 
 **Tests**: unit
 **Gate**: build
 
-**Commit**: `feat(game): show cooldowns and effects on the combat screen`
+**Commit**: `feat(game): use the leader skills in the fight`
 
 ---
 
