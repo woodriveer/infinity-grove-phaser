@@ -2731,6 +2731,10 @@ describe('ClickerGame click combo', () => {
 
         ctx.scene.update(0, 499);
         expect(combo(ctx)).toBe('Combo x11 · +11%');
+
+        //  1000 + 499 + 1 = 1500 ms since the last click: a skill that reset the timer would have kept the streak
+        ctx.scene.update(0, 1);
+        expect(combo(ctx)).toBe('');
     });
 
     it('gives a damage tick no combo', async () => {
@@ -2764,6 +2768,39 @@ describe('ClickerGame click combo', () => {
         ctx.click();
 
         expect(combo(ctx)).toBe('Combo x4 · +4%');
+    });
+});
+
+describe('ClickerGame combo and stars across changes', () => {
+    const big = () => ({
+        ...progress(1, 'PHASE', 1),
+        definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000 })) }
+    });
+
+    it('keeps the streak when the leader changes', async () => {
+        const heroes = { leaderId: 'kael', heroes: [ heroEntry('kael', { 0: 1 }, 0), heroEntry('lyra', { 0: 1 }, 0) ] };
+        const ctx = await createScene({ start: big(), heroes });
+
+        Array.from({ length: 5 }, () => ctx.click());
+        heroesGateway.setLeader.mockResolvedValue({ leaderId: 'lyra' });
+        await ctx.scene.heroes.setLeader('lyra');
+
+        expect(ctx.hud('.combo-hud').textContent).toBe('Combo x5 · +5%');
+    });
+
+    it('uses the new star bonus on the next click after a fusion', async () => {
+        const heroes = { leaderId: 'kael', heroes: [ heroEntry('kael', { 0: 3 }, 0) ] };
+        const ctx = await createScene({ start: big(), heroes });
+
+        ctx.click();
+        expect(ctx.texts.at(-1).text).toBe('1');
+
+        heroesGateway.fuse.mockResolvedValue(heroEntry('kael', { 1: 1 }, 1));
+        await ctx.scene.heroes.fuse('kael', 0);
+        ctx.scene.update(0, 1500);
+        ctx.click();
+
+        expect(ctx.texts.at(-1).text).toBe('1.1');
     });
 });
 

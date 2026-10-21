@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.jdbc.core.JdbcTemplate
 import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -15,37 +16,58 @@ class LyraLeaderBonusMigrationIT : IntegrationTestBase() {
 
     private val seeded = "30% de chance de executar um clique duplo crítico."
     private val old = "Ventos Ligeiros dura 50% mais."
+    private lateinit var kaelSeeded: String
 
-    private fun bonus() = jdbc.queryForObject("select leader_bonus from heroes where id = 'lyra'", String::class.java)
+    private fun bonusOf(id: String) = jdbc.queryForObject("select leader_bonus from heroes where id = ?", String::class.java, id)
+
+    private fun setBonus(
+        id: String,
+        text: String,
+    ) = jdbc.update("update heroes set leader_bonus = ? where id = ?", text, id)
 
     private fun migrate() = jdbc.execute(ClassPathResource("db/migration/V2__lyra_leader_bonus.sql").getContentAsString(Charsets.UTF_8))
 
+    @BeforeTest
+    fun remember() {
+        kaelSeeded = bonusOf("kael")!!
+    }
+
     @AfterTest
     fun restore() {
-        jdbc.update("update heroes set leader_bonus = ? where id = 'lyra'", seeded)
+        setBonus("lyra", seeded)
+        setBonus("kael", kaelSeeded)
     }
 
     @Test
     fun `a new database seeds the double critical click`() {
-        assertEquals(seeded, bonus())
+        assertEquals(seeded, bonusOf("lyra"))
     }
 
     @Test
     fun `a database seeded with the old text gets the new one`() {
-        jdbc.update("update heroes set leader_bonus = ? where id = 'lyra'", old)
+        setBonus("lyra", old)
 
         migrate()
 
-        assertEquals(seeded, bonus())
+        assertEquals(seeded, bonusOf("lyra"))
     }
 
     @Test
     fun `a bonus tuned in the database survives`() {
-        jdbc.update("update heroes set leader_bonus = 'Tuned' where id = 'lyra'")
+        setBonus("lyra", "Tuned")
 
         migrate()
 
-        assertEquals("Tuned", bonus())
+        assertEquals("Tuned", bonusOf("lyra"))
+    }
+
+    @Test
+    fun `another hero that holds the old text keeps it`() {
+        setBonus("kael", old)
+
+        migrate()
+
+        assertEquals(old, bonusOf("kael"))
     }
 
     @Test

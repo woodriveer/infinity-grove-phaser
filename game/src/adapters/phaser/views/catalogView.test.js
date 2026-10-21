@@ -69,6 +69,14 @@ describe('renderSkillList', () => {
     });
 });
 
+describe('renderHeroDetail leader bonus', () => {
+    it('prints the leader bonus of Lyra as the backend sends it', () => {
+        const lyra = { ...hero('lyra'), leaderBonus: '30% de chance de executar um clique duplo crítico.' };
+
+        expect(renderHeroDetail(lyra).querySelector('.hero-bonus').textContent).toBe('Bônus de líder: 30% de chance de executar um clique duplo crítico.');
+    });
+});
+
 describe('renderHeroDetail', () => {
     it('shows the portrait, class, element, stars, leader bonus and three skills', () => {
         const detail = renderHeroDetail(hero('kael'));
