@@ -157,14 +157,14 @@ The combat screen does not tell the player which chapter they are in, how much h
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| HUD-01 | P1: chapter pill (AC 1-2) | Specify | Pending |
-| HUD-02 | P1: HP text (AC 3-8) | Specify | Pending |
-| HUD-03 | P1: element wheel (AC 1-6) | Specify | Pending |
-| HUD-04 | P2: skill tooltip (AC 1-7) | Specify | Pending |
-| HUD-05 | P2: red dot on Equipamento, notice kept (AC 1-5) | Specify | Pending |
-| HUD-06 | P2: skill keys Q, W, E (AC 1-6) | Specify | Pending |
+| HUD-01 | P1: chapter pill (AC 1-2) | Done | Verified |
+| HUD-02 | P1: HP text (AC 3-8) | Done | Verified |
+| HUD-03 | P1: element wheel (AC 1-6) | Done | Verified |
+| HUD-04 | P2: skill tooltip (AC 1-7) | Done | Verified |
+| HUD-05 | P2: red dot on Equipamento, notice kept (AC 1-5) | Done | Verified |
+| HUD-06 | P2: skill keys Q, W, E (AC 1-6) | Done | Verified |
 
-**Coverage:** 6 total, 0 mapped to tasks, 6 unmapped
+**Coverage:** 6 total, 6 mapped to commits, 0 unmapped
 
 ---
 

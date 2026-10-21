@@ -168,6 +168,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md N4 N5 pause (game)
 - last seen: 2026-10-21T08:59:45Z
 
+### L-027 - Test that the visible state follows every damage source (click, skill hit, damage over time), not only the click and the kill
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: combat-hud
+- evidence: AC4 HP text on a damage tick (validation.md G1, ClickerGame.js update) (game)
+- last seen: 2026-10-21T18:09:44Z
+
+### L-028 - Assert a rendered value right after each non-lethal damage source, or removing its refresh survives
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: combat-hud
+- evidence: mutant 29 (validation.md G2, ClickerGame.js useSkill updateHealthBar) (game)
+- last seen: 2026-10-21T18:09:45Z
+
+### L-029 - Read the handler of an existing control before the spec states what it keeps, a label is not a key binding
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `game-ui` · harmful: 0
+- features: combat-hud
+- evidence: pause menu keys (validation.md G7) (game-ui)
+- last seen: 2026-10-21T18:09:45Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

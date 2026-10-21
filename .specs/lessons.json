@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 27,
+  "next_id": 30,
   "lessons": [
     {
       "id": "L-001",
@@ -474,6 +474,60 @@
       ],
       "created": "2026-10-21T08:59:45Z",
       "last_seen": "2026-10-21T08:59:45Z"
+    },
+    {
+      "id": "L-027",
+      "key": "ac_gap::test that the visible state follows every damage source click skill hit damage over time not only the click and the kill",
+      "text": "Test that the visible state follows every damage source (click, skill hit, damage over time), not only the click and the kill",
+      "signal": "ac_gap",
+      "scope": "game",
+      "status": "candidate",
+      "features": [
+        "combat-hud"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "AC4 HP text on a damage tick (validation.md G1, ClickerGame.js update) (game)"
+      ],
+      "created": "2026-10-21T18:09:44Z",
+      "last_seen": "2026-10-21T18:09:44Z"
+    },
+    {
+      "id": "L-028",
+      "key": "surviving_mutant::assert a rendered value right after each non lethal damage source or removing its refresh survives",
+      "text": "Assert a rendered value right after each non-lethal damage source, or removing its refresh survives",
+      "signal": "surviving_mutant",
+      "scope": "game",
+      "status": "candidate",
+      "features": [
+        "combat-hud"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "mutant 29 (validation.md G2, ClickerGame.js useSkill updateHealthBar) (game)"
+      ],
+      "created": "2026-10-21T18:09:45Z",
+      "last_seen": "2026-10-21T18:09:45Z"
+    },
+    {
+      "id": "L-029",
+      "key": "spec_precision_gap::read the handler of an existing control before the spec states what it keeps a label is not a key binding",
+      "text": "Read the handler of an existing control before the spec states what it keeps, a label is not a key binding",
+      "signal": "spec_precision_gap",
+      "scope": "game-ui",
+      "status": "candidate",
+      "features": [
+        "combat-hud"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "pause menu keys (validation.md G7) (game-ui)"
+      ],
+      "created": "2026-10-21T18:09:45Z",
+      "last_seen": "2026-10-21T18:09:45Z"
     }
   ]
 }
