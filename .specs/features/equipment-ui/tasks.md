@@ -114,10 +114,10 @@ T1 → T2 → T3 → T4 → T5 → T6
 
 **Done when**:
 
-- [ ] Each rarity carries its class, `data-rarity`, `data-gems` (0 to 4); only EPIC carries `data-effect="fantasy"`
-- [ ] The refine shows as `+<n>` above 0; a missing icon file is replaced by a drawn mark and the tile stays clickable
-- [ ] The CSS gives the five frames different shapes and stills the animations under `prefers-reduced-motion`
-- [ ] Gate check passes: `cd game && npm test && npm run build`
+- [x] Each rarity carries its class, `data-rarity`, `data-gems` (0 to 4); only EPIC carries `data-effect="fantasy"`
+- [x] The refine shows as `+<n>` above 0; a missing icon file is replaced by a drawn mark and the tile stays clickable
+- [x] The CSS gives the five frames different shapes and stills the animations under `prefers-reduced-motion`
+- [x] Gate check passes: `cd game && npm test && npm run build`
 
 **Tests**: unit
 **Gate**: build

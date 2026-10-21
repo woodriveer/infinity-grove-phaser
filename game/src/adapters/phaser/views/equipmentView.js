@@ -1,11 +1,8 @@
-import { describeAffix, describeClickDamage, formatCopper, RARITY_LABELS, SLOT_LABELS, SLOTS } from '../../../domain/equipment/equipment';
+import { describeAffix, describeClickDamage, formatCopper, pieceTitle, SLOT_LABELS, SLOTS } from '../../../domain/equipment/equipment';
 import { el } from './dom';
 
 export const EMPTY_TEXT = 'Nenhum equipamento ainda. Vença chefes para encontrar peças.';
 export const UNAVAILABLE_TEXT = 'Equipamento indisponível';
-
-//  "Raro Arma +3"
-const pieceTitle = (piece) => `${RARITY_LABELS[piece.rarity]} ${SLOT_LABELS[piece.slot]} +${piece.refine}`;
 
 const button = (text, testid, onClick, disabled = false) =>
 {

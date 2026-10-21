@@ -1660,3 +1660,186 @@ button:disabled {
 .stat-line {
     color: var(--color-neutral-800);
 }
+
+/* ══ Piece tiles: a frame per rarity. The five frames differ by shape (ring, gems, glow, motion), not by colour alone ══ */
+
+.piece-tile {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    font-family: var(--font-body);
+    border: 2px solid var(--frame);
+    border-radius: 14px;
+    background: var(--color-bg);
+    cursor: pointer;
+    isolation: isolate;
+}
+
+.piece-tile:hover {
+    transform: translateY(-1px);
+}
+
+.piece-tile .icon {
+    width: 40px;
+    height: 40px;
+}
+
+.piece-gems {
+    position: absolute;
+    top: -5px;
+    left: 4px;
+    display: flex;
+    gap: 2px;
+    pointer-events: none;
+}
+
+.piece-gem {
+    width: 7px;
+    height: 7px;
+    background: var(--gem, #f2c94c);
+    border: 1px solid var(--color-neutral-900);
+    transform: rotate(45deg);
+}
+
+.piece-refine {
+    position: absolute;
+    right: 2px;
+    bottom: 1px;
+    padding: 0 4px;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 14px;
+    color: var(--color-bg);
+    border-radius: 6px;
+    background: var(--color-neutral-900);
+}
+
+.piece-tile.is-empty {
+    border-style: dashed;
+    border-color: var(--color-neutral-400);
+    background: transparent;
+    cursor: default;
+}
+
+.piece-tile.is-empty .icon {
+    opacity: 0.3;
+}
+
+.piece-empty {
+    position: absolute;
+    bottom: 1px;
+    font-size: 9px;
+    color: var(--color-neutral-600);
+}
+
+/* COMMON: a thin grey border and nothing else */
+.piece-tile.rarity-common {
+    --frame: var(--color-neutral-400);
+    border-width: 1px;
+}
+
+/* UNCOMMON: a green border and 1 gem */
+.piece-tile.rarity-uncommon {
+    --frame: #5da048;
+    --gem: #8fd36d;
+}
+
+/* RARE: a blue double ring (border plus an outer ring) and 2 gems */
+.piece-tile.rarity-rare {
+    --frame: #3f8fd1;
+    --gem: #7cc4ff;
+    box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px #3f8fd1;
+}
+
+/* EPIC: a purple double ring, 3 gems and the fantasy effect: a pulsing aura, a light sweep along the tile and twinkling sparkles */
+.piece-tile.rarity-epic {
+    --frame: #9b59d0;
+    --gem: #d6a5ff;
+    box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px #9b59d0, 0 0 10px 3px rgb(155 89 208 / 0.55);
+    animation: epic-pulse 2.4s ease-in-out infinite;
+}
+
+.piece-tile[data-effect="fantasy"]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 12px;
+    background: linear-gradient(115deg, transparent 35%, rgb(214 165 255 / 0.65) 50%, transparent 65%);
+    background-size: 250% 100%;
+    animation: epic-sweep 2.8s linear infinite;
+}
+
+.piece-tile[data-effect="fantasy"]::after {
+    content: '';
+    position: absolute;
+    inset: -7px;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        radial-gradient(circle, #fff 0 1.5px, transparent 2.5px) 8% 18% / 11px 11px no-repeat,
+        radial-gradient(circle, #f3d9ff 0 1.5px, transparent 2.5px) 92% 30% / 9px 9px no-repeat,
+        radial-gradient(circle, #fff 0 1px, transparent 2px) 78% 92% / 8px 8px no-repeat,
+        radial-gradient(circle, #e8c4ff 0 1.5px, transparent 2.5px) 14% 86% / 10px 10px no-repeat;
+    animation: epic-twinkle 1.8s ease-in-out infinite;
+}
+
+/* LEGENDARY: a gold ornate border (thick, a ring plus a glow), 4 gems and a golden shimmer turning around the tile, no sparkles */
+.piece-tile.rarity-legendary {
+    --frame: #d9a521;
+    --gem: #ffe27a;
+    border-width: 3px;
+    box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px #d9a521, 0 0 12px 2px rgb(255 214 90 / 0.6);
+}
+
+.piece-tile.rarity-legendary::before {
+    content: '';
+    position: absolute;
+    inset: -7px;
+    z-index: -1;
+    border-radius: 18px;
+    background: conic-gradient(from 0deg, transparent 0 55%, rgb(255 226 122 / 0.9) 75%, transparent 90%);
+    animation: legendary-spin 3.2s linear infinite;
+}
+
+@keyframes epic-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px #9b59d0, 0 0 6px 1px rgb(155 89 208 / 0.4); }
+    50% { box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px #9b59d0, 0 0 16px 6px rgb(155 89 208 / 0.75); }
+}
+
+@keyframes epic-sweep {
+    from { background-position: 150% 0; }
+    to { background-position: -50% 0; }
+}
+
+@keyframes epic-twinkle {
+    0%, 100% { opacity: 0.25; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes legendary-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* No motion for a player who asks for none: the same colours, gems and a steady glow */
+@media (prefers-reduced-motion: reduce) {
+    .piece-tile.rarity-epic {
+        animation: none;
+        box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px #9b59d0, 0 0 12px 4px rgb(155 89 208 / 0.6);
+    }
+
+    .piece-tile[data-effect="fantasy"]::before,
+    .piece-tile[data-effect="fantasy"]::after {
+        animation: none;
+    }
+
+    .piece-tile.rarity-legendary,
+    .piece-tile.rarity-legendary::before {
+        animation: none;
+        box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px #d9a521, 0 0 12px 3px rgb(255 214 90 / 0.65);
+    }
+}

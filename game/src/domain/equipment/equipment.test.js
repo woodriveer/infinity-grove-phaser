@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { PLAYER } from '../combat/damage';
 import {
-    applyEquipmentDrop, attackerFor, bossTimeBonusMs, describeAffix, describeClickDamage, dropLabel, formatCopper, walletCopper, wornBy
+    applyEquipmentDrop, attackerFor, bossTimeBonusMs, describeAffix, describeClickDamage, dropLabel, formatCopper, pieceTitle, walletCopper, wornBy
 } from './equipment';
 
 const piece = (extra = {}) => ({
@@ -154,5 +154,18 @@ describe('applyEquipmentDrop', () => {
 
     it('adds nothing for a piece that was sold because the bag was full', () => {
         expect(applyEquipmentDrop([ piece({ id: 'a' }) ], { piece: piece({ id: 'b' }), sold: true }).map(({ id }) => id)).toEqual([ 'a' ]);
+    });
+});
+
+describe('pieceTitle', () => {
+    it('reads the rarity, the slot and the refine: Raro Arma +3', () => {
+        expect(pieceTitle(piece({ slot: 'WEAPON', rarity: 'RARE', refine: 3 }))).toBe('Raro Arma +3');
+    });
+
+    it('reads +0 at refine 0 and names every rarity and slot', () => {
+        expect(pieceTitle(piece({ slot: 'RING', rarity: 'COMMON', refine: 0 }))).toBe('Comum Anel +0');
+        expect(pieceTitle(piece({ slot: 'AMULET', rarity: 'LEGENDARY', refine: 10 }))).toBe('Lendário Amuleto +10');
+        expect(pieceTitle(piece({ slot: 'ARMOR', rarity: 'EPIC', refine: 1 }))).toBe('Épico Armadura +1');
+        expect(pieceTitle(piece({ slot: 'ARMOR', rarity: 'UNCOMMON', refine: 2 }))).toBe('Incomum Armadura +2');
     });
 });
