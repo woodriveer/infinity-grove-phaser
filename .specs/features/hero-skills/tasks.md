@@ -121,9 +121,9 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] `extend(4000)` raises `remainingMs` by 4000 and repeated calls add each time
-- [ ] Extending an already expired countdown makes it live again (`expired` false); the test pins this
-- [ ] Gate check passes: `cd game && npm test`
+- [x] `extend(4000)` raises `remainingMs` by 4000 and repeated calls add each time
+- [x] Extending an already expired countdown makes it live again (`expired` false); the test pins this
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick

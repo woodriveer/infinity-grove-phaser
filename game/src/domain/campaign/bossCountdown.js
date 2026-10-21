@@ -13,6 +13,12 @@ export class BossCountdown
         this.elapsedMs = Math.min(this.limitMs, this.elapsedMs + Math.max(0, ms));
     }
 
+    //  Adds time left, beyond the starting limit; an expired countdown that gains time is live again
+    extend (ms)
+    {
+        this.limitMs += Math.max(0, ms);
+    }
+
     get remainingMs ()
     {
         return this.limitMs - this.elapsedMs;

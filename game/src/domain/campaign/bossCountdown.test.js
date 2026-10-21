@@ -61,4 +61,26 @@ describe('BossCountdown', () => {
 
         expect(countdown.remainingMs).toBe(30000);
     });
+
+    it('gains 4000 ms of time left on extend, each time and beyond the starting limit', () => {
+        const countdown = new BossCountdown(30000);
+
+        countdown.advance(1000);
+        countdown.extend(4000);
+        countdown.extend(4000);
+
+        expect(countdown.remainingMs).toBe(37000);
+    });
+
+    it('is live again when an expired countdown gains time', () => {
+        const countdown = new BossCountdown(1000);
+
+        countdown.advance(1000);
+        expect(countdown.expired).toBe(true);
+
+        countdown.extend(4000);
+
+        expect(countdown.expired).toBe(false);
+        expect(countdown.seconds).toBe(4);
+    });
 });
