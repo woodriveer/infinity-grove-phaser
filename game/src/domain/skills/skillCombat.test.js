@@ -275,3 +275,149 @@ describe('timed effects', () => {
         expect(skills.slotState('lyra', 3, true).state).toBe('cooling');
     });
 });
+
+describe('damage over time', () => {
+    const advanceBy = (skills, monster, seconds, boss = false) => {
+        const ticks = [];
+
+        for (let i = 0; i < seconds; i++) {
+            ticks.push(skills.advance(1000, { monster, boss }).hits);
+        }
+
+        return ticks;
+    };
+
+    it('lands 6 magical ticks of 2 with Tempestade Arcana, the first 1 s after the cast, then stops', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'orina', 2);
+        expect(skills.advance(999, { monster }).hits).toEqual([]);
+
+        const ticks = [ skills.advance(1, { monster }).hits, ...advanceBy(skills, monster, 7) ];
+
+        expect(ticks.map((hits) => hits.length)).toEqual([ 1, 1, 1, 1, 1, 1, 0, 0 ]);
+        expect(ticks[0]).toEqual([ { damage: 2, critical: false } ]);
+        expect(monster.health).toBe(988);
+        expect(skills.effects()).toEqual([]);
+    });
+
+    it('lands every tick a long frame crosses', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'orina', 2);
+
+        expect(skills.advance(4500, { monster }).hits).toHaveLength(4);
+        expect(skills.advance(10000, { monster }).hits).toHaveLength(2);
+    });
+
+    it('never rolls a critical on a tick, even with a critical chance of 100', () => {
+        const skills = combat(() => 0);
+        const monster = monsterOf();
+
+        use(skills, monster, 'vex', 1, { attacker: { ...PLAYER, critChance: 100 } });
+
+        expect(skills.advance(1000, { monster }).hits).toEqual([ { damage: 1, critical: false } ]);
+    });
+
+    it('lands Bomba de Veneno as 1 per second for 8 s, with the tag showing x1', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'vex', 1);
+        expect(skills.effects()).toEqual([ { label: 'Bomba de Veneno x1', seconds: 8 } ]);
+
+        const ticks = advanceBy(skills, monster, 9);
+
+        expect(ticks.map((hits) => hits.length)).toEqual([ 1, 1, 1, 1, 1, 1, 1, 1, 0 ]);
+        expect(monster.health).toBe(992);
+    });
+
+    it('stacks the poison up to 3, ticks 1 per stack and restarts the 8 s', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'vex', 1);
+        skills.cooldowns.clear();
+        use(skills, monster, 'vex', 1);
+        skills.cooldowns.clear();
+        use(skills, monster, 'vex', 1);
+        skills.cooldowns.clear();
+        use(skills, monster, 'vex', 1);
+
+        expect(skills.effects()).toEqual([ { label: 'Bomba de Veneno x3', seconds: 8 } ]);
+        expect(skills.advance(1000, { monster }).hits).toEqual([ { damage: 3, critical: false } ]);
+    });
+
+    it('lands Golpe Sangrento as a hit of 6 and then 6 ticks of 1.5 over 6 s', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        expect(use(skills, monster, 'vex', 3).hits).toEqual([ { damage: 6, critical: false } ]);
+
+        const ticks = advanceBy(skills, monster, 7);
+
+        expect(ticks.map((hits) => hits.length)).toEqual([ 1, 1, 1, 1, 1, 1, 0 ]);
+        expect(ticks[0]).toEqual([ { damage: 1.5, critical: false } ]);
+        expect(monster.health).toBe(1000 - 6 - 9);
+    });
+
+    it('starts no bleed when the hit of Golpe Sangrento kills', () => {
+        const skills = combat();
+        const monster = monsterOf(5);
+
+        use(skills, monster, 'vex', 3);
+
+        expect(monster.dead).toBe(true);
+        expect(skills.effects()).toEqual([]);
+    });
+
+    it('ends the ticks when the monster dies or another monster comes', () => {
+        const skills = combat();
+        const monster = monsterOf(1.5);
+
+        use(skills, monster, 'orina', 2);
+
+        expect(skills.advance(5000, { monster }).hits).toEqual([ { damage: 2, critical: false } ]);
+        expect(monster.dead).toBe(true);
+        expect(skills.effects()).toEqual([]);
+
+        const other = monsterOf();
+
+        use(skills, other, 'vex', 1);
+        expect(skills.advance(3000, { monster: monsterOf() }).hits).toEqual([]);
+    });
+
+    it('fixes the base damage at the cast but reads the defense at each tick', () => {
+        const skills = combat();
+        const monster = monsterOf(1000, stats('FIRE', 50));
+
+        use(skills, monster, 'vex', 1, { attacker: { ...PLAYER, baseDamage: 10 } });
+        expect(skills.advance(1000, { monster }).hits[0].damage).toBe(5);
+
+        use(skills, monster, 'kael', 3);
+        expect(skills.advance(1000, { monster }).hits[0].damage).toBe(8);
+    });
+
+    it('follows Bênção at the tick: the tick at the second it ends still gets 1.3, the next one does not', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'seraphine', 1);
+        skills.advance(14000, { monster });
+        use(skills, monster, 'vex', 1);
+
+        expect(skills.advance(1000, { monster }).hits[0].damage).toBeCloseTo(1.3, 10);
+        expect(skills.advance(1000, { monster }).hits[0].damage).toBe(1);
+    });
+
+    it('applies the boss damage of the attacker to a tick on a boss', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'orina', 2, { attacker: { ...PLAYER, bossDamage: 50 } });
+
+        expect(skills.advance(1000, { monster, boss: true }).hits[0].damage).toBe(3);
+    });
+});

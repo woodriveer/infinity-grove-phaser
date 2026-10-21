@@ -232,12 +232,12 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Tempestade lands 6 ticks of 200 %, first at 1 s
-- [ ] Poison adds a stack to 3, restarts 8 s, ticks 100 % per stack
-- [ ] Golpe Sangrento hits 600 % then 6 ticks of 150 %
-- [ ] A large `advance` delta lands every crossed tick; monster death ends the ticks
-- [ ] Base and element are fixed at the cast; defense is read at each tick
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Tempestade lands 6 ticks of 200 %, first at 1 s
+- [x] Poison adds a stack to 3, restarts 8 s, ticks 100 % per stack
+- [x] Golpe Sangrento hits 600 % then 6 ticks of 150 %
+- [x] A large `advance` delta lands every crossed tick; monster death ends the ticks
+- [x] Base and element are fixed at the cast; defense is read at each tick
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
