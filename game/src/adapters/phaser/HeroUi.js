@@ -1,7 +1,9 @@
-import { dropLabel } from '../../domain/equipment/equipment';
+import { dropLabel, wornBy } from '../../domain/equipment/equipment';
+import { leaderStats } from '../../domain/equipment/leaderStats';
 import { renderBag, renderBagEntry } from './views/bagView';
 import { renderCatalog, renderHeroDetail } from './views/catalogView';
-import { renderEquipment, renderEquipmentUnavailable, renderPieceDetail } from './views/equipmentView';
+import { renderEquipment, renderEquipmentUnavailable, renderLeaderStats, renderPieceDetail } from './views/equipmentView';
+import { el } from './views/dom';
 import { renderFarm } from './views/farmView';
 import { renderFusion, renderFusionResult } from './views/fusionView';
 import { renderLeaderPicker } from './views/leaderView';
@@ -332,15 +334,25 @@ export class HeroUi
         }
     }
 
-    //  The slots of every hero and the bag, or one piece with its actions (`selected` is a piece id)
+    //  The attributes of the leader with the pieces it wears now, or null without a leader
+    leaderStatsFor ()
+    {
+        const leader = this.heroes.leader();
+
+        return leader ? { name: leader.name, lines: leaderStats({ leader, pieces: wornBy(this.equipment.pieces(), leader.id), talents: this.talents.talents() }) } : null;
+    }
+
+    //  The attributes of the leader, the slots of every hero and the bag, or one piece with its actions (`selected` is a piece id)
     render_equipment ({ selected = null } = {})
     {
         const piece = this.equipment.pieces().find((candidate) => candidate.id === selected);
         const owned = this.heroes.heroes();
+        const stats = this.leaderStatsFor();
 
         if (!piece)
         {
             this.body.replaceChildren(renderEquipment(this.equipment.pieces(), owned, {
+                stats,
                 onSelect: (picked) => this.render_equipment({ selected: picked.id })
             }));
             this.backButton.hidden = true;
@@ -348,13 +360,19 @@ export class HeroUi
             return;
         }
 
-        this.showDetail(renderPieceDetail(piece, owned, this.hooks.walletCopper(), {
+        const detail = renderPieceDetail(piece, owned, this.hooks.walletCopper(), {
             onEquip: (heroId) => this.act(() => this.equipment.equip(piece.id, heroId), piece.id),
             onUnequip: () => this.act(() => this.equipment.unequip(piece.id), piece.id),
             onRefine: () => this.act(() => this.equipment.refine(piece.id), piece.id),
             onReroll: (affix) => this.act(() => this.equipment.reroll(piece.id, affix), piece.id),
             onSell: () => this.act(() => this.equipment.sell(piece.id), piece.id)
-        }), () => this.render_equipment());
+        });
+
+        //  The panel stays above the piece, so an equip, a removal or a refine shows its effect at once
+        const screen = el('div', 'equip-with-stats');
+
+        screen.append(...(stats ? [ renderLeaderStats(stats) ] : []), detail);
+        this.showDetail(screen, () => this.render_equipment());
     }
 
     //  Runs an equipment action and shows the piece again (the list when the piece is gone); a refusal shows an error line

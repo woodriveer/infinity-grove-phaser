@@ -523,6 +523,113 @@ describe('HeroUi Talentos', () => {
     });
 });
 
+describe('HeroUi leader attributes', () => {
+    const weaponPiece = (extra = {}) => ({
+        id: 'w1', slot: 'WEAPON', rarity: 'RARE', refine: 0, clickDamage: 3.3, affixes: [], heroId: 'kael', sellPrice: 100, refineCost: 500, ...extra
+    });
+    const stat = (ctx, id) => ctx.testid(`stat-${id}`).textContent;
+
+    it('shows the panel titled Atributos de <nome> at the top of the Equipamento screen', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ weaponPiece({ heroId: null }) ] } });
+
+        await open(ctx, 'equipment');
+
+        expect(ctx.testid('leader-stats').querySelector('.leader-stats-title').textContent).toBe('Atributos de Hero kael');
+        expect(stat(ctx, 'clickDamage')).toBe('Dano de clique: 1.0');
+        expect(stat(ctx, 'critChance')).toBe('Chance de crítico: 10%');
+    });
+
+    it('counts only the pieces worn by the leader: a weapon in the bag or on another hero changes nothing', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ weaponPiece({ heroId: null }), weaponPiece({ id: 'w2', heroId: 'lyra' }) ] } });
+
+        await open(ctx, 'equipment');
+
+        expect(stat(ctx, 'clickDamage')).toBe('Dano de clique: 1.0');
+    });
+
+    it('counts the weapon the leader wears: 1 + 3.3 reads 4.3', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ weaponPiece() ] } });
+
+        await open(ctx, 'equipment');
+
+        expect(stat(ctx, 'clickDamage')).toBe('Dano de clique: 4.3');
+    });
+
+    it('shows the new numbers after the leader equips a piece, without reopening the window', async () => {
+        const bagged = weaponPiece({ heroId: null });
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ bagged ] } });
+
+        ctx.equipmentGateway.equip.mockResolvedValue({ capacity: 100, pieces: [ weaponPiece() ] });
+        await open(ctx, 'equipment');
+        ctx.testid('equip-piece-w1').click();
+        ctx.testid('piece-equip-kael').click();
+        await flush();
+
+        expect(stat(ctx, 'clickDamage')).toBe('Dano de clique: 4.3');
+        expect(ctx.testid('piece-detail')).not.toBeNull();
+    });
+
+    it('shows the old numbers after the piece is removed', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ weaponPiece() ] } });
+
+        ctx.equipmentGateway.unequip.mockResolvedValue({ capacity: 100, pieces: [ weaponPiece({ heroId: null }) ] });
+        await open(ctx, 'equipment');
+        ctx.testid('equip-slot-kael-WEAPON').click();
+        ctx.testid('piece-unequip').click();
+        await flush();
+
+        expect(stat(ctx, 'clickDamage')).toBe('Dano de clique: 1.0');
+    });
+
+    it('shows the new numbers after a refine', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ weaponPiece() ] } });
+
+        ctx.equipmentGateway.refine.mockResolvedValue({ equipment: { capacity: 100, pieces: [ weaponPiece({ refine: 1, clickDamage: 3.6 }) ] }, wallet: { gold: 0, silver: 0, copper: 0 } });
+        await open(ctx, 'equipment');
+        ctx.testid('equip-slot-kael-WEAPON').click();
+        ctx.testid('piece-refine').click();
+        await flush();
+
+        expect(stat(ctx, 'clickDamage')).toBe('Dano de clique: 4.6');
+    });
+
+    it('shows the name and the numbers of the new leader after a leader change', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ weaponPiece() ] } });
+
+        ctx.heroesGateway.setLeader.mockResolvedValue({ leaderId: 'lyra' });
+        await open(ctx, 'leader');
+        ctx.testid('leader-entry-lyra').click();
+        await flush();
+        //  The screen reads the heroes again when it opens: the backend now answers Lyra as the leader
+        ctx.heroesGateway.list.mockResolvedValue({ ...catalog(), leaderId: 'lyra' });
+        await open(ctx, 'equipment');
+
+        expect(ctx.testid('leader-stats').querySelector('.leader-stats-title').textContent).toBe('Atributos de Hero lyra');
+        expect(stat(ctx, 'clickDamage')).toBe('Dano de clique: 1.0');
+    });
+
+    it('adds the talents to the numbers', async () => {
+        const talentList = { talents: [ { id: 'CRIT_CHANCE', value: 4 }, { id: 'MINIBOSS_TIME', value: 4 }, { id: 'PHYSICAL_BREAK', value: 3 } ] };
+        const ctx = createUi({ talentList, equipmentList: { capacity: 100, pieces: [] } });
+
+        await ctx.talents.load();
+        await open(ctx, 'equipment');
+
+        expect(stat(ctx, 'critChance')).toBe('Chance de crítico: 14%');
+        expect(stat(ctx, 'minibossTime')).toBe('Tempo extra de miniboss: 4s');
+        expect(stat(ctx, 'breakPhysical')).toBe('Quebra de defesa física: 3');
+    });
+
+    it('shows no panel while there is no leader', async () => {
+        const ctx = createUi({ list: { leaderId: 'none', heroes: [ hero('kael', { 0: 1 }) ] }, equipmentList: { capacity: 100, pieces: [ weaponPiece({ heroId: null }) ] } });
+
+        await open(ctx, 'equipment');
+
+        expect(ctx.testid('leader-stats')).toBeNull();
+        expect(ctx.testid('equipment-list')).not.toBeNull();
+    });
+});
+
 describe('HeroUi equipment badge', () => {
     it('has no red dot until a piece drops', () => {
         const { testid } = createUi();

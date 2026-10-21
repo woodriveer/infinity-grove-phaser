@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { EMPTY_TEXT, renderEquipment, renderEquipmentUnavailable, renderPieceDetail, UNAVAILABLE_TEXT } from './equipmentView';
+import { EMPTY_TEXT, renderEquipment, renderEquipmentUnavailable, renderLeaderStats, renderPieceDetail, UNAVAILABLE_TEXT } from './equipmentView';
 
 const hero = (id, owned = true) => ({ id, name: `Hero ${id}`, owned });
 const heroes = [ hero('kael'), hero('lyra'), hero('vex', false) ];
@@ -62,6 +62,37 @@ describe('renderEquipment', () => {
 
         expect(onSelect).toHaveBeenNthCalledWith(1, bagged);
         expect(onSelect).toHaveBeenNthCalledWith(2, worn);
+    });
+});
+
+describe('renderLeaderStats', () => {
+    const stats = { name: 'Kael Raizférrea', lines: [ { id: 'clickDamage', text: 'Dano de clique: 1.0' }, { id: 'critChance', text: 'Chance de crítico: 10%' } ] };
+
+    it('is titled Atributos de <nome> and shows one line per attribute in order', () => {
+        const panel = renderLeaderStats(stats);
+
+        expect(panel.getAttribute('data-testid')).toBe('leader-stats');
+        expect(panel.querySelector('.leader-stats-title').textContent).toBe('Atributos de Kael Raizférrea');
+        expect([ ...panel.querySelectorAll('.stat-line') ].map((line) => line.textContent)).toEqual([ 'Dano de clique: 1.0', 'Chance de crítico: 10%' ]);
+        expect(text(panel, 'stat-clickDamage')).toBe('Dano de clique: 1.0');
+    });
+
+    it('shows above the slots and the bag in the screen', () => {
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), stats });
+
+        expect(screen.firstElementChild.getAttribute('data-testid')).toBe('leader-stats');
+        expect(screen.querySelector('[data-testid="equip-hero-kael"]')).not.toBeNull();
+    });
+
+    it('shows with the empty text when there is no piece yet', () => {
+        const screen = renderEquipment([], heroes, { onSelect: vi.fn(), stats });
+
+        expect(screen.querySelector('[data-testid="leader-stats"]')).not.toBeNull();
+        expect(text(screen, 'equipment-empty')).toBe('Nenhum equipamento ainda. Vença chefes para encontrar peças.');
+    });
+
+    it('shows no panel without a leader', () => {
+        expect(renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), stats: null }).querySelector('[data-testid="leader-stats"]')).toBeNull();
     });
 });
 

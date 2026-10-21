@@ -88,9 +88,9 @@ T1 → T2 → T3 → T4 → T5 → T6
 
 **Done when**:
 
-- [ ] The panel is titled `Atributos de <nome>` and shows the lines of the spec in order
-- [ ] It follows an equip, a removal, a refine and a leader change, and is absent without a leader
-- [ ] Gate check passes: `cd game && npm test`
+- [x] The panel is titled `Atributos de <nome>` and shows the lines of the spec in order
+- [x] It follows an equip, a removal, a refine and a leader change, and is absent without a leader
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick

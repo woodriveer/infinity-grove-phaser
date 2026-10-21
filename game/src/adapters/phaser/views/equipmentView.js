@@ -22,18 +22,46 @@ const pieceLines = (piece) => [
     ...piece.affixes.map(describeAffix)
 ];
 
+//  The attribute panel of the leader: `Atributos de <nome>` and one line per attribute ({ id, text } from `leaderStats`)
+export const renderLeaderStats = ({ name, lines }) =>
+{
+    const panel = el('div', 'leader-stats', '', { testid: 'leader-stats' });
+
+    panel.append(el('strong', 'leader-stats-title', `Atributos de ${name}`));
+    lines.forEach(({ id, text }) => panel.append(el('div', 'stat-line', text, { testid: `stat-${id}` })));
+
+    return panel;
+};
+
 //  The failure state of the screen
 export const renderEquipmentUnavailable = () => el('p', 'hero-empty', UNAVAILABLE_TEXT, { testid: 'equipment-unavailable' });
 
-//  The screen: the four slots of every owned hero, then the bag. `onSelect(piece)` fires when a worn or bagged piece is clicked.
-export const renderEquipment = (pieces, heroes, { onSelect }) =>
+//  The screen: the attribute panel of the leader (`stats` = { name, lines }, absent without a leader), the four slots of every owned hero,
+//  then the bag. `onSelect(piece)` fires when a worn or bagged piece is clicked.
+export const renderEquipment = (pieces, heroes, { onSelect, stats = null }) =>
 {
     if (pieces.length === 0)
     {
-        return el('p', 'hero-empty', EMPTY_TEXT, { testid: 'equipment-empty' });
+        const empty = el('p', 'hero-empty', EMPTY_TEXT, { testid: 'equipment-empty' });
+
+        if (!stats)
+        {
+            return empty;
+        }
+
+        const wrapper = el('div', 'equip-screen');
+
+        wrapper.append(renderLeaderStats(stats), empty);
+
+        return wrapper;
     }
 
     const screen = el('div', 'equip-screen', '', { testid: 'equipment-list' });
+
+    if (stats)
+    {
+        screen.append(renderLeaderStats(stats));
+    }
 
     heroes.filter((hero) => hero.owned).forEach((hero) =>
     {

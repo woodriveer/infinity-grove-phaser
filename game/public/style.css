@@ -1637,3 +1637,26 @@ button:disabled {
     border-radius: 12px;
     background: color-mix(in srgb, var(--branch, var(--color-neutral-500)) 25%, var(--color-bg));
 }
+
+/* ══ Equipamento: the attribute panel of the leader ══ */
+
+.leader-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px 18px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    font-size: 13px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+}
+
+.leader-stats-title {
+    grid-column: 1 / -1;
+    font-family: var(--font-heading);
+    font-size: 17px;
+}
+
+.stat-line {
+    color: var(--color-neutral-800);
+}
