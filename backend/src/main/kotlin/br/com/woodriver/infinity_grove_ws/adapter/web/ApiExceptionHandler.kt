@@ -12,6 +12,9 @@ import br.com.woodriver.infinity_grove_ws.domain.LoginException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.ProgressConflictException
 import br.com.woodriver.infinity_grove_ws.domain.ProgressRequestException
+import br.com.woodriver.infinity_grove_ws.domain.TalentConflictException
+import br.com.woodriver.infinity_grove_ws.domain.TalentNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.TalentRequestException
 import br.com.woodriver.infinity_grove_ws.domain.UserAlreadyExistsException
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.WalletRequestException
@@ -66,6 +69,15 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(EquipmentConflictException::class)
     fun equipmentConflict(e: EquipmentConflictException) = problem(HttpStatus.CONFLICT, e)
+
+    @ExceptionHandler(TalentRequestException::class)
+    fun talentRequest(e: TalentRequestException) = problem(HttpStatus.BAD_REQUEST, e)
+
+    @ExceptionHandler(TalentNotFoundException::class)
+    fun talentNotFound(e: TalentNotFoundException) = problem(HttpStatus.NOT_FOUND, e)
+
+    @ExceptionHandler(TalentConflictException::class)
+    fun talentConflict(e: TalentConflictException) = problem(HttpStatus.CONFLICT, e)
 
     @ExceptionHandler(BusinessException::class)
     fun business(e: BusinessException) = problem(HttpStatus.UNPROCESSABLE_CONTENT, e)

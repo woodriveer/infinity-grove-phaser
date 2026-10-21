@@ -153,10 +153,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] The responses carry the fields of the spec, `nextCost` null at the max level
-- [ ] 400 `INVALID_TALENT_REQUEST`, 401, 404 `TALENT_NOT_FOUND`, 409 `TALENT_LEVEL_MISMATCH`, `TALENT_MAX_LEVEL` and `NOT_ENOUGH_COPPER`
-- [ ] Two racing requests with the same `fromLevel`: exactly one succeeds
-- [ ] Gate check passes: `cd backend && ./gradlew test`
+- [x] The responses carry the fields of the spec, `nextCost` null at the max level
+- [x] 400 `INVALID_TALENT_REQUEST`, 401, 404 `TALENT_NOT_FOUND`, 409 `TALENT_LEVEL_MISMATCH`, `TALENT_MAX_LEVEL` and `NOT_ENOUGH_COPPER`
+- [x] Two racing requests with the same `fromLevel`: exactly one succeeds
+- [x] Gate check passes: `cd backend && ./gradlew test`
 
 **Tests**: integration
 **Gate**: full
