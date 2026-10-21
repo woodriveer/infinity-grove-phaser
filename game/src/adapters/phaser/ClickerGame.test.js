@@ -2644,6 +2644,116 @@ describe('ClickerGame skill tooltip', () => {
     });
 });
 
+describe('ClickerGame skill keys Q, W and E', () => {
+    const bigHealth = () => ({
+        ...progress(1, 'PHASE', 1),
+        definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000, minibossHealth: 1000 })) }
+    });
+    const leaderOf = (id, stars) => ({ leaderId: id, heroes: [ heroEntry(id, { [stars]: 1 }, stars), heroEntry('lyra'), heroEntry('orina') ] });
+    const slot = (ctx, number) => ctx.control(`[data-testid="skill-slot-${number}"]`);
+    const press = (ctx, name, event) => ctx.handlers[`keydown-${name}`](event);
+
+    it('Q uses the skill of slot 1 as a click on its slot: 15 damage and the 20 s cooldown', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
+
+        press(ctx, 'Q');
+
+        expect(ctx.scene.monster.health).toBe(985);
+        expect(slot(ctx, 1).getAttribute('data-state')).toBe('cooling');
+        expect(slot(ctx, 1).querySelector('.skill-slot-cooldown').textContent).toBe('20s');
+    });
+
+    it('W uses slot 2 (400 % hit) and E uses slot 3 (cooldown 30 s)', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 3) });
+
+        press(ctx, 'W');
+        expect(ctx.scene.monster.health).toBe(996);
+        expect(slot(ctx, 2).querySelector('.skill-slot-cooldown').textContent).toBe('25s');
+
+        press(ctx, 'E');
+        expect(slot(ctx, 3).querySelector('.skill-slot-cooldown').textContent).toBe('30s');
+    });
+
+    it('keeps the keys 1, 2 and 3 working', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 3) });
+
+        press(ctx, 'ONE');
+        press(ctx, 'TWO');
+        press(ctx, 'THREE');
+
+        expect(ctx.scene.monster.health).toBe(981);
+    });
+
+    it('uses a skill once per press: Q then the 1 key on the same slot is refused while it cools', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
+
+        press(ctx, 'Q');
+        press(ctx, 'ONE');
+        press(ctx, 'Q');
+
+        expect(ctx.scene.monster.health).toBe(985);
+    });
+
+    it('ignores the repeats of a held key and uses the skill on the first press', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
+
+        press(ctx, 'Q', { repeat: true });
+        expect(ctx.scene.monster.health).toBe(1000);
+
+        press(ctx, 'Q', { repeat: false });
+        press(ctx, 'Q', { repeat: true });
+        expect(ctx.scene.monster.health).toBe(985);
+    });
+
+    it('ignores the keys of a locked slot and of a leader with no star', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 0) });
+
+        press(ctx, 'Q');
+        expect(ctx.scene.monster.health).toBe(1000);
+
+        const one = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
+
+        press(one, 'W');
+        press(one, 'E');
+        expect(one.scene.monster.health).toBe(1000);
+    });
+
+    it('ignores the keys while the pause menu is open', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 3) });
+
+        ctx.handlers['keydown-ESC']();
+        press(ctx, 'Q');
+        press(ctx, 'W');
+        press(ctx, 'E');
+
+        expect(ctx.scene.monster.health).toBe(1000);
+    });
+
+    it('ignores the keys while a hero screen is open', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
+
+        ctx.control('[data-testid="hud-heroes"]').click();
+        await flush();
+        press(ctx, 'Q');
+
+        expect(ctx.scene.monster.health).toBe(1000);
+    });
+
+    it('ignores the keys while the heroes have not loaded', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: new Error('down') });
+
+        press(ctx, 'Q');
+
+        expect(ctx.scene.monster.health).toBe(1000);
+    });
+
+    it('shows the key letter on each slot', async () => {
+        const ctx = await createScene({ heroes: leaderOf('kael', 3) });
+
+        expect([ 1, 2, 3 ].map((number) => ctx.control(`[data-testid="skill-key-${number}"]`).textContent)).toEqual([ 'Q', 'W', 'E' ]);
+    });
+});
+
 describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
     const withStages = (patch, encounter = 'PHASE') => ({
         ...progress(1, encounter, 1),

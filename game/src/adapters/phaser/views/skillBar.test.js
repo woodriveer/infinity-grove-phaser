@@ -77,6 +77,14 @@ describe('renderSkillBar', () => {
     });
 });
 
+describe('renderSkillBar keys', () => {
+    it('shows Q, W and E on the slots of the skills 1, 2 and 3', () => {
+        const bar = renderSkillBar(leader(true, false, false));
+
+        expect([ 1, 2, 3 ].map((slot) => bar.querySelector(`[data-testid="skill-key-${slot}"]`).textContent)).toEqual([ 'Q', 'W', 'E' ]);
+    });
+});
+
 describe('renderSkillBar tooltip', () => {
     it('shows the skill card over an unlocked slot and over a locked one', () => {
         const bar = renderSkillBar(leader(true, false, false));

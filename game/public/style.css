@@ -1496,3 +1496,21 @@ button:disabled {
 .skill-tooltip.is-below {
     top: calc(100% + 10px);
 }
+
+/* The key that uses the skill, on the corner of its art */
+.skill-key {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    color: var(--color-bg);
+    border-radius: 6px;
+    background: var(--color-neutral-900);
+    opacity: 0.85;
+    pointer-events: none;
+}

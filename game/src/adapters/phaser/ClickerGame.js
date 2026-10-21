@@ -37,8 +37,8 @@ const BOSS_TIMER = { x: 512, y: 44 };
 const ENEMY_STATS = { x: 670, y: 596 };
 //  The running skill effects, under the stage and countdown pills
 const EFFECTS = { x: 512, y: 96 };
-//  Phaser key names of the skill keys 1, 2 and 3 and the slot each one uses
-const SKILL_KEYS = [ [ 'ONE', 1 ], [ 'TWO', 2 ], [ 'THREE', 3 ] ];
+//  Phaser key names of the skill keys and the slot each one uses: 1, 2, 3 and Q, W, E
+const SKILL_KEYS = [ [ 'ONE', 1 ], [ 'TWO', 2 ], [ 'THREE', 3 ], [ 'Q', 1 ], [ 'W', 2 ], [ 'E', 3 ] ];
 const DAMAGE_FONT = { fontFamily: 'Caprasimo', stroke: '#2e2b25', strokeThickness: 8 };
 const CRITICAL_TEXT = { color: '#ffc6a5', fontSize: 48 };
 const NORMAL_TEXT = { color: '#f5ead8', fontSize: 32 };
@@ -178,7 +178,8 @@ export class ClickerGame extends Scene
         this.pauseMenu.querySelector('.pause-confirm-no').addEventListener('click', () => this.showPauseOptions());
 
         this.input.keyboard.on('keydown-ESC', () => this.escape());
-        SKILL_KEYS.forEach(([ key, slot ]) => this.input.keyboard.on(`keydown-${key}`, () => this.useSkill(slot)));
+        //  A held key fires once: the repeats of the operating system are ignored
+        SKILL_KEYS.forEach(([ key, slot ]) => this.input.keyboard.on(`keydown-${key}`, (event) => !event?.repeat && this.useSkill(slot)));
     }
 
     //  Esc closes an open hero screen first; otherwise it opens or closes the pause menu
