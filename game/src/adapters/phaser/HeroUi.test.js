@@ -390,6 +390,64 @@ describe('HeroUi bag badge', () => {
     });
 });
 
+describe('HeroUi equipment badge', () => {
+    it('has no red dot until a piece drops', () => {
+        const { testid } = createUi();
+
+        expect(testid('equipment-badge').hidden).toBe(true);
+    });
+
+    it('a dropped piece lights the red dot on the Equipamento button and opening the screen clears it', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece() ] } });
+
+        ctx.ui.showEquipmentDrop({ piece: piece(), sold: false });
+
+        expect(ctx.testid('equipment-badge').hidden).toBe(false);
+        expect(ctx.testid('hud-equipment').contains(ctx.testid('equipment-badge'))).toBe(true);
+
+        await open(ctx, 'equipment');
+
+        expect(ctx.testid('equipment-badge').hidden).toBe(true);
+    });
+
+    it('a piece that drops while Equipamento is open leaves the dot off', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece() ] } });
+        await open(ctx, 'equipment');
+
+        ctx.ui.showEquipmentDrop({ piece: piece(), sold: false });
+
+        expect(ctx.testid('equipment-badge').hidden).toBe(true);
+    });
+
+    it('a piece that drops over another screen lights the dot', async () => {
+        const ctx = createUi();
+        await open(ctx, 'heroes');
+
+        ctx.ui.showEquipmentDrop({ piece: piece(), sold: false });
+
+        expect(ctx.testid('equipment-badge').hidden).toBe(false);
+    });
+
+    it('a piece sold on arrival because the bag is full leaves the dot off', () => {
+        const { ui, testid } = createUi();
+
+        ui.showEquipmentDrop({ piece: piece(), sold: true });
+
+        expect(testid('equipment-badge').hidden).toBe(true);
+    });
+
+    it('does not touch the bag red dot, and a card does not light the equipment one', () => {
+        const { ui, testid } = createUi();
+
+        ui.showEquipmentDrop({ piece: piece(), sold: false });
+        expect(testid('bag-badge').hidden).toBe(true);
+
+        ui.showDrop({ heroId: 'lyra', heroName: 'Lyra Folhaveloz', stars: 0 });
+        expect(testid('bag-badge').hidden).toBe(false);
+        expect(testid('equipment-badge').hidden).toBe(false);
+    });
+});
+
 describe('HeroUi card notice', () => {
     it('shows "Carta: <nome>" for 3 s', () => {
         const { ui, testid, timers } = createUi();

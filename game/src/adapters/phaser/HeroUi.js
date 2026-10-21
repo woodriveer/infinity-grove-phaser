@@ -41,8 +41,10 @@ const LEADER_FAILED = 'Não foi possível trocar o líder.';
 const EQUIPMENT_FAILED = 'Não foi possível concluir a ação.';
 
 //  The bag button carries a red dot while the bag holds a card the player has not looked at yet
-const BAG_BADGE_HTML = '<span class="hud-badge" data-testid="bag-badge" hidden></span>';
-const HUD_HTML = `<div class="hero-hud">${SCREENS.map(({ id, label }) => `<button type="button" data-testid="hud-${id}">${ICONS[id]}${label}${id === 'bag' ? BAG_BADGE_HTML : ''}</button>`).join('')}</div>`;
+//  and the Equipamento button while it holds a piece the player has not looked at yet
+const BADGED = [ 'bag', 'equipment' ];
+const badgeHtml = (id) => `<span class="hud-badge" data-testid="${id}-badge" hidden></span>`;
+const HUD_HTML = `<div class="hero-hud">${SCREENS.map(({ id, label }) => `<button type="button" data-testid="hud-${id}">${ICONS[id]}${label}${BADGED.includes(id) ? badgeHtml(id) : ''}</button>`).join('')}</div>`;
 
 const PANEL_HTML = '<div class="hero-panel" hidden><div class="hero-window">'
     + '<div class="hero-header"><span class="hero-title"></span><span>'
@@ -78,7 +80,8 @@ export class HeroUi
 
         const hud = this.createDom(HUD, HUD_HTML);
 
-        this.bagBadge = hud.querySelector('.hud-badge');
+        this.bagBadge = hud.querySelector('[data-testid="bag-badge"]');
+        this.equipmentBadge = hud.querySelector('[data-testid="equipment-badge"]');
         this.screen = null;
 
         SCREENS.forEach(({ id }) => hud.querySelector(`[data-testid="hud-${id}"]`).addEventListener('click', () => this.show(id)));
@@ -142,6 +145,11 @@ export class HeroUi
         if (screen === 'bag')
         {
             this.bagBadge.hidden = true;
+        }
+
+        if (screen === 'equipment')
+        {
+            this.equipmentBadge.hidden = true;
         }
         this.body.replaceChildren();
         this.backButton.hidden = true;
@@ -400,6 +408,12 @@ export class HeroUi
     //  "Equipamento encontrado: Raro Arma" for 3 s, in the same place as the card notice
     showEquipmentDrop (drop)
     {
+        //  A piece sold on arrival (the bag was full) leaves nothing to look at; one that lands while Equipamento is open is seen at once
+        if (!drop.sold)
+        {
+            this.equipmentBadge.hidden = this.open && this.screen === 'equipment';
+        }
+
         this.showNotice(`Equipamento encontrado: ${dropLabel(drop.piece)}`);
     }
 
