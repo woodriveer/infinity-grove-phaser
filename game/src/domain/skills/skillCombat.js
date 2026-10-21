@@ -44,7 +44,7 @@ export class SkillCombat
     }
 
     //  Starts an effect, or restarts its duration without stacking it
-    start (list, id, label, ms)
+    start (list, id, label, ms, owner = {})
     {
         const running = list.find((effect) => effect.id === id);
 
@@ -54,12 +54,12 @@ export class SkillCombat
         }
         else
         {
-            list.push({ id, label, remainingMs: ms, seq: this.sequence++ });
+            list.push({ id, label, remainingMs: ms, seq: this.sequence++, ...owner });
         }
     }
 
     //  Starts a damage over time on the monster, or restarts it; a stacking one gains a stack up to its maximum
-    startDot (skill, attacker)
+    startDot (skill, attacker, owner = {})
     {
         const { id, percent, count, maxStacks = 1 } = skill.ticks;
         const running = this.dots.find((dot) => dot.id === id);
@@ -72,7 +72,7 @@ export class SkillCombat
         else
         {
             this.dots.push({
-                id, label: skill.label, percent, damageType: skill.damageType, attacker, stacks: 1, maxStacks, remainingMs: ms, untilTickMs: TICK_MS, seq: this.sequence++
+                id, label: skill.label, percent, damageType: skill.damageType, attacker, stacks: 1, maxStacks, remainingMs: ms, untilTickMs: TICK_MS, seq: this.sequence++, ...owner
             });
         }
     }
@@ -80,13 +80,21 @@ export class SkillCombat
     //  The running effects as tags, in the order they started, with whole seconds left
     effects ()
     {
+        return this.effectsWithOwner().map(({ label, seconds }) => ({ label, seconds }));
+    }
+
+    //  The same effects with the hero and slot of the skill that started each, for the tooltip of its tag
+    effectsWithOwner ()
+    {
         this.follow(this.target);
 
         return [ ...this.buffs, ...this.debuffs, ...this.dots ]
             .sort((a, b) => a.seq - b.seq)
-            .map(({ label, remainingMs, maxStacks, stacks }) => ({
+            .map(({ label, remainingMs, maxStacks, stacks, heroId, slot }) => ({
                 label: maxStacks > 1 ? `${label} x${stacks}` : label,
-                seconds: Math.ceil(remainingMs / 1000)
+                seconds: Math.ceil(remainingMs / 1000),
+                heroId,
+                slot
             }));
     }
 
@@ -145,14 +153,16 @@ export class SkillCombat
         this.follow(monster);
         this.cooldowns.set(`${heroId}:${slot}`, skill.cooldownMs);
 
+        const owner = { heroId, slot };
+
         if (skill.buff)
         {
-            this.start(this.buffs, skill.buff.id, skill.label, skill.buff.ms);
+            this.start(this.buffs, skill.buff.id, skill.label, skill.buff.ms, owner);
         }
 
         if (skill.debuff)
         {
-            this.start(this.debuffs, skill.debuff.id, skill.label, skill.debuff.ms);
+            this.start(this.debuffs, skill.debuff.id, skill.label, skill.debuff.ms, owner);
         }
 
         const hits = [];
@@ -175,7 +185,7 @@ export class SkillCombat
 
         if (skill.ticks && !monster.dead)
         {
-            this.startDot(skill, attacker);
+            this.startDot(skill, attacker, owner);
         }
 
         if (skill.cast)

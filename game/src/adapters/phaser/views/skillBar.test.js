@@ -77,6 +77,39 @@ describe('renderSkillBar', () => {
     });
 });
 
+describe('renderSkillBar tooltip', () => {
+    it('shows the skill card over an unlocked slot and over a locked one', () => {
+        const bar = renderSkillBar(leader(true, false, false));
+
+        slots(bar)[0].dispatchEvent(new Event('pointerenter'));
+        expect(slots(bar)[0].querySelector('.skill-state').textContent).toBe('Liberada');
+        expect(slots(bar)[0].querySelector('.skill-tooltip .skill-name').textContent).toBe('Skill 1');
+        expect(slots(bar)[0].querySelector('.skill-tooltip .skill-cooldown').textContent).toBe('Recarga: 10s');
+
+        slots(bar)[1].dispatchEvent(new Event('pointerenter'));
+        expect(slots(bar)[1].querySelector('.skill-tooltip .skill-state').textContent).toBe('Bloqueada');
+    });
+
+    it('does not change what a click on the slot does', () => {
+        const used = [];
+        const bar = renderSkillBar(leader(true, false, false), { onUse: (slot) => used.push(slot) });
+
+        slots(bar)[0].dispatchEvent(new Event('pointerenter'));
+        slots(bar)[0].click();
+
+        expect(used).toEqual([ 1 ]);
+    });
+
+    it('hides the tooltip when the pointer leaves the slot', () => {
+        const bar = renderSkillBar(leader(true, false, false));
+
+        slots(bar)[0].dispatchEvent(new Event('pointerenter'));
+        slots(bar)[0].dispatchEvent(new Event('pointerleave'));
+
+        expect(bar.querySelector('[data-testid="skill-tooltip"]')).toBeNull();
+    });
+});
+
 describe('refreshSkillBar', () => {
     const states = { 1: { state: 'cooling', seconds: 7 }, 2: { state: 'casting', seconds: 2 }, 3: { state: 'ready', seconds: 0 } };
 

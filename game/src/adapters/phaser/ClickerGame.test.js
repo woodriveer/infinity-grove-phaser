@@ -2586,6 +2586,64 @@ describe('ClickerGame skills', () => {
     });
 });
 
+describe('ClickerGame skill tooltip', () => {
+    const lyra = () => ({ leaderId: 'lyra', heroes: [ heroEntry('lyra', { 3: 1 }, 3), heroEntry('kael'), heroEntry('orina') ] });
+    const slot = (ctx, number) => ctx.control(`[data-testid="skill-slot-${number}"]`);
+    const enter = (node) => node.dispatchEvent(new Event('pointerenter'));
+
+    it('shows the card of a slot on hover and hides it when the pointer leaves', async () => {
+        const ctx = await createScene({ heroes: lyra() });
+
+        enter(slot(ctx, 2));
+
+        expect(slot(ctx, 2).querySelector('[data-testid="skill-tooltip"] .skill-name').textContent).toBe('Skill 2');
+
+        slot(ctx, 2).dispatchEvent(new Event('pointerleave'));
+
+        expect(slot(ctx, 2).querySelector('[data-testid="skill-tooltip"]')).toBeNull();
+    });
+
+    it('shows the card of the skill that started a running effect when its tag is hovered, and keeps it as the seconds count down', async () => {
+        const ctx = await createScene({ heroes: lyra() });
+
+        ctx.scene.useSkill(3);
+        ctx.scene.update(0, 16);
+
+        const tag = ctx.hud('.effect-tags .tag-effect');
+
+        enter(tag);
+
+        expect(tag.querySelector('[data-testid="skill-tooltip"] .skill-name').textContent).toBe('Skill 3');
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.hud('.effect-tags .tag-effect')).toBe(tag);
+        expect(tag.querySelector('[data-testid="skill-tooltip"]')).not.toBeNull();
+    });
+
+    it('hides the tooltip when the effect ends and its tag goes away', async () => {
+        const ctx = await createScene({ heroes: lyra() });
+
+        ctx.scene.useSkill(3);
+        ctx.scene.update(0, 16);
+        enter(ctx.hud('.effect-tags .tag-effect'));
+        ctx.scene.update(0, 12000);
+
+        expect(ctx.hud('.effect-tags [data-testid="skill-tooltip"]')).toBeUndefined();
+    });
+
+    it('shows no tooltip on a tag while the heroes are unknown', async () => {
+        const ctx = await createScene({ heroes: lyra() });
+
+        ctx.scene.useSkill(3);
+        ctx.scene.update(0, 16);
+        ctx.scene.heroes.heroes().length = 0;
+        enter(ctx.hud('.effect-tags .tag-effect'));
+
+        expect(ctx.hud('.effect-tags [data-testid="skill-tooltip"]')).toBeUndefined();
+    });
+});
+
 describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
     const withStages = (patch, encounter = 'PHASE') => ({
         ...progress(1, encounter, 1),

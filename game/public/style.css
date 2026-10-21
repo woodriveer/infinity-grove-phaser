@@ -169,6 +169,8 @@ button:disabled {
 }
 
 .tag-effect {
+    position: relative;
+    pointer-events: auto;
     color: var(--color-accent-700);
     background: var(--color-bg);
     box-shadow: var(--shadow-lg);
@@ -1466,4 +1468,31 @@ button:disabled {
     line-height: 1.15;
     text-align: center;
     color: var(--color-neutral-700);
+}
+
+/* ══ Skill tooltip: the skill card of the hero screens over a slot or an effect tag ══ */
+
+.skill-tooltip {
+    position: absolute;
+    left: 50%;
+    z-index: 10;
+    width: 340px;
+    padding: 10px 12px;
+    font-weight: 500;
+    text-align: left;
+    white-space: normal;
+    color: var(--color-text);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.skill-tooltip.is-above {
+    bottom: calc(100% + 10px);
+}
+
+.skill-tooltip.is-below {
+    top: calc(100% + 10px);
 }

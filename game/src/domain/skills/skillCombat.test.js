@@ -142,6 +142,21 @@ describe('click', () => {
     });
 });
 
+describe('effect owners', () => {
+    it('names the hero and the slot of the skill that started each effect, in start order', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'lyra', 3);
+        use(skills, monster, 'vex', 1);
+
+        expect(skills.effectsWithOwner()).toEqual([
+            { label: 'Ventos Ligeiros', seconds: 12, heroId: 'lyra', slot: 3 },
+            { label: 'Bomba de Veneno x1', seconds: 8, heroId: 'vex', slot: 1 }
+        ]);
+    });
+});
+
 describe('timed effects', () => {
     it('adds Ventos Ligeiros 50 % to clicks for 12 s, then ends', () => {
         const skills = combat();

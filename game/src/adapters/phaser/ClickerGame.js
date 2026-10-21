@@ -7,7 +7,7 @@ import { SkillCombat } from '../../domain/skills/skillCombat';
 import { HeroUi } from './HeroUi';
 import { el } from './views/dom';
 import { renderElementWheel } from './views/elementWheel';
-import { renderEffectTags } from './views/skillEffects';
+import { renderEffectTags, updateEffectTags } from './views/skillEffects';
 
 //  The leader hero stands on the ground line of the monster; y is its feet
 const CHARACTER = { x: 230, y: 612, height: 320 };
@@ -517,14 +517,24 @@ export class ClickerGame extends Scene
     {
         this.heroUi.refreshSkills();
 
-        const effects = this.skills.effects();
-        const key = effects.map(({ label, seconds }) => `${label} ${seconds}`).join('|');
+        const effects = this.skills.effectsWithOwner();
+        const key = effects.map(({ label }) => label).join('|');
 
-        if (key !== this.effectsKey)
+        //  Same effects: only the seconds change, in place, so a tooltip open on a tag stays open
+        if (key === this.effectsKey)
         {
-            this.effectsKey = key;
-            this.effectTags.replaceChildren(...renderEffectTags(effects));
+            updateEffectTags(this.effectTags, effects);
+            return;
         }
+
+        this.effectsKey = key;
+        this.effectTags.replaceChildren(...renderEffectTags(effects, { skillOf: ({ heroId, slot }) => this.skillCard(heroId, slot) }));
+    }
+
+    //  The skill card ({ name, type, effect, ... }) of a hero's slot as the heroes payload has it, null while the heroes have not loaded
+    skillCard (heroId, slot)
+    {
+        return this.heroes.heroes().find((hero) => hero.id === heroId)?.skills.find((skill) => skill.slot === slot) ?? null;
     }
 
     //  The state of a slot of the leader for the bar: locked until the hero has the stars
