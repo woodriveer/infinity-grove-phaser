@@ -94,6 +94,8 @@ test.describe('Hero skills: every skill on the real scene', () => {
             await click(page);
             await expect.poll(() => dealt(page)).toBeCloseTo(0.5 * STAR, 5);
 
+            //  1.6 s without a click lets the combo of the first click lapse, so each click below is a plain one
+            await advance(page, 1_600);
             await use(page, 3);
             await expect(page.locator('.effect-tags')).toContainText('Brado Aterrador');
             await click(page);
@@ -214,6 +216,8 @@ test.describe('Hero skills: every skill on the real scene', () => {
             await click(page);
             await expect.poll(() => dealt(page)).toBeCloseTo(STAR, 5);
 
+            //  1.6 s without a click lets the combo of the first click lapse
+            await advance(page, 1_600);
             await use(page, 2);
             await click(page);
             await expect.poll(() => dealt(page)).toBeCloseTo(STAR + STAR * 2.5, 5);
