@@ -79,7 +79,7 @@ cristalizado na seiva ancestral. Especialista em ataque e controle.
 ### Lyra Folhaveloz — Arqueira
 Batedora élfica que caça nas copas da floresta; dizem que suas flechas seguem o
 vento. Especialista em dano rápido e preciso.
-**Bônus de líder:** Ventos Ligeiros dura 50% mais.
+**Bônus de líder:** 30% de chance de executar um clique duplo crítico.
 
 | Habilidade | Tipo | Efeito | Recarga |
 |---|---|---|---|

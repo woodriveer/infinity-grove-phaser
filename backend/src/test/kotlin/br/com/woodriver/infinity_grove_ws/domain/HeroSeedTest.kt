@@ -97,6 +97,11 @@ class HeroSeedTest {
     }
 
     @Test
+    fun `Lyra leads with a double critical click`() {
+        assertEquals("30% de chance de executar um clique duplo crítico.", heroes.first { it.id == "lyra" }.leaderBonus)
+    }
+
+    @Test
     fun `every hero has a leader bonus and every skill a type and an effect`() {
         assertTrue(heroes.all { it.leaderBonus.isNotBlank() })
         assertTrue(heroes.flatMap { it.skills }.all { it.type.isNotBlank() && it.effect.isNotBlank() })

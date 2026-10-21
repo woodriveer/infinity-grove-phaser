@@ -47,7 +47,7 @@ object HeroSeed {
             name = "Lyra Folhaveloz",
             heroClass = "Arqueira",
             element = Element.NATURE,
-            leaderBonus = "Ventos Ligeiros dura 50% mais.",
+            leaderBonus = "30% de chance de executar um clique duplo crítico.",
             portrait = "lyra_position",
             skills =
                 listOf(

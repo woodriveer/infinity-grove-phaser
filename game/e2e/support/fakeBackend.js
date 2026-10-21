@@ -79,7 +79,7 @@ const HEROES = [
         skills: [ skill(1, 'Corte Dimensional', 'Ataque', 20, 'kael_dimensional_cut'), skill(2, 'Investida do Baluarte', 'Controle', 25, 'kael_charge'), skill(3, 'Brado Aterrador', 'Debuff', 30, 'kael_screen') ]
     },
     {
-        id: 'lyra', name: 'Lyra Folhaveloz', heroClass: 'Arqueira', element: 'NATURE', leaderBonus: 'Ventos Ligeiros dura 50% mais.', portrait: 'lyra_position',
+        id: 'lyra', name: 'Lyra Folhaveloz', heroClass: 'Arqueira', element: 'NATURE', leaderBonus: '30% de chance de executar um clique duplo crítico.', portrait: 'lyra_position',
         skills: [ skill(1, 'Flecha Dupla', 'Ataque', 8, 'lyra_double_shot'), skill(2, 'Tiro Preciso', 'Ataque (conjuração)', 30, 'lyra_focused_shot'), skill(3, 'Ventos Ligeiros', 'Buff de grupo', 40, 'lyra_rapid_wind') ]
     },
     {

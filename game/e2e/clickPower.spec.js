@@ -75,4 +75,10 @@ test.describe('Click power', () => {
 
         expect(await dealt(page)).toBeCloseTo(1, 5);
     });
+
+    test('shows the new leader bonus of Lyra on the leader card', async ({ page }) => {
+        await startAs(page, 'lyra', { roll: 0.99 });
+
+        await expect(page.getByTestId('leader-card')).toContainText('30% de chance de executar um clique duplo crítico.');
+    });
 });
