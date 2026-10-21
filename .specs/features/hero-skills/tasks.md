@@ -397,9 +397,9 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Kael with 1 star as leader: key 1 deals 15 on a phase monster and the slot shows a countdown from `20s`
-- [ ] A second press does nothing
-- [ ] Gate check passes: `cd game && npm test && npm run test:e2e`
+- [x] Kael with 1 star as leader: key 1 deals 15 on a phase monster and the slot shows a countdown from `20s`
+- [x] A second press does nothing
+- [x] Gate check passes: `cd game && npm test && npm run test:e2e`
 
 **Tests**: e2e
 **Gate**: full
