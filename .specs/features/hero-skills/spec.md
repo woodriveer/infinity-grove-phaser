@@ -67,6 +67,7 @@ The combat screen shows the leader's three skills, but pressing a slot does noth
 | Cooldowns | Start on use, belong to (hero, slot), keep running across monsters, farm and leader changes, and reset on a page reload | A leader switch must not reset a cooldown | y |
 | Timed effects across monsters | Effects on the player (Ventos, Bênção, Fumaça) survive a monster's death and a leader change; effects on the monster (Brado, Prisão, Stun, Tempestade, Poison, Bleed) end when it dies or leaves | Buffs belong to the player, debuffs to the monster | y |
 | Pause | The pause menu and the hero screens freeze cooldowns, effects, ticks and casts | Same rule as the boss countdown | y |
+| Stun and Root tags | None; the boss countdown standing still is their sign. Prisão de Espinhos shows its own tag for its +25 % magical damage | A tag with the same label and seconds as Prisão would repeat it (decided after the Verifier flagged it) | y |
 | Enemy stat tags | Keep showing the monster's own defenses while Brado runs | The effect tag shows Brado | y |
 | A skill that kills | Counts exactly like a click kill (coins, campaign report, farm win) | One kill path | y |
 | On-screen texts | Slot: `<n>s` ready, `<left>s` cooling, `Mirando` casting; effect tag `<skill name> <left>s`, Poison `Bomba de Veneno x<stacks> <left>s`; seconds rounded up | Lesson L-010 | y |
@@ -125,9 +126,9 @@ The combat screen shows the leader's three skills, but pressing a slot does noth
 9. WHEN Golpe Sangrento hits THEN the game SHALL start a Bleed of 6 PHYSICAL ticks of 150 % Base, one each second.  <!-- event-driven -->
 10. The game SHALL never roll a critical on a tick.  <!-- ubiquitous -->
 11. WHEN a running effect is used again THEN the game SHALL restart its duration without stacking its value (Poison excepted).  <!-- event-driven -->
-12. WHEN the monster dies or leaves (timeout, leaving the fight, farm switch, realignment) THEN the game SHALL end Brado, Prisão, Stun, Tempestade, Poison and Bleed.  <!-- event-driven -->
+12. WHEN the monster dies or leaves (timeout, leaving the fight, farm switch, realignment) THEN the game SHALL end Brado, Prisão, the Stun and Root stops, Tempestade, Poison and Bleed.  <!-- event-driven -->
 13. WHILE Ventos Ligeiros, Bênção or Bomba de Fumaça runs the game SHALL keep it across monster deaths and leader changes until its seconds end.  <!-- state-driven -->
-14. WHILE an effect runs the game SHALL show a tag `<skill name> <left>s` in the effects row (`Bomba de Veneno x<stacks> <left>s` for Poison), seconds rounded up, in the order the effects started.  <!-- state-driven -->
+14. WHILE an effect runs the game SHALL show a tag `<skill name> <left>s` in the effects row (`Bomba de Veneno x<stacks> <left>s` for Poison), seconds rounded up, in the order the effects started; Stun and Root show no tag, the stopped countdown shows them.  <!-- state-driven -->
 15. WHILE the fight is paused the game SHALL freeze every effect and tick.  <!-- state-driven -->
 
 **Independent Test**: Use Ventos Ligeiros with Lyra and read a Base-1 click dealing 1.5; wait 12 s and read 1 again; the tag `Ventos Ligeiros 12s` counts down and disappears.
@@ -170,16 +171,16 @@ The combat screen shows the leader's three skills, but pressing a slot does noth
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| SKILL-01 | P1: activation, keys, guards (AC 1-4) | Design | Pending |
-| SKILL-02 | P1: skill hits and damage (AC 5-12) | Design | Pending |
-| SKILL-03 | P1: cooldown display and leader change (AC 13-16) | Design | Pending |
-| SKILL-04 | P2: buffs on the player (AC 1-4, 13) | Design | Pending |
-| SKILL-05 | P2: debuffs and damage over time on the monster (AC 5-12) | Design | Pending |
-| SKILL-06 | P2: effects row and pause (AC 14-15) | Design | Pending |
-| SKILL-07 | P3: Stun, Root and Carrilhão on the countdown (AC 1-5) | Design | Pending |
-| SKILL-08 | P3: Tiro Preciso cast (AC 6-9) | Design | Pending |
+| SKILL-01 | P1: activation, keys, guards (AC 1-4) | Done | Verified |
+| SKILL-02 | P1: skill hits and damage (AC 5-12) | Done | Verified |
+| SKILL-03 | P1: cooldown display and leader change (AC 13-16) | Done | Verified |
+| SKILL-04 | P2: buffs on the player (AC 1-4, 13) | Done | Verified |
+| SKILL-05 | P2: debuffs and damage over time on the monster (AC 5-12) | Done | Verified |
+| SKILL-06 | P2: effects row and pause (AC 14-15) | Done | Verified |
+| SKILL-07 | P3: Stun, Root and Carrilhão on the countdown (AC 1-5) | Done | Verified |
+| SKILL-08 | P3: Tiro Preciso cast (AC 6-9) | Done | Verified |
 
-**Coverage:** 8 total, 0 mapped to tasks, 8 unmapped ⚠️
+**Coverage:** 8 total, 8 mapped to tasks, 0 unmapped
 
 ---
 

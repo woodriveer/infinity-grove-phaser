@@ -2480,3 +2480,179 @@ describe('ClickerGame skills', () => {
         expect(ctx.scene.monster).toBeNull();
     });
 });
+
+describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
+    const withStages = (patch, encounter = 'PHASE') => ({
+        ...progress(1, encounter, 1),
+        definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, ...patch })) }
+    });
+    const big = (encounter) => withStages({ monsterHealth: 1000, minibossHealth: 1000 }, encounter);
+    const leaderOf = (id, stars) => ({ leaderId: id, heroes: [ heroEntry(id, { [stars]: 1 }, stars), heroEntry('lyra'), heroEntry('orina') ] });
+    const slot = (ctx, number) => ctx.control(`[data-testid="skill-slot-${number}"]`);
+    const key = (ctx, name) => ctx.handlers[`keydown-${name}`]();
+    const timer = (ctx) => ctx.hud('.boss-timer').textContent;
+    const tags = (ctx) => ctx.hud('.effect-tags').textContent;
+    const tick = (ctx) => ctx.loops[0].callback();
+    const fadeAndRespawn = (ctx) => {
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+    };
+
+    it('shows a critical skill hit bigger and peach like a critical click, and a normal one cream', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('kael', 3) });
+
+        key(ctx, 'ONE');
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '15', style: expect.objectContaining({ color: '#f5ead8', fontSize: 32 }) });
+
+        ctx.dice.value = 0;
+        key(ctx, 'TWO');
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '8', style: expect.objectContaining({ color: '#ffc6a5', fontSize: 48 }) });
+    });
+
+    it('never shows a tick as critical, whatever the roll', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('orina', 2) });
+
+        ctx.dice.value = 0;
+        key(ctx, 'TWO');
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '2', style: expect.objectContaining({ color: '#f5ead8', fontSize: 32 }) });
+    });
+
+    it('freezes the effects, the ticks and the aimed shot while the fight is paused', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('lyra', 3) });
+
+        key(ctx, 'TWO');
+        key(ctx, 'THREE');
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 12000);
+
+        expect(slot(ctx, 2).getAttribute('data-state')).toBe('casting');
+        expect(tags(ctx)).toBe('Ventos Ligeiros 12s');
+        expect(ctx.scene.monster.health).toBe(1000);
+
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 2000);
+        expect(ctx.scene.monster.health).toBe(940);
+    });
+
+    it('freezes the ticks of a damage over time while the fight is paused', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('orina', 2) });
+
+        key(ctx, 'TWO');
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 5000);
+
+        expect(ctx.scene.monster.health).toBe(1000);
+        expect(tags(ctx)).toBe('Tempestade Arcana 6s');
+    });
+
+    it('keeps the boss countdown stopped by Investida while paused, then stopped for the 3 s that were left', async () => {
+        const ctx = await createScene({ start: big('MINIBOSS'), heroes: leaderOf('kael', 2) });
+
+        key(ctx, 'TWO');
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 5000);
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 3000);
+
+        expect(timer(ctx)).toBe('Time: 30');
+    });
+
+    it('ends the effects on the monster when the boss runs out of time, keeping the buffs', async () => {
+        const ctx = await createScene({ start: big('MINIBOSS'), heroes: leaderOf('kael', 3) });
+
+        key(ctx, 'THREE');
+        expect(tags(ctx)).toBe('Brado Aterrador 10s');
+
+        ctx.scene.update(0, 30001);
+
+        expect(ctx.scene.monster).toBeNull();
+        expect(tags(ctx)).toBe('');
+    });
+
+    it('ends the effects on the monster when the player leaves the boss fight', async () => {
+        const ctx = await createScene({ start: big('MINIBOSS'), heroes: leaderOf('kael', 3) });
+
+        key(ctx, 'THREE');
+        ctx.handlers['keydown-ESC']();
+        ctx.control('.pause-leave').click();
+        ctx.control('.pause-confirm-yes').click();
+        ctx.scene.update(0, 1);
+
+        expect(tags(ctx)).toBe('');
+    });
+
+    it('ends the effects on the monster when the backend realigns the position', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('kael', 3) });
+
+        key(ctx, 'THREE');
+        ctx.scene.realign(ctx.scene.session.encounter());
+        ctx.scene.update(0, 1);
+
+        expect(tags(ctx)).toBe('');
+    });
+
+    it('ends the effects on the monster when a farm fight starts, and a buff survives', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('kael', 3) });
+
+        key(ctx, 'THREE');
+        ctx.scene.startFarm({ kind: 'MINIBOSS', stage: 1 });
+        ctx.scene.update(0, 1);
+
+        expect(tags(ctx)).toBe('');
+    });
+
+    it('wins a farm fight with a skill kill: one farm request, no coins and no campaign report', async () => {
+        const ctx = await createScene({ start: withStages({ monsterHealth: 10, minibossHealth: 10 }), heroes: leaderOf('kael', 1) });
+        const miniboss = { kind: 'MINIBOSS', stage: 1 };
+
+        farmGateway.win.mockResolvedValue({ drop: null, chapterBossWinsLeft: 10 });
+        ctx.scene.startFarm(miniboss);
+        key(ctx, 'ONE');
+        await flush();
+
+        expect(farmGateway.win).toHaveBeenCalledTimes(1);
+        expect(farmGateway.win).toHaveBeenCalledWith(miniboss);
+        expect(ctx.sprites).toHaveLength(0);
+        expect(campaignGateway.report).not.toHaveBeenCalled();
+    });
+
+    it('drops the coins and queues the CLEARED report when a tick kills the monster', async () => {
+        const ctx = await createScene({
+            wallet: walletResponse(undefined, { 1: [ 3 ] }),
+            start: withStages({ monsterHealth: 3 }),
+            heroes: leaderOf('orina', 2)
+        });
+        await flush();
+
+        key(ctx, 'TWO');
+        ctx.scene.update(0, 2000);
+
+        expect(ctx.scene.monster.dead).toBe(true);
+        expect(ctx.sprites).toHaveLength(3);
+
+        fadeAndRespawn(ctx);
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.report).toHaveBeenCalledWith({ chapter: 1, stage: 1, encounter: 'PHASE', phase: 1 }, 'CLEARED');
+    });
+
+    it('shows the cooldowns of the leader after a change of leader and the ones of the old leader when it comes back', async () => {
+        const heroes = { leaderId: 'kael', heroes: [ heroEntry('kael', { 1: 1 }, 1), heroEntry('lyra', { 1: 1 }, 1), heroEntry('orina') ] };
+        const ctx = await createScene({ start: big(), heroes });
+
+        key(ctx, 'ONE');
+        expect(slot(ctx, 1).getAttribute('data-state')).toBe('cooling');
+
+        heroesGateway.setLeader.mockResolvedValueOnce({ leaderId: 'lyra' });
+        await ctx.scene.heroes.setLeader('lyra');
+        expect(slot(ctx, 1).getAttribute('data-state')).toBe('ready');
+
+        heroesGateway.setLeader.mockResolvedValueOnce({ leaderId: 'kael' });
+        await ctx.scene.heroes.setLeader('kael');
+        expect(slot(ctx, 1).getAttribute('data-state')).toBe('cooling');
+        expect(slot(ctx, 1).querySelector('.skill-slot-cooldown').textContent).toBe('20s');
+    });
+});

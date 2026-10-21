@@ -206,11 +206,11 @@ describe('timed effects', () => {
         const monster = monsterOf();
 
         use(skills, monster, 'lyra', 3);
-        skills.advance(40000, { monster });
-        use(skills, monster, 'lyra', 3);
         skills.advance(5000, { monster });
+        skills.cooldowns.clear();
+        use(skills, monster, 'lyra', 3);
 
-        expect(skills.effects()).toEqual([ { label: 'Ventos Ligeiros', seconds: 7 } ]);
+        expect(skills.effects()).toEqual([ { label: 'Ventos Ligeiros', seconds: 12 } ]);
         expect(skills.click({ attacker: PLAYER, monster, boss: false }).damage).toBe(1.5);
     });
 

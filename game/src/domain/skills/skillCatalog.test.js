@@ -14,6 +14,16 @@ describe('skillCatalog', () => {
         expect([ 1, 2, 3 ].map((slot) => skillOf(heroId, slot).cooldownMs / 1000)).toEqual(seconds);
     });
 
+    it('pins the damage type of every skill: Kael, Lyra and Vex physical, Orina and Seraphine magical', () => {
+        const types = (heroId) => [ 1, 2, 3 ].map((slot) => skillOf(heroId, slot).damageType);
+
+        expect(types('kael')).toEqual([ 'PHYSICAL', 'PHYSICAL', 'PHYSICAL' ]);
+        expect(types('lyra')).toEqual([ 'PHYSICAL', 'PHYSICAL', 'PHYSICAL' ]);
+        expect(types('orina')).toEqual([ 'MAGICAL', 'MAGICAL', 'MAGICAL' ]);
+        expect(types('seraphine')).toEqual([ 'MAGICAL', 'MAGICAL', 'MAGICAL' ]);
+        expect(types('vex')).toEqual([ 'PHYSICAL', 'PHYSICAL', 'PHYSICAL' ]);
+    });
+
     it('pins the instant hits of the table', () => {
         expect(skillOf('kael', 1)).toMatchObject({ damageType: 'PHYSICAL', hits: [ { percent: 1500, armorPierce: 30 } ] });
         expect(skillOf('kael', 2)).toMatchObject({ damageType: 'PHYSICAL', hits: [ { percent: 400 } ], stunMs: 3000 });

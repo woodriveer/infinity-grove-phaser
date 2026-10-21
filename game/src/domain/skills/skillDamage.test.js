@@ -74,6 +74,13 @@ describe('buffs', () => {
 
         expect(clickDamage({ attacker, defender: enemy(), random: () => 0.999, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(true);
     });
+
+    it('caps 95 + 15 at 100 before the critical resistance: against resistance 50 a roll of 52 does not crit', () => {
+        const attacker = { ...PLAYER, critChance: 95 };
+
+        expect(clickDamage({ attacker, defender: enemy('FIRE', 0, 0, 50), random: () => 0.52, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(false);
+        expect(clickDamage({ attacker, defender: enemy('FIRE', 0, 0, 50), random: () => 0.49, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(true);
+    });
 });
 
 describe('debuffs', () => {
