@@ -654,6 +654,22 @@ describe('HeroUi equipment notice', () => {
         expect(testid('card-notice').hidden).toBe(false);
     });
 
+    it('a card then a piece: the notice of the piece shows, lasts 3 s from its own start and the card timer does not hide it', () => {
+        const { ui, testid, timers } = createUi();
+
+        ui.showDrop({ heroId: 'lyra', heroName: 'Lyra Folhaveloz', stars: 0 });
+        ui.showEquipmentDrop({ piece: piece({ rarity: 'RARE', slot: 'WEAPON' }), sold: false });
+
+        expect(timers.map((timer) => timer.delay)).toEqual([ 3000, 3000 ]);
+        expect(testid('card-notice').textContent).toBe('Equipamento encontrado: Raro Arma');
+
+        timers[0].callback();
+        expect(testid('card-notice').hidden).toBe(false);
+
+        timers[1].callback();
+        expect(testid('card-notice').hidden).toBe(true);
+    });
+
     it('does not light the bag red dot', () => {
         const { ui, testid } = createUi();
 

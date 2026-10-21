@@ -39,7 +39,7 @@ The combat screen does not tell the player which chapter they are in, how much h
 | Effect tag of a former leader | Shows the card of the hero that owns the skill | Effects survive a leader change (hero-skills) | n |
 | Drop notice | Already works (user confirmed); it stays as it is and only gets a regression test | The first reading of the request was wrong | y |
 | Skill keys | Q, W, E use slots 1, 2, 3 and are added to the existing keys 1, 2, 3, which keep working; each slot shows its keys as `Q` / `W` / `E` (`data-testid="skill-key-<slot>"`) | "Q W E por exemplo" (user); keeping 1-3 breaks nothing | n |
-| Keys vs pause menu | The pause menu keeps 1 and 2 for its options; Q, W, E do nothing while it is open | Same guard as the skill keys | n |
+| Keys vs pause menu | The pause menu has no key handler (its `1.` and `2.` are labels of the buttons); Q, W, E and 1, 2, 3 do nothing while it is open | Same guard as the skill keys; the first reading of the pause menu was wrong (Verifier G7) | n |
 | Equipment badge | A red dot on the Equipamento button while a dropped piece has not been looked at, like the bag badge for cards | The user asked for "a notificação" of a new item | n |
 
 **Open questions:** none - all resolved or logged above.

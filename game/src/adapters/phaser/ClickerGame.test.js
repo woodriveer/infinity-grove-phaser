@@ -371,6 +371,40 @@ describe('ClickerGame chapter and health text', () => {
     });
 });
 
+describe('ClickerGame HP text after skills', () => {
+    const big = () => ({
+        ...progress(1, 'PHASE', 1),
+        definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000 })) }
+    });
+    const hp = (ctx) => ctx.hud('.monster-hp').textContent;
+
+    it('follows a skill hit that does not kill: Corte Dimensional of a 1 star Kael reads HP 983.5/1000 and moves the bar', async () => {
+        const ctx = await createScene({ start: big(), heroes: { leaderId: 'kael', heroes: [ heroEntry('kael', { 1: 1 }, 1) ] } });
+
+        ctx.scene.useSkill(1);
+
+        expect(hp(ctx)).toBe('HP 983.5/1000');
+        expect(ctx.fill.width).toBeCloseTo(240 * 983.5 / 1000, 10);
+    });
+
+    it('follows a damage tick that does not kill: Tempestade Arcana of a 2 star Orina reads HP 997.6/1000 and moves the bar', async () => {
+        const ctx = await createScene({ start: big(), heroes: { leaderId: 'orina', heroes: [ heroEntry('orina', { 2: 1 }, 2) ] } });
+
+        ctx.scene.useSkill(2);
+        ctx.scene.update(0, 1000);
+
+        expect(hp(ctx)).toBe('HP 997.6/1000');
+        expect(ctx.fill.width).toBeCloseTo(240 * 997.6 / 1000, 10);
+    });
+
+    it('shows the chapter and the HP text while the heroes have not loaded', async () => {
+        const ctx = await createScene({ start: { ...big(), chapter: 3 }, heroes: new Error('down') });
+
+        expect(ctx.hud('.chapter-hud').textContent).toBe('Capítulo 3');
+        expect(hp(ctx)).toBe('HP 1000/1000');
+    });
+});
+
 describe('ClickerGame element wheel', () => {
     it('shows the element wheel without blocking clicks', async () => {
         const ctx = await createScene();
@@ -2928,8 +2962,11 @@ describe('ClickerGame skill tooltip', () => {
         ctx.scene.useSkill(3);
         ctx.scene.update(0, 16);
         enter(ctx.hud('.effect-tags .tag-effect'));
+        expect(ctx.hud('.effect-tags [data-testid="skill-tooltip"]')).toBeDefined();
+
         ctx.scene.update(0, 12000);
 
+        expect(ctx.hud('.effect-tags .tag-effect')).toBeUndefined();
         expect(ctx.hud('.effect-tags [data-testid="skill-tooltip"]')).toBeUndefined();
     });
 
@@ -3052,6 +3089,29 @@ describe('ClickerGame skill keys Q, W and E', () => {
         const ctx = await createScene({ heroes: leaderOf('kael', 3) });
 
         expect([ 1, 2, 3 ].map((number) => ctx.control(`[data-testid="skill-key-${number}"]`).textContent)).toEqual([ 'Q', 'W', 'E' ]);
+    });
+});
+
+describe('ClickerGame skill tooltip of a former leader', () => {
+    it('shows the card of the hero that owns the skill after the leader changed', async () => {
+        const heroes = { leaderId: 'lyra', heroes: [ heroEntry('lyra', { 3: 1 }, 3), heroEntry('kael', { 3: 1 }, 3) ] };
+        const ctx = await createScene({ heroes });
+
+        ctx.scene.useSkill(3);
+        ctx.scene.update(0, 16);
+        heroesGateway.setLeader.mockResolvedValue({ leaderId: 'kael' });
+        await ctx.scene.heroes.setLeader('kael');
+        ctx.scene.update(0, 16);
+
+        const tag = ctx.hud('.effect-tags .tag-effect');
+
+        tag.dispatchEvent(new Event('pointerenter'));
+
+        //  Ventos Ligeiros is Lyra slot 3: the card is hers, not the one of the new leader in the same slot
+        expect(tag.textContent).toContain('Ventos Ligeiros');
+        expect(tag.querySelector('[data-testid="skill-tooltip"] .skill-name').textContent).toBe('Skill 3');
+        expect(ctx.scene.skillCard('lyra', 3)).toBe(ctx.scene.heroes.heroes().find((hero) => hero.id === 'lyra').skills[2]);
+        expect(ctx.scene.skillCard('lyra', 3)).not.toBe(ctx.scene.skillCard('kael', 3));
     });
 });
 

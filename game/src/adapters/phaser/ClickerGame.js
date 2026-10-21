@@ -505,9 +505,14 @@ export class ClickerGame extends Scene
 
         hits.forEach(({ damage, critical }) => this.showDamage(formatDamage(damage), MONSTER.x, critical));
 
+        //  A tick that does not kill still moves the health bar and the HP text; one that kills runs the kill path
         if (alive && this.monster.dead)
         {
             this.afterDamage();
+        }
+        else if (alive && hits.length > 0)
+        {
+            this.updateHealthBar();
         }
 
         this.refreshSkillUi();
