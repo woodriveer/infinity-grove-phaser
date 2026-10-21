@@ -747,6 +747,44 @@ describe('HeroUi transfer of a set', () => {
     });
 });
 
+describe('HeroUi Rever chefes map', () => {
+    const beaten = (...stages) => ({ bosses: stages.map((stage) => ({ kind: 'MINIBOSS', stage })), chapterBossWinsLeft: 10 });
+    const states = (ctx) => ctx.root.flatMap((node) => [ ...node.querySelectorAll('.farm-map .map-node') ]).map((node) => node.getAttribute('data-state'));
+
+    it('opens the map of the chapter the player is in, titled Caminho do Capítulo <n>, and pauses the fight', async () => {
+        const ctx = createUi({ farmGet: beaten(1, 2, 3) });
+
+        ctx.hooks.mapPosition = vi.fn(() => ({ chapter: 3, stage: 4, kind: 'PHASE', stageCount: 10, completed: false }));
+        ctx.ui.hooks.mapPosition = ctx.hooks.mapPosition;
+        await open(ctx, 'farm');
+
+        expect(ctx.testid('farm-map-title').textContent).toBe('Caminho do Capítulo 3');
+        expect(ctx.hooks.pause).toHaveBeenCalledTimes(1);
+        expect(states(ctx)).toEqual([ 'defeated', 'defeated', 'defeated', 'current', ...Array(7).fill('locked') ]);
+    });
+
+    it('assumes stage 1 of chapter 1 while the campaign has not loaded', async () => {
+        const ctx = createUi({ farmGet: { bosses: [], chapterBossWinsLeft: 10 } });
+
+        await open(ctx, 'farm');
+
+        expect(ctx.testid('farm-map-title').textContent).toBe('Caminho do Capítulo 1');
+        expect(states(ctx)).toEqual([ 'current', ...Array(10).fill('locked') ]);
+        expect(ctx.testid('farm-empty').textContent).toBe('Nenhum chefe derrotado ainda.');
+    });
+
+    it('closes the window and starts the farm of a beaten stop', async () => {
+        const ctx = createUi({ farmGet: beaten(1, 2) });
+
+        await open(ctx, 'farm');
+        ctx.testid('farm-entry-miniboss-2').click();
+
+        expect(ctx.hooks.startFarm).toHaveBeenCalledWith({ kind: 'MINIBOSS', stage: 2 });
+        expect(ctx.query('.hero-panel').hidden).toBe(true);
+        expect(ctx.hooks.resume).toHaveBeenCalledTimes(1);
+    });
+});
+
 describe('HeroUi equipment badge', () => {
     it('has no red dot until a piece drops', () => {
         const { testid } = createUi();

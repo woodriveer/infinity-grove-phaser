@@ -222,7 +222,8 @@ export class ClickerGame extends Scene
             resume: () => this.resumeFromMenu(),
             startFarm: (boss) => this.startFarm(boss),
             useSkill: (slot) => this.useSkill(slot),
-            skillState: (slot) => this.skillState(slot)
+            skillState: (slot) => this.skillState(slot),
+            mapPosition: () => this.session.mapPosition()
         });
         this.heroes.onChange(() => this.showCharacter());
         this.loadHeroes();

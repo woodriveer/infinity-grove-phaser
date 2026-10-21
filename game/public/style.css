@@ -1913,3 +1913,160 @@ button:disabled {
     border-radius: 999px;
     background: var(--color-accent-2-200);
 }
+
+/* ══ Rever chefes: the chapter as a map ══ */
+
+.farm-screen {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.farm-map-title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 22px;
+}
+
+.farm-map {
+    position: relative;
+    width: 880px;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(160deg, #4f9a3c 0%, #8fa073 38%, #6b5d8f 72%, #3d2d5c 100%);
+}
+
+.farm-map-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.farm-trail {
+    display: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.farm-map.is-fallback .farm-trail {
+    display: block;
+}
+
+.farm-trail polyline {
+    fill: none;
+    stroke: rgb(245 234 216 / 0.8);
+    stroke-width: 1.2;
+    stroke-dasharray: 3 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.map-node {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    color: var(--color-text);
+    border: 3px solid var(--color-bg);
+    border-radius: 50%;
+    background: var(--color-surface);
+    box-shadow: 0 3px 8px rgb(0 0 0 / 0.4);
+    transform: translate(-50%, -50%);
+}
+
+.map-node.is-boss {
+    width: 96px;
+    height: 80px;
+    border-radius: 24px;
+    font-size: 20px;
+}
+
+.map-node.is-boss .farm-wins {
+    position: absolute;
+    top: calc(100% + 4px);
+    padding: 2px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+/* A beaten stop: a green flag mark, a button */
+.map-node[data-state="defeated"] {
+    border-color: #5da048;
+    background: var(--color-accent-2-200);
+    cursor: pointer;
+}
+
+.map-node[data-state="defeated"]::after {
+    content: '⚑';
+    position: absolute;
+    top: -14px;
+    right: -6px;
+    font-size: 20px;
+    color: #3f7d2c;
+}
+
+.map-node[data-state="defeated"]:hover:not(:disabled) {
+    box-shadow: 0 0 0 4px var(--color-accent), 0 3px 8px rgb(0 0 0 / 0.4);
+}
+
+.map-node[data-state="defeated"]:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* The next boss: a pulsing ring, not clickable */
+.map-node[data-state="current"] {
+    border-color: var(--color-accent);
+    background: var(--color-accent-100);
+    animation: map-current 1.6s ease-in-out infinite;
+}
+
+/* A locked stop: fog and a lock */
+.map-node[data-state="locked"] {
+    color: var(--color-neutral-600);
+    border-color: var(--color-neutral-400);
+    background: color-mix(in srgb, var(--color-neutral-300) 70%, transparent);
+    backdrop-filter: blur(3px);
+}
+
+.map-lock {
+    position: absolute;
+    right: -6px;
+    bottom: -6px;
+    font-size: 15px;
+}
+
+@keyframes map-current {
+    0%, 100% { box-shadow: 0 0 0 0 rgb(198 113 57 / 0.7), 0 3px 8px rgb(0 0 0 / 0.4); }
+    50% { box-shadow: 0 0 0 10px rgb(198 113 57 / 0), 0 3px 8px rgb(0 0 0 / 0.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .map-node[data-state="current"] {
+        animation: none;
+        box-shadow: 0 0 0 5px rgb(198 113 57 / 0.55), 0 3px 8px rgb(0 0 0 / 0.4);
+    }
+}
+
+/* A stage without a position on the map is listed below it as a plain button */
+.farm-extra {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.farm-extra .map-node {
+    position: static;
+    transform: none;
+}

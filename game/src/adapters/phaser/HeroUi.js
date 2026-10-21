@@ -40,6 +40,9 @@ const SCREENS = [
     { id: 'farm', label: 'Rever chefes', title: 'Rever chefes' }
 ];
 
+//  Where the map assumes the player stands while the campaign has not loaded
+const DEFAULT_POSITION = { chapter: 1, stage: 1, kind: 'PHASE', stageCount: 10, completed: false };
+
 const LOAD_FAILED = 'Não foi possível carregar.';
 const FUSE_FAILED = 'Não foi possível fundir as cartas.';
 const LEADER_FAILED = 'Não foi possível trocar o líder.';
@@ -70,10 +73,11 @@ const NOTICE_HTML = '<div class="hud-box hud-notice"><div class="card-notice" da
 //    walletCopper() -> the copper the player holds, to disable what costs more;
 //    pause() -> true when it paused the fight, false when the fight was already paused; resume() undoes a pause that pause() made;
 //    startFarm(boss) starts the farm fight of the chosen boss;
-//    useSkill(slot) uses a skill of the leader (optional); skillState(slot) -> { state, seconds } of a slot of the leader (optional).
+//    useSkill(slot) uses a skill of the leader (optional); skillState(slot) -> { state, seconds } of a slot of the leader (optional);
+//    mapPosition() -> { chapter, stage, kind, stageCount, completed } where the player stands, for the chapter map (optional).
 export class HeroUi
 {
-    constructor (scene, { heroes, equipment, talents, farm, pause, resume, startFarm, walletCopper, useSkill, skillState })
+    constructor (scene, { heroes, equipment, talents, farm, pause, resume, startFarm, walletCopper, useSkill, skillState, mapPosition })
     {
         this.scene = scene;
         this.heroes = heroes;
@@ -82,7 +86,7 @@ export class HeroUi
         this.talentBusy = false;
         this.equipBusy = false;
         this.farm = farm;
-        this.hooks = { pause, resume, startFarm, walletCopper, useSkill, skillState };
+        this.hooks = { pause, resume, startFarm, walletCopper, useSkill, skillState, mapPosition };
         this.open = false;
         this.pausedByUs = false;
         this.view = 0;
@@ -491,6 +495,7 @@ export class HeroUi
     {
         this.setError('');
         this.body.replaceChildren(renderFarm(this.farm.bosses(), this.farm.winsLeft(), {
+            map: this.hooks.mapPosition?.() ?? DEFAULT_POSITION,
             onPick: (boss) =>
             {
                 this.close();

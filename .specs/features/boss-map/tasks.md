@@ -89,12 +89,12 @@ T1 → T2 → T3
 
 **Done when**:
 
-- [ ] The map is titled `Caminho do Capítulo <n>` and shows 10 numbered stops and `Chefe` in path order, each with `data-state` and an accessible name
-- [ ] Only a defeated stop is a button, with the old test ids, and it starts the farm exactly as the row did; the chapter boss shows its wins and is disabled at 0
-- [ ] With no boss beaten the map shows with `Nenhum chefe derrotado ainda.`; opening it pauses the fight
-- [ ] The image `assets/ui/boss-map.jpg` is the background; while it fails the gradient and the dashed trail show, and with it no trail
-- [ ] A stage without a table position is a plain button below the map
-- [ ] Gate check passes: `cd game && npm test && npm run build`
+- [x] The map is titled `Caminho do Capítulo <n>` and shows 10 numbered stops and `Chefe` in path order, each with `data-state` and an accessible name
+- [x] Only a defeated stop is a button, with the old test ids, and it starts the farm exactly as the row did; the chapter boss shows its wins and is disabled at 0
+- [x] With no boss beaten the map shows with `Nenhum chefe derrotado ainda.`; opening it pauses the fight
+- [x] The image `assets/ui/boss-map.jpg` is the background; while it fails the gradient and the dashed trail show, and with it no trail
+- [x] A stage without a table position is a plain button below the map
+- [x] Gate check passes: `cd game && npm test && npm run build`
 
 **Tests**: unit
 **Gate**: build

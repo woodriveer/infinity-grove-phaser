@@ -3098,6 +3098,31 @@ describe('ClickerGame talents in combat', () => {
     });
 });
 
+describe('ClickerGame chapter map', () => {
+    const stops = (ctx) => ctx.doms.flatMap((dom) => [ ...dom.node.querySelectorAll('.farm-map .map-node') ]).map((node) => node.getAttribute('data-state'));
+
+    it('reads where the player stands from the campaign: stage 4 with 3 minibosses beaten', async () => {
+        const ctx = await createScene({ start: { ...progress(4, 'PHASE', 2), chapter: 2 } });
+
+        farmGateway.get.mockResolvedValue({ bosses: [ 1, 2, 3 ].map((stage) => ({ kind: 'MINIBOSS', stage })), chapterBossWinsLeft: 10 });
+        ctx.control('[data-testid="hud-farm"]').click();
+        await flush();
+
+        expect(ctx.hud('[data-testid="farm-map-title"]').textContent).toBe('Caminho do Capítulo 2');
+        expect(stops(ctx)).toEqual([ 'defeated', 'defeated', 'defeated', 'current', ...Array(7).fill('locked') ]);
+    });
+
+    it('shows the chapter boss as the current stop when the campaign is at the chapter boss', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1) });
+
+        farmGateway.get.mockResolvedValue({ bosses: Array.from({ length: 10 }, (_, index) => ({ kind: 'MINIBOSS', stage: index + 1 })), chapterBossWinsLeft: 10 });
+        ctx.control('[data-testid="hud-farm"]').click();
+        await flush();
+
+        expect(stops(ctx)).toEqual([ ...Array(10).fill('defeated'), 'current' ]);
+    });
+});
+
 describe('ClickerGame skill tooltip', () => {
     const lyra = () => ({ leaderId: 'lyra', heroes: [ heroEntry('lyra', { 3: 1 }, 3), heroEntry('kael'), heroEntry('orina') ] });
     const slot = (ctx, number) => ctx.control(`[data-testid="skill-slot-${number}"]`);
