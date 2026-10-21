@@ -1,10 +1,12 @@
 import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
-import { calculateDamage, formatDamage, PLAYER } from '../../domain/combat/damage';
+import { formatDamage, PLAYER } from '../../domain/combat/damage';
 import { attackerFor, bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/equipment';
 import { Monster } from '../../domain/combat/monster';
+import { SkillCombat } from '../../domain/skills/skillCombat';
 import { HeroUi } from './HeroUi';
 import { el } from './views/dom';
+import { renderEffectTags } from './views/skillEffects';
 
 //  The leader hero stands on the ground line of the monster; y is its feet
 const CHARACTER = { x: 230, y: 612, height: 320 };
@@ -27,6 +29,10 @@ const STAGE_HUD = { x: 356, y: 44 };
 const BOSS_TIMER = { x: 512, y: 44 };
 //  Under the monster, clear of the damage numbers that rise above its health bar
 const ENEMY_STATS = { x: 670, y: 596 };
+//  The running skill effects, under the stage and countdown pills
+const EFFECTS = { x: 512, y: 96 };
+//  Phaser key names of the skill keys 1, 2 and 3 and the slot each one uses
+const SKILL_KEYS = [ [ 'ONE', 1 ], [ 'TWO', 2 ], [ 'THREE', 3 ] ];
 const DAMAGE_FONT = { fontFamily: 'Caprasimo', stroke: '#2e2b25', strokeThickness: 8 };
 const CRITICAL_TEXT = { color: '#ffc6a5', fontSize: 48 };
 const NORMAL_TEXT = { color: '#f5ead8', fontSize: 32 };
@@ -36,6 +42,7 @@ const BATTLE_BAR_HTML = '<div class="battle-bar"></div>';
 const STAGE_HUD_HTML = '<div class="hud-box hud-stage"><div class="stage-hud"></div></div>';
 const BOSS_TIMER_HTML = '<div class="hud-box hud-timer"><div class="boss-timer"></div></div>';
 const ENEMY_STATS_HTML = '<div class="hud-box hud-enemy"><div class="enemy-stats"></div></div>';
+const EFFECTS_HTML = '<div class="hud-box hud-effects"><div class="effect-tags"></div></div>';
 const STAGE_MESSAGE_HTML = '<div class="hud-box hud-message"><div class="stage-message"></div></div>';
 const FARM_TOGGLE = { x: 918, y: 686 };
 const PAUSE_MENU = { x: 512, y: 384 };
@@ -72,6 +79,8 @@ export class ClickerGame extends Scene
         this.countdown = null;
         this.generation = 0;
         this.random = services.random ?? Math.random;
+        this.skills = new SkillCombat({ random: this.random });
+        this.effectsKey = '';
         this.loadingCampaign = false;
         this.paused = false;
         this.farmBoss = null;
@@ -117,6 +126,7 @@ export class ClickerGame extends Scene
         this.stageHud = this.createHtml(STAGE_HUD, STAGE_HUD_HTML, '.stage-hud');
         this.bossTimer = this.createHtml(BOSS_TIMER, BOSS_TIMER_HTML, '.boss-timer');
         this.enemyStats = this.createHtml(ENEMY_STATS, ENEMY_STATS_HTML, '.enemy-stats');
+        this.effectTags = this.createHtml(EFFECTS, EFFECTS_HTML, '.effect-tags');
         this.stageMessage = this.createHtml(STAGE_MESSAGE, STAGE_MESSAGE_HTML, '.stage-message');
         this.createControls();
         this.createHeroUi();
@@ -156,6 +166,7 @@ export class ClickerGame extends Scene
         this.pauseMenu.querySelector('.pause-confirm-no').addEventListener('click', () => this.showPauseOptions());
 
         this.input.keyboard.on('keydown-ESC', () => this.escape());
+        SKILL_KEYS.forEach(([ key, slot ]) => this.input.keyboard.on(`keydown-${key}`, () => this.useSkill(slot)));
     }
 
     //  Esc closes an open hero screen first; otherwise it opens or closes the pause menu
@@ -180,7 +191,9 @@ export class ClickerGame extends Scene
             walletCopper: () => walletCopper(this.wallet.display()),
             pause: () => this.pauseForMenu(),
             resume: () => this.resumeFromMenu(),
-            startFarm: (boss) => this.startFarm(boss)
+            startFarm: (boss) => this.startFarm(boss),
+            useSkill: (slot) => this.useSkill(slot),
+            skillState: (slot) => this.skillState(slot)
         });
         this.heroes.onChange(() => this.showCharacter());
         this.loadHeroes();
@@ -452,17 +465,111 @@ export class ClickerGame extends Scene
 
     update (time, delta)
     {
-        if (!this.countdown || this.paused)
+        if (this.paused)
         {
             return;
         }
 
-        this.countdown.advance(delta);
+        //  The stop of Stun and Root is read before the skills use it up with this frame
+        const countdownMs = this.skills.countdownMs(delta);
+        const alive = this.monster && !this.monster.dead;
+        const { hits } = this.skills.advance(delta, { monster: this.monster, boss: this.countdown !== null });
+
+        hits.forEach(({ damage, critical }) => this.showDamage(formatDamage(damage), MONSTER.x, critical));
+
+        if (alive && this.monster.dead)
+        {
+            this.afterDamage();
+        }
+
+        this.refreshSkillUi();
+
+        if (!this.countdown)
+        {
+            return;
+        }
+
+        this.countdown.advance(countdownMs);
         this.showCountdown();
 
         if (this.countdown.expired)
         {
             this.bossTimedOut();
+        }
+    }
+
+    //  The slots of the bar and the effect tags follow the skill combat
+    refreshSkillUi ()
+    {
+        this.heroUi.refreshSkills();
+
+        const effects = this.skills.effects();
+        const key = effects.map(({ label, seconds }) => `${label} ${seconds}`).join('|');
+
+        if (key !== this.effectsKey)
+        {
+            this.effectsKey = key;
+            this.effectTags.replaceChildren(...renderEffectTags(effects));
+        }
+    }
+
+    //  The state of a slot of the leader for the bar: locked until the hero has the stars
+    skillState (slot)
+    {
+        const leader = this.heroes.leader();
+        const unlocked = leader?.skills.find((skill) => skill.slot === slot)?.unlocked ?? false;
+
+        return leader ? this.skills.slotState(leader.id, slot, unlocked) : { state: 'locked', seconds: 0 };
+    }
+
+    //  The attacker of a click or a skill: the element of the leader and the pieces it wears; until the heroes and the equipment load it keeps
+    //  the default attacker
+    leaderAttacker ()
+    {
+        const leader = this.heroes.leader();
+        const base = leader ? { ...PLAYER, element: leader.element } : PLAYER;
+
+        return attackerFor(base, this.leaderPieces());
+    }
+
+    //  The leader uses the skill of `slot` (a click on its slot or the key 1, 2 or 3) on the monster on screen. A countdown means a boss.
+    useSkill (slot)
+    {
+        const leader = this.heroes.leader();
+
+        if (!leader || this.paused || this.heroUi.isOpen || !this.monster || this.monster.dead)
+        {
+            return;
+        }
+
+        const result = this.skills.use({
+            heroId: leader.id,
+            slot,
+            unlocked: leader.skills.find((skill) => skill.slot === slot)?.unlocked ?? false,
+            attacker: this.leaderAttacker(),
+            monster: this.monster,
+            boss: this.countdown !== null
+        });
+
+        if (!result.used)
+        {
+            return;
+        }
+
+        result.hits.forEach(({ damage, critical }) => this.showDamage(formatDamage(damage), MONSTER.x, critical));
+
+        if (result.countdown.extendMs > 0 && this.countdown)
+        {
+            this.countdown.extend(result.countdown.extendMs);
+            this.showCountdown();
+        }
+
+        this.updateHealthBar();
+        this.refreshSkillUi();
+
+        if (this.monster.dead)
+        {
+            this.afterDamage();
         }
     }
 
@@ -586,16 +693,18 @@ export class ClickerGame extends Scene
             return;
         }
 
-        //  The click hits with the element of the leader and the pieces it wears; until the heroes and the equipment load it keeps the
-        //  default attacker. A countdown means the monster is a boss.
-        const leader = this.heroes.leader();
-        const base = leader ? { ...PLAYER, element: leader.element } : PLAYER;
-        const attacker = attackerFor(base, this.leaderPieces());
-        const { damage, critical } = calculateDamage({ attacker, defender: this.monster.stats, random: this.random, boss: this.countdown !== null });
+        //  A countdown means the monster is a boss
+        const { damage, critical } = this.skills.click({ attacker: this.leaderAttacker(), monster: this.monster, boss: this.countdown !== null });
 
-        this.monster.hit(damage);
-        this.updateHealthBar();
         this.showDamage(formatDamage(damage), this.damageTextX(pointer), critical);
+        this.afterDamage();
+    }
+
+    //  The health bar follows a hit, and a monster at 0 health dies: coins (not in a farm fight), then the next encounter. One path for the
+    //  click, the skills and their ticks.
+    afterDamage ()
+    {
+        this.updateHealthBar();
 
         if (this.monster.dead)
         {

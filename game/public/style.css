@@ -168,6 +168,12 @@ button:disabled {
     background: var(--color-accent-2-100);
 }
 
+.tag-effect {
+    color: var(--color-accent-700);
+    background: var(--color-bg);
+    box-shadow: var(--shadow-lg);
+}
+
 /* Text that is read by assistive tech and the tests but drawn as an icon */
 .sr-only {
     position: absolute;
@@ -419,6 +425,11 @@ button:disabled {
     height: 48px;
 }
 
+.hud-effects {
+    width: 640px;
+    height: 40px;
+}
+
 .hud-message {
     width: 760px;
     height: 160px;
@@ -492,6 +503,17 @@ button:disabled {
 }
 
 .enemy-stats:empty {
+    display: none;
+}
+
+.effect-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+}
+
+.effect-tags:empty {
     display: none;
 }
 
@@ -751,6 +773,18 @@ button:disabled {
 
 .skill-slot:not(.is-locked) img {
     box-shadow: 0 0 0 3px var(--color-accent);
+}
+
+.skill-slot:not(.is-locked) {
+    cursor: pointer;
+}
+
+.skill-slot.is-cooling img {
+    filter: grayscale(0.7) brightness(0.8);
+}
+
+.skill-slot.is-casting img {
+    box-shadow: 0 0 0 3px var(--color-accent-2-800);
 }
 
 .skill-slot-cooldown {

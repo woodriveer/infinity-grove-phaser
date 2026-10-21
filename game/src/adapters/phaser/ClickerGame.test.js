@@ -2256,3 +2256,227 @@ describe('ClickerGame equipment', () => {
         expect(testid(ctx, 'piece-refine').disabled).toBe(true);
     });
 });
+
+describe('ClickerGame skills', () => {
+    const bigHealth = (encounter = 'PHASE', phase = 1) => ({
+        ...progress(1, encounter, phase),
+        definition: {
+            ...definition,
+            stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000, minibossHealth: 1000 }))
+        }
+    });
+    const leaderOf = (id, stars, extra = {}) => ({
+        leaderId: id,
+        heroes: [ heroEntry(id, { [stars]: 1 }, stars), heroEntry('lyra'), heroEntry('orina') ].map((hero) => ({ ...hero, ...extra }))
+    });
+    const slot = (ctx, number) => ctx.control(`[data-testid="skill-slot-${number}"]`);
+    const slotText = (ctx, number) => slot(ctx, number).querySelector('.skill-slot-cooldown').textContent;
+    const key = (ctx, name) => ctx.handlers[`keydown-${name}`]();
+    const timer = (ctx) => ctx.hud('.boss-timer').textContent;
+    const tags = (ctx) => ctx.hud('.effect-tags').textContent;
+    const tick = (ctx) => ctx.loops[0].callback();
+    const fadeAndRespawn = (ctx) => {
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+    };
+
+    it('uses the skill of slot 1 on the key 1: 15 damage, its number on screen and a 20 s cooldown on the slot', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
+
+        key(ctx, 'ONE');
+
+        expect(ctx.scene.monster.health).toBe(985);
+        expect(ctx.texts.at(-1).text).toBe('15');
+        expect(slot(ctx, 1).getAttribute('data-state')).toBe('cooling');
+        expect(slotText(ctx, 1)).toBe('20s');
+    });
+
+    it('uses the skills of slots 2 and 3 on the keys 2 and 3', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 3) });
+
+        key(ctx, 'TWO');
+        key(ctx, 'THREE');
+
+        expect(ctx.scene.monster.health).toBe(996);
+        expect(slot(ctx, 2).getAttribute('data-state')).toBe('cooling');
+        expect(slot(ctx, 3).getAttribute('data-state')).toBe('cooling');
+    });
+
+    it('uses a skill when its slot is clicked', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
+
+        slot(ctx, 1).click();
+
+        expect(ctx.scene.monster.health).toBe(985);
+    });
+
+    it('ignores the skill while it cools and counts the cooldown down with the scene update', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
+
+        key(ctx, 'ONE');
+        key(ctx, 'ONE');
+        expect(ctx.scene.monster.health).toBe(985);
+
+        ctx.scene.update(0, 5001);
+        expect(slotText(ctx, 1)).toBe('15s');
+
+        ctx.scene.update(0, 15000);
+        expect(slot(ctx, 1).getAttribute('data-state')).toBe('ready');
+        expect(slotText(ctx, 1)).toBe('10s');
+    });
+
+    it('ignores the key of a locked slot and of a leader with no star', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 0) });
+
+        key(ctx, 'ONE');
+        expect(ctx.scene.monster.health).toBe(1000);
+        expect(slot(ctx, 1).getAttribute('data-state')).toBe('locked');
+
+        const two = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
+
+        key(two, 'TWO');
+        expect(two.scene.monster.health).toBe(1000);
+    });
+
+    it('ignores the keys while the heroes have not loaded', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: new Error('down') });
+
+        key(ctx, 'ONE');
+
+        expect(ctx.scene.monster.health).toBe(1000);
+    });
+
+    it('ignores the keys while the fight is paused with Esc, and the pause freezes the cooldowns', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 3) });
+
+        key(ctx, 'ONE');
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 10000);
+        key(ctx, 'TWO');
+
+        expect(slotText(ctx, 1)).toBe('20s');
+        expect(ctx.scene.monster.health).toBe(985);
+    });
+
+    it('ignores the keys while a hero screen is open', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
+
+        ctx.control('[data-testid="hud-heroes"]').click();
+        await flush();
+        key(ctx, 'ONE');
+
+        expect(ctx.scene.monster.health).toBe(1000);
+    });
+
+    it('ignores the keys when there is no monster on screen', async () => {
+        const ctx = await createScene({ start: new Error('down'), heroes: leaderOf('kael', 1) });
+
+        expect(() => key(ctx, 'ONE')).not.toThrow();
+        expect(slot(ctx, 1).getAttribute('data-state')).toBe('ready');
+    });
+
+    it('ignores the keys once the chapter is complete', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1, true), heroes: leaderOf('kael', 1) });
+
+        expect(() => key(ctx, 'ONE')).not.toThrow();
+        expect(slot(ctx, 1).getAttribute('data-state')).toBe('ready');
+    });
+
+    it('handles a skill kill like a click kill: coins fly, the monster fades and the CLEARED report goes on the next tick', async () => {
+        const ctx = await createScene({ wallet: walletResponse(undefined, { 1: [ 3 ] }), heroes: leaderOf('kael', 1) });
+        await flush();
+
+        key(ctx, 'ONE');
+
+        expect(ctx.scene.monster.dead).toBe(true);
+        expect(ctx.sprites).toHaveLength(3);
+        expect(ctx.tweens.some((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500)).toBe(true);
+
+        fadeAndRespawn(ctx);
+        tick(ctx);
+        await flush();
+
+        expect(campaignGateway.report).toHaveBeenCalledWith({ chapter: 1, stage: 1, encounter: 'PHASE', phase: 1 }, 'CLEARED');
+    });
+
+    it('handles the kill of a tick like a click kill', async () => {
+        const start = bigHealth();
+
+        start.definition = { ...start.definition, stages: start.definition.stages.map((stage) => ({ ...stage, monsterHealth: 3 })) };
+
+        const ctx = await createScene({ start, heroes: leaderOf('orina', 2) });
+
+        key(ctx, 'TWO');
+        ctx.scene.update(0, 1000);
+        expect(ctx.scene.monster.dead).toBe(false);
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.monster.dead).toBe(true);
+        expect(ctx.tweens.some((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500)).toBe(true);
+        expect(ctx.texts.map((text) => text.text)).toEqual([ '2', '2' ]);
+    });
+
+    it('adds the click bonus of Ventos Ligeiros to the click and shows the effect tag with its seconds', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('lyra', 3) });
+
+        key(ctx, 'THREE');
+        ctx.click();
+
+        expect(ctx.texts.at(-1).text).toBe('1.5');
+        expect(tags(ctx)).toBe('Ventos Ligeiros 12s');
+
+        ctx.scene.update(0, 12000);
+        expect(tags(ctx)).toBe('');
+    });
+
+    it('keeps the effects across the death of the monster', async () => {
+        const ctx = await createScene({ start: progress(), heroes: leaderOf('lyra', 3) });
+
+        key(ctx, 'THREE');
+        ctx.scene.update(0, 1000);
+        while (!ctx.scene.monster.dead) {
+            ctx.click();
+        }
+        ctx.scene.update(0, 1000);
+
+        expect(tags(ctx)).toBe('Ventos Ligeiros 10s');
+    });
+
+    it('stops the boss countdown with Investida do Baluarte for 3 s', async () => {
+        const ctx = await createScene({ start: bigHealth('MINIBOSS'), heroes: leaderOf('kael', 2) });
+
+        key(ctx, 'TWO');
+        ctx.scene.update(0, 3000);
+        expect(timer(ctx)).toBe('Time: 30');
+
+        ctx.scene.update(0, 1001);
+        expect(timer(ctx)).toBe('Time: 29');
+    });
+
+    it('adds 4 s to the boss countdown with Carrilhão da Aurora', async () => {
+        const ctx = await createScene({ start: bigHealth('MINIBOSS'), heroes: leaderOf('seraphine', 3) });
+
+        key(ctx, 'THREE');
+
+        expect(timer(ctx)).toBe('Time: 34');
+    });
+
+    it('leaves a phase monster without countdown when Carrilhão is used', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('seraphine', 3) });
+
+        key(ctx, 'THREE');
+
+        expect(timer(ctx)).toBe('');
+        expect(slot(ctx, 3).getAttribute('data-state')).toBe('cooling');
+    });
+
+    it('lets the boss leave when its countdown reaches 0 even with a skill running', async () => {
+        const ctx = await createScene({ start: bigHealth('MINIBOSS'), heroes: leaderOf('lyra', 3) });
+
+        key(ctx, 'THREE');
+        ctx.scene.update(0, 30001);
+
+        expect(timer(ctx)).toBe('');
+        expect(ctx.scene.monster).toBeNull();
+    });
+});

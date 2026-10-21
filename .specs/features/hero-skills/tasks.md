@@ -368,12 +368,12 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Guards of the Edge Cases (heroes not loaded, 0 stars, paused, hero screen open, no monster) tested
-- [ ] A skill kill pays coins and reports the outcome like a click kill; farm win too
-- [ ] Skills advance between bosses; the countdown advances only by `countdownMs`
-- [ ] Carrilhão extends the live countdown
-- [ ] The effects row shows the tags and slot and tag CSS is added in `game/public/style.css`
-- [ ] Gate check passes: `cd game && npm test && npm run build`
+- [x] Guards of the Edge Cases (heroes not loaded, 0 stars, paused, hero screen open, no monster) tested
+- [x] A skill kill pays coins and reports the outcome like a click kill; farm win too
+- [x] Skills advance between bosses; the countdown advances only by `countdownMs`
+- [x] Carrilhão extends the live countdown
+- [x] The effects row shows the tags and slot and tag CSS is added in `game/public/style.css`
+- [x] Gate check passes: `cd game && npm test && npm run build`
 
 **Tests**: unit
 **Gate**: build
