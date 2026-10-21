@@ -168,9 +168,9 @@ T1 → T2 → T3 → T4 → T5 → T6
 
 **Done when**:
 
-- [ ] `transferSet(from, to)` equips the worn pieces on the target in the order Arma, Armadura, Anel, Amuleto
-- [ ] A failed request stops the rest, reloads the list and rejects
-- [ ] Gate check passes: `cd game && npm test`
+- [x] `transferSet(from, to)` equips the worn pieces on the target in the order Arma, Armadura, Anel, Amuleto
+- [x] A failed request stops the rest, reloads the list and rejects
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick

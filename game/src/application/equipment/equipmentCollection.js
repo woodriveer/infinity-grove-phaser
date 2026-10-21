@@ -1,4 +1,4 @@
-import { applyEquipmentDrop } from '../../domain/equipment/equipment';
+import { applyEquipmentDrop, SLOTS } from '../../domain/equipment/equipment';
 
 //  The pieces of the player as the backend sees them (worn and in the bag), kept in step with every action.
 //  Port (ADR 0007):
@@ -91,6 +91,33 @@ export const createEquipmentCollection = ({ gateway }) =>
         unequip: async (pieceId) =>
         {
             adopt(await gateway.unequip(pieceId));
+        },
+
+        //  Puts every piece worn by `fromHeroId` on `toHeroId`, one equip request per piece in the order Arma, Armadura, Anel, Amuleto; a piece
+        //  the target wore in the same slot goes back to the bag (the rule of the backend). The requests are not one transaction: when one
+        //  fails the rest are not sent, the list is read again from the backend (the truth) and the failure rejects.
+        transferSet: async (fromHeroId, toHeroId) =>
+        {
+            const worn = SLOTS.map((slot) => pieces.find((piece) => piece.heroId === fromHeroId && piece.slot === slot)).filter(Boolean);
+
+            if (fromHeroId === toHeroId)
+            {
+                return;
+            }
+
+            try
+            {
+                for (const piece of worn)
+                {
+                    adopt(await gateway.equip(piece.id, toHeroId));
+                }
+            }
+            catch (error)
+            {
+                await load().catch(() => {});
+
+                throw error;
+            }
         },
 
         refine: async (pieceId) =>
