@@ -1,9 +1,11 @@
 import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
+import { Combo, comboText } from '../../domain/combat/combo';
 import { formatDamage } from '../../domain/combat/damage';
 import { leaderAttacker } from '../../domain/combat/leaderAttacker';
 import { bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/equipment';
 import { healthText, Monster } from '../../domain/combat/monster';
+import { clickHits } from '../../domain/heroes/leaderBonus';
 import { SkillCombat } from '../../domain/skills/skillCombat';
 import { HeroUi } from './HeroUi';
 import { el } from './views/dom';
@@ -31,6 +33,11 @@ const STAGE_HUD = { x: 356, y: 44 };
 const CHAPTER_HUD = { x: 82, y: 96 };
 //  Above the leader's head, left of the monster
 const ELEMENT_WHEEL = { x: 108, y: 224 };
+//  Above the monster, clear of the damage numbers that rise from its health bar
+const COMBO_HUD = { x: 670, y: 150 };
+const COMBO_HUD_HTML = '<div class="hud-box hud-combo"><div class="combo-hud" data-testid="combo-hud"></div></div>';
+//  The second number of a double click sits beside the first so both can be read
+const DOUBLE_HIT_OFFSET = 36;
 const ELEMENT_WHEEL_HTML = '<div class="hud-box hud-wheel"></div>';
 //  Top centre of the screen, in the row of the stage and wallet pills
 const BOSS_TIMER = { x: 512, y: 44 };
@@ -89,6 +96,7 @@ export class ClickerGame extends Scene
         this.generation = 0;
         this.random = services.random ?? Math.random;
         this.skills = new SkillCombat({ random: this.random });
+        this.combo = new Combo();
         this.effectsKey = '';
         this.loadingCampaign = false;
         this.paused = false;
@@ -136,6 +144,7 @@ export class ClickerGame extends Scene
         //  Stage position, boss countdown and messages are real HTML too, click-through like the wallet text
         this.stageHud = this.createHtml(STAGE_HUD, STAGE_HUD_HTML, '.stage-hud');
         this.chapterHud = this.createHtml(CHAPTER_HUD, CHAPTER_HUD_HTML, '.chapter-hud');
+        this.comboHud = this.createHtml(COMBO_HUD, COMBO_HUD_HTML, '.combo-hud');
         this.createHtml(ELEMENT_WHEEL, ELEMENT_WHEEL_HTML, '.hud-wheel').append(renderElementWheel());
         this.bossTimer = this.createHtml(BOSS_TIMER, BOSS_TIMER_HTML, '.boss-timer');
         this.enemyStats = this.createHtml(ENEMY_STATS, ENEMY_STATS_HTML, '.enemy-stats');
@@ -486,6 +495,9 @@ export class ClickerGame extends Scene
             return;
         }
 
+        this.combo.advance(delta);
+        this.showCombo();
+
         //  The stop of Stun and Root is read before the skills use it up with this frame
         const countdownMs = this.skills.countdownMs(delta);
         const alive = this.monster && !this.monster.dead;
@@ -716,11 +728,34 @@ export class ClickerGame extends Scene
             return;
         }
 
-        //  A countdown means the monster is a boss
-        const { damage, critical } = this.skills.click({ attacker: this.leaderAttacker(), monster: this.monster, boss: this.countdown !== null });
+        //  A countdown means the monster is a boss. One click is one step of the combo; the double click of Lyra lands two critical hits that
+        //  share its bonus, and the second does not land when the first one kills.
+        const multiplier = 1 + this.combo.click() / 100;
+        const hits = clickHits(this.heroes.leader()?.id, this.random);
+        const x = this.damageTextX(pointer);
 
-        this.showDamage(formatDamage(damage), this.damageTextX(pointer), critical);
+        for (let hit = 0; hit < hits && !this.monster.dead; hit++)
+        {
+            const { damage, critical } = this.skills.click({
+                attacker: this.leaderAttacker(), monster: this.monster, boss: this.countdown !== null, multiplier, forceCritical: hits === 2
+            });
+
+            this.showDamage(formatDamage(damage), x + hit * DOUBLE_HIT_OFFSET, critical);
+        }
+
+        this.showCombo();
         this.afterDamage();
+    }
+
+    //  "Combo x11 · +11%" while a streak runs
+    showCombo ()
+    {
+        const text = comboText(this.combo);
+
+        if (this.comboHud.textContent !== text)
+        {
+            this.comboHud.textContent = text;
+        }
     }
 
     //  The health bar follows a hit, and a monster at 0 health dies: coins (not in a farm fight), then the next encounter. One path for the

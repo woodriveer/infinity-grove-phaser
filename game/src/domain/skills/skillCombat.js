@@ -126,13 +126,14 @@ export class SkillCombat
         return left > 0 ? { state: 'cooling', seconds: Math.ceil(left / 1000) } : { state: 'ready', seconds: 0 };
     }
 
-    //  A click of the leader's attacker under the running effects; damages the monster
-    click ({ attacker, monster, boss })
+    //  A click of the leader's attacker under the running effects; damages the monster. `multiplier` is the combo of the click and
+    //  `forceCritical` makes it a critical hit (the double click of Lyra).
+    click ({ attacker, monster, boss, multiplier = 1, forceCritical = false })
     {
         this.follow(monster);
 
         const result = clickDamage({
-            attacker, buffs: this.buffIds(), debuffs: this.debuffIds(), defender: monster.stats, random: this.random, boss
+            attacker, buffs: this.buffIds(), debuffs: this.debuffIds(), defender: monster.stats, random: this.random, boss, multiplier, forceCritical
         });
 
         monster.hit(result.damage);

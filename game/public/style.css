@@ -421,6 +421,11 @@ button:disabled {
     height: 16px;
 }
 
+.hud-combo {
+    width: 260px;
+    height: 44px;
+}
+
 .hud-wheel {
     width: 204px;
     height: 206px;
@@ -503,6 +508,21 @@ button:disabled {
 }
 
 .chapter-hud:empty {
+    display: none;
+}
+
+.combo-hud {
+    padding: 6px 18px;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    color: var(--color-accent-900);
+    white-space: pre;
+    border-radius: 999px;
+    background: var(--color-accent-300);
+    box-shadow: 0 0 0 3px var(--color-bg), var(--shadow-lg);
+}
+
+.combo-hud:empty {
     display: none;
 }
 

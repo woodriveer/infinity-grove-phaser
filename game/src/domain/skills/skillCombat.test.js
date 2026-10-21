@@ -142,6 +142,24 @@ describe('click', () => {
     });
 });
 
+describe('click with a multiplier and a forced critical', () => {
+    it('lands the combo multiplier on the monster', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        expect(skills.click({ attacker: PLAYER, monster, boss: false, multiplier: 1.5 }).damage).toBe(1.5);
+        expect(monster.health).toBe(998.5);
+    });
+
+    it('lands a forced critical click of 2', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        expect(skills.click({ attacker: PLAYER, monster, boss: false, forceCritical: true })).toEqual({ damage: 2, critical: true });
+        expect(monster.health).toBe(998);
+    });
+});
+
 describe('effect owners', () => {
     it('names the hero and the slot of the skill that started each effect, in start order', () => {
         const skills = combat();

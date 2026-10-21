@@ -316,16 +316,23 @@ describe('ClickerGame chapter and health text', () => {
         expect(hp(ctx)).toBe('HP 30/30');
     });
 
-    it('reads HP 10/30 after 20 damage, in the frame of the hit', async () => {
+    it('reads HP 10/30 after 20 damage', async () => {
         const ctx = await createScene({ start: bigMonster(30) });
 
-        for (let i = 0; i < 20; i++)
-        {
-            ctx.click();
-        }
+        ctx.scene.monster.hit(20);
+        ctx.scene.updateHealthBar();
 
         expect(hp(ctx)).toBe('HP 10/30');
         expect(ctx.fill.width).toBe(80);
+    });
+
+    it('follows a click in the frame of the hit, like the bar', async () => {
+        const ctx = await createScene({ start: bigMonster(30) });
+
+        ctx.click();
+
+        expect(hp(ctx)).toBe('HP 29/30');
+        expect(ctx.fill.width).toBe(232);
     });
 
     it('rounds a fractional health left up to one decimal', async () => {
@@ -420,7 +427,8 @@ describe('ClickerGame monster death', () => {
         kill(ctx);
 
         expect(ctx.texts).toHaveLength(10);
-        expect(ctx.texts[9].text).toBe('1');
+        //  The tenth click of a streak carries the combo of the nine before it: +9 %, 1.09 shown with one decimal
+        expect(ctx.texts[9].text).toBe('1.1');
     });
 
     it('ignores clicks while the monster is dead: no damage, no damage number', async () => {
@@ -480,6 +488,8 @@ describe('ClickerGame monster death', () => {
         kill(ctx);
         fadeTween(ctx).onComplete();
         ctx.timers[0].callback();
+        //  The combo of the kill lapses after 1.5 s without a click: the next click is a plain one
+        ctx.scene.update(0, 1500);
 
         ctx.click();
 
@@ -2285,7 +2295,8 @@ describe('ClickerGame equipment', () => {
         ctx.click();
 
         expect(equipmentGateway.list).toHaveBeenCalledTimes(2);
-        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 5);
+        //  The second click of the streak carries +1 % of combo: 4 x 1.01
+        expect(ctx.scene.monster.health).toBeCloseTo(ctx.scene.monster.maxHealth - 1 - 4.04, 10);
     });
 
     it('shows the notice and joins the list for a piece dropped by an accepted report', async () => {
@@ -2583,6 +2594,237 @@ describe('ClickerGame skills', () => {
 
         expect(timer(ctx)).toBe('');
         expect(ctx.scene.monster).toBeNull();
+    });
+});
+
+describe('ClickerGame click combo', () => {
+    const big = (health = 1000) => ({
+        ...progress(1, 'PHASE', 1),
+        definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: health })) }
+    });
+    const combo = (ctx) => ctx.hud('.combo-hud').textContent;
+    const clickTimes = (ctx, times) => Array.from({ length: times }, () => ctx.click());
+
+    it('shows nothing before the first click', async () => {
+        const ctx = await createScene({ start: big() });
+
+        expect(combo(ctx)).toBe('');
+    });
+
+    it('deals the 11th click of a streak 1.1 and reads Combo x11 · +11%', async () => {
+        const ctx = await createScene({ start: big() });
+
+        clickTimes(ctx, 11);
+
+        expect(ctx.texts.at(-1).text).toBe('1.1');
+        expect(combo(ctx)).toBe('Combo x11 · +11%');
+    });
+
+    it('stops at +50 %: the 51st click deals 1.5 and so does the 60th', async () => {
+        const ctx = await createScene({ start: big() });
+
+        clickTimes(ctx, 51);
+        expect(ctx.texts.at(-1).text).toBe('1.5');
+
+        clickTimes(ctx, 9);
+        expect(ctx.texts.at(-1).text).toBe('1.5');
+        expect(combo(ctx)).toBe('Combo x60 · +50%');
+    });
+
+    it('keeps the streak at 1499 ms and ends it at 1500 ms, hiding the text', async () => {
+        const kept = await createScene({ start: big() });
+        const ended = await createScene({ start: big() });
+
+        clickTimes(kept, 5);
+        clickTimes(ended, 5);
+        kept.scene.update(0, 1499);
+        ended.scene.update(0, 1500);
+
+        expect(combo(kept)).toBe('Combo x5 · +5%');
+        expect(combo(ended)).toBe('');
+    });
+
+    it('restarts at a plain click after the streak ended', async () => {
+        const ctx = await createScene({ start: big() });
+
+        clickTimes(ctx, 20);
+        ctx.scene.update(0, 1500);
+        ctx.click();
+
+        expect(ctx.texts.at(-1).text).toBe('1');
+        expect(combo(ctx)).toBe('Combo x1 · +1%');
+    });
+
+    it('freezes the 1500 ms while the fight is paused', async () => {
+        const ctx = await createScene({ start: big() });
+
+        clickTimes(ctx, 5);
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 10000);
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 1499);
+
+        expect(combo(ctx)).toBe('Combo x5 · +5%');
+    });
+
+    it('freezes the 1500 ms while a hero screen is open', async () => {
+        const ctx = await createScene({ start: big() });
+
+        clickTimes(ctx, 5);
+        ctx.control('[data-testid="hud-heroes"]').click();
+        await flush();
+        ctx.scene.update(0, 10000);
+
+        expect(combo(ctx)).toBe('Combo x5 · +5%');
+    });
+
+    it('keeps the streak and its timer when a skill is used, and gives the skill hit no combo', async () => {
+        const ctx = await createScene({ start: big(), heroes: { leaderId: 'kael', heroes: [ heroEntry('kael', { 1: 1 }, 1) ] } });
+
+        clickTimes(ctx, 11);
+        ctx.scene.update(0, 1000);
+        ctx.scene.useSkill(1);
+
+        expect(combo(ctx)).toBe('Combo x11 · +11%');
+        //  Corte Dimensional is 1500 % of 1.1 (1 star), with no combo on top
+        expect(ctx.texts.at(-1).text).toBe('16.5');
+
+        ctx.scene.update(0, 499);
+        expect(combo(ctx)).toBe('Combo x11 · +11%');
+    });
+
+    it('gives a damage tick no combo', async () => {
+        const ctx = await createScene({ start: big(), heroes: { leaderId: 'orina', heroes: [ heroEntry('orina', { 2: 1 }, 2) ] } });
+
+        clickTimes(ctx, 20);
+        ctx.scene.useSkill(2);
+        ctx.scene.update(0, 1000);
+
+        //  Tempestade Arcana: 200 % of 1.2 (2 stars) = 2.4 per tick
+        expect(ctx.texts.at(-1).text).toBe('2.4');
+    });
+
+    it('does not count a click on a dead monster', async () => {
+        const ctx = await createScene({ start: big(10) });
+
+        clickTimes(ctx, 10);
+        const text = combo(ctx);
+        ctx.click();
+
+        expect(ctx.scene.monster.dead).toBe(true);
+        expect(combo(ctx)).toBe(text);
+    });
+
+    it('keeps the streak across a kill and a new monster', async () => {
+        const ctx = await createScene({ start: big(3) });
+
+        clickTimes(ctx, 3);
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+        ctx.click();
+
+        expect(combo(ctx)).toBe('Combo x4 · +4%');
+    });
+});
+
+describe('ClickerGame Lyra double click', () => {
+    const big = (extra = {}) => ({
+        ...progress(1, 'PHASE', 1),
+        definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000, ...extra })) }
+    });
+    const leaderOf = (id, stars = 0) => ({ leaderId: id, heroes: [ heroEntry(id, { [stars]: 1 }, stars), heroEntry('kael', { 0: 1 }, 0) ] });
+    const critical = { color: '#ffc6a5', fontSize: 48 };
+    const normal = { color: '#f5ead8', fontSize: 32 };
+
+    it('deals two critical hits of 2 on a roll below 30', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('lyra') });
+
+        ctx.dice.value = 0.29;
+        ctx.click();
+
+        expect(ctx.texts.map((text) => text.text)).toEqual([ '2', '2' ]);
+        expect(ctx.texts.every((text) => text.style.color === critical.color && text.style.fontSize === critical.fontSize)).toBe(true);
+        expect(ctx.scene.monster.health).toBe(996);
+    });
+
+    it('deals one plain hit of 1 on a roll of 30 or above', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('lyra') });
+
+        ctx.dice.value = 0.3;
+        ctx.click();
+
+        expect(ctx.texts).toHaveLength(1);
+        expect(ctx.texts[0]).toMatchObject({ text: '1', style: expect.objectContaining(normal) });
+    });
+
+    it('rolls a double click on a roll of 0', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('lyra') });
+
+        ctx.dice.value = 0;
+        ctx.click();
+
+        expect(ctx.texts).toHaveLength(2);
+    });
+
+    it('makes both hits critical against a critical resistance of 100', async () => {
+        const start = big({ monster: { element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 100 } });
+        const ctx = await createScene({ start, heroes: leaderOf('lyra') });
+
+        ctx.dice.value = 0.29;
+        ctx.click();
+
+        expect(ctx.texts.map((text) => text.text)).toEqual([ '2', '2' ]);
+    });
+
+    it('does not land the second hit when the first kills', async () => {
+        const start = big({ monsterHealth: 2 });
+        const ctx = await createScene({ start, heroes: leaderOf('lyra') });
+
+        ctx.dice.value = 0.29;
+        ctx.click();
+
+        expect(ctx.texts.map((text) => text.text)).toEqual([ '2' ]);
+        expect(ctx.scene.monster.dead).toBe(true);
+    });
+
+    it('does not roll the double click for another leader', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('kael') });
+
+        ctx.dice.value = 0.29;
+        ctx.click();
+
+        expect(ctx.texts).toHaveLength(1);
+    });
+
+    it('does not roll it for the hits of a skill: Flecha Dupla lands exactly two numbers', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('lyra', 1) });
+
+        ctx.dice.value = 0.29;
+        ctx.scene.useSkill(1);
+
+        expect(ctx.texts).toHaveLength(2);
+    });
+
+    it('counts one click in the streak and shares its combo between the two hits', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('lyra') });
+
+        ctx.dice.value = 0.99;
+        Array.from({ length: 10 }, () => ctx.click());
+        ctx.dice.value = 0.29;
+        ctx.click();
+
+        //  The 11th click has +10 %: two critical hits of 2 x 1.1 = 2.2
+        expect(ctx.texts.slice(-2).map((text) => text.text)).toEqual([ '2.2', '2.2' ]);
+        expect(ctx.hud('.combo-hud').textContent).toBe('Combo x11 · +11%');
+    });
+
+    it('puts the second number beside the first so both can be read', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('lyra') });
+
+        ctx.dice.value = 0.29;
+        ctx.click();
+
+        expect(ctx.texts[1].x).toBeGreaterThan(ctx.texts[0].x);
     });
 });
 

@@ -11,7 +11,7 @@ const BRADO_DEFENSE_POINTS = 30;
 const PRISAO_MAGICAL = 1.25;
 
 //  One strike: `percent` of the attacker's base damage through the click formula, then the modifiers of the effects
-const strike = ({ attacker, percent = 100, damageType, armorPierce = 0, critChance, forceCritical = false, vsDarkness = 1, buffs, debuffs, defender, random, boss }) =>
+const strike = ({ attacker, percent = 100, damageType, armorPierce = 0, critChance, forceCritical = false, vsDarkness = 1, multiplier = 1, buffs, debuffs, defender, random, boss }) =>
 {
     const hitter = {
         ...attacker,
@@ -26,15 +26,16 @@ const strike = ({ attacker, percent = 100, damageType, armorPierce = 0, critChan
     const magicalDebuff = damageType === MAGICAL && debuffs.includes('prisao') ? PRISAO_MAGICAL : 1;
     const darkness = defender.element === 'DARKNESS' ? vsDarkness : 1;
 
-    return { damage: damage * physicalBuff * magicalDebuff * darkness, critical };
+    return { damage: damage * physicalBuff * magicalDebuff * darkness * multiplier, critical };
 };
 
-//  A click: the click bonuses of Ventos Ligeiros and Bênção add up and multiply the base damage
-export const clickDamage = ({ attacker, buffs, debuffs, defender, random, boss }) =>
+//  A click: the click bonuses of Ventos Ligeiros and Bênção add up and multiply the base damage. `multiplier` is the combo (1.1 for +10 %),
+//  applied to the final damage; `forceCritical` makes the hit critical whatever the roll (the double click of Lyra).
+export const clickDamage = ({ attacker, buffs, debuffs, defender, random, boss, multiplier = 1, forceCritical = false }) =>
 {
     const bonus = (buffs.includes('ventos') ? VENTOS_CLICK_PERCENT : 0) + (buffs.includes('bencao') ? BENCAO_CLICK_PERCENT : 0);
 
-    return strike({ attacker, percent: 100 + bonus, damageType: PHYSICAL, buffs, debuffs, defender, random, boss });
+    return strike({ attacker, percent: 100 + bonus, damageType: PHYSICAL, buffs, debuffs, defender, random, boss, multiplier, forceCritical });
 };
 
 //  A skill hit of `percent` % of the base damage

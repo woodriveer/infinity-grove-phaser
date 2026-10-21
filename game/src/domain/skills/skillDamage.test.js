@@ -83,6 +83,36 @@ describe('buffs', () => {
     });
 });
 
+describe('click multiplier and forced critical', () => {
+    it('multiplies the final click damage by the combo: x1.1 makes 1.1', () => {
+        expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, ...none, multiplier: 1.1 }).damage).toBeCloseTo(1.1, 10);
+    });
+
+    it('multiplies a critical click too: x1.5 on a critical click of 2 makes 3', () => {
+        expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: always, ...none, multiplier: 1.5 })).toEqual({ damage: 3, critical: true });
+    });
+
+    it('multiplies after the click buffs: Ventos (x1.5) and a combo of x1.1 make 1.65', () => {
+        expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, buffs: [ 'ventos' ], debuffs: [], multiplier: 1.1 }).damage).toBeCloseTo(1.65, 10);
+    });
+
+    it('makes the click critical whatever the roll and the critical resistance', () => {
+        expect(clickDamage({ attacker: PLAYER, defender: enemy('FIRE', 0, 0, 100), random: never, ...none, forceCritical: true })).toEqual({ damage: 2, critical: true });
+    });
+
+    it('does not roll the dice for a forced critical', () => {
+        let rolls = 0;
+
+        clickDamage({ attacker: PLAYER, defender: enemy(), random: () => { rolls += 1; return 0.99; }, ...none, forceCritical: true });
+
+        expect(rolls).toBe(0);
+    });
+
+    it('leaves a plain click alone: multiplier 1 and no forced critical', () => {
+        expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, ...none })).toEqual({ damage: 1, critical: false });
+    });
+});
+
 describe('debuffs', () => {
     it('lowers the physical defense by 30 points under Brado, never below 0', () => {
         const brado = { buffs: [], debuffs: [ 'brado' ] };
