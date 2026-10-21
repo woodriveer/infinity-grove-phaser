@@ -180,11 +180,11 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `CLICK_DAMAGE` 5, `CRIT_CHANCE` 4, `CRIT_DAMAGE` 6 give +15 %, +4 points and +0.3
-- [ ] The break talents lower the monster stats with a floor of 0, per damage type, and Base 100 against defense 20 with `PHYSICAL_BREAK` 5 deals 85
-- [ ] Break and Brado together floor at 0 (defense 10, break 4, Brado: 0)
-- [ ] `MINIBOSS_TIME` 5 adds 10 s to a miniboss, `BOSS_TIME` 4 adds 12 s to the chapter boss and neither adds to the other
-- [ ] Gate check passes: `cd game && npm test`
+- [x] `CLICK_DAMAGE` 5, `CRIT_CHANCE` 4, `CRIT_DAMAGE` 6 give +15 %, +4 points and +0.3
+- [x] The break talents lower the monster stats with a floor of 0, per damage type, and Base 100 against defense 20 with `PHYSICAL_BREAK` 5 deals 85
+- [x] Break and Brado together floor at 0 (defense 10, break 4, Brado: 0)
+- [x] `MINIBOSS_TIME` 5 adds 10 s to a miniboss, `BOSS_TIME` 4 adds 12 s to the chapter boss and neither adds to the other
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick

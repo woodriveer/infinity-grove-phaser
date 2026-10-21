@@ -9,9 +9,11 @@ const NO_USE = { used: false, hits: [], countdown: { extendMs: 0 } };
 
 export class SkillCombat
 {
-    constructor ({ random })
+    //  `statsOf(monster)` gives the stats a hit meets; the scene passes the monster stats after the break talents, read at the moment of the hit
+    constructor ({ random, statsOf = (monster) => monster.stats })
     {
         this.random = random;
+        this.statsOf = statsOf;
         //  Milliseconds left of each cooldown, by `heroId:slot`
         this.cooldowns = new Map();
         //  Effects on the player: { id, label, remainingMs, seq }
@@ -133,7 +135,7 @@ export class SkillCombat
         this.follow(monster);
 
         const result = clickDamage({
-            attacker, buffs: this.buffIds(), debuffs: this.debuffIds(), defender: monster.stats, random: this.random, boss, multiplier, forceCritical
+            attacker, buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), random: this.random, boss, multiplier, forceCritical
         });
 
         monster.hit(result.damage);
@@ -177,7 +179,7 @@ export class SkillCombat
 
             const result = hitDamage({
                 attacker, percent, armorPierce, damageType: skill.damageType, vsDarkness: skill.vsDarkness,
-                buffs: this.buffIds(), debuffs: this.debuffIds(), defender: monster.stats, random: this.random, boss
+                buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), random: this.random, boss
             });
 
             monster.hit(result.damage);
@@ -286,7 +288,7 @@ export class SkillCombat
         const { skill, attacker } = this.cast;
         const result = hitDamage({
             attacker, percent: skill.cast.hit.percent, damageType: skill.damageType, forceCritical: true,
-            buffs: this.buffIds(), debuffs: this.debuffIds(), defender: monster.stats, random: this.random, boss
+            buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), random: this.random, boss
         });
 
         this.cast = null;
@@ -300,7 +302,7 @@ export class SkillCombat
     {
         const damage = tickDamage({
             attacker: dot.attacker, percent: dot.percent * dot.stacks, damageType: dot.damageType,
-            buffs: this.buffIds(), debuffs: this.debuffIds(), defender: monster.stats, boss
+            buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), boss
         });
 
         monster.hit(damage);

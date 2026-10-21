@@ -53,4 +53,42 @@ describe('leaderAttacker', () => {
 
         expect(attacker.baseDamage).toBeCloseTo(4.4, 10);
     });
+
+    it('adds the power talents: CLICK_DAMAGE 5 (+15 %), CRIT_CHANCE 4 and CRIT_DAMAGE 6 (+30 %)', () => {
+        const talents = [
+            { id: 'CLICK_DAMAGE', value: 15 }, { id: 'CRIT_CHANCE', value: 4 }, { id: 'CRIT_DAMAGE', value: 30 }
+        ];
+        const attacker = leaderAttacker({ leader: { element: 'FIRE', stars: 0 }, talents });
+
+        expect(attacker.baseDamage).toBeCloseTo(1.15, 10);
+        expect(attacker.critChance).toBe(14);
+        expect(attacker.critMultiplier).toBeCloseTo(2.3, 10);
+    });
+
+    it('adds the talents to the stars and the equipment: 1 star, +15 % talent and a +10 % piece make base x 1.35', () => {
+        const attacker = leaderAttacker({
+            leader: { element: 'FIRE', stars: 1 },
+            pieces: [ piece([ affix('CLICK_DAMAGE_PCT', 10) ]) ],
+            talents: [ { id: 'CLICK_DAMAGE', value: 15 } ]
+        });
+
+        expect(attacker.baseDamage).toBeCloseTo(1.35, 10);
+    });
+
+    it('caps the critical chance at 100 with 3 stars, equipment and talents together', () => {
+        const attacker = leaderAttacker({
+            leader: { element: 'FIRE', stars: 3 },
+            pieces: [ piece([ affix('CRIT_CHANCE', 50) ]) ],
+            talents: [ { id: 'CRIT_CHANCE', value: 10 } ]
+        });
+
+        expect(attacker.critChance).toBe(100);
+    });
+
+    it('ignores the talents that are not about the click', () => {
+        const attacker = leaderAttacker({ leader: { element: 'FIRE', stars: 0 }, talents: [ { id: 'BOSS_TIME', value: 9 }, { id: 'PHYSICAL_BREAK', value: 9 } ] });
+
+        expect(attacker.baseDamage).toBe(1);
+        expect(attacker.critChance).toBe(10);
+    });
 });

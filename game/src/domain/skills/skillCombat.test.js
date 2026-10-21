@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Monster } from '../combat/monster';
 import { PLAYER } from '../combat/damage';
+import { monsterAfterBreak } from '../talents/talents';
 import { SkillCombat } from './skillCombat';
 
 const stats = (element = 'FIRE', physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element, physicalDefense, magicalDefense, critResistance });
@@ -139,6 +140,67 @@ describe('click', () => {
 
         expect(skills.click({ attacker: PLAYER, monster, boss: false })).toEqual({ damage: 1, critical: false });
         expect(monster.health).toBe(999);
+    });
+});
+
+describe('break talents', () => {
+    const breaks = (levels) => Object.entries(levels).map(([ id, value ]) => ({ id, value }));
+    const withBreak = (levels, random = never) => new SkillCombat({ random, statsOf: (monster) => monsterAfterBreak(monster.stats, breaks(levels)) });
+    const base100 = { ...PLAYER, baseDamage: 100 };
+
+    it('lets a Base 100 click against physical defense 20 deal 85 under PHYSICAL_BREAK 5 and 80 without it', () => {
+        const broken = monsterOf(1000, stats('FIRE', 20));
+        const plain = monsterOf(1000, stats('FIRE', 20));
+
+        expect(withBreak({ PHYSICAL_BREAK: 5 }).click({ attacker: base100, monster: broken, boss: false }).damage).toBe(85);
+        expect(combat().click({ attacker: base100, monster: plain, boss: false }).damage).toBe(80);
+    });
+
+    it('leaves the stats of the monster itself alone', () => {
+        const monster = monsterOf(1000, stats('FIRE', 20));
+
+        withBreak({ PHYSICAL_BREAK: 5 }).click({ attacker: base100, monster, boss: false });
+
+        expect(monster.stats.physicalDefense).toBe(20);
+    });
+
+    it('uses the magical break for a magical skill hit and the physical one for a physical hit', () => {
+        const magic = monsterOf(100000, stats('FIRE', 20, 20));
+        const physical = monsterOf(100000, stats('FIRE', 20, 20));
+
+        withBreak({ MAGICAL_BREAK: 10 }).use({ heroId: 'orina', slot: 3, unlocked: true, attacker: base100, monster: magic, boss: false });
+        withBreak({ MAGICAL_BREAK: 10 }).use({ heroId: 'kael', slot: 2, unlocked: true, attacker: base100, monster: physical, boss: false });
+
+        //  Chuva de Meteoros: 2500 % of 100 against magical defense 20 - 10 = 10 %; Investida: 400 % against physical defense 20 (no physical break)
+        expect(100000 - magic.health).toBeCloseTo(2250, 6);
+        expect(100000 - physical.health).toBeCloseTo(320, 6);
+    });
+
+    it('applies the break to a damage tick: Tempestade Arcana on magical defense 20 with MAGICAL_BREAK 5 ticks 200 x 0.85', () => {
+        const skills = withBreak({ MAGICAL_BREAK: 5 });
+        const monster = monsterOf(100000, stats('FIRE', 0, 20));
+
+        skills.use({ heroId: 'orina', slot: 2, unlocked: true, attacker: base100, monster, boss: false });
+        const { hits } = skills.advance(1000, { monster });
+
+        expect(hits[0].damage).toBeCloseTo(100 * 2 * 0.85, 6);
+    });
+
+    it('never takes the defense below 0 together with Brado Aterrador: defense 10, break 4 and Brado deal full damage', () => {
+        const skills = withBreak({ PHYSICAL_BREAK: 4 });
+        const monster = monsterOf(100000, stats('FIRE', 10));
+
+        use(skills, monster, 'kael', 3, { attacker: base100 });
+
+        expect(skills.click({ attacker: base100, monster, boss: false }).damage).toBe(100);
+    });
+
+    it('lowers the critical resistance: resistance 20 and CRIT_RESIST_BREAK 20 let a roll of 9 crit at 10 %', () => {
+        const monster = monsterOf(1000, stats('FIRE', 0, 0, 20));
+        const roll = () => 0.09;
+
+        expect(withBreak({ CRIT_RESIST_BREAK: 20 }, roll).click({ attacker: PLAYER, monster, boss: false })).toEqual({ damage: 2, critical: true });
+        expect(new SkillCombat({ random: roll }).click({ attacker: PLAYER, monster: monsterOf(1000, stats('FIRE', 0, 0, 20)), boss: false }).critical).toBe(false);
     });
 });
 
