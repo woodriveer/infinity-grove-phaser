@@ -82,13 +82,29 @@
 - **Date**: 2026-10-19
 - **Status**: active
 
+### AD-011
+- **Decision**: Talents are server-authoritative like the equipment: the backend keeps one `player_talents` row per upgraded talent, takes the copper under the wallet row lock and answers the tree with the value and the next price of each talent; the upgrade request carries the level the player saw (`fromLevel`) and a stale one answers 409 `TALENT_LEVEL_MISMATCH`. The game types no number of the catalog.
+- **Reason**: A client-chosen level or price is trivial to forge (AD-009), and a double click must not buy two levels.
+- **Trade-off**: Levels cannot be refunded or reset; the price curve `round(300 x 1.6^n)` is a config proposal that was not balance-tested; combat is still in the browser (AD-002).
+- **Scope**: `backend` talent code (ADR 0010, `V3__player_talents.sql`), `game/src/domain/talents`, `game/src/application/talents`, the Talentos screen
+- **Date**: 2026-10-21
+- **Status**: active
+
+### AD-012
+- **Decision**: Click power has one pure builder, `leaderAttacker`, that sums equipment, leader stars and power talents (percents add, critical chance caps at 100); the combo (+1 % per click up to +50 %, lost after 1.5 s, frozen while paused) multiplies the final click only and Lyra's leader bonus (30 % double critical click) is rolled once per click in the browser. The attribute panel of the Equipamento screen reads the same builder.
+- **Reason**: The combat and the panel must show the same numbers, and skills must not get the combo or the double click (the user wants the click to differ from the skills).
+- **Trade-off**: A leader with stars changes every number pinned by skill tests (they carry the 1.1, 1.2 or 1.4 star factor); the combo makes two clicks in the same streak deal different damage, so tests that need plain clicks let the combo lapse first.
+- **Scope**: `game/src/domain/combat`, `game/src/domain/heroes/starBonus.js`, `leaderBonus.js`, `ClickerGame`
+- **Date**: 2026-10-21
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: .specs/features/hero-skills (the 15 skills of the 5 heroes usable by the leader: key 1-3 or slot click, cooldowns, buffs, debuffs, damage over time, aimed shot, boss control)
-- **Phase / Task**: Done - T1 to T13 committed and pushed, Verifier fixes `ecdf03e` and `bdbde1d`; Verifier PASS (`validation.md`, iteration 3)
-- **Completed**: game only (no backend change): `game/src/domain/skills` (catalog, damage rules, `SkillCombat`), `forceCritical` in `calculateDamage`, `BossCountdown.extend`, clickable skill bar with cooldown states, effect tags, `ClickerGame` skill use/keys/frame advance with one `afterDamage()` kill path, e2e `skills.spec.js`
+- **Feature**: five features from the owner's batch of 2026-10-21, all game side except two backend pieces: `combat-hud`, `click-power`, `talents`, `equipment-ui`, `boss-map` (`.specs/features/*`)
+- **Phase / Task**: code of the five features done and pushed; Verifier PASS for `combat-hud` and `click-power`; `talents`, `equipment-ui` and `boss-map` were with the Verifier when this was written (see each `validation.md`)
+- **Completed**: chapter pill, HP text, element wheel, skill tooltip, keys Q W E, red dot on Equipamento; star bonus, combo, Lyra's double critical click (backend seed + V2 migration); talent tree (backend `V3`, endpoints, Talentos screen, effects in combat); leader attribute panel, icon bag with rarity frames and tooltip, transfer of a set; chapter map in Rever chefes
 - **In-progress** (file:line): none
-- **Next step**: deploy (`./publish.sh`) is pending; it needs the one-time local reset `docker compose down -v` in `backend/` (normalized-schema), which deletes local players. Then leader bonuses, account level / prestige and the talent tree
+- **Next step**: the owner generates the art of `PROMPTS_ASSETS_UI.md` into `game/public/assets/ui/` (13 files) and sends the map so the 11 positions of `mapLayout.js` are recalibrated; deploy (`./publish.sh`) is pending and needs the local reset `docker compose down -v` in `backend/` (Flyway V1 to V3 on a fresh database); then the other four leader bonuses, account level / prestige
 - **Blockers**: the owner's uncommitted `application.yaml` rates (cards 0.07/0.80, equipment miniboss 0.5) fail `EquipmentDropFlowIT` and `FarmControllerIT`; backend gates ran with `APP_EQUIPMENT_MINIBOSSRATE=0.25 APP_CARDS_MINIBOSSRATEPERSTAGE=0.02 APP_CARDS_CHAPTERBOSSRATE=0.30`
-- **Uncommitted files**: `backend/src/main/resources/application.yaml` (owner rate edits), `.idea/`, `game/public/assets/coin-*.png`, `game/src/scenes/` (owner work, never stage them; `git add game/src` stages scenes, add files by path)
+- **Uncommitted files**: `backend/src/main/resources/application.yaml` (owner rate edits), `.idea/`, `game/public/assets/coin-*.png`, `game/src/scenes/` (owner work, never stage them; add files by path)
 - **Branch**: main
