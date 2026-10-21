@@ -186,6 +186,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: pause menu keys (validation.md G7) (game-ui)
 - last seen: 2026-10-21T18:09:45Z
 
+### L-030 - Pin a timer by crossing its boundary by one unit after the action under test, a wait that stops just short cannot tell reset from kept
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: click-power
+- evidence: mutant 35 (validation.md G1, ClickerGame.js useSkill combo timer) (game)
+- last seen: 2026-10-21T18:42:06Z
+
+### L-031 - When a spec says a text shows in several screens, name the screens and add a test per screen that prints it
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `game-ui` · harmful: 0
+- features: click-power
+- evidence: AC8 hero screens text (validation.md G2) (game-ui)
+- last seen: 2026-10-21T18:42:06Z
+
+### L-032 - A freeze while any screen is open needs a test per screen the spec names, not one example
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `game-ui` · harmful: 0
+- features: click-power
+- evidence: combo freeze on hero screens (validation.md precision gap) (game-ui)
+- last seen: 2026-10-21T18:42:08Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

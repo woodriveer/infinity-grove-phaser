@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 30,
+  "next_id": 33,
   "lessons": [
     {
       "id": "L-001",
@@ -528,6 +528,60 @@
       ],
       "created": "2026-10-21T18:09:45Z",
       "last_seen": "2026-10-21T18:09:45Z"
+    },
+    {
+      "id": "L-030",
+      "key": "surviving_mutant::pin a timer by crossing its boundary by one unit after the action under test a wait that stops just short cannot tell reset from kept",
+      "text": "Pin a timer by crossing its boundary by one unit after the action under test, a wait that stops just short cannot tell reset from kept",
+      "signal": "surviving_mutant",
+      "scope": "game",
+      "status": "candidate",
+      "features": [
+        "click-power"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "mutant 35 (validation.md G1, ClickerGame.js useSkill combo timer) (game)"
+      ],
+      "created": "2026-10-21T18:42:06Z",
+      "last_seen": "2026-10-21T18:42:06Z"
+    },
+    {
+      "id": "L-031",
+      "key": "spec_precision_gap::when a spec says a text shows in several screens name the screens and add a test per screen that prints it",
+      "text": "When a spec says a text shows in several screens, name the screens and add a test per screen that prints it",
+      "signal": "spec_precision_gap",
+      "scope": "game-ui",
+      "status": "candidate",
+      "features": [
+        "click-power"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "AC8 hero screens text (validation.md G2) (game-ui)"
+      ],
+      "created": "2026-10-21T18:42:06Z",
+      "last_seen": "2026-10-21T18:42:06Z"
+    },
+    {
+      "id": "L-032",
+      "key": "spec_precision_gap::a freeze while any screen is open needs a test per screen the spec names not one example",
+      "text": "A freeze while any screen is open needs a test per screen the spec names, not one example",
+      "signal": "spec_precision_gap",
+      "scope": "game-ui",
+      "status": "candidate",
+      "features": [
+        "click-power"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "combo freeze on hero screens (validation.md precision gap) (game-ui)"
+      ],
+      "created": "2026-10-21T18:42:08Z",
+      "last_seen": "2026-10-21T18:42:08Z"
     }
   ]
 }

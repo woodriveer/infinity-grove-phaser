@@ -126,14 +126,14 @@ Click damage grows only through equipment. Lyra's leader bonus (`Ventos Ligeiros
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| PWR-01 | P1: Lyra double critical click (AC 1-7) | Specify | Pending |
-| PWR-02 | P1: Lyra leader bonus text, seed, migration (AC 8) | Specify | Pending |
-| PWR-03 | P1: star bonus table (AC 1-4, 6, 8) | Specify | Pending |
-| PWR-04 | P1: units and the attacker builder (AC 5, 7) | Specify | Pending |
-| PWR-05 | P2: combo bonus and timeout (AC 1-5, 8-10) | Specify | Pending |
-| PWR-06 | P2: combo text (AC 6-7) | Specify | Pending |
+| PWR-01 | P1: Lyra double critical click (AC 1-7) | Done | Verified |
+| PWR-02 | P1: Lyra leader bonus text, seed, migration (AC 8) | Done | Verified |
+| PWR-03 | P1: star bonus table (AC 1-4, 6, 8) | Done | Verified |
+| PWR-04 | P1: units and the attacker builder (AC 5, 7) | Done | Verified |
+| PWR-05 | P2: combo bonus and timeout (AC 1-5, 8-10) | Done | Verified |
+| PWR-06 | P2: combo text (AC 6-7) | Done | Verified |
 
-**Coverage:** 6 total, 0 mapped to tasks, 6 unmapped
+**Coverage:** 6 total, 6 mapped to commits, 0 unmapped
 
 ---
 

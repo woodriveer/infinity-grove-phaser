@@ -62,7 +62,7 @@ The Equipamento window lists every piece as a text row, hides the leader's real 
 3. The panel SHALL show the lines `Quebra de defesa física: <n>`, `Quebra de defesa mágica: <n>` and `Quebra de resistência a crítico: <n>` from the talents.  <!-- ubiquitous -->
 4. WHEN Kael has 0 stars, no equipment and no talents THEN the panel SHALL read `Dano de clique: 1.0`, `Chance de crítico: 10%`, `Dano crítico: x2`, `Perfuração de armadura: 0%`, `Dano em chefes: 0%`, `Tempo extra de miniboss: 0s` and `Tempo extra de chefe: 0s`.  <!-- event-driven -->
 5. WHEN Lyra has 3 stars and no equipment or talents THEN the panel SHALL read `Dano de clique: 1.4`, `Chance de crítico: 40%` and `Dano crítico: x2.5`.  <!-- event-driven -->
-6. WHEN the leader wears a weapon of 3.3 click damage and a ring of +12 % click damage THEN the panel SHALL read `Dano de clique: 4.9` (rounded from (1 + 3.3) x 1.12 = 4.816 to one decimal).  <!-- event-driven -->
+6. WHEN the leader wears a weapon of 3.3 click damage and a ring of +12 % click damage THEN the panel SHALL read `Dano de clique: 4.8` ((1 + 3.3) x 1.12 = 4.816, one decimal).  <!-- event-driven -->
 7. WHEN the player equips, removes or refines a piece THEN the panel SHALL show the new numbers without the window reopening.  <!-- event-driven -->
 8. WHEN the leader changes THEN the panel SHALL show the new leader's name and numbers.  <!-- event-driven -->
 9. WHEN `BOSS_TIME_SECONDS` pieces add 5 s and `MINIBOSS_TIME` is level 2 THEN the panel SHALL read `Tempo extra de miniboss: 9s` and `Tempo extra de chefe: 5s`.  <!-- event-driven -->
