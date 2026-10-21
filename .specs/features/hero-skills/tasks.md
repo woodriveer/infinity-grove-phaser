@@ -147,12 +147,12 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Corte Dimensional on Base 1 vs physical defense 50, no crit, deals 9.75 (SKILL-02 AC 6)
-- [ ] Luz Divina deals x1.5 to DARKNESS only
-- [ ] Ventos + Bênção on a click deal 2.275 (P2 AC 3); the click bonus does not apply to skill hits
-- [ ] Brado lowers physical defense by 30, floor 0; Prisão multiplies MAGICAL by 1.25; Fumaça adds 15 crit capped at 100
-- [ ] Ticks never crit
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Corte Dimensional on Base 1 vs physical defense 50, no crit, deals 9.75 (SKILL-02 AC 6)
+- [x] Luz Divina deals x1.5 to DARKNESS only
+- [x] Ventos + Bênção on a click deal 2.275 (P2 AC 3); the click bonus does not apply to skill hits
+- [x] Brado lowers physical defense by 30, floor 0; Prisão multiplies MAGICAL by 1.25; Fumaça adds 15 crit capped at 100
+- [x] Ticks never crit
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
