@@ -35,13 +35,13 @@ const startGame = async (page) => {
 const monsterHealth = (page) => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').monster?.health);
 
 test.describe('Hero skills', () => {
-    test('the key 1 uses Corte Dimensional for 15 damage and starts its 20 s cooldown', async ({ page }) => {
+    test('the key 1 uses Corte Dimensional for 16.5 damage (15 plus the 1 star bonus of 10 %) and starts its 20 s cooldown', async ({ page }) => {
         await startGame(page);
         await expect.poll(() => monsterHealth(page)).toBe(100);
 
         await page.keyboard.press('1');
 
-        await expect.poll(() => monsterHealth(page)).toBe(85);
+        await expect.poll(() => monsterHealth(page)).toBe(83.5);
         await expect(page.getByTestId('skill-slot-1')).toHaveAttribute('data-state', 'cooling');
         await expect(page.getByTestId('skill-slot-1').locator('.skill-slot-cooldown')).toHaveText('20s');
     });
@@ -51,11 +51,11 @@ test.describe('Hero skills', () => {
         await expect.poll(() => monsterHealth(page)).toBe(100);
 
         await page.keyboard.press('1');
-        await expect.poll(() => monsterHealth(page)).toBe(85);
+        await expect.poll(() => monsterHealth(page)).toBe(83.5);
         await page.keyboard.press('1');
 
         await expect(page.getByTestId('skill-slot-1').locator('.skill-slot-cooldown')).not.toHaveText('20s');
-        expect(await monsterHealth(page)).toBe(85);
+        expect(await monsterHealth(page)).toBe(83.5);
     });
 
     test('a click on the slot uses the skill without hitting the monster with a click', async ({ page }) => {
@@ -64,6 +64,6 @@ test.describe('Hero skills', () => {
 
         await page.getByTestId('skill-slot-1').click();
 
-        await expect.poll(() => monsterHealth(page)).toBe(85);
+        await expect.poll(() => monsterHealth(page)).toBe(83.5);
     });
 });

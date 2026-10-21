@@ -2385,13 +2385,13 @@ describe('ClickerGame skills', () => {
         ctx.timers.at(-1).callback();
     };
 
-    it('uses the skill of slot 1 on the key 1: 15 damage, its number on screen and a 20 s cooldown on the slot', async () => {
+    it('uses the skill of slot 1 on the key 1: 16.5 damage (15 plus the 10 % bonus of 1 star), its number on screen and a 20 s cooldown on the slot', async () => {
         const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
 
         key(ctx, 'ONE');
 
-        expect(ctx.scene.monster.health).toBe(985);
-        expect(ctx.texts.at(-1).text).toBe('15');
+        expect(ctx.scene.monster.health).toBe(983.5);
+        expect(ctx.texts.at(-1).text).toBe('16.5');
         expect(slot(ctx, 1).getAttribute('data-state')).toBe('cooling');
         expect(slotText(ctx, 1)).toBe('20s');
     });
@@ -2402,7 +2402,7 @@ describe('ClickerGame skills', () => {
         key(ctx, 'TWO');
         key(ctx, 'THREE');
 
-        expect(ctx.scene.monster.health).toBe(996);
+        expect(ctx.scene.monster.health).toBe(994.4);
         expect(slot(ctx, 2).getAttribute('data-state')).toBe('cooling');
         expect(slot(ctx, 3).getAttribute('data-state')).toBe('cooling');
     });
@@ -2412,7 +2412,7 @@ describe('ClickerGame skills', () => {
 
         slot(ctx, 1).click();
 
-        expect(ctx.scene.monster.health).toBe(985);
+        expect(ctx.scene.monster.health).toBe(983.5);
     });
 
     it('ignores the skill while it cools and counts the cooldown down with the scene update', async () => {
@@ -2420,7 +2420,7 @@ describe('ClickerGame skills', () => {
 
         key(ctx, 'ONE');
         key(ctx, 'ONE');
-        expect(ctx.scene.monster.health).toBe(985);
+        expect(ctx.scene.monster.health).toBe(983.5);
 
         ctx.scene.update(0, 5001);
         expect(slotText(ctx, 1)).toBe('15s');
@@ -2460,7 +2460,7 @@ describe('ClickerGame skills', () => {
         key(ctx, 'TWO');
 
         expect(slotText(ctx, 1)).toBe('20s');
-        expect(ctx.scene.monster.health).toBe(985);
+        expect(ctx.scene.monster.health).toBe(979);
     });
 
     it('ignores the keys while a hero screen is open', async () => {
@@ -2518,7 +2518,7 @@ describe('ClickerGame skills', () => {
 
         expect(ctx.scene.monster.dead).toBe(true);
         expect(ctx.tweens.some((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500)).toBe(true);
-        expect(ctx.texts.map((text) => text.text)).toEqual([ '2', '2' ]);
+        expect(ctx.texts.map((text) => text.text)).toEqual([ '2.4', '2.4' ]);
     });
 
     it('adds the click bonus of Ventos Ligeiros to the click and shows the effect tag with its seconds', async () => {
@@ -2527,7 +2527,7 @@ describe('ClickerGame skills', () => {
         key(ctx, 'THREE');
         ctx.click();
 
-        expect(ctx.texts.at(-1).text).toBe('1.5');
+        expect(ctx.texts.at(-1).text).toBe('2.1');
         expect(tags(ctx)).toBe('Ventos Ligeiros 12s');
 
         ctx.scene.update(0, 12000);
@@ -2583,6 +2583,65 @@ describe('ClickerGame skills', () => {
 
         expect(timer(ctx)).toBe('');
         expect(ctx.scene.monster).toBeNull();
+    });
+});
+
+describe('ClickerGame star bonus', () => {
+    const big = () => ({
+        ...progress(1, 'PHASE', 1),
+        definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000 })) }
+    });
+    const twoHeroes = (stars) => ({
+        leaderId: 'kael',
+        heroes: [ heroEntry('kael', { [stars]: 1 }, stars), heroEntry('lyra', { 0: 1 }, 0), heroEntry('orina') ]
+    });
+
+    it('clicks for 1 with no star', async () => {
+        const ctx = await createScene({ start: big(), heroes: twoHeroes(0) });
+
+        ctx.click();
+
+        expect(ctx.texts.at(-1).text).toBe('1');
+    });
+
+    it('clicks for 1.1 with 1 star and 1.2 with 2 stars', async () => {
+        const one = await createScene({ start: big(), heroes: twoHeroes(1) });
+        one.click();
+        const two = await createScene({ start: big(), heroes: twoHeroes(2) });
+        two.click();
+
+        expect(one.texts.at(-1).text).toBe('1.1');
+        expect(two.texts.at(-1).text).toBe('1.2');
+    });
+
+    it('clicks for 1.4 with 3 stars, and for 3.5 on a roll of 0.29 because the critical chance is 40', async () => {
+        const ctx = await createScene({ start: big(), heroes: twoHeroes(3) });
+
+        ctx.click();
+        expect(ctx.texts.at(-1).text).toBe('1.4');
+
+        ctx.dice.value = 0.29;
+        ctx.click();
+        expect(ctx.texts.at(-1).text).toBe('3.5');
+    });
+
+    it('does not crit on a roll of 0.40 with 3 stars: the chance is 40 points, not more', async () => {
+        const ctx = await createScene({ start: big(), heroes: twoHeroes(3) });
+
+        ctx.dice.value = 0.4;
+        ctx.click();
+
+        expect(ctx.texts.at(-1).text).toBe('1.4');
+    });
+
+    it('uses the bonus of the new leader on the next click', async () => {
+        const ctx = await createScene({ start: big(), heroes: twoHeroes(3) });
+
+        heroesGateway.setLeader.mockResolvedValue({ leaderId: 'lyra' });
+        await ctx.scene.heroes.setLeader('lyra');
+        ctx.click();
+
+        expect(ctx.texts.at(-1).text).toBe('1');
     });
 });
 
@@ -2653,12 +2712,12 @@ describe('ClickerGame skill keys Q, W and E', () => {
     const slot = (ctx, number) => ctx.control(`[data-testid="skill-slot-${number}"]`);
     const press = (ctx, name, event) => ctx.handlers[`keydown-${name}`](event);
 
-    it('Q uses the skill of slot 1 as a click on its slot: 15 damage and the 20 s cooldown', async () => {
+    it('Q uses the skill of slot 1 as a click on its slot: 16.5 damage (1 star) and the 20 s cooldown', async () => {
         const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 1) });
 
         press(ctx, 'Q');
 
-        expect(ctx.scene.monster.health).toBe(985);
+        expect(ctx.scene.monster.health).toBe(983.5);
         expect(slot(ctx, 1).getAttribute('data-state')).toBe('cooling');
         expect(slot(ctx, 1).querySelector('.skill-slot-cooldown').textContent).toBe('20s');
     });
@@ -2667,7 +2726,7 @@ describe('ClickerGame skill keys Q, W and E', () => {
         const ctx = await createScene({ start: bigHealth(), heroes: leaderOf('kael', 3) });
 
         press(ctx, 'W');
-        expect(ctx.scene.monster.health).toBe(996);
+        expect(ctx.scene.monster.health).toBe(994.4);
         expect(slot(ctx, 2).querySelector('.skill-slot-cooldown').textContent).toBe('25s');
 
         press(ctx, 'E');
@@ -2681,7 +2740,7 @@ describe('ClickerGame skill keys Q, W and E', () => {
         press(ctx, 'TWO');
         press(ctx, 'THREE');
 
-        expect(ctx.scene.monster.health).toBe(981);
+        expect(ctx.scene.monster.health).toBe(973.4);
     });
 
     it('uses a skill once per press: Q then the 1 key on the same slot is refused while it cools', async () => {
@@ -2691,7 +2750,7 @@ describe('ClickerGame skill keys Q, W and E', () => {
         press(ctx, 'ONE');
         press(ctx, 'Q');
 
-        expect(ctx.scene.monster.health).toBe(985);
+        expect(ctx.scene.monster.health).toBe(983.5);
     });
 
     it('ignores the repeats of a held key and uses the skill on the first press', async () => {
@@ -2702,7 +2761,7 @@ describe('ClickerGame skill keys Q, W and E', () => {
 
         press(ctx, 'Q', { repeat: false });
         press(ctx, 'Q', { repeat: true });
-        expect(ctx.scene.monster.health).toBe(985);
+        expect(ctx.scene.monster.health).toBe(983.5);
     });
 
     it('ignores the keys of a locked slot and of a leader with no star', async () => {
@@ -2775,11 +2834,11 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         const ctx = await createScene({ start: big(), heroes: leaderOf('kael', 3) });
 
         key(ctx, 'ONE');
-        expect(ctx.texts.at(-1)).toMatchObject({ text: '15', style: expect.objectContaining({ color: '#f5ead8', fontSize: 32 }) });
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '21', style: expect.objectContaining({ color: '#f5ead8', fontSize: 32 }) });
 
         ctx.dice.value = 0;
         key(ctx, 'TWO');
-        expect(ctx.texts.at(-1)).toMatchObject({ text: '8', style: expect.objectContaining({ color: '#ffc6a5', fontSize: 48 }) });
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '14', style: expect.objectContaining({ color: '#ffc6a5', fontSize: 48 }) });
     });
 
     it('never shows a tick as critical, whatever the roll', async () => {
@@ -2789,7 +2848,7 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         key(ctx, 'TWO');
         ctx.scene.update(0, 1000);
 
-        expect(ctx.texts.at(-1)).toMatchObject({ text: '2', style: expect.objectContaining({ color: '#f5ead8', fontSize: 32 }) });
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '2.4', style: expect.objectContaining({ color: '#f5ead8', fontSize: 32 }) });
     });
 
     it('freezes the effects, the ticks and the aimed shot while the fight is paused', async () => {
@@ -2806,7 +2865,7 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
 
         ctx.handlers['keydown-ESC']();
         ctx.scene.update(0, 2000);
-        expect(ctx.scene.monster.health).toBe(940);
+        expect(ctx.scene.monster.health).toBe(895);
     });
 
     it('freezes the ticks of a damage over time while the fight is paused', async () => {
@@ -2929,13 +2988,13 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         expect(slot(ctx, 1).querySelector('.skill-slot-cooldown').textContent).toBe('20s');
     });
 
-    it('shows the aimed shot as a critical number of 60 when the cast ends', async () => {
+    it('shows the aimed shot as a critical number of 105 (3000 % of 1.4, x2.5 with 3 stars) when the cast ends', async () => {
         const ctx = await createScene({ start: big(), heroes: leaderOf('lyra', 3) });
 
         key(ctx, 'TWO');
         ctx.scene.update(0, 2000);
 
-        expect(ctx.texts.at(-1)).toMatchObject({ text: '60', style: expect.objectContaining({ color: '#ffc6a5', fontSize: 48 }) });
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '105', style: expect.objectContaining({ color: '#ffc6a5', fontSize: 48 }) });
     });
 
     it('runs the aimed shot down only while the fight is not paused: after a pause the 2 s are still left', async () => {
@@ -2951,7 +3010,7 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         expect(slot(ctx, 2).getAttribute('data-state')).toBe('casting');
 
         ctx.scene.update(0, 1999);
-        expect(ctx.scene.monster.health).toBe(940);
+        expect(ctx.scene.monster.health).toBe(895);
     });
 
     it('runs a damage over time down only while the fight is not paused: after a pause the first tick is 1 s away', async () => {
@@ -2966,6 +3025,6 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         expect(ctx.scene.monster.health).toBe(1000);
 
         ctx.scene.update(0, 1);
-        expect(ctx.scene.monster.health).toBe(998);
+        expect(ctx.scene.monster.health).toBe(997.6);
     });
 });

@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { mockBackend } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
+//  Kael holds a 1 star card (click damage +10 %: a click deals 1.1 and Corte Dimensional 16.5)
 //  One stage of fire monsters with 100 health and no defense, so a skill damage and the HP text can be read exactly
 const HUD_CHAPTER = {
     bossHealth: 100,
@@ -42,7 +43,7 @@ test.describe('Combat HUD', () => {
 
         await menu.canvas.click();
 
-        await expect(page.getByTestId('monster-hp')).toHaveText('HP 99/100');
+        await expect(page.getByTestId('monster-hp')).toHaveText('HP 98.9/100');
     });
 
     test('draws the element wheel on screen and lets a click through to the monster', async ({ page }) => {
@@ -62,7 +63,7 @@ test.describe('Combat HUD', () => {
 
         await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
 
-        expect(before - await monsterHealth(page)).toBe(1);
+        expect(before - await monsterHealth(page)).toBeCloseTo(1.1, 5);
         await menu.canvas.hover();
     });
 
@@ -90,7 +91,7 @@ test.describe('Combat HUD', () => {
 
         await page.keyboard.press('q');
 
-        await expect.poll(() => monsterHealth(page)).toBe(85);
+        await expect.poll(() => monsterHealth(page)).toBe(83.5);
         await expect(page.getByTestId('skill-slot-1')).toHaveAttribute('data-state', 'cooling');
     });
 

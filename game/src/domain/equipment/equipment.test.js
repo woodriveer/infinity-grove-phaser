@@ -24,6 +24,22 @@ describe('attackerFor', () => {
         expect(attackerFor(PLAYER, [])).toBe(PLAYER);
     });
 
+    it('adds the three numbers of a bonus to the ones of the pieces, and still caps the critical chance at 100', () => {
+        const ring = piece({ affixes: [ affix('CLICK_DAMAGE_PCT', 10), affix('CRIT_CHANCE', 80), affix('CRIT_DAMAGE_PCT', 30) ] });
+        const attacker = attackerFor(PLAYER, [ ring ], { clickDamagePct: 20, critChance: 30, critDamagePct: 20 });
+
+        expect(attacker.baseDamage).toBeCloseTo(1.3, 10);
+        expect(attacker.critChance).toBe(100);
+        expect(attacker.critMultiplier).toBeCloseTo(2.5, 10);
+    });
+
+    it('applies a bonus even when the hero wears nothing', () => {
+        const attacker = attackerFor(PLAYER, [], { clickDamagePct: 10 });
+
+        expect(attacker.baseDamage).toBeCloseTo(1.1, 10);
+        expect(attacker.armorPierce).toBe(0);
+    });
+
     it('adds the weapon click damage to the base damage: a +0 weapon of 3 hits for 4', () => {
         expect(attackerFor(PLAYER, [ weapon(3) ]).baseDamage).toBe(4);
     });

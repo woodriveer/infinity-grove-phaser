@@ -1,7 +1,8 @@
 import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
-import { formatDamage, PLAYER } from '../../domain/combat/damage';
-import { attackerFor, bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/equipment';
+import { formatDamage } from '../../domain/combat/damage';
+import { leaderAttacker } from '../../domain/combat/leaderAttacker';
+import { bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/equipment';
 import { healthText, Monster } from '../../domain/combat/monster';
 import { SkillCombat } from '../../domain/skills/skillCombat';
 import { HeroUi } from './HeroUi';
@@ -547,14 +548,11 @@ export class ClickerGame extends Scene
         return leader ? this.skills.slotState(leader.id, slot, unlocked) : { state: 'locked', seconds: 0 };
     }
 
-    //  The attacker of a click or a skill: the element of the leader and the pieces it wears; until the heroes and the equipment load it keeps
-    //  the default attacker
+    //  The attacker of a click or a skill: the element of the leader, the pieces it wears and its stars; until the heroes and the equipment
+    //  load it keeps the default attacker
     leaderAttacker ()
     {
-        const leader = this.heroes.leader();
-        const base = leader ? { ...PLAYER, element: leader.element } : PLAYER;
-
-        return attackerFor(base, this.leaderPieces());
+        return leaderAttacker({ leader: this.heroes.leader(), pieces: this.leaderPieces() });
     }
 
     //  The leader uses the skill of `slot` (a click on its slot or the key 1, 2 or 3) on the monster on screen. A countdown means a boss.
