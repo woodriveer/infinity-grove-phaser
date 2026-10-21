@@ -64,6 +64,9 @@ export const createCampaignSession = ({ gateway }) =>
 
         get completed () { return campaign?.completed ?? false; },
 
+        //  The chapter number of the player's position, null before the campaign loads
+        get chapter () { return campaign?.chapter ?? null; },
+
         //  Fired with the encounter to show when a 409 replaced the position
         onRealign: (callback) =>
         {

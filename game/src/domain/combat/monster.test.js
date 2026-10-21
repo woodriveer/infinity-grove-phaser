@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DAMAGE_PER_CLICK, DEFAULT_STATS, MONSTER_MAX_HEALTH, Monster } from './monster';
+import { DAMAGE_PER_CLICK, DEFAULT_STATS, healthText, MONSTER_MAX_HEALTH, Monster } from './monster';
 
 describe('Monster', () => {
     it('starts at 10 health and alive', () => {
@@ -130,5 +130,43 @@ describe('Monster', () => {
         monster.respawn();
 
         expect(monster.stats).toBe(stats);
+    });
+});
+
+describe('healthText', () => {
+    it('reads the health left over the maximum', () => {
+        const monster = new Monster(30);
+
+        monster.hit(20);
+
+        expect(healthText(monster)).toBe('HP 10/30');
+    });
+
+    it('reads the full health of a new monster', () => {
+        expect(healthText(new Monster(30))).toBe('HP 30/30');
+    });
+
+    it('rounds the health left up to one decimal so a living monster never reads HP 0', () => {
+        const monster = new Monster(10);
+
+        monster.hit(9.96);
+
+        expect(healthText(monster)).toBe('HP 0.1/10');
+    });
+
+    it('keeps one decimal without a trailing zero', () => {
+        const monster = new Monster(10);
+
+        monster.hit(2.7);
+
+        expect(healthText(monster)).toBe('HP 7.3/10');
+    });
+
+    it('reads HP 0 only for a dead monster', () => {
+        const monster = new Monster(10);
+
+        monster.hit(10);
+
+        expect(healthText(monster)).toBe('HP 0/10');
     });
 });

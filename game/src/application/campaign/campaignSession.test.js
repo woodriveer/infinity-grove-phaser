@@ -38,6 +38,18 @@ describe('campaignSession', () => {
         return session;
     };
 
+    describe('chapter', () => {
+        it('is null before the campaign loads and the chapter of the position after', async () => {
+            gateway.get.mockResolvedValue({ ...progress(1, 'PHASE', 1), chapter: 3 });
+
+            expect(session.chapter).toBeNull();
+
+            await session.load();
+
+            expect(session.chapter).toBe(3);
+        });
+    });
+
     describe('load', () => {
         it('asks the gateway for the progress and resolves with the first encounter', async () => {
             const encounter = await session.load();

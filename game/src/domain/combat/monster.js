@@ -4,6 +4,9 @@ export const MONSTER_MAX_HEALTH = 10;
 //  A monster without attributes: fire, no defense, no critical resistance
 export const DEFAULT_STATS = { element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 };
 
+//  "HP 10/30": the health left rounded UP to one decimal (a living monster never reads HP 0) over the maximum
+export const healthText = ({ health, maxHealth }) => `HP ${Math.ceil(Math.round(health * 1e7) / 1e6) / 10}/${maxHealth}`;
+
 //  Fractional damage leaves float dust (10 - 0.1 x 100 is not 0); health is kept to 6 decimals so a monster can reach 0
 const HEALTH_PRECISION = 1e6;
 

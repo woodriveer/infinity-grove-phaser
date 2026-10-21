@@ -409,6 +409,16 @@ button:disabled {
     justify-content: flex-start;
 }
 
+.hud-chapter {
+    width: 136px;
+    height: 40px;
+}
+
+.hud-monster-hp {
+    width: 240px;
+    height: 16px;
+}
+
 .hud-wallet {
     width: 228px;
     height: 56px;
@@ -473,6 +483,31 @@ button:disabled {
 
 .stage-hud:empty {
     display: none;
+}
+
+.chapter-hud {
+    padding: 6px 16px;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    white-space: pre;
+    border-radius: 999px;
+    background: var(--color-bg);
+    box-shadow: var(--shadow-lg);
+}
+
+.chapter-hud:empty {
+    display: none;
+}
+
+.monster-hp {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 16px;
+    color: var(--color-bg);
+    white-space: pre;
+    -webkit-text-stroke: 3px var(--color-neutral-900);
+    paint-order: stroke fill;
 }
 
 .boss-timer {

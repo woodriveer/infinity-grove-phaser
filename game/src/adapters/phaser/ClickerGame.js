@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
 import { formatDamage, PLAYER } from '../../domain/combat/damage';
 import { attackerFor, bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/equipment';
-import { Monster } from '../../domain/combat/monster';
+import { healthText, Monster } from '../../domain/combat/monster';
 import { SkillCombat } from '../../domain/skills/skillCombat';
 import { HeroUi } from './HeroUi';
 import { el } from './views/dom';
@@ -25,6 +25,8 @@ const WALLET_SYNC_MS = 10000;
 //  fixed-size box (style.css) so it stays where it was placed
 const WALLET_HTML = '<div class="hud-box hud-wallet"><div class="wallet"></div></div>';
 const STAGE_HUD = { x: 356, y: 44 };
+//  Under the logo, top left
+const CHAPTER_HUD = { x: 82, y: 96 };
 //  Top centre of the screen, in the row of the stage and wallet pills
 const BOSS_TIMER = { x: 512, y: 44 };
 //  Under the monster, clear of the damage numbers that rise above its health bar
@@ -39,6 +41,8 @@ const NORMAL_TEXT = { color: '#f5ead8', fontSize: 32 };
 const STAGE_MESSAGE = { x: 512, y: 384 };
 const BATTLE_BAR = { x: 512, y: 686 };
 const BATTLE_BAR_HTML = '<div class="battle-bar"></div>';
+const CHAPTER_HUD_HTML = '<div class="hud-box hud-chapter"><div class="chapter-hud" data-testid="chapter-hud"></div></div>';
+const MONSTER_HP_HTML = `<div class="hud-box hud-monster-hp"><div class="monster-hp" data-testid="monster-hp"></div></div>`;
 const STAGE_HUD_HTML = '<div class="hud-box hud-stage"><div class="stage-hud"></div></div>';
 const BOSS_TIMER_HTML = '<div class="hud-box hud-timer"><div class="boss-timer"></div></div>';
 const ENEMY_STATS_HTML = '<div class="hud-box hud-enemy"><div class="enemy-stats"></div></div>';
@@ -110,6 +114,8 @@ export class ClickerGame extends Scene
         this.monsterParts = [ body, back, this.healthFill ];
         this.monsterParts.forEach((part) => part.setAlpha(0));
         this.damageTextY = barY - 8;
+        //  The text sits on the bar, same size and centre; it is HTML like every other HUD text (ADR 0004)
+        this.monsterHp = this.createHtml({ x: MONSTER.x, y: barY + HEALTH_BAR.height / 2 }, MONSTER_HP_HTML, '.monster-hp');
 
         //  Any click on the canvas hits the monster, not only a click on the monster itself
         this.input.on('pointerdown', (pointer) => this.hitMonster(pointer));
@@ -124,6 +130,7 @@ export class ClickerGame extends Scene
 
         //  Stage position, boss countdown and messages are real HTML too, click-through like the wallet text
         this.stageHud = this.createHtml(STAGE_HUD, STAGE_HUD_HTML, '.stage-hud');
+        this.chapterHud = this.createHtml(CHAPTER_HUD, CHAPTER_HUD_HTML, '.chapter-hud');
         this.bossTimer = this.createHtml(BOSS_TIMER, BOSS_TIMER_HTML, '.boss-timer');
         this.enemyStats = this.createHtml(ENEMY_STATS, ENEMY_STATS_HTML, '.enemy-stats');
         this.effectTags = this.createHtml(EFFECTS, EFFECTS_HTML, '.effect-tags');
@@ -419,6 +426,7 @@ export class ClickerGame extends Scene
         this.updateHealthBar();
         this.monsterParts.forEach((part) => part.setAlpha(1));
         this.stageHud.textContent = encounter.label;
+        this.chapterHud.textContent = `Capítulo ${this.session.chapter}`;
         this.showEnemyStats(encounter.stats);
 
         if (encounter.timeLimitMs)
@@ -446,6 +454,7 @@ export class ClickerGame extends Scene
         this.enemyStats.textContent = '';
         this.monsterParts.forEach((part) => part.setAlpha(0));
         this.stageHud.textContent = '';
+        this.monsterHp.textContent = '';
         this.stageMessage.textContent = COMPLETED_TEXT;
 
         //  The chapter boss report goes at once, not on the next tick: its answer opens the next chapter, if there is one
@@ -843,6 +852,7 @@ export class ClickerGame extends Scene
     updateHealthBar ()
     {
         this.healthFill.setSize(HEALTH_BAR.width * this.monster.health / this.monster.maxHealth, HEALTH_BAR.height);
+        this.monsterHp.textContent = healthText(this.monster);
     }
 
     //  The monster fades; `next` is the encounter that follows it (null when the chapter is over)

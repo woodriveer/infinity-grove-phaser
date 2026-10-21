@@ -278,6 +278,92 @@ describe('ClickerGame health bar', () => {
     });
 });
 
+describe('ClickerGame chapter and health text', () => {
+    const chapter = (ctx) => ctx.hud('.chapter-hud').textContent;
+    const hp = (ctx) => ctx.hud('.monster-hp').textContent;
+    const bigMonster = (health) => ({ ...progress(), definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: health })) } });
+    const killAll = (ctx) => {
+        while (ctx.scene.monster && !ctx.scene.monster.dead)
+        {
+            ctx.click();
+        }
+    };
+    const advance = (ctx) => {
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+    };
+
+    it('shows the chapter of the player position', async () => {
+        const ctx = await createScene({ start: { ...progress(), chapter: 2 } });
+
+        expect(chapter(ctx)).toBe('Capítulo 2');
+    });
+
+    it('shows the next chapter when the backend opens it', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1) });
+        campaignGateway.report.mockResolvedValue({ ...progress(1, 'PHASE', 1), chapter: 2 });
+
+        killAll(ctx);
+        advance(ctx);
+        await flush();
+
+        expect(chapter(ctx)).toBe('Capítulo 2');
+    });
+
+    it('shows the full health of a new monster', async () => {
+        const ctx = await createScene({ start: bigMonster(30) });
+
+        expect(hp(ctx)).toBe('HP 30/30');
+    });
+
+    it('reads HP 10/30 after 20 damage, in the frame of the hit', async () => {
+        const ctx = await createScene({ start: bigMonster(30) });
+
+        for (let i = 0; i < 20; i++)
+        {
+            ctx.click();
+        }
+
+        expect(hp(ctx)).toBe('HP 10/30');
+        expect(ctx.fill.width).toBe(80);
+    });
+
+    it('rounds a fractional health left up to one decimal', async () => {
+        const ctx = await createScene({ start: bigMonster(10) });
+
+        ctx.scene.monster.hit(9.96);
+        ctx.scene.updateHealthBar();
+
+        expect(hp(ctx)).toBe('HP 0.1/10');
+    });
+
+    it('is centred on the health bar and as wide as the bar', async () => {
+        const ctx = await createScene();
+        const element = ctx.doms.find((dom) => dom.node.querySelector('.monster-hp'));
+
+        expect(element.x).toBe(ctx.back.x + ctx.back.width / 2);
+        expect(element.y).toBe(ctx.back.y + ctx.back.height / 2);
+    });
+
+    it('shows the full health of the next monster', async () => {
+        const ctx = await createScene();
+
+        killAll(ctx);
+        advance(ctx);
+
+        expect(hp(ctx)).toBe('HP 10/10');
+    });
+
+    it('hides the text when the chapter is complete and no monster is on screen', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1) });
+
+        killAll(ctx);
+        advance(ctx);
+
+        expect(hp(ctx)).toBe('');
+    });
+});
+
 describe('ClickerGame monster death', () => {
     const kill = (ctx) => {
         for (let i = 0; i < 10; i++)
