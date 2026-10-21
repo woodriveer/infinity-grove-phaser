@@ -68,10 +68,10 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] 15 definitions with the table's percents, damage types, durations and cooldowns
-- [ ] A test pins every cooldown to the seconds in `HeroSeed.kt`
-- [ ] `skillOf` returns null for an unknown hero or slot
-- [ ] Gate check passes: `cd game && npm test`
+- [x] 15 definitions with the table's percents, damage types, durations and cooldowns
+- [x] A test pins every cooldown to the seconds in `HeroSeed.kt`
+- [x] `skillOf` returns null for an unknown hero or slot
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
