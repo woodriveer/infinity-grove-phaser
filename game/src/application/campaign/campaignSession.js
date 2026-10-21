@@ -97,6 +97,11 @@ export const createCampaignSession = ({ gateway }) =>
             return loading;
         },
 
+        //  Where the player stands, for the chapter map: { chapter, stage, kind, stageCount, completed }; null before the campaign loads
+        mapPosition: () => (campaign
+            ? { chapter: campaign.chapter, stage: campaign.stage, kind: campaign.kind, stageCount: campaign.stageCount, completed: campaign.completed }
+            : null),
+
         encounter: () => campaign?.encounter() ?? null,
 
         //  The encounter of a boss the player already beat, to fight it again; the position and the queue are untouched

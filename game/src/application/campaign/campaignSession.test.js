@@ -50,6 +50,27 @@ describe('campaignSession', () => {
         });
     });
 
+    describe('mapPosition', () => {
+        it('is null before the campaign loads', () => {
+            expect(session.mapPosition()).toBeNull();
+        });
+
+        it('gives the chapter, the stage, the kind, the stage count and whether it is completed', async () => {
+            gateway.get.mockResolvedValue({ ...progress(2, 'MINIBOSS', 1), chapter: 3 });
+            await session.load();
+
+            expect(session.mapPosition()).toEqual({ chapter: 3, stage: 2, kind: 'MINIBOSS', stageCount: 2, completed: false });
+        });
+
+        it('follows a cleared encounter', async () => {
+            gateway.get.mockResolvedValue(progress(2, 'MINIBOSS', 1));
+            await session.load();
+            session.clear();
+
+            expect(session.mapPosition()).toMatchObject({ kind: 'CHAPTER_BOSS', stage: 2 });
+        });
+    });
+
     describe('load', () => {
         it('asks the gateway for the progress and resolves with the first encounter', async () => {
             const encounter = await session.load();
