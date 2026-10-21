@@ -39,7 +39,7 @@ Prices and values live in the backend; the game reads them and never types a num
 | `CRIT_CHANCE` | `POWER` | Chance de crítico | +1 point of critical chance | 10 |
 | `CRIT_DAMAGE` | `POWER` | Dano crítico | +5 % critical damage | 10 |
 
-Price of the upgrade from level `n` to `n+1`, in copper: `round(300 x 1.6^n)`, so 300, 480, 768, 1229, 1966, 3146, 5033, 8053, 12884 and 20616 for `n` = 0 to 9 (base cost and growth are `app.talents` settings).
+Price of the upgrade from level `n` to `n+1`, in copper: `round(300 x 1.6^n)`, so 300, 480, 768, 1229, 1966, 3146, 5033, 8053, 12885 and 20616 for `n` = 0 to 9 (base cost and growth are `app.talents` settings).
 
 ---
 
@@ -146,7 +146,7 @@ Price of the upgrade from level `n` to `n+1`, in copper: `round(300 x 1.6^n)`, s
 ## Edge Cases
 
 - WHEN the player upgrades a talent while the wallet sync of kills is in flight THEN the game SHALL show the wallet the backend answered.
-- WHEN the player has 12 884 copper at level 8 THEN the game SHALL enable the button of that talent (`Melhorar (12884 cobre)` shown as `1 ouro 28 prata 84 cobre`).
+- WHEN the player has 12 885 copper at level 8 THEN the game SHALL enable the button of that talent (`Melhorar (12885 cobre)` shown as `1 ouro 28 prata 85 cobre`).
 - WHEN the level of a talent is 10 THEN the effect text SHALL read the max value (`+30%` for `CLICK_DAMAGE`).
 
 ---
