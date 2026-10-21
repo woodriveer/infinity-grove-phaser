@@ -421,3 +421,146 @@ describe('damage over time', () => {
         expect(skills.advance(1000, { monster, boss: true }).hits[0].damage).toBe(3);
     });
 });
+
+describe('the aimed shot', () => {
+    it('shows the slot as casting for 2 s and lands a critical hit of 30 afterwards, then the slot cools', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        expect(use(skills, monster, 'lyra', 2).hits).toEqual([]);
+        expect(skills.slotState('lyra', 2, true).state).toBe('casting');
+
+        expect(skills.advance(1999, { monster }).hits).toEqual([]);
+        expect(skills.slotState('lyra', 2, true).state).toBe('casting');
+
+        expect(skills.advance(1, { monster }).hits).toEqual([ { damage: 60, critical: true } ]);
+        expect(monster.health).toBe(940);
+        expect(skills.slotState('lyra', 2, true)).toEqual({ state: 'cooling', seconds: 28 });
+    });
+
+    it('is critical against critical resistance 100 and applies the boss damage', () => {
+        const skills = combat();
+        const monster = monsterOf(1000, stats('FIRE', 0, 0, 100));
+
+        use(skills, monster, 'lyra', 2, { attacker: { ...PLAYER, bossDamage: 50 }, boss: true });
+
+        expect(skills.advance(2000, { monster, boss: true }).hits).toEqual([ { damage: 90, critical: true } ]);
+    });
+
+    it('is lost when the monster dies before the cast ends, and the cooldown keeps running', () => {
+        const skills = combat();
+        const monster = monsterOf(5);
+
+        use(skills, monster, 'lyra', 2);
+        monster.hit(5);
+
+        expect(skills.advance(2000, { monster }).hits).toEqual([]);
+        expect(skills.slotState('lyra', 2, true)).toEqual({ state: 'cooling', seconds: 28 });
+    });
+
+    it('is lost when another monster is on screen or none', () => {
+        const skills = combat();
+        const other = monsterOf();
+
+        use(skills, monsterOf(), 'lyra', 2);
+        expect(skills.advance(2000, { monster: other }).hits).toEqual([]);
+        expect(other.health).toBe(1000);
+
+        skills.cooldowns.clear();
+        use(skills, other, 'lyra', 2);
+        expect(skills.advance(2000, { monster: null }).hits).toEqual([]);
+    });
+
+    it('is lost when a tick of the same step kills the monster', () => {
+        const skills = combat();
+        const monster = monsterOf(1);
+
+        use(skills, monster, 'orina', 2);
+        use(skills, monster, 'lyra', 2);
+
+        expect(skills.advance(2000, { monster }).hits).toEqual([ { damage: 2, critical: false } ]);
+        expect(monster.dead).toBe(true);
+    });
+});
+
+describe('boss control and the time shield', () => {
+    it('stops the countdown for 3 s with Investida do Baluarte on a boss: a frame of 1000 ms runs 0 ms', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'kael', 2, { boss: true });
+
+        expect(skills.countdownMs(1000)).toBe(0);
+        skills.advance(1000, { monster, boss: true });
+        expect(skills.countdownMs(1000)).toBe(0);
+        skills.advance(1000, { monster, boss: true });
+        expect(skills.countdownMs(1000)).toBe(0);
+        skills.advance(1000, { monster, boss: true });
+        expect(skills.countdownMs(1000)).toBe(1000);
+    });
+
+    it('runs the part of a frame after the stop ends', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'kael', 2, { boss: true });
+
+        expect(skills.countdownMs(4000)).toBe(1000);
+    });
+
+    it('stops the countdown for 2 s with Prisão de Espinhos on a boss', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'orina', 1, { boss: true });
+
+        expect(skills.countdownMs(2500)).toBe(500);
+    });
+
+    it('keeps a stun and a root together stopped until the later ends, without adding', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'kael', 2, { boss: true });
+        skills.advance(1000, { monster, boss: true });
+        use(skills, monster, 'orina', 1, { boss: true });
+
+        expect(skills.countdownMs(2500)).toBe(500);
+    });
+
+    it('leaves the countdown running on a phase monster', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'kael', 2, { boss: false });
+        use(skills, monster, 'orina', 1, { boss: false });
+
+        expect(skills.countdownMs(1000)).toBe(1000);
+    });
+
+    it('ends the stop when the boss dies', () => {
+        const skills = combat();
+        const monster = monsterOf(1);
+
+        use(skills, monster, 'orina', 1, { boss: true });
+        monster.hit(1);
+        skills.advance(0, { monster, boss: true });
+
+        expect(skills.countdownMs(1000)).toBe(1000);
+    });
+
+    it('adds 4 s to the countdown with Carrilhão da Aurora on a boss each time, and nothing on a phase monster', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        expect(use(skills, monster, 'seraphine', 3, { boss: true }).countdown).toEqual({ extendMs: 4000 });
+        skills.advance(45000, { monster, boss: true });
+        expect(use(skills, monster, 'seraphine', 3, { boss: true }).countdown).toEqual({ extendMs: 4000 });
+        skills.advance(45000, { monster, boss: true });
+        expect(use(skills, monster, 'seraphine', 3, { boss: false }).countdown).toEqual({ extendMs: 0 });
+    });
+
+    it('freezes nothing and extends nothing for the other skills', () => {
+        expect(use(combat(), monsterOf(), 'kael', 1, { boss: true }).countdown).toEqual({ extendMs: 0 });
+    });
+});

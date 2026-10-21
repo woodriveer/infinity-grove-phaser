@@ -261,10 +261,10 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Tiro Preciso state `casting` for 2 s, then a forced critical 3000 %; lost if the monster is gone, cooldown still running
-- [ ] Stun 3 s and Root 2 s freeze the countdown only on a boss; together they hold until the later ends
-- [ ] Carrilhão returns +4000 ms for a boss and nothing for a phase monster
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Tiro Preciso state `casting` for 2 s, then a forced critical 3000 %; lost if the monster is gone, cooldown still running
+- [x] Stun 3 s and Root 2 s freeze the countdown only on a boss; together they hold until the later ends
+- [x] Carrilhão returns +4000 ms for a boss and nothing for a phase monster
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick

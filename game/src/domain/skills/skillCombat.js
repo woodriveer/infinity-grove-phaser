@@ -20,6 +20,10 @@ export class SkillCombat
         this.debuffs = [];
         //  Damage over time on the monster: { id, label, percent, damageType, attacker, stacks, maxStacks, remainingMs, untilTickMs, seq }
         this.dots = [];
+        //  The aimed shot being cast: { key, remainingMs, skill, attacker, boss }; it belongs to `this.target`
+        this.cast = null;
+        //  Milliseconds the boss countdown stays stopped (Stun and Root do not add up)
+        this.freezeMs = 0;
         this.target = null;
         //  The start order of the effects, for the tags
         this.sequence = 0;
@@ -32,6 +36,8 @@ export class SkillCombat
         {
             this.debuffs = [];
             this.dots = [];
+            this.cast = null;
+            this.freezeMs = 0;
         }
 
         this.target = monster && !monster.dead ? monster : null;
@@ -102,6 +108,11 @@ export class SkillCombat
             return { state: 'locked', seconds: 0 };
         }
 
+        if (this.cast?.key === `${heroId}:${slot}`)
+        {
+            return { state: 'casting', seconds: Math.ceil(this.cast.remainingMs / 1000) };
+        }
+
         const left = this.cooldowns.get(`${heroId}:${slot}`) ?? 0;
 
         return left > 0 ? { state: 'cooling', seconds: Math.ceil(left / 1000) } : { state: 'ready', seconds: 0 };
@@ -167,7 +178,24 @@ export class SkillCombat
             this.startDot(skill, attacker);
         }
 
-        return { used: true, hits, countdown: { extendMs: 0 } };
+        if (skill.cast)
+        {
+            this.cast = { key: `${heroId}:${slot}`, remainingMs: skill.cast.ms, skill, attacker, boss };
+        }
+
+        //  Stun and Root stop the countdown of a boss only; a phase monster has none
+        if (boss)
+        {
+            this.freezeMs = Math.max(this.freezeMs, skill.stunMs ?? 0, skill.rootMs ?? 0);
+        }
+
+        return { used: true, hits, countdown: { extendMs: boss ? skill.countdownExtendMs ?? 0 : 0 } };
+    }
+
+    //  The part of a frame of `ms` the boss countdown runs; call it before `advance`, which uses up the stop
+    countdownMs (ms)
+    {
+        return Math.max(0, ms - this.freezeMs);
     }
 
     //  Moves the clock by `ms`: cooldowns and effects run down and the damage over time ticks once per second. Returns the ticks that landed.
@@ -181,13 +209,22 @@ export class SkillCombat
             this.cooldowns.set(key, Math.max(0, left - ms));
         }
 
+        this.freezeMs = Math.max(0, this.freezeMs - ms);
+
         const hits = [];
         let left = ms;
 
-        while (left > 0 && (this.buffs.length || this.debuffs.length || this.dots.length))
+        while (left > 0 && (this.buffs.length || this.debuffs.length || this.dots.length || this.cast))
         {
             const running = [ ...this.buffs, ...this.debuffs, ...this.dots ];
-            const step = Math.min(left, ...running.map((effect) => effect.remainingMs), ...this.dots.map((dot) => dot.untilTickMs));
+            const step = Math.min(
+                left, ...running.map((effect) => effect.remainingMs), ...this.dots.map((dot) => dot.untilTickMs), ...(this.cast ? [ this.cast.remainingMs ] : [])
+            );
+
+            if (this.cast)
+            {
+                this.cast.remainingMs -= step;
+            }
 
             running.forEach((effect) =>
             {
@@ -205,6 +242,19 @@ export class SkillCombat
                 }
             }
 
+            if (this.cast && this.cast.remainingMs <= 0)
+            {
+                //  A tick of this same step may have killed the monster: the shot is lost
+                if (monster && !monster.dead)
+                {
+                    hits.push(this.landCast(monster, boss));
+                }
+                else
+                {
+                    this.cast = null;
+                }
+            }
+
             this.buffs = this.buffs.filter((effect) => effect.remainingMs > 0);
             this.debuffs = this.debuffs.filter((effect) => effect.remainingMs > 0);
             this.dots = this.dots.filter((dot) => dot.remainingMs > 0);
@@ -217,6 +267,21 @@ export class SkillCombat
         }
 
         return { hits };
+    }
+
+    //  The cast ends: the shot lands as a critical hit on the monster it was aimed at, which is on screen and alive here
+    landCast (monster, boss)
+    {
+        const { skill, attacker } = this.cast;
+        const result = hitDamage({
+            attacker, percent: skill.cast.hit.percent, damageType: skill.damageType, forceCritical: true,
+            buffs: this.buffIds(), debuffs: this.debuffIds(), defender: monster.stats, random: this.random, boss
+        });
+
+        this.cast = null;
+        monster.hit(result.damage);
+
+        return result;
     }
 
     //  One tick of a damage over time on the monster: `stacks` times its percent of the base damage it was cast with
