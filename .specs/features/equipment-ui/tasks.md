@@ -61,10 +61,10 @@ T1 → T2 → T3 → T4 → T5 → T6
 
 **Done when**:
 
-- [ ] Kael with 0 stars, no equipment and no talents reads `1.0`, `10%`, `x2`, `0%`, `0%`, `0s`, `0s`
-- [ ] Lyra with 3 stars reads `1.4`, `40%`, `x2.5`
-- [ ] A weapon of 3.3 and a ring of +12 % read `4.8`; `BOSS_TIME_SECONDS` 5 and `MINIBOSS_TIME` 2 read `9s` and `5s`
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Kael with 0 stars, no equipment and no talents reads `1.0`, `10%`, `x2`, `0%`, `0%`, `0s`, `0s`
+- [x] Lyra with 3 stars reads `1.4`, `40%`, `x2.5`
+- [x] A weapon of 3.3 and a ring of +12 % read `4.8`; `BOSS_TIME_SECONDS` 5 and `MINIBOSS_TIME` 2 read `9s` and `5s`
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
