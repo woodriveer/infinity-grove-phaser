@@ -141,3 +141,137 @@ describe('click', () => {
         expect(monster.health).toBe(999);
     });
 });
+
+describe('timed effects', () => {
+    it('adds Ventos Ligeiros 50 % to clicks for 12 s, then ends', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'lyra', 3);
+        expect(skills.click({ attacker: PLAYER, monster, boss: false }).damage).toBe(1.5);
+
+        skills.advance(11999, { monster });
+        expect(skills.effects()).toEqual([ { label: 'Ventos Ligeiros', seconds: 1 } ]);
+
+        skills.advance(1, { monster });
+        expect(skills.effects()).toEqual([]);
+        expect(skills.click({ attacker: PLAYER, monster, boss: false }).damage).toBe(1);
+    });
+
+    it('runs Bênção da Grande Árvore for 15 s and Bomba de Fumaça for 10 s', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'seraphine', 1);
+        use(skills, monster, 'vex', 2);
+        skills.advance(10000, { monster });
+
+        expect(skills.effects()).toEqual([ { label: 'Bênção da Grande Árvore', seconds: 5 } ]);
+    });
+
+    it('adds the click bonuses of Ventos and Bênção: a click deals 2.275', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'lyra', 3);
+        use(skills, monster, 'seraphine', 1);
+
+        expect(skills.click({ attacker: PLAYER, monster, boss: false }).damage).toBeCloseTo(2.275, 10);
+    });
+
+    it('lowers the physical defense by 30 points for 10 s with Brado Aterrador', () => {
+        const skills = combat();
+        const monster = monsterOf(1000, stats('FIRE', 50));
+
+        use(skills, monster, 'kael', 3);
+        expect(skills.click({ attacker: PLAYER, monster, boss: false }).damage).toBe(0.8);
+
+        skills.advance(10000, { monster });
+        expect(skills.click({ attacker: PLAYER, monster, boss: false }).damage).toBe(0.5);
+    });
+
+    it('adds 25 % magical damage for 2 s with Prisão de Espinhos', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'orina', 1);
+        expect(use(skills, monster, 'orina', 3).hits[0].damage).toBe(31.25);
+
+        skills.advance(2000, { monster });
+        expect(skills.effects()).toEqual([]);
+    });
+
+    it('restarts a running effect without stacking it', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'lyra', 3);
+        skills.advance(40000, { monster });
+        use(skills, monster, 'lyra', 3);
+        skills.advance(5000, { monster });
+
+        expect(skills.effects()).toEqual([ { label: 'Ventos Ligeiros', seconds: 7 } ]);
+        expect(skills.click({ attacker: PLAYER, monster, boss: false }).damage).toBe(1.5);
+    });
+
+    it('keeps the buffs on the player when the monster dies, but ends the effects on the monster', () => {
+        const skills = combat();
+        const monster = monsterOf(2);
+
+        use(skills, monster, 'lyra', 3);
+        use(skills, monster, 'kael', 3);
+        monster.hit(2);
+
+        expect(skills.effects()).toEqual([ { label: 'Ventos Ligeiros', seconds: 12 } ]);
+    });
+
+    it('ends the effects on the monster when another monster is on screen, and keeps the buffs', () => {
+        const skills = combat();
+        const first = monsterOf(1000, stats('FIRE', 50));
+        const second = monsterOf(1000, stats('FIRE', 50));
+
+        use(skills, first, 'kael', 3);
+        use(skills, first, 'lyra', 3);
+        skills.advance(1000, { monster: second });
+
+        expect(skills.effects()).toEqual([ { label: 'Ventos Ligeiros', seconds: 11 } ]);
+        expect(skills.click({ attacker: PLAYER, monster: second, boss: false }).damage).toBe(0.75);
+    });
+
+    it('ends the effects on the monster when no monster is on screen', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'kael', 3);
+        skills.advance(1000, { monster: null });
+
+        expect(skills.effects()).toEqual([]);
+    });
+
+    it('lists the tags in the order the effects started, with seconds rounded up', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'seraphine', 1);
+        use(skills, monster, 'kael', 3);
+        use(skills, monster, 'lyra', 3);
+        skills.advance(500, { monster });
+
+        expect(skills.effects()).toEqual([
+            { label: 'Bênção da Grande Árvore', seconds: 15 },
+            { label: 'Brado Aterrador', seconds: 10 },
+            { label: 'Ventos Ligeiros', seconds: 12 }
+        ]);
+    });
+
+    it('keeps the buffs and the cooldowns when the leader changes (the heroes share one combat)', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'lyra', 3);
+
+        expect(use(skills, monster, 'kael', 1).used).toBe(true);
+        expect(skills.effects()).toEqual([ { label: 'Ventos Ligeiros', seconds: 12 } ]);
+        expect(skills.slotState('lyra', 3, true).state).toBe('cooling');
+    });
+});

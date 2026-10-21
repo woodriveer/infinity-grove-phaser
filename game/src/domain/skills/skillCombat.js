@@ -13,11 +13,49 @@ export class SkillCombat
         this.random = random;
         //  Milliseconds left of each cooldown, by `heroId:slot`
         this.cooldowns = new Map();
-        //  Effects on the player: { id, label, remainingMs }
+        //  Effects on the player: { id, label, remainingMs, seq }
         this.buffs = [];
-        //  Effects on the monster: { id, label, remainingMs }; they belong to `this.target`
+        //  Effects on the monster: same shape; they belong to `this.target` and end with it
         this.debuffs = [];
         this.target = null;
+        //  The start order of the effects, for the tags
+        this.sequence = 0;
+    }
+
+    //  The monster the effects on it belong to: another monster, a dead one or none ends them all
+    follow (monster)
+    {
+        if (monster !== this.target || !monster || monster.dead)
+        {
+            this.debuffs = [];
+        }
+
+        this.target = monster && !monster.dead ? monster : null;
+    }
+
+    //  Starts an effect, or restarts its duration without stacking it
+    start (list, id, label, ms)
+    {
+        const running = list.find((effect) => effect.id === id);
+
+        if (running)
+        {
+            running.remainingMs = ms;
+        }
+        else
+        {
+            list.push({ id, label, remainingMs: ms, seq: this.sequence++ });
+        }
+    }
+
+    //  The running effects as tags, in the order they started, with whole seconds left
+    effects ()
+    {
+        this.follow(this.target);
+
+        return [ ...this.buffs, ...this.debuffs ]
+            .sort((a, b) => a.seq - b.seq)
+            .map(({ label, remainingMs }) => ({ label, seconds: Math.ceil(remainingMs / 1000) }));
     }
 
     buffIds ()
@@ -46,6 +84,8 @@ export class SkillCombat
     //  A click of the leader's attacker under the running effects; damages the monster
     click ({ attacker, monster, boss })
     {
+        this.follow(monster);
+
         const result = clickDamage({
             attacker, buffs: this.buffIds(), debuffs: this.debuffIds(), defender: monster.stats, random: this.random, boss
         });
@@ -65,7 +105,18 @@ export class SkillCombat
             return NO_USE;
         }
 
+        this.follow(monster);
         this.cooldowns.set(`${heroId}:${slot}`, skill.cooldownMs);
+
+        if (skill.buff)
+        {
+            this.start(this.buffs, skill.buff.id, skill.label, skill.buff.ms);
+        }
+
+        if (skill.debuff)
+        {
+            this.start(this.debuffs, skill.debuff.id, skill.label, skill.debuff.ms);
+        }
 
         const hits = [];
 
@@ -88,13 +139,20 @@ export class SkillCombat
         return { used: true, hits, countdown: { extendMs: 0 } };
     }
 
-    //  Moves the clock by `ms`: cooldowns run down. Returns the hits that landed in that time.
-    advance (ms)
+    //  Moves the clock by `ms`: cooldowns and effects run down. Returns the hits that landed in that time.
+    advance (ms, { monster = null } = {})
     {
+        this.follow(monster);
+
         for (const [ key, left ] of this.cooldowns)
         {
             this.cooldowns.set(key, Math.max(0, left - ms));
         }
+
+        const tick = (effect) => ({ ...effect, remainingMs: effect.remainingMs - ms });
+
+        this.buffs = this.buffs.map(tick).filter((effect) => effect.remainingMs > 0);
+        this.debuffs = this.debuffs.map(tick).filter((effect) => effect.remainingMs > 0);
 
         return { hits: [] };
     }

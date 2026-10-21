@@ -204,11 +204,11 @@ T9 → T10 → T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Ventos 12 s, Bênção 15 s, Fumaça 10 s, Brado 10 s, Prisão 2 s run and end at their seconds
-- [ ] Reuse restarts duration without stacking
-- [ ] Buffs survive monster death and leader change; Brado and Prisão end with the monster
-- [ ] `effects()` lists tags in start order with seconds rounded up
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Ventos 12 s, Bênção 15 s, Fumaça 10 s, Brado 10 s, Prisão 2 s run and end at their seconds
+- [x] Reuse restarts duration without stacking
+- [x] Buffs survive monster death and leader change; Brado and Prisão end with the monster
+- [x] `effects()` lists tags in start order with seconds rounded up
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
