@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CHAPTER_BOSS, FARM, MINIBOSS, PHASE } from '../campaign/campaign';
-import { addBonuses, monsterAfterBreak, talentAttackerBonus, talentTimeBonusMs, talentValue } from './talents';
+import { addBonuses, BRANCH_TITLES, describeTalentEffect, monsterAfterBreak, talentAttackerBonus, talentIconName, talentTimeBonusMs, talentValue } from './talents';
 
 //  The tree as the backend answers it: value is level x perLevel
 const tree = (levels = {}) => [
@@ -102,5 +102,39 @@ describe('talentTimeBonusMs', () => {
     it('gives a phase monster and a list that has not loaded nothing', () => {
         expect(talentTimeBonusMs(tree({ MINIBOSS_TIME: 5, BOSS_TIME: 4 }), { kind: PHASE })).toBe(0);
         expect(talentTimeBonusMs(null, { kind: MINIBOSS })).toBe(0);
+    });
+});
+
+describe('describeTalentEffect', () => {
+    it('reads seconds as +6 s, percent as +9% and points as +3 pontos', () => {
+        expect(describeTalentEffect({ branch: 'TIME', unit: 's', value: 6 })).toBe('+6 s');
+        expect(describeTalentEffect({ branch: 'POWER', unit: '%', value: 9 })).toBe('+9%');
+        expect(describeTalentEffect({ branch: 'POWER', unit: 'points', value: 3 })).toBe('+3 pontos');
+    });
+
+    it('reads the points of a break talent as a reduction: -3 pontos', () => {
+        expect(describeTalentEffect({ branch: 'BREAK', unit: 'points', value: 3 })).toBe('-3 pontos');
+    });
+
+    it('reads nenhum at level 0 whatever the unit', () => {
+        expect(describeTalentEffect({ branch: 'TIME', unit: 's', value: 0 })).toBe('nenhum');
+        expect(describeTalentEffect({ branch: 'BREAK', unit: 'points', value: 0 })).toBe('nenhum');
+        expect(describeTalentEffect({ branch: 'POWER', unit: '%', value: 0 })).toBe('nenhum');
+    });
+
+    it('reads the maximum of Dano de clique as +30%', () => {
+        expect(describeTalentEffect({ branch: 'POWER', unit: '%', value: 30 })).toBe('+30%');
+    });
+});
+
+describe('talentIconName and the branch titles', () => {
+    it('names the 8 icons as the asset prompts do', () => {
+        expect([ 'MINIBOSS_TIME', 'BOSS_TIME', 'PHYSICAL_BREAK', 'MAGICAL_BREAK', 'CRIT_RESIST_BREAK', 'CLICK_DAMAGE', 'CRIT_CHANCE', 'CRIT_DAMAGE' ].map(talentIconName)).toEqual([
+            'talent-miniboss-time', 'talent-boss-time', 'talent-break-physical', 'talent-break-magical', 'talent-break-crit', 'talent-click-damage', 'talent-crit-chance', 'talent-crit-damage'
+        ]);
+    });
+
+    it('titles the three branches Tempo, Quebra de defesa and Poder do clique', () => {
+        expect(BRANCH_TITLES).toEqual({ TIME: 'Tempo', BREAK: 'Quebra de defesa', POWER: 'Poder do clique' });
     });
 });

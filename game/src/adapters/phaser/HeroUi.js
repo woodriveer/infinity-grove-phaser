@@ -6,6 +6,7 @@ import { renderFarm } from './views/farmView';
 import { renderFusion, renderFusionResult } from './views/fusionView';
 import { renderLeaderPicker } from './views/leaderView';
 import { refreshSkillBar, renderLeaderCard, renderSkillBar } from './views/skillBar';
+import { renderTalents, renderTalentsUnavailable } from './views/talentsView';
 
 const HUD = { x: 956, y: 370 };
 const PANEL = { x: 512, y: 384 };
@@ -23,6 +24,7 @@ const ICONS = {
     fusion: icon('<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>'),
     leader: icon('<path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path><path d="M5 21h14"></path>'),
     equipment: icon('<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>'),
+    talents: icon('<path d="M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3"></path><path d="M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4"></path><path d="M5 21h14"></path>'),
     farm: icon('<path d="M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z"></path><circle cx="15" cy="12" r="1"></circle><circle cx="9" cy="12" r="1"></circle>')
 };
 
@@ -32,6 +34,7 @@ const SCREENS = [
     { id: 'fusion', label: 'Fusão', title: 'Fusão' },
     { id: 'leader', label: 'Líder', title: 'Líder' },
     { id: 'equipment', label: 'Equipamento', title: 'Equipamento' },
+    { id: 'talents', label: 'Talentos', title: 'Talentos' },
     { id: 'farm', label: 'Rever chefes', title: 'Rever chefes' }
 ];
 
@@ -39,6 +42,8 @@ const LOAD_FAILED = 'Não foi possível carregar.';
 const FUSE_FAILED = 'Não foi possível fundir as cartas.';
 const LEADER_FAILED = 'Não foi possível trocar o líder.';
 const EQUIPMENT_FAILED = 'Não foi possível concluir a ação.';
+const TALENT_FAILED = 'Não foi possível melhorar o talento.';
+const NOT_ENOUGH_COPPER = 'Moedas insuficientes';
 
 //  The bag button carries a red dot while the bag holds a card the player has not looked at yet
 //  and the Equipamento button while it holds a piece the player has not looked at yet
@@ -56,21 +61,23 @@ const BAR_HTML = '<div class="skill-bar-host"></div>';
 const LEADER_HTML = '<div class="leader-host"></div>';
 const NOTICE_HTML = '<div class="hud-box hud-notice"><div class="card-notice" data-testid="card-notice" hidden></div></div>';
 
-//  The hero screens on top of the combat scene: six HUD buttons, one panel that shows the screen that was opened (Heróis, Mochila, Fusão,
-//  Líder, Equipamento, Rever chefes), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
+//  The hero screens on top of the combat scene: seven HUD buttons, one panel that shows the screen that was opened (Heróis, Mochila, Fusão,
+//  Líder, Equipamento, Talentos, Rever chefes), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
 //  It is plain DOM placed with scene.add.dom.
-//  Collaborators: heroes (heroCollection), equipment (equipmentCollection), farm (farmSession) and the scene hooks
+//  Collaborators: heroes (heroCollection), equipment (equipmentCollection), talents (talentCollection), farm (farmSession) and the scene hooks
 //    walletCopper() -> the copper the player holds, to disable what costs more;
 //    pause() -> true when it paused the fight, false when the fight was already paused; resume() undoes a pause that pause() made;
 //    startFarm(boss) starts the farm fight of the chosen boss;
 //    useSkill(slot) uses a skill of the leader (optional); skillState(slot) -> { state, seconds } of a slot of the leader (optional).
 export class HeroUi
 {
-    constructor (scene, { heroes, equipment, farm, pause, resume, startFarm, walletCopper, useSkill, skillState })
+    constructor (scene, { heroes, equipment, talents, farm, pause, resume, startFarm, walletCopper, useSkill, skillState })
     {
         this.scene = scene;
         this.heroes = heroes;
         this.equipment = equipment;
+        this.talents = talents;
+        this.talentBusy = false;
         this.farm = farm;
         this.hooks = { pause, resume, startFarm, walletCopper, useSkill, skillState };
         this.open = false;
@@ -164,6 +171,10 @@ export class HeroUi
             {
                 await Promise.all([ this.heroes.load(), this.equipment.load() ]);
             }
+            else if (screen === 'talents')
+            {
+                await this.talents.load();
+            }
             else
             {
                 await this.heroes.load();
@@ -177,6 +188,10 @@ export class HeroUi
                 if (screen === 'equipment')
                 {
                     this.body.replaceChildren(renderEquipmentUnavailable());
+                }
+                else if (screen === 'talents')
+                {
+                    this.body.replaceChildren(renderTalentsUnavailable());
                 }
                 else
                 {
@@ -362,6 +377,51 @@ export class HeroUi
             if (view === this.view)
             {
                 this.setError(EQUIPMENT_FAILED);
+            }
+        }
+    }
+
+    //  The three branches of the talent tree; `busy` disables every button while an upgrade runs
+    render_talents ()
+    {
+        this.backButton.hidden = true;
+        this.body.replaceChildren(renderTalents(this.talents.talents(), this.hooks.walletCopper(), {
+            busy: this.talentBusy,
+            onUpgrade: (talent) => this.upgradeTalent(talent)
+        }));
+    }
+
+    //  Buys the next level of a talent for the level the player saw; a refusal shows its text and the tree the backend answered after it
+    async upgradeTalent (talent)
+    {
+        const view = this.view;
+
+        this.talentBusy = true;
+        this.render_talents();
+
+        try
+        {
+            await this.talents.upgrade(talent.id, talent.level);
+
+            if (view === this.view)
+            {
+                this.setError('');
+            }
+        }
+        catch (error)
+        {
+            if (view === this.view)
+            {
+                this.setError(error.code === 'NOT_ENOUGH_COPPER' ? NOT_ENOUGH_COPPER : TALENT_FAILED);
+            }
+        }
+        finally
+        {
+            this.talentBusy = false;
+
+            if (view === this.view && this.screen === 'talents')
+            {
+                this.render_talents();
             }
         }
     }

@@ -62,3 +62,64 @@ test.describe('Talents in combat', () => {
         await expect(page.locator('.boss-timer')).toHaveText(/Time: (40|39)/);
     });
 });
+
+test.describe('Talentos screen', () => {
+    test('buying a level shows Nível 1/10, takes the copper and counts from the next click', async ({ page }) => {
+        const menu = await startGame(page, { wallets: { yan: 300 } });
+
+        await page.getByTestId('hud-talents').click();
+
+        await expect(page.locator('.hero-title')).toHaveText('Talentos');
+        await expect(page.locator('.talent-branch-title')).toHaveText([ 'Tempo', 'Quebra de defesa', 'Poder do clique' ]);
+        await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveText('Efeito: nenhum');
+        await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toHaveText('Melhorar (3 prata)');
+
+        await page.getByTestId('talent-upgrade-CLICK_DAMAGE').click();
+
+        await expect(page.getByTestId('talent-level-CLICK_DAMAGE')).toHaveText('Nível 1/10');
+        await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveText('Efeito: +3%');
+        await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toHaveText('Melhorar (4 prata 80 cobre)');
+        await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toBeDisabled();
+        await expect(page.locator('.wallet .coin-copper')).toHaveText('0');
+
+        await page.getByTestId('hero-close').click();
+        await menu.canvas.click();
+
+        expect(await dealt(page)).toBeCloseTo(1.03 * 0.8, 5);
+    });
+
+    test('a button is disabled while the wallet holds less than the price', async ({ page }) => {
+        await startGame(page, { wallets: { yan: 299 } });
+
+        await page.getByTestId('hud-talents').click();
+
+        await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toBeDisabled();
+    });
+
+    test('a talent already at level 10 shows Nível máximo and no button', async ({ page }) => {
+        await startGame(page, { talents: { yan: { CLICK_DAMAGE: 10 } } });
+
+        await page.getByTestId('hud-talents').click();
+
+        await expect(page.getByTestId('talent-max-CLICK_DAMAGE')).toHaveText('Nível máximo');
+        await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveText('Efeito: +30%');
+        await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toHaveCount(0);
+    });
+
+    test('draws a mark in place of the icons while the art does not exist', async ({ page }) => {
+        await startGame(page);
+
+        await page.getByTestId('hud-talents').click();
+
+        await expect(page.locator('[data-testid="talent-CLICK_DAMAGE"] .icon-fallback')).toBeVisible();
+    });
+
+    test('pauses the fight while the window is open', async ({ page }) => {
+        await startGame(page);
+
+        await page.getByTestId('hud-talents').click();
+        await expect(page.locator('.hero-panel')).toBeVisible();
+
+        expect(await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').paused)).toBe(true);
+    });
+});

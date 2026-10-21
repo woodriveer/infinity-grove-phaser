@@ -35,14 +35,14 @@ const monsterHealth = (page) => page.evaluate(() => window.__PHASER_GAME__.scene
 const walletText = (page) => page.locator('.wallet');
 
 test.describe('Equipment', () => {
-    test('the Equipamento button sits with the other five inside the game and opens an empty screen', async ({ page }) => {
+    test('the Equipamento button sits with the other six inside the game and opens an empty screen', async ({ page }) => {
         await mockBackend(page, { users: { yan: 'secret123' } });
         await startGame(page);
 
         const canvas = await page.locator('#game-container canvas').boundingBox();
         const hud = await page.locator('.hero-hud').boundingBox();
 
-        await expect(page.locator('.hero-hud button')).toHaveCount(6);
+        await expect(page.locator('.hero-hud button')).toHaveCount(7);
         await expect(page.getByTestId('hud-equipment')).toHaveText('Equipamento');
         expect(hud.y).toBeGreaterThanOrEqual(canvas.y);
         expect(hud.y + hud.height).toBeLessThanOrEqual(canvas.y + canvas.height);

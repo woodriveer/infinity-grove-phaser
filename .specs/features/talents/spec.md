@@ -57,7 +57,8 @@ Price of the upgrade from level `n` to `n+1`, in copper: `round(300 x 1.6^n)`, s
 | Time talents | `MINIBOSS_TIME` adds its seconds to the limit of a miniboss encounter, `BOSS_TIME` to the chapter boss; the equipment affix `BOSS_TIME_SECONDS` keeps adding to both | The user listed miniboss time and chapter boss time as two talents | n |
 | Power talents | `CLICK_DAMAGE` adds percent to the same sum as the equipment and star click damage; `CRIT_CHANCE` adds points (capped at 100); `CRIT_DAMAGE` adds percent to the critical multiplier like `CRIT_DAMAGE_PCT` | Same units as the equipment affixes and the star bonus (`click-power`) | n |
 | Screen | A seventh HUD button `Talentos` opens a window with three columns (Tempo, Quebra de defesa, Poder do clique) of cards; the window pauses the fight like the other hero screens | Same pattern as Equipamento | n |
-| Card text | Title `<label>`, line `Nível <level>/<max>`, line `Efeito: <value text>` (`+6 s`, `-3 pontos`, `+9%`, `+3 pontos`), button `Melhorar (<cost as formatCopper>)`; at the max `Nível máximo` and no button | Lesson L-010 | n |
+| Card text | Title `<label>`, line `Nível <level>/<max>`, line `Efeito: <value text>` (`+6 s`, `-3 pontos`, `+9%`, `+3 pontos`), button `Melhorar (<cost as formatCopper>)` (300 copper reads `3 prata`, 480 reads `4 prata 80 cobre`); at the max `Nível máximo` and no button | Lesson L-010 | n |
+| Level 0 effect | `Efeito: nenhum` while a talent has no level (value 0), whatever the unit | `-0 pontos` and `+0 s` read as noise (found while writing the screen) | n |
 | Button states | Disabled while the wallet holds less than the cost or while a request runs | Avoids a refused request | n |
 | Failure texts | `Moedas insuficientes` for NOT_ENOUGH_COPPER, `Não foi possível melhorar o talento.` for any other failure; the screen reloads the tree after a 409 | The server tree is the truth | n |
 | New account | All levels 0, no rows stored until the first upgrade | Rows only for upgraded talents | n |
@@ -130,7 +131,7 @@ Price of the upgrade from level `n` to `n+1`, in copper: `round(300 x 1.6^n)`, s
 
 1. The HUD SHALL show a button `Talentos`; WHEN clicked THEN the game SHALL pause the fight and open the window titled `Talentos` with three columns titled `Tempo`, `Quebra de defesa` and `Poder do clique`.  <!-- ubiquitous -->
 2. The window SHALL show, for each talent, its label, `Nível <level>/<max>`, `Efeito: <value text>` and the button `Melhorar (<cost>)`.  <!-- ubiquitous -->
-3. WHEN the player holds 300 copper and clicks `Melhorar (300 cobre)` on a level-0 talent THEN the game SHALL send the upgrade with `fromLevel` 0, show `Nível 1/10` and the new wallet.  <!-- event-driven -->
+3. WHEN the player holds 300 copper and clicks `Melhorar (3 prata)` on a level-0 talent THEN the game SHALL send the upgrade with `fromLevel` 0, show `Nível 1/10` and the new wallet.  <!-- event-driven -->
 4. WHILE the wallet holds less than a talent's price the game SHALL disable that talent's button.  <!-- state-driven -->
 5. WHILE a talent is at level 10 the game SHALL show `Nível máximo` and no button for it.  <!-- state-driven -->
 6. IF the backend answers 409 `NOT_ENOUGH_COPPER` THEN the game SHALL show `Moedas insuficientes` and reload the tree.  <!-- unwanted-behavior -->
@@ -139,14 +140,14 @@ Price of the upgrade from level `n` to `n+1`, in copper: `round(300 x 1.6^n)`, s
 9. IF the tree cannot be loaded THEN the game SHALL show `Talentos indisponíveis` and keep the fight playable.  <!-- unwanted-behavior -->
 10. WHEN a talent is upgraded THEN the game SHALL use the new level on the next click and the next encounter.  <!-- event-driven -->
 
-**Independent Test**: In the browser against the fake backend with 300 copper, open Talentos, click `Melhorar (300 cobre)` on `Dano de clique` and read `Nível 1/10`, `Efeito: +3%` and a disabled button.
+**Independent Test**: In the browser against the fake backend with 300 copper, open Talentos, click `Melhorar (3 prata)` on `Dano de clique` and read `Nível 1/10`, `Efeito: +3%` and a disabled button.
 
 ---
 
 ## Edge Cases
 
 - WHEN the player upgrades a talent while the wallet sync of kills is in flight THEN the game SHALL show the wallet the backend answered.
-- WHEN the player has 12 885 copper at level 8 THEN the game SHALL enable the button of that talent (`Melhorar (12885 cobre)` shown as `1 ouro 28 prata 85 cobre`).
+- WHEN the player has 12 885 copper at level 8 THEN the game SHALL enable the button of that talent (`Melhorar (1 ouro 28 prata 85 cobre)`).
 - WHEN the level of a talent is 10 THEN the effect text SHALL read the max value (`+30%` for `CLICK_DAMAGE`).
 
 ---

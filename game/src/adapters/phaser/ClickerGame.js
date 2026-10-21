@@ -215,6 +215,7 @@ export class ClickerGame extends Scene
         this.heroUi = new HeroUi(this, {
             heroes: this.heroes,
             equipment: this.equipment,
+            talents: this.talents,
             farm: this.farm,
             walletCopper: () => walletCopper(this.wallet.display()),
             pause: () => this.pauseForMenu(),

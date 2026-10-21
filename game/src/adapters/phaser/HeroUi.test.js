@@ -4,6 +4,7 @@ import { ApiError } from '../../application/ApiError';
 import { createEquipmentCollection } from '../../application/equipment/equipmentCollection';
 import { createFarmSession } from '../../application/farm/farmSession';
 import { createHeroCollection } from '../../application/heroes/heroCollection';
+import { createTalentCollection } from '../../application/talents/talentCollection';
 
 const flush = () => new Promise((resolve) => setTimeout(resolve));
 
@@ -28,7 +29,11 @@ const catalog = () => ({
 
 const farmState = () => ({ bosses: [ { kind: 'MINIBOSS', stage: 1 }, { kind: 'CHAPTER_BOSS' } ], chapterBossWinsLeft: 10 });
 
-const createUi = ({ list = catalog(), farmGet = farmState(), pause = true, equipmentList = { capacity: 100, pieces: [] }, wallet = 1_000_000, skillState } = {}) => {
+const createUi = ({ list = catalog(), farmGet = farmState(), pause = true, equipmentList = { capacity: 100, pieces: [] }, wallet = 1_000_000, skillState, talentList = { talents: [] } } = {}) => {
+    const talentGateway = {
+        list: vi.fn(() => (talentList instanceof Error ? Promise.reject(talentList) : Promise.resolve(talentList))),
+        upgrade: vi.fn()
+    };
     const heroesGateway = {
         list: vi.fn(() => (list instanceof Error ? Promise.reject(list) : Promise.resolve(list))),
         fuse: vi.fn(),
@@ -67,12 +72,13 @@ const createUi = ({ list = catalog(), farmGet = farmState(), pause = true, equip
     const heroes = createHeroCollection({ gateway: heroesGateway });
     const farm = createFarmSession({ gateway: farmGateway });
     const equipment = createEquipmentCollection({ gateway: equipmentGateway });
-    const ui = new HeroUi(scene, { heroes, equipment, farm, ...hooks });
+    const talents = createTalentCollection({ gateway: talentGateway });
+    const ui = new HeroUi(scene, { heroes, equipment, talents, farm, ...hooks });
     const root = scene.add.dom.mock.results.map((result) => result.value.node);
     const query = (selector) => root.map((node) => node.querySelector(selector)).find(Boolean) ?? null;
     const testid = (id) => query(`[data-testid="${id}"]`);
 
-    return { ui, scene, heroes, equipment, farm, heroesGateway, equipmentGateway, farmGateway, hooks, timers, query, testid, root };
+    return { ui, scene, heroes, equipment, talents, farm, heroesGateway, equipmentGateway, talentGateway, farmGateway, hooks, timers, query, testid, root };
 };
 
 const open = async (ctx, screen) => {
@@ -81,11 +87,11 @@ const open = async (ctx, screen) => {
 };
 
 describe('HeroUi HUD', () => {
-    it('shows the six buttons Heróis, Mochila, Fusão, Líder, Equipamento and Rever chefes', () => {
+    it('shows the seven buttons Heróis, Mochila, Fusão, Líder, Equipamento, Talentos and Rever chefes', () => {
         const { testid } = createUi();
 
-        expect([ 'heroes', 'bag', 'fusion', 'leader', 'equipment', 'farm' ].map((id) => testid(`hud-${id}`).textContent)).toEqual([
-            'Heróis', 'Mochila', 'Fusão', 'Líder', 'Equipamento', 'Rever chefes'
+        expect([ 'heroes', 'bag', 'fusion', 'leader', 'equipment', 'talents', 'farm' ].map((id) => testid(`hud-${id}`).textContent)).toEqual([
+            'Heróis', 'Mochila', 'Fusão', 'Líder', 'Equipamento', 'Talentos', 'Rever chefes'
         ]);
     });
 
@@ -387,6 +393,133 @@ describe('HeroUi bag badge', () => {
         ctx.ui.showDrop({ heroId: 'lyra', heroName: 'Lyra Folhaveloz', stars: 0 });
 
         expect(ctx.testid('bag-badge').hidden).toBe(false);
+    });
+});
+
+const talentTree = (levels = {}) => [
+    [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 3 ],
+    [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa física', 'points', 1 ], [ 'MAGICAL_BREAK', 'BREAK', 'Quebra de defesa mágica', 'points', 1 ],
+    [ 'CRIT_RESIST_BREAK', 'BREAK', 'Quebra de resistência a crítico', 'points', 1 ],
+    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique', '%', 3 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ]
+].map(([ id, branch, label, unit, perLevel ]) => {
+    const level = levels[id] ?? 0;
+
+    return { id, branch, label, unit, perLevel, maxLevel: 10, level, value: level * perLevel, nextCost: level >= 10 ? null : Math.round(300 * 1.6 ** level) };
+});
+
+describe('HeroUi Talentos', () => {
+    it('opens the window titled Talentos with the three columns and pauses the fight', async () => {
+        const ctx = createUi({ talentList: { talents: talentTree() } });
+
+        await open(ctx, 'talents');
+
+        expect(ctx.query('.hero-title').textContent).toBe('Talentos');
+        expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-branch-title') ]).map((node) => node.textContent)).toEqual([ 'Tempo', 'Quebra de defesa', 'Poder do clique' ]);
+        expect(ctx.hooks.pause).toHaveBeenCalledTimes(1);
+    });
+
+    it('sends the upgrade with fromLevel 0, shows Nível 1/10 and the new wallet state', async () => {
+        const ctx = createUi({ talentList: { talents: talentTree() }, wallet: 300 });
+        ctx.talentGateway.upgrade.mockResolvedValue({ talents: talentTree({ CLICK_DAMAGE: 1 }), wallet: { gold: 0, silver: 0, copper: 0 } });
+
+        await open(ctx, 'talents');
+        ctx.hooks.walletCopper.mockReturnValue(0);
+        ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
+        await flush();
+
+        expect(ctx.talentGateway.upgrade).toHaveBeenCalledWith('CLICK_DAMAGE', 0);
+        expect(ctx.testid('talent-level-CLICK_DAMAGE').textContent).toBe('Nível 1/10');
+        expect(ctx.testid('talent-effect-CLICK_DAMAGE').textContent).toBe('Efeito: +3%');
+        expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').disabled).toBe(true);
+    });
+
+    it('disables every Melhorar button while the request runs and enables them after', async () => {
+        const ctx = createUi({ talentList: { talents: talentTree() } });
+        let finish;
+
+        ctx.talentGateway.upgrade.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+        await open(ctx, 'talents');
+        ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
+
+        expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-upgrade') ]).every((button) => button.disabled)).toBe(true);
+
+        finish({ talents: talentTree({ CLICK_DAMAGE: 1 }), wallet: { gold: 0, silver: 0, copper: 0 } });
+        await flush();
+
+        expect(ctx.testid('talent-upgrade-CRIT_CHANCE').disabled).toBe(false);
+    });
+
+    it('says Moedas insuficientes on NOT_ENOUGH_COPPER and shows the tree the backend answered', async () => {
+        const ctx = createUi({ talentList: { talents: talentTree() } });
+
+        ctx.talentGateway.upgrade.mockRejectedValue(new ApiError('Not enough', { status: 409, code: 'NOT_ENOUGH_COPPER' }));
+        await open(ctx, 'talents');
+        ctx.talentGateway.list.mockResolvedValue({ talents: talentTree({ CLICK_DAMAGE: 2 }) });
+        ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
+        await flush();
+
+        expect(ctx.query('.hero-error').textContent).toBe('Moedas insuficientes');
+        expect(ctx.query('.hero-error').hidden).toBe(false);
+        expect(ctx.testid('talent-level-CLICK_DAMAGE').textContent).toBe('Nível 2/10');
+        expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').disabled).toBe(false);
+    });
+
+    it('says Não foi possível melhorar o talento. on any other failure and reloads after a 409', async () => {
+        const mismatch = createUi({ talentList: { talents: talentTree() } });
+
+        mismatch.talentGateway.upgrade.mockRejectedValue(new ApiError('Mismatch', { status: 409, code: 'TALENT_LEVEL_MISMATCH' }));
+        await open(mismatch, 'talents');
+        mismatch.testid('talent-upgrade-CLICK_DAMAGE').click();
+        await flush();
+
+        expect(mismatch.query('.hero-error').textContent).toBe('Não foi possível melhorar o talento.');
+        expect(mismatch.talentGateway.list).toHaveBeenCalledTimes(2);
+
+        const down = createUi({ talentList: { talents: talentTree() } });
+
+        down.talentGateway.upgrade.mockRejectedValue(new ApiError('down', { status: 500 }));
+        await open(down, 'talents');
+        down.testid('talent-upgrade-CLICK_DAMAGE').click();
+        await flush();
+
+        expect(down.query('.hero-error').textContent).toBe('Não foi possível melhorar o talento.');
+        expect(down.talentGateway.list).toHaveBeenCalledTimes(1);
+    });
+
+    it('clears the error line after the next successful upgrade', async () => {
+        const ctx = createUi({ talentList: { talents: talentTree() } });
+
+        ctx.talentGateway.upgrade.mockRejectedValueOnce(new ApiError('down', { status: 500 }));
+        await open(ctx, 'talents');
+        ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
+        await flush();
+        ctx.talentGateway.upgrade.mockResolvedValue({ talents: talentTree({ CLICK_DAMAGE: 1 }), wallet: { gold: 0, silver: 0, copper: 0 } });
+        ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
+        await flush();
+
+        expect(ctx.query('.hero-error').hidden).toBe(true);
+    });
+
+    it('says Talentos indisponíveis when the tree cannot be loaded', async () => {
+        const ctx = createUi({ talentList: new ApiError('down', { status: 500 }) });
+
+        await open(ctx, 'talents');
+
+        expect(ctx.testid('talents-unavailable').textContent).toBe('Talentos indisponíveis');
+    });
+
+    it('does not draw the screen again after it was closed while a request ran', async () => {
+        const ctx = createUi({ talentList: { talents: talentTree() } });
+        let finish;
+
+        ctx.talentGateway.upgrade.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+        await open(ctx, 'talents');
+        ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
+        ctx.ui.close();
+        finish({ talents: talentTree({ CLICK_DAMAGE: 1 }), wallet: { gold: 0, silver: 0, copper: 0 } });
+        await flush();
+
+        expect(ctx.query('.hero-body').childElementCount).toBe(0);
     });
 });
 

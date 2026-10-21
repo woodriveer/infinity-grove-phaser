@@ -45,3 +45,41 @@ export const addBonuses = (a, b) => ({
     critChance: a.critChance + b.critChance,
     critDamagePct: a.critDamagePct + b.critDamagePct
 });
+
+export const BRANCH_TITLES = { TIME: 'Tempo', BREAK: 'Quebra de defesa', POWER: 'Poder do clique' };
+export const BRANCHES = [ 'TIME', 'BREAK', 'POWER' ];
+
+//  "+6 s", "-3 pontos", "+9%", "+3 pontos"; "nenhum" at level 0. A BREAK talent lowers a stat, so its points read as a reduction.
+export const describeTalentEffect = ({ branch, unit, value }) =>
+{
+    if (value === 0)
+    {
+        return 'nenhum';
+    }
+
+    if (unit === '%')
+    {
+        return `+${value}%`;
+    }
+
+    if (unit === 's')
+    {
+        return `+${value} s`;
+    }
+
+    return `${branch === 'BREAK' ? '-' : '+'}${value} pontos`;
+};
+
+//  The file of the icon of a talent in assets/ui (the names of PROMPTS_ASSETS_UI.md)
+const ICON_NAMES = {
+    MINIBOSS_TIME: 'miniboss-time',
+    BOSS_TIME: 'boss-time',
+    PHYSICAL_BREAK: 'break-physical',
+    MAGICAL_BREAK: 'break-magical',
+    CRIT_RESIST_BREAK: 'break-crit',
+    CLICK_DAMAGE: 'click-damage',
+    CRIT_CHANCE: 'crit-chance',
+    CRIT_DAMAGE: 'crit-damage'
+};
+
+export const talentIconName = (talentId) => `talent-${ICON_NAMES[talentId] ?? talentId.toLowerCase()}`;

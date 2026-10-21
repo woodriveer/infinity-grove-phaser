@@ -261,9 +261,9 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] The window shows the texts and states of the spec, with the button disabled by funds, by a running request and at the max level
-- [ ] A 409 shows `Moedas insuficientes` or the generic text and reloads the tree
-- [ ] Gate check passes: `cd game && npm test && npm run build && npm run test:e2e`
+- [x] The window shows the texts and states of the spec, with the button disabled by funds, by a running request and at the max level
+- [x] A 409 shows `Moedas insuficientes` or the generic text and reloads the tree
+- [x] Gate check passes: `cd game && npm test && npm run build && npm run test:e2e`
 
 **Tests**: unit, e2e
 **Gate**: build
