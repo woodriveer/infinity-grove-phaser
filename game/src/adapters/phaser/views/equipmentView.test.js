@@ -175,6 +175,78 @@ describe('renderEquipment tiles and tooltip', () => {
     });
 });
 
+describe('renderEquipment transfer', () => {
+    const owned = [ hero('kael'), hero('lyra'), hero('orina') ];
+    const find = (screen, id) => screen.querySelector(`[data-testid="${id}"]`);
+
+    it('shows Transferir conjunto only for a hero that wears a piece', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }) ], owned, { onSelect: vi.fn(), onTransfer: vi.fn() });
+
+        expect(find(screen, 'equip-transfer-kael').textContent).toBe('Transferir conjunto');
+        expect(find(screen, 'equip-transfer-lyra')).toBeNull();
+        expect(find(screen, 'equip-transfer-orina')).toBeNull();
+    });
+
+    it('shows no button when only one hero is owned', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }) ], [ hero('kael'), hero('vex', false) ], { onSelect: vi.fn(), onTransfer: vi.fn() });
+
+        expect(find(screen, 'equip-transfer-kael')).toBeNull();
+    });
+
+    it('offers Para <nome> for every other owned hero when the button is clicked, and not for the source', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }) ], owned, { onSelect: vi.fn(), onTransfer: vi.fn() });
+
+        find(screen, 'equip-transfer-kael').click();
+
+        expect(find(screen, 'equip-transfer-kael-to-lyra').textContent).toBe('Para Hero lyra');
+        expect(find(screen, 'equip-transfer-kael-to-orina').textContent).toBe('Para Hero orina');
+        expect(find(screen, 'equip-transfer-kael-to-kael')).toBeNull();
+        expect(find(screen, 'equip-transfer-kael')).toBeNull();
+    });
+
+    it('offers no target that is not owned', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }) ], [ ...owned, hero('vex', false) ], { onSelect: vi.fn(), onTransfer: vi.fn() });
+
+        find(screen, 'equip-transfer-kael').click();
+
+        expect(find(screen, 'equip-transfer-kael-to-vex')).toBeNull();
+    });
+
+    it('calls onTransfer with the source and the picked target', () => {
+        const onTransfer = vi.fn();
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }) ], owned, { onSelect: vi.fn(), onTransfer });
+
+        find(screen, 'equip-transfer-kael').click();
+        find(screen, 'equip-transfer-kael-to-orina').click();
+
+        expect(onTransfer).toHaveBeenCalledTimes(1);
+        expect(onTransfer).toHaveBeenCalledWith('kael', 'orina');
+    });
+
+    it('shows the notice at the top', () => {
+        const screen = renderEquipment([ ring() ], owned, { onSelect: vi.fn(), notice: 'Conjunto transferido para Hero lyra' });
+
+        expect(find(screen, 'equip-transfer-notice').textContent).toBe('Conjunto transferido para Hero lyra');
+    });
+
+    it('shows no notice by default', () => {
+        expect(find(renderEquipment([ ring() ], owned, { onSelect: vi.fn() }), 'equip-transfer-notice')).toBeNull();
+    });
+
+    it('disables every button while a request runs', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }), ring() ], owned, { onSelect: vi.fn(), onTransfer: vi.fn(), busy: true });
+
+        expect([ ...screen.querySelectorAll('button') ].every((node) => node.disabled)).toBe(true);
+    });
+
+    it('leaves the buttons enabled when nothing runs', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }), ring() ], owned, { onSelect: vi.fn(), onTransfer: vi.fn() });
+
+        expect(find(screen, 'equip-transfer-kael').disabled).toBe(false);
+        expect(find(screen, 'equip-piece-r1').disabled).toBe(false);
+    });
+});
+
 describe('renderEquipmentUnavailable', () => {
     it('says the equipment is unavailable', () => {
         const node = renderEquipmentUnavailable();

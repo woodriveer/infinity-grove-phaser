@@ -630,6 +630,123 @@ describe('HeroUi leader attributes', () => {
     });
 });
 
+describe('HeroUi transfer of a set', () => {
+    const worn = (id, slot, heroId, extra = {}) => ({ id, slot, rarity: 'COMMON', refine: 0, clickDamage: slot === 'WEAPON' ? 3 : undefined, affixes: [], heroId, sellPrice: 100, refineCost: 500, ...extra });
+    const both = () => ({ capacity: 100, pieces: [ worn('w1', 'WEAPON', 'kael'), worn('r1', 'RING', 'kael'), worn('r2', 'RING', 'lyra') ] });
+    const equipped = (pieces, pieceId, heroId) => ({
+        capacity: 100,
+        pieces: pieces.map((p) => {
+            const moved = pieces.find((candidate) => candidate.id === pieceId);
+
+            if (p.id === pieceId) { return { ...p, heroId }; }
+
+            return p.heroId === heroId && p.slot === moved.slot ? { ...p, heroId: null } : p;
+        })
+    });
+    const pick = async (ctx, from = 'kael', to = 'lyra') =>
+    {
+        ctx.testid(`equip-transfer-${from}`).click();
+        ctx.testid(`equip-transfer-${from}-to-${to}`).click();
+        await flush();
+    };
+
+    it('moves the set: the pieces are under the target, the source is vazio and the displaced piece is in the bag', async () => {
+        const ctx = createUi({ equipmentList: both() });
+        let state = both().pieces;
+
+        ctx.equipmentGateway.equip.mockImplementation(async (id, heroId) =>
+        {
+            const next = equipped(state, id, heroId);
+
+            state = next.pieces;
+
+            return next;
+        });
+        await open(ctx, 'equipment');
+        await pick(ctx);
+
+        expect(ctx.equipmentGateway.equip.mock.calls).toEqual([ [ 'w1', 'lyra' ], [ 'r1', 'lyra' ] ]);
+        expect(ctx.testid('equip-slot-lyra-WEAPON').getAttribute('aria-label')).toBe('Comum Arma +0');
+        expect(ctx.testid('equip-slot-lyra-RING').getAttribute('aria-label')).toBe('Comum Anel +0');
+        expect(ctx.testid('equip-slot-kael-WEAPON').textContent).toBe('vazio');
+        expect(ctx.testid('equip-slot-kael-RING').textContent).toBe('vazio');
+        expect(ctx.testid('equip-piece-r2')).not.toBeNull();
+        expect(ctx.query('.equip-bag-title').textContent).toBe('Mochila (1)');
+    });
+
+    it('says Conjunto transferido para <nome>', async () => {
+        const ctx = createUi({ equipmentList: both() });
+
+        ctx.equipmentGateway.equip.mockImplementation(async (id, heroId) => equipped(both().pieces, id, heroId));
+        await open(ctx, 'equipment');
+        await pick(ctx);
+
+        expect(ctx.testid('equip-transfer-notice').textContent).toBe('Conjunto transferido para Hero lyra');
+        expect(ctx.query('.hero-error').hidden).toBe(true);
+    });
+
+    it('updates the attribute panel of the leader with the gear the target got', async () => {
+        const list = { capacity: 100, pieces: [ worn('w1', 'WEAPON', 'lyra', { clickDamage: 3 }) ] };
+        const ctx = createUi({ equipmentList: list });
+
+        ctx.equipmentGateway.equip.mockResolvedValue({ capacity: 100, pieces: [ worn('w1', 'WEAPON', 'kael', { clickDamage: 3 }) ] });
+        await open(ctx, 'equipment');
+        expect(ctx.testid('stat-clickDamage').textContent).toBe('Dano de clique: 1.0');
+
+        await pick(ctx, 'lyra', 'kael');
+
+        expect(ctx.testid('stat-clickDamage').textContent).toBe('Dano de clique: 4.0');
+    });
+
+    it('disables every equipment button while the transfer runs and enables them after', async () => {
+        const ctx = createUi({ equipmentList: both() });
+        let finish;
+
+        ctx.equipmentGateway.equip.mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
+        await open(ctx, 'equipment');
+        ctx.testid('equip-transfer-kael').click();
+        ctx.testid('equip-transfer-kael-to-lyra').click();
+
+        expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.equip-screen button') ]).every((button) => button.disabled)).toBe(true);
+
+        finish({ capacity: 100, pieces: [ worn('w1', 'WEAPON', 'lyra'), worn('r1', 'RING', 'kael'), worn('r2', 'RING', 'lyra') ] });
+        ctx.equipmentGateway.equip.mockImplementation(async () => both());
+        await flush();
+        await flush();
+
+        expect(ctx.testid('equip-transfer-kael').disabled).toBe(false);
+        expect(ctx.testid('equip-slot-kael-WEAPON').disabled).toBe(false);
+    });
+
+    it('says Não foi possível concluir a ação. on a failure, reloads the list and shows the screen again', async () => {
+        const ctx = createUi({ equipmentList: both() });
+
+        ctx.equipmentGateway.equip.mockRejectedValue(new ApiError('down', { status: 500 }));
+        await open(ctx, 'equipment');
+        await pick(ctx);
+
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível concluir a ação.');
+        expect(ctx.equipmentGateway.list).toHaveBeenCalledTimes(2);
+        expect(ctx.testid('equip-transfer-notice')).toBeNull();
+        expect(ctx.testid('equip-slot-kael-WEAPON').getAttribute('aria-label')).toBe('Comum Arma +0');
+    });
+
+    it('does not draw the screen again after the window was closed while the transfer ran', async () => {
+        const ctx = createUi({ equipmentList: both() });
+        let finish;
+
+        ctx.equipmentGateway.equip.mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
+        await open(ctx, 'equipment');
+        ctx.testid('equip-transfer-kael').click();
+        ctx.testid('equip-transfer-kael-to-lyra').click();
+        ctx.ui.close();
+        finish(both());
+        await flush();
+
+        expect(ctx.query('.hero-body').childElementCount).toBe(0);
+    });
+});
+
 describe('HeroUi equipment badge', () => {
     it('has no red dot until a piece drops', () => {
         const { testid } = createUi();

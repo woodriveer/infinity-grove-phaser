@@ -71,6 +71,8 @@ test.describe('Equipment', () => {
         await expect(page.getByTestId('piece-worn')).toHaveText('Equipado em Kael Raizférrea');
 
         await page.getByTestId('hero-close').click();
+        //  The combo of the first click lapses after 1.5 s of play, so the next click is a plain one
+        await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').update(0, 1600));
         const worn = await monsterHealth(page);
         await menu.canvas.click();
 
@@ -126,6 +128,6 @@ test.describe('Equipment', () => {
 
         await page.getByTestId('hud-equipment').click();
 
-        await expect(page.getByTestId('equip-piece-drop1')).toHaveText('Raro Arma +0');
+        await expect(page.getByTestId('equip-piece-drop1')).toHaveAttribute('aria-label', 'Raro Arma +0');
     });
 });

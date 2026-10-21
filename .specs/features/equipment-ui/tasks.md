@@ -194,11 +194,11 @@ T1 → T2 → T3 → T4 → T5 → T6
 
 **Done when**:
 
-- [ ] The button shows only for a hero with a worn piece when another hero is owned; the targets are `Para <nome>`
-- [ ] After the transfer the pieces are under the target, the source is `vazio`, the displaced pieces are in the bag and `Conjunto transferido para <nome>` shows
-- [ ] A failure shows `Não foi possível concluir a ação.`; every equipment button is disabled while the transfer runs
-- [ ] e2e: the panel numbers, the hover tooltip, the click detail and a transfer
-- [ ] Gate check passes: `cd game && npm test && npm run build && npm run test:e2e`
+- [x] The button shows only for a hero with a worn piece when another hero is owned; the targets are `Para <nome>`
+- [x] After the transfer the pieces are under the target, the source is `vazio`, the displaced pieces are in the bag and `Conjunto transferido para <nome>` shows
+- [x] A failure shows `Não foi possível concluir a ação.`; every equipment button is disabled while the transfer runs
+- [x] e2e: the panel numbers, the hover tooltip, the click detail and a transfer
+- [x] Gate check passes: `cd game && npm test && npm run build && npm run test:e2e`
 
 **Tests**: unit, e2e
 **Gate**: build

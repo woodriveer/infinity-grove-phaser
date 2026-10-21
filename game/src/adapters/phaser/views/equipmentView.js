@@ -15,6 +15,26 @@ const button = (text, testid, onClick, disabled = false) =>
     return node;
 };
 
+//  The button `Transferir conjunto` of a hero; a click offers one button `Para <nome>` per other owned hero
+const renderTransfer = (hero, owned, onTransfer) =>
+{
+    const box = el('div', 'equip-transfer');
+    const open = button('Transferir conjunto', `equip-transfer-${hero.id}`, () =>
+    {
+        const targets = el('div', 'equip-transfer-targets');
+
+        owned.filter((other) => other.id !== hero.id).forEach((other) =>
+        {
+            targets.append(button(`Para ${other.name}`, `equip-transfer-${hero.id}-to-${other.id}`, () => onTransfer?.(hero.id, other.id)));
+        });
+        open.replaceWith(targets);
+    });
+
+    box.append(open);
+
+    return box;
+};
+
 //  The attribute panel of the leader: `Atributos de <nome>` and one line per attribute ({ id, text } from `leaderStats`)
 export const renderLeaderStats = ({ name, lines }) =>
 {
@@ -30,8 +50,10 @@ export const renderLeaderStats = ({ name, lines }) =>
 export const renderEquipmentUnavailable = () => el('p', 'hero-empty', UNAVAILABLE_TEXT, { testid: 'equipment-unavailable' });
 
 //  The screen: the attribute panel of the leader (`stats` = { name, lines }, absent without a leader), the four slots of every owned hero,
-//  then the bag. `onSelect(piece)` fires when a worn or bagged piece is clicked.
-export const renderEquipment = (pieces, heroes, { onSelect, stats = null }) =>
+//  then the bag. `onSelect(piece)` fires when a worn or bagged piece is clicked. A hero that wears a piece has the button `Transferir conjunto`
+//  (when another hero is owned): it offers `Para <nome>` per other hero and `onTransfer(fromHeroId, toHeroId)` fires for the one picked.
+//  `notice` is a line shown at the top (the result of a transfer); `busy` disables every button while a request runs.
+export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, stats = null, notice = null, busy = false }) =>
 {
     if (pieces.length === 0)
     {
@@ -51,6 +73,11 @@ export const renderEquipment = (pieces, heroes, { onSelect, stats = null }) =>
 
     const screen = el('div', 'equip-screen', '', { testid: 'equipment-list' });
 
+    if (notice)
+    {
+        screen.append(el('p', 'equip-notice', notice, { testid: 'equip-transfer-notice' }));
+    }
+
     if (stats)
     {
         screen.append(renderLeaderStats(stats));
@@ -66,11 +93,22 @@ export const renderEquipment = (pieces, heroes, { onSelect, stats = null }) =>
         return tile;
     };
 
-    heroes.filter((hero) => hero.owned).forEach((hero) =>
+    const owned = heroes.filter((hero) => hero.owned);
+
+    owned.forEach((hero) =>
     {
         const block = el('div', 'equip-hero', '', { testid: `equip-hero-${hero.id}` });
+        const heading = el('div', 'equip-hero-heading');
+        const wearsSomething = pieces.some((piece) => piece.heroId === hero.id);
 
-        block.append(el('strong', 'equip-hero-name', hero.name));
+        heading.append(el('strong', 'equip-hero-name', hero.name));
+
+        if (wearsSomething && owned.length > 1)
+        {
+            heading.append(renderTransfer(hero, owned, onTransfer));
+        }
+
+        block.append(heading);
         SLOTS.forEach((slot) =>
         {
             const worn = pieces.find((piece) => piece.heroId === hero.id && piece.slot === slot);
@@ -89,6 +127,14 @@ export const renderEquipment = (pieces, heroes, { onSelect, stats = null }) =>
     screen.append(el('strong', 'equip-bag-title', `Mochila (${bag.length})`));
     bag.forEach((piece) => grid.append(tileOf(piece, `equip-piece-${piece.id}`)));
     screen.append(grid);
+
+    if (busy)
+    {
+        screen.querySelectorAll('button').forEach((button) =>
+        {
+            button.disabled = true;
+        });
+    }
 
     return screen;
 };

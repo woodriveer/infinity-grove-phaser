@@ -80,6 +80,7 @@ export class HeroUi
         this.equipment = equipment;
         this.talents = talents;
         this.talentBusy = false;
+        this.equipBusy = false;
         this.farm = farm;
         this.hooks = { pause, resume, startFarm, walletCopper, useSkill, skillState };
         this.open = false;
@@ -343,7 +344,7 @@ export class HeroUi
     }
 
     //  The attributes of the leader, the slots of every hero and the bag, or one piece with its actions (`selected` is a piece id)
-    render_equipment ({ selected = null } = {})
+    render_equipment ({ selected = null, notice = null } = {})
     {
         const piece = this.equipment.pieces().find((candidate) => candidate.id === selected);
         const owned = this.heroes.heroes();
@@ -353,7 +354,10 @@ export class HeroUi
         {
             this.body.replaceChildren(renderEquipment(this.equipment.pieces(), owned, {
                 stats,
-                onSelect: (picked) => this.render_equipment({ selected: picked.id })
+                notice,
+                busy: this.equipBusy,
+                onSelect: (picked) => this.render_equipment({ selected: picked.id }),
+                onTransfer: (fromHeroId, toHeroId) => this.transferSet(fromHeroId, toHeroId)
             }));
             this.backButton.hidden = true;
 
@@ -373,6 +377,45 @@ export class HeroUi
 
         screen.append(...(stats ? [ renderLeaderStats(stats) ] : []), detail);
         this.showDetail(screen, () => this.render_equipment());
+    }
+
+    //  Moves the whole set of a hero to another one: every equipment button is disabled while the requests run, then the list shows the
+    //  result (the pieces under the target, the source empty) with `Conjunto transferido para <nome>`; a failure shows the error line
+    async transferSet (fromHeroId, toHeroId)
+    {
+        const view = this.view;
+        const target = this.heroes.heroes().find((hero) => hero.id === toHeroId);
+        let notice = null;
+
+        this.equipBusy = true;
+        this.render_equipment();
+
+        try
+        {
+            await this.equipment.transferSet(fromHeroId, toHeroId);
+
+            if (view === this.view)
+            {
+                this.setError('');
+                notice = `Conjunto transferido para ${target.name}`;
+            }
+        }
+        catch
+        {
+            if (view === this.view)
+            {
+                this.setError(EQUIPMENT_FAILED);
+            }
+        }
+        finally
+        {
+            this.equipBusy = false;
+
+            if (view === this.view && this.screen === 'equipment')
+            {
+                this.render_equipment({ notice });
+            }
+        }
     }
 
     //  Runs an equipment action and shows the piece again (the list when the piece is gone); a refusal shows an error line
