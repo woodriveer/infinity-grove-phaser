@@ -164,6 +164,22 @@ const pieceView = (piece) => ({
     sellPrice: Math.floor(100 * RARITY[piece.rarity].index * (2 + piece.refine) / 2)
 });
 
+//  Talent contract (TalentController): the 8 talents of the backend catalog, level 0 to 10, the upgrade from level n costs round(300 x 1.6^n) copper
+const TALENT_CATALOG = [
+    [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 3 ],
+    [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa física', 'points', 1 ], [ 'MAGICAL_BREAK', 'BREAK', 'Quebra de defesa mágica', 'points', 1 ],
+    [ 'CRIT_RESIST_BREAK', 'BREAK', 'Quebra de resistência a crítico', 'points', 1 ],
+    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique', '%', 3 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ]
+];
+const TALENT_MAX_LEVEL = 10;
+const talentCost = (level) => Math.round(300 * 1.6 ** level);
+
+const talentsView = (levels) => TALENT_CATALOG.map(([ id, branch, label, unit, perLevel ]) => {
+    const level = levels[id] ?? 0;
+
+    return { id, branch, label, unit, perLevel, maxLevel: TALENT_MAX_LEVEL, level, value: level * perLevel, nextCost: level >= TALENT_MAX_LEVEL ? null : talentCost(level) };
+});
+
 const isPublic = (method, path) => method === 'POST' && (path === '/users' || path === '/users/login');
 
 //  Options: users {name: password}, delayMs, accessTtlMs (default 24 h), refreshTtlMs (default 30 days),
@@ -173,11 +189,13 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  definition (the chapter every player plays, default the backend seed),
 //  cards {name: { start, leader, copies: { 'kael:0': 3 }, cleared: [1], winsDay, winsToday }} (starting bags; a player not listed holds one blank Kael card),
 //  chances (the repeating list the drop rolls read, default never drops) and farmMinIntervalMs (default 0, the backend has 5000),
-//  equipment {name: [raw pieces]} (starting bags, default empty) and equipmentDrops (the pieces the next won bosses drop, one each, in order).
+//  equipment {name: [raw pieces]} (starting bags, default empty), equipmentDrops (the pieces the next won bosses drop, one each, in order) and
+//  talents {name: {TALENT_ID: level}} (starting levels, default 0; an upgrade takes copper from the wallet like the backend).
 //  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens.
 export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
-    cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = []
+    cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = [],
+    talents: startingTalents = {}
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -241,6 +259,47 @@ export async function mockBackend (page, {
         equipmentOf(username).push(piece);
 
         return { piece: pieceView(piece), sold: false };
+    };
+
+    const talentsByUser = new Map();
+    const talentsOf = (username) => {
+        if (!talentsByUser.has(username)) {
+            talentsByUser.set(username, { ...startingTalents[username] });
+        }
+
+        return talentsByUser.get(username);
+    };
+
+    const handleTalents = (route, method, path, body, now) => {
+        const username = authenticated(route, now);
+
+        if (!username) { return null; }
+
+        const levels = talentsOf(username);
+
+        if (method === 'GET' && path === '/talents') {
+            return route.fulfill({ json: { talents: talentsView(levels) } });
+        }
+
+        const action = path.match(/^\/talents\/([^/]+)\/upgrade$/);
+
+        if (method !== 'POST' || !action) { return route.fulfill(problem(404, 'Not found')); }
+
+        const id = decodeURIComponent(action[1]);
+
+        if (!TALENT_CATALOG.some(([ candidate ]) => candidate === id)) { return route.fulfill(problem(404, `Talent '${id}' not found`, 'TALENT_NOT_FOUND')); }
+        if (!Number.isInteger(body.fromLevel) || body.fromLevel < 0 || body.fromLevel > TALENT_MAX_LEVEL) { return route.fulfill(problem(400, 'fromLevel must be an integer between 0 and 10', 'INVALID_TALENT_REQUEST')); }
+
+        const level = levels[id] ?? 0;
+        const wallet = walletOf(username);
+
+        if (body.fromLevel !== level) { return route.fulfill(problem(409, `Talent '${id}' is at level ${level}`, 'TALENT_LEVEL_MISMATCH')); }
+        if (level >= TALENT_MAX_LEVEL) { return route.fulfill(problem(409, 'Talent is already at the maximum level', 'TALENT_MAX_LEVEL')); }
+        if (wallet.copper < talentCost(level)) { return route.fulfill(problem(409, 'Not enough copper', 'NOT_ENOUGH_COPPER')); }
+
+        wallet.copper -= talentCost(level);
+        levels[id] = level + 1;
+        return route.fulfill({ json: { talents: talentsView(levels), wallet: coins(wallet.copper) } });
     };
 
     const progresses = new Map();
@@ -600,6 +659,7 @@ export async function mockBackend (page, {
         if (path === '/heroes' || path.startsWith('/heroes/') || path === '/leader') { return handleHeroes(route, method, path, body, now); }
         if (path === '/farm' || path === '/farm/outcome') { return handleFarm(route, method, path, body, now); }
         if (path === '/equipment' || path.startsWith('/equipment/')) { return handleEquipment(route, method, path, body, now); }
+        if (path === '/talents' || path.startsWith('/talents/')) { return handleTalents(route, method, path, body, now); }
 
         if (path.startsWith('/users') && !isPublic(method, path)) {
             if (!hasValidBearer(request, now)) { return route.fulfill(unauthenticated()); }
@@ -627,6 +687,8 @@ export async function mockBackend (page, {
     await page.route('**/api/farm/**', handler);
     await page.route('**/api/equipment', handler);
     await page.route('**/api/equipment/**', handler);
+    await page.route('**/api/talents', handler);
+    await page.route('**/api/talents/**', handler);
 
     return {
         calls,
@@ -636,6 +698,7 @@ export async function mockBackend (page, {
         cards: cardsByUser,
         cardsOf,
         equipmentOf,
+        talentsOf,
         //  Replaces the list the drop rolls read, e.g. [ 0 ] drops every time
         setChances: (values) => {
             chances = [ ...values ];

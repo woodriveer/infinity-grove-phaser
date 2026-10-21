@@ -208,10 +208,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `list` and `upgrade(id, fromLevel)` call the endpoints and the collection keeps the tree and tells the wallet to the listeners
-- [ ] A 409 reloads the tree
-- [ ] The fake backend answers `/talents` with the prices of the spec
-- [ ] Gate check passes: `cd game && npm test`
+- [x] `list` and `upgrade(id, fromLevel)` call the endpoints and the collection keeps the tree and tells the wallet to the listeners
+- [x] A 409 reloads the tree
+- [x] The fake backend answers `/talents` with the prices of the spec
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
