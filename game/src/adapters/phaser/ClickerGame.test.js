@@ -2559,7 +2559,7 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         expect(timer(ctx)).toBe('Time: 30');
     });
 
-    it('ends the effects on the monster when the boss runs out of time, keeping the buffs', async () => {
+    it('ends the effects on the monster when the boss runs out of time', async () => {
         const ctx = await createScene({ start: big('MINIBOSS'), heroes: leaderOf('kael', 3) });
 
         key(ctx, 'THREE');
@@ -2593,7 +2593,7 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         expect(tags(ctx)).toBe('');
     });
 
-    it('ends the effects on the monster when a farm fight starts, and a buff survives', async () => {
+    it('ends the effects on the monster when a farm fight starts', async () => {
         const ctx = await createScene({ start: big(), heroes: leaderOf('kael', 3) });
 
         key(ctx, 'THREE');
@@ -2654,5 +2654,45 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         await ctx.scene.heroes.setLeader('kael');
         expect(slot(ctx, 1).getAttribute('data-state')).toBe('cooling');
         expect(slot(ctx, 1).querySelector('.skill-slot-cooldown').textContent).toBe('20s');
+    });
+
+    it('shows the aimed shot as a critical number of 60 when the cast ends', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('lyra', 3) });
+
+        key(ctx, 'TWO');
+        ctx.scene.update(0, 2000);
+
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '60', style: expect.objectContaining({ color: '#ffc6a5', fontSize: 48 }) });
+    });
+
+    it('runs the aimed shot down only while the fight is not paused: after a pause the 2 s are still left', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('lyra', 3) });
+
+        key(ctx, 'TWO');
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 5000);
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 1);
+
+        expect(ctx.scene.monster.health).toBe(1000);
+        expect(slot(ctx, 2).getAttribute('data-state')).toBe('casting');
+
+        ctx.scene.update(0, 1999);
+        expect(ctx.scene.monster.health).toBe(940);
+    });
+
+    it('runs a damage over time down only while the fight is not paused: after a pause the first tick is 1 s away', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('orina', 2) });
+
+        key(ctx, 'TWO');
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 5000);
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 999);
+
+        expect(ctx.scene.monster.health).toBe(1000);
+
+        ctx.scene.update(0, 1);
+        expect(ctx.scene.monster.health).toBe(998);
     });
 });
