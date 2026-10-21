@@ -150,6 +150,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md B8; SCHEMA-01/SCHEMA-02 (config)
 - last seen: 2026-10-19T23:20:06Z
 
+### L-024 - Assert the exact on-screen style (color and size) of a damage number on every code path that shows one, not only the click path
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: hero-skills
+- evidence: validation.md M1b ClickerGame.js update showDamage (game)
+- last seen: 2026-10-21T08:59:44Z
+
+### L-025 - Pin every field of a data table that changes a formula (such as damage type) with its own assertion, not only the fields next to it
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: hero-skills
+- evidence: validation.md M28 skillCatalog damageType (game)
+- last seen: 2026-10-21T08:59:44Z
+
+### L-026 - Test a pause by resuming for a time shorter than the frozen duration, so a timer that kept running while paused fails the test
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: hero-skills
+- evidence: validation.md N4 N5 pause (game)
+- last seen: 2026-10-21T08:59:45Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

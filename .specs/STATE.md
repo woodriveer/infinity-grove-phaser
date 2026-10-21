@@ -84,11 +84,11 @@
 
 ## Handoff
 
-- **Feature**: .specs/features/normalized-schema (foreign keys on every reference, `enemies` catalog, copper drops per stage through `drop_rules`, Flyway owns the schema)
-- **Phase / Task**: Done - T1 to T15 committed and pushed, Verifier fix `528ac3a`; Verifier PASS (`validation.md`, iteration 2)
-- **Completed**: backend (`DropQueue` rename, `WALLET_UNKNOWN_DROP_RULE`, `drop_rules` and `enemies` tables, stages/chapters referencing them, seeder of the 15 rules, `wallet_drop_queues`, wallet reading rules from the database, rule ids in `/progress`, `V1__schema.sql` with 20 FKs and checks, `ddl-auto: validate`, ADR 0009, AD-010), game (`dropRuleId` on encounters and monsters, e2e with rule-keyed drops)
+- **Feature**: .specs/features/hero-skills (the 15 skills of the 5 heroes usable by the leader: key 1-3 or slot click, cooldowns, buffs, debuffs, damage over time, aimed shot, boss control)
+- **Phase / Task**: Done - T1 to T13 committed and pushed, Verifier fixes `ecdf03e` and `bdbde1d`; Verifier PASS (`validation.md`, iteration 3)
+- **Completed**: game only (no backend change): `game/src/domain/skills` (catalog, damage rules, `SkillCombat`), `forceCritical` in `calculateDamage`, `BossCountdown.extend`, clickable skill bar with cooldown states, effect tags, `ClickerGame` skill use/keys/frame advance with one `afterDamage()` kill path, e2e `skills.spec.js`
 - **In-progress** (file:line): none
-- **Next step**: deploy (`./publish.sh`) after the one-time local reset `docker compose down -v` in `backend/`; then account level / prestige and the talent tree, then `hero-combat`
-- **Blockers**: the owner's uncommitted `application.yaml` rates (cards 0.07/0.80, equipment miniboss 0.5) fail `EquipmentDropFlowIT` and `FarmControllerIT`; gates ran with `APP_EQUIPMENT_MINIBOSSRATE=0.25 APP_CARDS_MINIBOSSRATEPERSTAGE=0.02 APP_CARDS_CHAPTERBOSSRATE=0.30`
-- **Uncommitted files**: `backend/src/main/resources/application.yaml` (owner rate edits), `.idea/`, `game/public/assets/coin-*.png`, `game/src/scenes/` (owner work, never staged)
+- **Next step**: deploy (`./publish.sh`) is pending; it needs the one-time local reset `docker compose down -v` in `backend/` (normalized-schema), which deletes local players. Then leader bonuses, account level / prestige and the talent tree
+- **Blockers**: the owner's uncommitted `application.yaml` rates (cards 0.07/0.80, equipment miniboss 0.5) fail `EquipmentDropFlowIT` and `FarmControllerIT`; backend gates ran with `APP_EQUIPMENT_MINIBOSSRATE=0.25 APP_CARDS_MINIBOSSRATEPERSTAGE=0.02 APP_CARDS_CHAPTERBOSSRATE=0.30`
+- **Uncommitted files**: `backend/src/main/resources/application.yaml` (owner rate edits), `.idea/`, `game/public/assets/coin-*.png`, `game/src/scenes/` (owner work, never stage them; `git add game/src` stages scenes, add files by path)
 - **Branch**: main
