@@ -1,9 +1,8 @@
 package br.com.woodriver.infinity_grove_ws.domain
 
 import org.slf4j.LoggerFactory
-import kotlin.math.pow
 
-enum class TalentBranch { TIME, BREAK, POWER }
+enum class TalentBranch { TIME, BREAK, POWER, COMBO }
 
 /**
  * One talent of the tree. [perLevel] is what one level gives, in [unit] (`s` seconds, `points`, `%`): the game turns the value of a TIME or
@@ -38,7 +37,7 @@ data class TalentDefinition(
     }
 }
 
-/** The 8 talents of the three branches: Tempo, Quebra de defesa and Poder do clique. */
+/** The 9 talents of the four branches: Tempo, Quebra de defesa, Poder do clique and Combo (the cap of the combo bonus). */
 object TalentCatalog {
     val all: List<TalentDefinition> =
         listOf(
@@ -50,55 +49,89 @@ object TalentCatalog {
             TalentDefinition("CLICK_DAMAGE", TalentBranch.POWER, "Dano de clique", "%", 3),
             TalentDefinition("CRIT_CHANCE", TalentBranch.POWER, "Chance de crítico", "points", 1),
             TalentDefinition("CRIT_DAMAGE", TalentBranch.POWER, "Dano crítico", "%", 5),
+            TalentDefinition("COMBO", TalentBranch.COMBO, "Limite de dano do combo", "%", 5),
         )
 
     fun find(id: String): TalentDefinition = all.firstOrNull { it.id == id } ?: throw TalentNotFoundException(id)
 }
 
-/** The numbers an operator tunes (`app.talents`): the upgrade from level `n` costs `round(baseCost x growth^n)` copper, the same curve for every talent. */
-data class TalentRules(
-    val baseCost: Long = 300,
-    val growth: Double = 1.6,
-) {
-    init {
-        require(baseCost >= 0) { "base-cost $baseCost must not be negative" }
-        require(growth >= 1.0) { "growth $growth must be at least 1" }
-    }
-
-    /** The copper that raises a talent from [level] to the next one. */
-    fun cost(level: Int): Long = Math.round(baseCost * growth.pow(level))
-}
-
-/** A talent raised by one level and what it cost. */
-data class TalentUpgrade(
-    val talents: PlayerTalents,
-    val cost: Long,
+/** A first clear of a position: the key that makes it pay once and the points it pays. */
+data class TalentAward(
+    val key: String,
+    val points: Int,
 )
 
 /**
- * The levels one player has bought. A talent with no entry is at level 0. Every change returns a new value; the service stores it under
- * the wallet lock.
+ * The numbers an operator tunes (`app.talents`): what one talent level costs in talent points and what the first clear of a phase, a
+ * miniboss and a chapter boss pays.
+ */
+data class TalentRules(
+    val costPerLevel: Int = 1,
+    val pointsPerPhase: Int = 1,
+    val pointsPerMiniboss: Int = 2,
+    val pointsPerChapterBoss: Int = 5,
+) {
+    init {
+        require(costPerLevel >= 1) { "cost-per-level $costPerLevel must be at least 1" }
+        require(pointsPerPhase >= 0 && pointsPerMiniboss >= 0 && pointsPerChapterBoss >= 0) { "Points per clear must not be negative" }
+    }
+
+    /** What clearing [position] pays; its key is the same for every clear of that position, so only the first one pays. */
+    fun award(position: ProgressPosition): TalentAward =
+        TalentAward(
+            key = "${position.chapter}:${position.stage}:${position.encounter}:${position.phase}",
+            points =
+                when (position.encounter) {
+                    Encounter.PHASE -> pointsPerPhase
+                    Encounter.MINIBOSS -> pointsPerMiniboss
+                    Encounter.CHAPTER_BOSS -> pointsPerChapterBoss
+                },
+        )
+}
+
+/** The talent points of a player: what the first clears paid, what the levels took and what is left. */
+data class TalentPoints(
+    val earned: Int,
+    val spent: Int,
+) {
+    val available: Int get() = earned - spent
+}
+
+/** A talent raised by one level and the points it cost. */
+data class TalentUpgrade(
+    val talents: PlayerTalents,
+    val cost: Int,
+)
+
+/**
+ * The levels one player has bought and the points their first clears paid ([earned]). A talent with no entry is at level 0. Every change
+ * returns a new value; the service stores it under the progress lock.
  */
 data class PlayerTalents(
     val username: String,
     val levels: Map<String, Int> = emptyMap(),
+    val earned: Int = 0,
 ) {
     init {
         require(levels.keys.all { id -> TalentCatalog.all.any { it.id == id } }) { "Every talent of $username must be in the catalog" }
         require(levels.values.all { it in 1..TalentDefinition.MAX_LEVEL }) { "Stored levels must be between 1 and ${TalentDefinition.MAX_LEVEL}" }
+        require(earned >= 0) { "Earned points $earned must not be negative" }
     }
 
     fun level(id: String): Int = levels[id] ?: 0
 
-    /** The copper of the next level of [definition], null at its top level. */
+    /** The points the levels already bought took. */
+    fun points(rules: TalentRules) = TalentPoints(earned, levels.values.sum() * rules.costPerLevel)
+
+    /** The points of the next level of [definition], null at its top level. */
     fun nextCost(
         definition: TalentDefinition,
         rules: TalentRules,
-    ): Long? = level(definition.id).takeIf { it < definition.maxLevel }?.let(rules::cost)
+    ): Int? = rules.costPerLevel.takeIf { level(definition.id) < definition.maxLevel }
 
     /**
      * Raises [definition] by one level. [fromLevel] is the level the player saw: any other stored level means a repeated or stale request
-     * and nothing changes. Returns the new levels and the copper the level costs; the caller takes the copper in the same transaction.
+     * and nothing changes. Returns the new levels and the points the level costs; they are derived from the levels, so the caller stores only the level.
      */
     fun upgrade(
         definition: TalentDefinition,
@@ -117,8 +150,15 @@ data class PlayerTalents(
             throw TalentMaxLevelException(definition.id)
         }
 
-        val cost = rules.cost(stored)
-        logger.info("Talent upgrade accepted username={} talent={} level={} copper={}", username, definition.id, stored + 1, cost)
+        val cost = rules.costPerLevel
+        val available = points(rules).available
+
+        if (available < cost) {
+            logger.warn("Talent upgrade refused, not enough points username={} talent={} available={} cost={}", username, definition.id, available, cost)
+            throw NotEnoughTalentPointsException(available, cost)
+        }
+
+        logger.info("Talent upgrade accepted username={} talent={} level={} points={}", username, definition.id, stored + 1, cost)
         return TalentUpgrade(copy(levels = levels + (definition.id to stored + 1)), cost)
     }
 

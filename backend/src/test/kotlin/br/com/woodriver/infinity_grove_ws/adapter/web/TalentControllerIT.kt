@@ -3,6 +3,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaTalentRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.TalentEntity
+import br.com.woodriver.infinity_grove_ws.adapter.repository.TalentRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.WalletEntity
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
@@ -20,6 +21,9 @@ import kotlin.test.assertEquals
 class TalentControllerIT : IntegrationTestBase() {
     @Autowired
     private lateinit var jpaTalentRepository: JpaTalentRepository
+
+    @Autowired
+    private lateinit var talentRepository: TalentRepository
 
     private lateinit var token: String
 
@@ -39,9 +43,9 @@ class TalentControllerIT : IntegrationTestBase() {
                 .path<String>("accessToken")
     }
 
-    private fun funded(copper: Long) = jpaWalletRepository.save(WalletEntity("yan", copper))
+    private fun earned(points: Int) = talentRepository.award("yan", "test:$points", points)
 
-    private fun copper() = jpaWalletRepository.findById("yan").get().copper
+    private fun copper() = jpaWalletRepository.findById("yan").map { it.copper }.orElse(0L)
 
     private fun level(id: String) = jpaTalentRepository.findAllByUsername("yan").firstOrNull { it.talentId == id }?.level ?: 0
 
@@ -56,106 +60,118 @@ class TalentControllerIT : IntegrationTestBase() {
             .then()
 
     @Test
-    fun `a new player gets the 8 talents at level 0 with a next cost of 300`() {
+    fun `a new player gets the 9 talents at level 0 with a next cost of 1 point and no points`() {
         asUser()
             .get("/talents")
             .then()
             .statusCode(200)
-            .body("talents.size()", equalTo(8))
-            .body("talents.id", equalTo(listOf("MINIBOSS_TIME", "BOSS_TIME", "PHYSICAL_BREAK", "MAGICAL_BREAK", "CRIT_RESIST_BREAK", "CLICK_DAMAGE", "CRIT_CHANCE", "CRIT_DAMAGE")))
-            .body("talents.branch", equalTo(listOf("TIME", "TIME", "BREAK", "BREAK", "BREAK", "POWER", "POWER", "POWER")))
-            .body("talents.level", equalTo(List(8) { 0 }))
-            .body("talents.value", equalTo(List(8) { 0 }))
-            .body("talents.nextCost", equalTo(List(8) { 300 }))
-            .body("talents.maxLevel", equalTo(List(8) { 10 }))
+            .body("talents.size()", equalTo(9))
+            .body("talents.id", equalTo(listOf("MINIBOSS_TIME", "BOSS_TIME", "PHYSICAL_BREAK", "MAGICAL_BREAK", "CRIT_RESIST_BREAK", "CLICK_DAMAGE", "CRIT_CHANCE", "CRIT_DAMAGE", "COMBO")))
+            .body("talents.branch", equalTo(listOf("TIME", "TIME", "BREAK", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO")))
+            .body("talents.level", equalTo(List(9) { 0 }))
+            .body("talents.value", equalTo(List(9) { 0 }))
+            .body("talents.nextCost", equalTo(List(9) { 1 }))
+            .body("talents.maxLevel", equalTo(List(9) { 10 }))
             .body("talents[5].label", equalTo("Dano de clique"))
             .body("talents[5].unit", equalTo("%"))
             .body("talents[5].perLevel", equalTo(3))
+            .body("talents[8].label", equalTo("Limite de dano do combo"))
+            .body("talents[8].unit", equalTo("%"))
+            .body("talents[8].perLevel", equalTo(5))
+            .body("points.earned", equalTo(0))
+            .body("points.spent", equalTo(0))
+            .body("points.available", equalTo(0))
     }
 
     @Test
-    fun `upgrading from level 0 with 300 copper answers level 1 and takes the copper`() {
-        funded(300)
+    fun `upgrading COMBO from level 0 with 3 points answers level 1 and value 5 and leaves 2 points`() {
+        earned(3)
 
-        upgrade("CLICK_DAMAGE", 0)
+        upgrade("COMBO", 0)
             .statusCode(200)
-            .body("talents[5].level", equalTo(1))
-            .body("talents[5].value", equalTo(3))
-            .body("talents[5].nextCost", equalTo(480))
-            .body("wallet.gold", equalTo(0))
-            .body("wallet.silver", equalTo(0))
-            .body("wallet.copper", equalTo(0))
+            .body("talents[8].level", equalTo(1))
+            .body("talents[8].value", equalTo(5))
+            .body("talents[8].nextCost", equalTo(1))
+            .body("points.earned", equalTo(3))
+            .body("points.spent", equalTo(1))
+            .body("points.available", equalTo(2))
+            .body("wallet", nullValue())
 
-        assertEquals(1, level("CLICK_DAMAGE"))
-        assertEquals(0L, copper())
+        assertEquals(1, level("COMBO"))
     }
 
     @Test
-    fun `the second level costs 480`() {
-        funded(1_000)
+    fun `an upgrade leaves the wallet untouched`() {
+        jpaWalletRepository.save(WalletEntity("yan", 5_000))
+        earned(1)
+
         upgrade("CLICK_DAMAGE", 0).statusCode(200)
 
-        upgrade("CLICK_DAMAGE", 1).statusCode(200).body("talents[5].level", equalTo(2)).body("talents[5].nextCost", equalTo(768))
-
-        assertEquals(220L, copper())
+        assertEquals(5_000L, copper())
     }
 
     @Test
-    fun `at level 9 the next cost is 20616`() {
-        jpaTalentRepository.save(TalentEntity("yan", "CLICK_DAMAGE", 9))
+    fun `the second level also costs 1 point`() {
+        earned(2)
+        upgrade("COMBO", 0).statusCode(200)
 
-        asUser().get("/talents").then().statusCode(200).body("talents[5].nextCost", equalTo(20616)).body("talents[5].value", equalTo(27))
+        upgrade("COMBO", 1).statusCode(200).body("talents[8].level", equalTo(2)).body("talents[8].value", equalTo(10)).body("points.available", equalTo(0))
+    }
+
+    @Test
+    fun `at level 10 the combo talent is worth 50`() {
+        jpaTalentRepository.save(TalentEntity("yan", "COMBO", 10))
+        earned(10)
+
+        asUser().get("/talents").then().statusCode(200).body("talents[8].value", equalTo(50)).body("talents[8].nextCost", nullValue())
     }
 
     @Test
     fun `a request made for another level than the stored one is 409 TALENT_LEVEL_MISMATCH and changes nothing`() {
-        funded(1_000)
+        earned(10)
         jpaTalentRepository.save(TalentEntity("yan", "CLICK_DAMAGE", 3))
 
         upgrade("CLICK_DAMAGE", 2).statusCode(409).body("code", equalTo("TALENT_LEVEL_MISMATCH"))
 
         assertEquals(3, level("CLICK_DAMAGE"))
-        assertEquals(1_000L, copper())
     }
 
     @Test
-    fun `a wallet with less copper than the price is 409 NOT_ENOUGH_COPPER and changes nothing`() {
-        funded(299)
+    fun `a player with no available point is 409 NOT_ENOUGH_TALENT_POINTS and changes nothing`() {
+        jpaWalletRepository.save(WalletEntity("yan", 1_000_000))
 
-        upgrade("CLICK_DAMAGE", 0).statusCode(409).body("code", equalTo("NOT_ENOUGH_COPPER"))
+        upgrade("CLICK_DAMAGE", 0).statusCode(409).body("code", equalTo("NOT_ENOUGH_TALENT_POINTS"))
 
         assertEquals(0, level("CLICK_DAMAGE"))
-        assertEquals(299L, copper())
-    }
-
-    @Test
-    fun `a talent at level 10 is 409 TALENT_MAX_LEVEL, takes nothing and has a null next cost`() {
-        funded(1_000_000)
-        jpaTalentRepository.save(TalentEntity("yan", "CLICK_DAMAGE", 10))
-
-        upgrade("CLICK_DAMAGE", 10).statusCode(409).body("code", equalTo("TALENT_MAX_LEVEL"))
-        asUser().get("/talents").then().statusCode(200).body("talents[5].nextCost", nullValue()).body("talents[5].value", equalTo(30))
-
         assertEquals(1_000_000L, copper())
     }
 
     @Test
+    fun `a talent at level 10 is 409 TALENT_MAX_LEVEL, spends nothing and has a null next cost`() {
+        earned(20)
+        jpaTalentRepository.save(TalentEntity("yan", "CLICK_DAMAGE", 10))
+
+        upgrade("CLICK_DAMAGE", 10).statusCode(409).body("code", equalTo("TALENT_MAX_LEVEL"))
+        asUser().get("/talents").then().statusCode(200).body("talents[5].nextCost", nullValue()).body("talents[5].value", equalTo(30)).body("points.available", equalTo(10))
+    }
+
+    @Test
     fun `an unknown talent is 404 TALENT_NOT_FOUND`() {
-        funded(1_000)
+        earned(1)
 
         upgrade("NOPE", 0).statusCode(404).body("code", equalTo("TALENT_NOT_FOUND"))
     }
 
     @Test
     fun `a missing, negative, too high or non integer fromLevel is 400 INVALID_TALENT_REQUEST`() {
-        funded(1_000)
+        earned(5)
 
         listOf(null, -1, 11, "1", 1.5).forEach { sent ->
             upgrade("CLICK_DAMAGE", sent).statusCode(400).body("code", equalTo("INVALID_TALENT_REQUEST"))
         }
 
         asUser().contentType(ContentType.JSON).body("{}").post("/talents/CLICK_DAMAGE/upgrade").then().statusCode(400).body("code", equalTo("INVALID_TALENT_REQUEST"))
-        assertEquals(1_000L, copper())
+        asUser().get("/talents").then().body("points.available", equalTo(5))
     }
 
     @Test
@@ -165,8 +181,8 @@ class TalentControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `two requests with the same fromLevel on a rich wallet succeed once and answer 409 to the other`() {
-        funded(10_000)
+    fun `two requests with the same fromLevel succeed once and answer 409 to the other`() {
+        earned(10)
         val pool = Executors.newFixedThreadPool(2)
 
         val statuses =
@@ -180,22 +196,43 @@ class TalentControllerIT : IntegrationTestBase() {
 
         assertEquals(listOf(200, 409), statuses.sorted())
         assertEquals(1, level("CLICK_DAMAGE"))
-        assertEquals(9_700L, copper())
+        asUser().get("/talents").then().body("points.spent", equalTo(1))
     }
 
     @Test
-    fun `the levels of one player do not touch another and go with the player`() {
+    fun `two upgrades of different talents with one point accept exactly one`() {
+        earned(1)
+        val pool = Executors.newFixedThreadPool(2)
+
+        val statuses =
+            try {
+                listOf("COMBO", "CLICK_DAMAGE")
+                    .map { id -> Callable { upgrade(id, 0).extract().statusCode() } }
+                    .map(pool::submit)
+                    .map { it.get() }
+            } finally {
+                pool.shutdown()
+            }
+
+        assertEquals(listOf(200, 409), statuses.sorted())
+        asUser().get("/talents").then().body("points.spent", equalTo(1)).body("points.available", equalTo(0))
+    }
+
+    @Test
+    fun `the levels and points of one player do not touch another and go with the player`() {
         users("other")
         jpaTalentRepository.save(TalentEntity("other", "CLICK_DAMAGE", 6))
-        funded(300)
+        talentRepository.award("other", "legacy", 6)
+        earned(1)
         upgrade("CLICK_DAMAGE", 0).statusCode(200)
 
         assertEquals(6, jpaTalentRepository.findAllByUsername("other").single().level)
+        assertEquals(6, talentRepository.earnedPoints("other"))
 
-        jpaWalletRepository.deleteById("yan")
         jpaUserRepository.deleteById("yan")
 
         assertEquals(emptyList(), jpaTalentRepository.findAllByUsername("yan"))
+        assertEquals(0, talentRepository.earnedPoints("yan"))
         assertEquals(1, jpaTalentRepository.findAllByUsername("other").size)
     }
 }

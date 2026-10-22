@@ -19,16 +19,16 @@ app:
   security:
     jwt-secret: ${JWT_SECRET}
   cards:
-    # miniboss chance per stage (stage n drops a hero card at n times it: 2 % to 20 % over a chapter), chance a repeated chapter
+    # miniboss chance per stage (stage n drops a hero card at n times it: 7 % to 70 % over a chapter), chance a repeated chapter
     # boss win does (the first win always does), chapter boss wins counted per UTC day, and the shortest time between two farm wins
-    miniboss-rate-per-stage: 0.02
-    chapter-boss-rate: 0.30
+    miniboss-rate-per-stage: 0.07
+    chapter-boss-rate: 0.80
     chapter-boss-daily-limit: 10
     farm-min-interval-ms: 5000
   equipment:
     # chance a won miniboss / chapter boss drops a piece, pieces the bag holds, copper to refine a COMMON piece from +0 (grows 1.7x per
     # level, times the rarity) and copper to reroll one affix
-    miniboss-rate: 0.25
+    miniboss-rate: 0.5
     chapter-boss-rate: 1.0
     bag-capacity: 100
     refine-base-cost: 500

@@ -246,6 +246,7 @@ class InMemoryEquipmentRepository : EquipmentRepositoryPort {
 
 class InMemoryTalentRepository : TalentRepositoryPort {
     val levels = linkedMapOf<Pair<String, String>, Int>()
+    val awards = linkedMapOf<Pair<String, String>, Int>()
 
     override fun findAll(username: String) = levels.filterKeys { it.first == username }.mapKeys { it.key.second }
 
@@ -257,8 +258,17 @@ class InMemoryTalentRepository : TalentRepositoryPort {
         levels[username to talentId] = level
     }
 
+    override fun earnedPoints(username: String) = awards.filterKeys { it.first == username }.values.sum()
+
+    override fun award(
+        username: String,
+        key: String,
+        points: Int,
+    ): Boolean = awards.putIfAbsent(username to key, points) == null
+
     override fun deleteByUsername(username: String) {
         levels.keys.removeIf { it.first == username }
+        awards.keys.removeIf { it.first == username }
     }
 }
 

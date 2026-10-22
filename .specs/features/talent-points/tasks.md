@@ -11,6 +11,8 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 **Spec**: `.specs/features/talent-points/spec.md`
 **Status**: In progress
 
+T1, T2 and T3 shipped in one commit: the domain change breaks the compilation of the service and the controller until they use points, so no earlier commit could pass its gate.
+
 The design is inline (no `design.md`): it extends the talents feature (ADR 0010, `domain` / `port` / `usecase` / `service` / `adapter` packages) and the game follows ADR 0007.
 
 ---
@@ -69,10 +71,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] The catalog holds 9 talents; `COMBO` is `COMBO`, `%`, 5 per level, max 10, label `Limite de dano do combo`; level 10 gives 50
-- [ ] A phase pays 1, a miniboss 2, a chapter boss 5 (settings `points-per-phase`, `points-per-miniboss`, `points-per-chapter-boss`); the award key is `chapter:stage:encounter:phase`
-- [ ] `upgrade` costs `cost-per-level` (1) points, refuses with `NOT_ENOUGH_TALENT_POINTS` at 0 available, and still refuses a level mismatch and the max level
-- [ ] Gate check passes: `cd backend && ./gradlew test --tests '*Talent*'`
+- [x] The catalog holds 9 talents; `COMBO` is `COMBO`, `%`, 5 per level, max 10, label `Limite de dano do combo`; level 10 gives 50
+- [x] A phase pays 1, a miniboss 2, a chapter boss 5 (settings `points-per-phase`, `points-per-miniboss`, `points-per-chapter-boss`); the award key is `chapter:stage:encounter:phase`
+- [x] `upgrade` costs `cost-per-level` (1) points, refuses with `NOT_ENOUGH_TALENT_POINTS` at 0 available, and still refuses a level mismatch and the max level
+- [x] Gate check passes: `cd backend && ./gradlew test --tests '*Talent*'`
 
 **Tests**: unit
 **Gate**: quick
@@ -96,11 +98,11 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Rows keyed by (username, award key) with a foreign key to `users` that cascades on delete; inserting an existing key is a no-op reported as not new
-- [ ] The earned points of a player are the sum of their awards, apart from other players
-- [ ] `V5` on a player with talent levels summing to 7 gives `earned` 7
-- [ ] `ddl-auto: validate` still passes
-- [ ] Gate check passes: `cd backend && ./gradlew test --tests '*Talent*' --tests '*SchemaValidationIT'`
+- [x] Rows keyed by (username, award key) with a foreign key to `users` that cascades on delete; inserting an existing key is a no-op reported as not new
+- [x] The earned points of a player are the sum of their awards, apart from other players
+- [x] `V5` on a player with talent levels summing to 7 gives `earned` 7
+- [x] `ddl-auto: validate` still passes
+- [x] Gate check passes: `cd backend && ./gradlew test --tests '*Talent*' --tests '*SchemaValidationIT'`
 
 **Tests**: integration
 **Gate**: full
@@ -124,11 +126,11 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `GET /talents` answers 9 talents and `points` `{ earned, spent, available }`; `nextCost` is 1, null at level 10
-- [ ] An upgrade with 3 available points raises the level and answers `spent` 1, `available` 2, with the wallet untouched and no `wallet` field
-- [ ] 0 available answers 409 `NOT_ENOUGH_TALENT_POINTS`; mismatch, max level, 404, 400 and 401 keep their codes
-- [ ] Two racing requests accept exactly one; upgrades of different talents never spend more than earned
-- [ ] Gate check passes: `cd backend && ./gradlew test --tests '*Talent*'`
+- [x] `GET /talents` answers 9 talents and `points` `{ earned, spent, available }`; `nextCost` is 1, null at level 10
+- [x] An upgrade with 3 available points raises the level and answers `spent` 1, `available` 2, with the wallet untouched and no `wallet` field
+- [x] 0 available answers 409 `NOT_ENOUGH_TALENT_POINTS`; mismatch, max level, 404, 400 and 401 keep their codes
+- [x] Two racing requests accept exactly one; upgrades of different talents never spend more than earned
+- [x] Gate check passes: `cd backend && ./gradlew test --tests '*Talent*'`
 
 **Tests**: unit, integration
 **Gate**: full

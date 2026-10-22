@@ -11,5 +11,15 @@ interface TalentRepositoryPort {
         level: Int,
     )
 
+    /** The talent points the first clears of the player paid. */
+    fun earnedPoints(username: String): Int
+
+    /** Records the award [key] of the player with its [points]; false, and nothing stored, when that key was already paid. */
+    fun award(
+        username: String,
+        key: String,
+        points: Int,
+    ): Boolean
+
     fun deleteByUsername(username: String)
 }

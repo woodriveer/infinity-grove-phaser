@@ -44,6 +44,55 @@ class TalentRepositoryIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `a player with no award has earned no points`() {
+        assertEquals(0, repository.earnedPoints("yan"))
+    }
+
+    @Test
+    fun `an award is stored once per key and the earned points are their sum`() {
+        assertEquals(true, repository.award("yan", "1:1:PHASE:1", 1))
+        assertEquals(true, repository.award("yan", "1:1:MINIBOSS:1", 2))
+        assertEquals(false, repository.award("yan", "1:1:PHASE:1", 1))
+
+        assertEquals(3, repository.earnedPoints("yan"))
+        assertEquals(2, jdbc.queryForObject("select count(*) from talent_point_awards where username = 'yan'", Int::class.java))
+    }
+
+    @Test
+    fun `earned points count only the awards of that player`() {
+        repository.award("yan", "1:1:PHASE:1", 1)
+        repository.award("other", "1:1:PHASE:1", 5)
+
+        assertEquals(1, repository.earnedPoints("yan"))
+        assertEquals(5, repository.earnedPoints("other"))
+    }
+
+    @Test
+    fun `an award for a player that does not exist breaks the foreign key`() {
+        assertFailsWith<DataAccessException> { repository.award("ghost", "1:1:PHASE:1", 1) }
+    }
+
+    @Test
+    fun `deleting the player deletes its awards`() {
+        repository.award("yan", "1:1:PHASE:1", 1)
+
+        jpaUserRepository.deleteById("yan")
+
+        assertEquals(0, repository.earnedPoints("yan"))
+    }
+
+    @Test
+    fun `deleteByUsername removes the awards of that player only`() {
+        repository.award("yan", "1:1:PHASE:1", 1)
+        repository.award("other", "1:1:PHASE:1", 5)
+
+        repository.deleteByUsername("yan")
+
+        assertEquals(0, repository.earnedPoints("yan"))
+        assertEquals(5, repository.earnedPoints("other"))
+    }
+
+    @Test
     fun `deleteByUsername removes the levels of that player only`() {
         repository.save("yan", "CLICK_DAMAGE", 2)
         repository.save("other", "CLICK_DAMAGE", 7)

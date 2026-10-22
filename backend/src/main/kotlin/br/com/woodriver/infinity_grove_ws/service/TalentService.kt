@@ -1,28 +1,30 @@
 package br.com.woodriver.infinity_grove_ws.service
 
 import br.com.woodriver.infinity_grove_ws.domain.PlayerTalents
+import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.TalentCatalog
 import br.com.woodriver.infinity_grove_ws.domain.TalentRules
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
+import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.TalentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.usecase.ListTalentsUseCase
-import br.com.woodriver.infinity_grove_ws.usecase.TalentChange
 import br.com.woodriver.infinity_grove_ws.usecase.UpgradeTalentUseCase
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * An upgrade takes only the `wallets` row, the last of the lock order (`progress`, `player_cards`, `wallets`, ADR 0006): it holds it for the
- * whole request, so two upgrades of one player run one after the other and the second sees the level the first stored.
+ * An upgrade takes the `progress` row, the first of the lock order (`progress`, `player_cards`, `wallets`, ADR 0006): a first clear pays its
+ * points under the same lock, so an upgrade never reads points a report is still adding and two upgrades of one player run one after the
+ * other. A player with no progress row gets it first, so there is always a row to lock.
  */
 @Service
 @Transactional
 class TalentService(
     private val talentRepository: TalentRepositoryPort,
     private val userRepository: UserRepositoryPort,
-    private val walletAccess: WalletAccess,
+    private val progressRepository: ProgressRepositoryPort,
     private val rules: TalentRules,
 ) : ListTalentsUseCase,
     UpgradeTalentUseCase {
@@ -36,23 +38,22 @@ class TalentService(
         username: String,
         talentId: String,
         fromLevel: Int,
-    ): TalentChange {
+    ): PlayerTalents {
         logger.info("Talent upgrade requested username={} talent={} fromLevel={}", username, talentId, fromLevel)
         requireUser(username)
         val definition = TalentCatalog.find(talentId)
         definition.requireSeenLevel(fromLevel)
 
-        val wallet = walletAccess.lock(username)
+        progressRepository.createIfAbsent(Progress.start(username))
+        progressRepository.findForUpdate(username)
         val upgrade = load(username).upgrade(definition, fromLevel, rules)
-        val paid = wallet.minus(upgrade.cost)
 
         talentRepository.save(username, talentId, upgrade.talents.level(talentId))
-        walletAccess.save(paid)
-        logger.info("Talent upgraded username={} talent={} level={} copper={}", username, talentId, upgrade.talents.level(talentId), upgrade.cost)
-        return TalentChange(upgrade.talents, paid)
+        logger.info("Talent upgraded username={} talent={} level={} points={}", username, talentId, upgrade.talents.level(talentId), upgrade.cost)
+        return upgrade.talents
     }
 
-    private fun load(username: String) = PlayerTalents(username, talentRepository.findAll(username))
+    private fun load(username: String) = PlayerTalents(username, talentRepository.findAll(username), talentRepository.earnedPoints(username))
 
     private fun requireUser(username: String) {
         if (!userRepository.existsByUsername(username)) {

@@ -26,3 +26,9 @@ class TalentLevelMismatchException(
 class TalentMaxLevelException(
     talentId: String,
 ) : TalentConflictException("TALENT_MAX_LEVEL", "Talent '$talentId' is already at the maximum level")
+
+/** The player holds fewer talent points than a level costs; nothing is spent. */
+class NotEnoughTalentPointsException(
+    available: Int,
+    cost: Int,
+) : TalentConflictException("NOT_ENOUGH_TALENT_POINTS", "A talent level costs $cost points, the player has $available")
