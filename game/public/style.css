@@ -739,6 +739,23 @@ button:disabled {
     box-shadow: 0 0 0 2px var(--color-bg);
 }
 
+/* The talents dot carries the count of unspent points */
+[data-testid="talents-badge"] {
+    top: 2px;
+    right: 10px;
+    width: auto;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 3px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+}
+
 /* The leader on the left of the battle bar */
 .leader-card {
     display: flex;

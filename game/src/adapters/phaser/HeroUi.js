@@ -51,9 +51,10 @@ const TALENT_FAILED = 'Não foi possível melhorar o talento.';
 const NOT_ENOUGH_COPPER = 'Moedas insuficientes';
 const NOT_ENOUGH_TALENT_POINTS = 'Pontos de talento insuficientes';
 
-//  The bag button carries a red dot while the bag holds a card the player has not looked at yet
+//  The bag button carries a red dot while the bag holds a card the player has not looked at yet; the talents button carries one with the unspent points
 //  and the Equipamento button while it holds a piece the player has not looked at yet
-const BADGED = [ 'bag', 'equipment' ];
+const BADGED = [ 'bag', 'equipment', 'talents' ];
+const MAX_BADGE_COUNT = 9;
 const badgeHtml = (id) => `<span class="hud-badge" data-testid="${id}-badge" hidden></span>`;
 const HUD_HTML = `<div class="hero-hud">${SCREENS.map(({ id, label }) => `<button type="button" data-testid="hud-${id}">${ICONS[id]}${label}${BADGED.includes(id) ? badgeHtml(id) : ''}</button>`).join('')}</div>`;
 
@@ -97,6 +98,8 @@ export class HeroUi
 
         this.bagBadge = hud.querySelector('[data-testid="bag-badge"]');
         this.equipmentBadge = hud.querySelector('[data-testid="equipment-badge"]');
+        this.talentsBadge = hud.querySelector('[data-testid="talents-badge"]');
+        this.talents.onChange?.(() => this.refreshTalentsBadge());
         this.screen = null;
 
         SCREENS.forEach(({ id }) => hud.querySelector(`[data-testid="hud-${id}"]`).addEventListener('click', () => this.show(id)));
@@ -544,10 +547,18 @@ export class HeroUi
         this.showNotice(`Equipamento encontrado: ${dropLabel(drop.piece)}`);
     }
 
-    //  "+2 pontos de talento" for 3 s after a first clear paid points, and the tree is read again so the screen shows them
-    showTalentPoints (points)
+    //  The red dot of Talentos counts the unspent points ("+9" from 10 on) and hides at zero
+    refreshTalentsBadge ()
     {
-        this.showNotice(`+${points} ${points === 1 ? 'ponto' : 'pontos'} de talento`);
+        const available = this.talents.points().available;
+
+        this.talentsBadge.textContent = available > MAX_BADGE_COUNT ? `+${MAX_BADGE_COUNT + 1}` : String(available);
+        this.talentsBadge.hidden = !(available > 0);
+    }
+
+    //  A first clear paid points: the tree is read again so the dot and the screen show them (no notice, it would hide the drop ones)
+    showTalentPoints ()
+    {
         this.talents.load()
             .then(() =>
             {

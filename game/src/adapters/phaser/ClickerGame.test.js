@@ -2371,7 +2371,7 @@ describe('ClickerGame equipment', () => {
         expect(ctx.scene.equipment.pieces().map(({ id }) => id)).toEqual([ 'new' ]);
     });
 
-    it('shows +2 pontos de talento and reads the tree again for a report that paid 2 points', async () => {
+    it('reads the tree again for a report that paid 2 points', async () => {
         const ctx = await createScene({ start: progress(1, 'MINIBOSS', 1) });
         campaignGateway.report.mockResolvedValue({ ...progress(2, 'PHASE', 1), talentPoints: 2 });
         const reads = talentGateway.list.mock.calls.length;
@@ -2380,11 +2380,11 @@ describe('ClickerGame equipment', () => {
         tick(ctx);
         await flush();
 
-        expect(testid(ctx, 'card-notice').textContent).toBe('+2 pontos de talento');
+        expect(testid(ctx, 'card-notice').hidden).toBe(true);
         expect(talentGateway.list.mock.calls.length).toBe(reads + 1);
     });
 
-    it('shows +1 ponto de talento for 1 point and no notice for 0', async () => {
+    it('shows no notice for the talent points of a first clear', async () => {
         const one = await createScene({ start: progress(1, 'MINIBOSS', 1) });
         campaignGateway.report.mockResolvedValue({ ...progress(2, 'PHASE', 1), talentPoints: 1 });
 
@@ -2392,7 +2392,7 @@ describe('ClickerGame equipment', () => {
         tick(one);
         await flush();
 
-        expect(testid(one, 'card-notice').textContent).toBe('+1 ponto de talento');
+        expect(testid(one, 'card-notice').hidden).toBe(true);
 
         const none = await createScene({ start: progress(1, 'MINIBOSS', 1) });
         campaignGateway.report.mockResolvedValue({ ...progress(2, 'PHASE', 1), talentPoints: 0 });

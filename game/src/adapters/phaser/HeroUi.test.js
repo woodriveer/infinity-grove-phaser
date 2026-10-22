@@ -858,31 +858,39 @@ describe('HeroUi equipment badge', () => {
     });
 });
 
-describe('HeroUi talent points notice', () => {
-    it('shows "+2 pontos de talento" for 3 s', () => {
-        const { ui, testid, timers } = createUi({ talentList: talentsAnswer({}, 0) });
+describe('HeroUi talent points badge', () => {
+    const badgeAfter = async (available) => {
+        const ctx = createUi({ talentList: talentsAnswer({}, available) });
 
-        ui.showTalentPoints(2);
+        await ctx.talents.load();
 
-        expect(testid('card-notice').textContent).toBe('+2 pontos de talento');
-        expect(testid('card-notice').hidden).toBe(false);
-        expect(timers.map((timer) => timer.delay)).toEqual([ 3000 ]);
+        return ctx.testid('talents-badge');
+    };
 
-        timers[0].callback();
+    it('stays hidden with no points and shows no notice when points arrive', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 0) });
 
-        expect(testid('card-notice').hidden).toBe(true);
+        await ctx.talents.load();
+        expect(ctx.testid('talents-badge').hidden).toBe(true);
+
+        ctx.talentGateway.list.mockResolvedValue(talentsAnswer({}, 2));
+        ctx.ui.showTalentPoints(2);
+        await flush();
+
+        expect(ctx.testid('card-notice').hidden).toBe(true);
+        expect(ctx.testid('talents-badge').hidden).toBe(false);
+        expect(ctx.testid('talents-badge').textContent).toBe('2');
     });
 
-    it('says "+1 ponto de talento" for a single point and "+5 pontos de talento" for 5', () => {
-        const { ui, testid } = createUi({ talentList: talentsAnswer({}, 0) });
-
-        ui.showTalentPoints(1);
-        expect(testid('card-notice').textContent).toBe('+1 ponto de talento');
-
-        ui.showTalentPoints(5);
-        expect(testid('card-notice').textContent).toBe('+5 pontos de talento');
+    it('counts the available points inside the dot, "+10" from 10 on', async () => {
+        expect((await badgeAfter(1)).textContent).toBe('1');
+        expect((await badgeAfter(9)).textContent).toBe('9');
+        expect((await badgeAfter(10)).textContent).toBe('+10');
+        expect((await badgeAfter(25)).textContent).toBe('+10');
     });
+});
 
+describe('HeroUi talent points reload', () => {
     it('reads the tree again and shows the new points on the open Talentos screen', async () => {
         const ctx = createUi({ talentList: talentsAnswer({}, 0) });
 
@@ -904,7 +912,6 @@ describe('HeroUi talent points notice', () => {
         ctx.ui.showTalentPoints(1);
         await flush();
 
-        expect(ctx.testid('card-notice').textContent).toBe('+1 ponto de talento');
         expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 0');
     });
 });
