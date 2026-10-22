@@ -4,7 +4,7 @@
 **Spec**: `.specs/features/talent-points/spec.md`
 **Diff range**: `6b49ab8..HEAD` (a9ad3df ... 7eb26a9), only the files of this feature. Commit 9fec6d7 also holds the owner's uncommitted `application.yaml` drop-rate edits (known, not part of the feature).
 **Verifier**: independent sub-agent (author != verifier)
-**Verdict**: PASS (re-verified after iteration 1: the surviving mutant `h`, removing the progress lock of the upgrade, is now killed 3 of 3 runs by `TalentControllerIT` race tests, which pre-create the progress row `TalentControllerIT.kt` `withProgress()`; the P2 AC6 wording was fixed in spec.md)
+**Verdict**: PASS (re-verified after iteration 1: the surviving mutant h, removing the progress lock of the upgrade, is now killed 3 of 3 runs by the TalentControllerIT race tests, which pre-create the progress row; the P2 AC6 wording was fixed in spec.md)
 
 ---
 
@@ -108,7 +108,7 @@ Scratch: detached git worktree `D:\Developer\scratch-verify-tp` (node_modules ju
 
 Mutant h detail: the `TalentControllerIT` race tests (`:226`, `:245`) register a fresh player whose `progress` row does not exist yet, so the first `createIfAbsent` insert makes the other request wait on the unique key and serialises them by accident. With the row pre-created (a `GET /progress` before the race) and the lock removed, "two upgrades of different talents with one point accept exactly one" FAILED in 3 of 3 runs (points overspent), so the lock matters and the committed tests do not pin it. The in-memory fake (`Fakes.kt:139`) cannot observe a lock, and `TalentServiceTest.kt:84` only asserts the progress row exists.
 
-**Sensor depth**: lightweight plus extras (8 mutants). **Result**: 7/8 killed, FAIL.
+**Sensor depth**: lightweight plus extras (8 mutants). **Result**: PASS, 8/8 killed after iteration 1 (mutant h killed 3 of 3 runs once the race tests pre-create the progress row).
 
 ---
 
