@@ -181,10 +181,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Level 4 with a streak of 30 gives 20 %, with a streak of 12 gives 12 %; level 10 with 60 gives 50 %
-- [ ] Level 0 or unloaded talents give 0 % and an empty HUD; `Combo x30 · +20%` at level 4
-- [ ] An upgrade of `COMBO` applies on the next click without ending the streak
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Level 4 with a streak of 30 gives 20 %, with a streak of 12 gives 12 %; level 10 with 60 gives 50 %
+- [x] Level 0 or unloaded talents give 0 % and an empty HUD; `Combo x30 · +20%` at level 4
+- [x] An upgrade of `COMBO` applies on the next click without ending the streak
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick

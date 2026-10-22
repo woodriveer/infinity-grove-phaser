@@ -7,7 +7,7 @@ import { bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/eq
 import { healthText, Monster } from '../../domain/combat/monster';
 import { clickHits } from '../../domain/heroes/leaderBonus';
 import { SkillCombat } from '../../domain/skills/skillCombat';
-import { monsterAfterBreak, talentTimeBonusMs } from '../../domain/talents/talents';
+import { monsterAfterBreak, talentComboCap, talentTimeBonusMs } from '../../domain/talents/talents';
 import { HeroUi } from './HeroUi';
 import { el } from './views/dom';
 import { renderElementWheel } from './views/elementWheel';
@@ -771,6 +771,8 @@ export class ClickerGame extends Scene
 
         //  A countdown means the monster is a boss. One click is one step of the combo; the double click of Lyra lands two critical hits that
         //  share its bonus, and the second does not land when the first one kills.
+        this.combo.maxPercent = talentComboCap(this.talents.talents());
+
         const multiplier = 1 + this.combo.click() / 100;
         const hits = clickHits(this.heroes.leader()?.id, this.random);
         const x = this.damageTextX(pointer);
@@ -791,6 +793,8 @@ export class ClickerGame extends Scene
     //  "Combo x11 · +11%" while a streak runs
     showCombo ()
     {
+        this.combo.maxPercent = talentComboCap(this.talents.talents());
+
         const text = comboText(this.combo);
 
         if (this.comboHud.textContent !== text)

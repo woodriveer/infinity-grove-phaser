@@ -39,6 +39,9 @@ export const talentTimeBonusMs = (talents, encounter) =>
     return kind === CHAPTER_BOSS ? talentValue(talents, 'BOSS_TIME') * SECOND : 0;
 };
 
+//  The cap of the combo bonus in percent (spec talent-points): 5 per level of COMBO, 0 without the talent or before the talents load
+export const talentComboCap = (talents) => talentValue(talents, 'COMBO');
+
 //  The sum of two attacker bonuses (the stars and the talents)
 export const addBonuses = (a, b) => ({
     clickDamagePct: a.clickDamagePct + b.clickDamagePct,

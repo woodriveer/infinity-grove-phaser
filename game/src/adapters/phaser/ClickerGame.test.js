@@ -65,7 +65,10 @@ const walletResponse = (coins = { gold: 2, silver: 14, copper: 37 }, drops = { 1
 
 //  Minimal Phaser stand-in: records what ClickerGame adds and exposes the click handler and tweens.
 //  `wallet` is what GET /wallet answers: a response object, an Error to reject with, or omitted to never answer.
-const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] }, talents = [] } = {}) => {
+//  The COMBO talent at its top level (cap 50 %), which the scenes get unless a test gives its own tree
+const COMBO_MAXED = { id: 'COMBO', branch: 'COMBO', perLevel: 5, maxLevel: 10, level: 10, value: 50, nextCost: null };
+
+const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] }, talents = [ COMBO_MAXED ] } = {}) => {
     dice.value = 0.99;
     Object.values(equipmentGateway).forEach((mock) => mock.mockReset());
     equipmentGateway.list.mockImplementation(() => (equipment instanceof Error ? Promise.reject(equipment) : Promise.resolve(equipment)));
@@ -2981,7 +2984,7 @@ describe('ClickerGame star bonus', () => {
 describe('ClickerGame talents in combat', () => {
     const tree = (levels = {}) => [
         [ 'MINIBOSS_TIME', 2 ], [ 'BOSS_TIME', 3 ], [ 'PHYSICAL_BREAK', 1 ], [ 'MAGICAL_BREAK', 1 ], [ 'CRIT_RESIST_BREAK', 1 ],
-        [ 'CLICK_DAMAGE', 3 ], [ 'CRIT_CHANCE', 1 ], [ 'CRIT_DAMAGE', 5 ]
+        [ 'CLICK_DAMAGE', 3 ], [ 'CRIT_CHANCE', 1 ], [ 'CRIT_DAMAGE', 5 ], [ 'COMBO', 5 ]
     ].map(([ id, perLevel ]) => ({ id, perLevel, maxLevel: 10, level: levels[id] ?? 0, value: (levels[id] ?? 0) * perLevel, nextCost: 300 }));
     const bigMonsters = (monster, extra = {}) => ({
         ...progress(1, 'PHASE', 1),
@@ -3088,6 +3091,67 @@ describe('ClickerGame talents in combat', () => {
 
         expect(talentGateway.list).toHaveBeenCalledTimes(2);
         expect(before - ctx.scene.monster.health).toBeCloseTo(0.85, 10);
+    });
+
+    const clickTimes = (ctx, times) => Array.from({ length: times }, () => ctx.click());
+    const comboHud = (ctx) => ctx.hud('.combo-hud').textContent;
+
+    it('caps the combo at COMBO 4 (+20 %): a streak of 30 reads +20% and the 31st click deals 1.2', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire()), talents: tree({ COMBO: 4 }) });
+
+        clickTimes(ctx, 30);
+        expect(comboHud(ctx)).toBe('Combo x30 · +20%');
+        ctx.click();
+
+        expect(ctx.texts.at(-1).text).toBe('1.2');
+    });
+
+    it('lets the combo grow below the cap: COMBO 4 and a streak of 12 read +12%', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire()), talents: tree({ COMBO: 4 }) });
+
+        clickTimes(ctx, 12);
+
+        expect(comboHud(ctx)).toBe('Combo x12 · +12%');
+    });
+
+    it('reaches +50 % at COMBO 10 with a streak of 60', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire()), talents: tree({ COMBO: 10 }) });
+
+        clickTimes(ctx, 60);
+
+        expect(comboHud(ctx)).toBe('Combo x60 · +50%');
+    });
+
+    it('gives no combo bonus and an empty HUD at COMBO 0', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire()), talents: tree() });
+
+        clickTimes(ctx, 11);
+
+        expect(comboHud(ctx)).toBe('');
+        expect(ctx.texts.at(-1).text).toBe('1');
+        expect(ctx.scene.monster.health).toBeCloseTo(1000 - 11, 10);
+    });
+
+    it('gives no combo bonus before the talents load', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire()), talents: new ApiError('down', { status: 500 }) });
+
+        clickTimes(ctx, 11);
+
+        expect(comboHud(ctx)).toBe('');
+        expect(ctx.scene.monster.health).toBeCloseTo(1000 - 11, 10);
+    });
+
+    it('uses the cap of an upgraded COMBO on the next click without ending the streak', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire()), talents: tree({ COMBO: 1 }) });
+
+        clickTimes(ctx, 10);
+        expect(comboHud(ctx)).toBe('Combo x10 · +5%');
+        talentGateway.upgrade.mockResolvedValue({ talents: tree({ COMBO: 2 }), points: { earned: 2, spent: 2, available: 0 } });
+        await ctx.scene.talents.upgrade('COMBO', 1);
+        ctx.click();
+
+        expect(ctx.texts.at(-1).text).toBe('1.1');
+        expect(comboHud(ctx)).toBe('Combo x11 · +10%');
     });
 
     it('uses an upgraded talent on the next click and shows the wallet the backend answered', async () => {

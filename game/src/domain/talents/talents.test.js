@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { CHAPTER_BOSS, FARM, MINIBOSS, PHASE } from '../campaign/campaign';
-import { addBonuses, BRANCH_TITLES, describeTalentEffect, monsterAfterBreak, talentAttackerBonus, talentIconName, talentTimeBonusMs, talentValue } from './talents';
+import { addBonuses, BRANCH_TITLES, describeTalentEffect, monsterAfterBreak, talentAttackerBonus, talentComboCap, talentIconName, talentTimeBonusMs, talentValue } from './talents';
 
 //  The tree as the backend answers it: value is level x perLevel
 const tree = (levels = {}) => [
     [ 'MINIBOSS_TIME', 2 ], [ 'BOSS_TIME', 3 ], [ 'PHYSICAL_BREAK', 1 ], [ 'MAGICAL_BREAK', 1 ], [ 'CRIT_RESIST_BREAK', 1 ],
-    [ 'CLICK_DAMAGE', 3 ], [ 'CRIT_CHANCE', 1 ], [ 'CRIT_DAMAGE', 5 ]
+    [ 'CLICK_DAMAGE', 3 ], [ 'CRIT_CHANCE', 1 ], [ 'CRIT_DAMAGE', 5 ], [ 'COMBO', 5 ]
 ].map(([ id, perLevel ]) => ({ id, perLevel, level: levels[id] ?? 0, value: (levels[id] ?? 0) * perLevel }));
 
 const monster = (physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element: 'FIRE', physicalDefense, magicalDefense, critResistance });
@@ -20,6 +20,19 @@ describe('talentValue', () => {
         expect(talentValue([], 'CLICK_DAMAGE')).toBe(0);
         expect(talentValue(null, 'CLICK_DAMAGE')).toBe(0);
         expect(talentValue(undefined, 'CLICK_DAMAGE')).toBe(0);
+    });
+});
+
+describe('talentComboCap', () => {
+    it('is 5 per level of COMBO: 20 at level 4, 50 at level 10', () => {
+        expect(talentComboCap(tree({ COMBO: 4 }))).toBe(20);
+        expect(talentComboCap(tree({ COMBO: 10 }))).toBe(50);
+    });
+
+    it('is 0 at level 0 and before the talents load', () => {
+        expect(talentComboCap(tree())).toBe(0);
+        expect(talentComboCap([])).toBe(0);
+        expect(talentComboCap(undefined)).toBe(0);
     });
 });
 
