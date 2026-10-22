@@ -262,10 +262,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] E2E: with 1 point, open Talentos, buy a COMBO level, read `Nível 1/10`, `Efeito: +5%` and `Pontos de talento: 0`
-- [ ] E2E: with `COMBO` 2, 30 rapid clicks read `Combo x30 · +10%`
-- [ ] ADR 0011 and an `AD-0NN` entry record the points, the first-clear key and the legacy grant
-- [ ] Gate check passes: `cd game && npm test && npm run test:e2e`; `cd backend && ./gradlew build`
+- [x] E2E: with 1 point, open Talentos, buy a COMBO level, read `Nível 1/10`, `Efeito: +5%` and `Pontos de talento: 0`
+- [x] E2E: with `COMBO` 2, 30 rapid clicks read `Combo x30 · +10%`
+- [x] ADR 0011 and an `AD-0NN` entry record the points, the first-clear key and the legacy grant
+- [x] Gate check passes: `cd game && npm test && npm run test:e2e`; `cd backend && ./gradlew build`
 
 **Tests**: e2e
 **Gate**: full

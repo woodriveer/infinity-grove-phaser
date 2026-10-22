@@ -1,10 +1,10 @@
 package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
-import br.com.woodriver.infinity_grove_ws.adapter.repository.TalentRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.CardCopyEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.PlayerCardsEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.ProgressEntity
+import br.com.woodriver.infinity_grove_ws.adapter.repository.TalentRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.UserEntity
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.HeroSeed
@@ -442,7 +442,12 @@ class ProgressControllerIT : IntegrationTestBase() {
         report(body(1, "PHASE", 5, "CLEARED")).then().statusCode(200).body("talentPoints", equalTo(0))
 
         assertEquals(1, talentRepository.earnedPoints("yan"))
-        asUser().get("/talents").then().statusCode(200).body("points.earned", equalTo(1)).body("points.available", equalTo(1))
+        asUser()
+            .get("/talents")
+            .then()
+            .statusCode(200)
+            .body("points.earned", equalTo(1))
+            .body("points.available", equalTo(1))
     }
 
     @Test

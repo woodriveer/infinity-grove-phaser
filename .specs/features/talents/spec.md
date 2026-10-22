@@ -4,6 +4,8 @@
 
 Copper, silver and gold only pay for refining, rerolling and selling equipment, so coins pile up with nothing to buy. This feature adds a talent tree with three branches (Tempo, Quebra de defesa, Poder do clique) that the player upgrades with coins; the backend owns the levels and the prices (AD-009), the game applies the effects in combat.
 
+> **Superseded in part by `.specs/features/talent-points/spec.md` (2026-10-22):** talent levels cost 1 talent point each instead of copper, the tree has a ninth talent `COMBO` in a fourth branch, and the Talentos screen shows `Pontos de talento`. The coin price, the wallet in the upgrade answer and `NOT_ENOUGH_COPPER` below no longer apply.
+
 ## Goals
 
 - [ ] The player spends coins on 8 talents in 3 branches, each up to level 10, from a new Talentos screen.

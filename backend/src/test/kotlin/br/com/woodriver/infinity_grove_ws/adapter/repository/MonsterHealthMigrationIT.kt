@@ -15,25 +15,31 @@ class MonsterHealthMigrationIT : IntegrationTestBase() {
 
     private fun migrate() = jdbc.execute(ClassPathResource("db/migration/V4__monster_health_growth.sql").getContentAsString(Charsets.UTF_8))
 
-    private fun stage(chapter: Int, number: Int) =
-        jdbc.queryForMap("select monster_health, miniboss_health from stages where chapter = ? and number = ?", chapter, number)
+    private fun stage(
+        chapter: Int,
+        number: Int,
+    ) = jdbc.queryForMap("select monster_health, miniboss_health from stages where chapter = ? and number = ?", chapter, number)
 
     private fun boss(chapter: Int) = jdbc.queryForObject("select boss_health from chapters where number = ?", Int::class.java, chapter)
 
-    private fun setOld(chapter: Int, number: Int) =
-        jdbc.update(
-            "update stages set monster_health = ?, miniboss_health = ? where chapter = ? and number = ?",
-            (10 + number - 1) * chapter,
-            (10 + number - 1) * chapter * 5,
-            chapter,
-            number,
-        )
+    private fun setOld(
+        chapter: Int,
+        number: Int,
+    ) = jdbc.update(
+        "update stages set monster_health = ?, miniboss_health = ? where chapter = ? and number = ?",
+        (10 + number - 1) * chapter,
+        (10 + number - 1) * chapter * 5,
+        chapter,
+        number,
+    )
 
     @AfterTest
     fun restore() {
         migrate()
         jdbc.update("update chapters set boss_health = 2000 * power(4, number - 1)::integer")
-        jdbc.update("update stages set monster_health = (40 + 4 * (number - 1)) * power(4, chapter - 1)::integer, miniboss_health = (40 + 4 * (number - 1)) * power(4, chapter - 1)::integer * 5")
+        jdbc.update(
+            "update stages set monster_health = (40 + 4 * (number - 1)) * power(4, chapter - 1)::integer, miniboss_health = (40 + 4 * (number - 1)) * power(4, chapter - 1)::integer * 5",
+        )
     }
 
     @Test

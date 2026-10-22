@@ -33,7 +33,10 @@ class TalentPointsMigrationIT : IntegrationTestBase() {
         grantLegacy()
 
         assertEquals(7, repository.earnedPoints("yan"))
-        assertEquals(7, jdbc.queryForObject("select points from talent_point_awards where username = 'yan' and award_key = 'legacy'", Int::class.java))
+        assertEquals(
+            7,
+            jdbc.queryForObject("select points from talent_point_awards where username = 'yan' and award_key = 'legacy'", Int::class.java),
+        )
     }
 
     @Test

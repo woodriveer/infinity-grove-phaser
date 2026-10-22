@@ -175,6 +175,12 @@ export const createCampaignSession = ({ gateway }) =>
 
                     queue.shift();
 
+                    //  The points come first: a card or a piece dropped by the same win is rarer and takes the notice over
+                    if (response?.talentPoints > 0)
+                    {
+                        talentPointsPaid(response.talentPoints);
+                    }
+
                     if (response?.drop)
                     {
                         dropped(response.drop);
@@ -183,11 +189,6 @@ export const createCampaignSession = ({ gateway }) =>
                     if (response?.equipmentDrop)
                     {
                         equipmentDropped(response.equipmentDrop);
-                    }
-
-                    if (response?.talentPoints > 0)
-                    {
-                        talentPointsPaid(response.talentPoints);
                     }
 
                     //  The chapter boss was the last report and the backend opened the next chapter: play it

@@ -164,21 +164,29 @@ const pieceView = (piece) => ({
     sellPrice: Math.floor(100 * RARITY[piece.rarity].index * (2 + piece.refine) / 2)
 });
 
-//  Talent contract (TalentController): the 8 talents of the backend catalog, level 0 to 10, the upgrade from level n costs round(300 x 1.6^n) copper
+//  Talent contract (TalentController): the 9 talents of the backend catalog, level 0 to 10, every level costs 1 talent point; the first clear of a
+//  phase pays 1 point, of a miniboss 2 and of a chapter boss 5
 const TALENT_CATALOG = [
     [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 3 ],
     [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa física', 'points', 1 ], [ 'MAGICAL_BREAK', 'BREAK', 'Quebra de defesa mágica', 'points', 1 ],
     [ 'CRIT_RESIST_BREAK', 'BREAK', 'Quebra de resistência a crítico', 'points', 1 ],
-    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique', '%', 3 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ]
+    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique', '%', 3 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ],
+    [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ]
 ];
 const TALENT_MAX_LEVEL = 10;
-const talentCost = (level) => Math.round(300 * 1.6 ** level);
+const TALENT_POINTS = { PHASE: 1, MINIBOSS: 2, CHAPTER_BOSS: 5 };
 
 const talentsView = (levels) => TALENT_CATALOG.map(([ id, branch, label, unit, perLevel ]) => {
     const level = levels[id] ?? 0;
 
-    return { id, branch, label, unit, perLevel, maxLevel: TALENT_MAX_LEVEL, level, value: level * perLevel, nextCost: level >= TALENT_MAX_LEVEL ? null : talentCost(level) };
+    return { id, branch, label, unit, perLevel, maxLevel: TALENT_MAX_LEVEL, level, value: level * perLevel, nextCost: level >= TALENT_MAX_LEVEL ? null : 1 };
 });
+
+const pointsView = (earned, levels) => {
+    const spent = Object.values(levels).reduce((sum, level) => sum + level, 0);
+
+    return { earned, spent, available: earned - spent };
+};
 
 const isPublic = (method, path) => method === 'POST' && (path === '/users' || path === '/users/login');
 
@@ -190,12 +198,13 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  cards {name: { start, leader, copies: { 'kael:0': 3 }, cleared: [1], winsDay, winsToday }} (starting bags; a player not listed holds one blank Kael card),
 //  chances (the repeating list the drop rolls read, default never drops) and farmMinIntervalMs (default 0, the backend has 5000),
 //  equipment {name: [raw pieces]} (starting bags, default empty), equipmentDrops (the pieces the next won bosses drop, one each, in order) and
-//  talents {name: {TALENT_ID: level}} (starting levels, default 0; an upgrade takes copper from the wallet like the backend).
+//  talents {name: {TALENT_ID: level}} (starting levels, default 0; an upgrade takes one talent point like the backend) and
+//  talentPoints {name: n} (points available at the start, on top of the ones the starting levels cost; first clears pay more).
 //  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens.
 export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
     cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = [],
-    talents: startingTalents = {}
+    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -270,6 +279,32 @@ export async function mockBackend (page, {
         return talentsByUser.get(username);
     };
 
+    //  The points a player earned: the levels they start with, the points they start with and the first clears paid since
+    const earnedByUser = new Map();
+    const clearedByUser = new Map();
+    const earnedOf = (username) => {
+        if (!earnedByUser.has(username)) {
+            const levels = Object.values(startingTalents[username] ?? {}).reduce((sum, level) => sum + level, 0);
+
+            earnedByUser.set(username, levels + (startingTalentPoints[username] ?? 0));
+        }
+
+        return earnedByUser.get(username);
+    };
+    const awardTalentPoints = (username, body) => {
+        const key = `${body.chapter}:${body.stage}:${body.encounter}:${body.phase}`;
+        const cleared = clearedByUser.get(username) ?? new Set();
+
+        clearedByUser.set(username, cleared);
+
+        if (cleared.has(key)) { return 0; }
+
+        cleared.add(key);
+        earnedByUser.set(username, earnedOf(username) + TALENT_POINTS[body.encounter]);
+
+        return TALENT_POINTS[body.encounter];
+    };
+
     const handleTalents = (route, method, path, body, now) => {
         const username = authenticated(route, now);
 
@@ -278,7 +313,7 @@ export async function mockBackend (page, {
         const levels = talentsOf(username);
 
         if (method === 'GET' && path === '/talents') {
-            return route.fulfill({ json: { talents: talentsView(levels) } });
+            return route.fulfill({ json: { talents: talentsView(levels), points: pointsView(earnedOf(username), levels) } });
         }
 
         const action = path.match(/^\/talents\/([^/]+)\/upgrade$/);
@@ -291,15 +326,13 @@ export async function mockBackend (page, {
         if (!Number.isInteger(body.fromLevel) || body.fromLevel < 0 || body.fromLevel > TALENT_MAX_LEVEL) { return route.fulfill(problem(400, 'fromLevel must be an integer between 0 and 10', 'INVALID_TALENT_REQUEST')); }
 
         const level = levels[id] ?? 0;
-        const wallet = walletOf(username);
 
         if (body.fromLevel !== level) { return route.fulfill(problem(409, `Talent '${id}' is at level ${level}`, 'TALENT_LEVEL_MISMATCH')); }
         if (level >= TALENT_MAX_LEVEL) { return route.fulfill(problem(409, 'Talent is already at the maximum level', 'TALENT_MAX_LEVEL')); }
-        if (wallet.copper < talentCost(level)) { return route.fulfill(problem(409, 'Not enough copper', 'NOT_ENOUGH_COPPER')); }
+        if (pointsView(earnedOf(username), levels).available < 1) { return route.fulfill(problem(409, 'Not enough talent points', 'NOT_ENOUGH_TALENT_POINTS')); }
 
-        wallet.copper -= talentCost(level);
         levels[id] = level + 1;
-        return route.fulfill({ json: { talents: talentsView(levels), wallet: coins(wallet.copper) } });
+        return route.fulfill({ json: { talents: talentsView(levels), points: pointsView(earnedOf(username), levels) } });
     };
 
     const progresses = new Map();
@@ -580,8 +613,9 @@ export async function mockBackend (page, {
             const drop = body.outcome === 'CLEARED' ? awardCards(cardsOf(username), body.encounter, body.chapter) : null;
 
             const equipmentDrop = body.outcome === 'CLEARED' ? awardEquipment(username, body.encounter) : null;
+            const talentPoints = body.outcome === 'CLEARED' ? awardTalentPoints(username, body) : 0;
 
-            return route.fulfill({ json: { ...progressBody(next), ...(drop && { drop }), ...(equipmentDrop && { equipmentDrop }) } });
+            return route.fulfill({ json: { ...progressBody(next), ...(drop && { drop }), ...(equipmentDrop && { equipmentDrop }), talentPoints } });
         }
 
         return route.fulfill(problem(404, 'Not found'));

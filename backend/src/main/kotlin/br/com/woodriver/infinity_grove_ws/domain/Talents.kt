@@ -114,7 +114,9 @@ data class PlayerTalents(
 ) {
     init {
         require(levels.keys.all { id -> TalentCatalog.all.any { it.id == id } }) { "Every talent of $username must be in the catalog" }
-        require(levels.values.all { it in 1..TalentDefinition.MAX_LEVEL }) { "Stored levels must be between 1 and ${TalentDefinition.MAX_LEVEL}" }
+        require(levels.values.all { it in 1..TalentDefinition.MAX_LEVEL }) {
+            "Stored levels must be between 1 and ${TalentDefinition.MAX_LEVEL}"
+        }
         require(earned >= 0) { "Earned points $earned must not be negative" }
     }
 
@@ -141,7 +143,13 @@ data class PlayerTalents(
         val stored = level(definition.id)
 
         if (fromLevel != stored) {
-            logger.warn("Talent upgrade refused, level mismatch username={} talent={} sent={} stored={}", username, definition.id, fromLevel, stored)
+            logger.warn(
+                "Talent upgrade refused, level mismatch username={} talent={} sent={} stored={}",
+                username,
+                definition.id,
+                fromLevel,
+                stored,
+            )
             throw TalentLevelMismatchException(definition.id, fromLevel, stored)
         }
 
@@ -154,7 +162,13 @@ data class PlayerTalents(
         val available = points(rules).available
 
         if (available < cost) {
-            logger.warn("Talent upgrade refused, not enough points username={} talent={} available={} cost={}", username, definition.id, available, cost)
+            logger.warn(
+                "Talent upgrade refused, not enough points username={} talent={} available={} cost={}",
+                username,
+                definition.id,
+                available,
+                cost,
+            )
             throw NotEnoughTalentPointsException(available, cost)
         }
 

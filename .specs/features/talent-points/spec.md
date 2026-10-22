@@ -43,7 +43,7 @@ Talents are bought with coins, which are also the currency of equipment, and the
 | Screen | Four columns: `Tempo`, `Quebra de defesa`, `Poder do clique`, `Combo`; a line `Pontos de talento: <available>` above them | Same window as `talents` | n |
 | Card text | Button `Melhorar (1 ponto)`; the COMBO card reads title `Limite de dano do combo`, `Efeito: +25%` at level 5 and `Efeito: nenhum` at level 0 | Lesson L-010: exact texts | n |
 | Failure texts | `Pontos de talento insuficientes` for `NOT_ENOUGH_TALENT_POINTS`, `Não foi possível melhorar o talento.` otherwise; the tree reloads after a 409 | Same as `talents` | n |
-| Award notice | After an accepted report that paid points the game shows the notice `+<n> ponto de talento` for 1 and `+<n> pontos de talento` otherwise, the same way as `Carta: <nome>` | Feedback for the reward | n |
+| Award notice | After an accepted report that paid points the game shows the notice `+<n> ponto de talento` for 1 and `+<n> pontos de talento` otherwise, the same way as `Carta: <nome>`; when the same report also dropped a card or a piece, that notice replaces the points one | One notice line is shared; the drop is rarer (found by the e2e specs of the drops) | n |
 | Combo HUD at cap 0 | While the cap is 0 the combo HUD stays empty | `Combo x5 · +0%` is noise | n |
 
 **Open questions:** none.
@@ -132,7 +132,7 @@ Talents are bought with coins, which are also the currency of equipment, and the
 6. IF the backend answers 409 `NOT_ENOUGH_TALENT_POINTS` THEN the game SHALL show `Pontos de talento insuficientes` and reload the tree; IF any other failure THEN `Não foi possível melhorar o talento.` and reload the tree.  <!-- unwanted-behavior -->
 7. WHILE a request runs the game SHALL disable every `Melhorar` button.  <!-- state-driven -->
 8. IF the tree cannot be loaded THEN the game SHALL show `Talentos indisponíveis` and keep the fight playable.  <!-- unwanted-behavior -->
-9. WHEN an accepted outcome report answers `talentPoints` 2 THEN the game SHALL show the notice `+2 pontos de talento` and reload the tree; WHEN it answers 1 THEN `+1 ponto de talento`; WHEN it answers 0 THEN no notice.  <!-- event-driven -->
+9. WHEN an accepted outcome report answers `talentPoints` 2 and dropped no card or piece THEN the game SHALL show the notice `+2 pontos de talento` and reload the tree; WHEN it answers 1 THEN `+1 ponto de talento`; WHEN it answers 0 THEN no notice.  <!-- event-driven -->
 10. The window SHALL not show the wallet price of a talent.  <!-- ubiquitous -->
 
 **Independent Test**: In the browser against the fake backend with 1 point, open Talentos, click `Melhorar (1 ponto)` on `Limite de dano do combo` and read `Nível 1/10`, `Efeito: +5%` and `Pontos de talento: 0`.

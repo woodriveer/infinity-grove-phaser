@@ -74,7 +74,8 @@ class TalentRepository(
     private val jpaTalentAwardRepository: JpaTalentAwardRepository,
 ) : TalentRepositoryPort {
     @Transactional
-    override fun findAll(username: String): Map<String, Int> = jpaTalentRepository.findAllByUsername(username).associate { it.talentId to it.level }
+    override fun findAll(username: String): Map<String, Int> =
+        jpaTalentRepository.findAllByUsername(username).associate { it.talentId to it.level }
 
     @Transactional
     override fun save(

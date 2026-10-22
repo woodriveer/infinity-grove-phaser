@@ -98,6 +98,14 @@
 - **Date**: 2026-10-21
 - **Status**: active
 
+### AD-013
+- **Decision**: Talents are bought with talent points, not coins: the first clear of a phase pays 1 point, of a miniboss 2 and of a chapter boss 5 (a replay, a failure and a farm win pay nothing); every level of every talent costs 1 point. The backend records one `talent_point_awards` row per player and cleared position (`chapter:stage:encounter:phase`) in the outcome report transaction, derives `available = earned - spent` from the awards and the levels, and an upgrade takes the `progress` row lock. A ninth talent `COMBO` (branch `COMBO`, 5 % a level, max 50) is the cap of the combo bonus; without it the combo gives nothing.
+- **Reason**: User decision: progress, not coins, should buy talents, and the combo should be a growing upgrade.
+- **Trade-off**: A new player starts with no combo bonus until the first point is spent; clears made before `V5` earn nothing (the migration grants each player as many `legacy` points as the talent levels they already owned); levels still cannot be refunded.
+- **Scope**: `backend` talent and progress code (ADR 0011, `V5__talent_point_awards.sql`), `game/src/domain/combat/combo.js`, `game/src/domain/talents`, the Talentos screen, `campaignSession`
+- **Date**: 2026-10-22
+- **Status**: active; supersedes the coin price of AD-011
+
 ## Handoff
 
 - **Feature**: five features from the owner's batch of 2026-10-21, all game side except two backend pieces: `combat-hud`, `click-power`, `talents`, `equipment-ui`, `boss-map` (`.specs/features/*`)

@@ -64,23 +64,23 @@ test.describe('Talents in combat', () => {
 });
 
 test.describe('Talentos screen', () => {
-    test('buying a level shows Nível 1/10, takes the copper and counts from the next click', async ({ page }) => {
-        const menu = await startGame(page, { wallets: { yan: 300 } });
+    test('buying a level with a point shows Nível 1/10, spends the point and counts from the next click', async ({ page }) => {
+        const menu = await startGame(page, { talentPoints: { yan: 1 } });
 
         await page.getByTestId('hud-talents').click();
 
         await expect(page.locator('.hero-title')).toHaveText('Talentos');
-        await expect(page.locator('.talent-branch-title')).toHaveText([ 'Tempo', 'Quebra de defesa', 'Poder do clique' ]);
+        await expect(page.locator('.talent-branch-title')).toHaveText([ 'Tempo', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
+        await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 1');
         await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveText('Efeito: nenhum');
-        await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toHaveText('Melhorar (3 prata)');
+        await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toHaveText('Melhorar (1 ponto)');
 
         await page.getByTestId('talent-upgrade-CLICK_DAMAGE').click();
 
         await expect(page.getByTestId('talent-level-CLICK_DAMAGE')).toHaveText('Nível 1/10');
         await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveText('Efeito: +3%');
-        await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toHaveText('Melhorar (4 prata 80 cobre)');
+        await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 0');
         await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toBeDisabled();
-        await expect(page.locator('.wallet .coin-copper')).toHaveText('0');
 
         await page.getByTestId('hero-close').click();
         await menu.canvas.click();
@@ -88,12 +88,14 @@ test.describe('Talentos screen', () => {
         expect(await dealt(page)).toBeCloseTo(1.03 * 0.8, 5);
     });
 
-    test('a button is disabled while the wallet holds less than the price', async ({ page }) => {
-        await startGame(page, { wallets: { yan: 299 } });
+    test('every button is disabled with 0 points even when the wallet is rich', async ({ page }) => {
+        await startGame(page, { wallets: { yan: 1_000_000 } });
 
         await page.getByTestId('hud-talents').click();
 
+        await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 0');
         await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toBeDisabled();
+        await expect(page.getByTestId('talent-upgrade-COMBO')).toBeDisabled();
     });
 
     test('a talent already at level 10 shows Nível máximo and no button', async ({ page }) => {
@@ -112,6 +114,7 @@ test.describe('Talentos screen', () => {
         await page.getByTestId('hud-talents').click();
 
         await expect(page.locator('[data-testid="talent-CLICK_DAMAGE"] .icon-fallback')).toBeVisible();
+        await expect(page.locator('[data-testid="talent-COMBO"] .icon-fallback')).toBeVisible();
     });
 
     test('pauses the fight while the window is open', async ({ page }) => {
@@ -121,5 +124,54 @@ test.describe('Talentos screen', () => {
         await expect(page.locator('.hero-panel')).toBeVisible();
 
         expect(await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').paused)).toBe(true);
+    });
+});
+
+test.describe('Talent points and the combo talent', () => {
+    const rapidClicks = async (menu, times) => {
+        for (let i = 0; i < times; i++) {
+            await menu.canvas.click();
+        }
+    };
+
+    test('without COMBO the combo HUD stays empty and every click deals the same', async ({ page }) => {
+        const menu = await startGame(page);
+
+        await rapidClicks(menu, 11);
+
+        await expect(page.getByTestId('combo-hud')).toHaveText('');
+        expect(await dealt(page)).toBeCloseTo(11 * 0.8, 5);
+    });
+
+    test('COMBO 2 caps a streak of 30 clicks at +10%', async ({ page }) => {
+        const menu = await startGame(page, { talents: { yan: { COMBO: 2 } } });
+
+        await rapidClicks(menu, 30);
+
+        await expect(page.getByTestId('combo-hud')).toHaveText('Combo x30 · +10%');
+    });
+
+    test('a first clear pays a point that buys a COMBO level: Nível 1/10, Efeito: +5% and 0 points left', async ({ page }) => {
+        const menu = await startGame(page);
+
+        //  Phase 1 of stage 1 has a monster of 1000 health; a skill-less kill is long, so clear it through the scene
+        await page.evaluate(() => {
+            const scene = window.__PHASER_GAME__.scene.getScene('ClickerGame');
+
+            scene.monster.health = 0.01;
+        });
+        await menu.canvas.click();
+        //  The report leaves with the 10 s tick; run it now
+        await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').tick());
+        await expect(page.getByTestId('card-notice')).toHaveText('+1 ponto de talento');
+
+        await page.getByTestId('hud-talents').click();
+        await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 1');
+        await page.getByTestId('talent-upgrade-COMBO').click();
+
+        await expect(page.getByTestId('talent-level-COMBO')).toHaveText('Nível 1/10');
+        await expect(page.getByTestId('talent-effect-COMBO')).toHaveText('Efeito: +5%');
+        await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 0');
+        await expect(page.getByTestId('talent-upgrade-COMBO')).toBeDisabled();
     });
 });

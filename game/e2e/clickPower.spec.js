@@ -13,11 +13,12 @@ const chapter = (monster) => ({
     stages: [ { number: 1, phasesPerStage: 5, monsterHealth: 1000, minibossHealth: 1000, minibossTimeLimitMs: 60_000, monster, miniboss: monster } ]
 });
 
-const startAs = async (page, heroId, { stars = 0, roll } = {}) => {
+const startAs = async (page, heroId, { stars = 0, roll, talents } = {}) => {
     await mockBackend(page, {
         users: { yan: 'secret123' },
         definition: chapter(bare(ELEMENT_OF[heroId])),
-        cards: { yan: { leader: heroId, copies: { [`${heroId}:${stars}`]: 1 } } }
+        cards: { yan: { leader: heroId, copies: { [`${heroId}:${stars}`]: 1 } } },
+        ...(talents && { talents })
     });
 
     const menu = await openMainMenu(page, roll === undefined ? {} : { random: roll });
@@ -38,7 +39,7 @@ const dealt = async (page) => 1000 - await health(page);
 
 test.describe('Click power', () => {
     test('a streak of 11 clicks reads Combo x11 · +11% and ends after 1.5 s without a click', async ({ page }) => {
-        const menu = await startAs(page, 'kael');
+        const menu = await startAs(page, 'kael', { talents: { yan: { COMBO: 10 } } });
 
         for (let i = 0; i < 11; i++)
         {

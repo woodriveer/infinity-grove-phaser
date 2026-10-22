@@ -66,8 +66,22 @@ class TalentControllerIT : IntegrationTestBase() {
             .then()
             .statusCode(200)
             .body("talents.size()", equalTo(9))
-            .body("talents.id", equalTo(listOf("MINIBOSS_TIME", "BOSS_TIME", "PHYSICAL_BREAK", "MAGICAL_BREAK", "CRIT_RESIST_BREAK", "CLICK_DAMAGE", "CRIT_CHANCE", "CRIT_DAMAGE", "COMBO")))
-            .body("talents.branch", equalTo(listOf("TIME", "TIME", "BREAK", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO")))
+            .body(
+                "talents.id",
+                equalTo(
+                    listOf(
+                        "MINIBOSS_TIME",
+                        "BOSS_TIME",
+                        "PHYSICAL_BREAK",
+                        "MAGICAL_BREAK",
+                        "CRIT_RESIST_BREAK",
+                        "CLICK_DAMAGE",
+                        "CRIT_CHANCE",
+                        "CRIT_DAMAGE",
+                        "COMBO",
+                    ),
+                ),
+            ).body("talents.branch", equalTo(listOf("TIME", "TIME", "BREAK", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO")))
             .body("talents.level", equalTo(List(9) { 0 }))
             .body("talents.value", equalTo(List(9) { 0 }))
             .body("talents.nextCost", equalTo(List(9) { 1 }))
@@ -115,7 +129,10 @@ class TalentControllerIT : IntegrationTestBase() {
         earned(2)
         upgrade("COMBO", 0).statusCode(200)
 
-        upgrade("COMBO", 1).statusCode(200).body("talents[8].level", equalTo(2)).body("talents[8].value", equalTo(10)).body("points.available", equalTo(0))
+        upgrade(
+            "COMBO",
+            1,
+        ).statusCode(200).body("talents[8].level", equalTo(2)).body("talents[8].value", equalTo(10)).body("points.available", equalTo(0))
     }
 
     @Test
@@ -123,7 +140,12 @@ class TalentControllerIT : IntegrationTestBase() {
         jpaTalentRepository.save(TalentEntity("yan", "COMBO", 10))
         earned(10)
 
-        asUser().get("/talents").then().statusCode(200).body("talents[8].value", equalTo(50)).body("talents[8].nextCost", nullValue())
+        asUser()
+            .get("/talents")
+            .then()
+            .statusCode(200)
+            .body("talents[8].value", equalTo(50))
+            .body("talents[8].nextCost", nullValue())
     }
 
     @Test
@@ -152,7 +174,15 @@ class TalentControllerIT : IntegrationTestBase() {
         jpaTalentRepository.save(TalentEntity("yan", "CLICK_DAMAGE", 10))
 
         upgrade("CLICK_DAMAGE", 10).statusCode(409).body("code", equalTo("TALENT_MAX_LEVEL"))
-        asUser().get("/talents").then().statusCode(200).body("talents[5].nextCost", nullValue()).body("talents[5].value", equalTo(30)).body("points.available", equalTo(10))
+        asUser()
+            .get(
+                "/talents",
+            ).then()
+            .statusCode(
+                200,
+            ).body("talents[5].nextCost", nullValue())
+            .body("talents[5].value", equalTo(30))
+            .body("points.available", equalTo(10))
     }
 
     @Test
@@ -170,14 +200,26 @@ class TalentControllerIT : IntegrationTestBase() {
             upgrade("CLICK_DAMAGE", sent).statusCode(400).body("code", equalTo("INVALID_TALENT_REQUEST"))
         }
 
-        asUser().contentType(ContentType.JSON).body("{}").post("/talents/CLICK_DAMAGE/upgrade").then().statusCode(400).body("code", equalTo("INVALID_TALENT_REQUEST"))
+        asUser()
+            .contentType(
+                ContentType.JSON,
+            ).body("{}")
+            .post("/talents/CLICK_DAMAGE/upgrade")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo("INVALID_TALENT_REQUEST"))
         asUser().get("/talents").then().body("points.available", equalTo(5))
     }
 
     @Test
     fun `every talent route needs a token`() {
         given().get("/talents").then().statusCode(401)
-        given().contentType(ContentType.JSON).body("""{"fromLevel":0}""").post("/talents/CLICK_DAMAGE/upgrade").then().statusCode(401)
+        given()
+            .contentType(ContentType.JSON)
+            .body("""{"fromLevel":0}""")
+            .post("/talents/CLICK_DAMAGE/upgrade")
+            .then()
+            .statusCode(401)
     }
 
     @Test
@@ -215,7 +257,11 @@ class TalentControllerIT : IntegrationTestBase() {
             }
 
         assertEquals(listOf(200, 409), statuses.sorted())
-        asUser().get("/talents").then().body("points.spent", equalTo(1)).body("points.available", equalTo(0))
+        asUser()
+            .get("/talents")
+            .then()
+            .body("points.spent", equalTo(1))
+            .body("points.available", equalTo(0))
     }
 
     @Test

@@ -48,12 +48,15 @@ class TalentService(
         progressRepository.findForUpdate(username)
         val upgrade = load(username).upgrade(definition, fromLevel, rules)
 
-        talentRepository.save(username, talentId, upgrade.talents.level(talentId))
-        logger.info("Talent upgraded username={} talent={} level={} points={}", username, talentId, upgrade.talents.level(talentId), upgrade.cost)
+        val level = upgrade.talents.level(talentId)
+
+        talentRepository.save(username, talentId, level)
+        logger.info("Talent upgraded username={} talent={} level={} points={}", username, talentId, level, upgrade.cost)
         return upgrade.talents
     }
 
-    private fun load(username: String) = PlayerTalents(username, talentRepository.findAll(username), talentRepository.earnedPoints(username))
+    private fun load(username: String) =
+        PlayerTalents(username, talentRepository.findAll(username), talentRepository.earnedPoints(username))
 
     private fun requireUser(username: String) {
         if (!userRepository.existsByUsername(username)) {

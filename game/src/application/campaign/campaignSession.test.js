@@ -427,6 +427,28 @@ describe('campaignSession', () => {
         });
     });
 
+    describe('talent points order', () => {
+        it('fires before the card and the piece of the same report, so a drop notice is the last one shown', async () => {
+            const order = [];
+
+            await loaded();
+            session.onTalentPoints(() => order.push('points'));
+            session.onDrop(() => order.push('card'));
+            session.onEquipmentDrop(() => order.push('piece'));
+            gateway.report.mockResolvedValue({
+                ...progress(1, 'PHASE', 2),
+                talentPoints: 2,
+                drop: { heroId: 'kael', heroName: 'Kael', stars: 0 },
+                equipmentDrop: { piece: { id: 'p1' }, sold: false }
+            });
+            session.clear();
+
+            await session.flush();
+
+            expect(order).toEqual([ 'points', 'card', 'piece' ]);
+        });
+    });
+
     describe('card drops', () => {
         const drop = { heroId: 'kael', heroName: 'Kael Raizférrea', stars: 0 };
 

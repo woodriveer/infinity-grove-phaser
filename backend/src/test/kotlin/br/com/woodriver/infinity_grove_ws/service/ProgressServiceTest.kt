@@ -68,7 +68,16 @@ class ProgressServiceTest {
         )
 
     private val service get() =
-        ProgressService(progresses, chapters, users, playerCards, CardRewards(heroes, chance, rates, clock), equipmentRewards(), talents, TalentRules())
+        ProgressService(
+            progresses,
+            chapters,
+            users,
+            playerCards,
+            CardRewards(heroes, chance, rates, clock),
+            equipmentRewards(),
+            talents,
+            TalentRules(),
+        )
 
     private val start = ProgressPosition(1, 1, Encounter.PHASE, 1)
 
@@ -475,7 +484,17 @@ class ProgressServiceTest {
             object : PlayerCardsRepositoryPort by playerCards {
                 override fun save(cards: PlayerCards): PlayerCards = error("cards store is down")
             }
-        val broken = ProgressService(progresses, chapters, users, failing, CardRewards(heroes, chance, rates, clock), equipmentRewards(), talents, TalentRules())
+        val broken =
+            ProgressService(
+                progresses,
+                chapters,
+                users,
+                failing,
+                CardRewards(heroes, chance, rates, clock),
+                equipmentRewards(),
+                talents,
+                TalentRules(),
+            )
 
         assertFailsWith<IllegalStateException> { broken.report("yan", miniboss, Outcome.CLEARED) }
     }
@@ -556,7 +575,16 @@ class ProgressServiceTest {
                 override fun save(piece: br.com.woodriver.infinity_grove_ws.domain.Piece) = error("equipment store is down")
             }
         val broken =
-            ProgressService(progresses, chapters, users, playerCards, CardRewards(heroes, chance, rates, clock), equipmentRewards(failing), talents, TalentRules())
+            ProgressService(
+                progresses,
+                chapters,
+                users,
+                playerCards,
+                CardRewards(heroes, chance, rates, clock),
+                equipmentRewards(failing),
+                talents,
+                TalentRules(),
+            )
 
         assertFailsWith<IllegalStateException> { broken.report("yan", chapterBoss, Outcome.CLEARED) }
     }
