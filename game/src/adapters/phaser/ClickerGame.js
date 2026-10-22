@@ -24,7 +24,7 @@ const LOGO = { x: 82, y: 44, width: 136 };
 //  The wallet pill sits in the top-right corner; coins fly to its centre
 const WALLET = { x: 890, y: 44 };
 const COINS = [ [ 'gold', 'Gold' ], [ 'silver', 'Silver' ], [ 'copper', 'Copper' ] ];
-const COIN = { duration: 600, stagger: 100 };
+const COIN = { duration: 600, stagger: 100, maxFlying: 5 };
 const WALLET_SYNC_MS = 10000;
 //  Phaser measures a DOM element once, when it is added, and centres it on that size: every element whose content changes sits in a
 //  fixed-size box (style.css) so it stays where it was placed
@@ -95,6 +95,7 @@ export class ClickerGame extends Scene
         this.monster = null;
         this.countdown = null;
         this.generation = 0;
+        this.coinsFlying = 0;
         this.random = services.random ?? Math.random;
         //  The break talents lower the stats of the monster at the moment of every hit, so an upgrade counts from the next click
         this.skills = new SkillCombat({ random: this.random, statsOf: (monster) => monsterAfterBreak(monster.stats, this.talents.talents()) });
@@ -907,8 +908,9 @@ export class ClickerGame extends Scene
         this.showEncounter(this.session.encounter());
     }
 
-    //  One coin per copper of the next drop queued for the monster's drop rule flies from the monster to the wallet text;
-    //  each landing counts 1 copper
+    //  The next drop queued for the monster's drop rule flies from the monster to the wallet text as at most COIN.maxFlying coins
+    //  in the air at once; the drop's copper is shared among them and each landing counts its share. With no free slot the drop
+    //  lands at once.
     dropCoins ()
     {
         const drop = this.wallet.takeDrop(this.monster.dropRuleId);
@@ -918,10 +920,23 @@ export class ClickerGame extends Scene
             return;
         }
 
-        for (let i = 0; i < drop.value; i++)
+        const count = Math.min(drop.value, COIN.maxFlying - this.coinsFlying);
+
+        if (count <= 0)
+        {
+            this.wallet.land(drop.id, drop.value);
+            this.refreshWalletText();
+            return;
+        }
+
+        const share = Math.floor(drop.value / count);
+        const extra = drop.value % count;
+
+        for (let i = 0; i < count; i++)
         {
             const coin = this.add.sprite(MONSTER.x, MONSTER.y, 'coin').play('rotate');
 
+            this.coinsFlying += 1;
             this.tweens.add({
                 targets: coin,
                 x: WALLET.x,
@@ -931,7 +946,8 @@ export class ClickerGame extends Scene
                 onComplete: () =>
                 {
                     coin.destroy();
-                    this.wallet.land(drop.id);
+                    this.coinsFlying -= 1;
+                    this.wallet.land(drop.id, share + (i < extra ? 1 : 0));
                     this.refreshWalletText();
                 }
             });

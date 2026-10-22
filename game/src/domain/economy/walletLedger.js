@@ -48,14 +48,15 @@ export class WalletLedger
         return { id: entry.id, value: entry.value };
     }
 
-    //  One coin of the drop reached the wallet text: it counts 1 copper. Coins of unknown or settled drops count nothing.
-    land (id)
+    //  A coin of the drop reached the wallet text: it counts `amount` copper (1 by default), never past the drop's value.
+    //  Coins of unknown or settled drops count nothing.
+    land (id, amount = 1)
     {
         const entry = this.entries.find((candidate) => candidate.id === id);
 
-        if (entry && entry.landed < entry.value)
+        if (entry)
         {
-            entry.landed += 1;
+            entry.landed = Math.min(entry.value, entry.landed + amount);
         }
     }
 

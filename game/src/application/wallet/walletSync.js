@@ -66,7 +66,7 @@ export const createWalletSync = ({ gateway }) =>
 
         takeDrop: (level) => ledger.takeDrop(level),
 
-        land: (id) => ledger.land(id),
+        land: (id, amount) => ledger.land(id, amount),
 
         load,
 

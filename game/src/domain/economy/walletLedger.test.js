@@ -346,3 +346,17 @@ describe('WalletLedger setBase', () => {
         expect(ledger.display()).toEqual(wallet(0, 0, 5));
     });
 });
+
+describe('WalletLedger landing an amount', () => {
+    it('counts the given copper for a landed coin and never more than the drop value', () => {
+        const ledger = new WalletLedger();
+        ledger.load({ wallet: { gold: 0, silver: 0, copper: 0 }, drops: { 1: [10] } });
+        const { id } = ledger.takeDrop(1);
+
+        ledger.land(id, 4);
+        expect(ledger.display().copper).toBe(4);
+
+        ledger.land(id, 40);
+        expect(ledger.display().copper).toBe(10);
+    });
+});

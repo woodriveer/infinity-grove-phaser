@@ -729,14 +729,24 @@ describe('ClickerGame coin drops', () => {
         expect(ctx.walletText().textContent).toBe('Gold: 8  Silver: 0  Copper: 0');
     });
 
-    it('spawns that many coins for a drop above 5 copper', async () => {
+    it('flies at most 5 coins for a drop above 5 copper and still credits the whole drop', async () => {
         const ctx = await loadedScene(walletResponse(undefined, { 1: [12] }));
 
         kill(ctx);
         landAll(ctx);
 
-        expect(ctx.sprites).toHaveLength(12);
+        expect(ctx.sprites).toHaveLength(5);
         expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 49');
+    });
+
+    it('flies 5 coins for a drop of 2 silver and credits 200 copper', async () => {
+        const ctx = await loadedScene(walletResponse({ gold: 0, silver: 0, copper: 0 }, { 1: [200] }));
+
+        kill(ctx);
+        landAll(ctx);
+
+        expect(ctx.sprites).toHaveLength(5);
+        expect(ctx.walletText().textContent).toBe('Gold: 0  Silver: 2  Copper: 0');
     });
 
     it('drops nothing when the wallet has not loaded', async () => {
@@ -949,11 +959,13 @@ describe('ClickerGame wallet sync', () => {
         kill(ctx);
         tick(ctx);
         await flush();
+        ctx.tweens.filter((t) => ctx.sprites.includes(t.targets)).forEach((t) => t.onComplete());
         respawn(ctx);
 
         kill(ctx);
+        ctx.tweens.filter((t) => ctx.sprites.includes(t.targets)).forEach((t) => t.onComplete());
 
-        expect(ctx.sprites).toHaveLength(3 + 7);
+        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 47');
     });
 
     it('keeps playing and sends the same kills again on the next tick after a failed sync', async () => {
@@ -1296,8 +1308,9 @@ describe('ClickerGame stages', () => {
         await flush();
 
         killAll(ctx);
+        ctx.tweens.filter((t) => ctx.sprites.includes(t.targets)).forEach((t) => t.onComplete());
 
-        expect(ctx.sprites).toHaveLength(7);
+        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 44');
     });
 
     it('a chapter boss kill takes from the queue of the boss drop rule', async () => {
@@ -1305,8 +1318,9 @@ describe('ClickerGame stages', () => {
         await flush();
 
         killAll(ctx);
+        ctx.tweens.filter((t) => ctx.sprites.includes(t.targets)).forEach((t) => t.onComplete());
 
-        expect(ctx.sprites).toHaveLength(9);
+        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 46');
     });
 
     it('a miniboss kill drops nothing when its drop rule has no queue', async () => {
