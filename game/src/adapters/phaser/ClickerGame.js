@@ -835,7 +835,17 @@ export class ClickerGame extends Scene
 
         this.hideCountdown();
 
-        return farming ? this.session.encounter() : this.session.clear();
+        if (farming)
+        {
+            return this.session.encounter();
+        }
+
+        const next = this.session.clear();
+
+        //  The report goes at once, not on the next tick: the talent points, the card and the piece it pays show up as the encounter is won
+        this.session.flush();
+
+        return next;
     }
 
     //  Fights a boss the player already beat again and again; the campaign position and its report queue are never touched

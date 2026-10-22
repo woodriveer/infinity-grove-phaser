@@ -1355,35 +1355,32 @@ describe('ClickerGame progress saving', () => {
         status: 409, code: 'PROGRESS_CONFLICT', body: { progress: stored }
     });
 
-    it('sends nothing until a tick: a kill only queues its report', async () => {
+    it('sends the CLEARED report as soon as the kill happens, without waiting for a tick', async () => {
         const ctx = await createScene();
 
         killAll(ctx);
-        advance(ctx);
+        await flush();
 
-        expect(campaignGateway.report).not.toHaveBeenCalled();
+        expect(campaignGateway.report).toHaveBeenCalledTimes(1);
     });
 
-    it('sends the CLEARED report with the position it left on the next tick', async () => {
+    it('sends the CLEARED report with the position it left', async () => {
         const ctx = await createScene();
         killAll(ctx);
         advance(ctx);
-
-        tick(ctx);
         await flush();
 
         expect(campaignGateway.report).toHaveBeenCalledTimes(1);
         expect(campaignGateway.report).toHaveBeenCalledWith(at(1, 'PHASE', 1), 'CLEARED');
     });
 
-    it('sends several kills in order on one tick', async () => {
+    it('sends several kills in order, one report each', async () => {
         const ctx = await createScene();
         killAll(ctx);
         advance(ctx);
+        await flush();
         killAll(ctx);
         advance(ctx);
-
-        tick(ctx);
         await flush();
 
         expect(campaignGateway.report).toHaveBeenCalledTimes(2);
@@ -1403,11 +1400,9 @@ describe('ClickerGame progress saving', () => {
 
     it('keeps playing and sends the same report again on the next tick after a failed one', async () => {
         const ctx = await createScene();
+        campaignGateway.report.mockRejectedValueOnce(new ApiError('Cannot reach the server. Try again later.'));
         killAll(ctx);
         advance(ctx);
-        campaignGateway.report.mockRejectedValueOnce(new ApiError('Cannot reach the server. Try again later.'));
-
-        tick(ctx);
         await flush();
         expect(label(ctx)).toBe('Stage 1/10  Phase 2/5');
         tick(ctx);
@@ -1428,11 +1423,8 @@ describe('ClickerGame progress saving', () => {
 
     it('plays the stored position when a report is answered 409', async () => {
         const ctx = await createScene();
-        killAll(ctx);
-        advance(ctx);
         campaignGateway.report.mockRejectedValueOnce(conflict(progress(1, 'PHASE', 4)));
-
-        tick(ctx);
+        killAll(ctx);
         await flush();
 
         expect(label(ctx)).toBe('Stage 1/10  Phase 4/5');
@@ -1442,13 +1434,13 @@ describe('ClickerGame progress saving', () => {
 
     it('does not resend the voided reports after a 409', async () => {
         const ctx = await createScene();
+        let refuse;
+        campaignGateway.report.mockReturnValueOnce(new Promise((resolve, reject) => { refuse = () => reject(conflict(progress(1, 'PHASE', 4))); }));
         killAll(ctx);
         advance(ctx);
         killAll(ctx);
         advance(ctx);
-        campaignGateway.report.mockRejectedValueOnce(conflict(progress(1, 'PHASE', 4)));
-
-        tick(ctx);
+        refuse();
         await flush();
         tick(ctx);
         await flush();
@@ -1458,11 +1450,9 @@ describe('ClickerGame progress saving', () => {
 
     it('realigns to a boss with its countdown when the stored position is a boss', async () => {
         const ctx = await createScene();
+        campaignGateway.report.mockRejectedValueOnce(conflict(progress(3, 'MINIBOSS', 1)));
         killAll(ctx);
         advance(ctx);
-        campaignGateway.report.mockRejectedValueOnce(conflict(progress(3, 'MINIBOSS', 1)));
-
-        tick(ctx);
         await flush();
 
         expect(label(ctx)).toBe('Stage 3/10  Miniboss');
@@ -1471,9 +1461,8 @@ describe('ClickerGame progress saving', () => {
 
     it('does not spawn a stale encounter when a realignment happens while the monster fades', async () => {
         const ctx = await createScene();
-        killAll(ctx);
         campaignGateway.report.mockRejectedValueOnce(conflict(progress(2, 'PHASE', 1)));
-        tick(ctx);
+        killAll(ctx);
         await flush();
 
         ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
@@ -1484,10 +1473,9 @@ describe('ClickerGame progress saving', () => {
 
     it('does not spawn a stale encounter when a realignment happens during the respawn wait', async () => {
         const ctx = await createScene();
+        campaignGateway.report.mockRejectedValueOnce(conflict(progress(2, 'PHASE', 1)));
         killAll(ctx);
         ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
-        campaignGateway.report.mockRejectedValueOnce(conflict(progress(2, 'PHASE', 1)));
-        tick(ctx);
         await flush();
 
         ctx.timers.at(-1).callback();
