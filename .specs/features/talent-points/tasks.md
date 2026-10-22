@@ -154,10 +154,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Clearing a new phase answers `talentPoints` 1, a miniboss 2, a chapter boss 5
-- [ ] Replaying the last phase after a failed miniboss answers 0; a `FAILED` report answers 0; a refused (409) report adds nothing; a farm win adds nothing
-- [ ] The points show in `earned` of `GET /talents`
-- [ ] Gate check passes: `cd backend && ./gradlew test`
+- [x] Clearing a new phase answers `talentPoints` 1, a miniboss 2, a chapter boss 5
+- [x] Replaying the last phase after a failed miniboss answers 0; a `FAILED` report answers 0; a refused (409) report adds nothing; a farm win adds nothing
+- [x] The points show in `earned` of `GET /talents`
+- [x] Gate check passes: `cd backend && ./gradlew test`
 
 **Tests**: unit, integration
 **Gate**: full

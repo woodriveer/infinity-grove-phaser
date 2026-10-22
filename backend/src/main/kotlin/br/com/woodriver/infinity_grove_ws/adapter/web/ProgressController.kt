@@ -109,6 +109,9 @@ data class ProgressResponse(
     /** The piece of equipment the reported win dropped; present only on an outcome response that dropped one. */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     val equipmentDrop: EquipmentDropResponse? = null,
+    /** The talent points the reported clear paid, 0 for a replay or a failure; present only on an outcome response. */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val talentPoints: Int? = null,
 ) {
     companion object {
         fun from(
@@ -117,6 +120,7 @@ data class ProgressResponse(
         ) = from(result.view).copy(
             drop = result.drop?.let(DropResponse::from),
             equipmentDrop = result.equipmentDrop?.let { EquipmentDropResponse.from(it, rules) },
+            talentPoints = result.talentPoints,
         )
 
         fun from(view: ProgressView): ProgressResponse {

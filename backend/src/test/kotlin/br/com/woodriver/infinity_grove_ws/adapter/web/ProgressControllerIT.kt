@@ -1,6 +1,7 @@
 package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
+import br.com.woodriver.infinity_grove_ws.adapter.repository.TalentRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.CardCopyEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.PlayerCardsEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.ProgressEntity
@@ -15,6 +16,7 @@ import io.restassured.specification.RequestSpecification
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasSize
 import org.hamcrest.Matchers.nullValue
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
@@ -25,6 +27,9 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 
 class ProgressControllerIT : IntegrationTestBase() {
+    @Autowired
+    private lateinit var talentRepository: TalentRepository
+
     private fun user(name: String = "yan") = jpaUserRepository.save(UserEntity(name, "hash", 1L, 1L))
 
     private fun asUser(name: String = "yan"): RequestSpecification = given().header("Authorization", bearerToken(name))
@@ -424,5 +429,45 @@ class ProgressControllerIT : IntegrationTestBase() {
             .body("drop.heroId", equalTo("lyra"))
             .body("chapter", equalTo(2))
             .body("completed", equalTo(false))
+    }
+
+    @Test
+    fun `POST outcome answers the talent points of a first clear and nothing for a replay`() {
+        user()
+        cards()
+        store(1, "PHASE", 5)
+
+        report(body(1, "PHASE", 5, "CLEARED")).then().statusCode(200).body("talentPoints", equalTo(1))
+        report(body(1, "MINIBOSS", 1, "FAILED")).then().statusCode(200).body("talentPoints", equalTo(0))
+        report(body(1, "PHASE", 5, "CLEARED")).then().statusCode(200).body("talentPoints", equalTo(0))
+
+        assertEquals(1, talentRepository.earnedPoints("yan"))
+        asUser().get("/talents").then().statusCode(200).body("points.earned", equalTo(1)).body("points.available", equalTo(1))
+    }
+
+    @Test
+    fun `POST outcome pays 2 points for a miniboss and 5 for the chapter boss`() {
+        user()
+        cards()
+        store(1, "MINIBOSS", 1)
+        report(body(1, "MINIBOSS", 1, "CLEARED")).then().statusCode(200).body("talentPoints", equalTo(2))
+
+        store(10, "CHAPTER_BOSS", 1)
+        report(body(10, "CHAPTER_BOSS", 1, "CLEARED")).then().statusCode(200).body("talentPoints", equalTo(5))
+
+        assertEquals(7, talentRepository.earnedPoints("yan"))
+    }
+
+    @Test
+    fun `a failed or rejected report pays nothing and GET progress has no talent points`() {
+        user()
+        cards()
+        store(1, "MINIBOSS", 1)
+
+        report(body(1, "MINIBOSS", 1, "FAILED")).then().statusCode(200).body("talentPoints", equalTo(0))
+        report(body(3, "PHASE", 1, "CLEARED")).then().statusCode(409)
+        getProgress().then().statusCode(200).body("talentPoints", nullValue())
+
+        assertEquals(0, talentRepository.earnedPoints("yan"))
     }
 }

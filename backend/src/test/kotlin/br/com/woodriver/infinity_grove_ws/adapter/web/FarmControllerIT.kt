@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.adapter.repository.ProgressEntity
+import br.com.woodriver.infinity_grove_ws.adapter.repository.TalentRepository
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.response.Response
@@ -9,12 +10,16 @@ import io.restassured.specification.RequestSpecification
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasSize
 import org.hamcrest.Matchers.nullValue
+import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.ZoneOffset
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class FarmControllerIT : IntegrationTestBase() {
+    @Autowired
+    private lateinit var talentRepository: TalentRepository
+
     private fun register(username: String = "yan"): String =
         "Bearer " +
             given()
@@ -241,5 +246,15 @@ class FarmControllerIT : IntegrationTestBase() {
         win(token, chapterBoss).then().statusCode(409)
 
         assertEquals(0, jpaPieceRepository.count())
+    }
+
+    @Test
+    fun `a farm win pays no talent points`() {
+        val token = register()
+        finished()
+
+        win(token, miniboss3).then().statusCode(200)
+
+        assertEquals(0, talentRepository.earnedPoints("yan"))
     }
 }

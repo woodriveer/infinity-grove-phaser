@@ -9,10 +9,12 @@ import br.com.woodriver.infinity_grove_ws.domain.Outcome
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
 import br.com.woodriver.infinity_grove_ws.domain.ProgressView
+import br.com.woodriver.infinity_grove_ws.domain.TalentRules
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.port.ChapterRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.TalentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.usecase.GetProgressUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.OutcomeResult
@@ -30,6 +32,8 @@ class ProgressService(
     private val playerCardsRepository: PlayerCardsRepositoryPort,
     private val rewards: CardRewards,
     private val equipmentRewards: EquipmentRewards,
+    private val talentRepository: TalentRepositoryPort,
+    private val talentRules: TalentRules,
 ) : GetProgressUseCase,
     ReportOutcomeUseCase {
     override fun get(username: String): ProgressView {
@@ -49,7 +53,22 @@ class ProgressService(
         val next = progress.report(position, outcome, chapter)
         progressRepository.save(next)
         val (drop, equipmentDrop) = if (outcome == Outcome.CLEARED) awardBoss(username, position) else NO_REWARDS
-        return OutcomeResult(next.view(chapterOf(next)), drop, equipmentDrop)
+        val talentPoints = if (outcome == Outcome.CLEARED) awardTalentPoints(username, position) else 0
+        return OutcomeResult(next.view(chapterOf(next)), drop, equipmentDrop, talentPoints)
+    }
+
+    /**
+     * Pays the talent points of the first clear of [position], under the progress lock [load] took. A position cleared before finds its award
+     * key and pays nothing, which is how a phase replayed after a failed boss stays free.
+     */
+    private fun awardTalentPoints(
+        username: String,
+        position: ProgressPosition,
+    ): Int {
+        val award = talentRules.award(position)
+        val paid = talentRepository.award(username, award.key, award.points)
+        logger.info("Talent points for a clear username={} key={} points={} first={}", username, award.key, award.points, paid)
+        return if (paid) award.points else 0
     }
 
     /**

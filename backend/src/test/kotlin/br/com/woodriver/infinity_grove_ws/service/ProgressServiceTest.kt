@@ -6,6 +6,7 @@ import br.com.woodriver.infinity_grove_ws.InMemoryEquipmentRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryHeroRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryTalentRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
 import br.com.woodriver.infinity_grove_ws.LogCapture
@@ -28,6 +29,7 @@ import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.ProgressConflictException
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
+import br.com.woodriver.infinity_grove_ws.domain.TalentRules
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.port.EquipmentRepositoryPort
@@ -47,6 +49,7 @@ class ProgressServiceTest {
     private val chapters = InMemoryChapterRepository(*(1..5).map(ChapterDefinition::of).toTypedArray())
     private val heroes = InMemoryHeroRepository(*HeroSeed.heroes().toTypedArray())
     private val playerCards = InMemoryPlayerCardsRepository()
+    private val talents = InMemoryTalentRepository()
     private val rates =
         CardDropRates(minibossRatePerStage = 0.02, chapterBossRate = 0.30, chapterBossDailyLimit = 10, farmMinIntervalMs = 5000)
     private val today = LocalDate.of(2026, 10, 18)
@@ -65,7 +68,7 @@ class ProgressServiceTest {
         )
 
     private val service get() =
-        ProgressService(progresses, chapters, users, playerCards, CardRewards(heroes, chance, rates, clock), equipmentRewards())
+        ProgressService(progresses, chapters, users, playerCards, CardRewards(heroes, chance, rates, clock), equipmentRewards(), talents, TalentRules())
 
     private val start = ProgressPosition(1, 1, Encounter.PHASE, 1)
 
@@ -179,6 +182,114 @@ class ProgressServiceTest {
         existingUser()
         progresses.save(Progress("yan", position))
         playerCards.save(PlayerCards.start("yan", start, HeroSeed.heroes()).withBosses(bosses))
+    }
+
+    private fun earned() = talents.earnedPoints("yan")
+
+    @Test
+    fun `the first clear of a phase pays 1 talent point and answers it`() {
+        existingUser()
+
+        val result = service.report("yan", start, Outcome.CLEARED)
+
+        assertEquals(1, result.talentPoints)
+        assertEquals(1, earned())
+    }
+
+    @Test
+    fun `the first clear of a miniboss pays 2 talent points`() {
+        playerAt(miniboss)
+
+        val result = service.report("yan", miniboss, Outcome.CLEARED)
+
+        assertEquals(2, result.talentPoints)
+        assertEquals(2, earned())
+    }
+
+    @Test
+    fun `the first clear of a chapter boss pays 5 talent points`() {
+        playerAt(chapterBoss)
+
+        val result = service.report("yan", chapterBoss, Outcome.CLEARED)
+
+        assertEquals(5, result.talentPoints)
+        assertEquals(5, earned())
+    }
+
+    @Test
+    fun `walking a whole chapter pays 50 phases, 10 minibosses and the boss once each`() {
+        existingUser()
+        var position = start
+        repeat(50 + 10 + 1) {
+            val view = service.report("yan", position, Outcome.CLEARED).view
+            position = view.progress.position
+        }
+
+        assertEquals(50 * 1 + 10 * 2 + 5, earned())
+    }
+
+    @Test
+    fun `the last phase replayed after a failed miniboss pays nothing`() {
+        existingUser()
+        progresses.save(Progress("yan", ProgressPosition(1, 1, Encounter.PHASE, 5)))
+        playerCards.save(PlayerCards.start("yan", Element.FIRE, HeroSeed.heroes()))
+        val lastPhase = ProgressPosition(1, 1, Encounter.PHASE, 5)
+
+        assertEquals(1, service.report("yan", lastPhase, Outcome.CLEARED).talentPoints)
+        service.report("yan", miniboss, Outcome.FAILED)
+        val replay = service.report("yan", lastPhase, Outcome.CLEARED)
+
+        assertEquals(0, replay.talentPoints)
+        assertEquals(1, earned())
+    }
+
+    @Test
+    fun `a failed miniboss pays nothing, then winning it pays its 2 points once`() {
+        playerAt(miniboss)
+
+        assertEquals(0, service.report("yan", miniboss, Outcome.FAILED).talentPoints)
+        assertEquals(0, earned())
+        service.report("yan", ProgressPosition(1, 1, Encounter.PHASE, 5), Outcome.CLEARED)
+        assertEquals(2, service.report("yan", miniboss, Outcome.CLEARED).talentPoints)
+        assertEquals(1 + 2, earned())
+    }
+
+    @Test
+    fun `a refused report pays nothing`() {
+        existingUser()
+
+        assertFailsWith<ProgressConflictException> { service.report("yan", ProgressPosition(1, 3, Encounter.PHASE, 1), Outcome.CLEARED) }
+
+        assertEquals(0, earned())
+    }
+
+    @Test
+    fun `the first phase of the next chapter pays its own point`() {
+        playerAt(ProgressPosition(1, 10, Encounter.CHAPTER_BOSS, 1))
+        service.report("yan", chapterBoss, Outcome.CLEARED)
+
+        val result = service.report("yan", ProgressPosition(2, 1, Encounter.PHASE, 1), Outcome.CLEARED)
+
+        assertEquals(1, result.talentPoints)
+        assertEquals(5 + 1, earned())
+    }
+
+    @Test
+    fun `the points follow the settings`() {
+        existingUser()
+        val tuned =
+            ProgressService(
+                progresses,
+                chapters,
+                users,
+                playerCards,
+                CardRewards(heroes, chance, rates, clock),
+                equipmentRewards(),
+                talents,
+                TalentRules(pointsPerPhase = 3),
+            )
+
+        assertEquals(3, tuned.report("yan", start, Outcome.CLEARED).talentPoints)
     }
 
     private fun blankCopies(heroId: String) = playerCards.cards.getValue("yan").copiesOf(heroId, 0)
@@ -364,7 +475,7 @@ class ProgressServiceTest {
             object : PlayerCardsRepositoryPort by playerCards {
                 override fun save(cards: PlayerCards): PlayerCards = error("cards store is down")
             }
-        val broken = ProgressService(progresses, chapters, users, failing, CardRewards(heroes, chance, rates, clock), equipmentRewards())
+        val broken = ProgressService(progresses, chapters, users, failing, CardRewards(heroes, chance, rates, clock), equipmentRewards(), talents, TalentRules())
 
         assertFailsWith<IllegalStateException> { broken.report("yan", miniboss, Outcome.CLEARED) }
     }
@@ -445,7 +556,7 @@ class ProgressServiceTest {
                 override fun save(piece: br.com.woodriver.infinity_grove_ws.domain.Piece) = error("equipment store is down")
             }
         val broken =
-            ProgressService(progresses, chapters, users, playerCards, CardRewards(heroes, chance, rates, clock), equipmentRewards(failing))
+            ProgressService(progresses, chapters, users, playerCards, CardRewards(heroes, chance, rates, clock), equipmentRewards(failing), talents, TalentRules())
 
         assertFailsWith<IllegalStateException> { broken.report("yan", chapterBoss, Outcome.CLEARED) }
     }
