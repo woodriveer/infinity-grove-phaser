@@ -236,9 +236,9 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `talentPoints` 2 shows `+2 pontos de talento`, 1 shows `+1 ponto de talento`, 0 shows nothing
-- [ ] The talent tree is reloaded after a paying report
-- [ ] Gate check passes: `cd game && npm test`
+- [x] `talentPoints` 2 shows `+2 pontos de talento`, 1 shows `+1 ponto de talento`, 0 shows nothing
+- [x] The talent tree is reloaded after a paying report
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick

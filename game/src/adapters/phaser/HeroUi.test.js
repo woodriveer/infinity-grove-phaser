@@ -858,6 +858,57 @@ describe('HeroUi equipment badge', () => {
     });
 });
 
+describe('HeroUi talent points notice', () => {
+    it('shows "+2 pontos de talento" for 3 s', () => {
+        const { ui, testid, timers } = createUi({ talentList: talentsAnswer({}, 0) });
+
+        ui.showTalentPoints(2);
+
+        expect(testid('card-notice').textContent).toBe('+2 pontos de talento');
+        expect(testid('card-notice').hidden).toBe(false);
+        expect(timers.map((timer) => timer.delay)).toEqual([ 3000 ]);
+
+        timers[0].callback();
+
+        expect(testid('card-notice').hidden).toBe(true);
+    });
+
+    it('says "+1 ponto de talento" for a single point and "+5 pontos de talento" for 5', () => {
+        const { ui, testid } = createUi({ talentList: talentsAnswer({}, 0) });
+
+        ui.showTalentPoints(1);
+        expect(testid('card-notice').textContent).toBe('+1 ponto de talento');
+
+        ui.showTalentPoints(5);
+        expect(testid('card-notice').textContent).toBe('+5 pontos de talento');
+    });
+
+    it('reads the tree again and shows the new points on the open Talentos screen', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 0) });
+
+        await open(ctx, 'talents');
+        expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 0');
+        ctx.talentGateway.list.mockResolvedValue(talentsAnswer({}, 2));
+        ctx.ui.showTalentPoints(2);
+        await flush();
+
+        expect(ctx.talentGateway.list).toHaveBeenCalledTimes(2);
+        expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 2');
+    });
+
+    it('does not fail when the tree cannot be read again', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 0) });
+
+        await open(ctx, 'talents');
+        ctx.talentGateway.list.mockRejectedValue(new ApiError('down', { status: 500 }));
+        ctx.ui.showTalentPoints(1);
+        await flush();
+
+        expect(ctx.testid('card-notice').textContent).toBe('+1 ponto de talento');
+        expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 0');
+    });
+});
+
 describe('HeroUi card notice', () => {
     it('shows "Carta: <nome>" for 3 s', () => {
         const { ui, testid, timers } = createUi();

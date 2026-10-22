@@ -17,6 +17,7 @@ export const createCampaignSession = ({ gateway }) =>
     let realigned = () => {};
     let dropped = () => {};
     let equipmentDropped = () => {};
+    let talentPointsPaid = () => {};
 
     const enqueue = (outcome) =>
     {
@@ -135,6 +136,12 @@ export const createCampaignSession = ({ gateway }) =>
             equipmentDropped = callback;
         },
 
+        //  Fired with the number of talent points of each accepted report that paid some (the first clear of a phase or a boss)
+        onTalentPoints: (callback) =>
+        {
+            talentPointsPaid = callback;
+        },
+
         //  Sends the queued reports in order, one request at a time. A failed report stays first for the next flush.
         flush: async () =>
         {
@@ -176,6 +183,11 @@ export const createCampaignSession = ({ gateway }) =>
                     if (response?.equipmentDrop)
                     {
                         equipmentDropped(response.equipmentDrop);
+                    }
+
+                    if (response?.talentPoints > 0)
+                    {
+                        talentPointsPaid(response.talentPoints);
                     }
 
                     //  The chapter boss was the last report and the backend opened the next chapter: play it

@@ -396,6 +396,37 @@ describe('campaignSession', () => {
         });
     });
 
+    describe('talent points', () => {
+        it('onTalentPoints fires with the points of an accepted report that paid some', async () => {
+            const received = [];
+
+            await loaded();
+            session.onTalentPoints((points) => received.push(points));
+            gateway.report.mockResolvedValue({ ...progress(1, 'PHASE', 2), talentPoints: 2 });
+            session.clear();
+
+            await session.flush();
+
+            expect(received).toEqual([ 2 ]);
+        });
+
+        it('does not fire for 0 points or for a report without the field', async () => {
+            const received = [];
+
+            await loaded();
+            session.onTalentPoints((points) => received.push(points));
+            gateway.report
+                .mockResolvedValueOnce({ ...progress(1, 'PHASE', 2), talentPoints: 0 })
+                .mockResolvedValueOnce(progress(1, 'MINIBOSS'));
+            session.clear();
+            await session.flush();
+            session.clear();
+            await session.flush();
+
+            expect(received).toEqual([]);
+        });
+    });
+
     describe('card drops', () => {
         const drop = { heroId: 'kael', heroName: 'Kael Raizférrea', stars: 0 };
 

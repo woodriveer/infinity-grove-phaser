@@ -111,6 +111,7 @@ export class ClickerGame extends Scene
         this.session.onRealign((encounter) => this.realign(encounter));
         this.session.onDrop((drop) => this.receiveDrop(drop));
         this.session.onEquipmentDrop((drop) => this.receiveEquipmentDrop(drop));
+        this.session.onTalentPoints((points) => this.heroUi.showTalentPoints(points));
         this.equipment.onWallet((coins) => this.receiveWallet(coins));
         this.talents.onChange(() => this.refreshEnemyStats());
 

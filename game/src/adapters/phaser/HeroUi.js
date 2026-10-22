@@ -544,6 +544,21 @@ export class HeroUi
         this.showNotice(`Equipamento encontrado: ${dropLabel(drop.piece)}`);
     }
 
+    //  "+2 pontos de talento" for 3 s after a first clear paid points, and the tree is read again so the screen shows them
+    showTalentPoints (points)
+    {
+        this.showNotice(`+${points} ${points === 1 ? 'ponto' : 'pontos'} de talento`);
+        this.talents.load()
+            .then(() =>
+            {
+                if (this.open && this.screen === 'talents' && !this.talentBusy)
+                {
+                    this.render_talents();
+                }
+            })
+            .catch(() => {});
+    }
+
     showNotice (text)
     {
         const id = ++this.noticeId;
