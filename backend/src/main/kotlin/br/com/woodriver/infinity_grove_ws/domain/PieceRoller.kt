@@ -8,22 +8,44 @@ object PieceRoller {
     private const val WEAPON_CLICK_MIN = 2
     private const val WEAPON_CLICK_MAX = 5
 
+    /** The first chapter whose bosses can drop a rare piece; before it only common and uncommon ones fall. */
+    const val RARE_FROM_CHAPTER = 4
+
+    /** The first chapter whose boss can drop epic and legendary pieces; the chapter before it only reaches rare. */
+    const val EPIC_FROM_CHAPTER = 5
+
+    private val earlyMinibossWeights = listOf(Rarity.COMMON to 65, Rarity.UNCOMMON to 35)
     private val minibossWeights = listOf(Rarity.COMMON to 60, Rarity.UNCOMMON to 30, Rarity.RARE to 10)
+    private val earlyChapterBossWeights = listOf(Rarity.COMMON to 30, Rarity.UNCOMMON to 70)
+    private val rareChapterBossWeights = listOf(Rarity.UNCOMMON to 40, Rarity.RARE to 60)
     private val chapterBossWeights = listOf(Rarity.UNCOMMON to 40, Rarity.RARE to 40, Rarity.EPIC to 15, Rarity.LEGENDARY to 5)
 
-    /** The piece a won [encounter] drops for [username], or null. A phase never drops; the chance of the others comes from [rules]. */
+    private fun minibossWeights(chapter: Int) = if (chapter >= RARE_FROM_CHAPTER) minibossWeights else earlyMinibossWeights
+
+    private fun chapterBossWeights(chapter: Int) =
+        when {
+            chapter >= EPIC_FROM_CHAPTER -> chapterBossWeights
+            chapter >= RARE_FROM_CHAPTER -> rareChapterBossWeights
+            else -> earlyChapterBossWeights
+        }
+
+    /**
+     * The piece a won [encounter] of [chapter] drops for [username], or null. A phase never drops; the chance of the others comes from
+     * [rules] and the rarities that can fall grow with the chapter. The default [chapter] is the last one, where nothing is held back.
+     */
     fun roll(
         encounter: Encounter,
         rules: EquipmentRules,
         username: String,
         id: String,
         chance: () -> Double,
+        chapter: Int = ChapterOrder.MAX_CHAPTER,
     ): Piece? {
         val (rate, weights) =
             when (encounter) {
                 Encounter.PHASE -> return null
-                Encounter.MINIBOSS -> rules.minibossRate to minibossWeights
-                Encounter.CHAPTER_BOSS -> rules.chapterBossRate to chapterBossWeights
+                Encounter.MINIBOSS -> rules.minibossRate to minibossWeights(chapter)
+                Encounter.CHAPTER_BOSS -> rules.chapterBossRate to chapterBossWeights(chapter)
             }
         if (chance() >= rate) return null
         val rarity = pickWeighted(weights, chance)

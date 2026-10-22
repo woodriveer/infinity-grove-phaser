@@ -72,17 +72,17 @@ class ProgressControllerIT : IntegrationTestBase() {
             .body("encounter", equalTo("PHASE"))
             .body("phase", equalTo(1))
             .body("completed", equalTo(false))
-            .body("definition.bossHealth", equalTo(300))
+            .body("definition.bossHealth", equalTo(2000))
             .body("definition.bossTimeLimitMs", equalTo(60_000))
             .body("definition.stages", hasSize<Int>(10))
             .body("definition.stages[0].number", equalTo(1))
             .body("definition.stages[0].phasesPerStage", equalTo(5))
-            .body("definition.stages[0].monsterHealth", equalTo(10))
-            .body("definition.stages[0].minibossHealth", equalTo(50))
+            .body("definition.stages[0].monsterHealth", equalTo(40))
+            .body("definition.stages[0].minibossHealth", equalTo(200))
             .body("definition.stages[0].minibossTimeLimitMs", equalTo(30_000))
             .body("definition.stages[9].number", equalTo(10))
-            .body("definition.stages[9].monsterHealth", equalTo(19))
-            .body("definition.stages[9].minibossHealth", equalTo(95))
+            .body("definition.stages[9].monsterHealth", equalTo(76))
+            .body("definition.stages[9].minibossHealth", equalTo(380))
     }
 
     @Test
@@ -166,7 +166,7 @@ class ProgressControllerIT : IntegrationTestBase() {
         assertEquals(61, clears)
         assertEquals(2, current.path<Int>("chapter"))
         assertEquals(listOf(1, "PHASE", 1, false), position(current))
-        assertEquals(600, current.path<Int>("definition.bossHealth"))
+        assertEquals(8000, current.path<Int>("definition.bossHealth"))
     }
 
     @Test

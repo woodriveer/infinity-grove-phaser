@@ -173,4 +173,43 @@ class PieceRollerTest {
         assertNull(PieceRoller.roll(Encounter.MINIBOSS, never, "yan", "p", Script(0.0)))
         assertNull(PieceRoller.roll(Encounter.CHAPTER_BOSS, never, "yan", "p", Script(0.0)))
     }
+
+    private fun rarityIn(
+        chapter: Int,
+        encounter: Encounter,
+        point: Double,
+    ) = PieceRoller.roll(encounter, rules, "yan", "p", Script(0.0, point), chapter)!!.rarity
+
+    @Test
+    fun `before chapter 4 a miniboss drops only common and uncommon pieces`() {
+        (1..3).forEach { chapter ->
+            assertEquals(Rarity.COMMON, rarityIn(chapter, Encounter.MINIBOSS, 0.0))
+            assertEquals(Rarity.COMMON, rarityIn(chapter, Encounter.MINIBOSS, 0.649))
+            assertEquals(Rarity.UNCOMMON, rarityIn(chapter, Encounter.MINIBOSS, 0.65))
+            assertEquals(Rarity.UNCOMMON, rarityIn(chapter, Encounter.MINIBOSS, 0.999))
+        }
+    }
+
+    @Test
+    fun `from chapter 4 a miniboss can drop a rare piece`() {
+        assertEquals(Rarity.RARE, rarityIn(4, Encounter.MINIBOSS, 0.95))
+        assertEquals(Rarity.RARE, rarityIn(5, Encounter.MINIBOSS, 0.95))
+    }
+
+    @Test
+    fun `before chapter 4 a chapter boss drops only common and uncommon pieces`() {
+        (1..3).forEach { chapter ->
+            assertEquals(Rarity.COMMON, rarityIn(chapter, Encounter.CHAPTER_BOSS, 0.0))
+            assertEquals(Rarity.UNCOMMON, rarityIn(chapter, Encounter.CHAPTER_BOSS, 0.3))
+            assertEquals(Rarity.UNCOMMON, rarityIn(chapter, Encounter.CHAPTER_BOSS, 0.999))
+        }
+    }
+
+    @Test
+    fun `the chapter 4 boss reaches rare and the chapter 5 boss epic and legendary`() {
+        assertEquals(Rarity.UNCOMMON, rarityIn(4, Encounter.CHAPTER_BOSS, 0.0))
+        assertEquals(Rarity.RARE, rarityIn(4, Encounter.CHAPTER_BOSS, 0.999))
+        assertEquals(Rarity.EPIC, rarityIn(5, Encounter.CHAPTER_BOSS, 0.85))
+        assertEquals(Rarity.LEGENDARY, rarityIn(5, Encounter.CHAPTER_BOSS, 0.99))
+    }
 }

@@ -212,7 +212,7 @@ class FarmControllerIT : IntegrationTestBase() {
             .then()
             .statusCode(200)
             .body("equipmentDrop.sold", equalTo(false))
-            .body("equipmentDrop.piece.rarity", equalTo("RARE"))
+            .body("equipmentDrop.piece.rarity", equalTo("UNCOMMON"))
             .body("equipmentDrop.piece.slot", equalTo("RING"))
 
         assertEquals(1, jpaPieceRepository.count())

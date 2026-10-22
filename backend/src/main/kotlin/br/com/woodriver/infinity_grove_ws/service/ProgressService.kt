@@ -68,7 +68,7 @@ class ProgressService(
             }
         val (updated, drop) = rewards.award(cards, position.encounter, position.chapter, position.stage)
         if (updated != cards) playerCardsRepository.save(updated)
-        return drop to equipmentRewards.award(username, position.encounter)
+        return drop to equipmentRewards.award(username, position.encounter, position.chapter)
     }
 
     /** Returns the locked progress, creating it first when the player has none. */

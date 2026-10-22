@@ -26,8 +26,9 @@ class EquipmentRewards(
     fun award(
         username: String,
         encounter: Encounter,
+        chapter: Int,
     ): EquipmentDrop? {
-        val piece = PieceRoller.roll(encounter, rules, username, ids.next(), chanceRoller::roll) ?: return null
+        val piece = PieceRoller.roll(encounter, rules, username, ids.next(), chanceRoller::roll, chapter) ?: return null
         val bag = PlayerEquipment(username, equipmentRepository.findAll(username), rules.bagCapacity)
         if (bag.isFull) {
             val price = piece.sellPrice()

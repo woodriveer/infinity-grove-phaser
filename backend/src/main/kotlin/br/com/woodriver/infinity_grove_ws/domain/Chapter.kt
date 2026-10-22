@@ -70,10 +70,12 @@ data class ChapterDefinition(
     companion object {
         private const val FIRST_CHAPTER_STAGES = 10
         private const val PHASES_PER_STAGE = 5
-        private const val BASE_MONSTER_HEALTH = 10
+        private const val BASE_MONSTER_HEALTH = 40
+        private const val MONSTER_HEALTH_PER_STAGE = 4
+        private const val HEALTH_GROWTH_PER_CHAPTER = 4
         private const val MINIBOSS_HEALTH_FACTOR = 5
         private const val MINIBOSS_TIME_LIMIT_MS = 30_000L
-        private const val BOSS_HEALTH = 300
+        private const val BOSS_HEALTH = 2000
         private const val BOSS_TIME_LIMIT_MS = 60_000L
         private const val MINIBOSS_BASE_DEFENSE = 10
         private const val MINIBOSS_BASE_CRIT_RESISTANCE = 10
@@ -107,6 +109,9 @@ data class ChapterDefinition(
 
         private fun monsterRuleId(number: Int) = bossRuleId(number) - 2
 
+        /** How many times the health of chapter 1 the monsters of chapter [number] have: it multiplies by 4 each chapter (1, 4, 16, 64, 256). */
+        fun healthFactor(number: Int): Int = (1 until number).fold(1) { factor, _ -> factor * HEALTH_GROWTH_PER_CHAPTER }
+
         /** Chapter 1 as seeded: reachable with 1 damage per click, tunable in the database afterwards. */
         fun first() = of(1)
 
@@ -117,13 +122,14 @@ data class ChapterDefinition(
         fun of(number: Int): ChapterDefinition {
             require(number in 1..ChapterOrder.MAX_CHAPTER) { "Chapter $number must be between 1 and ${ChapterOrder.MAX_CHAPTER}" }
             val defenseBonus = DEFENSE_PER_CHAPTER * (number - 1)
+            val healthFactor = healthFactor(number)
             return ChapterDefinition(
                 number = number,
-                bossHealth = BOSS_HEALTH * number,
+                bossHealth = BOSS_HEALTH * healthFactor,
                 bossTimeLimitMs = BOSS_TIME_LIMIT_MS,
                 stages =
                     (1..FIRST_CHAPTER_STAGES).map { n ->
-                        val monsterHealth = (BASE_MONSTER_HEALTH + n - 1) * number
+                        val monsterHealth = (BASE_MONSTER_HEALTH + MONSTER_HEALTH_PER_STAGE * (n - 1)) * healthFactor
                         // the elements take turns by stage, so every multiplier shows up in the chapter
                         val element = Element.entries[(n - 1 + number - 1) % Element.entries.size]
                         val defense = minOf(MINIBOSS_BASE_DEFENSE + n + defenseBonus, EnemyStats.MAX_DEFENSE)

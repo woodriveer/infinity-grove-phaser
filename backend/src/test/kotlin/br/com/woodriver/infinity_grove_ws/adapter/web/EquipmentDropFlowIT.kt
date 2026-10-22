@@ -88,9 +88,9 @@ class EquipmentDropFlowIT : IntegrationTestBase() {
         report(10, "CHAPTER_BOSS")
             .then()
             .statusCode(200)
-            .body("equipmentDrop.piece.rarity", equalTo("RARE"))
+            .body("equipmentDrop.piece.rarity", equalTo("UNCOMMON"))
             .body("equipmentDrop.piece.slot", equalTo("RING"))
-            .body("equipmentDrop.piece.affixes", hasSize<Any>(3))
+            .body("equipmentDrop.piece.affixes", hasSize<Any>(2))
             .body("equipmentDrop.piece.clickDamage", nullValue())
 
         assertEquals(1, jpaPieceRepository.count())
@@ -121,14 +121,14 @@ class EquipmentDropFlowIT : IntegrationTestBase() {
             .then()
             .statusCode(200)
             .body("equipmentDrop.sold", equalTo(true))
-            .body("equipmentDrop.piece.rarity", equalTo("UNCOMMON"))
+            .body("equipmentDrop.piece.rarity", equalTo("COMMON"))
 
         assertEquals(100, jpaPieceRepository.count())
         asUser()
             .get("/wallet")
             .then()
             .statusCode(200)
-            .body("wallet.silver", equalTo(2))
+            .body("wallet.silver", equalTo(1))
             .body("wallet.copper", equalTo(0))
     }
 }

@@ -92,8 +92,8 @@ class ChapterTest {
     }
 
     @Test
-    fun `the seeded phase monster health grows from 10 to 19`() {
-        assertEquals((10..19).toList(), ChapterDefinition.first().stages.map { it.monsterHealth })
+    fun `the seeded phase monster health grows from 40 to 76 in steps of 4`() {
+        assertEquals((40..76 step 4).toList(), ChapterDefinition.first().stages.map { it.monsterHealth })
     }
 
     @Test
@@ -105,10 +105,10 @@ class ChapterTest {
     }
 
     @Test
-    fun `the seeded chapter boss has 300 health and a 60 second limit`() {
+    fun `the seeded chapter boss has 2000 health and a 60 second limit`() {
         val first = ChapterDefinition.first()
 
-        assertEquals(300, first.bossHealth)
+        assertEquals(2000, first.bossHealth)
         assertEquals(60_000L, first.bossTimeLimitMs)
     }
 
@@ -175,5 +175,13 @@ class ChapterTest {
         assertEquals(1, chapter.bossDropRuleId)
         assertEquals(1, chapter.stages.single().monsterDropRuleId)
         assertEquals(1, chapter.stages.single().minibossDropRuleId)
+    }
+
+    @Test
+    fun `the health multiplies by 4 each chapter`() {
+        assertEquals(listOf(1, 4, 16, 64, 256), (1..5).map { ChapterDefinition.healthFactor(it) })
+        assertEquals(40 * 16, ChapterDefinition.of(3).stage(1).monsterHealth)
+        assertEquals(76 * 256, ChapterDefinition.of(5).stage(10).monsterHealth)
+        assertEquals(2000 * 64, ChapterDefinition.of(4).bossHealth)
     }
 }

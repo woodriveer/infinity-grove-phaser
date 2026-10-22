@@ -51,7 +51,7 @@ class EquipmentRewardsTest {
 
     @Test
     fun `a chapter boss win stores the rolled piece and returns it unsold`() {
-        val drop = rewards().award("yan", Encounter.CHAPTER_BOSS)
+        val drop = rewards().award("yan", Encounter.CHAPTER_BOSS, 5)
 
         assertEquals(EquipmentDrop(uncommonWeapon, sold = false), drop)
         assertEquals(listOf(uncommonWeapon), pieces.findAll("yan"))
@@ -59,7 +59,7 @@ class EquipmentRewardsTest {
 
     @Test
     fun `a miniboss win whose roll fails returns null and stores nothing`() {
-        val drop = rewards(chance = SequenceChanceRoller(0.5)).award("yan", Encounter.MINIBOSS)
+        val drop = rewards(chance = SequenceChanceRoller(0.5)).award("yan", Encounter.MINIBOSS, 5)
 
         assertNull(drop)
         assertTrue(pieces.pieces.isEmpty())
@@ -67,7 +67,7 @@ class EquipmentRewardsTest {
 
     @Test
     fun `a miniboss win whose roll passes stores a piece`() {
-        val drop = rewards(chance = SequenceChanceRoller(0.2, 0.0)).award("yan", Encounter.MINIBOSS)
+        val drop = rewards(chance = SequenceChanceRoller(0.2, 0.0)).award("yan", Encounter.MINIBOSS, 5)
 
         assertEquals(Rarity.COMMON, drop!!.piece.rarity)
         assertEquals(listOf(drop.piece), pieces.findAll("yan"))
@@ -77,14 +77,14 @@ class EquipmentRewardsTest {
     fun `a phase win rolls nothing`() {
         val chance = SequenceChanceRoller(0.0)
 
-        assertNull(rewards(chance = chance).award("yan", Encounter.PHASE))
+        assertNull(rewards(chance = chance).award("yan", Encounter.PHASE, 5))
         assertEquals(0, chance.reads)
         assertTrue(pieces.pieces.isEmpty())
     }
 
     @Test
     fun `a miss touches no wallet`() {
-        rewards(chance = SequenceChanceRoller(0.5)).award("yan", Encounter.MINIBOSS)
+        rewards(chance = SequenceChanceRoller(0.5)).award("yan", Encounter.MINIBOSS, 5)
 
         assertTrue(wallets.wallets.isEmpty())
     }
@@ -95,7 +95,7 @@ class EquipmentRewardsTest {
         pieces.save(ring("r2"))
         wallets.save(Wallet.open("yan", table, SequenceDropRoller(1), 0).copy(copper = 1_000))
 
-        val drop = rewards(EquipmentRules(bagCapacity = 2)).award("yan", Encounter.CHAPTER_BOSS)
+        val drop = rewards(EquipmentRules(bagCapacity = 2)).award("yan", Encounter.CHAPTER_BOSS, 5)
 
         assertEquals(EquipmentDrop(uncommonWeapon, sold = true), drop)
         assertEquals(listOf("r1", "r2"), pieces.findAll("yan").map { it.id })
@@ -106,7 +106,7 @@ class EquipmentRewardsTest {
     fun `a full bag with no wallet creates the wallet with the sell price`() {
         pieces.save(ring("r1"))
 
-        rewards(EquipmentRules(bagCapacity = 1)).award("yan", Encounter.CHAPTER_BOSS)
+        rewards(EquipmentRules(bagCapacity = 1)).award("yan", Encounter.CHAPTER_BOSS, 5)
 
         assertEquals(200L, wallets.wallets.getValue("yan").copper)
     }
@@ -115,7 +115,7 @@ class EquipmentRewardsTest {
     fun `the bag of another player does not count`() {
         pieces.save(ring("r1").copy(username = "other"))
 
-        val drop = rewards(EquipmentRules(bagCapacity = 1)).award("yan", Encounter.CHAPTER_BOSS)
+        val drop = rewards(EquipmentRules(bagCapacity = 1)).award("yan", Encounter.CHAPTER_BOSS, 5)
 
         assertEquals(false, drop!!.sold)
         assertTrue(wallets.wallets.isEmpty())
