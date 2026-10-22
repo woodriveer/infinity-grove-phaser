@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 33,
+  "next_id": 35,
   "lessons": [
     {
       "id": "L-001",
@@ -582,6 +582,42 @@
       ],
       "created": "2026-10-21T18:42:08Z",
       "last_seen": "2026-10-21T18:42:08Z"
+    },
+    {
+      "id": "L-033",
+      "key": "surviving_mutant::concurrency tests must start from an existing lock row a fresh player s insert race serialises requests and hides a missing pessimistic lock",
+      "text": "Concurrency tests must start from an existing lock row; a fresh player's insert race serialises requests and hides a missing pessimistic lock",
+      "signal": "surviving_mutant",
+      "scope": "backend/service",
+      "status": "candidate",
+      "features": [
+        "talent-points"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "mutant h: backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/TalentService.kt:48 (backend/service)"
+      ],
+      "created": "2026-10-22T12:59:06Z",
+      "last_seen": "2026-10-22T12:59:06Z"
+    },
+    {
+      "id": "L-034",
+      "key": "spec_precision_gap::keep an ac s failure handling wording identical to the assumptions row that defines it which errors trigger a reload",
+      "text": "Keep an AC's failure-handling wording identical to the Assumptions row that defines it (which errors trigger a reload)",
+      "signal": "spec_precision_gap",
+      "scope": "specs",
+      "status": "candidate",
+      "features": [
+        "talent-points"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec P2 AC6 vs HeroUi.test.js:490 (specs)"
+      ],
+      "created": "2026-10-22T12:59:06Z",
+      "last_seen": "2026-10-22T12:59:06Z"
     }
   ]
 }

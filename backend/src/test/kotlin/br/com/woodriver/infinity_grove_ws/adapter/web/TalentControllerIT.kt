@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaTalentRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.ProgressEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.TalentEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.TalentRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.WalletEntity
@@ -42,6 +43,9 @@ class TalentControllerIT : IntegrationTestBase() {
                 .extract()
                 .path<String>("accessToken")
     }
+
+    // the race tests need the progress row that the upgrade locks to exist already; the first insert would order the requests by accident
+    private fun withProgress() = jpaProgressRepository.save(ProgressEntity("yan", 1, 1, "PHASE", 1, false))
 
     private fun earned(points: Int) = talentRepository.award("yan", "test:$points", points)
 
@@ -224,6 +228,7 @@ class TalentControllerIT : IntegrationTestBase() {
 
     @Test
     fun `two requests with the same fromLevel succeed once and answer 409 to the other`() {
+        withProgress()
         earned(10)
         val pool = Executors.newFixedThreadPool(2)
 
@@ -243,6 +248,7 @@ class TalentControllerIT : IntegrationTestBase() {
 
     @Test
     fun `two upgrades of different talents with one point accept exactly one`() {
+        withProgress()
         earned(1)
         val pool = Executors.newFixedThreadPool(2)
 

@@ -204,6 +204,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: combo freeze on hero screens (validation.md precision gap) (game-ui)
 - last seen: 2026-10-21T18:42:08Z
 
+### L-033 - Concurrency tests must start from an existing lock row; a fresh player's insert race serialises requests and hides a missing pessimistic lock
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `backend/service` · harmful: 0
+- features: talent-points
+- evidence: mutant h: backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/TalentService.kt:48 (backend/service)
+- last seen: 2026-10-22T12:59:06Z
+
+### L-034 - Keep an AC's failure-handling wording identical to the Assumptions row that defines it (which errors trigger a reload)
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `specs` · harmful: 0
+- features: talent-points
+- evidence: spec P2 AC6 vs HeroUi.test.js:490 (specs)
+- last seen: 2026-10-22T12:59:06Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

@@ -129,7 +129,7 @@ Talents are bought with coins, which are also the currency of equipment, and the
 3. WHEN the player holds 1 point and clicks `Melhorar (1 ponto)` on a level-0 talent THEN the game SHALL send the upgrade with `fromLevel` 0, show `Nível 1/10` and `Pontos de talento: 0`.  <!-- event-driven -->
 4. WHILE the player holds 0 available points the game SHALL disable every `Melhorar` button, whatever the wallet holds.  <!-- state-driven -->
 5. WHILE a talent is at level 10 the game SHALL show `Nível máximo` and no button for it.  <!-- state-driven -->
-6. IF the backend answers 409 `NOT_ENOUGH_TALENT_POINTS` THEN the game SHALL show `Pontos de talento insuficientes` and reload the tree; IF any other failure THEN `Não foi possível melhorar o talento.` and reload the tree.  <!-- unwanted-behavior -->
+6. IF the backend answers 409 `NOT_ENOUGH_TALENT_POINTS` THEN the game SHALL show `Pontos de talento insuficientes` and reload the tree; IF any other failure THEN `Não foi possível melhorar o talento.`, and the tree reloads only after a 409.  <!-- unwanted-behavior -->
 7. WHILE a request runs the game SHALL disable every `Melhorar` button.  <!-- state-driven -->
 8. IF the tree cannot be loaded THEN the game SHALL show `Talentos indisponíveis` and keep the fight playable.  <!-- unwanted-behavior -->
 9. WHEN an accepted outcome report answers `talentPoints` 2 and dropped no card or piece THEN the game SHALL show the notice `+2 pontos de talento` and reload the tree; WHEN it answers 1 THEN `+1 ponto de talento`; WHEN it answers 0 THEN no notice.  <!-- event-driven -->
