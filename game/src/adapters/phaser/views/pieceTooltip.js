@@ -34,16 +34,28 @@ export const attachPieceTooltip = (tile, piece, heroes) =>
 {
     let tooltip = null;
 
-    const hide = () =>
+    //  A screen that re-renders under the pointer drops the tile without a `pointerleave`, so while the tooltip shows the document watches
+    //  the pointer: once it is off the tile, or the tile is gone, the tooltip goes
+    const guard = (event) =>
+    {
+        if (!tile.isConnected || !tile.contains(event.target))
+        {
+            hide();
+        }
+    };
+
+    function hide()
     {
         tooltip?.remove();
         tooltip = null;
-    };
+        document.removeEventListener('pointermove', guard, true);
+    }
 
     tile.addEventListener('pointerenter', () =>
     {
         hide();
         tooltip = renderPieceTooltip(piece, heroes);
+        document.addEventListener('pointermove', guard, true);
 
         const host = tile.closest('.hero-panel');
 
@@ -69,4 +81,5 @@ export const attachPieceTooltip = (tile, piece, heroes) =>
         tooltip.style.top = `${top}px`;
     });
     tile.addEventListener('pointerleave', hide);
+    tile.addEventListener('click', hide);
 };

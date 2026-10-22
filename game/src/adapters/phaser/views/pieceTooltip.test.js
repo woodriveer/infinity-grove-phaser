@@ -66,4 +66,41 @@ describe('attachPieceTooltip in a panel', () => {
 
         expect(panel.querySelectorAll('[data-testid="piece-tooltip"]')).toHaveLength(1);
     });
+    it('removes the tooltip when the tile is re-rendered away or the pointer moves off it, without a pointerleave', () => {
+        const panel = document.createElement('div');
+        const tileNode = document.createElement('button');
+        const elsewhere = document.createElement('div');
+
+        panel.className = 'hero-panel';
+        panel.append(tileNode, elsewhere);
+        document.body.append(panel);
+        attachPieceTooltip(tileNode, piece, []);
+
+        tileNode.dispatchEvent(new Event('pointerenter'));
+        tileNode.remove();
+        elsewhere.dispatchEvent(new Event('pointermove', { bubbles: true }));
+
+        expect(panel.querySelector('[data-testid="piece-tooltip"]')).toBeNull();
+
+        panel.append(tileNode);
+        tileNode.dispatchEvent(new Event('pointerenter'));
+        elsewhere.dispatchEvent(new Event('pointermove', { bubbles: true }));
+
+        expect(panel.querySelector('[data-testid="piece-tooltip"]')).toBeNull();
+        panel.remove();
+    });
+
+    it('removes the tooltip on a click of the tile', () => {
+        const panel = document.createElement('div');
+        const tileNode = document.createElement('button');
+
+        panel.className = 'hero-panel';
+        panel.append(tileNode);
+        attachPieceTooltip(tileNode, piece, []);
+
+        tileNode.dispatchEvent(new Event('pointerenter'));
+        tileNode.click();
+
+        expect(panel.querySelector('[data-testid="piece-tooltip"]')).toBeNull();
+    });
 });
