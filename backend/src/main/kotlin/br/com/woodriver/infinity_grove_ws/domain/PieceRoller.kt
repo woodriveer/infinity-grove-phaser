@@ -5,8 +5,8 @@ package br.com.woodriver.infinity_grove_ws.domain
  * (exclusive), read in a fixed order: the drop, the rarity, the slot, the weapon's click damage, then for each affix its type and value.
  */
 object PieceRoller {
-    private const val WEAPON_CLICK_MIN = 2
-    private const val WEAPON_CLICK_MAX = 5
+    /** The base click damage of a weapon by rarity, worst first; like the affix bands they never overlap. */
+    private val weaponClickRanges = listOf(2..3, 4..5, 6..7, 8..9, 10..12)
 
     /** The first chapter whose bosses can drop a rare piece; before it only common and uncommon ones fall. */
     const val RARE_FROM_CHAPTER = 4
@@ -50,7 +50,7 @@ object PieceRoller {
         if (chance() >= rate) return null
         val rarity = pickWeighted(weights, chance)
         val slot = Slot.entries[pick(Slot.entries.size, chance)]
-        val baseClick = if (slot == Slot.WEAPON) rarity.scale(between(WEAPON_CLICK_MIN, WEAPON_CLICK_MAX, chance)) else null
+        val baseClick = if (slot == Slot.WEAPON) between(weaponClickRanges[rarity.index - 1], chance) else null
         val remaining = AffixType.allowedOn(slot).toMutableList()
         val affixes =
             List(rarity.affixCount) {
@@ -60,12 +60,12 @@ object PieceRoller {
         return Piece(id, username, slot, rarity, baseClick, refine = 0, affixes = affixes)
     }
 
-    /** An affix of [type] with a value drawn between its bounds and scaled by the [rarity] multiplier. */
+    /** An affix of [type] with a value drawn from the band of [rarity]. */
     fun affix(
         type: AffixType,
         rarity: Rarity,
         chance: () -> Double,
-    ): Affix = Affix(type, rarity.scale(between(type.min, type.max, chance)))
+    ): Affix = Affix(type, between(type.rangeFor(rarity), chance))
 
     /** An index from 0 to [size] - 1, uniform. */
     fun pick(
@@ -74,10 +74,9 @@ object PieceRoller {
     ): Int = minOf(size - 1, (chance() * size).toInt())
 
     private fun between(
-        min: Int,
-        max: Int,
+        range: IntRange,
         chance: () -> Double,
-    ): Int = min + pick(max - min + 1, chance)
+    ): Int = range.first + pick(range.last - range.first + 1, chance)
 
     private fun pickWeighted(
         weights: List<Pair<Rarity, Int>>,

@@ -87,25 +87,25 @@ class PieceRollerTest {
     }
 
     @Test
-    fun `a weapon gets base click damage from 2 to 5 and no click damage percent`() {
+    fun `a weapon gets base click damage from 2 to 3 and no click damage percent`() {
         val low = roll(Encounter.MINIBOSS, 0.0, 0.0, 0.0, 0.0)!!
         val high = roll(Encounter.MINIBOSS, 0.0, 0.0, 0.0, 0.999)!!
 
         assertEquals(Slot.WEAPON, low.slot)
         assertEquals(2, low.baseClick)
-        assertEquals(5, high.baseClick)
+        assertEquals(3, high.baseClick)
         assertEquals(listOf(AffixType.CRIT_CHANCE), low.affixes.map { it.type })
     }
 
     @Test
-    fun `the weapon click damage is scaled by the rarity multiplier and rounded down`() {
+    fun `the weapon click damage is drawn from the band of its rarity`() {
         val legendary = roll(Encounter.CHAPTER_BOSS, 0.0, 0.99, 0.0, 0.999)!!
         val rare = roll(Encounter.CHAPTER_BOSS, 0.0, 0.4, 0.0, 0.5)!!
 
         assertEquals(Rarity.LEGENDARY, legendary.rarity)
-        assertEquals(11, legendary.baseClick)
+        assertEquals(12, legendary.baseClick)
         assertEquals(Rarity.RARE, rare.rarity)
-        assertEquals(6, rare.baseClick)
+        assertEquals(7, rare.baseClick)
     }
 
     @Test
@@ -118,14 +118,14 @@ class PieceRollerTest {
     }
 
     @Test
-    fun `an affix value is drawn between its bounds then scaled and rounded down`() {
+    fun `an affix value is drawn from the band of its rarity`() {
         val low = roll(Encounter.MINIBOSS, 0.0, 0.0, 0.5, 0.0, 0.0)!!
         val high = roll(Encounter.MINIBOSS, 0.0, 0.0, 0.5, 0.0, 0.999)!!
         val scaled = roll(Encounter.CHAPTER_BOSS, 0.0, 0.99, 0.5, 0.0, 0.999)!!
 
         assertEquals(5, low.affixes.single().base)
-        assertEquals(15, high.affixes.single().base)
-        assertEquals(33, scaled.affixes.first().base)
+        assertEquals(9, high.affixes.single().base)
+        assertEquals(30, scaled.affixes.first().base)
     }
 
     @Test

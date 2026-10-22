@@ -4,6 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class EquipmentTest {
     private val rules = EquipmentRules()
@@ -22,11 +23,19 @@ class EquipmentTest {
     ) = Piece("p2", "yan", Slot.RING, rarity, null, refine, affixes)
 
     @Test
-    fun `rarities hold 1 2 3 4 and 4 affixes with the spec multipliers`() {
+    fun `rarities hold 1 2 3 4 and 4 affixes with the spec cost multipliers`() {
         assertEquals(listOf(1, 2, 3, 4, 4), Rarity.entries.map { it.affixCount })
-        assertEquals(listOf(1.0, 1.2, 1.5, 1.8, 2.2), Rarity.entries.map { it.valueMultiplier })
         assertEquals(listOf(1, 2, 3, 5, 8), Rarity.entries.map { it.costMultiplier })
         assertEquals(listOf(1, 2, 3, 4, 5), Rarity.entries.map { it.index })
+    }
+
+    @Test
+    fun `the value bands of the rarities never overlap so a better rarity always rolls higher`() {
+        AffixType.entries.forEach { type ->
+            Rarity.entries.zipWithNext().forEach { (worse, better) ->
+                assertTrue(type.rangeFor(worse).last < type.rangeFor(better).first, "$type $worse vs $better")
+            }
+        }
     }
 
     @Test
@@ -160,15 +169,15 @@ class EquipmentTest {
     }
 
     @Test
-    fun `a reroll rolls the new base inside the range of the new type scaled by the rarity`() {
+    fun `a reroll rolls the new base inside the band of the piece rarity`() {
         val piece = weapon(Rarity.UNCOMMON, refine = 5, affixes = listOf(Affix(AffixType.CRIT_CHANCE, 2)))
 
         val low = piece.rerolled(0, zero)
         val high = piece.rerolled(0, scripted(0.0, 0.999))
 
         assertEquals(AffixType.CRIT_DAMAGE_PCT, low.affixes[0].type)
-        assertEquals(12, low.affixes[0].base)
-        assertEquals(36, high.affixes[0].base)
+        assertEquals(20, low.affixes[0].base)
+        assertEquals(29, high.affixes[0].base)
     }
 
     @Test

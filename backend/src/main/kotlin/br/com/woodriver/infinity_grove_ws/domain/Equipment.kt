@@ -5,43 +5,39 @@ import java.math.BigInteger
 enum class Slot { WEAPON, ARMOR, RING, AMULET }
 
 /**
- * How good a piece is: the number of [affixCount] affixes it rolls, the [valueMultiplier] applied to every rolled value and the
- * [costMultiplier] of its refine cost. [index] is 1 for the worst rarity and sets the sell price.
+ * How good a piece is: the number of [affixCount] affixes it rolls and the [costMultiplier] of its refine cost. Its values are rolled in
+ * the band the rarity owns (see [AffixType.rangeFor]). [index] is 1 for the worst rarity and sets the sell price.
  */
 enum class Rarity(
     val index: Int,
     val affixCount: Int,
-    val valueMultiplier: Double,
     val costMultiplier: Int,
 ) {
-    COMMON(1, 1, 1.0, 1),
-    UNCOMMON(2, 2, 1.2, 2),
-    RARE(3, 3, 1.5, 3),
-    EPIC(4, 4, 1.8, 5),
-    LEGENDARY(5, 4, 2.2, 8),
-    ;
-
-    /** [value] times the rarity multiplier, rounded down (whole tenths, so no floating point rounding decides the result). */
-    fun scale(value: Int): Int = value * Math.round(valueMultiplier * TENTHS).toInt() / TENTHS
-
-    private companion object {
-        const val TENTHS = 10
-    }
+    COMMON(1, 1, 1),
+    UNCOMMON(2, 2, 2),
+    RARE(3, 3, 3),
+    EPIC(4, 4, 5),
+    LEGENDARY(5, 4, 8),
 }
 
-/** A kind of attribute a piece can carry, rolled between [min] and [max] before the rarity multiplier. The weapon has its own click damage. */
+/**
+ * A kind of attribute a piece can carry. [ranges] holds the band each rarity rolls in, worst rarity first; the bands never overlap, so
+ * at the same refine level a better rarity always beats a worse one. The weapon has its own click damage.
+ */
 enum class AffixType(
-    val min: Int,
-    val max: Int,
+    private val ranges: List<IntRange>,
     private val onWeapon: Boolean = true,
 ) {
-    CLICK_DAMAGE_PCT(5, 15, onWeapon = false),
-    CRIT_CHANCE(1, 5),
-    CRIT_DAMAGE_PCT(10, 30),
-    BOSS_DAMAGE_PCT(5, 15),
-    BOSS_TIME_SECONDS(1, 3),
-    ARMOR_PIERCE_PCT(5, 15),
+    CLICK_DAMAGE_PCT(listOf(5..9, 10..14, 15..19, 20..24, 25..30), onWeapon = false),
+    CRIT_CHANCE(listOf(1..2, 3..4, 5..6, 7..8, 9..10)),
+    CRIT_DAMAGE_PCT(listOf(10..19, 20..29, 30..39, 40..49, 50..60)),
+    BOSS_DAMAGE_PCT(listOf(5..9, 10..14, 15..19, 20..24, 25..30)),
+    BOSS_TIME_SECONDS(listOf(1..1, 2..2, 3..3, 4..4, 5..6)),
+    ARMOR_PIERCE_PCT(listOf(5..9, 10..14, 15..19, 20..24, 25..30)),
     ;
+
+    /** The values a piece of [rarity] can roll for this attribute, before refining. */
+    fun rangeFor(rarity: Rarity): IntRange = ranges[rarity.index - 1]
 
     fun allowedOn(slot: Slot) = slot != Slot.WEAPON || onWeapon
 
@@ -50,7 +46,7 @@ enum class AffixType(
     }
 }
 
-/** One attribute of a piece. [base] is the value as rolled (rarity multiplier included); the refine level is applied by [Piece.value]. */
+/** One attribute of a piece. [base] is the value as rolled; the refine level is applied by [Piece.value]. */
 data class Affix(
     val type: AffixType,
     val base: Int,

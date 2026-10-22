@@ -263,7 +263,7 @@ class EquipmentServiceTest {
         val change = service.reroll("yan", "w", 0)
 
         val piece = change.equipment.find("w")
-        assertEquals(Affix(AffixType.CRIT_DAMAGE_PCT, 12), piece.affixes[0])
+        assertEquals(Affix(AffixType.CRIT_DAMAGE_PCT, 20), piece.affixes[0])
         assertEquals(Affix(AffixType.BOSS_DAMAGE_PCT, 6), piece.affixes[1])
         assertEquals(5, piece.refine)
         assertEquals(piece, pieces.pieces.getValue("w"))

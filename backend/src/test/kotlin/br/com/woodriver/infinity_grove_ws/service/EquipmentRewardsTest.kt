@@ -44,9 +44,9 @@ class EquipmentRewardsTest {
             "yan",
             Slot.WEAPON,
             Rarity.UNCOMMON,
-            2,
+            4,
             0,
-            listOf(Affix(AffixType.CRIT_CHANCE, 1), Affix(AffixType.CRIT_DAMAGE_PCT, 12)),
+            listOf(Affix(AffixType.CRIT_CHANCE, 3), Affix(AffixType.CRIT_DAMAGE_PCT, 20)),
         )
 
     @Test

@@ -60,7 +60,7 @@ class EquipmentRerollIT : IntegrationTestBase() {
             .body("wallet.copper", equalTo(0))
             .body("wallet.silver", equalTo(10))
 
-        assertEquals("CRIT_DAMAGE_PCT:12,BOSS_DAMAGE_PCT:6", jpaPieceRepository.findById("w1").get().affixes)
+        assertEquals("CRIT_DAMAGE_PCT:20,BOSS_DAMAGE_PCT:6", jpaPieceRepository.findById("w1").get().affixes)
         assertEquals(1_000L, copper())
     }
 
