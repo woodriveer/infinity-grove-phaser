@@ -112,7 +112,6 @@ export class ClickerGame extends Scene
         this.session.onDrop((drop) => this.receiveDrop(drop));
         this.session.onEquipmentDrop((drop) => this.receiveEquipmentDrop(drop));
         this.equipment.onWallet((coins) => this.receiveWallet(coins));
-        this.talents.onWallet((coins) => this.receiveWallet(coins));
         this.talents.onChange(() => this.refreshEnemyStats());
 
         this.add.image(512, 384, 'background');

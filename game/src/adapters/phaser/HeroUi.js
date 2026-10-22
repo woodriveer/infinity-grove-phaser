@@ -49,6 +49,7 @@ const LEADER_FAILED = 'Não foi possível trocar o líder.';
 const EQUIPMENT_FAILED = 'Não foi possível concluir a ação.';
 const TALENT_FAILED = 'Não foi possível melhorar o talento.';
 const NOT_ENOUGH_COPPER = 'Moedas insuficientes';
+const NOT_ENOUGH_TALENT_POINTS = 'Pontos de talento insuficientes';
 
 //  The bag button carries a red dot while the bag holds a card the player has not looked at yet
 //  and the Equipamento button while it holds a piece the player has not looked at yet
@@ -450,7 +451,7 @@ export class HeroUi
     render_talents ()
     {
         this.backButton.hidden = true;
-        this.body.replaceChildren(renderTalents(this.talents.talents(), this.hooks.walletCopper(), {
+        this.body.replaceChildren(renderTalents(this.talents.talents(), this.talents.points(), {
             busy: this.talentBusy,
             onUpgrade: (talent) => this.upgradeTalent(talent)
         }));
@@ -477,7 +478,7 @@ export class HeroUi
         {
             if (view === this.view)
             {
-                this.setError(error.code === 'NOT_ENOUGH_COPPER' ? NOT_ENOUGH_COPPER : TALENT_FAILED);
+                this.setError(error.code === 'NOT_ENOUGH_TALENT_POINTS' ? NOT_ENOUGH_TALENT_POINTS : TALENT_FAILED);
             }
         }
         finally

@@ -147,7 +147,7 @@ describe('talentIconName and the branch titles', () => {
         ]);
     });
 
-    it('titles the three branches Tempo, Quebra de defesa and Poder do clique', () => {
-        expect(BRANCH_TITLES).toEqual({ TIME: 'Tempo', BREAK: 'Quebra de defesa', POWER: 'Poder do clique' });
+    it('titles the four branches Tempo, Quebra de defesa, Poder do clique and Combo', () => {
+        expect(BRANCH_TITLES).toEqual({ TIME: 'Tempo', BREAK: 'Quebra de defesa', POWER: 'Poder do clique', COMBO: 'Combo' });
     });
 });

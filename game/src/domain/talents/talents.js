@@ -49,8 +49,8 @@ export const addBonuses = (a, b) => ({
     critDamagePct: a.critDamagePct + b.critDamagePct
 });
 
-export const BRANCH_TITLES = { TIME: 'Tempo', BREAK: 'Quebra de defesa', POWER: 'Poder do clique' };
-export const BRANCHES = [ 'TIME', 'BREAK', 'POWER' ];
+export const BRANCH_TITLES = { TIME: 'Tempo', BREAK: 'Quebra de defesa', POWER: 'Poder do clique', COMBO: 'Combo' };
+export const BRANCHES = [ 'TIME', 'BREAK', 'POWER', 'COMBO' ];
 
 //  "+6 s", "-3 pontos", "+9%", "+3 pontos"; "nenhum" at level 0. A BREAK talent lowers a stat, so its points read as a reduction.
 export const describeTalentEffect = ({ branch, unit, value }) =>
@@ -82,7 +82,8 @@ const ICON_NAMES = {
     CRIT_RESIST_BREAK: 'break-crit',
     CLICK_DAMAGE: 'click-damage',
     CRIT_CHANCE: 'crit-chance',
-    CRIT_DAMAGE: 'crit-damage'
+    CRIT_DAMAGE: 'crit-damage',
+    COMBO: 'combo'
 };
 
 export const talentIconName = (talentId) => `talent-${ICON_NAMES[talentId] ?? talentId.toLowerCase()}`;

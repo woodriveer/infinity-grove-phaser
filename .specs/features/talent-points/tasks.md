@@ -208,11 +208,11 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] The window shows the points line, four columns and the COMBO card with `Efeito: nenhum` at level 0 and `+25%` at level 5
-- [ ] Every button is disabled at 0 points or while a request runs; `Nível máximo` and no button at level 10
-- [ ] `Pontos de talento insuficientes` for `NOT_ENOUGH_TALENT_POINTS`, `Não foi possível melhorar o talento.` otherwise, and the tree reloads after a 409
-- [ ] No wallet price or `onWallet` call is left in the talent flow
-- [ ] Gate check passes: `cd game && npm test`
+- [x] The window shows the points line, four columns and the COMBO card with `Efeito: nenhum` at level 0 and `+25%` at level 5
+- [x] Every button is disabled at 0 points or while a request runs; `Nível máximo` and no button at level 10
+- [x] `Pontos de talento insuficientes` for `NOT_ENOUGH_TALENT_POINTS`, `Não foi possível melhorar o talento.` otherwise, and the tree reloads after a 409
+- [x] No wallet price or `onWallet` call is left in the talent flow
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick

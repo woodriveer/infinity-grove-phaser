@@ -400,41 +400,55 @@ const talentTree = (levels = {}) => [
     [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 3 ],
     [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa física', 'points', 1 ], [ 'MAGICAL_BREAK', 'BREAK', 'Quebra de defesa mágica', 'points', 1 ],
     [ 'CRIT_RESIST_BREAK', 'BREAK', 'Quebra de resistência a crítico', 'points', 1 ],
-    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique', '%', 3 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ]
+    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique', '%', 3 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ],
+    [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ]
 ].map(([ id, branch, label, unit, perLevel ]) => {
     const level = levels[id] ?? 0;
 
-    return { id, branch, label, unit, perLevel, maxLevel: 10, level, value: level * perLevel, nextCost: level >= 10 ? null : Math.round(300 * 1.6 ** level) };
+    return { id, branch, label, unit, perLevel, maxLevel: 10, level, value: level * perLevel, nextCost: level >= 10 ? null : 1 };
 });
 
+const pointsOf = (available, spent = 0) => ({ earned: available + spent, spent, available });
+//  What the backend answers: the tree and the points
+const talentsAnswer = (levels = {}, available = 1) => ({ talents: talentTree(levels), points: pointsOf(available) });
+
 describe('HeroUi Talentos', () => {
-    it('opens the window titled Talentos with the three columns and pauses the fight', async () => {
-        const ctx = createUi({ talentList: { talents: talentTree() } });
+    it('opens the window titled Talentos with the points line, the four columns and pauses the fight', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 3) });
 
         await open(ctx, 'talents');
 
         expect(ctx.query('.hero-title').textContent).toBe('Talentos');
-        expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-branch-title') ]).map((node) => node.textContent)).toEqual([ 'Tempo', 'Quebra de defesa', 'Poder do clique' ]);
+        expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 3');
+        expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-branch-title') ]).map((node) => node.textContent)).toEqual([ 'Tempo', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
         expect(ctx.hooks.pause).toHaveBeenCalledTimes(1);
     });
 
-    it('sends the upgrade with fromLevel 0, shows Nível 1/10 and the new wallet state', async () => {
-        const ctx = createUi({ talentList: { talents: talentTree() }, wallet: 300 });
-        ctx.talentGateway.upgrade.mockResolvedValue({ talents: talentTree({ CLICK_DAMAGE: 1 }), wallet: { gold: 0, silver: 0, copper: 0 } });
+    it('sends the upgrade with fromLevel 0, shows Nível 1/10 and Pontos de talento: 0', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+        ctx.talentGateway.upgrade.mockResolvedValue({ talents: talentTree({ COMBO: 1 }), points: pointsOf(0, 1) });
 
         await open(ctx, 'talents');
-        ctx.hooks.walletCopper.mockReturnValue(0);
-        ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
+        ctx.testid('talent-upgrade-COMBO').click();
         await flush();
 
-        expect(ctx.talentGateway.upgrade).toHaveBeenCalledWith('CLICK_DAMAGE', 0);
-        expect(ctx.testid('talent-level-CLICK_DAMAGE').textContent).toBe('Nível 1/10');
-        expect(ctx.testid('talent-effect-CLICK_DAMAGE').textContent).toBe('Efeito: +3%');
-        expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').disabled).toBe(true);
+        expect(ctx.talentGateway.upgrade).toHaveBeenCalledWith('COMBO', 0);
+        expect(ctx.testid('talent-level-COMBO').textContent).toBe('Nível 1/10');
+        expect(ctx.testid('talent-effect-COMBO').textContent).toBe('Efeito: +5%');
+        expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 0');
+        expect(ctx.testid('talent-upgrade-COMBO').disabled).toBe(true);
+    });
+
+    it('disables every Melhorar button with 0 points even when the wallet is rich', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 0), wallet: 1_000_000 });
+
+        await open(ctx, 'talents');
+
+        expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-upgrade') ]).every((button) => button.disabled)).toBe(true);
     });
 
     it('disables every Melhorar button while the request runs and enables them after', async () => {
-        const ctx = createUi({ talentList: { talents: talentTree() } });
+        const ctx = createUi({ talentList: talentsAnswer({}, 5) });
         let finish;
 
         ctx.talentGateway.upgrade.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
@@ -443,29 +457,30 @@ describe('HeroUi Talentos', () => {
 
         expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-upgrade') ]).every((button) => button.disabled)).toBe(true);
 
-        finish({ talents: talentTree({ CLICK_DAMAGE: 1 }), wallet: { gold: 0, silver: 0, copper: 0 } });
+        finish({ talents: talentTree({ CLICK_DAMAGE: 1 }), points: pointsOf(4, 1) });
         await flush();
 
         expect(ctx.testid('talent-upgrade-CRIT_CHANCE').disabled).toBe(false);
     });
 
-    it('says Moedas insuficientes on NOT_ENOUGH_COPPER and shows the tree the backend answered', async () => {
-        const ctx = createUi({ talentList: { talents: talentTree() } });
+    it('says Pontos de talento insuficientes on NOT_ENOUGH_TALENT_POINTS and shows the tree the backend answered', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 1) });
 
-        ctx.talentGateway.upgrade.mockRejectedValue(new ApiError('Not enough', { status: 409, code: 'NOT_ENOUGH_COPPER' }));
+        ctx.talentGateway.upgrade.mockRejectedValue(new ApiError('Not enough', { status: 409, code: 'NOT_ENOUGH_TALENT_POINTS' }));
         await open(ctx, 'talents');
-        ctx.talentGateway.list.mockResolvedValue({ talents: talentTree({ CLICK_DAMAGE: 2 }) });
+        ctx.talentGateway.list.mockResolvedValue(talentsAnswer({ CLICK_DAMAGE: 2 }, 3));
         ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
         await flush();
 
-        expect(ctx.query('.hero-error').textContent).toBe('Moedas insuficientes');
+        expect(ctx.query('.hero-error').textContent).toBe('Pontos de talento insuficientes');
         expect(ctx.query('.hero-error').hidden).toBe(false);
         expect(ctx.testid('talent-level-CLICK_DAMAGE').textContent).toBe('Nível 2/10');
+        expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 3');
         expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').disabled).toBe(false);
     });
 
     it('says Não foi possível melhorar o talento. on any other failure and reloads after a 409', async () => {
-        const mismatch = createUi({ talentList: { talents: talentTree() } });
+        const mismatch = createUi({ talentList: talentsAnswer({}, 1) });
 
         mismatch.talentGateway.upgrade.mockRejectedValue(new ApiError('Mismatch', { status: 409, code: 'TALENT_LEVEL_MISMATCH' }));
         await open(mismatch, 'talents');
@@ -475,7 +490,7 @@ describe('HeroUi Talentos', () => {
         expect(mismatch.query('.hero-error').textContent).toBe('Não foi possível melhorar o talento.');
         expect(mismatch.talentGateway.list).toHaveBeenCalledTimes(2);
 
-        const down = createUi({ talentList: { talents: talentTree() } });
+        const down = createUi({ talentList: talentsAnswer({}, 1) });
 
         down.talentGateway.upgrade.mockRejectedValue(new ApiError('down', { status: 500 }));
         await open(down, 'talents');
@@ -487,13 +502,13 @@ describe('HeroUi Talentos', () => {
     });
 
     it('clears the error line after the next successful upgrade', async () => {
-        const ctx = createUi({ talentList: { talents: talentTree() } });
+        const ctx = createUi({ talentList: talentsAnswer({}, 2) });
 
         ctx.talentGateway.upgrade.mockRejectedValueOnce(new ApiError('down', { status: 500 }));
         await open(ctx, 'talents');
         ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
         await flush();
-        ctx.talentGateway.upgrade.mockResolvedValue({ talents: talentTree({ CLICK_DAMAGE: 1 }), wallet: { gold: 0, silver: 0, copper: 0 } });
+        ctx.talentGateway.upgrade.mockResolvedValue({ talents: talentTree({ CLICK_DAMAGE: 1 }), points: pointsOf(1, 1) });
         ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
         await flush();
 
@@ -509,14 +524,14 @@ describe('HeroUi Talentos', () => {
     });
 
     it('does not draw the screen again after it was closed while a request ran', async () => {
-        const ctx = createUi({ talentList: { talents: talentTree() } });
+        const ctx = createUi({ talentList: talentsAnswer({}, 1) });
         let finish;
 
         ctx.talentGateway.upgrade.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
         await open(ctx, 'talents');
         ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
         ctx.ui.close();
-        finish({ talents: talentTree({ CLICK_DAMAGE: 1 }), wallet: { gold: 0, silver: 0, copper: 0 } });
+        finish({ talents: talentTree({ CLICK_DAMAGE: 1 }), points: pointsOf(0, 1) });
         await flush();
 
         expect(ctx.query('.hero-body').childElementCount).toBe(0);

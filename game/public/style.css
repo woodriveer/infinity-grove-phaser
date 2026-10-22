@@ -1537,12 +1537,18 @@ button:disabled {
     pointer-events: none;
 }
 
-/* ══ Talentos: three columns of cards ══ */
+/* ══ Talentos: the points line and four columns of cards ══ */
 
 .talent-screen {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 14px;
+}
+
+.talent-points {
+    grid-column: 1 / -1;
+    font-family: var(--font-heading);
+    font-size: 18px;
 }
 
 .talent-column {
@@ -1557,6 +1563,7 @@ button:disabled {
 .talent-column[data-branch="TIME"] { --branch: #3b9aa6; }
 .talent-column[data-branch="BREAK"] { --branch: #c4492f; }
 .talent-column[data-branch="POWER"] { --branch: #c99a1f; }
+.talent-column[data-branch="COMBO"] { --branch: #8a5bd6; }
 
 .talent-branch-title {
     font-family: var(--font-heading);

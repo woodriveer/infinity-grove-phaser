@@ -5,32 +5,48 @@ const catalog = [
     [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 3 ],
     [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa física', 'points', 1 ], [ 'MAGICAL_BREAK', 'BREAK', 'Quebra de defesa mágica', 'points', 1 ],
     [ 'CRIT_RESIST_BREAK', 'BREAK', 'Quebra de resistência a crítico', 'points', 1 ],
-    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique', '%', 3 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ]
+    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique', '%', 3 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ],
+    [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ]
 ];
-const COSTS = [ 300, 480, 768, 1229, 1966, 3146, 5033, 8053, 12885, 20616 ];
-
 //  The tree as the backend answers it
 const tree = (levels = {}) => catalog.map(([ id, branch, label, unit, perLevel ]) =>
 {
     const level = levels[id] ?? 0;
 
-    return { id, branch, label, unit, perLevel, maxLevel: 10, level, value: level * perLevel, nextCost: level >= 10 ? null : COSTS[level] };
+    return { id, branch, label, unit, perLevel, maxLevel: 10, level, value: level * perLevel, nextCost: level >= 10 ? null : 1 };
 });
 
-const show = (levels, wallet = 1_000_000, options = {}) => renderTalents(tree(levels), wallet, { onUpgrade: vi.fn(), ...options });
+const points = (available) => ({ earned: available, spent: 0, available });
+const show = (levels, available = 50, options = {}) => renderTalents(tree(levels), points(available), { onUpgrade: vi.fn(), ...options });
 const text = (screen, id) => screen.querySelector(`[data-testid="${id}"]`).textContent;
 
 describe('renderTalents', () => {
-    it('shows three columns titled Tempo, Quebra de defesa and Poder do clique', () => {
+    it('shows four columns titled Tempo, Quebra de defesa, Poder do clique and Combo', () => {
         const screen = show();
 
-        expect([ ...screen.querySelectorAll('.talent-branch-title') ].map((node) => node.textContent)).toEqual([ 'Tempo', 'Quebra de defesa', 'Poder do clique' ]);
+        expect([ ...screen.querySelectorAll('.talent-branch-title') ].map((node) => node.textContent)).toEqual([ 'Tempo', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
     });
 
-    it('puts the talents of each branch in its column: 2, 3 and 3', () => {
+    it('puts the talents of each branch in its column: 2, 3, 3 and 1', () => {
         const screen = show();
 
-        expect([ 'TIME', 'BREAK', 'POWER' ].map((branch) => screen.querySelectorAll(`[data-testid="talent-branch-${branch}"] .talent-card`).length)).toEqual([ 2, 3, 3 ]);
+        expect([ 'TIME', 'BREAK', 'POWER', 'COMBO' ].map((branch) => screen.querySelectorAll(`[data-testid="talent-branch-${branch}"] .talent-card`).length)).toEqual([ 2, 3, 3, 1 ]);
+    });
+
+    it('holds the card Limite de dano do combo in the Combo column', () => {
+        const screen = show();
+
+        expect(screen.querySelector('[data-testid="talent-branch-COMBO"] .talent-name').textContent).toBe('Limite de dano do combo');
+    });
+
+    it('reads the available points above the columns', () => {
+        expect(text(show({}, 7), 'talent-points')).toBe('Pontos de talento: 7');
+        expect(text(show({}, 0), 'talent-points')).toBe('Pontos de talento: 0');
+    });
+
+    it('reads the combo effect: nenhum at level 0 and +25% at level 5', () => {
+        expect(text(show(), 'talent-effect-COMBO')).toBe('Efeito: nenhum');
+        expect(text(show({ COMBO: 5 }), 'talent-effect-COMBO')).toBe('Efeito: +25%');
     });
 
     it('shows the label, the level and the effect of a talent', () => {
@@ -53,22 +69,21 @@ describe('renderTalents', () => {
         expect(text(show(), 'talent-effect-CLICK_DAMAGE')).toBe('Efeito: nenhum');
     });
 
-    it('shows Melhorar with the price of the next level: 3 prata (300 copper) at level 0, 4 prata 80 cobre at level 1', () => {
-        const screen = show({ CRIT_CHANCE: 1 });
+    it('shows Melhorar (1 ponto) at every level below the top, whatever the level', () => {
+        const screen = show({ CRIT_CHANCE: 1, CLICK_DAMAGE: 8 });
 
-        expect(text(screen, 'talent-upgrade-CLICK_DAMAGE')).toBe('Melhorar (3 prata)');
-        expect(text(screen, 'talent-upgrade-CRIT_CHANCE')).toBe('Melhorar (4 prata 80 cobre)');
+        expect(text(screen, 'talent-upgrade-CLICK_DAMAGE')).toBe('Melhorar (1 ponto)');
+        expect(text(screen, 'talent-upgrade-CRIT_CHANCE')).toBe('Melhorar (1 ponto)');
+        expect(text(screen, 'talent-upgrade-COMBO')).toBe('Melhorar (1 ponto)');
     });
 
-    it('writes a price in gold, silver and copper like the equipment: 12885 is 1 ouro 28 prata 85 cobre', () => {
-        const screen = show({ CLICK_DAMAGE: 8 });
-
-        expect(text(screen, 'talent-upgrade-CLICK_DAMAGE')).toBe('Melhorar (1 ouro 28 prata 85 cobre)');
+    it('shows no wallet price', () => {
+        expect(show().textContent).not.toMatch(/prata|cobre|ouro/);
     });
 
     it('calls onUpgrade with the talent when the button is clicked', () => {
         const onUpgrade = vi.fn();
-        const screen = show({}, 1_000, { onUpgrade });
+        const screen = show({}, 1, { onUpgrade });
 
         screen.querySelector('[data-testid="talent-upgrade-CLICK_DAMAGE"]').click();
 
@@ -76,16 +91,16 @@ describe('renderTalents', () => {
         expect(onUpgrade.mock.calls[0][0]).toMatchObject({ id: 'CLICK_DAMAGE', level: 0 });
     });
 
-    it('enables the button at exactly the price and disables it one copper below', () => {
-        const exact = show({}, 300);
-        const short = show({}, 299);
+    it('enables every button with 1 available point and disables every one with 0', () => {
+        const one = show({}, 1);
+        const none = show({}, 0);
 
-        expect(exact.querySelector('[data-testid="talent-upgrade-CLICK_DAMAGE"]').disabled).toBe(false);
-        expect(short.querySelector('[data-testid="talent-upgrade-CLICK_DAMAGE"]').disabled).toBe(true);
+        expect(one.querySelector('[data-testid="talent-upgrade-CLICK_DAMAGE"]').disabled).toBe(false);
+        expect([ ...none.querySelectorAll('.talent-upgrade') ].every((button) => button.disabled)).toBe(true);
     });
 
     it('disables every button while a request runs', () => {
-        const screen = show({}, 1_000_000, { busy: true });
+        const screen = show({}, 50, { busy: true });
 
         expect([ ...screen.querySelectorAll('.talent-upgrade') ].every((button) => button.disabled)).toBe(true);
     });

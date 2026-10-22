@@ -1,19 +1,20 @@
 //  The talents of the player as the backend sees them, kept in step with every upgrade.
 //  Port (ADR 0007):
 //    gateway  { list(), upgrade(talentId, fromLevel) }  the backend /talents calls.
-//             list resolves with { talents: [ { id, level, value, nextCost, ... } ] }; upgrade with { talents, wallet }.
+//             list and upgrade resolve with { talents: [ { id, level, value, nextCost, ... } ], points: { earned, spent, available } }.
 //             Each rejects with an ApiError.
 export const createTalentCollection = ({ gateway }) =>
 {
     let talents = [];
+    let points = { earned: 0, spent: 0, available: 0 };
     let loaded = false;
     let loading = null;
     const listeners = [];
-    let walletChanged = () => {};
 
-    const adopt = (list) =>
+    const adopt = (tree) =>
     {
-        talents = list;
+        talents = tree.talents;
+        points = tree.points ?? points;
         loaded = true;
         listeners.forEach((listener) => listener());
     };
@@ -21,9 +22,9 @@ export const createTalentCollection = ({ gateway }) =>
     const load = () =>
     {
         loading ??= gateway.list()
-            .then(({ talents: list }) =>
+            .then((tree) =>
             {
-                adopt(list);
+                adopt(tree);
             })
             .finally(() =>
             {
@@ -39,18 +40,15 @@ export const createTalentCollection = ({ gateway }) =>
         //  The tree as last read; empty until the first load
         talents: () => talents,
 
+        //  The talent points as last read: what the first clears paid, what the levels took and what is left
+        points: () => points,
+
         levelOf: (talentId) => talents.find((talent) => talent.id === talentId)?.level ?? 0,
 
         //  Fired after every change: a load or an upgrade
         onChange: (listener) =>
         {
             listeners.push(listener);
-        },
-
-        //  Fired with the wallet the backend answered after an upgrade
-        onWallet: (listener) =>
-        {
-            walletChanged = listener;
         },
 
         //  Reads the tree from the backend (one request at a time); rejects and keeps what it had when the backend cannot be reached
@@ -62,10 +60,7 @@ export const createTalentCollection = ({ gateway }) =>
         {
             try
             {
-                const change = await gateway.upgrade(talentId, fromLevel);
-
-                adopt(change.talents);
-                walletChanged(change.wallet);
+                adopt(await gateway.upgrade(talentId, fromLevel));
             }
             catch (error)
             {

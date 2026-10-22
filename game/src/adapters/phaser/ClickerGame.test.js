@@ -3154,22 +3154,24 @@ describe('ClickerGame talents in combat', () => {
         expect(comboHud(ctx)).toBe('Combo x11 · +10%');
     });
 
-    it('uses an upgraded talent on the next click and shows the wallet the backend answered', async () => {
+    it('uses an upgraded talent on the next click and leaves the wallet alone', async () => {
         const ctx = await createScene({ start: bigMonsters(fire()), talents: tree() });
 
-        talentGateway.upgrade.mockResolvedValue({ talents: tree({ CLICK_DAMAGE: 1 }), wallet: { gold: 0, silver: 7, copper: 0 } });
+        const walletBefore = { ...ctx.scene.wallet.display() };
+
+        talentGateway.upgrade.mockResolvedValue({ talents: tree({ CLICK_DAMAGE: 1 }), points: { earned: 1, spent: 1, available: 0 } });
         await ctx.scene.talents.upgrade('CLICK_DAMAGE', 0);
         ctx.click();
 
         expect(talentGateway.upgrade).toHaveBeenCalledWith('CLICK_DAMAGE', 0);
         expect(ctx.scene.monster.health).toBeCloseTo(1000 - 1.03, 10);
-        expect(ctx.scene.wallet.display()).toEqual({ gold: 0, silver: 7, copper: 0 });
+        expect(ctx.scene.wallet.display()).toEqual(walletBefore);
     });
 
     it('updates the enemy tags when a break talent is upgraded', async () => {
         const ctx = await createScene({ start: bigMonsters(fire(20)), talents: tree() });
 
-        talentGateway.upgrade.mockResolvedValue({ talents: tree({ PHYSICAL_BREAK: 1 }), wallet: { gold: 0, silver: 0, copper: 0 } });
+        talentGateway.upgrade.mockResolvedValue({ talents: tree({ PHYSICAL_BREAK: 1 }), points: { earned: 1, spent: 1, available: 0 } });
         await ctx.scene.talents.upgrade('PHYSICAL_BREAK', 0);
 
         expect(ctx.hud('.enemy-stats').textContent).toContain('Physical def 19%');
