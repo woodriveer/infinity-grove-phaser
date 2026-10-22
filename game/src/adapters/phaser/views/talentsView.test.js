@@ -5,8 +5,8 @@ const catalog = [
     [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 3 ],
     [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa física', 'points', 1 ], [ 'MAGICAL_BREAK', 'BREAK', 'Quebra de defesa mágica', 'points', 1 ],
     [ 'CRIT_RESIST_BREAK', 'BREAK', 'Quebra de resistência a crítico', 'points', 1 ],
-    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique', '%', 3 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ],
-    [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ]
+    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique (%)', '%', 5 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ],
+    [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ], [ 'CLICK_FLAT_DAMAGE', 'POWER', 'Dano direto de clique', 'dmg', 2 ]
 ];
 //  The tree as the backend answers it
 const tree = (levels = {}) => catalog.map(([ id, branch, label, unit, perLevel ]) =>
@@ -30,7 +30,7 @@ describe('renderTalents', () => {
     it('puts the talents of each branch in its column: 2, 3, 3 and 1', () => {
         const screen = show();
 
-        expect([ 'TIME', 'BREAK', 'POWER', 'COMBO' ].map((branch) => screen.querySelectorAll(`[data-testid="talent-branch-${branch}"] .talent-card`).length)).toEqual([ 2, 3, 3, 1 ]);
+        expect([ 'TIME', 'BREAK', 'POWER', 'COMBO' ].map((branch) => screen.querySelectorAll(`[data-testid="talent-branch-${branch}"] .talent-card`).length)).toEqual([ 2, 3, 4, 1 ]);
     });
 
     it('holds the card Limite de dano do combo in the Combo column', () => {
@@ -52,9 +52,9 @@ describe('renderTalents', () => {
     it('shows the label, the level and the effect of a talent', () => {
         const screen = show({ CLICK_DAMAGE: 3 });
 
-        expect(screen.querySelector('[data-testid="talent-CLICK_DAMAGE"] .talent-name').textContent).toBe('Dano de clique');
+        expect(screen.querySelector('[data-testid="talent-CLICK_DAMAGE"] .talent-name').textContent).toBe('Dano de clique (%)');
         expect(text(screen, 'talent-level-CLICK_DAMAGE')).toBe('Nível 3/10');
-        expect(text(screen, 'talent-effect-CLICK_DAMAGE')).toBe('Efeito: +9%');
+        expect(text(screen, 'talent-effect-CLICK_DAMAGE')).toBe('Efeito: +15%');
     });
 
     it('reads the effect of every unit: +6 s, -3 pontos for a break and +3 pontos', () => {
@@ -110,7 +110,7 @@ describe('renderTalents', () => {
 
         expect(text(screen, 'talent-max-CLICK_DAMAGE')).toBe('Nível máximo');
         expect(screen.querySelector('[data-testid="talent-upgrade-CLICK_DAMAGE"]')).toBeNull();
-        expect(text(screen, 'talent-effect-CLICK_DAMAGE')).toBe('Efeito: +30%');
+        expect(text(screen, 'talent-effect-CLICK_DAMAGE')).toBe('Efeito: +50%');
         expect(screen.querySelector('[data-testid="talent-upgrade-CRIT_CHANCE"]')).not.toBeNull();
     });
 

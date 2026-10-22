@@ -11,7 +11,7 @@ class TalentsTest {
     private val combo = TalentCatalog.find("COMBO")
 
     @Test
-    fun `the catalog has the 9 talents of the four branches with the values of the spec`() {
+    fun `the catalog has the 10 talents of the four branches with the values of the spec`() {
         assertEquals(
             listOf(
                 Triple("MINIBOSS_TIME", TalentBranch.TIME, 2),
@@ -19,20 +19,21 @@ class TalentsTest {
                 Triple("PHYSICAL_BREAK", TalentBranch.BREAK, 1),
                 Triple("MAGICAL_BREAK", TalentBranch.BREAK, 1),
                 Triple("CRIT_RESIST_BREAK", TalentBranch.BREAK, 1),
-                Triple("CLICK_DAMAGE", TalentBranch.POWER, 3),
+                Triple("CLICK_DAMAGE", TalentBranch.POWER, 5),
                 Triple("CRIT_CHANCE", TalentBranch.POWER, 1),
                 Triple("CRIT_DAMAGE", TalentBranch.POWER, 5),
                 Triple("COMBO", TalentBranch.COMBO, 5),
+                Triple("CLICK_FLAT_DAMAGE", TalentBranch.POWER, 2),
             ),
             TalentCatalog.all.map { Triple(it.id, it.branch, it.perLevel) },
         )
-        assertEquals(List(9) { 10 }, TalentCatalog.all.map { it.maxLevel })
+        assertEquals(List(10) { 10 }, TalentCatalog.all.map { it.maxLevel })
     }
 
     @Test
     fun `units are seconds, points or percent`() {
         assertEquals(
-            listOf("s", "s", "points", "points", "points", "%", "points", "%", "%"),
+            listOf("s", "s", "points", "points", "points", "%", "points", "%", "%", "dmg"),
             TalentCatalog.all.map { it.unit },
         )
     }
@@ -41,6 +42,18 @@ class TalentsTest {
     fun `the combo talent reads Limite de dano do combo and gives 5 percent a level up to 50`() {
         assertEquals("Limite de dano do combo", combo.label)
         assertEquals(listOf(0, 5, 20, 50), listOf(0, 1, 4, 10).map(combo::valueAt))
+    }
+
+    @Test
+    fun `the click damage percent talent gives 5 percent a level up to 50`() {
+        assertEquals(listOf(0, 5, 25, 50), listOf(0, 1, 5, 10).map(clickDamage::valueAt))
+    }
+
+    @Test
+    fun `the flat click damage talent gives 1, 3, 5 and so on up to 19`() {
+        val flat = TalentCatalog.find("CLICK_FLAT_DAMAGE")
+
+        assertEquals(listOf(0, 1, 3, 5, 19), listOf(0, 1, 2, 3, 10).map(flat::valueAt))
     }
 
     @Test
@@ -89,8 +102,8 @@ class TalentsTest {
     fun `a new player has level 0 and 0 points and every next cost is 1`() {
         val talents = PlayerTalents("yan")
 
-        assertEquals(List(9) { 0 }, TalentCatalog.all.map { talents.level(it.id) })
-        assertEquals(List(9) { 1 }, TalentCatalog.all.map { talents.nextCost(it, rules) })
+        assertEquals(List(10) { 0 }, TalentCatalog.all.map { talents.level(it.id) })
+        assertEquals(List(10) { 1 }, TalentCatalog.all.map { talents.nextCost(it, rules) })
         assertEquals(TalentPoints(0, 0), talents.points(rules))
         assertEquals(0, talents.points(rules).available)
     }
@@ -162,8 +175,8 @@ class TalentsTest {
 
     @Test
     fun `the value of a talent is its level times the per level amount`() {
-        assertEquals(15, clickDamage.valueAt(5))
-        assertEquals(30, clickDamage.valueAt(10))
+        assertEquals(25, clickDamage.valueAt(5))
+        assertEquals(50, clickDamage.valueAt(10))
         assertEquals(0, clickDamage.valueAt(0))
         assertEquals(12, TalentCatalog.find("BOSS_TIME").valueAt(4))
         assertEquals(30, TalentCatalog.find("CRIT_DAMAGE").valueAt(6))

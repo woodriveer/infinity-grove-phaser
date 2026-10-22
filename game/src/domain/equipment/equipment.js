@@ -43,11 +43,11 @@ const sumOf = (pieces, type) => pieces.reduce((total, piece) => total
 
 //  The attacker of a click for a hero wearing `pieces`, built on `base`: base damage (base + weapon click damage) times the click damage
 //  percent, the critical chance (at most 100) and multiplier, the armor pierce and the boss damage. With no pieces and no bonus it is `base` itself.
-//  `bonus` carries more sources of the same three numbers (the stars of the leader): clickDamagePct and critDamagePct add to the pieces'
+//  `bonus` carries more sources of the same numbers (the stars and talents of the leader): clickDamageFlat adds to the base damage before the percent, clickDamagePct and critDamagePct add to the pieces'
 //  percents, critChance adds points.
-export const attackerFor = (base, pieces, { clickDamagePct = 0, critChance = 0, critDamagePct = 0 } = {}) =>
+export const attackerFor = (base, pieces, { clickDamageFlat = 0, clickDamagePct = 0, critChance = 0, critDamagePct = 0 } = {}) =>
 {
-    if (pieces.length === 0 && !clickDamagePct && !critChance && !critDamagePct)
+    if (pieces.length === 0 && !clickDamageFlat && !clickDamagePct && !critChance && !critDamagePct)
     {
         return base;
     }
@@ -56,7 +56,7 @@ export const attackerFor = (base, pieces, { clickDamagePct = 0, critChance = 0, 
 
     return {
         ...base,
-        baseDamage: (base.baseDamage + weaponDamage) * (1 + (sumOf(pieces, 'CLICK_DAMAGE_PCT') + clickDamagePct) / 100),
+        baseDamage: (base.baseDamage + weaponDamage + clickDamageFlat) * (1 + (sumOf(pieces, 'CLICK_DAMAGE_PCT') + clickDamagePct) / 100),
         critChance: Math.min(100, base.critChance + sumOf(pieces, 'CRIT_CHANCE') + critChance),
         critMultiplier: base.critMultiplier + (sumOf(pieces, 'CRIT_DAMAGE_PCT') + critDamagePct) / 100,
         armorPierce: sumOf(pieces, 'ARMOR_PIERCE_PCT'),

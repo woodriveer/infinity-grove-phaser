@@ -48,12 +48,12 @@ test.describe('Talents in combat', () => {
         expect(await dealt(page)).toBeCloseTo(0.8, 5);
     });
 
-    test('CLICK_DAMAGE 5 adds 15 % to a click', async ({ page }) => {
+    test('CLICK_DAMAGE 5 adds 25 % to a click', async ({ page }) => {
         const menu = await startGame(page, { talents: { yan: { CLICK_DAMAGE: 5 } } });
 
         await menu.canvas.click();
 
-        expect(await dealt(page)).toBeCloseTo(1.15 * 0.8, 5);
+        expect(await dealt(page)).toBeCloseTo(1.25 * 0.8, 5);
     });
 
     test('MINIBOSS_TIME 5 gives a miniboss 40 s instead of 30', async ({ page }) => {
@@ -78,14 +78,14 @@ test.describe('Talentos screen', () => {
         await page.getByTestId('talent-upgrade-CLICK_DAMAGE').click();
 
         await expect(page.getByTestId('talent-level-CLICK_DAMAGE')).toHaveText('Nível 1/10');
-        await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveText('Efeito: +3%');
+        await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveText('Efeito: +5%');
         await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 0');
         await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toBeDisabled();
 
         await page.getByTestId('hero-close').click();
         await menu.canvas.click();
 
-        expect(await dealt(page)).toBeCloseTo(1.03 * 0.8, 5);
+        expect(await dealt(page)).toBeCloseTo(1.05 * 0.8, 5);
     });
 
     test('every button is disabled with 0 points even when the wallet is rich', async ({ page }) => {
@@ -104,7 +104,7 @@ test.describe('Talentos screen', () => {
         await page.getByTestId('hud-talents').click();
 
         await expect(page.getByTestId('talent-max-CLICK_DAMAGE')).toHaveText('Nível máximo');
-        await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveText('Efeito: +30%');
+        await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveText('Efeito: +50%');
         await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toHaveCount(0);
     });
 

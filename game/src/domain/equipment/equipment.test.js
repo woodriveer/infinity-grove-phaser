@@ -40,6 +40,12 @@ describe('attackerFor', () => {
         expect(attacker.armorPierce).toBe(0);
     });
 
+    it('adds the flat click damage of a bonus to the base damage before the percent', () => {
+        const attacker = attackerFor(PLAYER, [ weapon(3) ], { clickDamageFlat: 5, clickDamagePct: 50 });
+
+        expect(attacker.baseDamage).toBeCloseTo((1 + 3 + 5) * 1.5, 10);
+    });
+
     it('adds the weapon click damage to the base damage: a +0 weapon of 3 hits for 4', () => {
         expect(attackerFor(PLAYER, [ weapon(3) ]).baseDamage).toBe(4);
     });

@@ -15,14 +15,16 @@ data class TalentDefinition(
     val unit: String,
     val perLevel: Int,
     val maxLevel: Int = MAX_LEVEL,
+    val firstLevel: Int = perLevel,
 ) {
     init {
         require(perLevel >= 1) { "Talent $id per-level $perLevel must be at least 1" }
+        require(firstLevel >= 1) { "Talent $id first-level $firstLevel must be at least 1" }
         require(maxLevel >= 1) { "Talent $id max-level $maxLevel must be at least 1" }
     }
 
-    /** What [level] levels give. */
-    fun valueAt(level: Int): Int = level * perLevel
+    /** What [level] levels give: [firstLevel] for the first one and [perLevel] more for each next one, 0 at level 0. */
+    fun valueAt(level: Int): Int = if (level == 0) 0 else firstLevel + (level - 1) * perLevel
 
     /** A level the client claims to have seen must lie between 0 and the top level. */
     fun requireSeenLevel(level: Int?): Int {
@@ -37,7 +39,7 @@ data class TalentDefinition(
     }
 }
 
-/** The 9 talents of the four branches: Tempo, Quebra de defesa, Poder do clique and Combo (the cap of the combo bonus). */
+/** The 10 talents of the four branches: Tempo, Quebra de defesa, Poder do clique and Combo (the cap of the combo bonus). */
 object TalentCatalog {
     val all: List<TalentDefinition> =
         listOf(
@@ -46,10 +48,11 @@ object TalentCatalog {
             TalentDefinition("PHYSICAL_BREAK", TalentBranch.BREAK, "Quebra de defesa física", "points", 1),
             TalentDefinition("MAGICAL_BREAK", TalentBranch.BREAK, "Quebra de defesa mágica", "points", 1),
             TalentDefinition("CRIT_RESIST_BREAK", TalentBranch.BREAK, "Quebra de resistência a crítico", "points", 1),
-            TalentDefinition("CLICK_DAMAGE", TalentBranch.POWER, "Dano de clique", "%", 3),
+            TalentDefinition("CLICK_DAMAGE", TalentBranch.POWER, "Dano de clique (%)", "%", 5),
             TalentDefinition("CRIT_CHANCE", TalentBranch.POWER, "Chance de crítico", "points", 1),
             TalentDefinition("CRIT_DAMAGE", TalentBranch.POWER, "Dano crítico", "%", 5),
             TalentDefinition("COMBO", TalentBranch.COMBO, "Limite de dano do combo", "%", 5),
+            TalentDefinition("CLICK_FLAT_DAMAGE", TalentBranch.POWER, "Dano direto de clique", "dmg", 2, firstLevel = 1),
         )
 
     fun find(id: String): TalentDefinition = all.firstOrNull { it.id == id } ?: throw TalentNotFoundException(id)

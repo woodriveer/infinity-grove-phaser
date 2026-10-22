@@ -5,14 +5,18 @@ import { addBonuses, BRANCH_TITLES, describeTalentEffect, monsterAfterBreak, tal
 //  The tree as the backend answers it: value is level x perLevel
 const tree = (levels = {}) => [
     [ 'MINIBOSS_TIME', 2 ], [ 'BOSS_TIME', 3 ], [ 'PHYSICAL_BREAK', 1 ], [ 'MAGICAL_BREAK', 1 ], [ 'CRIT_RESIST_BREAK', 1 ],
-    [ 'CLICK_DAMAGE', 3 ], [ 'CRIT_CHANCE', 1 ], [ 'CRIT_DAMAGE', 5 ], [ 'COMBO', 5 ]
-].map(([ id, perLevel ]) => ({ id, perLevel, level: levels[id] ?? 0, value: (levels[id] ?? 0) * perLevel }));
+    [ 'CLICK_DAMAGE', 5 ], [ 'CRIT_CHANCE', 1 ], [ 'CRIT_DAMAGE', 5 ], [ 'COMBO', 5 ], [ 'CLICK_FLAT_DAMAGE', 2 ]
+].map(([ id, perLevel ]) => {
+    const level = levels[id] ?? 0;
+
+    return { id, perLevel, level, value: level === 0 ? 0 : perLevel * level - (id === 'CLICK_FLAT_DAMAGE' ? 1 : 0) };
+});
 
 const monster = (physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element: 'FIRE', physicalDefense, magicalDefense, critResistance });
 
 describe('talentValue', () => {
     it('reads the value the backend sent', () => {
-        expect(talentValue(tree({ CLICK_DAMAGE: 5 }), 'CLICK_DAMAGE')).toBe(15);
+        expect(talentValue(tree({ CLICK_DAMAGE: 5 }), 'CLICK_DAMAGE')).toBe(25);
     });
 
     it('is 0 for a talent at level 0, a talent that is not in the list and a list that has not loaded', () => {
@@ -37,23 +41,27 @@ describe('talentComboCap', () => {
 });
 
 describe('talentAttackerBonus', () => {
-    it('gives CLICK_DAMAGE 5, CRIT_CHANCE 4 and CRIT_DAMAGE 6 as +15 %, +4 points and +30 %', () => {
-        expect(talentAttackerBonus(tree({ CLICK_DAMAGE: 5, CRIT_CHANCE: 4, CRIT_DAMAGE: 6 }))).toEqual({ clickDamagePct: 15, critChance: 4, critDamagePct: 30 });
+    it('gives CLICK_DAMAGE 5, CRIT_CHANCE 4 and CRIT_DAMAGE 6 as +25 %, +4 points and +30 %', () => {
+        expect(talentAttackerBonus(tree({ CLICK_DAMAGE: 5, CRIT_CHANCE: 4, CRIT_DAMAGE: 6 }))).toEqual({ clickDamageFlat: 0, clickDamagePct: 25, critChance: 4, critDamagePct: 30 });
+    });
+
+    it('gives CLICK_FLAT_DAMAGE 3 as +5 flat damage', () => {
+        expect(talentAttackerBonus(tree({ CLICK_FLAT_DAMAGE: 3 })).clickDamageFlat).toBe(5);
     });
 
     it('gives nothing without talents', () => {
-        expect(talentAttackerBonus(null)).toEqual({ clickDamagePct: 0, critChance: 0, critDamagePct: 0 });
+        expect(talentAttackerBonus(null)).toEqual({ clickDamageFlat: 0, clickDamagePct: 0, critChance: 0, critDamagePct: 0 });
     });
 
     it('does not read the time or break talents', () => {
-        expect(talentAttackerBonus(tree({ BOSS_TIME: 9, PHYSICAL_BREAK: 9 }))).toEqual({ clickDamagePct: 0, critChance: 0, critDamagePct: 0 });
+        expect(talentAttackerBonus(tree({ BOSS_TIME: 9, PHYSICAL_BREAK: 9 }))).toEqual({ clickDamageFlat: 0, clickDamagePct: 0, critChance: 0, critDamagePct: 0 });
     });
 });
 
 describe('addBonuses', () => {
     it('adds the three numbers', () => {
-        expect(addBonuses({ clickDamagePct: 10, critChance: 1, critDamagePct: 2 }, { clickDamagePct: 5, critChance: 4, critDamagePct: 6 }))
-            .toEqual({ clickDamagePct: 15, critChance: 5, critDamagePct: 8 });
+        expect(addBonuses({ clickDamagePct: 10, critChance: 1, critDamagePct: 2 }, { clickDamageFlat: 3, clickDamagePct: 5, critChance: 4, critDamagePct: 6 }))
+            .toEqual({ clickDamageFlat: 3, clickDamagePct: 15, critChance: 5, critDamagePct: 8 });
     });
 });
 
@@ -123,6 +131,7 @@ describe('describeTalentEffect', () => {
         expect(describeTalentEffect({ branch: 'TIME', unit: 's', value: 6 })).toBe('+6 s');
         expect(describeTalentEffect({ branch: 'POWER', unit: '%', value: 9 })).toBe('+9%');
         expect(describeTalentEffect({ branch: 'POWER', unit: 'points', value: 3 })).toBe('+3 pontos');
+        expect(describeTalentEffect({ branch: 'POWER', unit: 'dmg', value: 5 })).toBe('+5 de dano');
     });
 
     it('reads the points of a break talent as a reduction: -3 pontos', () => {

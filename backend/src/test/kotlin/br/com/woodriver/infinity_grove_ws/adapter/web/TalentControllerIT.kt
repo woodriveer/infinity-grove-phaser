@@ -64,12 +64,12 @@ class TalentControllerIT : IntegrationTestBase() {
             .then()
 
     @Test
-    fun `a new player gets the 9 talents at level 0 with a next cost of 1 point and no points`() {
+    fun `a new player gets the 10 talents at level 0 with a next cost of 1 point and no points`() {
         asUser()
             .get("/talents")
             .then()
             .statusCode(200)
-            .body("talents.size()", equalTo(9))
+            .body("talents.size()", equalTo(10))
             .body(
                 "talents.id",
                 equalTo(
@@ -83,19 +83,23 @@ class TalentControllerIT : IntegrationTestBase() {
                         "CRIT_CHANCE",
                         "CRIT_DAMAGE",
                         "COMBO",
+                        "CLICK_FLAT_DAMAGE",
                     ),
                 ),
-            ).body("talents.branch", equalTo(listOf("TIME", "TIME", "BREAK", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO")))
-            .body("talents.level", equalTo(List(9) { 0 }))
-            .body("talents.value", equalTo(List(9) { 0 }))
-            .body("talents.nextCost", equalTo(List(9) { 1 }))
-            .body("talents.maxLevel", equalTo(List(9) { 10 }))
-            .body("talents[5].label", equalTo("Dano de clique"))
+            ).body("talents.branch", equalTo(listOf("TIME", "TIME", "BREAK", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO", "POWER")))
+            .body("talents.level", equalTo(List(10) { 0 }))
+            .body("talents.value", equalTo(List(10) { 0 }))
+            .body("talents.nextCost", equalTo(List(10) { 1 }))
+            .body("talents.maxLevel", equalTo(List(10) { 10 }))
+            .body("talents[5].label", equalTo("Dano de clique (%)"))
             .body("talents[5].unit", equalTo("%"))
-            .body("talents[5].perLevel", equalTo(3))
+            .body("talents[5].perLevel", equalTo(5))
             .body("talents[8].label", equalTo("Limite de dano do combo"))
             .body("talents[8].unit", equalTo("%"))
             .body("talents[8].perLevel", equalTo(5))
+            .body("talents[9].label", equalTo("Dano direto de clique"))
+            .body("talents[9].unit", equalTo("dmg"))
+            .body("talents[9].perLevel", equalTo(2))
             .body("points.earned", equalTo(0))
             .body("points.spent", equalTo(0))
             .body("points.available", equalTo(0))
@@ -185,7 +189,7 @@ class TalentControllerIT : IntegrationTestBase() {
             .statusCode(
                 200,
             ).body("talents[5].nextCost", nullValue())
-            .body("talents[5].value", equalTo(30))
+            .body("talents[5].value", equalTo(50))
             .body("points.available", equalTo(10))
     }
 

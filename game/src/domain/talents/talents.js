@@ -8,9 +8,10 @@ const SECOND = 1000;
 //  What the talent `id` adds now, 0 when it is missing
 export const talentValue = (talents, id) => talents?.find((talent) => talent.id === id)?.value ?? 0;
 
-//  The three numbers of the leader attacker the power talents raise (see `attackerFor`): percent of click damage, points of critical
-//  chance and percent of critical damage
+//  The four numbers of the leader attacker the power talents raise (see `attackerFor`): flat click damage, percent of click damage, points
+//  of critical chance and percent of critical damage
 export const talentAttackerBonus = (talents) => ({
+    clickDamageFlat: talentValue(talents, 'CLICK_FLAT_DAMAGE'),
     clickDamagePct: talentValue(talents, 'CLICK_DAMAGE'),
     critChance: talentValue(talents, 'CRIT_CHANCE'),
     critDamagePct: talentValue(talents, 'CRIT_DAMAGE')
@@ -44,6 +45,7 @@ export const talentComboCap = (talents) => talentValue(talents, 'COMBO');
 
 //  The sum of two attacker bonuses (the stars and the talents)
 export const addBonuses = (a, b) => ({
+    clickDamageFlat: (a.clickDamageFlat ?? 0) + (b.clickDamageFlat ?? 0),
     clickDamagePct: a.clickDamagePct + b.clickDamagePct,
     critChance: a.critChance + b.critChance,
     critDamagePct: a.critDamagePct + b.critDamagePct
@@ -65,6 +67,11 @@ export const describeTalentEffect = ({ branch, unit, value }) =>
         return `+${value}%`;
     }
 
+    if (unit === 'dmg')
+    {
+        return `+${value} de dano`;
+    }
+
     if (unit === 's')
     {
         return `+${value} s`;
@@ -83,7 +90,8 @@ const ICON_NAMES = {
     CLICK_DAMAGE: 'click-damage',
     CRIT_CHANCE: 'crit-chance',
     CRIT_DAMAGE: 'crit-damage',
-    COMBO: 'combo'
+    COMBO: 'combo',
+    CLICK_FLAT_DAMAGE: 'click-flat-damage'
 };
 
 export const talentIconName = (talentId) => `talent-${ICON_NAMES[talentId] ?? talentId.toLowerCase()}`;
