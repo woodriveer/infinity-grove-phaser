@@ -59,9 +59,10 @@ const val TEST_JWT_SECRET = "integration-test-secret-0123456789-abcdef"
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = [
         "app.security.jwt-secret=$TEST_JWT_SECRET",
-        // the tests roll against the original chances; the shipped yaml makes every boss win drop a card
+        // the tests roll against the original chances; the shipped yaml makes every boss win drop a card or a piece more often
         "app.cards.miniboss-rate-per-stage=0.02",
         "app.cards.chapter-boss-rate=0.30",
+        "app.equipment.miniboss-rate=0.25",
     ],
 )
 @Import(PostgresTestConfiguration::class, ChanceTestConfiguration::class)
