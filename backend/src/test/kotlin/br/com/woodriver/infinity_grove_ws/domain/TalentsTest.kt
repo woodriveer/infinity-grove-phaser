@@ -25,16 +25,16 @@ class TalentsTest {
                 Triple("COMBO", TalentBranch.COMBO, 5),
                 Triple("CLICK_FLAT_DAMAGE", TalentBranch.POWER, 2),
             ),
-            TalentCatalog.all.map { Triple(it.id, it.branch, it.perLevel) },
+            TalentCatalog.all.filter { it.grade == 1 }.map { Triple(it.id, it.branch, it.perLevel) },
         )
-        assertEquals(List(10) { 10 }, TalentCatalog.all.map { it.maxLevel })
+        assertEquals(List(30) { 10 }, TalentCatalog.all.map { it.maxLevel })
     }
 
     @Test
     fun `units are seconds, points or percent`() {
         assertEquals(
             listOf("s", "s", "points", "points", "points", "%", "points", "%", "%", "dmg"),
-            TalentCatalog.all.map { it.unit },
+            TalentCatalog.all.filter { it.grade == 1 }.map { it.unit },
         )
     }
 
@@ -54,6 +54,43 @@ class TalentsTest {
         val flat = TalentCatalog.find("CLICK_FLAT_DAMAGE")
 
         assertEquals(listOf(0, 1, 3, 5, 19), listOf(0, 1, 2, 3, 10).map(flat::valueAt))
+    }
+
+    @Test
+    fun `the catalog has 3 grades of the 10 talents, grade N giving N times the value of grade 1`() {
+        assertEquals(30, TalentCatalog.all.size)
+        assertEquals(listOf(1, 2, 3), TalentCatalog.all.filter { it.baseId == "COMBO" }.map { it.grade })
+        assertEquals(listOf("COMBO", "COMBO_G2", "COMBO_G3"), TalentCatalog.all.filter { it.baseId == "COMBO" }.map { it.id })
+        assertEquals(listOf(50, 100, 150), listOf("COMBO", "COMBO_G2", "COMBO_G3").map { TalentCatalog.find(it).valueAt(10) })
+        assertEquals(listOf(19, 38, 57), listOf("CLICK_FLAT_DAMAGE", "CLICK_FLAT_DAMAGE_G2", "CLICK_FLAT_DAMAGE_G3").map { TalentCatalog.find(it).valueAt(10) })
+    }
+
+    @Test
+    fun `a grade is locked until the previous grade is at level 10 and grade 1 is always open`() {
+        val g2 = TalentCatalog.find("COMBO_G2")
+        val g3 = TalentCatalog.find("COMBO_G3")
+
+        assertEquals(listOf(true, false, false), listOf(combo, g2, g3).map { PlayerTalents("yan").unlocked(it) })
+        assertEquals(false, PlayerTalents("yan", mapOf("COMBO" to 9)).unlocked(g2))
+        assertEquals(true, PlayerTalents("yan", mapOf("COMBO" to 10)).unlocked(g2))
+        assertEquals(false, PlayerTalents("yan", mapOf("COMBO" to 10)).unlocked(g3))
+        assertEquals(true, PlayerTalents("yan", mapOf("COMBO" to 10, "COMBO_G2" to 10)).unlocked(g3))
+    }
+
+    @Test
+    fun `a locked grade refuses the upgrade`() {
+        assertFailsWith<TalentLockedException> { PlayerTalents("yan", mapOf("COMBO" to 9), earned = 50).upgrade(TalentCatalog.find("COMBO_G2"), 0, rules) }
+    }
+
+    @Test
+    fun `a grade level costs its grade in points and the spent points add them up`() {
+        val opened = PlayerTalents("yan", mapOf("COMBO" to 10), earned = 30)
+        val upgrade = opened.upgrade(TalentCatalog.find("COMBO_G2"), 0, rules)
+
+        assertEquals(2, upgrade.cost)
+        assertEquals(2, opened.nextCost(TalentCatalog.find("COMBO_G2"), rules))
+        assertEquals(TalentPoints(30, 12), upgrade.talents.points(rules))
+        assertEquals(TalentPoints(30, 10 + 2 * 4 + 3 * 2), PlayerTalents("yan", mapOf("COMBO" to 10, "COMBO_G2" to 4, "COMBO_G3" to 2), earned = 30).points(rules))
     }
 
     @Test
@@ -102,8 +139,8 @@ class TalentsTest {
     fun `a new player has level 0 and 0 points and every next cost is 1`() {
         val talents = PlayerTalents("yan")
 
-        assertEquals(List(10) { 0 }, TalentCatalog.all.map { talents.level(it.id) })
-        assertEquals(List(10) { 1 }, TalentCatalog.all.map { talents.nextCost(it, rules) })
+        assertEquals(List(30) { 0 }, TalentCatalog.all.map { talents.level(it.id) })
+        assertEquals(List(10) { 1 } + List(10) { 2 } + List(10) { 3 }, TalentCatalog.all.map { talents.nextCost(it, rules) })
         assertEquals(TalentPoints(0, 0), talents.points(rules))
         assertEquals(0, talents.points(rules).available)
     }

@@ -1619,6 +1619,22 @@ button:disabled {
     color: var(--branch);
 }
 
+.talent-grade-title {
+    padding-top: 6px;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.talent-locked {
+    opacity: 0.5;
+}
+
+.talent-lock {
+    font-size: 12px;
+    font-style: italic;
+}
+
 .talent-upgrade {
     align-self: flex-start;
     padding: 6px 12px;

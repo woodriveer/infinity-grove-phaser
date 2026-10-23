@@ -14,14 +14,20 @@ const renderCard = (talent, available, { busy, onUpgrade }) =>
     const card = el('div', 'talent-card', '', { testid: `talent-${talent.id}`, 'data-branch': talent.branch });
     const text = el('div', 'talent-text');
     const maxed = talent.nextCost == null;
+    const locked = talent.unlocked === false;
 
     text.append(
-        el('strong', 'talent-name', talent.label),
+        el('strong', 'talent-name', talent.grade > 1 ? `${talent.label} (Grau ${talent.grade})` : talent.label),
         el('div', 'talent-level', `Nível ${talent.level}/${talent.maxLevel}`, { testid: `talent-level-${talent.id}` }),
         el('div', 'talent-effect', `Efeito: ${describeTalentEffect(talent)}`, { testid: `talent-effect-${talent.id}` })
     );
 
-    if (maxed)
+    if (locked)
+    {
+        card.classList.add('talent-locked');
+        text.append(el('div', 'talent-lock', `Bloqueado: chegue ao nível ${talent.maxLevel} do Grau ${talent.grade - 1}`, { testid: `talent-locked-${talent.id}` }));
+    }
+    else if (maxed)
     {
         text.append(el('div', 'talent-max', 'Nível máximo', { testid: `talent-max-${talent.id}` }));
     }
@@ -35,7 +41,7 @@ const renderCard = (talent, available, { busy, onUpgrade }) =>
         text.append(button);
     }
 
-    card.append(iconWithFallback(talentIconName(talent.id), GLYPHS[talent.branch], 'talent-icon'), text);
+    card.append(iconWithFallback(talentIconName(talent.baseId ?? talent.id), GLYPHS[talent.branch], 'talent-icon'), text);
 
     return card;
 };
@@ -61,7 +67,18 @@ export const renderTalents = (talents, points, { busy = false, onUpgrade, onRese
         const column = el('div', 'talent-column', '', { testid: `talent-branch-${branch}`, 'data-branch': branch });
 
         column.append(el('strong', 'talent-branch-title', BRANCH_TITLES[branch]));
-        talents.filter((talent) => talent.branch === branch).forEach((talent) => column.append(renderCard(talent, points.available, { busy, onUpgrade })));
+        let grade = 0;
+
+        talents.filter((talent) => talent.branch === branch).forEach((talent) =>
+        {
+            if ((talent.grade ?? 1) !== grade)
+            {
+                grade = talent.grade ?? 1;
+                column.append(el('div', 'talent-grade-title', `Grau ${grade}`, { testid: `talent-grade-${branch}-${grade}` }));
+            }
+
+            column.append(renderCard(talent, points.available, { busy, onUpgrade }));
+        });
         screen.append(column);
     });
 

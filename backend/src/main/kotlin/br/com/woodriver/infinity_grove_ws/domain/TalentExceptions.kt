@@ -27,6 +27,11 @@ class TalentMaxLevelException(
     talentId: String,
 ) : TalentConflictException("TALENT_MAX_LEVEL", "Talent '$talentId' is already at the maximum level")
 
+/** The previous grade of the talent is not at its top level yet, so this grade is closed. */
+class TalentLockedException(
+    talentId: String,
+) : TalentConflictException("TALENT_LOCKED", "Talent '$talentId' opens when the previous grade reaches its top level")
+
 /** The player holds fewer talent points than a level costs; nothing is spent. */
 class NotEnoughTalentPointsException(
     available: Int,

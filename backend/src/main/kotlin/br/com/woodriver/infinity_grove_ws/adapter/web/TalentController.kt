@@ -17,7 +17,7 @@ import java.security.Principal
 
 /**
  * A talent as the game shows it: what one level gives, the level the player has, the value it adds now and the talent points of the next
- * level (null at the top level).
+ * level (null at the top level), its grade (1 to 3, a grade costs its number of points per level) and whether that grade is open.
  */
 data class TalentResponse(
     val id: String,
@@ -29,6 +29,9 @@ data class TalentResponse(
     val level: Int,
     val value: Int,
     val nextCost: Int?,
+    val grade: Int,
+    val baseId: String,
+    val unlocked: Boolean,
 )
 
 /** The talent points of the player: what the first clears paid, what the levels took and what is left. */
@@ -61,6 +64,9 @@ data class TalentsResponse(
                         level = talents.level(it.id),
                         value = it.valueAt(talents.level(it.id)),
                         nextCost = talents.nextCost(it, rules),
+                        grade = it.grade,
+                        baseId = it.baseId,
+                        unlocked = talents.unlocked(it),
                     )
                 },
                 TalentPointsResponse(points.earned, points.spent, points.available),

@@ -5,8 +5,10 @@ import { CHAPTER_BOSS, FARM, MINIBOSS } from '../campaign/campaign';
 
 const SECOND = 1000;
 
-//  What the talent `id` adds now, 0 when it is missing
-export const talentValue = (talents, id) => talents?.find((talent) => talent.id === id)?.value ?? 0;
+//  What the talent `id` adds now, 0 when it is missing: the values of all its grades added (grade N is `<id>_G<N>`, with `baseId` = `id`)
+export const talentValue = (talents, id) => (talents ?? [])
+    .filter((talent) => (talent.baseId ?? talent.id) === id)
+    .reduce((sum, talent) => sum + talent.value, 0);
 
 //  The four numbers of the leader attacker the power talents raise (see `attackerFor`): flat click damage, percent of click damage, points
 //  of critical chance and percent of critical damage

@@ -40,6 +40,35 @@ describe('Reiniciar pontos', () => {
     });
 });
 
+describe('talent grades', () => {
+    const graded = () => [
+        ...tree({ COMBO: 10 }).map((talent) => ({ ...talent, baseId: talent.id, grade: 1, unlocked: true })),
+        ...tree().map((talent) => ({ ...talent, id: `${talent.id}_G2`, baseId: talent.id, grade: 2, nextCost: 2, unlocked: talent.id === 'COMBO' }))
+    ];
+    const render = (available = 50) => renderTalents(graded(), points(available), { onUpgrade: vi.fn() });
+
+    it('titles the blocks of a column Grau 1 and Grau 2', () => {
+        const screen = render();
+
+        expect([ ...screen.querySelectorAll('[data-testid="talent-branch-COMBO"] .talent-grade-title') ].map((node) => node.textContent)).toEqual([ 'Grau 1', 'Grau 2' ]);
+    });
+
+    it('opens the grade 2 of a talent whose grade 1 is at 10 and prices it at 2 points', () => {
+        const screen = render();
+
+        expect(text(screen, 'talent-upgrade-COMBO_G2')).toBe('Melhorar (2 pontos)');
+        expect(screen.querySelector('[data-testid="talent-locked-COMBO_G2"]')).toBeNull();
+    });
+
+    it('shows a locked grade with its reason and no upgrade button', () => {
+        const screen = render();
+
+        expect(text(screen, 'talent-locked-CLICK_DAMAGE_G2')).toBe('Bloqueado: chegue ao nível 10 do Grau 1');
+        expect(screen.querySelector('[data-testid="talent-upgrade-CLICK_DAMAGE_G2"]')).toBeNull();
+        expect(screen.querySelector('[data-testid="talent-CLICK_DAMAGE_G2"]').classList.contains('talent-locked')).toBe(true);
+    });
+});
+
 describe('renderTalents', () => {
     it('shows four columns titled Tempo, Quebra de defesa, Poder do clique and Combo', () => {
         const screen = show();

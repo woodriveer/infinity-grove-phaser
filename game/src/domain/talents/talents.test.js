@@ -19,6 +19,17 @@ describe('talentValue', () => {
         expect(talentValue(tree({ CLICK_DAMAGE: 5 }), 'CLICK_DAMAGE')).toBe(25);
     });
 
+    it('adds the values of every grade of the talent', () => {
+        const grades = [
+            { id: 'CLICK_FLAT_DAMAGE', baseId: 'CLICK_FLAT_DAMAGE', grade: 1, value: 19 },
+            { id: 'CLICK_FLAT_DAMAGE_G2', baseId: 'CLICK_FLAT_DAMAGE', grade: 2, value: 6 },
+            { id: 'CLICK_DAMAGE', baseId: 'CLICK_DAMAGE', grade: 1, value: 50 }
+        ];
+
+        expect(talentValue(grades, 'CLICK_FLAT_DAMAGE')).toBe(25);
+        expect(talentAttackerBonus(grades)).toMatchObject({ clickDamageFlat: 25, clickDamagePct: 50 });
+    });
+
     it('is 0 for a talent at level 0, a talent that is not in the list and a list that has not loaded', () => {
         expect(talentValue(tree(), 'CLICK_DAMAGE')).toBe(0);
         expect(talentValue([], 'CLICK_DAMAGE')).toBe(0);

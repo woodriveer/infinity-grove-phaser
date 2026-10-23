@@ -7,6 +7,9 @@ enum class TalentBranch { TIME, BREAK, POWER, COMBO }
 /**
  * One talent of the tree. [perLevel] is what one level gives, in [unit] (`s` seconds, `points`, `%`): the game turns the value of a TIME or
  * POWER talent into a bonus and the value of a BREAK talent into a reduction of the monster stat it names.
+ *
+ * A talent comes in [grade]s: grade 1 keeps the id of its [baseId], grade N is `<baseId>_G<N>`. A grade gives N times the grade 1 value per
+ * level, costs N talent points per level and opens when the previous grade reaches its top level.
  */
 data class TalentDefinition(
     val id: String,
@@ -16,12 +19,21 @@ data class TalentDefinition(
     val perLevel: Int,
     val maxLevel: Int = MAX_LEVEL,
     val firstLevel: Int = perLevel,
+    val grade: Int = 1,
+    val baseId: String = id,
 ) {
     init {
         require(perLevel >= 1) { "Talent $id per-level $perLevel must be at least 1" }
         require(firstLevel >= 1) { "Talent $id first-level $firstLevel must be at least 1" }
         require(maxLevel >= 1) { "Talent $id max-level $maxLevel must be at least 1" }
+        require(grade in 1..MAX_GRADE) { "Talent $id grade $grade must be between 1 and $MAX_GRADE" }
     }
+
+    /** The id of the grade before this one, null for grade 1: its top level opens this grade. */
+    val previousGradeId: String? get() = if (grade == 1) null else gradeId(baseId, grade - 1)
+
+    /** The talent points one level of this grade costs. */
+    fun costPerLevel(rules: TalentRules): Int = rules.costPerLevel * grade
 
     /** What [level] levels give: [firstLevel] for the first one and [perLevel] more for each next one, 0 at level 0. */
     fun valueAt(level: Int): Int = if (level == 0) 0 else firstLevel + (level - 1) * perLevel
@@ -36,12 +48,21 @@ data class TalentDefinition(
 
     companion object {
         const val MAX_LEVEL = 10
+        const val MAX_GRADE = 3
+
+        fun gradeId(
+            baseId: String,
+            grade: Int,
+        ): String = if (grade == 1) baseId else "${baseId}_G$grade"
     }
 }
 
-/** The 10 talents of the four branches: Tempo, Quebra de defesa, Poder do clique and Combo (the cap of the combo bonus). */
+/**
+ * The 10 talents of the four branches (Tempo, Quebra de defesa, Poder do clique and Combo, the cap of the combo bonus) in 3 grades each:
+ * the 10 of grade 1, then the 10 of grade 2, then the 10 of grade 3.
+ */
 object TalentCatalog {
-    val all: List<TalentDefinition> =
+    private val grade1 =
         listOf(
             TalentDefinition("MINIBOSS_TIME", TalentBranch.TIME, "Tempo do miniboss", "s", 2),
             TalentDefinition("BOSS_TIME", TalentBranch.TIME, "Tempo do chefe do capítulo", "s", 3),
@@ -54,6 +75,19 @@ object TalentCatalog {
             TalentDefinition("COMBO", TalentBranch.COMBO, "Limite de dano do combo", "%", 5),
             TalentDefinition("CLICK_FLAT_DAMAGE", TalentBranch.POWER, "Dano direto de clique", "dmg", 2, firstLevel = 1),
         )
+
+    val all: List<TalentDefinition> =
+        (1..TalentDefinition.MAX_GRADE).flatMap { grade ->
+            grade1.map {
+                it.copy(
+                    id = TalentDefinition.gradeId(it.id, grade),
+                    perLevel = it.perLevel * grade,
+                    firstLevel = it.firstLevel * grade,
+                    grade = grade,
+                    baseId = it.id,
+                )
+            }
+        }
 
     fun find(id: String): TalentDefinition = all.firstOrNull { it.id == id } ?: throw TalentNotFoundException(id)
 }
@@ -126,13 +160,20 @@ data class PlayerTalents(
     fun level(id: String): Int = levels[id] ?: 0
 
     /** The points the levels already bought took. */
-    fun points(rules: TalentRules) = TalentPoints(earned, levels.values.sum() * rules.costPerLevel)
+    fun points(rules: TalentRules) =
+        TalentPoints(earned, TalentCatalog.all.sumOf { level(it.id) * it.costPerLevel(rules) })
+
+    /** True for grade 1 and for a grade whose previous grade is at its top level. */
+    fun unlocked(definition: TalentDefinition): Boolean {
+        val previous = definition.previousGradeId ?: return true
+        return level(previous) >= TalentCatalog.find(previous).maxLevel
+    }
 
     /** The points of the next level of [definition], null at its top level. */
     fun nextCost(
         definition: TalentDefinition,
         rules: TalentRules,
-    ): Int? = rules.costPerLevel.takeIf { level(definition.id) < definition.maxLevel }
+    ): Int? = definition.costPerLevel(rules).takeIf { level(definition.id) < definition.maxLevel }
 
     /**
      * Raises [definition] by one level. [fromLevel] is the level the player saw: any other stored level means a repeated or stale request
@@ -156,12 +197,17 @@ data class PlayerTalents(
             throw TalentLevelMismatchException(definition.id, fromLevel, stored)
         }
 
+        if (!unlocked(definition)) {
+            logger.warn("Talent upgrade refused, grade locked username={} talent={}", username, definition.id)
+            throw TalentLockedException(definition.id)
+        }
+
         if (stored >= definition.maxLevel) {
             logger.warn("Talent upgrade refused, max level username={} talent={}", username, definition.id)
             throw TalentMaxLevelException(definition.id)
         }
 
-        val cost = rules.costPerLevel
+        val cost = definition.costPerLevel(rules)
         val available = points(rules).available
 
         if (available < cost) {

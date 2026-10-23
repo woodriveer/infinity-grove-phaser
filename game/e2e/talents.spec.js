@@ -173,6 +173,19 @@ test.describe('Talent points and the combo talent', () => {
         await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 1');
     });
 
+    test('grade 2 opens at level 10 of grade 1 and costs 2 points a level', async ({ page }) => {
+        await startGame(page, { talents: { yan: { COMBO: 10 } }, talentPoints: { yan: 5 } });
+
+        await page.getByTestId('hud-talents').click();
+        await expect(page.getByTestId('talent-locked-CLICK_DAMAGE_G2')).toBeVisible();
+        await expect(page.getByTestId('talent-upgrade-COMBO_G2')).toHaveText('Melhorar (2 pontos)');
+        await page.getByTestId('talent-upgrade-COMBO_G2').click();
+
+        await expect(page.getByTestId('talent-level-COMBO_G2')).toHaveText('Nível 1/10');
+        await expect(page.getByTestId('talent-effect-COMBO_G2')).toHaveText('Efeito: +10%');
+        await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 3');
+    });
+
     test('Reiniciar pontos takes every level back and gives the points again', async ({ page }) => {
         const menu = await startGame(page, { talentPoints: { yan: 2 } });
 

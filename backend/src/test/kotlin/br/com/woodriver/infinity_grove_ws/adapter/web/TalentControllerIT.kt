@@ -64,14 +64,14 @@ class TalentControllerIT : IntegrationTestBase() {
             .then()
 
     @Test
-    fun `a new player gets the 10 talents at level 0 with a next cost of 1 point and no points`() {
+    fun `a new player gets the 30 talents of 3 grades at level 0 with a next cost of 1, 2 and 3 points and no points`() {
         asUser()
             .get("/talents")
             .then()
             .statusCode(200)
-            .body("talents.size()", equalTo(10))
+            .body("talents.size()", equalTo(30))
             .body(
-                "talents.id",
+                "talents.id.findAll { !it.contains('_G') }",
                 equalTo(
                     listOf(
                         "MINIBOSS_TIME",
@@ -86,11 +86,16 @@ class TalentControllerIT : IntegrationTestBase() {
                         "CLICK_FLAT_DAMAGE",
                     ),
                 ),
-            ).body("talents.branch", equalTo(listOf("TIME", "TIME", "BREAK", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO", "POWER")))
-            .body("talents.level", equalTo(List(10) { 0 }))
-            .body("talents.value", equalTo(List(10) { 0 }))
-            .body("talents.nextCost", equalTo(List(10) { 1 }))
-            .body("talents.maxLevel", equalTo(List(10) { 10 }))
+            ).body("talents.branch", equalTo(List(3) { listOf("TIME", "TIME", "BREAK", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO", "POWER") }.flatten()))
+            .body("talents.level", equalTo(List(30) { 0 }))
+            .body("talents.value", equalTo(List(30) { 0 }))
+            .body("talents.nextCost", equalTo(List(10) { 1 } + List(10) { 2 } + List(10) { 3 }))
+            .body("talents.maxLevel", equalTo(List(30) { 10 }))
+            .body("talents.grade", equalTo(List(10) { 1 } + List(10) { 2 } + List(10) { 3 }))
+            .body("talents.unlocked", equalTo(List(10) { true } + List(20) { false }))
+            .body("talents[18].id", equalTo("COMBO_G2"))
+            .body("talents[18].baseId", equalTo("COMBO"))
+            .body("talents[18].perLevel", equalTo(10))
             .body("talents[5].label", equalTo("Dano de clique (%)"))
             .body("talents[5].unit", equalTo("%"))
             .body("talents[5].perLevel", equalTo(5))
@@ -115,12 +120,28 @@ class TalentControllerIT : IntegrationTestBase() {
             .post("/talents/reset")
             .then()
             .statusCode(200)
-            .body("talents.level", equalTo(List(10) { 0 }))
+            .body("talents.level", equalTo(List(30) { 0 }))
             .body("points.earned", equalTo(3))
             .body("points.spent", equalTo(0))
             .body("points.available", equalTo(3))
 
         assertEquals(0, level("COMBO"))
+    }
+
+    @Test
+    fun `a grade 2 talent is locked at 409 until grade 1 is at level 10, then costs 2 points a level`() {
+        earned(30)
+        upgrade("COMBO_G2", 0).statusCode(409).body("code", equalTo("TALENT_LOCKED"))
+        repeat(10) { n -> upgrade("COMBO", n).statusCode(200) }
+
+        upgrade("COMBO_G2", 0)
+            .statusCode(200)
+            .body("talents[18].level", equalTo(1))
+            .body("talents[18].value", equalTo(10))
+            .body("talents[18].unlocked", equalTo(true))
+            .body("talents[28].unlocked", equalTo(false))
+            .body("points.spent", equalTo(12))
+            .body("points.available", equalTo(18))
     }
 
     @Test
