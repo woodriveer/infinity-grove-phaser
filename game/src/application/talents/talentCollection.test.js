@@ -13,11 +13,32 @@ describe('talentCollection', () => {
     beforeEach(() => {
         gateway = {
             list: vi.fn().mockResolvedValue({ talents: [ talent('CLICK_DAMAGE'), talent('CRIT_CHANCE', 4) ], points: points(6, 4) }),
-            upgrade: vi.fn()
+            upgrade: vi.fn(),
+            reset: vi.fn()
         };
         collection = createTalentCollection({ gateway });
         changes = vi.fn();
         collection.onChange(changes);
+    });
+
+    describe('reset', () => {
+        it('adopts the tree the backend answers and fires onChange', async () => {
+            gateway.reset.mockResolvedValue({ talents: [ talent('CLICK_DAMAGE'), talent('CRIT_CHANCE') ], points: points(6, 0) });
+
+            await collection.reset();
+
+            expect(collection.levelOf('CRIT_CHANCE')).toBe(0);
+            expect(collection.points()).toEqual({ earned: 6, spent: 0, available: 6 });
+            expect(changes).toHaveBeenCalledTimes(1);
+        });
+
+        it('rejects and keeps what it had when the backend refuses', async () => {
+            await collection.load();
+            gateway.reset.mockRejectedValue(new Error('down'));
+
+            await expect(collection.reset()).rejects.toThrow('down');
+            expect(collection.levelOf('CRIT_CHANCE')).toBe(4);
+        });
     });
 
     describe('load', () => {

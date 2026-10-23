@@ -42,12 +42,19 @@ const renderCard = (talent, available, { busy, onUpgrade }) =>
 
 //  The talent tree: the line "Pontos de talento: <n>" and four columns (Tempo, Quebra de defesa, Poder do clique, Combo) of cards. `points`
 //  is { earned, spent, available }; a button is disabled when the talent costs more than `available`, and `busy` disables every button
-//  while a request runs. `onUpgrade(talent)` fires when a button is clicked.
-export const renderTalents = (talents, points, { busy = false, onUpgrade }) =>
+//  while a request runs. `onUpgrade(talent)` fires when a button is clicked. The "Reiniciar pontos" button asks `onReset()` to take every
+//  level back; it is disabled while nothing is spent.
+export const renderTalents = (talents, points, { busy = false, onUpgrade, onReset }) =>
 {
     const screen = el('div', 'talent-screen', '', { testid: 'talent-screen' });
 
     screen.append(el('div', 'talent-points', `Pontos de talento: ${points.available}`, { testid: 'talent-points' }));
+
+    const reset = el('button', 'talent-reset', 'Reiniciar pontos', { type: 'button', testid: 'talent-reset' });
+
+    reset.disabled = busy || points.spent === 0;
+    reset.addEventListener('click', () => onReset?.());
+    screen.append(reset);
 
     BRANCHES.forEach((branch) =>
     {

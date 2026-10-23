@@ -20,6 +20,26 @@ const points = (available) => ({ earned: available, spent: 0, available });
 const show = (levels, available = 50, options = {}) => renderTalents(tree(levels), points(available), { onUpgrade: vi.fn(), ...options });
 const text = (screen, id) => screen.querySelector(`[data-testid="${id}"]`).textContent;
 
+describe('Reiniciar pontos', () => {
+    const withSpent = (spent, options = {}) => renderTalents(tree(), { earned: spent, spent, available: 0 }, { onUpgrade: vi.fn(), ...options });
+    const button = (screen) => screen.querySelector('[data-testid="talent-reset"]');
+
+    it('is labelled and calls onReset when clicked', () => {
+        const onReset = vi.fn();
+        const screen = withSpent(3, { onReset });
+
+        expect(button(screen).textContent).toBe('Reiniciar pontos');
+        button(screen).click();
+        expect(onReset).toHaveBeenCalledTimes(1);
+    });
+
+    it('is disabled while nothing is spent or a request runs', () => {
+        expect(button(withSpent(0)).disabled).toBe(true);
+        expect(button(withSpent(3, { busy: true })).disabled).toBe(true);
+        expect(button(withSpent(3)).disabled).toBe(false);
+    });
+});
+
 describe('renderTalents', () => {
     it('shows four columns titled Tempo, Quebra de defesa, Poder do clique and Combo', () => {
         const screen = show();

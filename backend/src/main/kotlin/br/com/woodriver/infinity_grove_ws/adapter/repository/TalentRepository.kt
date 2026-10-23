@@ -101,6 +101,11 @@ class TalentRepository(
     }
 
     @Transactional
+    override fun deleteLevels(username: String) {
+        jpaTalentRepository.deleteAllByUsername(username)
+    }
+
+    @Transactional
     override fun deleteByUsername(username: String) {
         jpaTalentRepository.deleteAllByUsername(username)
         jpaTalentAwardRepository.deleteAllByUsername(username)

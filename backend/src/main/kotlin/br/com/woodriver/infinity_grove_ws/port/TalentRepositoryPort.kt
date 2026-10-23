@@ -11,6 +11,9 @@ interface TalentRepositoryPort {
         level: Int,
     )
 
+    /** Removes every level of the player, keeping the points their first clears paid. */
+    fun deleteLevels(username: String)
+
     /** The talent points the first clears of the player paid. */
     fun earnedPoints(username: String): Int
 

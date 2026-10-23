@@ -18,3 +18,8 @@ interface UpgradeTalentUseCase {
         fromLevel: Int,
     ): PlayerTalents
 }
+
+interface ResetTalentsUseCase {
+    /** Takes back every talent level of the player: the points the levels cost become available again, the points earned stay. */
+    fun reset(username: String): PlayerTalents
+}

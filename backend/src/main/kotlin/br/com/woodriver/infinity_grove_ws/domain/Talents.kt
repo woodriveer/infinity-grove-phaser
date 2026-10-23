@@ -66,11 +66,11 @@ data class TalentAward(
 
 /**
  * The numbers an operator tunes (`app.talents`): what one talent level costs in talent points and what the first clear of a phase, a
- * miniboss and a chapter boss pays.
+ * miniboss and a chapter boss pays (a phase pays nothing by default: points come from minibosses and chapter bosses only).
  */
 data class TalentRules(
     val costPerLevel: Int = 1,
-    val pointsPerPhase: Int = 1,
+    val pointsPerPhase: Int = 0,
     val pointsPerMiniboss: Int = 2,
     val pointsPerChapterBoss: Int = 5,
 ) {

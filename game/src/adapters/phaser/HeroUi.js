@@ -48,6 +48,7 @@ const FUSE_FAILED = 'Não foi possível fundir as cartas.';
 const LEADER_FAILED = 'Não foi possível trocar o líder.';
 const EQUIPMENT_FAILED = 'Não foi possível concluir a ação.';
 const TALENT_FAILED = 'Não foi possível melhorar o talento.';
+const TALENT_RESET_FAILED = 'Não foi possível reiniciar os talentos.';
 const NOT_ENOUGH_COPPER = 'Moedas insuficientes';
 const NOT_ENOUGH_TALENT_POINTS = 'Pontos de talento insuficientes';
 
@@ -456,7 +457,8 @@ export class HeroUi
         this.backButton.hidden = true;
         this.body.replaceChildren(renderTalents(this.talents.talents(), this.talents.points(), {
             busy: this.talentBusy,
-            onUpgrade: (talent) => this.upgradeTalent(talent)
+            onUpgrade: (talent) => this.upgradeTalent(talent),
+            onReset: () => this.resetTalents()
         }));
     }
 
@@ -482,6 +484,41 @@ export class HeroUi
             if (view === this.view)
             {
                 this.setError(error.code === 'NOT_ENOUGH_TALENT_POINTS' ? NOT_ENOUGH_TALENT_POINTS : TALENT_FAILED);
+            }
+        }
+        finally
+        {
+            this.talentBusy = false;
+
+            if (view === this.view && this.screen === 'talents')
+            {
+                this.render_talents();
+            }
+        }
+    }
+
+    //  Takes back every talent level so the player can spend the points again
+    async resetTalents ()
+    {
+        const view = this.view;
+
+        this.talentBusy = true;
+        this.render_talents();
+
+        try
+        {
+            await this.talents.reset();
+
+            if (view === this.view)
+            {
+                this.setError('');
+            }
+        }
+        catch
+        {
+            if (view === this.view)
+            {
+                this.setError(TALENT_RESET_FAILED);
             }
         }
         finally

@@ -28,6 +28,13 @@ describe('talentApi', () => {
         expect(httpClient.post).toHaveBeenCalledWith('/talents/CLICK_DAMAGE/upgrade', { fromLevel: 0 });
     });
 
+    it('reset posts to /talents/reset and returns the tree', async () => {
+        httpClient.post.mockResolvedValue({ data: { talents } });
+
+        await expect(talentApi.reset()).resolves.toEqual({ talents });
+        expect(httpClient.post).toHaveBeenCalledWith('/talents/reset');
+    });
+
     it('sends a fromLevel of 0 as 0, not as a missing field', async () => {
         httpClient.post.mockResolvedValue({ data: { talents, wallet: {} } });
 

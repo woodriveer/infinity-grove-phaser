@@ -165,7 +165,7 @@ const pieceView = (piece) => ({
 });
 
 //  Talent contract (TalentController): the 10 talents of the backend catalog, level 0 to 10, every level costs 1 talent point; the first clear of a
-//  phase pays 1 point, of a miniboss 2 and of a chapter boss 5
+//  phase pays nothing, of a miniboss 2 and of a chapter boss 5; POST /talents/reset takes every level back
 const TALENT_CATALOG = [
     [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 3 ],
     [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa física', 'points', 1 ], [ 'MAGICAL_BREAK', 'BREAK', 'Quebra de defesa mágica', 'points', 1 ],
@@ -174,7 +174,7 @@ const TALENT_CATALOG = [
     [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ], [ 'CLICK_FLAT_DAMAGE', 'POWER', 'Dano direto de clique', 'dmg', 2 ]
 ];
 const TALENT_MAX_LEVEL = 10;
-const TALENT_POINTS = { PHASE: 1, MINIBOSS: 2, CHAPTER_BOSS: 5 };
+const TALENT_POINTS = { PHASE: 0, MINIBOSS: 2, CHAPTER_BOSS: 5 };
 
 const talentsView = (levels) => TALENT_CATALOG.map(([ id, branch, label, unit, perLevel ]) => {
     const level = levels[id] ?? 0;
@@ -313,6 +313,11 @@ export async function mockBackend (page, {
         const levels = talentsOf(username);
 
         if (method === 'GET' && path === '/talents') {
+            return route.fulfill({ json: { talents: talentsView(levels), points: pointsView(earnedOf(username), levels) } });
+        }
+
+        if (method === 'POST' && path === '/talents/reset') {
+            Object.keys(levels).forEach((id) => { delete levels[id]; });
             return route.fulfill({ json: { talents: talentsView(levels), points: pointsView(earnedOf(username), levels) } });
         }
 

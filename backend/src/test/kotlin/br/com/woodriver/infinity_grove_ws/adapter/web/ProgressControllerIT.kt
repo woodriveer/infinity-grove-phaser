@@ -435,19 +435,30 @@ class ProgressControllerIT : IntegrationTestBase() {
     fun `POST outcome answers the talent points of a first clear and nothing for a replay`() {
         user()
         cards()
-        store(1, "PHASE", 5)
+        store(1, "MINIBOSS", 1)
 
-        report(body(1, "PHASE", 5, "CLEARED")).then().statusCode(200).body("talentPoints", equalTo(1))
-        report(body(1, "MINIBOSS", 1, "FAILED")).then().statusCode(200).body("talentPoints", equalTo(0))
-        report(body(1, "PHASE", 5, "CLEARED")).then().statusCode(200).body("talentPoints", equalTo(0))
+        report(body(1, "MINIBOSS", 1, "CLEARED")).then().statusCode(200).body("talentPoints", equalTo(2))
+        store(1, "MINIBOSS", 1)
+        report(body(1, "MINIBOSS", 1, "CLEARED")).then().statusCode(200).body("talentPoints", equalTo(0))
 
-        assertEquals(1, talentRepository.earnedPoints("yan"))
+        assertEquals(2, talentRepository.earnedPoints("yan"))
         asUser()
             .get("/talents")
             .then()
             .statusCode(200)
-            .body("points.earned", equalTo(1))
-            .body("points.available", equalTo(1))
+            .body("points.earned", equalTo(2))
+            .body("points.available", equalTo(2))
+    }
+
+    @Test
+    fun `POST outcome pays nothing for a phase`() {
+        user()
+        cards()
+        store(1, "PHASE", 5)
+
+        report(body(1, "PHASE", 5, "CLEARED")).then().statusCode(200).body("talentPoints", equalTo(0))
+
+        assertEquals(0, talentRepository.earnedPoints("yan"))
     }
 
     @Test

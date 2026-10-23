@@ -5,6 +5,7 @@ import br.com.woodriver.infinity_grove_ws.domain.TalentCatalog
 import br.com.woodriver.infinity_grove_ws.domain.TalentRequestException
 import br.com.woodriver.infinity_grove_ws.domain.TalentRules
 import br.com.woodriver.infinity_grove_ws.usecase.ListTalentsUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.ResetTalentsUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.UpgradeTalentUseCase
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -73,10 +74,14 @@ data class TalentsResponse(
 class TalentController(
     private val listTalents: ListTalentsUseCase,
     private val upgradeTalent: UpgradeTalentUseCase,
+    private val resetTalents: ResetTalentsUseCase,
     private val rules: TalentRules,
 ) {
     @GetMapping
     fun get(principal: Principal) = TalentsResponse.from(listTalents.list(principal.name), rules)
+
+    @PostMapping("/reset")
+    fun reset(principal: Principal) = TalentsResponse.from(resetTalents.reset(principal.name), rules)
 
     @PostMapping("/{id}/upgrade")
     fun upgrade(

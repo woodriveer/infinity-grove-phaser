@@ -64,8 +64,8 @@ class TalentsTest {
     }
 
     @Test
-    fun `a first clear pays 1 point for a phase, 2 for a miniboss and 5 for a chapter boss`() {
-        assertEquals(1, rules.award(ProgressPosition(1, 1, Encounter.PHASE, 1)).points)
+    fun `a first clear pays no point for a phase, 2 for a miniboss and 5 for a chapter boss`() {
+        assertEquals(0, rules.award(ProgressPosition(1, 1, Encounter.PHASE, 1)).points)
         assertEquals(2, rules.award(ProgressPosition(1, 1, Encounter.MINIBOSS, 1)).points)
         assertEquals(5, rules.award(ProgressPosition(1, 5, Encounter.CHAPTER_BOSS, 1)).points)
     }

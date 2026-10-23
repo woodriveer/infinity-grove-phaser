@@ -146,6 +146,36 @@ class TalentServiceTest {
     }
 
     @Test
+    fun `reset takes back every level and keeps the points earned`() {
+        player(5)
+        service.upgrade("yan", "COMBO", 0)
+        service.upgrade("yan", "CLICK_DAMAGE", 0)
+
+        val reset = service.reset("yan")
+
+        assertEquals(emptyMap(), reset.levels)
+        assertEquals(emptyMap(), talents.levels)
+        assertEquals(TalentPoints(5, 0), reset.points(rules))
+        assertTrue(progress.progresses.containsKey("yan"))
+    }
+
+    @Test
+    fun `reset leaves the levels of other players`() {
+        player(2)
+        users.save(User("other", "hash", 1L, 1L))
+        talents.save("other", "COMBO", 3)
+
+        service.reset("yan")
+
+        assertEquals(3, talents.levels.getValue("other" to "COMBO"))
+    }
+
+    @Test
+    fun `reset for an unknown user fails`() {
+        assertFailsWith<UserNotFoundException> { service.reset("ghost") }
+    }
+
+    @Test
     fun `an upgrade for an unknown user fails`() {
         assertFailsWith<UserNotFoundException> { service.upgrade("ghost", "COMBO", 0) }
     }

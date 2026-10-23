@@ -106,6 +106,29 @@ class TalentControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `POST reset takes back every level and answers all the earned points as available`() {
+        earned(3)
+        upgrade("COMBO", 0).statusCode(200)
+        upgrade("CLICK_DAMAGE", 0).statusCode(200)
+
+        asUser()
+            .post("/talents/reset")
+            .then()
+            .statusCode(200)
+            .body("talents.level", equalTo(List(10) { 0 }))
+            .body("points.earned", equalTo(3))
+            .body("points.spent", equalTo(0))
+            .body("points.available", equalTo(3))
+
+        assertEquals(0, level("COMBO"))
+    }
+
+    @Test
+    fun `POST reset without a token is refused`() {
+        given().post("/talents/reset").then().statusCode(401)
+    }
+
+    @Test
     fun `upgrading COMBO from level 0 with 3 points answers level 1 and value 5 and leaves 2 points`() {
         earned(3)
 

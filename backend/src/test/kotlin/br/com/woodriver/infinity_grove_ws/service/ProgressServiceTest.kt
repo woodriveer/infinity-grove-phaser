@@ -196,13 +196,13 @@ class ProgressServiceTest {
     private fun earned() = talents.earnedPoints("yan")
 
     @Test
-    fun `the first clear of a phase pays 1 talent point and answers it`() {
+    fun `the first clear of a phase pays no talent point`() {
         existingUser()
 
         val result = service.report("yan", start, Outcome.CLEARED)
 
-        assertEquals(1, result.talentPoints)
-        assertEquals(1, earned())
+        assertEquals(0, result.talentPoints)
+        assertEquals(0, earned())
     }
 
     @Test
@@ -226,7 +226,7 @@ class ProgressServiceTest {
     }
 
     @Test
-    fun `walking a whole chapter pays 50 phases, 10 minibosses and the boss once each`() {
+    fun `walking a whole chapter pays 10 minibosses and the boss once each, and its 50 phases nothing`() {
         existingUser()
         var position = start
         repeat(50 + 10 + 1) {
@@ -234,7 +234,7 @@ class ProgressServiceTest {
             position = view.progress.position
         }
 
-        assertEquals(50 * 1 + 10 * 2 + 5, earned())
+        assertEquals(10 * 2 + 5, earned())
     }
 
     @Test
@@ -244,12 +244,12 @@ class ProgressServiceTest {
         playerCards.save(PlayerCards.start("yan", Element.FIRE, HeroSeed.heroes()))
         val lastPhase = ProgressPosition(1, 1, Encounter.PHASE, 5)
 
-        assertEquals(1, service.report("yan", lastPhase, Outcome.CLEARED).talentPoints)
+        assertEquals(0, service.report("yan", lastPhase, Outcome.CLEARED).talentPoints)
         service.report("yan", miniboss, Outcome.FAILED)
         val replay = service.report("yan", lastPhase, Outcome.CLEARED)
 
         assertEquals(0, replay.talentPoints)
-        assertEquals(1, earned())
+        assertEquals(0, earned())
     }
 
     @Test
@@ -260,7 +260,7 @@ class ProgressServiceTest {
         assertEquals(0, earned())
         service.report("yan", ProgressPosition(1, 1, Encounter.PHASE, 5), Outcome.CLEARED)
         assertEquals(2, service.report("yan", miniboss, Outcome.CLEARED).talentPoints)
-        assertEquals(1 + 2, earned())
+        assertEquals(2, earned())
     }
 
     @Test
@@ -273,14 +273,14 @@ class ProgressServiceTest {
     }
 
     @Test
-    fun `the first phase of the next chapter pays its own point`() {
+    fun `the first phase of the next chapter pays no point`() {
         playerAt(ProgressPosition(1, 10, Encounter.CHAPTER_BOSS, 1))
         service.report("yan", chapterBoss, Outcome.CLEARED)
 
         val result = service.report("yan", ProgressPosition(2, 1, Encounter.PHASE, 1), Outcome.CLEARED)
 
-        assertEquals(1, result.talentPoints)
-        assertEquals(5 + 1, earned())
+        assertEquals(0, result.talentPoints)
+        assertEquals(5, earned())
     }
 
     @Test

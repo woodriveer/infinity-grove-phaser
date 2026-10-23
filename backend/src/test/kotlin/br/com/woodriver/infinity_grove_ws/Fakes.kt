@@ -258,6 +258,10 @@ class InMemoryTalentRepository : TalentRepositoryPort {
         levels[username to talentId] = level
     }
 
+    override fun deleteLevels(username: String) {
+        levels.keys.removeIf { it.first == username }
+    }
+
     override fun earnedPoints(username: String) = awards.filterKeys { it.first == username }.values.sum()
 
     override fun award(

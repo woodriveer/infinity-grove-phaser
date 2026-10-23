@@ -151,10 +151,10 @@ test.describe('Talent points and the combo talent', () => {
         await expect(page.getByTestId('combo-hud')).toHaveText('Combo x30 · +10%');
     });
 
-    test('a first clear pays a point that buys a COMBO level: Nível 1/10, Efeito: +5% and 0 points left', async ({ page }) => {
-        const menu = await startGame(page);
+    test('a first miniboss clear pays 2 points that buy a COMBO level: Nível 1/10, Efeito: +5% and 1 point left', async ({ page }) => {
+        const menu = await startGame(page, { progress: { yan: { stage: 1, encounter: 'MINIBOSS', phase: 1 } } });
 
-        //  Phase 1 of stage 1 has a monster of 1000 health; a skill-less kill is long, so clear it through the scene
+        //  A skill-less kill is long, so clear it through the scene
         await page.evaluate(() => {
             const scene = window.__PHASER_GAME__.scene.getScene('ClickerGame');
 
@@ -163,15 +163,29 @@ test.describe('Talent points and the combo talent', () => {
         await menu.canvas.click();
         //  The report leaves with the 10 s tick; run it now
         await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').tick());
-        await expect(page.getByTestId('card-notice')).toHaveText('+1 ponto de talento');
 
         await page.getByTestId('hud-talents').click();
-        await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 1');
+        await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 2');
         await page.getByTestId('talent-upgrade-COMBO').click();
 
         await expect(page.getByTestId('talent-level-COMBO')).toHaveText('Nível 1/10');
         await expect(page.getByTestId('talent-effect-COMBO')).toHaveText('Efeito: +5%');
+        await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 1');
+    });
+
+    test('Reiniciar pontos takes every level back and gives the points again', async ({ page }) => {
+        const menu = await startGame(page, { talentPoints: { yan: 2 } });
+
+        await page.getByTestId('hud-talents').click();
+        await expect(page.getByTestId('talent-reset')).toBeDisabled();
+        await page.getByTestId('talent-upgrade-COMBO').click();
+        await page.getByTestId('talent-upgrade-COMBO').click();
         await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 0');
-        await expect(page.getByTestId('talent-upgrade-COMBO')).toBeDisabled();
+
+        await page.getByTestId('talent-reset').click();
+
+        await expect(page.getByTestId('talent-level-COMBO')).toHaveText('Nível 0/10');
+        await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 2');
+        await expect(page.getByTestId('talent-reset')).toBeDisabled();
     });
 });

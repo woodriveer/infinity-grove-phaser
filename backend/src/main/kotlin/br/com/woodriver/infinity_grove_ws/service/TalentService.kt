@@ -9,6 +9,7 @@ import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.TalentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.usecase.ListTalentsUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.ResetTalentsUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.UpgradeTalentUseCase
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -27,7 +28,8 @@ class TalentService(
     private val progressRepository: ProgressRepositoryPort,
     private val rules: TalentRules,
 ) : ListTalentsUseCase,
-    UpgradeTalentUseCase {
+    UpgradeTalentUseCase,
+    ResetTalentsUseCase {
     override fun list(username: String): PlayerTalents {
         logger.info("Listing talents username={}", username)
         requireUser(username)
@@ -53,6 +55,17 @@ class TalentService(
         talentRepository.save(username, talentId, level)
         logger.info("Talent upgraded username={} talent={} level={} points={}", username, talentId, level, upgrade.cost)
         return upgrade.talents
+    }
+
+    override fun reset(username: String): PlayerTalents {
+        logger.info("Talent reset requested username={}", username)
+        requireUser(username)
+
+        progressRepository.createIfAbsent(Progress.start(username))
+        progressRepository.findForUpdate(username)
+        talentRepository.deleteLevels(username)
+        logger.info("Talents reset username={}", username)
+        return load(username)
     }
 
     private fun load(username: String) =
