@@ -150,15 +150,15 @@ Every hit on a monster needs a click, so a player who has beaten the first chapt
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| AUTO-01 | P1: Auto click after chapter 1 (AC 1, 5, 6, 7) - timing rule | Design | Pending |
-| AUTO-02 | P1: Auto click after chapter 1 (AC 2, 9) - unlock by chapter | Design | Pending |
-| AUTO-03 | P1: Auto click after chapter 1 (AC 3, 4, 8) - hit equals a manual click | Design | Pending |
-| AUTO-04 | P1: Switch on the HUD (AC 1-6) | Design | Pending |
-| AUTO-05 | P2: Crystals and speed upgrades (AC 1-4, 13) - state and catalog | Design | Pending |
-| AUTO-06 | P2: Crystals and speed upgrades (AC 5-12) - upgrade endpoint | Design | Pending |
-| AUTO-07 | P2: Crystals and upgrade on the HUD (AC 1-8) | Design | Pending |
+| AUTO-01 | P1: Auto click after chapter 1 (AC 1, 5, 6, 7) - timing rule | Execute | Verified |
+| AUTO-02 | P1: Auto click after chapter 1 (AC 2, 9) - unlock by chapter | Execute | Verified |
+| AUTO-03 | P1: Auto click after chapter 1 (AC 3, 4, 8) - hit equals a manual click | Execute | Verified |
+| AUTO-04 | P1: Switch on the HUD (AC 1-6) | Execute | Verified |
+| AUTO-05 | P2: Crystals and speed upgrades (AC 1-4, 13) - state and catalog | Execute | Verified |
+| AUTO-06 | P2: Crystals and speed upgrades (AC 5-12) - upgrade endpoint | Execute | Verified |
+| AUTO-07 | P2: Crystals and upgrade on the HUD (AC 1-8) | Execute | Verified |
 
-**Coverage:** 7 total, 0 mapped to tasks, 7 unmapped ⚠️
+**Coverage:** 7 total, 7 mapped to tasks, 0 unmapped
 
 ---
 

@@ -106,6 +106,14 @@
 - **Date**: 2026-10-22
 - **Status**: active; supersedes the coin price of AD-011
 
+### AD-014
+- **Decision**: Crystals are a server-authoritative special currency (`player_crystals`, no row = 0) with no source yet; the auto click level (`player_auto_click`, 0 to 4, 500/250/150/100/50 ms) is bought with them under the `progress` row lock, with `fromLevel` and a 409 `AUTO_CLICK_LEVEL_MISMATCH` carrying the stored state. The game clicks in the browser from chapter 2 through the same path as a manual click.
+- **Reason**: Same forgery argument as AD-009/AD-011; the owner has not chosen how crystals are earned (an account reset is being considered).
+- **Trade-off**: Nobody can upgrade until a crystal source exists; the click rate is not checked by the server (AD-002).
+- **Scope**: `backend` auto click code (`V6__auto_click.sql`, `AutoClick*`), `game/src/domain/combat/autoClick.js`, `game/src/application/autoClick`, the HUD box in `ClickerGame`
+- **Date**: 2026-10-27
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: five features from the owner's batch of 2026-10-21, all game side except two backend pieces: `combat-hud`, `click-power`, `talents`, `equipment-ui`, `boss-map` (`.specs/features/*`)
