@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "2.3.21"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
+    jacoco
 }
 
 group = "br.com.woodriver"
@@ -60,4 +61,14 @@ ktlint {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    // every test run writes the coverage report (build/reports/jacoco/test): html to read, xml for the release report
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }

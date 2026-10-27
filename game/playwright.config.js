@@ -21,7 +21,8 @@ export default defineConfig({
     webServer: {
         command: `npm run dev -- --port ${port} --strictPort`,
         url: `http://localhost:${port}`,
-        reuseExistingServer: !process.env.CI,
+        //  A coverage run needs its own instrumented server, never one already running
+        reuseExistingServer: !process.env.CI && process.env.VITE_COVERAGE !== 'true',
         timeout: 60_000
     }
 });

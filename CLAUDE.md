@@ -12,6 +12,7 @@
   - **unit test coverage**: line and branch percentage of backend (JaCoCo) and game (Vitest `--coverage`, v8), for the whole project and for the files the feature changed;
   - **e2e coverage**: the line percentage of game code that the Playwright suite exercises (istanbul instrumentation), and the feature's e2e scenarios with pass/fail;
   - failing tests that are not caused by the feature, and why.
+- Coverage commands: backend `cd backend && ./gradlew test` (JaCoCo, `build/reports/jacoco/test/jacocoTestReport.xml`); game unit `cd game && npm run test:coverage` (`coverage/unit/coverage-summary.json`); e2e `cd game && npm run test:e2e:coverage` (`coverage/e2e/coverage-summary.json`). The e2e number is a lower bound: a page reloaded inside a test loses what it counted before the reload.
 - Every number comes from a command run for that report. If a coverage tool is not configured, write `não medido` with the reason. Never estimate a number.
 
 # Deploy

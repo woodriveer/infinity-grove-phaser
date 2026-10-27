@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/coverage';
 import { mockBackend, serverDown } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu, registryValue } from './support/game';
 

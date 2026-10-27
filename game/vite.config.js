@@ -1,4 +1,5 @@
 import { defineConfig, loadEnv } from 'vite';
+import istanbul from 'vite-plugin-istanbul';
 
 export default defineConfig(({ mode }) => {
     //  Empty prefix loads non-VITE_ vars too; those stay server-side (dev proxy only).
@@ -15,6 +16,11 @@ export default defineConfig(({ mode }) => {
         : undefined;
 
     return {
+        //  The e2e coverage run (`npm run test:e2e:coverage`) sets VITE_COVERAGE=true: the dev server then instruments the game code and
+        //  the pages expose window.__coverage__. Any other run, and every build, serves the code as it is.
+        plugins: [
+            istanbul({ include: 'src/**/*.js', exclude: ['src/**/*.test.js'], extension: ['.js'], requireEnv: true })
+        ],
         server: {
             port: 8081,
             proxy
