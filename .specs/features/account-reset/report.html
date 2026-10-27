@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reset de conta</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+:root[data-theme="dark"] { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Reset de conta</h1>
+<p class="sub">Feature <code>account-reset</code> · commits <code>7c9dd48..fbfbaed</code> (8 tarefas) · verificação em <code>d20341d</code> · 27/10/2026</p>
+
+<p><span class="verdict">Verifier: PASS</span> &nbsp;28 de 28 critérios P1 cobertos · sensor 16 mutantes, 16 mortos, 0 sobreviventes</p>
+
+<h2>Resumo</h2>
+<div class="cards">
+    <div class="card"><div class="n">+562 / −13</div><div class="l">linhas de código de produção (21 arquivos)</div></div>
+    <div class="card"><div class="n">+1083 / −5</div><div class="l">linhas de teste (15 arquivos)</div></div>
+    <div class="card"><div class="n">35 + 30</div><div class="l">testes novos: backend + jogo (unitários)</div></div>
+    <div class="card"><div class="n">2</div><div class="l">cenários e2e novos</div></div>
+</div>
+
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Área</th><th>Arquivos</th><th class="num">Adicionadas</th><th class="num">Removidas</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td>11</td><td class="num">306</td><td class="num">6</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes, <code>style.css</code>)</td><td>10</td><td class="num">256</td><td class="num">7</td></tr>
+</table></div>
+
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th class="num">Linhas +/−</th><th class="num">Testes novos</th><th class="num">Total após a execução</th><th>Resultado</th></tr>
+<tr><td>Backend (JUnit + Testcontainers)</td><td class="num">+618 / −1</td><td class="num">35</td><td class="num">832</td><td class="ok">832 passaram</td></tr>
+<tr><td>Jogo unitário (Vitest, jsdom)</td><td class="num">+358 / −1</td><td class="num">30</td><td class="num">1250</td><td class="ok">1250 passaram</td></tr>
+<tr><td>E2E (Playwright, backend falso)</td><td class="num">+107 / −3</td><td class="num">2</td><td class="num">111</td><td>107 passaram, 4 falharam (fora da feature, ver abaixo)</td></tr>
+</table></div>
+
+<h2>Cobertura</h2>
+<div class="scroll"><table>
+<tr><th>Medida</th><th>Projeto</th><th>Arquivos da feature</th></tr>
+<tr><td>Unitário backend (JaCoCo, linhas / branches)</td><td class="na">não medido</td><td class="na">não medido</td></tr>
+<tr><td>Unitário jogo (Vitest v8, linhas / branches)</td><td class="na">não medido</td><td class="na">não medido</td></tr>
+<tr><td>E2E jogo (istanbul, linhas)</td><td class="na">não medido</td><td class="na">não medido</td></tr>
+</table></div>
+<p class="sub">Nenhuma ferramenta de cobertura está configurada: o backend não tem o plugin JaCoCo, o jogo não tem <code>@vitest/coverage-v8</code> e o Playwright não tem instrumentação istanbul.</p>
+
+<h2>Cenários e2e da feature</h2>
+<div class="scroll"><table>
+<tr><th>Cenário (<code>e2e/accountReset.spec.js</code>)</th><th>Resultado</th></tr>
+<tr><td>No capítulo 3 o botão oferece 3 cristais, e <code>Cancelar</code> mantém o capítulo</td><td class="ok">passou</td></tr>
+<tr><td><code>Resetar</code> leva ao capítulo 1, mostra <code>Cristais: 3</code>, o aviso <code>+3 cristais</code> e o auto clique, sem nenhum clique atingir o monstro</td><td class="ok">passou</td></tr>
+</table></div>
+
+<h2>Sensor do Verifier</h2>
+<ul>
+    <li>Backend (8): recompensa da campanha completa, ordem mismatch/locked, apagar pontos de talento, contar resets, auto clique com resets (serviço e domínio), <code>progress</code> no 409, manter cristais. Todos mortos.</li>
+    <li>Jogo (8): recompensa da campanha completa, desbloqueio com resets, fila anulada no <code>restart</code>, caixa fechando no 409, <code>Resetar</code> desabilitado, recarga dos talentos, capítulo enviado, realinhar no mismatch. Todos mortos.</li>
+</ul>
+
+<h2>Lacunas não bloqueantes</h2>
+<ul>
+    <li>A tela Talentos depois do reset é verificada pelos dados que ela lê, não pela tela renderizada.</li>
+    <li>O caso de borda da farm só tem evidência indireta.</li>
+    <li>Em <code>RESET_LOCKED</code> a resposta não traz progresso, então "realinhar" não muda nada. É inofensivo, porque esse erro só ocorre com os dois capítulos em 1.</li>
+</ul>
+
+<h2>Falhas fora da feature</h2>
+<div class="scroll"><table>
+<tr><th>Teste</th><th>Motivo</th></tr>
+<tr><td><code>farm.spec.js:82</code> e <code>:109</code></td><td>Já falhavam em <code>7c9dd48</code>, antes desta feature. Com a campanha completa, o auto clique mata o chefe da farm sozinho e gera vitórias extras.</td></tr>
+<tr><td><code>bossMap.spec.js:54</code>, <code>talents.spec.js:111</code></td><td>Passam numa árvore limpa. Falham na árvore local porque as artes novas não commitadas (<code>boss-map.jpg</code>, <code>talent-*.png</code>) já existem e esses testes esperam a arte ausente.</td></tr>
+<tr><td>3 testes de <code>ClickerGame farm mode</code> (unitários)</td><td>Falham no código commitado desde <code>7c9dd48</code>. Passam com as alterações locais ainda não commitadas do <code>ClickerGame.test.js</code>.</td></tr>
+</table></div>
+</main>
+</body>
+</html>
