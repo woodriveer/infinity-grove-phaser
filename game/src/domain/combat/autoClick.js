@@ -4,8 +4,9 @@
 export const AUTO_CLICK_BASE_MS = 500;
 export const AUTO_CLICK_MAX_PER_FRAME = 5;
 
-//  Open once the chapter 1 boss is beaten: chapter 2 or later, or a completed campaign; closed before the campaign loads
-export const autoClickUnlocked = ({ chapter, completed }) => completed === true || (chapter ?? 0) >= 2;
+//  Open once the chapter 1 boss is beaten: chapter 2 or later, or a completed campaign; closed before the campaign loads. A player who
+//  reset the account (spec account-reset) keeps it from chapter 1.
+export const autoClickUnlocked = ({ chapter, completed, resets = 0 }) => resets >= 1 || completed === true || (chapter ?? 0) >= 2;
 
 export class AutoClicker
 {

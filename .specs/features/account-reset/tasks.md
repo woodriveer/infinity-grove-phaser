@@ -180,9 +180,9 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Reward null at chapter 1 and before load, 2 at 2, 4 at 4, 5 at 5 and when completed
-- [ ] Auto click unlocked at chapter 1 with resets 1, locked with resets 0 or undefined
-- [ ] Gate check passes: `cd game && npm test`
+- [x] Reward null at chapter 1 and before load, 2 at 2, 4 at 4, 5 at 5 and when completed
+- [x] Auto click unlocked at chapter 1 with resets 1, locked with resets 0 or undefined
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
