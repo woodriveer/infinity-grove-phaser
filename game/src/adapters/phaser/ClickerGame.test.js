@@ -3827,6 +3827,12 @@ describe('ClickerGame auto click', () => {
         {
             ctx.scene.update(0, 500);
         }
+        const timedOut = ctx.texts.length;
+
+        expect(ctx.scene.monster).toBeNull();
+        expect(() => ctx.scene.update(0, 1000)).not.toThrow();
+        expect(ctx.texts.length).toBe(timedOut);
+
         ctx.timers.at(-1).callback();
         const before = ctx.texts.length;
 

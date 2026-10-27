@@ -56,6 +56,12 @@ T5 → T6 → T7 → T8
 T9 → T10 → T11
 ```
 
+### Phase 4: Verifier fixes (iteration 2)
+
+```
+T12
+```
+
 ---
 
 ## Task Breakdown
@@ -324,3 +330,17 @@ T9 → T10 → T11
 **Tests**: unit
 **Gate**: build
 
+### T12: Pin the no-monster guard of the auto click
+
+**What**: The boss-timeout scene test asserts no monster, no throw and no hit while the next monster is on its way.
+**Where**: `game/src/adapters/phaser/ClickerGame.test.js`
+**Depends on**: None
+**Requirement**: AUTO-01
+
+**Done when**:
+
+- [x] Removing `!this.monster ||` from the auto click guard fails the suite
+- [x] Gate check passes: `cd game && npm test`
+
+**Tests**: unit
+**Gate**: quick

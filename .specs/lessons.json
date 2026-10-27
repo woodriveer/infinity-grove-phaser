@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 35,
+  "next_id": 38,
   "lessons": [
     {
       "id": "L-001",
@@ -618,6 +618,60 @@
       ],
       "created": "2026-10-22T12:59:06Z",
       "last_seen": "2026-10-22T12:59:06Z"
+    },
+    {
+      "id": "L-035",
+      "key": "surviving_mutant::when a loop stops at a kill assert the kill side effects report drop combo happen once not only the hit count",
+      "text": "When a loop stops at a kill, assert the kill side effects (report, drop, combo) happen once, not only the hit count",
+      "signal": "surviving_mutant",
+      "scope": "game",
+      "status": "candidate",
+      "features": [
+        "auto-click"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "G8 game/src/adapters/phaser/ClickerGame.js:302 (game)"
+      ],
+      "created": "2026-10-27T10:50:22Z",
+      "last_seen": "2026-10-27T10:50:22Z"
+    },
+    {
+      "id": "L-036",
+      "key": "ac_gap::when an acceptance criterion requires log fields assert them with a captured appender instead of marking logs as not asserted",
+      "text": "When an acceptance criterion requires log fields, assert them with a captured appender instead of marking logs as not asserted",
+      "signal": "ac_gap",
+      "scope": "backend",
+      "status": "candidate",
+      "features": [
+        "auto-click"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "AUTO-06 AC12 backend/.../domain/AutoClick.kt:74 (backend)"
+      ],
+      "created": "2026-10-27T10:50:23Z",
+      "last_seen": "2026-10-27T10:50:23Z"
+    },
+    {
+      "id": "L-037",
+      "key": "surviving_mutant::when an acceptance criterion lists several guard states joined by or write one test per state not one for the group",
+      "text": "When an acceptance criterion lists several guard states joined by or, write one test per state, not one for the group",
+      "signal": "surviving_mutant",
+      "scope": "game",
+      "status": "candidate",
+      "features": [
+        "auto-click"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md iteration 2 mutant N8, game/src/adapters/phaser/ClickerGame.js:293 (AUTO-01 AC6 no monster) (game)"
+      ],
+      "created": "2026-10-27T11:45:53Z",
+      "last_seen": "2026-10-27T11:45:53Z"
     }
   ]
 }

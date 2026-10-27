@@ -216,6 +216,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: spec P2 AC6 vs HeroUi.test.js:490 (specs)
 - last seen: 2026-10-22T12:59:06Z
 
+### L-035 - When a loop stops at a kill, assert the kill side effects (report, drop, combo) happen once, not only the hit count
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: auto-click
+- evidence: G8 game/src/adapters/phaser/ClickerGame.js:302 (game)
+- last seen: 2026-10-27T10:50:22Z
+
+### L-036 - When an acceptance criterion requires log fields, assert them with a captured appender instead of marking logs as not asserted
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `backend` · harmful: 0
+- features: auto-click
+- evidence: AUTO-06 AC12 backend/.../domain/AutoClick.kt:74 (backend)
+- last seen: 2026-10-27T10:50:23Z
+
+### L-037 - When an acceptance criterion lists several guard states joined by or, write one test per state, not one for the group
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: auto-click
+- evidence: validation.md iteration 2 mutant N8, game/src/adapters/phaser/ClickerGame.js:293 (AUTO-01 AC6 no monster) (game)
+- last seen: 2026-10-27T11:45:53Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
