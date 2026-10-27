@@ -179,10 +179,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] At 500 ms: 499 ms gives 0, 1 ms more gives 1, 1000 ms gives 2; a 10 s frame gives 5 and keeps the rest
-- [ ] A new interval applies from the next advance
-- [ ] Unlock false at chapter 1, true at 2 and when completed, false before the campaign loads (`chapter: null`)
-- [ ] Gate check passes: `cd game && npm test`
+- [x] At 500 ms: 499 ms gives 0, 1 ms more gives 1, 1000 ms gives 2; a 10 s frame gives 5 and keeps the rest
+- [x] A new interval applies from the next advance
+- [x] Unlock false at chapter 1, true at 2 and when completed, false before the campaign loads (`chapter: null`)
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
