@@ -103,6 +103,9 @@ const CHAPTER_BOSS_RATE = 0.10;
 const DAILY_CHAPTER_BOSS_WINS = 10;
 const FUSION_SIZE = 3;
 
+const AUTO_CLICK_INTERVALS = [ 500, 250, 150, 100, 50 ];
+const AUTO_CLICK_PRICES = [ 10, 25, 50, 100 ];
+
 const chapterElements = (start) => [ start, TRIAD_HITS[start], TRIAD_HITS[TRIAD_HITS[start]], 'DARKNESS', 'LIGHT' ];
 const heroOfElement = (element) => HEROES.find((hero) => hero.element === element);
 const heroOfChapter = (start, chapter) => heroOfElement(chapterElements(start)[Math.min(chapter, 5) - 1]);
@@ -207,12 +210,13 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  chances (the repeating list the drop rolls read, default never drops) and farmMinIntervalMs (default 0, the backend has 5000),
 //  equipment {name: [raw pieces]} (starting bags, default empty), equipmentDrops (the pieces the next won bosses drop, one each, in order) and
 //  talents {name: {TALENT_ID: level}} (starting levels, default 0; an upgrade takes one talent point like the backend) and
-//  talentPoints {name: n} (points available at the start, on top of the ones the starting levels cost; first clears pay more).
+//  talentPoints {name: n} (points available at the start, on top of the ones the starting levels cost; first clears pay more) and
+//  autoClick {name: { level, crystals }} (default level 0 and 0 crystals; the upgrade follows AutoClickController).
 //  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens.
 export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
     cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = [],
-    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}
+    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -311,6 +315,56 @@ export async function mockBackend (page, {
         earnedByUser.set(username, earnedOf(username) + TALENT_POINTS[body.encounter]);
 
         return TALENT_POINTS[body.encounter];
+    };
+
+    //  Auto click contract (AutoClickController): levels 0 to 4 at 500, 250, 150, 100 and 50 ms, upgrades for 10, 25, 50 and 100 crystals,
+    //  open from chapter 2
+    const autoClicks = new Map();
+    const autoClickOf = (username) => {
+        if (!autoClicks.has(username)) {
+            autoClicks.set(username, { level: 0, crystals: 0, ...startingAutoClick[username] });
+        }
+
+        return autoClicks.get(username);
+    };
+    const autoClickView = ({ level, crystals }) => ({
+        level, maxLevel: 4, intervalMs: AUTO_CLICK_INTERVALS[level], crystals,
+        next: level < 4 ? { level: level + 1, intervalMs: AUTO_CLICK_INTERVALS[level + 1], price: AUTO_CLICK_PRICES[level] } : null
+    });
+
+    const handleAutoClick = (route, method, path, body, now) => {
+        const username = authenticated(route, now);
+
+        if (!username) { return null; }
+
+        const state = autoClickOf(username);
+
+        if (method === 'GET' && path === '/auto-click') {
+            return route.fulfill({ json: autoClickView(state) });
+        }
+
+        if (method === 'POST' && path === '/auto-click/upgrade') {
+            if (!Number.isInteger(body?.fromLevel) || body.fromLevel < 0) {
+                return route.fulfill(problem(400, 'fromLevel must be an integer', 'INVALID_AUTO_CLICK_REQUEST'));
+            }
+            if (body.fromLevel !== state.level) {
+                const refusal = problem(409, 'Level mismatch', 'AUTO_CLICK_LEVEL_MISMATCH');
+
+                return route.fulfill({ ...refusal, json: { ...refusal.json, autoClick: autoClickView(state) } });
+            }
+            if (state.level >= 4) { return route.fulfill(problem(409, 'Max level', 'AUTO_CLICK_MAX_LEVEL')); }
+            if ((progressOf(username).chapter ?? 1) < 2) {
+                return route.fulfill(problem(409, 'Locked', 'AUTO_CLICK_LOCKED'));
+            }
+            if (state.crystals < AUTO_CLICK_PRICES[state.level]) { return route.fulfill(problem(409, 'Not enough crystals', 'NOT_ENOUGH_CRYSTALS')); }
+
+            state.crystals -= AUTO_CLICK_PRICES[state.level];
+            state.level += 1;
+
+            return route.fulfill({ json: autoClickView(state) });
+        }
+
+        return route.fulfill(problem(404, 'Not found'));
     };
 
     const handleTalents = (route, method, path, body, now) => {
@@ -710,6 +764,7 @@ export async function mockBackend (page, {
         if (path === '/farm' || path === '/farm/outcome') { return handleFarm(route, method, path, body, now); }
         if (path === '/equipment' || path.startsWith('/equipment/')) { return handleEquipment(route, method, path, body, now); }
         if (path === '/talents' || path.startsWith('/talents/')) { return handleTalents(route, method, path, body, now); }
+        if (path === '/auto-click' || path.startsWith('/auto-click/')) { return handleAutoClick(route, method, path, body, now); }
 
         if (path.startsWith('/users') && !isPublic(method, path)) {
             if (!hasValidBearer(request, now)) { return route.fulfill(unauthenticated()); }
@@ -739,6 +794,8 @@ export async function mockBackend (page, {
     await page.route('**/api/equipment/**', handler);
     await page.route('**/api/talents', handler);
     await page.route('**/api/talents/**', handler);
+    await page.route('**/api/auto-click', handler);
+    await page.route('**/api/auto-click/**', handler);
 
     return {
         calls,

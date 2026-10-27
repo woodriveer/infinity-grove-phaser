@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/auto-click/design.md`
-**Status**: In Progress
+**Status**: Done
 
 ---
 
@@ -263,10 +263,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] At chapter 2 the monster loses health with no click; unchecking `Auto clique` stops it
-- [ ] The HUD shows `500 ms`, `Cristais: 0` and a disabled `Melhorar: 250 ms (10 cristais)`
-- [ ] At chapter 1 no `Auto clique` switch is visible
-- [ ] Gate check passes: `cd game && npx playwright test e2e/autoClick.spec.js`
+- [x] At chapter 2 the monster loses health with no click; unchecking `Auto clique` stops it
+- [x] The HUD shows `500 ms`, `Cristais: 0` and a disabled `Melhorar: 250 ms (10 cristais)`
+- [x] At chapter 1 no `Auto clique` switch is visible
+- [x] Gate check passes: `cd game && npx playwright test e2e/autoClick.spec.js`
 
 **Tests**: e2e
 **Gate**: full
