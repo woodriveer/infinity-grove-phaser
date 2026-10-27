@@ -463,9 +463,10 @@ button:disabled {
 }
 
 .hud-auto-click {
-    width: 200px;
-    height: 132px;
+    width: 260px;
+    height: 120px;
     align-items: flex-start;
+    justify-content: flex-start;
 }
 
 .hud-notice {

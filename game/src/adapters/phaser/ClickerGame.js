@@ -66,8 +66,9 @@ const EFFECTS_HTML = '<div class="hud-box hud-effects"><div class="effect-tags">
 const STAGE_MESSAGE_HTML = '<div class="hud-box hud-message"><div class="stage-message"></div></div>';
 const FARM_TOGGLE = { x: 918, y: 686 };
 const PAUSE_MENU = { x: 512, y: 384 };
-//  Right edge, under the wallet pill: the auto click switch, its interval, the crystals and the next upgrade (spec auto-click)
-const AUTO_CLICK_HUD = { x: 918, y: 136 };
+//  Right of the element wheel, above the leader's head: the auto click switch, its interval, the crystals and the next upgrade
+//  (spec auto-click)
+const AUTO_CLICK_HUD = { x: 366, y: 200 };
 const AUTO_CLICK_HUD_HTML = '<div class="hud-box hud-auto-click"><div class="auto-click" data-testid="auto-click"></div></div>';
 const FARM_TOGGLE_HTML = '<div class="hud-box hud-farm"><label class="farm-toggle"><input type="checkbox"> Farm boss</label></div>';
 const PAUSE_MENU_HTML = '<div class="pause-menu" hidden><div class="pause-card">'
