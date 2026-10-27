@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 38,
+  "next_id": 41,
   "lessons": [
     {
       "id": "L-001",
@@ -672,6 +672,60 @@
       ],
       "created": "2026-10-27T11:45:53Z",
       "last_seen": "2026-10-27T11:45:53Z"
+    },
+    {
+      "id": "L-038",
+      "key": "spec_precision_gap::when an ac asks the client to realign after an error code specify whether that error s body carries the state to realign to",
+      "text": "When an AC asks the client to realign after an error code, specify whether that error's body carries the state to realign to",
+      "signal": "spec_precision_gap",
+      "scope": "api-errors",
+      "status": "candidate",
+      "features": [
+        "account-reset"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md P1 Reset button AC-8 (RESET_LOCKED has no progress body to realign to) (api-errors)"
+      ],
+      "created": "2026-10-27T20:36:52Z",
+      "last_seen": "2026-10-27T20:36:52Z"
+    },
+    {
+      "id": "L-039",
+      "key": "ac_gap::give every spec edge case its own test in the feature diff even when existing behavior is expected to satisfy it",
+      "text": "Give every spec edge case its own test in the feature diff, even when existing behavior is expected to satisfy it",
+      "signal": "ac_gap",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "account-reset"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md edge case farm after reset; validation.md Edge cases (indirect via FarmServiceTest.kt:101) (tests)"
+      ],
+      "created": "2026-10-27T20:36:53Z",
+      "last_seen": "2026-10-27T20:36:53Z"
+    },
+    {
+      "id": "L-040",
+      "key": "ac_gap::assert ui acceptance criteria on the rendered view screen text badge visibility not only on the service state behind it",
+      "text": "Assert UI acceptance criteria on the rendered view (screen text, badge visibility), not only on the service state behind it",
+      "signal": "ac_gap",
+      "scope": "game-ui",
+      "status": "candidate",
+      "features": [
+        "account-reset"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md P1 Reset button AC-7; ClickerGame.test.js:4092-4093 asserts service state only (game-ui)"
+      ],
+      "created": "2026-10-27T20:36:53Z",
+      "last_seen": "2026-10-27T20:36:53Z"
     }
   ]
 }

@@ -134,20 +134,20 @@ With the prices 10/25/50/100 (185 crystals in total), the auto click reaches 50 
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| RESET-01 | P1: Reset for crystals - AC 1, 2 (reward) | T1-T4 | Implementing |
-| RESET-02 | P1: Reset for crystals - AC 3 (progress to 1-1) | T1-T4 | Implementing |
-| RESET-03 | P1: Reset for crystals - AC 4, 5 (talents and awards wiped) | T1-T4 | Implementing |
-| RESET-04 | P1: Reset for crystals - AC 6 (kept state) | T1-T4 | Implementing |
-| RESET-05 | P1: Reset for crystals - AC 7, 8 (count and answer) | T1-T4 | Implementing |
-| RESET-06 | P1: Reset for crystals - AC 9, 10, 11 (errors) | T1-T4 | Implementing |
-| RESET-07 | P1: Reset for crystals - AC 12 (concurrency) | T1-T4 | Implementing |
-| RESET-08 | P1: Reset for crystals - AC 13 (logs) | T1-T4 | Implementing |
-| RESET-09 | P1: Reset button - AC 1, 2 (button and label) | T5-T8 | Implementing |
-| RESET-10 | P1: Reset button - AC 3, 4, 5, 10 (dialog) | T5-T8 | Implementing |
-| RESET-11 | P1: Reset button - AC 6, 7 (success) | T5-T8 | Implementing |
-| RESET-12 | P1: Reset button - AC 8, 9 (failures) | T5-T8 | Implementing |
-| RESET-13 | P1: Auto click after reset - AC 1, 3, 4 (backend unlock) | T1-T4 | Implementing |
-| RESET-14 | P1: Auto click after reset - AC 2, 4, 5 (game unlock) | T5-T8 | Implementing |
+| RESET-01 | P1: Reset for crystals - AC 1, 2 (reward) | T1-T4 | Verified |
+| RESET-02 | P1: Reset for crystals - AC 3 (progress to 1-1) | T1-T4 | Verified |
+| RESET-03 | P1: Reset for crystals - AC 4, 5 (talents and awards wiped) | T1-T4 | Verified |
+| RESET-04 | P1: Reset for crystals - AC 6 (kept state) | T1-T4 | Verified |
+| RESET-05 | P1: Reset for crystals - AC 7, 8 (count and answer) | T1-T4 | Verified |
+| RESET-06 | P1: Reset for crystals - AC 9, 10, 11 (errors) | T1-T4 | Verified |
+| RESET-07 | P1: Reset for crystals - AC 12 (concurrency) | T1-T4 | Verified |
+| RESET-08 | P1: Reset for crystals - AC 13 (logs) | T1-T4 | Verified |
+| RESET-09 | P1: Reset button - AC 1, 2 (button and label) | T5-T8 | Verified |
+| RESET-10 | P1: Reset button - AC 3, 4, 5, 10 (dialog) | T5-T8 | Verified |
+| RESET-11 | P1: Reset button - AC 6, 7 (success) | T5-T8 | Verified |
+| RESET-12 | P1: Reset button - AC 8, 9 (failures) | T5-T8 | Verified |
+| RESET-13 | P1: Auto click after reset - AC 1, 3, 4 (backend unlock) | T1-T4 | Verified |
+| RESET-14 | P1: Auto click after reset - AC 2, 4, 5 (game unlock) | T5-T8 | Verified |
 
 **Coverage:** 14 total, 14 mapped to tasks, 0 unmapped
 

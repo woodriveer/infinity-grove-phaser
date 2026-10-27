@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/account-reset/design.md`
-**Status**: Done (awaiting Verifier)
+**Status**: Done
 
 ---
 

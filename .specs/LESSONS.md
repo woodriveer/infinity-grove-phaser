@@ -234,6 +234,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md iteration 2 mutant N8, game/src/adapters/phaser/ClickerGame.js:293 (AUTO-01 AC6 no monster) (game)
 - last seen: 2026-10-27T11:45:53Z
 
+### L-038 - When an AC asks the client to realign after an error code, specify whether that error's body carries the state to realign to
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `api-errors` · harmful: 0
+- features: account-reset
+- evidence: spec.md P1 Reset button AC-8 (RESET_LOCKED has no progress body to realign to) (api-errors)
+- last seen: 2026-10-27T20:36:52Z
+
+### L-039 - Give every spec edge case its own test in the feature diff, even when existing behavior is expected to satisfy it
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: account-reset
+- evidence: spec.md edge case farm after reset; validation.md Edge cases (indirect via FarmServiceTest.kt:101) (tests)
+- last seen: 2026-10-27T20:36:53Z
+
+### L-040 - Assert UI acceptance criteria on the rendered view (screen text, badge visibility), not only on the service state behind it
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `game-ui` · harmful: 0
+- features: account-reset
+- evidence: spec.md P1 Reset button AC-7; ClickerGame.test.js:4092-4093 asserts service state only (game-ui)
+- last seen: 2026-10-27T20:36:53Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
