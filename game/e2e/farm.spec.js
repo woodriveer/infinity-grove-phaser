@@ -106,7 +106,7 @@ test.describe('Rever chefes', () => {
         await expect(page.getByTestId('farm-entry-chapter-boss')).toBeDisabled();
     });
 
-    test('a win the backend refuses ends the farm without a notice', async ({ page }) => {
+    test('a win too soon after the previous one pays nothing and keeps the farm on the same boss', async ({ page }) => {
         const { backend, menu } = await startGame(page, { farmMinIntervalMs: 600_000 });
         await openFarm(page);
         await page.getByTestId('farm-entry-miniboss-1').click();
@@ -115,13 +115,15 @@ test.describe('Rever chefes', () => {
         await expect.poll(() => farmCalls(backend).length).toBe(1);
         //  The boss fades and comes back after about 1.5 s
         await expect.poll(() => bossHealth(page), { timeout: 10_000 }).toBe(2);
-        await expect(farmLabel(page)).toHaveText('Rever chefe: Miniboss 1');
         await menu.canvas.click();
-
         await expect.poll(() => farmCalls(backend).length).toBe(2);
-        await expect(page.locator('.stage-message')).toHaveText('Chapter complete!');
-        await expect(page.getByTestId('card-notice')).toBeHidden();
+
+        //  The refused win does not throw the player out to the campaign: the same boss comes back, full health
+        await expect.poll(() => bossHealth(page), { timeout: 10_000 }).toBe(2);
+        await expect(farmLabel(page)).toHaveText('Rever chefe: Miniboss 1');
+        await expect(page.locator('.stage-message')).toHaveText('');
         expect(backend.progresses.get('yan')).toMatchObject(COMPLETED);
+        expect(backend.calls.filter((call) => call.path === '/progress/outcome')).toEqual([]);
     });
 
     test('Leave fight in a farm fight returns to the campaign without reporting anything', async ({ page }) => {
@@ -138,5 +140,57 @@ test.describe('Rever chefes', () => {
         await expect(page.locator('.pause-menu')).toBeHidden();
         expect(farmCalls(backend)).toEqual([]);
         expect(backend.calls.filter((call) => call.path === '/progress/outcome')).toEqual([]);
+    });
+});
+
+test.describe('Farm boss switch', () => {
+    const AT_MINIBOSS = { stage: 1, encounter: 'MINIBOSS', phase: 1, completed: false };
+    const RARE_WEAPON = (id) => ({ id, slot: 'WEAPON', rarity: 'RARE', baseClick: 4, refine: 0, affixes: [] });
+    const progressCalls = (backend) => backend.calls.filter((call) => call.path === '/progress/outcome');
+    const farmSwitch = (page) => page.locator('.farm-toggle input');
+
+    test('every miniboss win with the switch on drops cards and equipment, and the miniboss keeps coming back', async ({ page }) => {
+        const { backend, menu } = await startGame(page, {
+            progress: { yan: AT_MINIBOSS },
+            chances: [ 0 ],
+            equipmentDrops: [ RARE_WEAPON('drop1'), RARE_WEAPON('drop2') ]
+        });
+        await expect(farmLabel(page)).toHaveText('Stage 1/1  Miniboss');
+        await farmSwitch(page).check();
+
+        //  The first win is the campaign clear: it pays the card and the piece and the miniboss comes back as a farm fight
+        await menu.canvas.click();
+        await expect.poll(() => progressCalls(backend).length).toBe(1);
+        expect(progressCalls(backend)[0].body).toMatchObject({ stage: 1, encounter: 'MINIBOSS', outcome: 'CLEARED' });
+        await expect.poll(() => backend.cardsOf('yan').copies['kael:0']).toBe(2);
+        await expect.poll(() => backend.equipmentOf('yan').map(({ id }) => id)).toEqual([ 'drop1' ]);
+        await expect(farmLabel(page)).toHaveText('Rever chefe: Miniboss 1', { timeout: 10_000 });
+        await expect.poll(() => bossHealth(page), { timeout: 10_000 }).toBe(2);
+
+        //  The second win is a farm win: it drops again instead of only coins
+        await menu.canvas.click();
+        await expect.poll(() => farmCalls(backend).length).toBe(1);
+        expect(farmCalls(backend)[0].body).toEqual({ boss: { kind: 'MINIBOSS', stage: 1 }, outcome: 'CLEARED' });
+        await expect.poll(() => backend.cardsOf('yan').copies['kael:0']).toBe(3);
+        await expect.poll(() => backend.equipmentOf('yan').map(({ id }) => id)).toEqual([ 'drop1', 'drop2' ]);
+        await expect(page.getByTestId('card-notice')).toBeVisible();
+        await expect.poll(() => bossHealth(page), { timeout: 10_000 }).toBe(2);
+        await expect(farmLabel(page)).toHaveText('Rever chefe: Miniboss 1');
+        expect(progressCalls(backend)).toHaveLength(1);
+    });
+
+    test('turning the switch off goes on to the campaign after the next win', async ({ page }) => {
+        const { backend, menu } = await startGame(page, { progress: { yan: AT_MINIBOSS } });
+        await farmSwitch(page).check();
+
+        await menu.canvas.click();
+        await expect(farmLabel(page)).toHaveText('Rever chefe: Miniboss 1', { timeout: 10_000 });
+        await expect.poll(() => bossHealth(page), { timeout: 10_000 }).toBe(2);
+        await farmSwitch(page).uncheck();
+        await menu.canvas.click();
+
+        await expect.poll(() => farmCalls(backend).length).toBe(1);
+        await expect(farmLabel(page)).not.toHaveText('Rever chefe: Miniboss 1', { timeout: 10_000 });
+        expect(backend.progresses.get('yan')).toMatchObject({ encounter: 'CHAPTER_BOSS' });
     });
 });

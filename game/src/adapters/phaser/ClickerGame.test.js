@@ -1687,7 +1687,7 @@ describe('ClickerGame pause and leave fight', () => {
         expect(label(ctx)).toBe('Stage 2/10  Phase 1/5');
     });
 
-    it('respawns the same boss after a kill when farming is on, without reporting a win', async () => {
+    it('reports the miniboss win when farming is on and brings it back as a farm fight', async () => {
         const ctx = await createScene({ start: bossStart() });
 
         ctx.control('.farm-toggle input').checked = true;
@@ -1695,10 +1695,44 @@ describe('ClickerGame pause and leave fight', () => {
         advance(ctx);
         await ctx.scene.session.flush();
 
-        expect(label(ctx)).toBe('Stage 1/10  Miniboss');
+        expect(campaignGateway.report).toHaveBeenCalledWith({ chapter: 1, stage: 1, encounter: 'MINIBOSS', phase: 1 }, 'CLEARED');
+        expect(ctx.scene.farmBoss).toEqual({ kind: 'MINIBOSS', stage: 1 });
+        expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
         expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
         expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth);
-        expect(campaignGateway.report).not.toHaveBeenCalled();
+    });
+
+    it('reports every later win of the switched farm as a farm win, so each one can drop', async () => {
+        const ctx = await createScene({ start: bossStart() });
+        farmGateway.win.mockResolvedValue({ drop: { heroId: 'kael', heroName: 'Hero kael', stars: 0 }, chapterBossWinsLeft: 10 });
+
+        ctx.control('.farm-toggle input').checked = true;
+        killAll(ctx);
+        advance(ctx);
+        killAll(ctx);
+        await flush();
+        advance(ctx);
+
+        expect(farmGateway.win).toHaveBeenCalledTimes(1);
+        expect(farmGateway.win).toHaveBeenCalledWith({ kind: 'MINIBOSS', stage: 1 });
+        expect(ctx.control('[data-testid="card-notice"]').hidden).toBe(false);
+        expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
+    });
+
+    it('goes back to the campaign after the next win once the switch is turned off', async () => {
+        const ctx = await createScene({ start: bossStart() });
+        farmGateway.win.mockResolvedValue({ drop: null, chapterBossWinsLeft: 10 });
+
+        ctx.control('.farm-toggle input').checked = true;
+        killAll(ctx);
+        advance(ctx);
+        ctx.control('.farm-toggle input').checked = false;
+        killAll(ctx);
+        advance(ctx);
+
+        expect(farmGateway.win).toHaveBeenCalledTimes(1);
+        expect(ctx.scene.farmBoss).toBeNull();
+        expect(label(ctx)).toBe('Stage 2/10  Phase 1/5');
     });
 
     it('still moves on after a phase monster when farming is on', async () => {
@@ -2142,7 +2176,7 @@ describe('ClickerGame farm mode', () => {
         expect(ctx.scene.heroUi.isOpen).toBe(false);
     });
 
-    it('a refused win ends the farm without a notice and reloads the farm state', async () => {
+    it('a win refused as too fast pays nothing but keeps the farm going', async () => {
         const ctx = await createScene({ start: midCampaign() });
         farmGateway.win.mockRejectedValue(new ApiError('Too fast', { status: 409, code: 'FARM_TOO_FAST' }));
         ctx.scene.startFarm(miniboss);
@@ -2161,6 +2195,22 @@ describe('ClickerGame farm mode', () => {
         const ctx = await createScene({ start: midCampaign() });
         farmGateway.win.mockRejectedValue(new ApiError('Cannot reach the server. Try again later.'));
         ctx.scene.startFarm(miniboss);
+
+        killAll(ctx);
+        await flush();
+        advance(ctx);
+
+        expect(ctx.scene.farmBoss).toBe(miniboss);
+        expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
+        expect(testid(ctx, 'card-notice').hidden).toBe(true);
+        expect(farmGateway.get.mock.calls.length).toBe(loads);
+    });
+
+    it('a refused win ends the farm without a notice and reloads the farm state', async () => {
+        const ctx = await createScene({ start: midCampaign() });
+        farmGateway.win.mockRejectedValue(new ApiError('Not beaten', { status: 409, code: 'BOSS_NOT_AVAILABLE' }));
+        ctx.scene.startFarm(miniboss);
+        const loads = farmGateway.get.mock.calls.length;
 
         killAll(ctx);
         await flush();

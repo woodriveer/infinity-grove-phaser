@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
+import { MINIBOSS } from '../../domain/campaign/campaign';
 import { Combo, comboText } from '../../domain/combat/combo';
 import { formatDamage } from '../../domain/combat/damage';
 import { leaderAttacker } from '../../domain/combat/leaderAttacker';
@@ -104,6 +105,8 @@ export class ClickerGame extends Scene
         this.loadingCampaign = false;
         this.paused = false;
         this.farmBoss = null;
+        //  True while the farm fight comes from the Farm boss switch, not from Rever chefes: turning the switch off ends it
+        this.farmBySwitch = false;
         this.heroes = services.createHeroCollection();
         this.equipment = services.createEquipmentCollection();
         this.talents = services.createTalentCollection();
@@ -653,7 +656,7 @@ export class ClickerGame extends Scene
         this.monsterParts.forEach((part) => part.setAlpha(0));
 
         //  A farmed boss that survives its time limit just comes back; nothing is reported and the campaign does not move
-        this.showAfterDelay(this.farmBoss ? this.session.farmEncounter(this.farmBoss) : this.session.fail());
+        this.showAfterDelay(this.farmBoss ? this.nextFarmEncounter() : this.session.fail());
     }
 
     //  Shows `next` after the respawn delay unless a realignment replaced the position in the meantime
@@ -823,7 +826,7 @@ export class ClickerGame extends Scene
         }
     }
 
-    //  Farming a boss replays it without reporting a win, so the stored position stays on that boss
+    //  A farm fight reports a farm win and leaves the campaign alone; any other win moves the campaign on
     clearEncounter ()
     {
         if (this.farmBoss)
@@ -831,19 +834,24 @@ export class ClickerGame extends Scene
             return this.winFarm();
         }
 
-        const farming = this.countdown && this.farmToggle.checked;
+        const won = this.session.encounter();
 
         this.hideCountdown();
-
-        if (farming)
-        {
-            return this.session.encounter();
-        }
 
         const next = this.session.clear();
 
         //  The report goes at once, not on the next tick: the talent points, the card and the piece it pays show up as the encounter is won
         this.session.flush();
+
+        //  With the Farm boss switch on, a won miniboss is now beaten and comes back as a farm fight, so every later win pays its drops
+        //  too. The chapter boss moves on: its farm opens from Rever chefes once the chapter is completed.
+        if (this.farmToggle.checked && won?.kind === MINIBOSS)
+        {
+            this.farmBoss = { kind: MINIBOSS, stage: won.stage };
+            this.farmBySwitch = true;
+
+            return this.session.farmEncounter(this.farmBoss);
+        }
 
         return next;
     }
@@ -857,6 +865,7 @@ export class ClickerGame extends Scene
         }
 
         this.farmBoss = boss;
+        this.farmBySwitch = false;
         this.generation += 1;
         this.hideCountdown();
         this.tweens.killTweensOf(this.monsterParts);
@@ -871,10 +880,25 @@ export class ClickerGame extends Scene
         this.hideCountdown();
         this.reportFarmWin(boss);
 
-        return this.session.farmEncounter(boss);
+        return this.nextFarmEncounter();
     }
 
-    //  The card of the win joins the bag; the chapter boss at 0 wins left today ends the farm and shows the list. A refusal ends it too.
+    //  The same boss again, or the campaign position once the Farm boss switch that started this farm was turned off
+    nextFarmEncounter ()
+    {
+        if (this.farmBySwitch && !this.farmToggle.checked)
+        {
+            this.farmBoss = null;
+            this.farmBySwitch = false;
+
+            return this.session.encounter();
+        }
+
+        return this.session.farmEncounter(this.farmBoss);
+    }
+
+    //  The card of the win joins the bag; the chapter boss at 0 wins left today ends the farm and shows the list. A refusal (the boss
+    //  cannot be farmed, or no wins left today) ends it too.
     async reportFarmWin (boss)
     {
         try
@@ -904,6 +928,12 @@ export class ClickerGame extends Scene
         }
         catch (error)
         {
+            //  A win too soon after the previous one pays nothing, but the farm goes on: only a boss that cannot be farmed ends it
+            if (error?.code === 'FARM_TOO_FAST')
+            {
+                return;
+            }
+
             if (this.sys.isActive() && error?.status === 409 && this.farmBoss === boss)
             {
                 this.leaveFarm();
@@ -916,6 +946,7 @@ export class ClickerGame extends Scene
     leaveFarm ()
     {
         this.farmBoss = null;
+        this.farmBySwitch = false;
         this.generation += 1;
         this.hideCountdown();
         this.tweens.killTweensOf(this.monsterParts);
