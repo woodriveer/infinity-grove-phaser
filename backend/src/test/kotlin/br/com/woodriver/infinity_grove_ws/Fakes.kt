@@ -26,6 +26,7 @@ import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenSecretPort
+import br.com.woodriver.infinity_grove_ws.port.ResetRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.TalentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.WalletRepositoryPort
@@ -308,5 +309,18 @@ class InMemoryCrystalRepository : CrystalRepositoryPort {
         crystals: Long,
     ) {
         balances[username] = crystals
+    }
+}
+
+class InMemoryResetRepository : ResetRepositoryPort {
+    val counts = linkedMapOf<String, Int>()
+
+    override fun count(username: String) = counts[username] ?: 0
+
+    override fun save(
+        username: String,
+        resets: Int,
+    ) {
+        counts[username] = resets
     }
 }

@@ -3,6 +3,7 @@ package br.com.woodriver.infinity_grove_ws.service
 import br.com.woodriver.infinity_grove_ws.InMemoryAutoClickRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryCrystalRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryResetRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
 import br.com.woodriver.infinity_grove_ws.adapter.config.AutoClickConfig
 import br.com.woodriver.infinity_grove_ws.adapter.config.AutoClickProperties
@@ -26,7 +27,8 @@ class AutoClickServiceTest {
     private val autoClick = InMemoryAutoClickRepository()
     private val crystals = InMemoryCrystalRepository()
     private val progress = InMemoryProgressRepository()
-    private val service = AutoClickService(autoClick, crystals, users, progress, AutoClickRules())
+    private val resets = InMemoryResetRepository()
+    private val service = AutoClickService(autoClick, crystals, users, progress, resets, AutoClickRules())
 
     private fun player(
         chapter: Int? = 2,
@@ -118,6 +120,25 @@ class AutoClickServiceTest {
     @Test
     fun `an upgrade for an unknown user fails`() {
         assertFailsWith<UserNotFoundException> { service.upgrade("ghost", 0) }
+    }
+
+    @Test
+    fun `get gives the reset count of the player`() {
+        player()
+        resets.save("yan", 2)
+
+        assertEquals(PlayerAutoClick("yan", 0, 0, 2), service.get("yan"))
+    }
+
+    @Test
+    fun `an upgrade in chapter 1 applies once the player has reset`() {
+        player(chapter = 1, crystalBalance = 10)
+        resets.save("yan", 1)
+
+        val upgraded = service.upgrade("yan", 0)
+
+        assertEquals(PlayerAutoClick("yan", 1, 0, 1), upgraded)
+        assertEquals(1, autoClick.level("yan"))
     }
 
     @Test

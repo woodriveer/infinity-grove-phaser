@@ -122,13 +122,13 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Chapter 3, 4 crystals, 1 reset: result reward 3, crystals 7, resets 2, progress chapter 1 stage 1 PHASE 1 not completed; talents deleted; auto click level untouched
-- [ ] Completed campaign pays 5; no crystal row starts from 0
-- [ ] Mismatch and locked change nothing (progress, crystals, resets, talents)
-- [ ] Unknown user → `UserNotFoundException`
-- [ ] `AutoClickService.get` answers `resets`; upgrade at chapter 1 with resets 1 applies, with resets 0 is `AUTO_CLICK_LOCKED`
-- [ ] Applied reset logs info with username, chapter, reward, crystals, resets; a refusal logs warn with the reason and the stored chapter
-- [ ] Gate check passes: `cd backend && ./gradlew test --tests '*Reset*' --tests '*AutoClick*'`
+- [x] Chapter 3, 4 crystals, 1 reset: result reward 3, crystals 7, resets 2, progress chapter 1 stage 1 PHASE 1 not completed; talents deleted; auto click level untouched
+- [x] Completed campaign pays 5; no crystal row starts from 0
+- [x] Mismatch and locked change nothing (progress, crystals, resets, talents)
+- [x] Unknown user → `UserNotFoundException`
+- [x] `AutoClickService.get` answers `resets`; upgrade at chapter 1 with resets 1 applies, with resets 0 is `AUTO_CLICK_LOCKED`
+- [x] Applied reset logs info with username, chapter, reward, crystals, resets; a refusal logs warn with the reason and the stored chapter
+- [x] Gate check passes: `cd backend && ./gradlew test --tests '*Reset*' --tests '*AutoClick*'`
 
 **Tests**: unit
 **Gate**: quick

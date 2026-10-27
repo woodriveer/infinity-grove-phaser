@@ -8,6 +8,7 @@ import br.com.woodriver.infinity_grove_ws.domain.autoClickUnlocked
 import br.com.woodriver.infinity_grove_ws.port.AutoClickRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.CrystalRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.ResetRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.usecase.GetAutoClickUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.UpgradeAutoClickUseCase
@@ -27,6 +28,7 @@ class AutoClickService(
     private val crystalRepository: CrystalRepositoryPort,
     private val userRepository: UserRepositoryPort,
     private val progressRepository: ProgressRepositoryPort,
+    private val resetRepository: ResetRepositoryPort,
     private val rules: AutoClickRules,
 ) : GetAutoClickUseCase,
     UpgradeAutoClickUseCase {
@@ -45,7 +47,8 @@ class AutoClickService(
 
         progressRepository.createIfAbsent(Progress.start(username))
         val progress = checkNotNull(progressRepository.findForUpdate(username)) { "Progress of $username was just created" }
-        val upgraded = load(username).upgrade(fromLevel, autoClickUnlocked(progress), rules)
+        val current = load(username)
+        val upgraded = current.upgrade(fromLevel, autoClickUnlocked(progress, current.resets), rules)
 
         autoClickRepository.save(username, upgraded.level)
         crystalRepository.save(username, upgraded.crystals)
@@ -53,7 +56,8 @@ class AutoClickService(
         return upgraded
     }
 
-    private fun load(username: String) = PlayerAutoClick(username, autoClickRepository.level(username), crystalRepository.balance(username))
+    private fun load(username: String) =
+        PlayerAutoClick(username, autoClickRepository.level(username), crystalRepository.balance(username), resetRepository.count(username))
 
     private fun requireUser(username: String) {
         if (!userRepository.existsByUsername(username)) {

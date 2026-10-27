@@ -41,11 +41,15 @@ fun autoClickUnlocked(
     resets: Int = 0,
 ): Boolean = resets >= 1 || progress.completed || progress.position.chapter >= 2
 
-/** One player's auto click level and crystal balance. Every change returns a new value; the service stores it under the progress lock. */
+/**
+ * One player's auto click level and crystal balance, with how many times they reset the account (it opens the auto click in chapter 1).
+ * Every change returns a new value; the service stores it under the progress lock.
+ */
 data class PlayerAutoClick(
     val username: String,
     val level: Int = 0,
     val crystals: Long = 0,
+    val resets: Int = 0,
 ) {
     init {
         require(level >= 0) { "Auto click level $level must not be negative" }
