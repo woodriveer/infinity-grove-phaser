@@ -114,6 +114,14 @@
 - **Date**: 2026-10-27
 - **Status**: active
 
+### AD-015
+- **Decision**: The account reset is the crystal source: `POST /account/reset` from the chapter the player saw (`fromChapter`, 409 `RESET_CHAPTER_MISMATCH` otherwise) under the `progress` row lock puts the campaign back at chapter 1, deletes every talent level and talent point award, pays `min(chapter, 5)` crystals and raises `player_resets`. Coins, equipment, cards, crystals and the auto click level stay. The auto click is unlocked also once `resets >= 1`.
+- **Reason**: User decision: reset from chapter 2, chapter N pays N crystals, the auto click must work right after a reset.
+- **Trade-off**: 185 crystals for the top auto click mean 37 resets at least; resets have no cooldown; combat is still in the browser (AD-002), so a forged campaign reaches chapter 5 faster.
+- **Scope**: `backend` reset code (`V7__player_resets.sql`, `AccountReset*`), `AutoClickService`, `game/src/domain/campaign/accountReset.js`, `game/src/application/accountReset`, the auto click box of `ClickerGame`
+- **Date**: 2026-10-27
+- **Status**: active; gives AD-014 its crystal source
+
 ## Handoff
 
 - **Feature**: five features from the owner's batch of 2026-10-21, all game side except two backend pieces: `combat-hud`, `click-power`, `talents`, `equipment-ui`, `boss-map` (`.specs/features/*`)
