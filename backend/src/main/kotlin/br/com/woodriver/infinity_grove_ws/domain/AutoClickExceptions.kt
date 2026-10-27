@@ -11,9 +11,13 @@ open class AutoClickConflictException(
     message: String,
 ) : BusinessException(code, message)
 
-/** The player saw another level than the stored one: a repeated or stale request, nothing is charged. [current] is the stored state. */
+/**
+ * The player saw another level than the stored one: a repeated or stale request, nothing is charged. [current] is the stored state and
+ * [rules] the rules it was read against, so the answer can show it.
+ */
 class AutoClickLevelMismatchException(
     val current: PlayerAutoClick,
+    val rules: AutoClickRules,
     sent: Int,
 ) : AutoClickConflictException(
         "AUTO_CLICK_LEVEL_MISMATCH",

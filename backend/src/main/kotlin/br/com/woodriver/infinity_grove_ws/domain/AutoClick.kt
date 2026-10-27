@@ -65,7 +65,7 @@ data class PlayerAutoClick(
 
         if (fromLevel != level) {
             logger.warn("Auto click upgrade refused, level mismatch username={} sent={} stored={}", username, fromLevel, level)
-            throw AutoClickLevelMismatchException(this, fromLevel)
+            throw AutoClickLevelMismatchException(this, rules, fromLevel)
         }
 
         val step = next(rules)

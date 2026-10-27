@@ -151,11 +151,11 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] A new player gets `{ level: 0, maxLevel: 4, intervalMs: 500, crystals: 0, next: { level: 1, intervalMs: 250, price: 10 } }`
-- [ ] Chapter 2 with 10 crystals upgrading from 0 answers level 1, 250, 0 crystals, next `{ 2, 150, 25 }`
-- [ ] 409 `NOT_ENOUGH_CRYSTALS`, `AUTO_CLICK_MAX_LEVEL`, `AUTO_CLICK_LOCKED`, `AUTO_CLICK_LEVEL_MISMATCH` (with `autoClick`); 400 `INVALID_AUTO_CLICK_REQUEST`; 401 without a token; nothing changes on a refusal
-- [ ] Two racing upgrades from the same level apply exactly one
-- [ ] Gate check passes: `cd backend && ./gradlew build`
+- [x] A new player gets `{ level: 0, maxLevel: 4, intervalMs: 500, crystals: 0, next: { level: 1, intervalMs: 250, price: 10 } }`
+- [x] Chapter 2 with 10 crystals upgrading from 0 answers level 1, 250, 0 crystals, next `{ 2, 150, 25 }`
+- [x] 409 `NOT_ENOUGH_CRYSTALS`, `AUTO_CLICK_MAX_LEVEL`, `AUTO_CLICK_LOCKED`, `AUTO_CLICK_LEVEL_MISMATCH` (with `autoClick`); 400 `INVALID_AUTO_CLICK_REQUEST`; 401 without a token; nothing changes on a refusal
+- [x] Two racing upgrades from the same level apply exactly one
+- [x] Gate check passes: `cd backend && ./gradlew build`
 
 **Tests**: integration
 **Gate**: build

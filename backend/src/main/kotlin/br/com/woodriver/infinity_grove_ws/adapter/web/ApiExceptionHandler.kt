@@ -1,5 +1,8 @@
 package br.com.woodriver.infinity_grove_ws.adapter.web
 
+import br.com.woodriver.infinity_grove_ws.domain.AutoClickConflictException
+import br.com.woodriver.infinity_grove_ws.domain.AutoClickLevelMismatchException
+import br.com.woodriver.infinity_grove_ws.domain.AutoClickRequestException
 import br.com.woodriver.infinity_grove_ws.domain.BusinessException
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentConflictException
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentNotFoundException
@@ -78,6 +81,17 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(TalentConflictException::class)
     fun talentConflict(e: TalentConflictException) = problem(HttpStatus.CONFLICT, e)
+
+    @ExceptionHandler(AutoClickRequestException::class)
+    fun autoClickRequest(e: AutoClickRequestException) = problem(HttpStatus.BAD_REQUEST, e)
+
+    /** The body carries the stored auto click so the game can realign without another request. */
+    @ExceptionHandler(AutoClickLevelMismatchException::class)
+    fun autoClickLevelMismatch(e: AutoClickLevelMismatchException) =
+        problem(HttpStatus.CONFLICT, e).apply { setProperty("autoClick", AutoClickResponse.from(e.current, e.rules)) }
+
+    @ExceptionHandler(AutoClickConflictException::class)
+    fun autoClickConflict(e: AutoClickConflictException) = problem(HttpStatus.CONFLICT, e)
 
     @ExceptionHandler(BusinessException::class)
     fun business(e: BusinessException) = problem(HttpStatus.UNPROCESSABLE_CONTENT, e)
