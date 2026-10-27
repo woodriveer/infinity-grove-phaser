@@ -19,5 +19,6 @@
 
 - After finishing a new feature/spec (Verifier PASS, everything pushed), deploy it manually to Cloudflare. The deploy is never automatic and never skipped silently.
 - From the repository root run `./publish.sh`: it starts everything, opens the `cloudflared` quick tunnel to the backend and publishes the game Worker pointing at that tunnel. To publish only the Worker, run `BACKEND_URL=<tunnel> npm run deploy` inside `game/`. Details in `game/readme.md`.
+- While a previous `./publish.sh` is still running, a new run reuses its backend and tunnel: it publishes nothing when the game code is the one already published, republishes only the Worker when the game changed, and asks for a restart when the backend changed (`--force` publishes anyway). The state is in `.publish-state`.
 - It needs `cloudflared` and a prior `npx wrangler login`. If either is missing, or the user is away from the machine, report that the deploy is pending instead of skipping it.
 - The site is `https://infinity-grove.yan-tapajos.workers.dev/`. It works only while the tunnel runs, so tell the user the deploy is live only for that session.
