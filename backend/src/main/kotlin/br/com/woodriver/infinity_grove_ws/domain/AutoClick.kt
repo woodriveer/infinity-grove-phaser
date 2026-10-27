@@ -64,29 +64,49 @@ data class PlayerAutoClick(
         if (fromLevel < 0) throw AutoClickRequestException("fromLevel must be an integer of at least 0")
 
         if (fromLevel != level) {
-            logger.warn("Auto click upgrade refused, level mismatch username={} sent={} stored={}", username, fromLevel, level)
+            logger.warn(
+                "Auto click upgrade refused, level mismatch username={} sent={} stored={} crystals={}",
+                username,
+                fromLevel,
+                level,
+                crystals,
+            )
             throw AutoClickLevelMismatchException(this, rules, fromLevel)
         }
 
         val step = next(rules)
 
         if (step == null) {
-            logger.warn("Auto click upgrade refused, max level username={} level={}", username, level)
+            logger.warn("Auto click upgrade refused, max level username={} level={} crystals={}", username, level, crystals)
             throw AutoClickMaxLevelException()
         }
 
         if (!unlocked) {
-            logger.warn("Auto click upgrade refused, locked username={} level={}", username, level)
+            logger.warn("Auto click upgrade refused, locked username={} level={} crystals={}", username, level, crystals)
             throw AutoClickLockedException()
         }
 
         if (crystals < step.price) {
-            logger.warn("Auto click upgrade refused, not enough crystals username={} crystals={} price={}", username, crystals, step.price)
+            logger.warn(
+                "Auto click upgrade refused, not enough crystals username={} level={} crystals={} price={}",
+                username,
+                level,
+                crystals,
+                step.price,
+            )
             throw NotEnoughCrystalsException(crystals, step.price)
         }
 
-        logger.info("Auto click upgraded username={} from={} to={} price={}", username, level, step.level, step.price)
-        return copy(level = step.level, crystals = crystals - step.price)
+        val upgraded = copy(level = step.level, crystals = crystals - step.price)
+        logger.info(
+            "Auto click upgraded username={} from={} to={} price={} crystals={}",
+            username,
+            level,
+            upgraded.level,
+            step.price,
+            upgraded.crystals,
+        )
+        return upgraded
     }
 
     private companion object {

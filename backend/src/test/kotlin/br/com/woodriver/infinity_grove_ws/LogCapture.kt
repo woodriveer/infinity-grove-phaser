@@ -22,6 +22,9 @@ class LogCapture(
     /** The formatted INFO messages in the order they were logged. */
     val infos get() = appender.list.filter { it.level == Level.INFO }.map { it.formattedMessage }
 
+    /** The formatted WARN messages in the order they were logged. */
+    val warns get() = appender.list.filter { it.level == Level.WARN }.map { it.formattedMessage }
+
     override fun close() {
         logger.detachAppender(appender)
         logger.level = previousLevel

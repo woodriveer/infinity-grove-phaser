@@ -1,5 +1,6 @@
 package br.com.woodriver.infinity_grove_ws.domain
 
+import br.com.woodriver.infinity_grove_ws.LogCapture
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -122,5 +123,34 @@ class AutoClickTest {
         assertFalse(autoClickUnlocked(Progress("yan", ProgressPosition(1, 10, Encounter.CHAPTER_BOSS, 1))))
         assertTrue(autoClickUnlocked(Progress("yan", ProgressPosition(2, 1, Encounter.PHASE, 1))))
         assertTrue(autoClickUnlocked(Progress("yan", ProgressPosition(1, 10, Encounter.CHAPTER_BOSS, 1), completed = true)))
+    }
+
+    @Test
+    fun `an applied upgrade logs the username, the levels and the crystals at info`() {
+        LogCapture(PlayerAutoClick::class.java).use { logs ->
+            player(level = 1, crystals = 30).upgrade(1, unlocked = true, rules)
+
+            assertEquals(listOf("Auto click upgraded username=yan from=1 to=2 price=25 crystals=5"), logs.infos)
+        }
+    }
+
+    @Test
+    fun `every refused upgrade logs the username, the levels and the crystals at warn`() {
+        LogCapture(PlayerAutoClick::class.java).use { logs ->
+            runCatching { player(level = 1, crystals = 7).upgrade(0, unlocked = true, rules) }
+            runCatching { player(level = 4, crystals = 8).upgrade(4, unlocked = true, rules) }
+            runCatching { player(level = 0, crystals = 9).upgrade(0, unlocked = false, rules) }
+            runCatching { player(level = 0, crystals = 3).upgrade(0, unlocked = true, rules) }
+
+            assertEquals(
+                listOf(
+                    "Auto click upgrade refused, level mismatch username=yan sent=0 stored=1 crystals=7",
+                    "Auto click upgrade refused, max level username=yan level=4 crystals=8",
+                    "Auto click upgrade refused, locked username=yan level=0 crystals=9",
+                    "Auto click upgrade refused, not enough crystals username=yan level=0 crystals=3 price=10",
+                ),
+                logs.warns,
+            )
+        }
     }
 }
