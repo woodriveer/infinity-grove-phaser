@@ -96,9 +96,9 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] No row reads 0; a saved count reads back per player, apart from other players
-- [ ] `ddl-auto: validate` passes
-- [ ] Gate check passes: `cd backend && ./gradlew test --tests '*Reset*' --tests '*SchemaValidationIT'`
+- [x] No row reads 0; a saved count reads back per player, apart from other players
+- [x] `ddl-auto: validate` passes
+- [x] Gate check passes: `cd backend && ./gradlew test --tests '*Reset*' --tests '*SchemaValidationIT'`
 
 **Tests**: integration
 **Gate**: full
