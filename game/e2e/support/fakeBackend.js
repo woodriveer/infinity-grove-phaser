@@ -327,9 +327,10 @@ export async function mockBackend (page, {
 
         return autoClicks.get(username);
     };
-    const autoClickView = ({ level, crystals }) => ({
+    const autoClickView = ({ level, crystals, resets = 0 }) => ({
         level, maxLevel: 4, intervalMs: AUTO_CLICK_INTERVALS[level], crystals,
-        next: level < 4 ? { level: level + 1, intervalMs: AUTO_CLICK_INTERVALS[level + 1], price: AUTO_CLICK_PRICES[level] } : null
+        next: level < 4 ? { level: level + 1, intervalMs: AUTO_CLICK_INTERVALS[level + 1], price: AUTO_CLICK_PRICES[level] } : null,
+        resets
     });
 
     const handleAutoClick = (route, method, path, body, now) => {
@@ -353,7 +354,7 @@ export async function mockBackend (page, {
                 return route.fulfill({ ...refusal, json: { ...refusal.json, autoClick: autoClickView(state) } });
             }
             if (state.level >= 4) { return route.fulfill(problem(409, 'Max level', 'AUTO_CLICK_MAX_LEVEL')); }
-            if ((progressOf(username).chapter ?? 1) < 2) {
+            if ((progressOf(username).chapter ?? 1) < 2 && !progressOf(username).completed && !(state.resets >= 1)) {
                 return route.fulfill(problem(409, 'Locked', 'AUTO_CLICK_LOCKED'));
             }
             if (state.crystals < AUTO_CLICK_PRICES[state.level]) { return route.fulfill(problem(409, 'Not enough crystals', 'NOT_ENOUGH_CRYSTALS')); }
@@ -365,6 +366,41 @@ export async function mockBackend (page, {
         }
 
         return route.fulfill(problem(404, 'Not found'));
+    };
+
+    //  Account reset contract (AccountResetController): from chapter 2 the campaign goes back to its start, the talents and their points
+    //  are wiped, and the chapter left (up to 5) is paid in crystals; the crystals and the auto click level stay
+    const handleAccountReset = (route, method, path, body, now) => {
+        const username = authenticated(route, now);
+
+        if (!username) { return null; }
+
+        if (method !== 'POST' || path !== '/account/reset') { return route.fulfill(problem(404, 'Not found')); }
+
+        const progress = progressOf(username);
+        const chapter = progress.chapter ?? 1;
+
+        if (!Number.isInteger(body?.fromChapter)) {
+            return route.fulfill(problem(400, 'fromChapter must be an integer', 'INVALID_RESET_REQUEST'));
+        }
+        if (body.fromChapter !== chapter) {
+            const refusal = problem(409, 'Chapter mismatch', 'RESET_CHAPTER_MISMATCH');
+
+            return route.fulfill({ ...refusal, json: { ...refusal.json, progress: progressBody(progress) } });
+        }
+        if (chapter < 2 && !progress.completed) { return route.fulfill(problem(409, 'Locked', 'RESET_LOCKED')); }
+
+        const reward = progress.completed ? 5 : Math.min(chapter, 5);
+        const state = autoClickOf(username);
+
+        state.crystals += reward;
+        state.resets = (state.resets ?? 0) + 1;
+        progresses.set(username, { ...startOfCampaign(), chapter: 1 });
+        talentsByUser.set(username, {});
+        earnedByUser.set(username, 0);
+        clearedByUser.set(username, new Set());
+
+        return route.fulfill({ json: { reward, crystals: state.crystals, resets: state.resets, progress: progressBody(progressOf(username)) } });
     };
 
     const handleTalents = (route, method, path, body, now) => {
@@ -765,6 +801,7 @@ export async function mockBackend (page, {
         if (path === '/equipment' || path.startsWith('/equipment/')) { return handleEquipment(route, method, path, body, now); }
         if (path === '/talents' || path.startsWith('/talents/')) { return handleTalents(route, method, path, body, now); }
         if (path === '/auto-click' || path.startsWith('/auto-click/')) { return handleAutoClick(route, method, path, body, now); }
+        if (path.startsWith('/account/')) { return handleAccountReset(route, method, path, body, now); }
 
         if (path.startsWith('/users') && !isPublic(method, path)) {
             if (!hasValidBearer(request, now)) { return route.fulfill(unauthenticated()); }
@@ -796,6 +833,7 @@ export async function mockBackend (page, {
     await page.route('**/api/talents/**', handler);
     await page.route('**/api/auto-click', handler);
     await page.route('**/api/auto-click/**', handler);
+    await page.route('**/api/account/**', handler);
 
     return {
         calls,

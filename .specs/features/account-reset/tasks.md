@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/account-reset/design.md`
-**Status**: In Progress
+**Status**: Done (awaiting Verifier)
 
 ---
 
@@ -264,9 +264,9 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] At chapter 3 the button reads `Resetar conta (+3 cristais)`; `Cancelar` keeps the chapter
-- [ ] `Resetar` brings `Capítulo 1`, `Cristais: 3`, the `+3 cristais` notice and the `Auto clique` switch
-- [ ] Gate check passes: `cd game && npx playwright test e2e/accountReset.spec.js`
+- [x] At chapter 3 the button reads `Resetar conta (+3 cristais)`; `Cancelar` keeps the chapter
+- [x] `Resetar` brings `Capítulo 1`, `Cristais: 3`, the `+3 cristais` notice and the `Auto clique` switch
+- [x] Gate check passes: `cd game && npx playwright test e2e/accountReset.spec.js`
 
 **Tests**: e2e
 **Gate**: full

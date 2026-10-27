@@ -149,7 +149,7 @@ With the prices 10/25/50/100 (185 crystals in total), the auto click reaches 50 
 | RESET-13 | P1: Auto click after reset - AC 1, 3, 4 (backend unlock) | T1-T4 | Implementing |
 | RESET-14 | P1: Auto click after reset - AC 2, 4, 5 (game unlock) | T5-T8 | Implementing |
 
-**Coverage:** 14 total, 0 mapped to tasks, 14 unmapped ⚠️
+**Coverage:** 14 total, 14 mapped to tasks, 0 unmapped
 
 ---
 
