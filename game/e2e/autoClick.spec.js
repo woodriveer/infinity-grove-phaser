@@ -45,9 +45,18 @@ test.describe('Auto click', () => {
 
     test('unchecking Auto clique stops it, without the click hitting the monster', async ({ page }) => {
         await startGame(page, 2);
+        //  Counts the hits of the pointer: the click on the switch must not reach the canvas
+        await page.evaluate(() => {
+            const scene = window.__PHASER_GAME__.scene.getScene('ClickerGame');
+            const hit = scene.hitMonster.bind(scene);
+
+            window.__pointerHits = 0;
+            scene.hitMonster = (pointer) => { window.__pointerHits += 1; hit(pointer); };
+        });
 
         await page.getByTestId('auto-click-toggle').click();
         await expect(page.getByTestId('auto-click-toggle')).not.toBeChecked();
+        expect(await page.evaluate(() => window.__pointerHits)).toBe(0);
         const stopped = await health(page);
         await page.waitForTimeout(1500);
 

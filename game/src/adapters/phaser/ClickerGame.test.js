@@ -3810,10 +3810,29 @@ describe('ClickerGame auto click', () => {
         expect(lasting.texts).toHaveLength(5);
 
         const ctx = await createScene({ start: atChapter(2, 3) });
+        const kills = vi.spyOn(ctx.scene, 'clearEncounter');
         ctx.scene.update(0, 10000);
 
         expect(ctx.scene.monster.dead).toBe(true);
         expect(ctx.texts).toHaveLength(3);
+        expect(ctx.scene.combo.streak).toBe(3);
+        expect(kills).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps hitting the next monster after a boss runs out of time', async () => {
+        const tough = { ...definition, stages: definition.stages.map((stage) => ({ ...stage, minibossHealth: 1000 })) };
+        const ctx = await createScene({ start: { ...progress(1, 'MINIBOSS', 1), chapter: 2, definition: tough } });
+
+        while (ctx.scene.countdown)
+        {
+            ctx.scene.update(0, 500);
+        }
+        ctx.timers.at(-1).callback();
+        const before = ctx.texts.length;
+
+        expect(ctx.scene.monster.dead).toBe(false);
+        ctx.scene.update(0, 500);
+        expect(ctx.texts.length).toBe(before + 1);
     });
 
     it('fires nothing while the monster is dead', async () => {
