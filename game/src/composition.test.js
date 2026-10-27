@@ -4,7 +4,7 @@ import { services } from './composition';
 describe('composition root', () => {
     it('hands the scenes the session, the user api and one factory per game service', () => {
         expect(Object.keys(services).sort()).toEqual([
-            'createCampaignSession', 'createEquipmentCollection', 'createFarmSession', 'createHeroCollection', 'createTalentCollection', 'createWalletSync', 'session', 'users'
+            'autoClickPreference', 'createAutoClickState', 'createCampaignSession', 'createEquipmentCollection', 'createFarmSession', 'createHeroCollection', 'createTalentCollection', 'createWalletSync', 'session', 'users'
         ]);
         expect(typeof services.users.signUp).toBe('function');
         expect(typeof services.session.restore).toBe('function');
@@ -38,6 +38,17 @@ describe('composition root', () => {
         expect(first.talents()).toEqual([]);
         expect(first.loaded).toBe(false);
         expect(typeof first.upgrade).toBe('function');
+    });
+
+    it('builds a fresh auto click state on every call and hands the switch preference', () => {
+        const first = services.createAutoClickState();
+        const second = services.createAutoClickState();
+
+        expect(first).not.toBe(second);
+        expect(first.state()).toBeNull();
+        expect(first.intervalMs()).toBe(500);
+        expect(typeof first.upgrade).toBe('function');
+        expect(typeof services.autoClickPreference.enabled).toBe('function');
     });
 
     it('builds a fresh farm session with its own state on every call', () => {

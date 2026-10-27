@@ -206,11 +206,11 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] The api calls `GET /auto-click` and `POST /auto-click/upgrade` `{ fromLevel }`
-- [ ] The state reads 500 ms before a load and after a failed one, the answered interval after a load or an upgrade; an upgrade sends the held level; a 409 reloads and rethrows
-- [ ] The preference is true by default, stores and restores the choice under `infinity-grove.auto-click`, and is true when storage throws
-- [ ] `services` carries `createAutoClickState` and `autoClickPreference`
-- [ ] Gate check passes: `cd game && npm test`
+- [x] The api calls `GET /auto-click` and `POST /auto-click/upgrade` `{ fromLevel }`
+- [x] The state reads 500 ms before a load and after a failed one, the answered interval after a load or an upgrade; an upgrade sends the held level; a 409 reloads and rethrows
+- [x] The preference is true by default, stores and restores the choice under `infinity-grove.auto-click`, and is true when storage throws
+- [x] `services` carries `createAutoClickState` and `autoClickPreference`
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick
