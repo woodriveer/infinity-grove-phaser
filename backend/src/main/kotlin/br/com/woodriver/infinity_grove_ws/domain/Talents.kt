@@ -160,8 +160,7 @@ data class PlayerTalents(
     fun level(id: String): Int = levels[id] ?: 0
 
     /** The points the levels already bought took. */
-    fun points(rules: TalentRules) =
-        TalentPoints(earned, TalentCatalog.all.sumOf { level(it.id) * it.costPerLevel(rules) })
+    fun points(rules: TalentRules) = TalentPoints(earned, TalentCatalog.all.sumOf { level(it.id) * it.costPerLevel(rules) })
 
     /** True for grade 1 and for a grade whose previous grade is at its top level. */
     fun unlocked(definition: TalentDefinition): Boolean {
