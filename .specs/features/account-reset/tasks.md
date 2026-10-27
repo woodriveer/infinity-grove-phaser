@@ -235,12 +235,12 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Chapter 4: button `Resetar conta (+4 cristais)`; chapter 1 with no resets: no button and no box
-- [ ] The button opens the dialog with the spec text; `Cancelar` closes it with no request; a dialog click does not hit the monster
-- [ ] `Resetar` sends, is disabled meanwhile; 200 closes the dialog, shows `Cristais: <n>` and notice `+N cristais`, fight back at chapter 1
-- [ ] 409 closes the dialog and realigns; network error keeps it open with `Não foi possível resetar. Tente de novo.` and `Resetar` enabled
-- [ ] Chapter 1 with resets 1: switch shown and auto click hits
-- [ ] Gate check passes: `cd game && npm test && npm run build`
+- [x] Chapter 4: button `Resetar conta (+4 cristais)`; chapter 1 with no resets: no button and no box
+- [x] The button opens the dialog with the spec text; `Cancelar` closes it with no request; a dialog click does not hit the monster
+- [x] `Resetar` sends, is disabled meanwhile; 200 closes the dialog, shows `Cristais: <n>` and notice `+N cristais`, fight back at chapter 1
+- [x] 409 closes the dialog and realigns; network error keeps it open with `Não foi possível resetar. Tente de novo.` and `Resetar` enabled
+- [x] Chapter 1 with resets 1: switch shown and auto click hits
+- [x] Gate check passes: `cd game && npm test && npm run build`
 
 **Tests**: unit
 **Gate**: build

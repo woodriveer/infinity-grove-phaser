@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
 import { MINIBOSS } from '../../domain/campaign/campaign';
 import { AutoClicker, autoClickUnlocked } from '../../domain/combat/autoClick';
+import { resetReward } from '../../domain/campaign/accountReset';
 import { Combo, comboText } from '../../domain/combat/combo';
 import { formatDamage } from '../../domain/combat/damage';
 import { leaderAttacker } from '../../domain/combat/leaderAttacker';
@@ -12,6 +13,7 @@ import { SkillCombat } from '../../domain/skills/skillCombat';
 import { monsterAfterBreak, talentComboCap, talentTimeBonusMs } from '../../domain/talents/talents';
 import { HeroUi } from './HeroUi';
 import { renderAutoClick } from './views/autoClickView';
+import { RESET_ERROR_TEXT, renderResetButton, renderResetDialog, resetNoticeText } from './views/resetView';
 import { el } from './views/dom';
 import { renderElementWheel } from './views/elementWheel';
 import { renderEffectTags, updateEffectTags } from './views/skillEffects';
@@ -70,6 +72,8 @@ const PAUSE_MENU = { x: 512, y: 384 };
 //  (spec auto-click)
 const AUTO_CLICK_HUD = { x: 366, y: 200 };
 const AUTO_CLICK_HUD_HTML = '<div class="hud-box hud-auto-click"><div class="auto-click" data-testid="auto-click"></div></div>';
+//  The confirmation of the account reset (spec account-reset) covers the screen like the pause menu
+const RESET_DIALOG_HTML = '<div class="reset-dialog" data-testid="reset-dialog" hidden><div class="reset-card"></div></div>';
 const FARM_TOGGLE_HTML = '<div class="hud-box hud-farm"><label class="farm-toggle"><input type="checkbox"> Farm boss</label></div>';
 const PAUSE_MENU_HTML = '<div class="pause-menu" hidden><div class="pause-card">'
     + '<div class="pause-title">Paused</div>'
@@ -122,6 +126,9 @@ export class ClickerGame extends Scene
         this.autoClickEnabled = this.autoClickPreference.enabled();
         this.autoClicker = new AutoClicker();
         this.upgradingAutoClick = false;
+        this.accountReset = services.createAccountReset({ session: this.session, autoClick: this.autoClick, talents: this.talents });
+        this.resetting = false;
+        this.resetError = null;
         this.session.onRealign((encounter) => this.realign(encounter));
         this.session.onDrop((drop) => this.receiveDrop(drop));
         this.session.onEquipmentDrop((drop) => this.receiveEquipmentDrop(drop));
@@ -198,6 +205,7 @@ export class ClickerGame extends Scene
     {
         this.farmToggle = this.createHtml(FARM_TOGGLE, FARM_TOGGLE_HTML, '.farm-toggle input', true);
         this.createAutoClickHud();
+        this.createResetDialog();
         //  Above the hero buttons and the skill bar, which are added after it
         this.pauseElement = this.add.dom(PAUSE_MENU.x, PAUSE_MENU.y).createFromHTML(PAUSE_MENU_HTML).setDepth(1);
         this.pauseMenu = this.pauseElement.node.querySelector('.pause-menu');
@@ -221,21 +229,120 @@ export class ClickerGame extends Scene
         this.autoClickBox = this.autoClickElement.node.querySelector('.auto-click');
         this.autoClickBox.addEventListener('change', (event) => this.switchAutoClick(event.target.checked));
         this.autoClickBox.addEventListener('click', (event) => event.target.closest('.auto-click-upgrade') && this.upgradeAutoClick());
+        this.autoClickBox.addEventListener('click', (event) => event.target.closest('.reset-account') && this.openResetDialog());
         this.showAutoClick();
         this.loadAutoClick();
     }
 
+    //  Open past chapter 1, and from chapter 1 too once the player reset the account
     get autoClickOpen ()
     {
-        return autoClickUnlocked({ chapter: this.session.chapter, completed: this.session.completed });
+        return autoClickUnlocked({ chapter: this.session.chapter, completed: this.session.completed, resets: this.autoClick.state()?.resets ?? 0 });
+    }
+
+    //  The crystals a reset pays now, null while the reset is closed
+    get resetReward ()
+    {
+        return resetReward({ chapter: this.session.chapter, completed: this.session.completed });
     }
 
     showAutoClick ()
     {
+        const reward = this.resetReward;
+
         this.autoClickElement.setVisible(this.autoClickOpen);
         this.autoClickBox.replaceChildren(...renderAutoClick({
             enabled: this.autoClickEnabled, intervalMs: this.autoClick.intervalMs(), state: this.autoClick.state(), busy: this.upgradingAutoClick
-        }));
+        }), ...(reward === null ? [] : [ renderResetButton(reward) ]));
+    }
+
+    //  The dialog is clickable HTML above the HUD; its buttons confirm or cancel the reset
+    createResetDialog ()
+    {
+        this.resetDialogElement = this.add.dom(PAUSE_MENU.x, PAUSE_MENU.y).createFromHTML(RESET_DIALOG_HTML).setDepth(1);
+        this.resetDialog = this.resetDialogElement.node.querySelector('.reset-dialog');
+        this.resetCard = this.resetDialog.querySelector('.reset-card');
+        this.resetCard.addEventListener('click', (event) =>
+        {
+            if (event.target.closest('.reset-confirm'))
+            {
+                this.confirmReset();
+            }
+            else if (event.target.closest('.reset-cancel'))
+            {
+                this.closeResetDialog();
+            }
+        });
+    }
+
+    openResetDialog ()
+    {
+        if (this.resetReward === null)
+        {
+            return;
+        }
+
+        this.resetError = null;
+        this.resetDialog.hidden = false;
+        this.showResetDialog();
+    }
+
+    showResetDialog ()
+    {
+        this.resetCard.replaceChildren(...renderResetDialog({ reward: this.resetReward, busy: this.resetting, error: this.resetError }));
+    }
+
+    closeResetDialog ()
+    {
+        this.resetDialog.hidden = true;
+        this.resetError = null;
+    }
+
+    //  The reset is sent from the chapter shown. The answer restarts the fight at chapter 1 through the session; a refusal realigns and
+    //  closes the dialog, a failed request keeps it open to try again.
+    async confirmReset ()
+    {
+        if (this.resetting)
+        {
+            return;
+        }
+
+        this.resetting = true;
+        this.resetError = null;
+        this.showResetDialog();
+
+        try
+        {
+            const answer = await this.accountReset.reset();
+
+            this.closeResetDialog();
+            this.heroUi.showNotice(resetNoticeText(answer.reward));
+        }
+        catch (error)
+        {
+            if (error?.status === 409)
+            {
+                this.closeResetDialog();
+            }
+            else
+            {
+                this.resetError = RESET_ERROR_TEXT;
+            }
+        }
+        finally
+        {
+            this.resetting = false;
+
+            if (this.sys.isActive())
+            {
+                this.showAutoClick();
+
+                if (!this.resetDialog.hidden)
+                {
+                    this.showResetDialog();
+                }
+            }
+        }
     }
 
     switchAutoClick (on)

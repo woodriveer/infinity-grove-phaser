@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClickerGame } from './ClickerGame';
 import { ApiError } from '../../application/ApiError';
+import { createAccountReset } from '../../application/accountReset/accountReset';
 import { createAutoClickState } from '../../application/autoClick/autoClickState';
 import { createCampaignSession } from '../../application/campaign/campaignSession';
 import { createEquipmentCollection } from '../../application/equipment/equipmentCollection';
@@ -24,6 +25,8 @@ const farmGateway = { get: vi.fn(), win: vi.fn() };
 const talentGateway = { list: vi.fn(), upgrade: vi.fn() };
 //  The real auto click state over a mocked gateway, and the switch preference as a plain object (on unless a test turns it off)
 const autoClickGateway = { get: vi.fn(), upgrade: vi.fn() };
+//  The real account reset over a mocked gateway, working on the services of the scene
+const resetGateway = { reset: vi.fn() };
 const autoClickPreference = { on: true, stored: [], enabled () { return this.on; }, setEnabled (on) { this.on = on; this.stored.push(on); } };
 const equipmentGateway = { list: vi.fn(), equip: vi.fn(), unequip: vi.fn(), refine: vi.fn(), reroll: vi.fn(), sell: vi.fn() };
 //  The critical roll: 0.99 never crits a monster of the default stats (10 % chance); a test sets `dice.value` to force one
@@ -37,6 +40,7 @@ const services = {
     createTalentCollection: () => createTalentCollection({ gateway: talentGateway }),
     createFarmSession: () => createFarmSession({ gateway: farmGateway }),
     createAutoClickState: () => createAutoClickState({ gateway: autoClickGateway }),
+    createAccountReset: (ports) => createAccountReset({ gateway: resetGateway, ...ports }),
     autoClickPreference
 };
 
@@ -83,6 +87,7 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
     autoClickPreference.stored = [];
     autoClickGateway.get.mockReset();
     autoClickGateway.upgrade.mockReset();
+    resetGateway.reset.mockReset();
     autoClickGateway.get.mockImplementation(() => (autoClick instanceof Error ? Promise.reject(autoClick) : Promise.resolve(autoClick)));
     Object.values(equipmentGateway).forEach((mock) => mock.mockReset());
     equipmentGateway.list.mockImplementation(() => (equipment instanceof Error ? Promise.reject(equipment) : Promise.resolve(equipment)));
@@ -3963,5 +3968,193 @@ describe('ClickerGame auto click', () => {
         expect(autoClickElement(ctx).visible).toBe(true);
         ctx.scene.update(0, 500);
         expect(ctx.texts.length).toBe(before + 1);
+    });
+});
+
+describe('ClickerGame account reset', () => {
+    const tough = (stages) => stages.map((stage) => ({ ...stage, monsterHealth: 1000 }));
+    const atChapter = (chapter, completed = false) => ({ ...progress(), chapter, completed });
+    const START = progress();
+    const resetButton = (ctx) => ctx.hud('[data-testid="reset-account"]');
+    const dialog = (ctx) => ctx.hud('[data-testid="reset-dialog"]');
+    const question = (ctx) => ctx.hud('[data-testid="reset-question"]')?.textContent;
+    const confirm = (ctx) => ctx.hud('[data-testid="reset-confirm"]');
+    const cancel = (ctx) => ctx.hud('[data-testid="reset-cancel"]');
+    const error = (ctx) => ctx.hud('[data-testid="reset-error"]')?.textContent;
+    const crystals = (ctx) => ctx.hud('[data-testid="auto-click-crystals"]')?.textContent;
+    const notice = (ctx) => ctx.control('[data-testid="card-notice"]');
+    const autoClickElement = (ctx) => ctx.doms.find((d) => d.node.querySelector('.auto-click'));
+    const deferred = () => {
+        let resolve;
+        const promise = new Promise((done) => { resolve = done; });
+
+        return { promise, resolve };
+    };
+
+    it('shows Resetar conta (+4 cristais) in the auto click box in chapter 4', async () => {
+        const ctx = await createScene({ start: atChapter(4) });
+
+        expect(resetButton(ctx).textContent).toBe('Resetar conta (+4 cristais)');
+        expect(autoClickElement(ctx).visible).toBe(true);
+    });
+
+    it('offers 5 crystals on a completed campaign', async () => {
+        const ctx = await createScene({ start: atChapter(5, true) });
+
+        expect(resetButton(ctx).textContent).toBe('Resetar conta (+5 cristais)');
+    });
+
+    it('shows no reset button and no box in chapter 1 for a player who never reset', async () => {
+        const ctx = await createScene({ start: atChapter(1) });
+
+        expect(resetButton(ctx)).toBeUndefined();
+        expect(autoClickElement(ctx).visible).toBe(false);
+    });
+
+    it('opens the dialog with what is lost, what is kept and the reward', async () => {
+        const ctx = await createScene({ start: atChapter(4) });
+
+        expect(dialog(ctx).hidden).toBe(true);
+        resetButton(ctx).click();
+
+        expect(dialog(ctx).hidden).toBe(false);
+        expect(question(ctx)).toBe('Resetar a conta? Você volta ao capítulo 1 e perde todos os talentos e pontos de talento. '
+            + 'Moedas, equipamentos, cartas, cristais e o auto clique são mantidos. Você ganha 4 cristais.');
+        expect(confirm(ctx).textContent).toBe('Resetar');
+        expect(cancel(ctx).textContent).toBe('Cancelar');
+    });
+
+    it('closes the dialog on Cancelar and sends nothing', async () => {
+        const ctx = await createScene({ start: atChapter(4) });
+        resetButton(ctx).click();
+
+        cancel(ctx).click();
+
+        expect(dialog(ctx).hidden).toBe(true);
+        expect(resetGateway.reset).not.toHaveBeenCalled();
+    });
+
+    it('a click in the dialog does not hit the monster', async () => {
+        const ctx = await createScene({ start: atChapter(4), autoClickOn: false });
+        const health = ctx.scene.monster.health;
+        resetButton(ctx).click();
+
+        cancel(ctx).click();
+
+        expect(ctx.scene.monster.health).toBe(health);
+        expect(ctx.texts).toHaveLength(0);
+    });
+
+    it('sends the reset from the chapter shown and disables Resetar until the answer arrives', async () => {
+        const ctx = await createScene({ start: atChapter(4) });
+        const answer = deferred();
+        resetGateway.reset.mockReturnValue(answer.promise);
+        resetButton(ctx).click();
+
+        confirm(ctx).click();
+
+        expect(resetGateway.reset).toHaveBeenCalledWith(4);
+        expect(confirm(ctx).disabled).toBe(true);
+        confirm(ctx).click();
+        expect(resetGateway.reset).toHaveBeenCalledTimes(1);
+        answer.resolve({ reward: 4, crystals: 4, resets: 1, progress: START });
+        await flush();
+    });
+
+    it('closes the dialog, shows the answered crystals and the +4 cristais notice and fights chapter 1 again after the reset', async () => {
+        const ctx = await createScene({ start: atChapter(4) });
+        resetGateway.reset.mockResolvedValue({ reward: 4, crystals: 4, resets: 1, progress: START });
+        resetButton(ctx).click();
+
+        confirm(ctx).click();
+        await flush();
+
+        expect(dialog(ctx).hidden).toBe(true);
+        expect(crystals(ctx)).toBe('Cristais: 4');
+        expect(notice(ctx).textContent).toBe('+4 cristais');
+        expect(notice(ctx).hidden).toBe(false);
+        expect(ctx.timers.at(-1).delay).toBe(3000);
+        expect(ctx.hud('.chapter-hud').textContent).toBe('Capítulo 1');
+        expect(ctx.scene.session.encounter()).toMatchObject({ kind: 'PHASE', stage: 1, phase: 1 });
+        expect(resetButton(ctx)).toBeUndefined();
+    });
+
+    it('reads the talents again after the reset, so the tree shows every level at 0 and no points', async () => {
+        const ctx = await createScene({ start: atChapter(4) });
+        const wiped = { ...COMBO_MAXED, level: 0, value: 0, nextCost: 1 };
+        resetGateway.reset.mockResolvedValue({ reward: 4, crystals: 4, resets: 1, progress: START });
+        talentGateway.list.mockResolvedValue({ talents: [ wiped ], points: { earned: 0, spent: 0, available: 0 } });
+        resetButton(ctx).click();
+
+        confirm(ctx).click();
+        await flush();
+
+        expect(ctx.scene.talents.talents()).toEqual([ wiped ]);
+        expect(ctx.scene.talents.points()).toEqual({ earned: 0, spent: 0, available: 0 });
+    });
+
+    it('keeps the auto click running in chapter 1 after the reset', async () => {
+        const ctx = await createScene({ start: { ...atChapter(4), definition: { ...definition, stages: tough(definition.stages) } } });
+        resetGateway.reset.mockResolvedValue({ reward: 4, crystals: 4, resets: 1, progress: { ...START, definition: { ...definition, stages: tough(definition.stages) } } });
+        resetButton(ctx).click();
+        confirm(ctx).click();
+        await flush();
+
+        ctx.scene.update(0, 500);
+
+        expect(autoClickElement(ctx).visible).toBe(true);
+        expect(ctx.scene.monster.health).toBeLessThan(1000);
+    });
+
+    it('closes the dialog, realigns to the stored progress and keeps the crystals after a 409 mismatch', async () => {
+        const ctx = await createScene({ start: atChapter(4), autoClick: { ...AUTO_CLICK_LEVEL_0, crystals: 6 } });
+        resetGateway.reset.mockRejectedValue(new ApiError('mismatch', {
+            status: 409, code: 'RESET_CHAPTER_MISMATCH', body: { code: 'RESET_CHAPTER_MISMATCH', progress: atChapter(5) }
+        }));
+        resetButton(ctx).click();
+
+        confirm(ctx).click();
+        await flush();
+
+        expect(dialog(ctx).hidden).toBe(true);
+        expect(ctx.hud('.chapter-hud').textContent).toBe('Capítulo 5');
+        expect(crystals(ctx)).toBe('Cristais: 6');
+        expect(resetButton(ctx).textContent).toBe('Resetar conta (+5 cristais)');
+    });
+
+    it('closes the dialog on a 409 RESET_LOCKED', async () => {
+        const ctx = await createScene({ start: atChapter(4) });
+        resetGateway.reset.mockRejectedValue(new ApiError('locked', { status: 409, code: 'RESET_LOCKED', body: { code: 'RESET_LOCKED' } }));
+        resetButton(ctx).click();
+
+        confirm(ctx).click();
+        await flush();
+
+        expect(dialog(ctx).hidden).toBe(true);
+        expect(ctx.hud('.chapter-hud').textContent).toBe('Capítulo 4');
+    });
+
+    it('keeps the dialog open with the error line and Resetar enabled when the request fails', async () => {
+        const ctx = await createScene({ start: atChapter(4) });
+        resetGateway.reset.mockRejectedValue(new ApiError('Cannot reach the server. Try again later.'));
+        resetButton(ctx).click();
+
+        confirm(ctx).click();
+        await flush();
+
+        expect(dialog(ctx).hidden).toBe(false);
+        expect(error(ctx)).toBe('Não foi possível resetar. Tente de novo.');
+        expect(confirm(ctx).disabled).toBe(false);
+        expect(ctx.hud('.chapter-hud').textContent).toBe('Capítulo 4');
+    });
+
+    it('shows the switch and runs the auto click in chapter 1 for a player who reset before', async () => {
+        const ctx = await createScene({ start: { ...atChapter(1), definition: { ...definition, stages: tough(definition.stages) } }, autoClick: { ...AUTO_CLICK_LEVEL_0, resets: 1 } });
+
+        ctx.scene.update(0, 500);
+
+        expect(autoClickElement(ctx).visible).toBe(true);
+        expect(resetButton(ctx)).toBeUndefined();
+        expect(ctx.scene.monster.health).toBeLessThan(1000);
     });
 });

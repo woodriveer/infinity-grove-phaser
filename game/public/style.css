@@ -87,6 +87,7 @@ body {
 .logout,
 .path-back,
 .pause-menu button,
+.reset-card button,
 .hero-header button,
 .bag-fuse,
 .fusion-button {
@@ -117,6 +118,7 @@ body {
 .auth-actions button[name="login"],
 .pause-menu .pause-continue,
 .pause-menu .pause-confirm-no,
+.reset-card .reset-cancel,
 .bag-fuse,
 .fusion-button {
     color: var(--color-bg);
@@ -464,7 +466,7 @@ button:disabled {
 
 .hud-auto-click {
     width: 260px;
-    height: 120px;
+    height: 160px;
     align-items: flex-start;
     justify-content: flex-start;
 }
@@ -679,7 +681,30 @@ button:disabled {
     cursor: not-allowed;
 }
 
+/* The account reset (spec account-reset): the button under the crystals and the line of a failed request in its dialog */
+.reset-account {
+    padding: 6px 10px;
+    font: inherit;
+    border: none;
+    border-radius: 999px;
+    background: var(--color-accent);
+    color: var(--color-bg);
+    cursor: pointer;
+}
+
+.reset-question {
+    font-size: 17px;
+    line-height: 1.4;
+}
+
+.reset-error {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-accent-700);
+}
+
 .pause-menu,
+.reset-dialog,
 .hero-panel {
     position: relative;
     width: 1024px;
@@ -690,7 +715,8 @@ button:disabled {
     background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
 }
 
-.pause-card {
+.pause-card,
+.reset-card {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
