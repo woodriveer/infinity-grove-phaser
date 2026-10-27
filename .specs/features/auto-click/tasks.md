@@ -124,10 +124,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `get` answers level, crystals and rules for a known user; an unknown user is `UserNotFoundException`
-- [ ] `upgrade` creates the progress if absent, locks it, checks the chapter, saves level and crystals; a refusal saves nothing
-- [ ] Settings `app.auto-click.intervals-ms` and `prices` default to the spec values
-- [ ] Gate check passes: `cd backend && ./gradlew test --tests '*AutoClick*'`
+- [x] `get` answers level, crystals and rules for a known user; an unknown user is `UserNotFoundException`
+- [x] `upgrade` creates the progress if absent, locks it, checks the chapter, saves level and crystals; a refusal saves nothing
+- [x] Settings `app.auto-click.intervals-ms` and `prices` default to the spec values
+- [x] Gate check passes: `cd backend && ./gradlew test --tests '*AutoClick*'`
 
 **Tests**: unit
 **Gate**: quick

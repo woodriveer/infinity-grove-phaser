@@ -33,3 +33,7 @@ app:
     bag-capacity: 100
     refine-base-cost: 500
     reroll-cost: 5000
+  auto-click:
+    # click interval of each auto click level (level 0 first) and crystals of the upgrade to each level after 0
+    intervals-ms: [ 500, 250, 150, 100, 50 ]
+    prices: [ 10, 25, 50, 100 ]

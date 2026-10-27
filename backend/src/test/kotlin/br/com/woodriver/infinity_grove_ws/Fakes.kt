@@ -12,8 +12,10 @@ import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import br.com.woodriver.infinity_grove_ws.port.AccessToken
 import br.com.woodriver.infinity_grove_ws.port.AccessTokenIssuerPort
+import br.com.woodriver.infinity_grove_ws.port.AutoClickRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ChanceRollerPort
 import br.com.woodriver.infinity_grove_ws.port.ChapterRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.CrystalRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.DropRollerPort
 import br.com.woodriver.infinity_grove_ws.port.DropRuleRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.EquipmentRepositoryPort
@@ -281,4 +283,30 @@ class SequenceIds : IdGeneratorPort {
     private var count = 0
 
     override fun next() = "piece-${++count}"
+}
+
+class InMemoryAutoClickRepository : AutoClickRepositoryPort {
+    val levels = linkedMapOf<String, Int>()
+
+    override fun level(username: String) = levels[username] ?: 0
+
+    override fun save(
+        username: String,
+        level: Int,
+    ) {
+        levels[username] = level
+    }
+}
+
+class InMemoryCrystalRepository : CrystalRepositoryPort {
+    val balances = linkedMapOf<String, Long>()
+
+    override fun balance(username: String) = balances[username] ?: 0L
+
+    override fun save(
+        username: String,
+        crystals: Long,
+    ) {
+        balances[username] = crystals
+    }
 }
