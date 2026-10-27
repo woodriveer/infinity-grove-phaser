@@ -19,13 +19,17 @@ data class AutoClickStepResponse(
     val price: Long,
 )
 
-/** The auto click as the game shows it: the level, the top level, the click interval now, the crystals and the next upgrade (null at the top). */
+/**
+ * The auto click as the game shows it: the level, the top level, the click interval now, the crystals, the next upgrade (null at the top)
+ * and how many times the player reset the account (from 1 the auto click works in chapter 1).
+ */
 data class AutoClickResponse(
     val level: Int,
     val maxLevel: Int,
     val intervalMs: Int,
     val crystals: Long,
     val next: AutoClickStepResponse?,
+    val resets: Int,
 ) {
     companion object {
         fun from(
@@ -37,6 +41,7 @@ data class AutoClickResponse(
             intervalMs = autoClick.intervalMs(rules),
             crystals = autoClick.crystals,
             next = autoClick.next(rules)?.let { AutoClickStepResponse(it.level, it.intervalMs, it.price) },
+            resets = autoClick.resets,
         )
     }
 }

@@ -151,7 +151,12 @@ class AccountResetServiceTest {
         chapter: Int,
         crystalBalance: Long,
     ) {
-        assertEquals(chapter, progress.progresses.getValue("yan").position.chapter)
+        assertEquals(
+            chapter,
+            progress.progresses
+                .getValue("yan")
+                .position.chapter,
+        )
         assertEquals(crystalBalance, crystals.balance("yan"))
         assertEquals(0, resets.count("yan"))
         assertEquals(mapOf("CLICK_DAMAGE" to 2), talents.findAll("yan"))

@@ -15,6 +15,9 @@ import br.com.woodriver.infinity_grove_ws.domain.LoginException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.ProgressConflictException
 import br.com.woodriver.infinity_grove_ws.domain.ProgressRequestException
+import br.com.woodriver.infinity_grove_ws.domain.ResetChapterMismatchException
+import br.com.woodriver.infinity_grove_ws.domain.ResetConflictException
+import br.com.woodriver.infinity_grove_ws.domain.ResetRequestException
 import br.com.woodriver.infinity_grove_ws.domain.TalentConflictException
 import br.com.woodriver.infinity_grove_ws.domain.TalentNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.TalentRequestException
@@ -92,6 +95,17 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(AutoClickConflictException::class)
     fun autoClickConflict(e: AutoClickConflictException) = problem(HttpStatus.CONFLICT, e)
+
+    @ExceptionHandler(ResetRequestException::class)
+    fun resetRequest(e: ResetRequestException) = problem(HttpStatus.BAD_REQUEST, e)
+
+    /** The body carries the stored progress so the game can realign without another request. */
+    @ExceptionHandler(ResetChapterMismatchException::class)
+    fun resetChapterMismatch(e: ResetChapterMismatchException) =
+        problem(HttpStatus.CONFLICT, e).apply { setProperty("progress", ProgressResponse.from(e.current)) }
+
+    @ExceptionHandler(ResetConflictException::class)
+    fun resetConflict(e: ResetConflictException) = problem(HttpStatus.CONFLICT, e)
 
     @ExceptionHandler(BusinessException::class)
     fun business(e: BusinessException) = problem(HttpStatus.UNPROCESSABLE_CONTENT, e)

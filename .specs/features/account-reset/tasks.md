@@ -152,11 +152,11 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Spec independent test: chapter 3, 4 crystals, level 1, 2 talent levels, 900 copper → 200 `{ reward: 3, crystals: 7, resets: 1, progress: { chapter: 1, stage: 1, ... } }`; talents all 0 with 0 points; wallet 900; auto click level 1
-- [ ] 409 `RESET_LOCKED`; 409 `RESET_CHAPTER_MISMATCH` with `progress`; 400 `INVALID_RESET_REQUEST` (missing, string); 401 without a token; nothing changes on a refusal
-- [ ] Two racing resets from the same chapter: one 200, one 409 `RESET_CHAPTER_MISMATCH`, crystals paid once
-- [ ] `GET /auto-click` answers `resets`; after a reset an upgrade at chapter 1 applies
-- [ ] Gate check passes: `cd backend && ./gradlew build`
+- [x] Spec independent test: chapter 3, 4 crystals, level 1, 2 talent levels, 900 copper → 200 `{ reward: 3, crystals: 7, resets: 1, progress: { chapter: 1, stage: 1, ... } }`; talents all 0 with 0 points; wallet 900; auto click level 1
+- [x] 409 `RESET_LOCKED`; 409 `RESET_CHAPTER_MISMATCH` with `progress`; 400 `INVALID_RESET_REQUEST` (missing, string); 401 without a token; nothing changes on a refusal
+- [x] Two racing resets from the same chapter: one 200, one 409 `RESET_CHAPTER_MISMATCH`, crystals paid once
+- [x] `GET /auto-click` answers `resets`; after a reset an upgrade at chapter 1 applies
+- [x] Gate check passes: `cd backend && ./gradlew build`
 
 **Tests**: integration
 **Gate**: build
