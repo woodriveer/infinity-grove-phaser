@@ -32,8 +32,14 @@ data class AutoClickStep(
     val price: Long,
 )
 
-/** The auto click opens once the chapter 1 boss is beaten: chapter 2 or later, or a completed campaign. */
-fun autoClickUnlocked(progress: Progress): Boolean = progress.completed || progress.position.chapter >= 2
+/**
+ * The auto click opens once the chapter 1 boss is beaten: chapter 2 or later, or a completed campaign. A player who reset the account
+ * ([resets] at least 1) keeps it from chapter 1 (spec account-reset).
+ */
+fun autoClickUnlocked(
+    progress: Progress,
+    resets: Int = 0,
+): Boolean = resets >= 1 || progress.completed || progress.position.chapter >= 2
 
 /** One player's auto click level and crystal balance. Every change returns a new value; the service stores it under the progress lock. */
 data class PlayerAutoClick(

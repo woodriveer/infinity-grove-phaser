@@ -69,10 +69,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Reward: chapter 1 → null, 2 → 2, 3 → 3, 5 → 5, completed chapter 5 → 5
-- [ ] Check: `fromChapter` ≠ stored → `RESET_CHAPTER_MISMATCH` carrying the view (also at chapter 1); chapter 1 sent 1 → `RESET_LOCKED`; matching chapter ≥ 2 returns the reward
-- [ ] `autoClickUnlocked` true at chapter 1 with resets 1, false with resets 0
-- [ ] Gate check passes: `cd backend && ./gradlew test --tests '*Reset*' --tests '*AutoClick*'`
+- [x] Reward: chapter 1 → null, 2 → 2, 3 → 3, 5 → 5, completed chapter 5 → 5
+- [x] Check: `fromChapter` ≠ stored → `RESET_CHAPTER_MISMATCH` carrying the view (also at chapter 1); chapter 1 sent 1 → `RESET_LOCKED`; matching chapter ≥ 2 returns the reward
+- [x] `autoClickUnlocked` true at chapter 1 with resets 1, false with resets 0
+- [x] Gate check passes: `cd backend && ./gradlew test --tests '*Reset*' --tests '*AutoClick*'`
 
 **Tests**: unit
 **Gate**: quick
