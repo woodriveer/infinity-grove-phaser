@@ -98,4 +98,27 @@ describe('autoClickState', () => {
         expect(autoClick.state()).toEqual(LEVEL_0);
         expect(gateway.get).toHaveBeenCalledTimes(1);
     });
+
+    it('takes the crystals and the reset count of a reset and keeps the rest of the state', async () => {
+        gateway.get.mockResolvedValue({ ...LEVEL_1, resets: 0 });
+        await autoClick.load();
+        const onChange = vi.fn();
+        autoClick.onChange(onChange);
+
+        autoClick.adoptReset({ reward: 3, crystals: 23, resets: 1 });
+
+        expect(autoClick.state()).toEqual({ ...LEVEL_1, crystals: 23, resets: 1 });
+        expect(autoClick.intervalMs()).toBe(250);
+        expect(onChange).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads the state when a reset arrives before the first load', async () => {
+        gateway.get.mockResolvedValue({ ...LEVEL_0, crystals: 3, resets: 1 });
+
+        autoClick.adoptReset({ reward: 3, crystals: 3, resets: 1 });
+        await vi.waitFor(() => expect(autoClick.loaded).toBe(true));
+
+        expect(gateway.get).toHaveBeenCalledTimes(1);
+        expect(autoClick.state()).toEqual({ ...LEVEL_0, crystals: 3, resets: 1 });
+    });
 });

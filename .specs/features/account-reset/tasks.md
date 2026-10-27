@@ -206,12 +206,12 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] The api posts `/account/reset` `{ fromChapter }`
-- [ ] `reset()` sends the session chapter; a 200 restarts the session at the answered progress (queue voided, realign fired), sets crystals and resets in the auto click state, reloads the talents
-- [ ] A 409 with `progress` restarts the session at it and rejects; crystals unchanged
-- [ ] A network error rejects and changes nothing
-- [ ] `services` carries `createAccountReset`
-- [ ] Gate check passes: `cd game && npm test`
+- [x] The api posts `/account/reset` `{ fromChapter }`
+- [x] `reset()` sends the session chapter; a 200 restarts the session at the answered progress (queue voided, realign fired), sets crystals and resets in the auto click state, reloads the talents
+- [x] A 409 with `progress` restarts the session at it and rejects; crystals unchanged
+- [x] A network error rejects and changes nothing
+- [x] `services` carries `createAccountReset`
+- [x] Gate check passes: `cd game && npm test`
 
 **Tests**: unit
 **Gate**: quick

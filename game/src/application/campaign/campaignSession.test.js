@@ -323,6 +323,24 @@ describe('campaignSession', () => {
         });
     });
 
+    describe('restart', () => {
+        it('adopts the progress of a reset, voids the queued reports and tells the scene the first encounter', async () => {
+            gateway.get.mockResolvedValue({ ...progress(2, 'MINIBOSS'), chapter: 3 });
+            await loaded();
+            session.clear();
+            const onRealign = vi.fn();
+            session.onRealign(onRealign);
+
+            session.restart(progress(1, 'PHASE', 1));
+
+            expect(session.chapter).toBe(1);
+            expect(session.encounter()).toMatchObject({ kind: 'PHASE', stage: 1, phase: 1 });
+            expect(onRealign).toHaveBeenCalledWith(expect.objectContaining({ kind: 'PHASE', stage: 1, phase: 1 }));
+            await session.flush();
+            expect(gateway.report).not.toHaveBeenCalled();
+        });
+    });
+
     describe('equipment drops', () => {
         const equipmentDrop = { piece: { id: 'p1', slot: 'WEAPON', rarity: 'RARE' }, sold: false };
 

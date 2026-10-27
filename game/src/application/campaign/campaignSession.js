@@ -74,6 +74,13 @@ export const createCampaignSession = ({ gateway }) =>
             realigned = callback;
         },
 
+        //  The account was reset (spec account-reset): the progress the backend answered replaces ours, the queued reports of the old
+        //  position are void, and the realign callback gets the first encounter
+        restart: (progress) =>
+        {
+            adopt(progress);
+        },
+
         //  Fired with the card of each accepted report that dropped one
         onDrop: (callback) =>
         {
