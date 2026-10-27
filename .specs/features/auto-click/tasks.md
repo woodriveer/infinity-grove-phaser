@@ -50,6 +50,12 @@ T1 → T2 → T3 → T4
 T5 → T6 → T7 → T8
 ```
 
+### Phase 3: Verifier fixes (iteration 1)
+
+```
+T9 → T10 → T11
+```
+
 ---
 
 ## Task Breakdown
@@ -275,13 +281,11 @@ T5 → T6 → T7 → T8
 
 ---
 
-## Fix Tasks (Verifier iteration 1)
-
-### F1: Kill the mid-burst mutant and cover the boss timeout edge case
+### T9: Kill the mid-burst mutant and cover the boss timeout edge case
 
 **What**: The burst test asserts the combo of 3 and one kill; a new scene test runs the auto click on the monster after a boss timeout.
 **Where**: `game/src/adapters/phaser/ClickerGame.test.js`
-**Depends on**: T8
+**Depends on**: None
 **Requirement**: AUTO-01, AUTO-03
 
 **Done when**:
@@ -292,11 +296,11 @@ T5 → T6 → T7 → T8
 **Tests**: unit
 **Gate**: quick
 
-### F2: Pin the switch click in the e2e
+### T10: Pin the switch click in the e2e
 
 **What**: The e2e counts pointer hits across the click on `Auto clique` and expects 0.
 **Where**: `game/e2e/autoClick.spec.js`
-**Depends on**: F1
+**Depends on**: T9
 **Requirement**: AUTO-04
 
 **Done when**:
@@ -306,11 +310,11 @@ T5 → T6 → T7 → T8
 **Tests**: e2e
 **Gate**: full
 
-### F3: Log the crystals of every upgrade and refusal
+### T11: Log the crystals of every upgrade and refusal
 
 **What**: The applied upgrade logs at info and every refusal at warn with username, levels and crystals, pinned by log-capture tests.
 **Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AutoClick.kt`
-**Depends on**: F2
+**Depends on**: T10
 **Requirement**: AUTO-06
 
 **Done when**:
