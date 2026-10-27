@@ -98,9 +98,9 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] No row reads as 0 crystals and level 0; saved values read back per player, apart from other players
-- [ ] Rows cascade when the user is deleted; `ddl-auto: validate` passes
-- [ ] Gate check passes: `cd backend && ./gradlew test --tests '*AutoClick*' --tests '*Crystal*' --tests '*SchemaValidationIT'`
+- [x] No row reads as 0 crystals and level 0; saved values read back per player, apart from other players
+- [x] Rows cascade when the user is deleted; `ddl-auto: validate` passes
+- [x] Gate check passes: `cd backend && ./gradlew test --tests '*AutoClick*' --tests '*Crystal*' --tests '*SchemaValidationIT'`
 
 **Tests**: integration
 **Gate**: full
