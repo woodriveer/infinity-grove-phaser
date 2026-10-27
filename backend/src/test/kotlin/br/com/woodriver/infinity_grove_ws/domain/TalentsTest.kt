@@ -62,7 +62,12 @@ class TalentsTest {
         assertEquals(listOf(1, 2, 3), TalentCatalog.all.filter { it.baseId == "COMBO" }.map { it.grade })
         assertEquals(listOf("COMBO", "COMBO_G2", "COMBO_G3"), TalentCatalog.all.filter { it.baseId == "COMBO" }.map { it.id })
         assertEquals(listOf(50, 100, 150), listOf("COMBO", "COMBO_G2", "COMBO_G3").map { TalentCatalog.find(it).valueAt(10) })
-        assertEquals(listOf(19, 38, 57), listOf("CLICK_FLAT_DAMAGE", "CLICK_FLAT_DAMAGE_G2", "CLICK_FLAT_DAMAGE_G3").map { TalentCatalog.find(it).valueAt(10) })
+        assertEquals(
+            listOf(19, 38, 57),
+            listOf("CLICK_FLAT_DAMAGE", "CLICK_FLAT_DAMAGE_G2", "CLICK_FLAT_DAMAGE_G3").map {
+                TalentCatalog.find(it).valueAt(10)
+            },
+        )
     }
 
     @Test
@@ -79,7 +84,9 @@ class TalentsTest {
 
     @Test
     fun `a locked grade refuses the upgrade`() {
-        assertFailsWith<TalentLockedException> { PlayerTalents("yan", mapOf("COMBO" to 9), earned = 50).upgrade(TalentCatalog.find("COMBO_G2"), 0, rules) }
+        assertFailsWith<TalentLockedException> {
+            PlayerTalents("yan", mapOf("COMBO" to 9), earned = 50).upgrade(TalentCatalog.find("COMBO_G2"), 0, rules)
+        }
     }
 
     @Test
@@ -90,7 +97,10 @@ class TalentsTest {
         assertEquals(2, upgrade.cost)
         assertEquals(2, opened.nextCost(TalentCatalog.find("COMBO_G2"), rules))
         assertEquals(TalentPoints(30, 12), upgrade.talents.points(rules))
-        assertEquals(TalentPoints(30, 10 + 2 * 4 + 3 * 2), PlayerTalents("yan", mapOf("COMBO" to 10, "COMBO_G2" to 4, "COMBO_G3" to 2), earned = 30).points(rules))
+        assertEquals(
+            TalentPoints(30, 10 + 2 * 4 + 3 * 2),
+            PlayerTalents("yan", mapOf("COMBO" to 10, "COMBO_G2" to 4, "COMBO_G3" to 2), earned = 30).points(rules),
+        )
     }
 
     @Test

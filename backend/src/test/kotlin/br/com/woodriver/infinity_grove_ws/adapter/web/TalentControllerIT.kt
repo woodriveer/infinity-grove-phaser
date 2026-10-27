@@ -86,8 +86,14 @@ class TalentControllerIT : IntegrationTestBase() {
                         "CLICK_FLAT_DAMAGE",
                     ),
                 ),
-            ).body("talents.branch", equalTo(List(3) { listOf("TIME", "TIME", "BREAK", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO", "POWER") }.flatten()))
-            .body("talents.level", equalTo(List(30) { 0 }))
+            ).body(
+                "talents.branch",
+                equalTo(
+                    List(3) {
+                        listOf("TIME", "TIME", "BREAK", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO", "POWER")
+                    }.flatten(),
+                ),
+            ).body("talents.level", equalTo(List(30) { 0 }))
             .body("talents.value", equalTo(List(30) { 0 }))
             .body("talents.nextCost", equalTo(List(10) { 1 } + List(10) { 2 } + List(10) { 3 }))
             .body("talents.maxLevel", equalTo(List(30) { 10 }))
