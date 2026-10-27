@@ -130,7 +130,7 @@ Every hit on a monster needs a click, so a player who has beaten the first chapt
 4. WHILE the crystals are fewer than the price, the upgrade button SHALL be disabled.
 5. WHILE the level is 4, the game SHALL show no upgrade button.
 6. WHEN the player presses an enabled upgrade button THEN the game SHALL send the upgrade with the level it shows, disable the button until the answer arrives and then show the answered state and use its interval.
-7. IF the upgrade answers 409 THEN the game SHALL show the state the backend returned (or reload it) and keep the current interval.
+7. IF the upgrade answers 409 THEN the game SHALL show the state the backend returned (or reload it) and run at that state's interval, never at the interval of the refused upgrade.
 8. IF the auto click state cannot be loaded THEN the game SHALL use 500 ms and hide the crystals and the upgrade button.
 
 **Independent Test**: With a stubbed state of 0 crystals at level 0, the HUD shows `500 ms`, `Cristais: 0` and a disabled `Melhorar: 250 ms (10 cristais)`.

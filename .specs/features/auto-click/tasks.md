@@ -234,12 +234,12 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] Chapter 2, switch on: 1000 ms of update hit twice with the click damage at `MONSTER.x`, combo 2; chapter 1: none and the switch hidden
-- [ ] No auto click while paused or without a living monster; a burst stops at the kill; manual clicks still hit
-- [ ] Switch off stops it and is stored; the box shows `Auto clique`, `500 ms`, `Cristais: 0` and a disabled `Melhorar: 250 ms (10 cristais)`; no button at level 4; a load failure hides crystals and button
-- [ ] Pressing an enabled button upgrades from the shown level and the interval changes; a 409 shows the stored state
-- [ ] Chapter 1 boss beaten → the switch shows and the auto click starts
-- [ ] Gate check passes: `cd game && npm test && npm run build`
+- [x] Chapter 2, switch on: 1000 ms of update hit twice with the click damage at `MONSTER.x`, combo 2; chapter 1: none and the switch hidden
+- [x] No auto click while paused or without a living monster; a burst stops at the kill; manual clicks still hit
+- [x] Switch off stops it and is stored; the box shows `Auto clique`, `500 ms`, `Cristais: 0` and a disabled `Melhorar: 250 ms (10 cristais)`; no button at level 4; a load failure hides crystals and button
+- [x] Pressing an enabled button upgrades from the shown level and the interval changes; a 409 shows the stored state
+- [x] Chapter 1 boss beaten → the switch shows and the auto click starts
+- [x] Gate check passes: `cd game && npm test && npm run build`
 
 **Tests**: unit
 **Gate**: build

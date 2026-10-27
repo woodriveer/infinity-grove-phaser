@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClickerGame } from './ClickerGame';
 import { ApiError } from '../../application/ApiError';
+import { createAutoClickState } from '../../application/autoClick/autoClickState';
 import { createCampaignSession } from '../../application/campaign/campaignSession';
 import { createEquipmentCollection } from '../../application/equipment/equipmentCollection';
 import { createFarmSession } from '../../application/farm/farmSession';
@@ -21,6 +22,9 @@ const campaignGateway = { get: vi.fn(), report: vi.fn() };
 const heroesGateway = { list: vi.fn(), fuse: vi.fn(), setLeader: vi.fn() };
 const farmGateway = { get: vi.fn(), win: vi.fn() };
 const talentGateway = { list: vi.fn(), upgrade: vi.fn() };
+//  The real auto click state over a mocked gateway, and the switch preference as a plain object (on unless a test turns it off)
+const autoClickGateway = { get: vi.fn(), upgrade: vi.fn() };
+const autoClickPreference = { on: true, stored: [], enabled () { return this.on; }, setEnabled (on) { this.on = on; this.stored.push(on); } };
 const equipmentGateway = { list: vi.fn(), equip: vi.fn(), unequip: vi.fn(), refine: vi.fn(), reroll: vi.fn(), sell: vi.fn() };
 //  The critical roll: 0.99 never crits a monster of the default stats (10 % chance); a test sets `dice.value` to force one
 const dice = { value: 0.99 };
@@ -31,7 +35,9 @@ const services = {
     createHeroCollection: () => createHeroCollection({ gateway: heroesGateway }),
     createEquipmentCollection: () => createEquipmentCollection({ gateway: equipmentGateway }),
     createTalentCollection: () => createTalentCollection({ gateway: talentGateway }),
-    createFarmSession: () => createFarmSession({ gateway: farmGateway })
+    createFarmSession: () => createFarmSession({ gateway: farmGateway }),
+    createAutoClickState: () => createAutoClickState({ gateway: autoClickGateway }),
+    autoClickPreference
 };
 
 //  The drop rules of chapter 1: monster 1, miniboss 2, boss 3
@@ -66,10 +72,18 @@ const walletResponse = (coins = { gold: 2, silver: 14, copper: 37 }, drops = { 1
 //  Minimal Phaser stand-in: records what ClickerGame adds and exposes the click handler and tweens.
 //  `wallet` is what GET /wallet answers: a response object, an Error to reject with, or omitted to never answer.
 //  The COMBO talent at its top level (cap 50 %), which the scenes get unless a test gives its own tree
+//  What GET /auto-click answers by default: level 0 at 500 ms with no crystals
+const AUTO_CLICK_LEVEL_0 = { level: 0, maxLevel: 4, intervalMs: 500, crystals: 0, next: { level: 1, intervalMs: 250, price: 10 } };
+
 const COMBO_MAXED = { id: 'COMBO', branch: 'COMBO', perLevel: 5, maxLevel: 10, level: 10, value: 50, nextCost: null };
 
-const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] }, talents = [ COMBO_MAXED ] } = {}) => {
+const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] }, talents = [ COMBO_MAXED ], autoClick = AUTO_CLICK_LEVEL_0, autoClickOn = true } = {}) => {
     dice.value = 0.99;
+    autoClickPreference.on = autoClickOn;
+    autoClickPreference.stored = [];
+    autoClickGateway.get.mockReset();
+    autoClickGateway.upgrade.mockReset();
+    autoClickGateway.get.mockImplementation(() => (autoClick instanceof Error ? Promise.reject(autoClick) : Promise.resolve(autoClick)));
     Object.values(equipmentGateway).forEach((mock) => mock.mockReset());
     equipmentGateway.list.mockImplementation(() => (equipment instanceof Error ? Promise.reject(equipment) : Promise.resolve(equipment)));
     talentGateway.list.mockReset();
@@ -3681,5 +3695,248 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
 
         ctx.scene.update(0, 1);
         expect(ctx.scene.monster.health).toBe(997.6);
+    });
+});
+
+describe('ClickerGame auto click', () => {
+    const atChapter = (chapter, health = 10) => ({
+        ...progress(), chapter, definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: health })) }
+    });
+    const autoClickElement = (ctx) => ctx.doms.find((d) => d.node.querySelector('.auto-click'));
+    const toggle = (ctx) => ctx.hud('[data-testid="auto-click-toggle"]');
+    const interval = (ctx) => ctx.hud('[data-testid="auto-click-interval"]')?.textContent;
+    const crystals = (ctx) => ctx.hud('[data-testid="auto-click-crystals"]')?.textContent;
+    const upgradeButton = (ctx) => ctx.hud('[data-testid="auto-click-upgrade"]');
+    const switchTo = (ctx, on) => {
+        toggle(ctx).checked = on;
+        toggle(ctx).dispatchEvent(new Event('change', { bubbles: true }));
+    };
+    const LEVEL_1 = { level: 1, maxLevel: 4, intervalMs: 250, crystals: 0, next: { level: 2, intervalMs: 150, price: 25 } };
+
+    it('hits twice in 1000 ms with no click in chapter 2, at the monster centre and with one combo step each', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.texts).toHaveLength(2);
+        expect(ctx.texts.map((text) => text.x)).toEqual([ 670, 670 ]);
+        expect(ctx.scene.combo.streak).toBe(2);
+        expect(ctx.scene.monster.health).toBeLessThan(10);
+    });
+
+    it('deals what two manual clicks deal', async () => {
+        const manual = await createScene({ start: atChapter(2), autoClickOn: false });
+        manual.click();
+        manual.click();
+        const byHand = manual.scene.monster.health;
+
+        const auto = await createScene({ start: atChapter(2) });
+        auto.scene.update(0, 1000);
+
+        expect(auto.scene.monster.health).toBe(byHand);
+    });
+
+    it('rolls the critical hit like a manual click', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        ctx.dice.value = 0;
+
+        ctx.scene.update(0, 500);
+
+        expect(ctx.texts[0].style.fontSize).toBe(48);
+    });
+
+    it('lands the double critical click of Lyra', async () => {
+        const ctx = await createScene({ start: atChapter(2, 100), heroes: { ...heroesResponse(), leaderId: 'lyra' } });
+        ctx.dice.value = 0;
+
+        ctx.scene.update(0, 500);
+
+        expect(ctx.texts).toHaveLength(2);
+        expect(ctx.texts.every((text) => text.style.fontSize === 48)).toBe(true);
+    });
+
+    it('fires nothing before 500 ms', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        ctx.scene.update(0, 499);
+
+        expect(ctx.scene.monster.health).toBe(10);
+    });
+
+    it('fires nothing and hides the switch in chapter 1', async () => {
+        const ctx = await createScene({ start: atChapter(1) });
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.monster.health).toBe(10);
+        expect(autoClickElement(ctx).visible).toBe(false);
+    });
+
+    it('shows the switch, 500 ms, Cristais: 0 and a disabled Melhorar: 250 ms (10 cristais) in chapter 2', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        expect(autoClickElement(ctx).visible).toBe(true);
+        expect(ctx.hud('.auto-click-toggle').textContent).toBe(' Auto clique');
+        expect(toggle(ctx).checked).toBe(true);
+        expect(interval(ctx)).toBe('500 ms');
+        expect(crystals(ctx)).toBe('Cristais: 0');
+        expect(upgradeButton(ctx).textContent).toBe('Melhorar: 250 ms (10 cristais)');
+        expect(upgradeButton(ctx).disabled).toBe(true);
+    });
+
+    it('runs on a completed campaign', async () => {
+        const ctx = await createScene({ start: { ...atChapter(1), completed: true } });
+
+        expect(autoClickElement(ctx).visible).toBe(true);
+    });
+
+    it('adds no time while paused', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        ctx.handlers['keydown-ESC']();
+        ctx.scene.update(0, 1000);
+        expect(ctx.scene.monster.health).toBe(10);
+
+        ctx.scene.resumeFight();
+        ctx.scene.update(0, 499);
+        expect(ctx.scene.monster.health).toBe(10);
+        ctx.scene.update(0, 1);
+        expect(ctx.texts).toHaveLength(1);
+    });
+
+    it('fires 5 clicks for a 10 s frame and stops the burst at the kill', async () => {
+        const lasting = await createScene({ start: atChapter(2, 1000) });
+        lasting.scene.update(0, 10000);
+        expect(lasting.texts).toHaveLength(5);
+
+        const ctx = await createScene({ start: atChapter(2, 3) });
+        ctx.scene.update(0, 10000);
+
+        expect(ctx.scene.monster.dead).toBe(true);
+        expect(ctx.texts).toHaveLength(3);
+    });
+
+    it('fires nothing while the monster is dead', async () => {
+        const ctx = await createScene({ start: atChapter(2, 1) });
+        ctx.scene.update(0, 500);
+        expect(ctx.scene.monster.dead).toBe(true);
+
+        ctx.scene.update(0, 2000);
+
+        expect(ctx.texts).toHaveLength(1);
+    });
+
+    it('keeps the manual click and does not reset the auto click time', async () => {
+        const ctx = await createScene({ start: atChapter(2, 1000) });
+
+        ctx.scene.update(0, 300);
+        ctx.click();
+        ctx.scene.update(0, 200);
+
+        expect(ctx.texts).toHaveLength(2);
+    });
+
+    it('stops when the switch is turned off and stores the choice', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        switchTo(ctx, false);
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.monster.health).toBe(10);
+        expect(autoClickPreference.stored).toEqual([ false ]);
+        expect(toggle(ctx).checked).toBe(false);
+    });
+
+    it('runs again when the switch is turned back on', async () => {
+        const ctx = await createScene({ start: atChapter(2), autoClickOn: false });
+        expect(toggle(ctx).checked).toBe(false);
+
+        switchTo(ctx, true);
+        ctx.scene.update(0, 500);
+
+        expect(ctx.texts).toHaveLength(1);
+        expect(autoClickPreference.stored).toEqual([ true ]);
+    });
+
+    it('starts off when the stored choice is off', async () => {
+        const ctx = await createScene({ start: atChapter(2), autoClickOn: false });
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.monster.health).toBe(10);
+    });
+
+    it('runs at 500 ms and hides the crystals and the button when the state cannot load', async () => {
+        const ctx = await createScene({ start: atChapter(2, 1000), autoClick: new Error('down') });
+
+        expect(interval(ctx)).toBe('500 ms');
+        expect(crystals(ctx)).toBeUndefined();
+        expect(upgradeButton(ctx)).toBeUndefined();
+
+        ctx.scene.update(0, 1000);
+        expect(ctx.texts).toHaveLength(2);
+    });
+
+    it('runs at the interval of the level the backend answers and shows no button at level 4', async () => {
+        const ctx = await createScene({ start: atChapter(2, 1000), autoClick: { level: 4, maxLevel: 4, intervalMs: 50, crystals: 0, next: null } });
+
+        expect(interval(ctx)).toBe('50 ms');
+        expect(upgradeButton(ctx)).toBeUndefined();
+
+        ctx.scene.update(0, 100);
+        expect(ctx.texts).toHaveLength(2);
+    });
+
+    it('upgrades from the level shown, disables the button meanwhile and runs at the answered interval', async () => {
+        const ctx = await createScene({ start: atChapter(2, 1000), autoClick: { ...AUTO_CLICK_LEVEL_0, crystals: 10 } });
+        let answer;
+        autoClickGateway.upgrade.mockImplementation(() => new Promise((resolve) => { answer = resolve; }));
+        expect(upgradeButton(ctx).disabled).toBe(false);
+
+        upgradeButton(ctx).click();
+
+        expect(autoClickGateway.upgrade).toHaveBeenCalledWith(0);
+        expect(upgradeButton(ctx).disabled).toBe(true);
+
+        answer(LEVEL_1);
+        await flush();
+
+        expect(interval(ctx)).toBe('250 ms');
+        expect(upgradeButton(ctx).textContent).toBe('Melhorar: 150 ms (25 cristais)');
+        ctx.scene.update(0, 250);
+        expect(ctx.texts).toHaveLength(1);
+    });
+
+    it('keeps 500 ms and shows the reloaded state after a 409 refusal', async () => {
+        const ctx = await createScene({ start: atChapter(2, 1000), autoClick: { ...AUTO_CLICK_LEVEL_0, crystals: 10 } });
+        autoClickGateway.get.mockResolvedValue({ ...AUTO_CLICK_LEVEL_0, crystals: 4 });
+        autoClickGateway.upgrade.mockRejectedValue(new ApiError('poor', { status: 409, code: 'NOT_ENOUGH_CRYSTALS', body: {} }));
+
+        upgradeButton(ctx).click();
+        await flush();
+        await flush();
+
+        expect(interval(ctx)).toBe('500 ms');
+        expect(crystals(ctx)).toBe('Cristais: 4');
+        expect(upgradeButton(ctx).disabled).toBe(true);
+    });
+
+    it('shows the switch and starts once the chapter 1 boss is beaten', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1) });
+        campaignGateway.report.mockResolvedValue({ ...progress(1, 'PHASE', 1), chapter: 2 });
+        expect(autoClickElement(ctx).visible).toBe(false);
+
+        while (!ctx.scene.monster.dead)
+        {
+            ctx.click();
+        }
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+        await flush();
+        const before = ctx.texts.length;
+
+        expect(autoClickElement(ctx).visible).toBe(true);
+        ctx.scene.update(0, 500);
+        expect(ctx.texts.length).toBe(before + 1);
     });
 });

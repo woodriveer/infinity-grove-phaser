@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
 import { MINIBOSS } from '../../domain/campaign/campaign';
+import { AutoClicker, autoClickUnlocked } from '../../domain/combat/autoClick';
 import { Combo, comboText } from '../../domain/combat/combo';
 import { formatDamage } from '../../domain/combat/damage';
 import { leaderAttacker } from '../../domain/combat/leaderAttacker';
@@ -10,6 +11,7 @@ import { clickHits } from '../../domain/heroes/leaderBonus';
 import { SkillCombat } from '../../domain/skills/skillCombat';
 import { monsterAfterBreak, talentComboCap, talentTimeBonusMs } from '../../domain/talents/talents';
 import { HeroUi } from './HeroUi';
+import { renderAutoClick } from './views/autoClickView';
 import { el } from './views/dom';
 import { renderElementWheel } from './views/elementWheel';
 import { renderEffectTags, updateEffectTags } from './views/skillEffects';
@@ -64,6 +66,9 @@ const EFFECTS_HTML = '<div class="hud-box hud-effects"><div class="effect-tags">
 const STAGE_MESSAGE_HTML = '<div class="hud-box hud-message"><div class="stage-message"></div></div>';
 const FARM_TOGGLE = { x: 918, y: 686 };
 const PAUSE_MENU = { x: 512, y: 384 };
+//  Right edge, under the wallet pill: the auto click switch, its interval, the crystals and the next upgrade (spec auto-click)
+const AUTO_CLICK_HUD = { x: 918, y: 136 };
+const AUTO_CLICK_HUD_HTML = '<div class="hud-box hud-auto-click"><div class="auto-click" data-testid="auto-click"></div></div>';
 const FARM_TOGGLE_HTML = '<div class="hud-box hud-farm"><label class="farm-toggle"><input type="checkbox"> Farm boss</label></div>';
 const PAUSE_MENU_HTML = '<div class="pause-menu" hidden><div class="pause-card">'
     + '<div class="pause-title">Paused</div>'
@@ -111,12 +116,18 @@ export class ClickerGame extends Scene
         this.equipment = services.createEquipmentCollection();
         this.talents = services.createTalentCollection();
         this.farm = services.createFarmSession();
+        this.autoClick = services.createAutoClickState();
+        this.autoClickPreference = services.autoClickPreference;
+        this.autoClickEnabled = this.autoClickPreference.enabled();
+        this.autoClicker = new AutoClicker();
+        this.upgradingAutoClick = false;
         this.session.onRealign((encounter) => this.realign(encounter));
         this.session.onDrop((drop) => this.receiveDrop(drop));
         this.session.onEquipmentDrop((drop) => this.receiveEquipmentDrop(drop));
         this.session.onTalentPoints((points) => this.heroUi.showTalentPoints(points));
         this.equipment.onWallet((coins) => this.receiveWallet(coins));
         this.talents.onChange(() => this.refreshEnemyStats());
+        this.autoClick.onChange(() => this.showAutoClick());
 
         this.add.image(512, 384, 'background');
 
@@ -185,6 +196,7 @@ export class ClickerGame extends Scene
     createControls ()
     {
         this.farmToggle = this.createHtml(FARM_TOGGLE, FARM_TOGGLE_HTML, '.farm-toggle input', true);
+        this.createAutoClickHud();
         //  Above the hero buttons and the skill bar, which are added after it
         this.pauseElement = this.add.dom(PAUSE_MENU.x, PAUSE_MENU.y).createFromHTML(PAUSE_MENU_HTML).setDepth(1);
         this.pauseMenu = this.pauseElement.node.querySelector('.pause-menu');
@@ -199,6 +211,97 @@ export class ClickerGame extends Scene
         this.input.keyboard.on('keydown-ESC', () => this.escape());
         //  A held key fires once: the repeats of the operating system are ignored
         SKILL_KEYS.forEach(([ key, slot ]) => this.input.keyboard.on(`keydown-${key}`, (event) => !event?.repeat && this.useSkill(slot)));
+    }
+
+    //  The auto click box is clickable HTML, hidden until the campaign is past chapter 1; it reads its state in the background
+    createAutoClickHud ()
+    {
+        this.autoClickElement = this.add.dom(AUTO_CLICK_HUD.x, AUTO_CLICK_HUD.y).createFromHTML(AUTO_CLICK_HUD_HTML);
+        this.autoClickBox = this.autoClickElement.node.querySelector('.auto-click');
+        this.autoClickBox.addEventListener('change', (event) => this.switchAutoClick(event.target.checked));
+        this.autoClickBox.addEventListener('click', (event) => event.target.closest('.auto-click-upgrade') && this.upgradeAutoClick());
+        this.showAutoClick();
+        this.loadAutoClick();
+    }
+
+    get autoClickOpen ()
+    {
+        return autoClickUnlocked({ chapter: this.session.chapter, completed: this.session.completed });
+    }
+
+    showAutoClick ()
+    {
+        this.autoClickElement.setVisible(this.autoClickOpen);
+        this.autoClickBox.replaceChildren(...renderAutoClick({
+            enabled: this.autoClickEnabled, intervalMs: this.autoClick.intervalMs(), state: this.autoClick.state(), busy: this.upgradingAutoClick
+        }));
+    }
+
+    switchAutoClick (on)
+    {
+        this.autoClickEnabled = on;
+        this.autoClickPreference.setEnabled(on);
+        this.showAutoClick();
+    }
+
+    async loadAutoClick ()
+    {
+        try
+        {
+            await this.autoClick.load();
+        }
+        catch
+        {
+            //  The auto click runs at 500 ms with no crystals or upgrade shown; the next tick tries again
+        }
+    }
+
+    //  The upgrade is sent from the level shown; a refusal leaves the state the backend answered on screen
+    async upgradeAutoClick ()
+    {
+        if (this.upgradingAutoClick)
+        {
+            return;
+        }
+
+        this.upgradingAutoClick = true;
+        this.showAutoClick();
+
+        try
+        {
+            await this.autoClick.upgrade();
+        }
+        catch
+        {
+            //  The box shows the stored state again
+        }
+        finally
+        {
+            this.upgradingAutoClick = false;
+
+            if (this.sys.isActive())
+            {
+                this.showAutoClick();
+            }
+        }
+    }
+
+    //  While it may hit, the fight time drives the auto click; each click is a full click at the monster centre and a kill ends the burst
+    autoClickFrame (delta)
+    {
+        if (!this.autoClickOpen || !this.autoClickEnabled || !this.monster || this.monster.dead)
+        {
+            return;
+        }
+
+        this.autoClicker.intervalMs = this.autoClick.intervalMs();
+
+        const clicks = this.autoClicker.advance(delta);
+
+        for (let click = 0; click < clicks && !this.monster.dead; click++)
+        {
+            this.strike(MONSTER.x);
+        }
     }
 
     //  Esc closes an open hero screen first; otherwise it opens or closes the pause menu
@@ -467,6 +570,7 @@ export class ClickerGame extends Scene
         this.monsterParts.forEach((part) => part.setAlpha(1));
         this.stageHud.textContent = encounter.label;
         this.chapterHud.textContent = `Capítulo ${this.session.chapter}`;
+        this.showAutoClick();
         this.monsterStats = encounter.stats;
         this.showEnemyStats(monsterAfterBreak(encounter.stats, this.talents.talents()));
 
@@ -506,6 +610,7 @@ export class ClickerGame extends Scene
         this.stageHud.textContent = '';
         this.monsterHp.textContent = '';
         this.stageMessage.textContent = COMPLETED_TEXT;
+        this.showAutoClick();
 
         //  The chapter boss report goes at once, not on the next tick: its answer opens the next chapter, if there is one
         this.session.flush();
@@ -530,6 +635,7 @@ export class ClickerGame extends Scene
         }
 
         this.combo.advance(delta);
+        this.autoClickFrame(delta);
         this.showCombo();
 
         //  The stop of Stun and Root is read before the skills use it up with this frame
@@ -712,6 +818,11 @@ export class ClickerGame extends Scene
         {
             this.loadTalents();
         }
+
+        if (!this.autoClick.loaded)
+        {
+            this.loadAutoClick();
+        }
     }
 
     //  One last, best-effort sync when the scene ends; a failure is not retried
@@ -772,13 +883,18 @@ export class ClickerGame extends Scene
             return;
         }
 
+        this.strike(this.damageTextX(pointer));
+    }
+
+    //  One click on the living monster, by hand or by the auto click, with its number at `x`
+    strike (x)
+    {
         //  A countdown means the monster is a boss. One click is one step of the combo; the double click of Lyra lands two critical hits that
         //  share its bonus, and the second does not land when the first one kills.
         this.combo.maxPercent = talentComboCap(this.talents.talents());
 
         const multiplier = 1 + this.combo.click() / 100;
         const hits = clickHits(this.heroes.leader()?.id, this.random);
-        const x = this.damageTextX(pointer);
 
         for (let hit = 0; hit < hits && !this.monster.dead; hit++)
         {

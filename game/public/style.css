@@ -462,6 +462,12 @@ button:disabled {
     height: 48px;
 }
 
+.hud-auto-click {
+    width: 200px;
+    height: 132px;
+    align-items: flex-start;
+}
+
 .hud-notice {
     width: 600px;
     height: 64px;
@@ -594,7 +600,8 @@ button:disabled {
     paint-order: stroke fill;
 }
 
-.farm-toggle {
+.farm-toggle,
+.auto-click-toggle {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -606,7 +613,8 @@ button:disabled {
     cursor: pointer;
 }
 
-.farm-toggle input {
+.farm-toggle input,
+.auto-click-toggle input {
     appearance: none;
     position: relative;
     flex: none;
@@ -618,7 +626,8 @@ button:disabled {
     cursor: pointer;
 }
 
-.farm-toggle input::after {
+.farm-toggle input::after,
+.auto-click-toggle input::after {
     content: '';
     position: absolute;
     left: 3px;
@@ -630,12 +639,43 @@ button:disabled {
     transition: left 120ms;
 }
 
-.farm-toggle input:checked {
+.farm-toggle input:checked,
+.auto-click-toggle input:checked {
     background: var(--color-accent-2-600);
 }
 
-.farm-toggle input:checked::after {
+.farm-toggle input:checked::after,
+.auto-click-toggle input:checked::after {
     left: 19px;
+}
+
+/* The auto click box (spec auto-click): the switch, then the interval and the crystals, then the upgrade */
+.auto-click {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 20px;
+    background: var(--color-bg);
+    box-shadow: var(--shadow-lg);
+}
+
+.auto-click-upgrade {
+    padding: 6px 10px;
+    font: inherit;
+    border: none;
+    border-radius: 999px;
+    background: var(--color-accent-2-600);
+    color: var(--color-bg);
+    cursor: pointer;
+}
+
+.auto-click-upgrade:disabled {
+    background: var(--color-neutral-400);
+    cursor: not-allowed;
 }
 
 .pause-menu,
