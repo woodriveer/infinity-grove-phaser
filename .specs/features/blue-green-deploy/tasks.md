@@ -293,8 +293,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests: the suite comes from `git show <hash>:deploy/regression.mjs` and falls back to the working tree file when the commit has none; the `docker run` names `infinity-grove-regression-<short hash>`, uses `--network backend_default` and targets `http://backend-<slot>:8080`; a non-zero status returns false
-- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
+- [x] Tests: the suite comes from `git show <hash>:deploy/regression.mjs` and falls back to the working tree file when the commit has none; the `docker run` names `infinity-grove-regression-<short hash>`, uses `--network backend_default` and targets `http://backend-<slot>:8080`; a non-zero status returns false
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
