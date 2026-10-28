@@ -122,6 +122,14 @@
 - **Date**: 2026-10-27
 - **Status**: active; gives AD-014 its crystal source
 
+### AD-016
+- **Decision**: The backend goes live only through the blue-green watcher that `./publish.sh` starts: every new commit on `origin/main` that changes `backend/**` is built from the commit tree into the idle slot, checked by the API regression suite on the real database and switched in with `nginx -s reload`; the old slot is kept stopped 5 minutes for `./deploy.sh --rollback`. Every Flyway migration must keep the previous backend working (expand/contract: add columns and tables first, drop them in a later commit), because a failed deploy does not undo the migration it ran.
+- **Reason**: User decision: deploy on every push to `main` with no downtime, only after a regression suite passed; Flyway has no down migrations and both slots share one database.
+- **Trade-off**: A destructive migration needs two commits; a commit that breaks the old backend through its migration hurts even when its suite fails; uncommitted work no longer reaches players through `publish.sh`.
+- **Scope**: `deploy/`, `publish.sh`, `deploy.sh`, `backend/Dockerfile`, the `deploy` profile of `backend/docker-compose.yml`, `backend/src/main/resources/db/migration`
+- **Date**: 2026-10-28
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: five features from the owner's batch of 2026-10-21, all game side except two backend pieces: `combat-hud`, `click-power`, `talents`, `equipment-ui`, `boss-map` (`.specs/features/*`)

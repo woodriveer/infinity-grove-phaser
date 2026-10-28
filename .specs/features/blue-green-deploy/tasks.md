@@ -468,8 +468,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] CLAUDE.md no longer mentions `.publish-state`; AD-016 states the expand/contract rule
-- [ ] `python <skill-dir>/scripts/validate_state.py` passes on the existing features
+- [x] CLAUDE.md no longer mentions `.publish-state`; AD-016 states the expand/contract rule
+- [x] `python <skill-dir>/scripts/validate_state.py` passes on the existing features
 
 **Tests**: none
 **Gate**: build

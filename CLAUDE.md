@@ -12,13 +12,18 @@
   - **unit test coverage**: line and branch percentage of backend (JaCoCo) and game (Vitest `--coverage`, v8), for the whole project and for the files the feature changed;
   - **e2e coverage**: the line percentage of game code that the Playwright suite exercises (istanbul instrumentation), and the feature's e2e scenarios with pass/fail;
   - failing tests that are not caused by the feature, and why.
-- Coverage commands: backend `cd backend && ./gradlew test` (JaCoCo, `build/reports/jacoco/test/jacocoTestReport.xml`); game unit `cd game && npm run test:coverage` (`coverage/unit/coverage-summary.json`); e2e `cd game && npm run test:e2e:coverage` (`coverage/e2e/coverage-summary.json`). The e2e number is a lower bound: a page reloaded inside a test loses what it counted before the reload.
+- Coverage commands: backend `cd backend && ./gradlew test` (JaCoCo, `build/reports/jacoco/test/jacocoTestReport.xml`); game unit `cd game && npm run test:coverage` (`coverage/unit/coverage-summary.json`); e2e `cd game && npm run test:e2e:coverage` (`coverage/e2e/coverage-summary.json`); deploy `node --test --experimental-test-coverage "deploy/**/*.test.mjs"` (printed in the run output). The e2e number is a lower bound: a page reloaded inside a test loses what it counted before the reload.
 - Every number comes from a command run for that report. If a coverage tool is not configured, write `não medido` with the reason. Never estimate a number.
 
 # Deploy
 
-- After finishing a new feature/spec (Verifier PASS, everything pushed), deploy it manually to Cloudflare. The deploy is never automatic and never skipped silently.
-- From the repository root run `./publish.sh`: it starts everything, opens the `cloudflared` quick tunnel to the backend and publishes the game Worker pointing at that tunnel. To publish only the Worker, run `BACKEND_URL=<tunnel> npm run deploy` inside `game/`. Details in `game/readme.md`.
-- While a previous `./publish.sh` is still running, a new run reuses its backend and tunnel: it publishes nothing when the game code is the one already published, republishes only the Worker when the game changed, and asks for a restart when the backend changed (`--force` publishes anyway). The state is in `.publish-state`.
-- It needs `cloudflared` and a prior `npx wrangler login`. If either is missing, or the user is away from the machine, report that the deploy is pending instead of skipping it.
-- The site is `https://infinity-grove.yan-tapajos.workers.dev/`. It works only while the tunnel runs, so tell the user the deploy is live only for that session.
+- The backend and the game go live from `origin/main` while `./publish.sh` runs. From the repository root it starts the blue-green stack in Docker (Postgres, the active backend slot, the nginx proxy on `localhost:8080`, Dozzle), opens the `cloudflared` quick tunnel to the proxy, publishes the game Worker through that tunnel and starts the deploy watcher (`deploy/watcher.mjs`).
+- Every 60 s the watcher fetches `origin/main` and deploys the newest commit it has not handled. A commit that changes `backend/**` is built into the idle slot, checked by the regression suite (`deploy/regression.mjs`) and switched in with no downtime; a failing commit never takes traffic. A commit that changes the game republishes the Worker through the same tunnel. Any other commit is only recorded. The state is in `.deploy-state`.
+- Only the tree of a commit is deployed, never the working tree: uncommitted files never reach players.
+- After finishing a new feature/spec (Verifier PASS, everything pushed), make sure `./publish.sh` is running and the commit is on `origin/main`; the watcher deploys it within a few minutes. This step is never skipped silently: if `publish.sh` is not running and cannot be started, report that the deploy is pending.
+- `./deploy.sh --rollback` brings back the previous backend within 5 minutes of a deploy; after that the old slot and its image are removed.
+- Dozzle shows the live logs of every container (slots, proxy, regression runs) at `http://localhost:8888`.
+- A second `./publish.sh` while one runs only prints the tunnel and the active slot; `--force` republishes the Worker of the handled commit. To publish only the Worker by hand, run `BACKEND_URL=<tunnel> npm run deploy` inside `game/`. Details in `game/readme.md`.
+- Every Flyway migration must keep the previous backend working (expand/contract, AD-016): a failed deploy does not undo it.
+- It needs Docker, `cloudflared` and a prior `npx wrangler login`. If one is missing, or the user is away from the machine, report that the deploy is pending instead of skipping it.
+- The site is `https://infinity-grove.yan-tapajos.workers.dev/`. It works only while the tunnel runs, so tell the user the deploy is live only while `publish.sh` runs.

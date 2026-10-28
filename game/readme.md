@@ -22,12 +22,14 @@ See `docs/adr/` for the architecture decisions.
 
 The game is served by a Cloudflare Worker at `https://infinity-grove.yan-tapajos.workers.dev/`. It forwards `/api/*` to a backend that must be reachable from the internet (the backend has no `/api` prefix; the Worker strips it).
 
-Deploy by hand after every change to `game/`; a `git push` does not publish:
+The Worker is published by `./publish.sh` (repository root) and, while it runs, by its deploy watcher: every commit on `origin/main` that changes the game is built from the commit tree (never the working tree) and published through the running tunnel. A `git push` is enough while `publish.sh` runs.
+
+`./publish.sh` starts the backend blue-green stack in Docker, opens a Cloudflare quick tunnel to the proxy on `localhost:8080`, publishes the Worker of the last handled commit pointing at that tunnel and starts the watcher (needs Docker, `cloudflared` and `npx wrangler login`). The tunnel address changes on every run, so the site works only while the script runs. `./publish.sh --no-deploy` skips the first publish; a second run while one is up prints the tunnel, and `--force` republishes. The container logs are at `http://localhost:8888` (Dozzle).
+
+To publish by hand from `game/`:
 
 ```
 BACKEND_URL=https://<backend-host> npm run deploy
 ```
 
-`BACKEND_URL` is the bare backend address, without `/api`. It needs a prior `npx wrangler login`.
-
-From the repository root, `./publish.sh` does all of it: it runs `start.sh`, opens a Cloudflare quick tunnel to the backend and publishes the latest game pointing at that tunnel (needs `cloudflared` and `npx wrangler login`). The tunnel address changes on every run, so the site works only while the script runs. `./publish.sh --no-deploy` skips the publish.
+`BACKEND_URL` is the bare backend address, without `/api`. This publishes the working tree, uncommitted changes included.
