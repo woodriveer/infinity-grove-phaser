@@ -100,10 +100,10 @@ The Rever chefes window is a plain list of the bosses already beaten. The player
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| MAP-01 | P1: map, order and states (AC 1-4, 6-7) | Specify | Pending |
-| MAP-02 | P1: farm click, wins, empty, pause (AC 5, 8-10) | Specify | Pending |
-| MAP-03 | P2: image, fallback, positions (AC 1-5) | Specify | Pending |
-| MAP-04 | P2: Gemini prompt (AC 6) | Specify | Pending |
+| MAP-01 | P1: map, order and states (AC 1-4, 6-7) | Done | Verified |
+| MAP-02 | P1: farm click, wins, empty, pause (AC 5, 8-10) | Done | Verified |
+| MAP-03 | P2: image, fallback, positions (AC 1-5) | Done | Verified |
+| MAP-04 | P2: Gemini prompt (AC 6) | Done | Verified |
 
 **Coverage:** 4 total, 0 mapped to tasks, 4 unmapped
 

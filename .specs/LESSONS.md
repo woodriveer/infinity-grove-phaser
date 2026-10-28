@@ -300,6 +300,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: iteration 2 M15 (verification)
 - last seen: 2026-10-28T18:03:03Z
 
+### L-049 - An AC met only by CSS visibility needs an e2e toBeHidden/toBeVisible check per state; a class check in jsdom does not prove it.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game/e2e` · harmful: 0
+- features: boss-map
+- evidence: game/e2e/bossMap.spec.js:85 M8 (game/e2e)
+- last seen: 2026-10-28T18:07:56Z
+
+### L-050 - Map each spec Independent Test line to an e2e scenario, or the untested half goes unseen.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: boss-map
+- evidence: P2 AC3 Independent Test (spec)
+- last seen: 2026-10-28T18:07:56Z
+
+### L-051 - When a test depends on whether an asset exists, serve or block it with page.route so local files cannot change the result.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `game/e2e` · harmful: 0
+- features: boss-map
+- evidence: game/e2e/bossMap.spec.js fallback (game/e2e)
+- last seen: 2026-10-28T18:07:57Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

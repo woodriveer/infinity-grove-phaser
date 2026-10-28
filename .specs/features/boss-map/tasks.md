@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Spec**: `.specs/features/boss-map/spec.md`
-**Status**: In progress
+**Status**: Done
 
 The design is inline (no `design.md`): game only, ADR 0007. The stop states are a pure domain rule (`domain/campaign/bossMap.js`); the map is plain DOM (`views/farmView.js`) tested in jsdom like the other hero screens. The rows of the old list become stops, so the tests that pinned the rows follow the spec (a stop shows its number and its accessible name); the test ids `farm-entry-*` (defeated stops) and `farm-empty` stay.
 

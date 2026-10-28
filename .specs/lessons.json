@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 49,
+  "next_id": 52,
   "lessons": [
     {
       "id": "L-001",
@@ -872,6 +872,60 @@
       ],
       "created": "2026-10-28T18:03:03Z",
       "last_seen": "2026-10-28T18:03:03Z"
+    },
+    {
+      "id": "L-049",
+      "key": "surviving_mutant::an ac met only by css visibility needs an e2e tobehidden tobevisible check per state a class check in jsdom does not prove it",
+      "text": "An AC met only by CSS visibility needs an e2e toBeHidden/toBeVisible check per state; a class check in jsdom does not prove it.",
+      "signal": "surviving_mutant",
+      "scope": "game/e2e",
+      "status": "candidate",
+      "features": [
+        "boss-map"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/e2e/bossMap.spec.js:85 M8 (game/e2e)"
+      ],
+      "created": "2026-10-28T18:07:56Z",
+      "last_seen": "2026-10-28T18:07:56Z"
+    },
+    {
+      "id": "L-050",
+      "key": "ac_gap::map each spec independent test line to an e2e scenario or the untested half goes unseen",
+      "text": "Map each spec Independent Test line to an e2e scenario, or the untested half goes unseen.",
+      "signal": "ac_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "boss-map"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "P2 AC3 Independent Test (spec)"
+      ],
+      "created": "2026-10-28T18:07:56Z",
+      "last_seen": "2026-10-28T18:07:56Z"
+    },
+    {
+      "id": "L-051",
+      "key": "spec_precision_gap::when a test depends on whether an asset exists serve or block it with page route so local files cannot change the result",
+      "text": "When a test depends on whether an asset exists, serve or block it with page.route so local files cannot change the result.",
+      "signal": "spec_precision_gap",
+      "scope": "game/e2e",
+      "status": "candidate",
+      "features": [
+        "boss-map"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/e2e/bossMap.spec.js fallback (game/e2e)"
+      ],
+      "created": "2026-10-28T18:07:57Z",
+      "last_seen": "2026-10-28T18:07:57Z"
     }
   ]
 }
