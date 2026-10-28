@@ -167,8 +167,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests: a missing file reads `null`, a round trip keeps every field of the data model, a second `acquireLock` is refused until `releaseLock`, `clearStaleLock` frees it
-- [ ] Gate check passes: `node --test deploy/`
+- [x] Tests: a missing file reads `null`, a round trip keeps every field of the data model, a second `acquireLock` is refused until `releaseLock`, `clearStaleLock` frees it
+- [x] Gate check passes: `node --test deploy/`
 
 **Tests**: unit
 **Gate**: quick
