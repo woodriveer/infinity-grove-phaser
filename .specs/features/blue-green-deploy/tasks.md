@@ -393,8 +393,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests: Docker down and fetch failure log their exact text and change nothing; the same target does nothing but sweep; a README-only range sets `handled` with no build; a backend range deploys; a game range publishes the Worker; a mixed range publishes only after a passed deploy; a taken lock skips the tick; two commits since `handled` deploy only the newest; the lock is released on every path
-- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
+- [x] Tests: Docker down and fetch failure log their exact text and change nothing; the same target does nothing but sweep; a README-only range sets `handled` with no build; a backend range deploys; a game range publishes the Worker; a mixed range publishes only after a passed deploy; a taken lock skips the tick; two commits since `handled` deploy only the newest; the lock is released on every path
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
