@@ -267,9 +267,9 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests on a fake `fetch`: the happy path prints `Regressão OK: 12 verificações em <s> s` and deletes the user; a wrong status in each of `reset bloqueado`, `reset` and `auto clique após reset` prints `FALHOU: <check>: <expected> / <received>`, stops there and still deletes the user; a failed delete fails the run; the CLI exits 0/1
-- [ ] Live: `node deploy/regression.mjs http://localhost:8080` against `start.sh` exits 0, and `GET /users` shows no `regression-` user afterwards (output in the commit body)
-- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
+- [x] Tests on a fake `fetch`: the happy path prints `Regressão OK: 12 verificações em <s> s` and deletes the user; a wrong status in each of `reset bloqueado`, `reset` and `auto clique após reset` prints `FALHOU: <check>: <expected> / <received>`, stops there and still deletes the user; a failed delete fails the run; the CLI exits 0/1
+- [x] Live: `node deploy/regression.mjs http://localhost:8080` against `start.sh` exits 0, and `GET /users` shows no `regression-` user afterwards (output in the commit body)
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: full
