@@ -1,5 +1,5 @@
 //  Publishes the Worker built from a commit's game tree, never the working tree, through the live tunnel
-import { mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -12,7 +12,8 @@ export const publishWorker = ({ exec, root, hash, tunnel, log }) =>
     const steps = [
         () => exec('git', ['archive', '--format=tar', `--output=${join(dir, 'game.tar')}`, hash, 'game'], { cwd: root }),
         () => exec('tar', ['-xf', 'game.tar'], { cwd: dir }),
-        () => exec('npm ci', [], { cwd: game, shell: true }),
+        //  game/package-lock.json is gitignored: npm ci needs one, so a tree without it installs from package.json
+        () => exec(existsSync(join(game, 'package-lock.json')) ? 'npm ci' : 'npm install', [], { cwd: game, shell: true }),
         () => exec('npm run deploy', [], { cwd: game, env: { BACKEND_URL: tunnel }, shell: true })
     ];
 

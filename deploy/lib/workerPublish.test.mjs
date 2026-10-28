@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { publishWorker } from './workerPublish.mjs';
 
@@ -8,8 +8,9 @@ const HASH = 'ccccccc3333333333333333333333333333333333';
 const ROOT = '/repo';
 const TUNNEL = 'https://abc.trycloudflare.com';
 
-//  A fake exec: git archive writes the tar it is told to; a command matching a failing pattern exits 1
-const fakeExec = (failing = []) =>
+//  A fake exec: git archive writes the tar it is told to, tar unpacks a game tree (with a package-lock.json unless told not to);
+//  a command matching a failing pattern exits 1
+const fakeExec = (failing = [], { lock = true } = {}) =>
 {
     const calls = [];
     const exec = (command, args, options = {}) =>
@@ -20,6 +21,17 @@ const fakeExec = (failing = []) =>
         {
             const output = args.find((arg) => arg.startsWith('--output=')).slice('--output='.length);
             writeFileSync(output, 'tar');
+        }
+
+        if (command === 'tar')
+        {
+            mkdirSync(join(options.cwd, 'game'));
+            writeFileSync(join(options.cwd, 'game', 'package.json'), '{}');
+
+            if (lock)
+            {
+                writeFileSync(join(options.cwd, 'game', 'package-lock.json'), '{}');
+            }
         }
 
         return { status: failing.some((pattern) => calls.at(-1).line.includes(pattern)) ? 1 : 0, stdout: '', stderr: '' };
@@ -74,3 +86,15 @@ for (const step of ['git archive', 'tar -xf', 'npm ci', 'npm run deploy'])
         assert.equal(existsSync(dirname(calls[0].line.match(/--output=(\S+)/)[1])), false);
     });
 }
+
+//  game/package-lock.json is gitignored, so a commit tree usually has none and npm ci would refuse to run
+test('a commit tree with no package-lock.json installs with npm install', () =>
+{
+    const { exec, calls } = fakeExec([], { lock: false });
+
+    const { ok } = publish(exec);
+
+    assert.equal(ok, true);
+    assert.deepEqual(calls.slice(2).map((call) => call.line), ['npm install', 'npm run deploy']);
+    assert.equal(calls[2].options.shell, true);
+});
