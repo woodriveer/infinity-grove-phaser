@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 45,
+  "next_id": 46,
   "lessons": [
     {
       "id": "L-001",
@@ -800,6 +800,24 @@
       ],
       "created": "2026-10-28T09:23:27Z",
       "last_seen": "2026-10-28T09:23:27Z"
+    },
+    {
+      "id": "L-045",
+      "key": "surviving_mutant::give a check whose failure a fallback value would mask such as an earlier token its own failing case test",
+      "text": "Give a check whose failure a fallback value would mask, such as an earlier token, its own failing-case test",
+      "signal": "surviving_mutant",
+      "scope": "deploy",
+      "status": "candidate",
+      "features": [
+        "blue-green-deploy"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M27 deploy/regression.mjs:80 (deploy)"
+      ],
+      "created": "2026-10-28T09:37:36Z",
+      "last_seen": "2026-10-28T09:37:36Z"
     }
   ]
 }

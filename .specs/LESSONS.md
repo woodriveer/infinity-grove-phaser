@@ -276,6 +276,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: SPEC_DEVIATION deploy/lib/previous.mjs:38 (spec)
 - last seen: 2026-10-28T09:23:27Z
 
+### L-045 - Give a check whose failure a fallback value would mask, such as an earlier token, its own failing-case test
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `deploy` · harmful: 0
+- features: blue-green-deploy
+- evidence: validation.md M27 deploy/regression.mjs:80 (deploy)
+- last seen: 2026-10-28T09:37:36Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
