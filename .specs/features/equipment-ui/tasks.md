@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Spec**: `.specs/features/equipment-ui/spec.md`
-**Status**: In progress
+**Status**: Done
 
 The design is inline (no `design.md`): game only, ADR 0007 (`domain` / `application` / `adapters`); the screen is plain DOM tested in jsdom like the other hero screens. The tiles replace the text rows of the Equipamento screen, so the tests that pinned those rows (`equipmentView.test.js`) follow the spec (tiles with an icon, tooltip with the title); the test ids `equip-piece-<id>`, `equip-slot-<hero>-<slot>`, `equipment-list`, `equipment-bag` and `piece-*` stay.
 

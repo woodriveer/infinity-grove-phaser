@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 46,
+  "next_id": 49,
   "lessons": [
     {
       "id": "L-001",
@@ -818,6 +818,60 @@
       ],
       "created": "2026-10-28T09:37:36Z",
       "last_seen": "2026-10-28T09:37:36Z"
+    },
+    {
+      "id": "L-046",
+      "key": "surviving_mutant::a test that reads a css rule must cut out its own media block searching from a match to the end of the file passes on unrelated blocks",
+      "text": "A test that reads a CSS rule must cut out its own @media block; searching from a match to the end of the file passes on unrelated blocks.",
+      "signal": "surviving_mutant",
+      "scope": "game/css-tests",
+      "status": "candidate",
+      "features": [
+        "equipment-ui"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/src/rarityFrames.test.js:32 M13/M14 (game/css-tests)"
+      ],
+      "created": "2026-10-28T18:03:01Z",
+      "last_seen": "2026-10-28T18:03:01Z"
+    },
+    {
+      "id": "L-047",
+      "key": "surviving_mutant::when a css rule has a selector list assert each selector of the list not only the last one",
+      "text": "When a CSS rule has a selector list, assert each selector of the list, not only the last one.",
+      "signal": "surviving_mutant",
+      "scope": "game/css-tests",
+      "status": "candidate",
+      "features": [
+        "equipment-ui"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/src/rarityFrames.test.js M15 (game/css-tests)"
+      ],
+      "created": "2026-10-28T18:03:02Z",
+      "last_seen": "2026-10-28T18:03:02Z"
+    },
+    {
+      "id": "L-048",
+      "key": "surviving_mutant::check a fix for a surviving mutant with a fresh mutant on the sibling behaviour of the same ac not only by re running the original mutant",
+      "text": "Check a fix for a surviving mutant with a fresh mutant on the sibling behaviour of the same AC, not only by re-running the original mutant.",
+      "signal": "surviving_mutant",
+      "scope": "verification",
+      "status": "candidate",
+      "features": [
+        "equipment-ui"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "iteration 2 M15 (verification)"
+      ],
+      "created": "2026-10-28T18:03:03Z",
+      "last_seen": "2026-10-28T18:03:03Z"
     }
   ]
 }

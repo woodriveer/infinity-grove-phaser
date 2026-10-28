@@ -282,6 +282,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md M27 deploy/regression.mjs:80 (deploy)
 - last seen: 2026-10-28T09:37:36Z
 
+### L-046 - A test that reads a CSS rule must cut out its own @media block; searching from a match to the end of the file passes on unrelated blocks.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game/css-tests` · harmful: 0
+- features: equipment-ui
+- evidence: game/src/rarityFrames.test.js:32 M13/M14 (game/css-tests)
+- last seen: 2026-10-28T18:03:01Z
+
+### L-047 - When a CSS rule has a selector list, assert each selector of the list, not only the last one.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game/css-tests` · harmful: 0
+- features: equipment-ui
+- evidence: game/src/rarityFrames.test.js M15 (game/css-tests)
+- last seen: 2026-10-28T18:03:02Z
+
+### L-048 - Check a fix for a surviving mutant with a fresh mutant on the sibling behaviour of the same AC, not only by re-running the original mutant.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `verification` · harmful: 0
+- features: equipment-ui
+- evidence: iteration 2 M15 (verification)
+- last seen: 2026-10-28T18:03:03Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

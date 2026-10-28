@@ -134,12 +134,12 @@ The Equipamento window lists every piece as a text row, hides the leader's real 
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| EQU-01 | P1: panel lines and numbers (AC 1-6, 9) | Specify | Pending |
-| EQU-02 | P1: panel follows changes (AC 7-8, 10) | Specify | Pending |
-| EQU-03 | P1: tiles, rarity frames, refine (AC 1-2, 7-8, 10-13) | Specify | Pending |
-| EQU-04 | P1: tooltip and click (AC 3-6, 9) | Specify | Pending |
-| EQU-05 | P2: transfer flow (AC 1-4) | Specify | Pending |
-| EQU-06 | P2: transfer refresh and failure (AC 5-8) | Specify | Pending |
+| EQU-01 | P1: panel lines and numbers (AC 1-6, 9) | Done | Verified |
+| EQU-02 | P1: panel follows changes (AC 7-8, 10) | Done | Verified |
+| EQU-03 | P1: tiles, rarity frames, refine (AC 1-2, 7-8, 10-13) | Done | Verified |
+| EQU-04 | P1: tooltip and click (AC 3-6, 9) | Done | Verified |
+| EQU-05 | P2: transfer flow (AC 1-4) | Done | Verified |
+| EQU-06 | P2: transfer refresh and failure (AC 5-8) | Done | Verified |
 
 **Coverage:** 6 total, 0 mapped to tasks, 6 unmapped
 
