@@ -10,6 +10,7 @@ export const renderConf = (slot) => `upstream backend {
 
 server {
     listen 80;
+    keepalive_timeout 0;
 
     location / {
         proxy_pass http://backend;

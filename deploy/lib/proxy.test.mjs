@@ -36,6 +36,13 @@ test('the conf names only the given slot', () =>
     assert.match(renderConf('green'), /proxy_pass http:\/\/backend;/);
 });
 
+//  A reload closes the idle keep-alive connections of the old workers, and a request sent on one at that moment is reset
+//  (seen live: one UND_ERR_SOCKET right at a switch); with no client keep-alive no connection is idle at a reload
+test('the conf turns off client keep-alive, so a reload resets no request', () =>
+{
+    assert.match(renderConf('green'), /^\s*keepalive_timeout 0;$/m);
+});
+
 test('writeConf writes default.conf in the dir', () =>
 {
     writeConf(dir, 'blue');
