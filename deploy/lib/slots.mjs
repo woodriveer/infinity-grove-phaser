@@ -30,6 +30,9 @@ export const startSlot = (exec, root, slot, image) =>
 
 export const stopSlot = (exec, slot) => exec('docker', ['stop', containerOf(slot)]).status === 0;
 
+//  Starts the slot's stopped container as it is, image and all (a rollback)
+export const resumeSlot = (exec, slot) => exec('docker', ['start', containerOf(slot)]).status === 0;
+
 export const removeSlot = (exec, root, slot) =>
     exec('docker', [...COMPOSE, 'rm', '-sf', `backend-${slot}`], { cwd: root }).status === 0;
 

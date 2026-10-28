@@ -343,8 +343,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests: the sweep keeps a previous slot stopped 4 min 59 s ago and removes the container and its image at 5 min; a rollback starts the previous container, waits for 401, switches, stops the other slot, logs `Rollback para <h> no slot <slot>` and keeps `handled`; with no previous container it returns false with `Sem versão anterior para voltar (removida após 5 min)`
-- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
+- [x] Tests: the sweep keeps a previous slot stopped 4 min 59 s ago and removes the container and its image at 5 min; a rollback starts the previous container, waits for 401, switches, stops the other slot, logs `Rollback para <h> no slot <slot>` and keeps `handled`; with no previous container it returns false with `Sem versão anterior para voltar (removida após 5 min)`
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
