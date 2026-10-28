@@ -217,8 +217,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests: the conf names only `backend-<slot>:8080`; `switchTo` runs `nginx -t` before `nginx -s reload`; a failed `nginx -t` writes the old conf back and returns false without a reload
-- [ ] Gate check passes: `node --test deploy/`
+- [x] Tests: the conf names only `backend-<slot>:8080`; `switchTo` runs `nginx -t` before `nginx -s reload`; a failed `nginx -t` writes the old conf back and returns false without a reload
+- [x] Gate check passes: `node --test deploy/`
 
 **Tests**: unit
 **Gate**: quick
