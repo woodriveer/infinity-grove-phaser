@@ -368,8 +368,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests: it extracts `git archive <hash> game` into a temp dir, runs `npm ci` then `npm run deploy` there with `BACKEND_URL=<tunnel>`, removes the dir on success and on failure, and logs `Publicação do Worker <h> falhou` on a non-zero status
-- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
+- [x] Tests: it extracts `git archive <hash> game` into a temp dir, runs `npm ci` then `npm run deploy` there with `BACKEND_URL=<tunnel>`, removes the dir on success and on failure, and logs `Publicação do Worker <h> falhou` on a non-zero status
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick

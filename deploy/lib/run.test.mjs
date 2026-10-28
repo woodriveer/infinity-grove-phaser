@@ -53,3 +53,11 @@ test('runs in the given cwd', () =>
 
     assert.equal(result.stdout.toLowerCase(), dir.toLowerCase());
 });
+
+test('runs a command line through the shell when asked', () =>
+{
+    const result = run('npm --version', [], { shell: true });
+
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /^\d+\.\d+\.\d+/);
+});
