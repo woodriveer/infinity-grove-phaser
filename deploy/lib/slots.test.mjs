@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { SLOTS, buildImage, imageOf, otherSlot, removeImage, removeSlot, slotExists, startSlot, stopSlot, waitReady } from './slots.mjs';
 
@@ -189,4 +190,20 @@ test('waitReady still takes a 401 that comes just before 180 s', async () =>
 
     assert.equal(await waitReady(fetch, 'green', clock), true);
     assert.equal(clock.now(), 178000);
+});
+
+//  Docker Desktop accepts a connection on the slot port before the backend listens; the request timer must keep Node alive
+//  until it aborts, or the watcher exits on an unsettled await (seen live: exit 13 in the middle of a deploy)
+test('waitReady keeps the process alive while a request hangs, and aborts it on its own timer', () =>
+{
+    const script = `
+        import { waitReady } from ${JSON.stringify(new URL('./slots.mjs', import.meta.url).href)};
+        const fetch = (url, { signal }) => new Promise((resolve, reject) => signal.addEventListener('abort', () => reject(signal.reason)));
+        const ready = await waitReady(fetch, 'green', { timeoutMs: 300, intervalMs: 10, requestTimeoutMs: 100 });
+        console.log('ready=' + ready);
+    `;
+    const child = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8' });
+
+    assert.equal(child.status, 0, child.stderr);
+    assert.equal(child.stdout.trim(), 'ready=false');
 });

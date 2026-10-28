@@ -42,17 +42,22 @@ export const removeImage = (exec, image) => exec('docker', ['image', 'rm', image
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-//  Ready on the first 401 from /progress (Spring and security are up, no token sent); a refused connection or a 5xx keeps polling
-export const waitReady = async (fetch, slot, { timeoutMs = 180000, intervalMs = 2000, now = Date.now, sleep = wait } = {}) =>
+//  Ready on the first 401 from /progress (Spring and security are up, no token sent); a refused connection or a 5xx keeps polling.
+//  The request timer is a plain setTimeout, not AbortSignal.timeout: Docker Desktop accepts a connection before the backend
+//  listens, and with only an unref'd timer pending Node ends the run on an unsettled await
+export const waitReady = async (fetch, slot, { timeoutMs = 180000, intervalMs = 2000, requestTimeoutMs = 10000, now = Date.now, sleep = wait } = {}) =>
 {
     const url = `http://127.0.0.1:${SLOTS[slot].port}/progress`;
     const start = now();
 
     for (;;)
     {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
+
         try
         {
-            const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+            const response = await fetch(url, { signal: controller.signal });
 
             if (response.status === 401)
             {
@@ -62,6 +67,10 @@ export const waitReady = async (fetch, slot, { timeoutMs = 180000, intervalMs = 
         catch
         {
             //  not listening yet
+        }
+        finally
+        {
+            clearTimeout(timer);
         }
 
         if (now() - start >= timeoutMs)
