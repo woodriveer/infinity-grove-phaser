@@ -3163,6 +3163,18 @@ describe('ClickerGame talents in combat', () => {
         expect(ctx.scene.countdown.limitMs).toBe(45_000);
     });
 
+    it('adds a time talent upgraded during the fight to the limit of the next encounter', async () => {
+        const ctx = await createScene({ start: progress(1, 'MINIBOSS', 1), talents: tree() });
+
+        expect(ctx.scene.countdown.limitMs).toBe(30_000);
+
+        talentGateway.upgrade.mockResolvedValue({ talents: tree({ MINIBOSS_TIME: 5 }), points: { earned: 5, spent: 5, available: 0 } });
+        await ctx.scene.talents.upgrade('MINIBOSS_TIME', 0);
+        ctx.scene.showEncounter(ctx.scene.session.encounter());
+
+        expect(ctx.scene.countdown.limitMs).toBe(40_000);
+    });
+
     it('fights with no talent effect while they cannot be loaded, and tries again on the next tick', async () => {
         const ctx = await createScene({ start: bigMonsters(fire(20)), talents: new ApiError('down', { status: 500 }) });
 
