@@ -2,16 +2,16 @@
 
 **Date**: 2026-10-28
 **Spec**: `.specs/features/blue-green-deploy/spec.md` (updated in `37f3132`)
-**Diff range**: round 1 `0ee314b..dc803b2` (25 commits: d73282c docs, ca7bf41 T1, 08dd35f T2, 6a8e858 T3, 68973d1 T4, c9de3b6 T5, 01c0421 T6, 4f0bd9e T7, 2e29bc3 docs, 4585351 T8, 90e5b82 T9, 0622f68 T10, 4905672 T11, 60393e6 T12, 1c3fd10 T13, 1179abe T14, 1b119fd fix, 4ca7feb chore, 837ca2d fix, 05e98aa fix, 439c76a / 4ea7667 / 32b6928 live gate commits, d05c174 T15, dc803b2 T16). Round 2 adds `19da347` (fix: readiness only on 401, FALHOU tests for the early checks, CLI with no argument, a failed deploy removes the refused image) and `37f3132` (spec: FALHOU texts, rollback failure texts US-4 AC 4, short hash). `ce25ebe` is the round-1 report.
-**Verifier**: independent sub-agent (author ≠ verifier), re-verification round 2 of 3
+**Diff range**: round 1 `0ee314b..dc803b2` (25 commits: d73282c docs, ca7bf41 T1, 08dd35f T2, 6a8e858 T3, 68973d1 T4, c9de3b6 T5, 01c0421 T6, 4f0bd9e T7, 2e29bc3 docs, 4585351 T8, 90e5b82 T9, 0622f68 T10, 4905672 T11, 60393e6 T12, 1c3fd10 T13, 1179abe T14, 1b119fd fix, 4ca7feb chore, 837ca2d fix, 05e98aa fix, 439c76a / 4ea7667 / 32b6928 live gate commits, d05c174 T15, dc803b2 T16). Round 2 adds `19da347` (fix: readiness only on 401, FALHOU tests for the early checks, CLI with no argument, a failed deploy removes the refused image) and `37f3132` (spec: FALHOU texts, rollback failure texts US-4 AC 4, short hash). `ce25ebe` is the round-1 report. Round 3 adds `1897dd1` (tests only: a `login` row in the early-failure table of `deploy/regression.test.mjs`, and a backendDeploy test that a failed redeploy of the active commit runs no `docker image rm`). `b41af0e` is the round-2 report.
+**Verifier**: independent sub-agent (author ≠ verifier), re-verification round 3 of 3
 
-**Verdict**: FAIL
+**Verdict**: PASS
 
-The 4 surviving mutants of round 1 (M1, M1b, M11, M12) are all killed now, and so are the 6 new mutants on the round-2 code (removal of the refused image, the rollback failure texts). The spec now states the FALHOU wordings, the rollback failure texts and the short hash, so the three spec-precision notes of round 1 are closed.
+Round 3 closes the only blocking gap of round 2. Mutant M27 (`login` without `expectStatus(response, 200)`, `deploy/regression.mjs:80`) is now killed by the new `login` row (`deploy/regression.test.mjs:230`). The optional probe M26 (a failed redeploy of the active commit removes its image) is now killed too, by `deploy/lib/backendDeploy.test.mjs:158-165`. Three earlier killed mutants (M1, M12, M21) were run again and are still killed. Each of the 12 checks of the suite now has a failing-case test, so US-2 AC 2 is fully covered.
 
-The verdict is still FAIL because of **one new surviving mutant, M27**. The `login` check (US-2 AC 2, "log in (200)") is the only one of the 12 checks with no failing-case test. 19da347 added failing cases for `cadastro`, `progresso inicial`, `carteira`, `talentos`, `heróis`, `equipamentos` and `auto clique inicial`, but not for `login`. Removing `expectStatus(response, 200)` from `login` (`deploy/regression.mjs:80`) leaves all 117 tests passing. The mutant is not equivalent: the next line falls back to the `cadastro` token (`token = response.body?.accessToken ?? token`), so a backend whose `POST /users/login` answers 500 would pass the whole suite and take traffic. The fix is one test case. No production change is needed.
+1897dd1 changes only tests (10 lines added in 2 test files). No production, backend or game file changed since round 2.
 
-A second probe (M26) survives but is equivalent in production (see the sensor section). The restart edge case has code and launcher-level evidence only. It does not block.
+The restart edge case is still ⚠️ with code and launcher-level evidence only, as in round 2. It does not block, because the Test Coverage Matrix plans the launchers as live-only.
 
 ---
 
@@ -26,9 +26,9 @@ A second probe (M26) survives but is equivalent in production (see the sensor se
 | T5 classify changes | ✅ Done | c9de3b6 |
 | T6 proxy switch | ✅ Done | 01c0421, keep-alive fix 05e98aa |
 | T7 slot lifecycle | ✅ Done | 4f0bd9e, hang fix 837ca2d; readiness tests 19da347 |
-| T8 regression suite | ⚠️ Partial | 4585351; failing cases 19da347, still none for `login` (M27) |
+| T8 regression suite | ✅ Done | 4585351; failing cases 19da347; `login` case 1897dd1 (M27 killed) |
 | T9 suite in a container | ✅ Done | 90e5b82 |
-| T10 blue-green deploy | ✅ Done | 0622f68; refused image removed 19da347 |
+| T10 blue-green deploy | ✅ Done | 0622f68; refused image removed 19da347; active-commit image test 1897dd1 (M26 killed) |
 | T11 sweep and rollback | ✅ Done | 4905672; SPEC_DEVIATION marker removed 19da347 (texts now in the spec) |
 | T12 Worker of a commit | ✅ Done | 60393e6, 1b119fd |
 | T13 watcher | ✅ Done | 1c3fd10 |
@@ -40,7 +40,7 @@ A second probe (M26) survives but is equivalent in production (see the sensor se
 
 ## Spec-Anchored Acceptance Criteria
 
-Paths are relative to `deploy/`. Line numbers are at `37f3132`. "Live" means the evidence in the commit body named (the author's run on the real stack). It is accepted as recorded evidence and is not a unit test.
+Paths are relative to `deploy/`. Line numbers are at `37f3132`, except the US-2 AC 2 row and the round-3 sensor rows, which are at `1897dd1`. 1897dd1 inserts one line at `regression.test.mjs:230` and nine lines at `lib/backendDeploy.test.mjs:158-166`, so in those two files the older citations after those points move down by 1 and 9 lines. "Live" means the evidence in the commit body named (the author's run on the real stack). It is accepted as recorded evidence and is not a unit test.
 
 ### P1: Deploy a new backend with no downtime
 
@@ -61,7 +61,7 @@ Paths are relative to `deploy/`. Line numbers are at `37f3132`. "Live" means the
 | # | Criterion | Spec-defined outcome | `file:line` + assertion | Result |
 | - | --------- | -------------------- | ----------------------- | ------ |
 | 1 | Base URL as only argument; exit 0 / 1 | 0 all pass, 1 otherwise | `regression.test.mjs:395-396` - code `0` + OK line; `:420-421` - code `1` + FALHOU line; `:403-408` - no argument: code `1`, stdout `'Uso: node regression.mjs <url base>\n'` | ✅ PASS (round-1 note closed) |
-| 2 | The 12 checks in order with their values | the 12 checks of the spec | `regression.test.mjs:142-165` - exact request order, `checks == 12`. Failing cases: `cadastro` `:229`; `progresso inicial` `:230`, `:260`; `carteira` / `talentos` / `heróis` / `equipamentos` `:231-234`; `auto clique inicial` `:235`, `:252`; `reset bloqueado` `:205`; `capítulo 1` `:343`; `reset` `:213`, `:324`; `auto clique após reset` `:221`, `:333`. Each early case asserts `ok == false`, the stop count, the single line and the delete (`:245-248`). **`login` (200) has no failing case** | ❌ GAP: **mutant M27 survived**. Removing the `login` status check (`regression.mjs:80`) passes every test, and the cadastro token fallback (`regression.mjs:81`) lets a broken login pass the suite |
+| 2 | The 12 checks in order with their values | the 12 checks of the spec | `regression.test.mjs:142-165` - exact request order, `checks == 12`. Failing cases (at `1897dd1`), one per check: `cadastro` `:229`; `login` `:230` (`'FALHOU: login: 200 / 500'`, stops after `1` check); `progresso inicial` `:231`, `:261`; `carteira` / `talentos` / `heróis` / `equipamentos` `:232-235`; `auto clique inicial` `:236`; `reset bloqueado` `:205`; `capítulo 1` `:344`; `reset` `:213`, `:325`; `auto clique após reset` `:221`, `:334`. Each early case asserts `ok == false`, the stop count, the single line and the delete (`:246-249`) | ✅ PASS (M27 killed in round 3) |
 | 3 | A failed check prints the line and stops | `FALHOU: <check>: <expected> / <received>`, with the wordings now in the spec | Spec examples, all asserted verbatim: `200 / 500` `:213`, `:231-234`; `capítulo 1 etapa 1 / capítulo 2 etapa 1` `:230`; `nível 0 e resets 0 / nível 0 e resets 1` `:235`; `409 RESET_LOCKED / 500` `:421` (a 500 whose body has a `code` adds it: `500 INTERNAL` `:205`); `reward 2 e capítulo 1 / reward 1 e capítulo 1` `:324`; `resets 1 e crystals 2 / resets 0 e crystals 0` `:333`; `201 com accessToken / 201 sem accessToken` `:229`; `limpeza: 204 / <status>` `:355`. Stop: `checks` count `:246`, `:308` | ✅ PASS (round-1 spec-precision note closed) |
 | 4 | Delete every created user, pass or fail | `DELETE /users/{username}`, none left | `regression.test.mjs:163-165` - DELETE last, `users.size == 0`; `:248` and `:310-311` on each failure; `:355` failed delete fails the run; live (4585351, d05c174) 0 `regression-` users | ✅ PASS |
 | 5 | All pass → summary | `Regressão OK: <n> verificações em <s> s` | `regression.test.mjs:149` - `'Regressão OK: 12 verificações em 4.2 s'`; `:396` CLI regex | ✅ PASS |
@@ -108,13 +108,27 @@ The `// SPEC_DEVIATION` marker that round 1 found at `lib/previous.mjs:38` was r
 | Two commits between polls | `watcher.test.mjs:216-218` | ✅ |
 | Restart during a deploy → next `publish.sh` starts the recorded slot and removes a stale lock | `publish.sh:100` - `rm -f .deploy.lock`; `publish.sh:105-108` - `SLOT` / `COMMIT` from `state_get active.*`; `publish.sh:125` - `up -d --wait postgres dozzle "backend-$SLOT"`. Launchers are covered live by the Test Coverage Matrix (tasks.md:25). The d05c174 body shows publish.sh runs that went on from an existing `.deploy-state` across the bug-fix restarts. It records no run cut off during a deploy with a lock left behind | ⚠️ Code + launcher-level evidence; this exact case is not recorded. Non-blocking (Minor) |
 
-**Status**: ❌ 28 of 29 ACs covered. US-2 AC 2 has a gap (`login`, M27). Two ACs are live only (US-1 AC 6, the US-3 AC 1 loop). One edge case has code-level evidence only (restart). No spec-precision gaps left.
+**Status**: ✅ 29 of 29 ACs covered. Two ACs are live only (US-1 AC 6, the US-3 AC 1 loop). One edge case has code-level evidence only (restart). No spec-precision gaps left.
 
 ---
 
 ## Discrimination Sensor
 
-### Round 2 (at `37f3132`)
+### Round 3 (at `1897dd1`)
+
+The sensor ran in a scratch worktree (`git worktree add <scratchpad>/vwt4 HEAD`). A Node script applied each mutant as a replacement that had to match exactly once (M27 with a CRLF-tolerant pattern that removes the one `expectStatus(response, 200);` line inside `login`), ran `node --test "deploy/**/*.test.mjs"` in the worktree, and wrote the original file back. Baseline in the worktree with no mutant: 119 pass. After the runs the worktree `git status --porcelain` was empty, and the worktree was removed with `git worktree remove --force`. The real tree `git status --porcelain` (36 lines, the owner's uncommitted files) was identical before and after.
+
+| # | File:line | Mutation | Killed by | Killed? |
+| - | --------- | -------- | --------- | ------- |
+| M27 | `regression.mjs:80` | `login` status not checked (`expectStatus(response, 200)` removed) | `regression.test.mjs:241` (case `:230`), "a wrong answer in "login" prints FALHOU and stops there" | ✅ Killed |
+| M26 | `lib/backendDeploy.mjs:23` | guard checks only `previous.commit` (removes the image when `hash === active.commit`) | `lib/backendDeploy.test.mjs:158`, "a failed redeploy of the active commit keeps its image" | ✅ Killed |
+| M1 (again) | `lib/slots.mjs:62` | readiness accepts `200` as well as `401` | `slots.test.mjs:187`, `:198` | ✅ Killed (2 tests) |
+| M12 (again) | `regression.mjs:88` | `progresso inicial` chapter/stage not checked (`expect(true, ...)`) | `regression.test.mjs:241` (case `:231`), `:261` | ✅ Killed (2 tests) |
+| M21 (again) | `lib/backendDeploy.mjs:25` | a failed deploy never removes the refused image | readiness, suite and switch failure tests (`lib/backendDeploy.test.mjs:154`) | ✅ Killed (3 tests) |
+
+**Result**: round 3, 5 injected, 5 killed, 0 survived - PASS ✅
+
+### Round 2 (history, at `37f3132`)
 
 The sensor ran in scratch worktrees (`git worktree add <scratchpad>/vwt2 HEAD`, then `<scratchpad>/vwt3` for M27). A Node script applied each mutant as an exact replacement that had to match once, ran `node --test "deploy/**/*.test.mjs"` in the worktree, and wrote the original file back. Baseline in the worktree with no mutant: 117 pass. After each run the worktree `git status --porcelain` was empty, and the worktree was removed with `git worktree remove --force`. The real tree `git status --porcelain` (36 lines, the owner's uncommitted files) was identical before and after both runs.
 
@@ -138,7 +152,7 @@ M26 is equivalent in production. `hash === active.commit` happens only if `origi
 M27 is not equivalent. When `POST /users/login` answers 500, `regression.mjs:81` keeps the `cadastro` token, and the remaining 10 checks pass on the fake backend and on a real backend whose only fault is login.
 
 **Sensor depth**: expanded (the feature controls what reaches players and runs on the real database)
-**Result (round 2)**: 11 injected, 10 killed, 1 survived (M27), plus 1 equivalent probe (M26) - FAIL ❌
+**Result (round 2)**: 11 injected, 10 killed, 1 survived (M27), plus 1 equivalent probe (M26) - FAIL ❌. Both are killed in round 3.
 
 ### Round 1 (history, at `dc803b2`)
 
@@ -168,7 +182,7 @@ M27 is not equivalent. When `POST /users/login` answers 500, `regression.mjs:81`
 | M19 | `lib/backendDeploy.mjs:25` | a failed commit is not marked handled | the failure tests | ✅ Killed |
 | M20 | `regression.mjs:150` | suite does not stop at the first failed check | FALHOU tests | ✅ Killed |
 
-Round 1 result: 22 injected, 18 killed, 4 survived - FAIL ❌ (line numbers at `dc803b2`).
+Round 1 outcome: 22 injected, 18 killed, 4 survived - FAIL ❌ (line numbers at `dc803b2`).
 
 ---
 
@@ -176,13 +190,13 @@ Round 1 result: 22 injected, 18 killed, 4 survived - FAIL ❌ (line numbers at `
 
 | Principle | Status |
 | --------- | ------ |
-| Minimum code | ✅ The round-2 production change is 6 lines (`lib/backendDeploy.mjs:21-26`) |
-| Surgical changes | ✅ 19da347 touches only `deploy/`; no backend or game file |
+| Minimum code | ✅ The round-2 production change is 6 lines (`lib/backendDeploy.mjs:21-26`); round 3 changes no production code (10 test lines) |
+| Surgical changes | ✅ 19da347 and 1897dd1 touch only `deploy/`; no backend or game file |
 | No scope creep | ✅ The refused-image removal was the optional item of round-1 Fix 4 (a resource leak). It is guarded so an image that a kept slot runs is never removed (`lib/backendDeploy.test.mjs:158-165`). `clearStaleLock` (`lib/state.mjs:48`) is still exported and unused (cosmetic) |
 | Matches patterns | ✅ Same injected-`exec` fakes and table-driven failure tests as round 1 |
 | Spec-anchored outcome check | ✅ Every log and FALHOU text named in the spec is asserted verbatim |
-| Per-layer coverage | ❌ One of the 12 suite checks (`login`) has no failing case (M27). The launchers and the watcher loop are live-only, as the Test Coverage Matrix plans |
-| Every test maps to a requirement | ✅ The 13 new tests map to US-1 AC 2, US-2 AC 1-3 and the refused-image guard |
+| Per-layer coverage | ✅ Each of the 12 suite checks has a failing case (`login` added in 1897dd1). The launchers and the watcher loop are live-only, as the Test Coverage Matrix plans |
+| Every test maps to a requirement | ✅ The 13 round-2 tests map to US-1 AC 2, US-2 AC 1-3 and the refused-image guard; the 2 round-3 tests map to US-2 AC 2-3 (`login`) and the refused-image guard (active commit) |
 | Documented guidelines | ✅ CLAUDE.md, tasks.md Test Coverage Matrix |
 
 ---
@@ -190,10 +204,10 @@ Round 1 result: 22 injected, 18 killed, 4 survived - FAIL ❌ (line numbers at `
 ## Gate Check
 
 - **Gate command** (Build level, tasks.md): `node --test "deploy/**/*.test.mjs"` and `docker compose -f backend/docker-compose.yml --profile deploy config -q` and `cd backend && ./gradlew ktlintCheck`
-- **Deploy tests**: 117 tests, 117 passed, 0 failed, 0 skipped, 0 cancelled (Node v22.19.0, real tree, `37f3132`)
-- **Compose config**: exit 0
-- **ktlintCheck**: not re-run in round 2. No backend file changed since round 1 (`git diff --stat dc803b2..37f3132 -- backend` is empty), and round 1 was BUILD SUCCESSFUL
-- **Test count before feature**: 0; **round 1**: 104; **round 2**: 117 (+13: 2 readiness, 9 suite failure cases, 1 CLI with no argument, 1 kept image)
+- **Deploy tests**: 119 tests, 119 passed, 0 failed, 0 skipped, 0 cancelled (Node v22.19.0, real tree, `1897dd1`, round 3)
+- **Compose config**: exit 0 (run again in round 3)
+- **ktlintCheck**: not run again in rounds 2 and 3. No backend file changed since round 1 (`git diff --stat dc803b2..1897dd1 -- backend` is empty), and round 1 was BUILD SUCCESSFUL
+- **Test count before feature**: 0; **round 1**: 104; **round 2**: 117 (+13: 2 readiness, 9 suite failure cases, 1 CLI with no argument, 1 kept image); **round 3**: 119 (+2: `login` failure case, active-commit image kept)
 - **Skipped tests**: none
 - **Failures**: none
 - **Live stack**: not touched by the verifier (no compose up/down/rm, no publish.sh or deploy.sh)
@@ -203,19 +217,11 @@ Round 1 result: 22 injected, 18 killed, 4 survived - FAIL ❌ (line numbers at `
 
 ## Fix Plans
 
-### Fix 1: A failing case for `login` (M27) - Major
-
-- **Root cause**: the `early` table in `deploy/regression.test.mjs:228-236` skips `login`, and `regression.mjs:81` falls back to the `cadastro` token, so nothing else fails when login is broken.
-- **Fix task**: add `['login', 'POST /users/login', { status: 500, body: null }, 'FALHOU: login: 200 / 500', 1]` to the `early` table (the loop at `:238-250` already asserts `ok`, the stop count, the single line and the delete).
-- **Done when**: M27 (`expectStatus(response, 200)` removed from `login`) is killed, and each of the 12 checks has a failing-case test.
+Round-2 Fix 1 (`login`, M27) and Fix 3 (M26) are done in 1897dd1. One non-blocking item is left.
 
 ### Fix 2: Restart edge case evidence - Minor (non-blocking)
 
 - Record a live run in a commit body: stop `publish.sh` while `.deploy-state` names `green` and a `.deploy.lock` exists, then run `./publish.sh` and show that `backend-green` starts and the lock is gone. Or move the start-up choice into a tested Node helper. Use `clearStaleLock` there, or delete it.
-
-### Fix 3: Optional test for M26 - Cosmetic
-
-- In `deploy/lib/backendDeploy.test.mjs`, add a test where a failed deploy whose `hash` equals `state.active.commit` runs no `docker image rm`. Docker already refuses that removal, so this test only pins intent.
 
 ---
 
@@ -224,10 +230,10 @@ Round 1 result: 22 injected, 18 killed, 4 survived - FAIL ❌ (line numbers at `
 | Requirement | Previous Status | New Status |
 | ----------- | --------------- | ---------- |
 | BG-01 | ✅ Verified | ✅ Verified |
-| BG-02 | ❌ Needs Fix | ✅ Verified (M1, M1b killed) |
+| BG-02 | ✅ Verified | ✅ Verified (M1 still killed in round 3) |
 | BG-03 | ✅ Verified | ✅ Verified (AC 6 live only) |
 | BG-04, BG-05 | ✅ Verified | ✅ Verified |
-| BG-06 | ❌ Needs Fix | ❌ Needs Fix (Fix 1, `login`; M11 and M12 killed) |
+| BG-06 | ❌ Needs Fix | ✅ Verified (M27 killed in round 3; M11 and M12 killed in round 2) |
 | BG-07, BG-08 | ✅ Verified | ✅ Verified |
 | BG-09 | ✅ Verified | ✅ Verified (AC 1 loop live only) |
 | BG-10, BG-11, BG-13 | ✅ Verified | ✅ Verified |
@@ -238,12 +244,12 @@ Round 1 result: 22 injected, 18 killed, 4 survived - FAIL ❌ (line numbers at `
 
 ## Summary
 
-**Overall**: ❌ Not Ready (FAIL), because of one surviving mutant (M27, `login`). The production code needs no change; one test case closes it.
+**Overall**: ✅ Ready (PASS).
 
-**Spec-anchored check**: 28 of 29 ACs matched the spec outcome (US-1 AC 6 and the US-3 AC 1 loop are live only). US-2 AC 2 has a gap (`login`). No spec-precision gaps are left. The restart edge case has code-level evidence only.
-**Sensor**: round 2: 11 injected, 10 killed, 1 survived (M27), plus 1 equivalent probe (M26). Round 1: 22 injected, 18 killed, 4 survived, and all 4 are now killed.
-**Gate**: 117 deploy tests passed, compose config ok.
+**Spec-anchored check**: 29 of 29 ACs matched the spec outcome (US-1 AC 6 and the US-3 AC 1 loop are live only, as planned). No spec-precision gaps. The restart edge case has code and launcher-level evidence only (non-blocking).
+**Sensor**: round 3: 5 injected, 5 killed, 0 survived. Round 2: 11 injected, 10 killed, 1 survived (M27, now killed), plus probe M26 (now killed). Round 1: 22 injected, 18 killed, 4 survived (all killed since round 2). Across rounds: 38 counted injections (22 + 11 + 5) plus the M26 probe of round 2; 33 killed and 5 survived (M1, M1b, M11, M12 in round 1, M27 in round 2), and every survivor and the probe are killed at `1897dd1`.
+**Gate**: 119 deploy tests passed, compose config ok.
 
-**What works**: everything listed in round 1. On top of that: readiness only on a 401; a failing case with the exact FALHOU text for 11 of the 12 checks; the CLI with no argument; removal of a refused image unless a kept slot runs it; and the rollback failure texts verbatim.
+**What works**: everything listed in rounds 1 and 2. On top of that, each of the 12 suite checks has a failing-case test with its exact FALHOU text, and a failed redeploy of the active commit keeps its image.
 
-**Next steps**: Fix 1 (one test case), then re-verify (round 3 of 3) on M27.
+**Next steps**: optional Fix 2 (restart evidence). Then the release report and the deploy.
