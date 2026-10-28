@@ -130,6 +130,14 @@
 - **Date**: 2026-10-28
 - **Status**: active
 
+### AD-017
+- **Decision**: The talent tree has 10 talents in 3 grades each (30 ids: `<ID>`, `<ID>_G2`, `<ID>_G3`). Grade N costs N points a level, gives N times the grade 1 value a level and opens at level 10 of the grade before (else 409 `TALENT_LOCKED`); the game adds the values of every grade of a talent. `CLICK_DAMAGE` gives 5 % a level and a tenth talent `CLICK_FLAT_DAMAGE` adds 1, 3, 5... up to 19 to the base damage. A phase pays 0 points (only minibosses and chapter bosses pay), and `POST /talents/reset` (`Reiniciar pontos`) takes every level back and keeps the points earned.
+- **Reason**: Owner changes after AD-013 (`b443844`, `4a4f86f`, `08be5c9`), recorded here because the commits changed no spec; the talents Verifier (2026-10-28) found the drift.
+- **Trade-off**: A reset with no cost lets the player respec at will; the price of grade 3 makes a full tree far longer to reach than AD-013 planned.
+- **Scope**: `backend` talent catalog, upgrade and reset code, `game/src/domain/talents`, the Talentos screen
+- **Date**: 2026-10-23
+- **Status**: active; supersedes the 9-talent tree, the 1 point a level for every talent and the phase point of AD-013
+
 ## Handoff
 
 - **Feature**: five features from the owner's batch of 2026-10-21, all game side except two backend pieces: `combat-hud`, `click-power`, `talents`, `equipment-ui`, `boss-map` (`.specs/features/*`)

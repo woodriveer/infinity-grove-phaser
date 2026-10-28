@@ -6,6 +6,8 @@ Copper, silver and gold only pay for refining, rerolling and selling equipment, 
 
 > **Superseded in part by `.specs/features/talent-points/spec.md` (2026-10-22):** talent levels cost 1 talent point each instead of copper, the tree has a ninth talent `COMBO` in a fourth branch, and the Talentos screen shows `Pontos de talento`. The coin price, the wallet in the upgrade answer and `NOT_ENOUGH_COPPER` below no longer apply.
 
+> **Superseded in part again (2026-10-22 and 2026-10-23, AD-017):** `b443844` raises `CLICK_DAMAGE` to 5 % a level (`+50%` at level 10) and adds a tenth talent `CLICK_FLAT_DAMAGE`; `4a4f86f` makes a phase pay 0 points and adds `POST /talents/reset` with a `Reiniciar pontos` button, which takes every level back and keeps the points earned; `08be5c9` gives each talent 3 grades (30 talents, ids `<ID>_G2` and `<ID>_G3`), grade N costs N points a level, gives N times the grade 1 value and opens at level 10 of the grade before, and a locked grade answers 409 `TALENT_LOCKED`.
+
 ## Goals
 
 - [ ] The player spends coins on 8 talents in 3 branches, each up to level 10, from a new Talentos screen.
@@ -150,7 +152,7 @@ Price of the upgrade from level `n` to `n+1`, in copper: `round(300 x 1.6^n)`, s
 
 - WHEN the player upgrades a talent while the wallet sync of kills is in flight THEN the game SHALL show the wallet the backend answered.
 - WHEN the player has 12 885 copper at level 8 THEN the game SHALL enable the button of that talent (`Melhorar (1 ouro 28 prata 85 cobre)`).
-- WHEN the level of a talent is 10 THEN the effect text SHALL read the max value (`+30%` for `CLICK_DAMAGE`).
+- WHEN the level of a talent is 10 THEN the effect text SHALL read the max value (`+50%` for `CLICK_DAMAGE`, AD-017).
 
 ---
 

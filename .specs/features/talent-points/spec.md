@@ -4,6 +4,8 @@
 
 Talents are bought with coins, which are also the currency of equipment, and the click combo is a fixed bonus the player cannot grow. This feature replaces coins with talent points earned by clearing the campaign for the first time, and adds the combo as a ninth talent in a new branch, so the player chooses where each hard-won point goes. It changes the talents feature (`.specs/features/talents/spec.md`) and the combo of `click-power`.
 
+> **Superseded in part (2026-10-22 and 2026-10-23, AD-017):** `b443844` raises `CLICK_DAMAGE` to 5 % a level (`+50%` at level 10) and adds a tenth talent `CLICK_FLAT_DAMAGE`; `4a4f86f` makes a phase pay 0 points and adds `POST /talents/reset` with a `Reiniciar pontos` button, which takes every level back and keeps the points earned; `08be5c9` gives each talent 3 grades (30 talents, ids `<ID>_G2` and `<ID>_G3`), grade N costs N points a level, gives N times the grade 1 value and opens at level 10 of the grade before, and a locked grade answers 409 `TALENT_LOCKED`.
+
 ## Goals
 
 - [ ] The first clear of a phase pays 1 talent point, of a miniboss 2, of a chapter boss 5; a replay pays nothing.

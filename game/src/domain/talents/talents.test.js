@@ -155,8 +155,8 @@ describe('describeTalentEffect', () => {
         expect(describeTalentEffect({ branch: 'POWER', unit: '%', value: 0 })).toBe('nenhum');
     });
 
-    it('reads the maximum of Dano de clique as +30%', () => {
-        expect(describeTalentEffect({ branch: 'POWER', unit: '%', value: 30 })).toBe('+30%');
+    it('reads the maximum of Dano de clique, 10 levels of 5 %, as +50%', () => {
+        expect(describeTalentEffect({ branch: 'POWER', unit: '%', value: 50 })).toBe('+50%');
     });
 });
 
