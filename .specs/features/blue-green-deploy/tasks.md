@@ -19,8 +19,8 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 | Code Layer | Required Test Type | Coverage Expectation | Location Pattern | Run Command |
 | --- | --- | --- | --- | --- |
-| Deploy modules (`deploy/lib/*.mjs`, `deploy/watcher.mjs`, `deploy/deploy.mjs`) | unit | Every branch; 1:1 to the spec ACs and edge cases they own; every log text asserted verbatim | `deploy/**/*.test.mjs` | `node --test deploy/` |
-| Regression suite (`deploy/regression.mjs`) | unit + live | Every check, the `FALHOU` and `Regressão OK` lines, cleanup on pass and on fail, exit codes; one run against the real local backend | `deploy/regression.test.mjs` | `node --test deploy/` and `node deploy/regression.mjs http://localhost:<port>` |
+| Deploy modules (`deploy/lib/*.mjs`, `deploy/watcher.mjs`, `deploy/deploy.mjs`) | unit | Every branch; 1:1 to the spec ACs and edge cases they own; every log text asserted verbatim | `deploy/**/*.test.mjs` | `node --test "deploy/**/*.test.mjs"` |
+| Regression suite (`deploy/regression.mjs`) | unit + live | Every check, the `FALHOU` and `Regressão OK` lines, cleanup on pass and on fail, exit codes; one run against the real local backend | `deploy/regression.test.mjs` | `node --test "deploy/**/*.test.mjs"` and `node deploy/regression.mjs http://localhost:<port>` |
 | Container config (`backend/Dockerfile`, compose, nginx conf) | none (build gate) | The image builds from `git archive`, the stack comes up, the slot answers 401 | - | `docker build`, `docker compose --profile deploy config`, `curl` |
 | Launchers (`publish.sh`, `deploy.sh`) | e2e (live, on the real stack) | The Independent Tests of US-1, US-3 and US-4 run on the real stack, with the output recorded in the task's commit body | - | `./publish.sh`, a pushed commit, `./deploy.sh --rollback` |
 | Backend and game code | none | Not changed by this feature | - | - |
@@ -31,9 +31,9 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 | Gate Level | When to Use | Command |
 | --- | --- | --- |
-| Quick | After tasks with unit tests only | `node --test deploy/` |
-| Full | After tasks with live checks | `node --test deploy/` plus the live command named in the task |
-| Build | After a phase, or config-only tasks | `node --test deploy/` and `docker compose -f backend/docker-compose.yml --profile deploy config -q` and `cd backend && ./gradlew ktlintCheck` |
+| Quick | After tasks with unit tests only | `node --test "deploy/**/*.test.mjs"` |
+| Full | After tasks with live checks | `node --test "deploy/**/*.test.mjs"` plus the live command named in the task |
+| Build | After a phase, or config-only tasks | `node --test "deploy/**/*.test.mjs"` and `docker compose -f backend/docker-compose.yml --profile deploy config -q` and `cd backend && ./gradlew ktlintCheck` |
 
 ---
 
@@ -143,7 +143,7 @@ T15 → T16
 **Done when**:
 
 - [x] Tests: status and stdout of `node -e`, a non-zero status, `input` piped to stdin, `env` merged over `process.env`
-- [x] Gate check passes: `node --test deploy/`
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
@@ -168,7 +168,7 @@ T15 → T16
 **Done when**:
 
 - [x] Tests: a missing file reads `null`, a round trip keeps every field of the data model, a second `acquireLock` is refused until `releaseLock`, `clearStaleLock` frees it
-- [x] Gate check passes: `node --test deploy/`
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
@@ -193,7 +193,7 @@ T15 → T16
 **Done when**:
 
 - [x] Tests: `backend/src/...` is backend only; `game/src/a.js` and `game/wrangler.jsonc` are game; `game/src/a.test.js`, `game/e2e/x.js` and `README.md` are neither; a mixed list is both; `changedFiles` calls `git diff --name-only <from> <to>`
-- [x] Gate check passes: `node --test deploy/`
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
@@ -218,7 +218,7 @@ T15 → T16
 **Done when**:
 
 - [x] Tests: the conf names only `backend-<slot>:8080`; `switchTo` runs `nginx -t` before `nginx -s reload`; a failed `nginx -t` writes the old conf back and returns false without a reload
-- [x] Gate check passes: `node --test deploy/`
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
@@ -243,7 +243,7 @@ T15 → T16
 **Done when**:
 
 - [x] Tests: `buildImage` pipes the `git archive --format=tar <hash>:backend` output into `docker build -t infinity-grove-backend:<hash> -`; `startSlot` sets `<SLOT>_IMAGE` and recreates only that service; `waitReady` is true on the first 401, keeps polling on a refused connection and on 5xx, and is false at 180 s (fake clock)
-- [x] Gate check passes: `node --test deploy/`
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
@@ -269,7 +269,7 @@ T15 → T16
 
 - [ ] Tests on a fake `fetch`: the happy path prints `Regressão OK: 12 verificações em <s> s` and deletes the user; a wrong status in each of `reset bloqueado`, `reset` and `auto clique após reset` prints `FALHOU: <check>: <expected> / <received>`, stops there and still deletes the user; a failed delete fails the run; the CLI exits 0/1
 - [ ] Live: `node deploy/regression.mjs http://localhost:8080` against `start.sh` exits 0, and `GET /users` shows no `regression-` user afterwards (output in the commit body)
-- [ ] Gate check passes: `node --test deploy/`
+- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: full
@@ -294,7 +294,7 @@ T15 → T16
 **Done when**:
 
 - [ ] Tests: the suite comes from `git show <hash>:deploy/regression.mjs` and falls back to the working tree file when the commit has none; the `docker run` names `infinity-grove-regression-<short hash>`, uses `--network backend_default` and targets `http://backend-<slot>:8080`; a non-zero status returns false
-- [ ] Gate check passes: `node --test deploy/`
+- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
@@ -319,7 +319,7 @@ T15 → T16
 **Done when**:
 
 - [ ] Tests with fakes: success switches to the idle slot, logs `Deploy <h> ativo no slot <slot>`, waits 10 s, stops the old slot, and sets `active`, `previous` (with `stoppedAt`) and `handled`; a build failure, a readiness timeout, a failed suite and a failed switch each log their exact text, remove the new slot (except the build failure, where no slot exists), never stop the active one, and set only `handled`
-- [ ] Gate check passes: `node --test deploy/`
+- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
@@ -344,7 +344,7 @@ T15 → T16
 **Done when**:
 
 - [ ] Tests: the sweep keeps a previous slot stopped 4 min 59 s ago and removes the container and its image at 5 min; a rollback starts the previous container, waits for 401, switches, stops the other slot, logs `Rollback para <h> no slot <slot>` and keeps `handled`; with no previous container it returns false with `Sem versão anterior para voltar (removida após 5 min)`
-- [ ] Gate check passes: `node --test deploy/`
+- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
@@ -369,7 +369,7 @@ T15 → T16
 **Done when**:
 
 - [ ] Tests: it extracts `git archive <hash> game` into a temp dir, runs `npm ci` then `npm run deploy` there with `BACKEND_URL=<tunnel>`, removes the dir on success and on failure, and logs `Publicação do Worker <h> falhou` on a non-zero status
-- [ ] Gate check passes: `node --test deploy/`
+- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
@@ -394,7 +394,7 @@ T15 → T16
 **Done when**:
 
 - [ ] Tests: Docker down and fetch failure log their exact text and change nothing; the same target does nothing but sweep; a README-only range sets `handled` with no build; a backend range deploys; a game range publishes the Worker; a mixed range publishes only after a passed deploy; a taken lock skips the tick; two commits since `handled` deploy only the newest; the lock is released on every path
-- [ ] Gate check passes: `node --test deploy/`
+- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
@@ -419,7 +419,7 @@ T15 → T16
 **Done when**:
 
 - [ ] Tests: `--rollback` saves the new state and exits 0; with no previous slot it exits 1; with the lock taken it exits 1 with `Um deploy está em andamento; tente de novo em instantes`; an unknown flag prints the usage and exits 1
-- [ ] Gate check passes: `node --test deploy/`
+- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
@@ -444,7 +444,7 @@ T15 → T16
 **Done when**:
 
 - [ ] Live, recorded in the commit body: the first run with no state builds `origin/main` into `blue` and publishes the Worker; a backend commit pushed afterwards goes live while a 100 ms `/progress` poller sees no failure, and the tunnel address does not change; a README-only commit builds nothing; a commit whose `/account/reset` answers 500 (local throwaway branch fast-forwarded and reverted) is refused with the old slot serving; `./deploy.sh --rollback` within 5 min brings the old commit back; the old container is gone after 5 min
-- [ ] Gate check passes: `node --test deploy/` (live checks above)
+- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"` (live checks above)
 
 **Tests**: e2e
 **Gate**: full
@@ -455,7 +455,7 @@ T15 → T16
 
 ### T16: Docs and project decision
 
-**What**: The CLAUDE.md Deploy section (watcher, commit tree only, `deploy.sh --rollback`, Dozzle at `localhost:8888`, `node --test deploy/` in the coverage line), the `game/readme.md` deploy notes, and AD-016 in `.specs/STATE.md`.
+**What**: The CLAUDE.md Deploy section (watcher, commit tree only, `deploy.sh --rollback`, Dozzle at `localhost:8888`, `node --test "deploy/**/*.test.mjs"` in the coverage line), the `game/readme.md` deploy notes, and AD-016 in `.specs/STATE.md`.
 **Where**: `CLAUDE.md`
 **Depends on**: T15
 **Reuses**: None
