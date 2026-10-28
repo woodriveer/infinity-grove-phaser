@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa do capítulo</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+:root[data-theme="dark"] { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Mapa do capítulo</h1>
+<p class="sub">Feature <code>boss-map</code> · commits <code>e9970d0..f090a33</code> (3 tarefas) e a correção <code>984a6e2</code> · verificação em <code>91d5f21</code> · cobertura medida em <code>eadfdc6</code> · 28/10/2026</p>
+
+<p><span class="verdict">Verifier: PASS</span> &nbsp;na 2ª rodada · 16 de 16 critérios · sensor 8 mutantes, 7 mortos, 1 equivalente</p>
+
+<h2>Resumo</h2>
+<div class="cards">
+    <div class="card"><div class="n">+333 / −22</div><div class="l">linhas de código de produção (7 arquivos)</div></div>
+    <div class="card"><div class="n">+453 / −32</div><div class="l">linhas de teste (8 arquivos)</div></div>
+    <div class="card"><div class="n">32</div><div class="l">testes unitários novos</div></div>
+    <div class="card"><div class="n">6</div><div class="l">cenários e2e novos</div></div>
+</div>
+
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Área</th><th>Arquivos</th><th class="num">Adicionadas</th><th class="num">Removidas</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td>0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes, <code>style.css</code>)</td><td>7</td><td class="num">333</td><td class="num">22</td></tr>
+</table></div>
+<p class="sub">Arquivos: <code>bossMap.js</code>, <code>mapLayout.js</code>, <code>farmView.js</code>, <code>campaignSession.js</code>, <code>HeroUi.js</code>, <code>ClickerGame.js</code>, <code>style.css</code>. O prompt do Gemini em <code>PROMPTS_ASSETS_UI.md</code> (+139 / −10) não conta como código de produção.</p>
+
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th class="num">Linhas +/−</th><th class="num">Testes novos</th><th class="num">Total após a execução</th><th>Resultado</th></tr>
+<tr><td>Backend (JUnit + Testcontainers)</td><td class="num">0</td><td class="num">0</td><td class="num">832</td><td class="ok">832 passaram</td></tr>
+<tr><td>Jogo unitário (Vitest, jsdom)</td><td class="num">+324 / −30</td><td class="num">32</td><td class="num">1249</td><td>1246 passaram, 3 falharam (fora da feature, ver abaixo)</td></tr>
+<tr><td>E2E (Playwright, backend falso, com cobertura)</td><td class="num">+129 / −2</td><td class="num">6</td><td class="num">112</td><td>109 passaram, 1 instável, 2 falharam (fora da feature, ver abaixo)</td></tr>
+</table></div>
+
+<h2>Cobertura</h2>
+<div class="scroll"><table>
+<tr><th>Medida</th><th>Projeto</th><th>Arquivos da feature</th></tr>
+<tr><td>Unitário backend (JaCoCo, linhas / branches)</td><td>99,11% / 92,75%</td><td>sem código de backend</td></tr>
+<tr><td>Unitário jogo (Vitest v8, linhas / branches)</td><td>96,62% / 94,33%</td><td>97,41% / 90,53% (6 arquivos de <code>game/src</code>)</td></tr>
+<tr><td>E2E jogo (istanbul, linhas)</td><td>90,52% (branches 71,83%)</td><td>89,55%</td></tr>
+</table></div>
+<p class="sub">Os arquivos da feature incluem <code>ClickerGame.js</code> e <code>HeroUi.js</code> inteiros, que são maiores que a parte do mapa. O <code>style.css</code> não entra na medição de linhas.</p>
+
+<h2>Cenários e2e da feature</h2>
+<div class="scroll"><table>
+<tr><th>Cenário (<code>e2e/bossMap.spec.js</code>)</th><th>Resultado</th></tr>
+<tr><td>No estágio 4: três paradas derrotadas, a atual e o resto bloqueado, sob o título do capítulo</td><td class="ok">passou</td></tr>
+<tr><td>Um clique numa parada vencida começa a luta da farm; uma parada bloqueada não faz nada</td><td class="ok">passou</td></tr>
+<tr><td>Sem o mapa pintado, mostra a trilha tracejada e o gradiente, com as paradas nas posições da tabela</td><td class="ok">passou</td></tr>
+<tr><td>Com a imagem carregada, mostra o mapa em 880 × 495 (ou menor, em 16:9) sem a trilha</td><td class="ok">passou</td></tr>
+<tr><td>No começo da campanha: todas as paradas bloqueadas ou atual, e o texto vazio</td><td class="ok">passou</td></tr>
+<tr><td>Pausa a luta com o mapa aberto e retoma ao fechar</td><td class="ok">passou</td></tr>
+</table></div>
+
+<h2>Sensor do Verifier</h2>
+<ul>
+    <li><b>Rodada 1</b> (9 mutantes, 1 sobreviveu): a trilha continuava visível sobre o mapa carregado, e nenhum teste via isso. O tamanho 880 × 495 e a janela estreita também não tinham teste.</li>
+    <li><b>Correção</b> (<code>984a6e2</code>, só teste): um e2e entrega a imagem por <code>page.route</code> e confere a trilha escondida, o tamanho e a proporção. O cenário do fallback agora responde 404 para a imagem, então a arte local não muda o resultado.</li>
+    <li><b>Rodada 2</b> (8 mutantes): 7 mortos, inclusive a trilha, a largura, a proporção, o <code>max-width</code>, a ordem dos estados e o fallback no <code>load</code>. O 8º (a guarda de <code>completed</code> em <code>bossMap.js:18</code>) não muda nenhuma saída: é equivalente.</li>
+</ul>
+
+<h2>Lacunas não bloqueantes</h2>
+<ul>
+    <li>O destaque da próxima parada e a névoa das bloqueadas são só CSS e precisam de teste manual.</li>
+    <li>A checagem da janela estreita depende do painel de hoje deixar 868 px. Se o painel crescer, ela passa a testar só o tamanho cheio.</li>
+    <li>A arte: o código commitado procura <code>assets/ui/boss-map.jpg</code>. A arte local está em <code>assets/boss-map.jpg</code>, e a mudança de caminho em <code>mapLayout.js</code> não está commitada. As 11 posições ainda precisam ser recalibradas com a arte.</li>
+</ul>
+
+<h2>Falhas fora da feature</h2>
+<div class="scroll"><table>
+<tr><th>Teste</th><th>Motivo</th></tr>
+<tr><td>3 testes de <code>ClickerGame farm mode</code> (unitários)</td><td>Quebrados desde <code>9e11bf9</code> (<code>fix(farm)</code>): um deles falha com <code>ReferenceError: loads is not defined</code>. Esse commit é posterior à feature e não toca o mapa.</td></tr>
+<tr><td><code>farm.spec.js:82</code> (falhou nas 3 tentativas) e <code>:109</code> (instável)</td><td>Testam as vitórias e o pagamento da farm, que <code>9e11bf9</code> mudou. Os passos do mapa nesses testes passam.</td></tr>
+<tr><td><code>drops.spec.js:74</code> (falhou nas 3 tentativas)</td><td>Testa as filas de drop de monstro e miniboss. Nenhum commit da feature toca drops.</td></tr>
+</table></div>
+</main>
+</body>
+</html>

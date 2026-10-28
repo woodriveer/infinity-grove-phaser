@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tela de equipamento</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+:root[data-theme="dark"] { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Tela de equipamento</h1>
+<p class="sub">Feature <code>equipment-ui</code> · commits <code>99294a5..1ef36a9</code> (6 tarefas) e as correções <code>4066eee</code>, <code>9afa052</code> · verificação em <code>91d5f21</code> · cobertura medida em <code>eadfdc6</code> · 28/10/2026</p>
+
+<p><span class="verdict">Verifier: PASS</span> &nbsp;na 3ª rodada · 33 de 33 critérios · sensor 11 mutantes, 11 mortos</p>
+
+<h2>Resumo</h2>
+<div class="cards">
+    <div class="card"><div class="n">+646 / −49</div><div class="l">linhas de código de produção (8 arquivos)</div></div>
+    <div class="card"><div class="n">+983 / −15</div><div class="l">linhas de teste (10 arquivos)</div></div>
+    <div class="card"><div class="n">79</div><div class="l">testes unitários novos</div></div>
+    <div class="card"><div class="n">5</div><div class="l">cenários e2e novos</div></div>
+</div>
+
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Área</th><th>Arquivos</th><th class="num">Adicionadas</th><th class="num">Removidas</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td>0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes, <code>style.css</code>)</td><td>8</td><td class="num">646</td><td class="num">49</td></tr>
+</table></div>
+<p class="sub">Arquivos: <code>leaderStats.js</code>, <code>equipment.js</code>, <code>equipmentCollection.js</code>, <code>pieceTile.js</code>, <code>pieceTooltip.js</code>, <code>equipmentView.js</code>, <code>HeroUi.js</code>, <code>style.css</code>.</p>
+
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th class="num">Linhas +/−</th><th class="num">Testes novos</th><th class="num">Total após a execução</th><th>Resultado</th></tr>
+<tr><td>Backend (JUnit + Testcontainers)</td><td class="num">0</td><td class="num">0</td><td class="num">832</td><td class="ok">832 passaram</td></tr>
+<tr><td>Jogo unitário (Vitest, jsdom)</td><td class="num">+858 / −14</td><td class="num">79</td><td class="num">1249</td><td>1246 passaram, 3 falharam (fora da feature, ver abaixo)</td></tr>
+<tr><td>E2E (Playwright, backend falso, com cobertura)</td><td class="num">+125 / −1</td><td class="num">5</td><td class="num">112</td><td>109 passaram, 1 instável, 2 falharam (fora da feature, ver abaixo)</td></tr>
+</table></div>
+
+<h2>Cobertura</h2>
+<div class="scroll"><table>
+<tr><th>Medida</th><th>Projeto</th><th>Arquivos da feature</th></tr>
+<tr><td>Unitário backend (JaCoCo, linhas / branches)</td><td>99,11% / 92,75%</td><td>sem código de backend</td></tr>
+<tr><td>Unitário jogo (Vitest v8, linhas / branches)</td><td>96,62% / 94,33%</td><td>97,22% / 89,01% (7 arquivos de <code>game/src</code>)</td></tr>
+<tr><td>E2E jogo (istanbul, linhas)</td><td>90,52% (branches 71,83%)</td><td>91,67%</td></tr>
+</table></div>
+<p class="sub">O <code>HeroUi.js</code> entra inteiro, mesmo sendo maior que a parte desta feature. O <code>style.css</code> não entra na medição de linhas.</p>
+
+<h2>Cenários e2e da feature</h2>
+<div class="scroll"><table>
+<tr><th>Cenário</th><th>Resultado</th></tr>
+<tr><td><code>equipmentUi.spec.js</code>: mostra os atributos do líder e acompanha o equipamento</td><td class="ok">passou</td></tr>
+<tr><td><code>equipmentUi.spec.js</code>: mostra a mochila como tiles com uma moldura por raridade</td><td class="ok">passou</td></tr>
+<tr><td><code>equipmentUi.spec.js</code>: o hover mostra o tooltip sem botão, o clique abre as ações</td><td class="ok">passou</td></tr>
+<tr><td><code>equipmentUi.spec.js</code>: o tooltip de um tile vestido nomeia o herói e some ao sair</td><td class="ok">passou</td></tr>
+<tr><td><code>equipmentUi.spec.js</code>: transfere o conjunto de Kael para Lyra (peças com ela, Kael vazio, o anel antigo dela na mochila)</td><td class="ok">passou</td></tr>
+<tr><td><code>equipment.spec.js</code>: os 5 cenários anteriores do equipamento, que a feature tocou</td><td class="ok">5 passaram</td></tr>
+</table></div>
+
+<h2>Sensor do Verifier</h2>
+<ul>
+    <li><b>Rodada 1</b> (14 mutantes, 2 sobreviveram): apagar a regra de "menos movimento" da moldura EPIC ou LEGENDARY passava. O teste procurava <code>animation: none</code> até o fim do <code>style.css</code> e achava um bloco do mapa (<code>4066eee</code>).</li>
+    <li><b>Rodada 2</b> (8 mutantes, 1 sobreviveu): o teste não olhava o seletor <code>::before</code> da varredura de luz da EPIC (<code>9afa052</code>).</li>
+    <li><b>Rodada 3</b> (11 mutantes, 11 mortos): as 3 regras de CSS, mais o texto e a posição do tooltip, o dano de clique, a recarga após falha da transferência, o <code>+0</code> e o botão de transferir com um herói só. PASS.</li>
+</ul>
+
+<h2>Lacunas não bloqueantes</h2>
+<ul>
+    <li>Nenhum teste refina uma peça e lê o tile redesenhado (o <code>+N</code> novo com a mesma moldura). As partes têm prova indireta: <code>pieceTile.test.js:40</code> e <code>HeroUi.test.js:608</code>.</li>
+</ul>
+
+<h2>Falhas fora da feature</h2>
+<div class="scroll"><table>
+<tr><th>Teste</th><th>Motivo</th></tr>
+<tr><td>3 testes de <code>ClickerGame farm mode</code> (unitários)</td><td>Quebrados desde <code>9e11bf9</code> (<code>fix(farm)</code>): um deles falha com <code>ReferenceError: loads is not defined</code>.</td></tr>
+<tr><td><code>farm.spec.js:82</code> (falhou nas 3 tentativas) e <code>:109</code> (instável)</td><td>Testam as vitórias e o pagamento da farm, que <code>9e11bf9</code> mudou.</td></tr>
+<tr><td><code>drops.spec.js:74</code> (falhou nas 3 tentativas)</td><td>Testa as filas de drop de monstro e miniboss. Nenhum commit da feature toca drops.</td></tr>
+</table></div>
+</main>
+</body>
+</html>
