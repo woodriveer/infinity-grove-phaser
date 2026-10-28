@@ -46,6 +46,8 @@ Today a new backend goes live by stopping `./publish.sh` and starting it again. 
 | `publish.sh` | It starts the compose stack (Postgres, proxy, Dozzle, the active slot) instead of `gradlew bootRun`, then the tunnel to `localhost:8080`, then the watcher | One command stays the way to go live | n |
 | Failed commit | Not retried; the next new commit is tried | A rerun of the same code fails the same way | n |
 
+In every log text and container name, `<hash>` is the 7-character short hash; `.deploy-state` keeps the full hash.
+
 **Open questions:** none - all resolved or logged above.
 
 ---
@@ -84,7 +86,7 @@ Today a new backend goes live by stopping `./publish.sh` and starting it again. 
 
 1. The suite SHALL take the base URL of the backend to test as its only argument and exit 0 when every check passes, 1 otherwise.
 2. The suite SHALL check, in order: register a new user (201 with an access token), log in (200), `GET /progress` at chapter 1 stage 1, `GET /wallet`, `GET /talents`, `GET /heroes`, `GET /equipment`, `GET /auto-click` (level 0, `resets` 0), `POST /account/reset` at chapter 1 answering 409 `RESET_LOCKED`, clearing every encounter of chapter 1 with `POST /progress/outcome` until the progress is at chapter 2, `POST /account/reset` with `fromChapter` 2 answering 200 with `reward` 2 and progress chapter 1, and `GET /auto-click` answering `resets` 1 and `crystals` 2.
-3. WHEN a check fails THEN the suite SHALL print `FALHOU: <check>: <expected> / <received>` and stop.
+3. WHEN a check fails THEN the suite SHALL print `FALHOU: <check>: <expected> / <received>` and stop. A wrong status prints the two statuses (`200 / 500`); a wrong value prints both values in the check's words (`capítulo 1 etapa 1 / capítulo 2 etapa 1`, `nível 0 e resets 0 / nível 0 e resets 1`, `409 RESET_LOCKED / 500`, `reward 2 e capítulo 1 / reward 1 e capítulo 1`, `resets 1 e crystals 2 / resets 0 e crystals 0`, `201 com accessToken / 201 sem accessToken`); a failed delete prints `FALHOU: limpeza: 204 / <status>`.
 4. WHEN the suite ends (pass or fail) THEN it SHALL delete every user it created with `DELETE /users/{username}`.
 5. WHEN every check passes THEN the suite SHALL print `Regressão OK: <n> verificações em <s> s`.
 6. IF the suite exits non-zero THEN the deploy SHALL remove the new slot, keep the proxy on the active slot, and log `Deploy <hash> falhou na regressão; o slot <slot> continua ativo`.
@@ -124,6 +126,7 @@ Today a new backend goes live by stopping `./publish.sh` and starting it again. 
 1. WHEN the owner runs `./deploy.sh --rollback` while the previous slot's container still exists THEN the script SHALL start it, wait for it to be ready, point the proxy at it, stop the other slot, and log `Rollback para <hash> no slot <slot>`.
 2. IF the previous container no longer exists THEN `./deploy.sh --rollback` SHALL exit 1 with `Sem versão anterior para voltar (removida após 5 min)`.
 3. WHEN a rollback is done THEN the watcher SHALL NOT redeploy the commit rolled back from until a newer commit appears.
+4. IF the previous slot does not answer 401 within 180 s THEN the rollback SHALL stop it, keep the proxy, and log `Rollback para <hash> falhou: o backend não ficou pronto em 180 s`; IF the proxy switch fails THEN it SHALL log `Rollback para <hash> falhou na troca do proxy; o slot <slot> continua ativo`.
 
 **Independent Test**: Right after a deploy of B over A, run `./deploy.sh --rollback`: `localhost:8080` answers like A.
 
