@@ -14,6 +14,12 @@ Corroborated across multiple features. Safe to apply as guidance.
 - evidence: STG-19, STG-22 (validation.md G1, G2) (game) (+1 more)
 - last seen: 2026-10-18T11:47:40Z
 
+### L-039 - Give every spec edge case its own test in the feature diff, even when existing behavior is expected to satisfy it
+- signal: `ac_gap` · recurrence: 2 feature(s) · scope: `tests` · harmful: 0
+- features: account-reset, blue-green-deploy
+- evidence: spec.md edge case farm after reset; validation.md Edge cases (indirect via FarmServiceTest.kt:101) (tests) (+1 more)
+- last seen: 2026-10-28T09:23:26Z
+
 ## Candidates (under observation - do NOT load as guidance yet)
 
 Seen once or not yet corroborated. Tracked, not trusted.
@@ -240,17 +246,35 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: spec.md P1 Reset button AC-8 (RESET_LOCKED has no progress body to realign to) (api-errors)
 - last seen: 2026-10-27T20:36:52Z
 
-### L-039 - Give every spec edge case its own test in the feature diff, even when existing behavior is expected to satisfy it
-- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
-- features: account-reset
-- evidence: spec.md edge case farm after reset; validation.md Edge cases (indirect via FarmServiceTest.kt:101) (tests)
-- last seen: 2026-10-27T20:36:53Z
-
 ### L-040 - Assert UI acceptance criteria on the rendered view (screen text, badge visibility), not only on the service state behind it
 - signal: `ac_gap` · recurrence: 1 feature(s) · scope: `game-ui` · harmful: 0
 - features: account-reset
 - evidence: spec.md P1 Reset button AC-7; ClickerGame.test.js:4092-4093 asserts service state only (game-ui)
 - last seen: 2026-10-27T20:36:53Z
+
+### L-041 - When readiness accepts one exact status, test that other success statuses such as 200 keep polling
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `deploy` · harmful: 0
+- features: blue-green-deploy
+- evidence: M1/M1b deploy/lib/slots.mjs:62 (deploy)
+- last seen: 2026-10-28T09:23:26Z
+
+### L-042 - Give every check of a regression suite its own failing-case test, not only the happy path order
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `deploy` · harmful: 0
+- features: blue-green-deploy
+- evidence: M11/M12 deploy/regression.mjs:88,100 (deploy)
+- last seen: 2026-10-28T09:23:26Z
+
+### L-043 - When an AC fixes a message frame with placeholders, write the exact value each placeholder takes per case
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: blue-green-deploy
+- evidence: US-2 AC 3 FALHOU expected/received wording (spec)
+- last seen: 2026-10-28T09:23:26Z
+
+### L-044 - Give every failure path of an operation that logs exact texts its own exact text in the spec, not only the main path
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: blue-green-deploy
+- evidence: SPEC_DEVIATION deploy/lib/previous.mjs:38 (spec)
+- last seen: 2026-10-28T09:23:27Z
 
 ## Quarantined (failed when applied - ignore)
 

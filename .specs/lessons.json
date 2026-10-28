@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 41,
+  "next_id": 45,
   "lessons": [
     {
       "id": "L-001",
@@ -697,17 +697,19 @@
       "text": "Give every spec edge case its own test in the feature diff, even when existing behavior is expected to satisfy it",
       "signal": "ac_gap",
       "scope": "tests",
-      "status": "candidate",
+      "status": "confirmed",
       "features": [
-        "account-reset"
+        "account-reset",
+        "blue-green-deploy"
       ],
-      "recurrence": 1,
+      "recurrence": 2,
       "harmful": 0,
       "evidence": [
-        "spec.md edge case farm after reset; validation.md Edge cases (indirect via FarmServiceTest.kt:101) (tests)"
+        "spec.md edge case farm after reset; validation.md Edge cases (indirect via FarmServiceTest.kt:101) (tests)",
+        "Edge case restart, publish.sh:100-108 (tests)"
       ],
       "created": "2026-10-27T20:36:53Z",
-      "last_seen": "2026-10-27T20:36:53Z"
+      "last_seen": "2026-10-28T09:23:26Z"
     },
     {
       "id": "L-040",
@@ -726,6 +728,78 @@
       ],
       "created": "2026-10-27T20:36:53Z",
       "last_seen": "2026-10-27T20:36:53Z"
+    },
+    {
+      "id": "L-041",
+      "key": "surviving_mutant::when readiness accepts one exact status test that other success statuses such as 200 keep polling",
+      "text": "When readiness accepts one exact status, test that other success statuses such as 200 keep polling",
+      "signal": "surviving_mutant",
+      "scope": "deploy",
+      "status": "candidate",
+      "features": [
+        "blue-green-deploy"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M1/M1b deploy/lib/slots.mjs:62 (deploy)"
+      ],
+      "created": "2026-10-28T09:23:26Z",
+      "last_seen": "2026-10-28T09:23:26Z"
+    },
+    {
+      "id": "L-042",
+      "key": "surviving_mutant::give every check of a regression suite its own failing case test not only the happy path order",
+      "text": "Give every check of a regression suite its own failing-case test, not only the happy path order",
+      "signal": "surviving_mutant",
+      "scope": "deploy",
+      "status": "candidate",
+      "features": [
+        "blue-green-deploy"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M11/M12 deploy/regression.mjs:88,100 (deploy)"
+      ],
+      "created": "2026-10-28T09:23:26Z",
+      "last_seen": "2026-10-28T09:23:26Z"
+    },
+    {
+      "id": "L-043",
+      "key": "spec_precision_gap::when an ac fixes a message frame with placeholders write the exact value each placeholder takes per case",
+      "text": "When an AC fixes a message frame with placeholders, write the exact value each placeholder takes per case",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "blue-green-deploy"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "US-2 AC 3 FALHOU expected/received wording (spec)"
+      ],
+      "created": "2026-10-28T09:23:26Z",
+      "last_seen": "2026-10-28T09:23:26Z"
+    },
+    {
+      "id": "L-044",
+      "key": "spec_deviation::give every failure path of an operation that logs exact texts its own exact text in the spec not only the main path",
+      "text": "Give every failure path of an operation that logs exact texts its own exact text in the spec, not only the main path",
+      "signal": "spec_deviation",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "blue-green-deploy"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "SPEC_DEVIATION deploy/lib/previous.mjs:38 (spec)"
+      ],
+      "created": "2026-10-28T09:23:27Z",
+      "last_seen": "2026-10-28T09:23:27Z"
     }
   ]
 }
