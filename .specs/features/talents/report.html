@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Talentos</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+:root[data-theme="dark"] { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Talentos</h1>
+<p class="sub">Feature <code>talents</code> · 9 commits de código, de <code>cd95ed6</code> a <code>3e2c525</code>, e as correções <code>91d5f21</code>, <code>eadfdc6</code> · verificação em <code>eadfdc6</code> · cobertura unitária e do backend em <code>eadfdc6</code>, e2e em <code>a3d2ae8</code> (mesmo código de produção) · 28/10/2026</p>
+
+<p><span class="verdict">Verifier: PASS</span> &nbsp;na 3ª rodada · 38 de 38 critérios (spec <code>talents</code>, spec <code>talent-points</code> e AD-017) · sensor 9 mutantes, 9 mortos</p>
+
+<h2>Resumo</h2>
+<div class="cards">
+    <div class="card"><div class="n">+933 / −19</div><div class="l">linhas de código de produção (21 arquivos)</div></div>
+    <div class="card"><div class="n">+1622 / −15</div><div class="l">linhas de teste (17 arquivos)</div></div>
+    <div class="card"><div class="n">48 + 82</div><div class="l">testes novos: backend + jogo (unitários)</div></div>
+    <div class="card"><div class="n">9</div><div class="l">cenários e2e novos</div></div>
+</div>
+
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Área</th><th>Arquivos</th><th class="num">Adicionadas</th><th class="num">Removidas</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td>10</td><td class="num">456</td><td class="num">0</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes, <code>style.css</code>)</td><td>11</td><td class="num">477</td><td class="num">19</td></tr>
+</table></div>
+<p class="sub">Backend: domínio <code>Talents.kt</code>, <code>TalentService</code>, <code>TalentController</code>, repositório, porta, caso de uso, config, exceções e a migração <code>V3__player_talents.sql</code>. Jogo: <code>talents.js</code>, <code>talentCollection.js</code>, <code>talentApi.js</code>, <code>talentsView.js</code>, os efeitos em <code>leaderAttacker.js</code>, <code>skillCombat.js</code> e <code>ClickerGame.js</code>. Os pontos de talento, os graus e o reset vieram depois, em commits fora deste intervalo (spec <code>talent-points</code> e AD-017).</p>
+
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th class="num">Linhas +/−</th><th class="num">Testes novos</th><th class="num">Total após a execução</th><th>Resultado</th></tr>
+<tr><td>Backend (JUnit + Testcontainers)</td><td class="num">+597 / −0</td><td class="num">48</td><td class="num">832</td><td class="ok">832 passaram</td></tr>
+<tr><td>Jogo unitário (Vitest, jsdom)</td><td class="num">+833 / −11</td><td class="num">82</td><td class="num">1249</td><td>1246 passaram, 3 falharam (fora da feature, ver abaixo)</td></tr>
+<tr><td>E2E (Playwright, backend falso, com cobertura)</td><td class="num">+192 / −4</td><td class="num">9</td><td class="num">112</td><td>109 passaram, 1 instável, 2 falharam (fora da feature, ver abaixo)</td></tr>
+</table></div>
+
+<h2>Cobertura</h2>
+<div class="scroll"><table>
+<tr><th>Medida</th><th>Projeto</th><th>Arquivos da feature</th></tr>
+<tr><td>Unitário backend (JaCoCo, linhas / branches)</td><td>99,11% / 92,75%</td><td>99,34% / 87,91% (9 classes Kotlin)</td></tr>
+<tr><td>Unitário jogo (Vitest v8, linhas / branches)</td><td>96,62% / 94,33%</td><td>97,57% / 91,63% (10 arquivos de <code>game/src</code>)</td></tr>
+<tr><td>E2E jogo (istanbul, linhas)</td><td>90,52% (branches 71,83%)</td><td>90,99%</td></tr>
+</table></div>
+<p class="sub">Os arquivos da feature incluem <code>ClickerGame.js</code>, <code>HeroUi.js</code> e <code>ApiExceptionHandler.kt</code> inteiros. A migração SQL e o <code>style.css</code> não entram na medição de linhas.</p>
+
+<h2>Cenários e2e (<code>e2e/talents.spec.js</code>)</h2>
+<div class="scroll"><table>
+<tr><th>Cenário</th><th>Resultado</th></tr>
+<tr><td>PHYSICAL_BREAK 5 baixa a defesa: um clique tira 0,85 em vez de 0,8</td><td class="ok">passou</td></tr>
+<tr><td>Sem talentos, o mesmo clique tira 0,8</td><td class="ok">passou</td></tr>
+<tr><td>CLICK_DAMAGE 5 soma 25% ao clique</td><td class="ok">passou</td></tr>
+<tr><td>MINIBOSS_TIME 5 dá 40 s ao miniboss em vez de 30</td><td class="ok">passou</td></tr>
+<tr><td>Comprar um nível com um ponto mostra Nível 1/10, gasta o ponto e vale a partir do próximo clique</td><td class="ok">passou</td></tr>
+<tr><td>Com 0 pontos todo botão fica desabilitado, mesmo com a carteira cheia</td><td class="ok">passou</td></tr>
+<tr><td>Um talento no nível 10 mostra Nível máximo e nenhum botão</td><td class="ok">passou</td></tr>
+<tr><td>Desenha uma marca no lugar dos ícones enquanto a arte não existe</td><td class="ok">passou</td></tr>
+<tr><td>Pausa a luta com a janela aberta</td><td class="ok">passou</td></tr>
+<tr><td>Os 5 cenários de pontos, COMBO, grau 2 e Reiniciar pontos (features posteriores)</td><td class="ok">5 passaram</td></tr>
+</table></div>
+
+<h2>Sensor do Verifier</h2>
+<ul>
+    <li><b>Rodada 1</b> (13 mutantes, 13 mortos): o código passou, mas o veredito foi FAIL por desvio da spec. Os commits <code>b443844</code>, <code>4a4f86f</code> e <code>08be5c9</code> mudaram a árvore (3 graus, 30 talentos, reset, dano de clique a 5% por nível) sem spec nem decisão. Correção <code>91d5f21</code>: a decisão AD-017, notas nas duas specs de talentos e o caso de borda em +50%.</li>
+    <li><b>Rodada 2</b> (12 mutantes, 1 sobreviveu): congelar os talentos de tempo no primeiro encontro com chefe passava. Nenhum teste melhorava um talento e depois começava o encontro seguinte. Correção <code>eadfdc6</code>, só teste.</li>
+    <li><b>Rodada 3</b> (9 mutantes, 9 mortos): o congelamento, o tempo do chefe na farm, as quebras de defesa no combate e nas tags, o piso 0 da resistência crítica, a resposta da melhoria ignorada, e no backend o <code>&lt;</code> do custo, o <code>nextCost</code> no nível 10 e o 400 do <code>fromLevel</code>. PASS.</li>
+</ul>
+
+<h2>Lacunas não bloqueantes</h2>
+<ul>
+    <li>A AD-017 não diz o status nem o corpo de <code>POST /talents/reset</code>. Os testes fixam 200 com <code>{ talents, points }</code>.</li>
+    <li>Os textos dos graus (<code>Grau N</code>, <code>Bloqueado: chegue ao nível 10 do Grau 1</code>) e a regra que desabilita <code>Reiniciar pontos</code> não estão em nenhuma spec.</li>
+    <li>Três títulos de teste desatualizados (só cosmético): <code>ClickerGame.test.js:3085</code>, <code>leaderAttacker.test.js:57</code> e <code>talentsView.test.js:79</code>.</li>
+</ul>
+
+<h2>Falhas fora da feature</h2>
+<div class="scroll"><table>
+<tr><th>Teste</th><th>Motivo</th></tr>
+<tr><td>3 testes de <code>ClickerGame farm mode</code> (unitários)</td><td>Quebrados desde <code>9e11bf9</code> (<code>fix(farm)</code>): um deles falha com <code>ReferenceError: loads is not defined</code>.</td></tr>
+<tr><td><code>farm.spec.js:82</code> (falhou nas 3 tentativas) e <code>:109</code> (instável)</td><td>Testam as vitórias e o pagamento da farm, que <code>9e11bf9</code> mudou.</td></tr>
+<tr><td><code>drops.spec.js:74</code> (falhou nas 3 tentativas)</td><td>Testa as filas de drop de monstro e miniboss. Nenhum commit da feature toca drops.</td></tr>
+</table></div>
+</main>
+</body>
+</html>
