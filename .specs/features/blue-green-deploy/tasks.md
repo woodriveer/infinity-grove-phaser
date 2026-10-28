@@ -142,8 +142,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests: status and stdout of `node -e`, a non-zero status, `input` piped to stdin, `env` merged over `process.env`
-- [ ] Gate check passes: `node --test deploy/`
+- [x] Tests: status and stdout of `node -e`, a non-zero status, `input` piped to stdin, `env` merged over `process.env`
+- [x] Gate check passes: `node --test deploy/`
 
 **Tests**: unit
 **Gate**: quick
