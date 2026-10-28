@@ -162,22 +162,22 @@ In every log text and container name, `<hash>` is the 7-character short hash; `.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| BG-01 | P1: Deploy - AC 1 (image from the commit) | Design | Pending |
-| BG-02 | P1: Deploy - AC 2, 3 (start and readiness) | Design | Pending |
-| BG-03 | P1: Deploy - AC 4, 5, 6 (suite then zero-downtime switch) | Design | Pending |
-| BG-04 | P1: Deploy - AC 7 (old slot kept 5 min) | Design | Pending |
-| BG-05 | P1: Deploy - AC 8, 9 (state; tunnel and Worker unchanged) | Design | Pending |
-| BG-06 | P1: Regression - AC 1, 2, 3, 5 (checks and output) | Design | Pending |
-| BG-07 | P1: Regression - AC 4 (cleanup) | Design | Pending |
-| BG-08 | P1: Regression - AC 6 (failure keeps the old slot) | Design | Pending |
-| BG-09 | P1: Watcher - AC 1, 2, 3, 5, 6 | Design | Pending |
-| BG-10 | P1: Watcher - AC 4 (Worker from the commit) | Design | Pending |
-| BG-11 | P1: Watcher - AC 7 (commit tree only) | Design | Pending |
-| BG-12 | P2: Rollback | Design | Pending |
-| BG-13 | P2: Dozzle | Design | Pending |
-| BG-14 | Edge cases (first start, Docker down, build failure, restart) | Design | Pending |
+| BG-01 | P1: Deploy - AC 1 (image from the commit) | Execute | Verified |
+| BG-02 | P1: Deploy - AC 2, 3 (start and readiness) | Execute | Verified |
+| BG-03 | P1: Deploy - AC 4, 5, 6 (suite then zero-downtime switch) | Execute | Verified |
+| BG-04 | P1: Deploy - AC 7 (old slot kept 5 min) | Execute | Verified |
+| BG-05 | P1: Deploy - AC 8, 9 (state; tunnel and Worker unchanged) | Execute | Verified |
+| BG-06 | P1: Regression - AC 1, 2, 3, 5 (checks and output) | Execute | Verified |
+| BG-07 | P1: Regression - AC 4 (cleanup) | Execute | Verified |
+| BG-08 | P1: Regression - AC 6 (failure keeps the old slot) | Execute | Verified |
+| BG-09 | P1: Watcher - AC 1, 2, 3, 5, 6 | Execute | Verified |
+| BG-10 | P1: Watcher - AC 4 (Worker from the commit) | Execute | Verified |
+| BG-11 | P1: Watcher - AC 7 (commit tree only) | Execute | Verified |
+| BG-12 | P2: Rollback | Execute | Verified |
+| BG-13 | P2: Dozzle | Execute | Verified |
+| BG-14 | Edge cases (first start, Docker down, build failure, restart) | Execute | Verified |
 
-**Coverage:** 14 total, 0 mapped to tasks, 14 unmapped ⚠️
+**Coverage:** 14 total, 14 mapped to tasks, 0 unmapped
 
 ---
 

@@ -1,7 +1,7 @@
 # Blue-Green Deploy Design
 
 **Spec**: `.specs/features/blue-green-deploy/spec.md`
-**Status**: Draft
+**Status**: Approved
 
 ---
 

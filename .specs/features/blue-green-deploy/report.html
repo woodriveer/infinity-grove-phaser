@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deploy blue-green</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+:root[data-theme="dark"] { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Deploy blue-green</h1>
+<p class="sub">Feature <code>blue-green-deploy</code> · commits <code>b4ac3b3..4781b39</code> (32 commits, 16 tarefas) · verificação em <code>4781b39</code> · 28/10/2026</p>
+
+<p><span class="verdict">Verifier: PASS</span> &nbsp;na 3ª rodada · 29 de 29 critérios · sensor 38 mutantes, 33 mortos na hora, 5 sobreviventes corrigidos com testes e mortos depois</p>
+
+<h2>Resumo</h2>
+<div class="cards">
+    <div class="card"><div class="n">+1045 / −99</div><div class="l">linhas de código de produção (18 arquivos)</div></div>
+    <div class="card"><div class="n">+1932</div><div class="l">linhas de teste (12 arquivos)</div></div>
+    <div class="card"><div class="n">119</div><div class="l">testes novos do deploy (<code>node --test</code>)</div></div>
+    <div class="card"><div class="n">7548 / 0</div><div class="l">requisições a cada 100 ms durante as trocas / falhas</div></div>
+</div>
+
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Área</th><th>Arquivos</th><th class="num">Adicionadas</th><th class="num">Removidas</th></tr>
+<tr><td>Deploy (<code>deploy/**</code> sem testes, <code>deploy.sh</code>)</td><td>13</td><td class="num">873</td><td class="num">0</td></tr>
+<tr><td><code>publish.sh</code> (reescrito)</td><td>1</td><td class="num">102</td><td class="num">99</td></tr>
+<tr><td>Containers (<code>backend/Dockerfile</code>, <code>.dockerignore</code>, <code>docker-compose.yml</code>)</td><td>3</td><td class="num">69</td><td class="num">0</td></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td>1</td><td class="num">1</td><td class="num">0</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes, <code>style.css</code>)</td><td>0</td><td class="num">0</td><td class="num">0</td></tr>
+</table></div>
+<p class="sub">A linha do backend é o comentário do commit de teste <code>439c76a</code>, que serviu para provar o deploy ao vivo.</p>
+
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th class="num">Linhas +/−</th><th class="num">Testes novos</th><th class="num">Total após a execução</th><th>Resultado</th></tr>
+<tr><td>Deploy (<code>node --test "deploy/**/*.test.mjs"</code>)</td><td class="num">+1932 / −0</td><td class="num">119</td><td class="num">119</td><td class="ok">119 passaram</td></tr>
+<tr><td>Backend (JUnit + Testcontainers)</td><td class="num">0</td><td class="num">0</td><td class="num">832</td><td class="ok">832 passaram</td></tr>
+<tr><td>Jogo unitário (Vitest, jsdom)</td><td class="num">0</td><td class="num">0</td><td class="num">1250</td><td class="ok">1250 passaram</td></tr>
+<tr><td>E2E (Playwright, backend falso, com cobertura)</td><td class="num">0</td><td class="num">0</td><td class="num">111</td><td>107 passaram, 4 falharam (fora da feature, ver abaixo)</td></tr>
+</table></div>
+
+<h2>Cobertura</h2>
+<div class="scroll"><table>
+<tr><th>Medida</th><th>Projeto</th><th>Arquivos da feature</th></tr>
+<tr><td>Deploy (<code>node --test --experimental-test-coverage</code>, linhas / branches)</td><td>98,25% / 96,72%</td><td>98,25% / 96,72% (todo o <code>deploy/</code> é novo)</td></tr>
+<tr><td>Unitário backend (JaCoCo, linhas / branches)</td><td>99,11% / 92,75%</td><td>sem código de backend novo (só um comentário)</td></tr>
+<tr><td>Unitário jogo (Vitest v8, linhas / branches)</td><td>96,41% / 94,22%</td><td>sem código de jogo alterado</td></tr>
+<tr><td>E2E jogo (istanbul, linhas)</td><td>90,92% (branches 72,48%)</td><td>sem código de jogo alterado</td></tr>
+</table></div>
+<p class="sub">No deploy, o ponto menos coberto é o laço de 60 s do <code>watcher.mjs</code> (linhas 111-144, 76,39%), que só foi provado ao vivo. O <code>publish.sh</code> e o <code>deploy.sh</code> não têm medição de linha: a matriz de testes cobre esses dois ao vivo.</p>
+
+<h2>Teste ao vivo (stack real)</h2>
+<div class="scroll"><table>
+<tr><th>Cenário</th><th>Resultado</th></tr>
+<tr><td>Primeiro <code>publish.sh</code> sem estado: imagem do <code>origin/main</code> no slot blue, túnel e Worker</td><td class="ok">passou: <code>/api/progress</code> respondeu 401 pelo Worker</td></tr>
+<tr><td>Push de backend inofensivo <code>439c76a</code></td><td class="ok">passou: <code>Deploy 439c76a ativo no slot blue</code> 2 min 39 s depois do push, túnel igual, 0 falhas</td></tr>
+<tr><td>Commit que quebra o reset <code>4ea7667</code></td><td class="ok">recusado: <code>Deploy 4ea7667 falhou na regressão; o slot blue continua ativo</code>, nenhum usuário <code>regression-</code> sobrou</td></tr>
+<tr><td>Revert <code>32b6928</code></td><td class="ok">passou: <code>Deploy 32b6928 ativo no slot green</code></td></tr>
+<tr><td><code>./deploy.sh --rollback</code></td><td class="ok">passou: <code>Rollback para 439c76a no slot blue</code>, 0 falhas</td></tr>
+<tr><td>Remoção da versão anterior</td><td class="ok">passou: container e imagem removidos 5 min 41 s depois de parar</td></tr>
+<tr><td>Cliente consultando <code>localhost:8080/progress</code> a cada 100 ms</td><td class="ok">7548 de 7548 responderam 401</td></tr>
+</table></div>
+
+<h2>Sensor do Verifier</h2>
+<ul>
+    <li><b>Rodada 1</b> (22 mutantes, 4 sobreviveram):
+        <ul>
+            <li>A prontidão aceitava 200 ou qualquer resposta abaixo de 500.</li>
+            <li>A regressão não conferia o valor em <code>progresso inicial</code> nem em <code>auto clique inicial</code>.</li>
+            <li>Correção: só testes novos, além da remoção da imagem recusada (<code>19da347</code>).</li>
+        </ul>
+    </li>
+    <li><b>Rodada 2</b> (11 mutantes, 1 sobreviveu): o <code>login</code> da regressão não tinha teste de falha (<code>1897dd1</code>).</li>
+    <li><b>Rodada 3</b> (5 mutantes, 5 mortos): PASS.</li>
+</ul>
+
+<h2>Defeitos achados no teste ao vivo e corrigidos</h2>
+<ul>
+    <li>A publicação do Worker falhava porque o <code>game/package-lock.json</code> não está no git. Agora ela usa <code>npm install</code> quando falta esse arquivo (<code>1b119fd</code>).</li>
+    <li>O watcher caía enquanto esperava a prontidão: o timer de <code>AbortSignal.timeout</code> não mantém o Node vivo (<code>837ca2d</code>).</li>
+    <li>Uma requisição falhava logo depois da troca, porque o <code>nginx -s reload</code> fechava as conexões keep-alive. O proxy ficou com <code>keepalive_timeout 0</code> (<code>05e98aa</code>).</li>
+</ul>
+
+<h2>Lacunas não bloqueantes</h2>
+<ul>
+    <li>O reinício no meio de um deploy, que deixa um <code>.deploy.lock</code> velho, não foi reproduzido. A prova é o código do <code>publish.sh</code> e os vários reinícios a partir do <code>.deploy-state</code> feitos no teste ao vivo. O <code>clearStaleLock</code> está testado, mas nenhum código chama.</li>
+    <li>"Nenhuma requisição perdida na troca" e o laço de 60 s do watcher só têm prova ao vivo.</li>
+</ul>
+
+<h2>Falhas fora da feature</h2>
+<div class="scroll"><table>
+<tr><th>Teste</th><th>Motivo</th></tr>
+<tr><td><code>farm.spec.js:82</code></td><td>Já falhava em <code>7c9dd48</code>. Com a campanha completa, o auto clique mata o chefe da farm sozinho.</td></tr>
+<tr><td><code>bossMap.spec.js:54</code>, <code>talents.spec.js:111</code></td><td>As artes novas não commitadas (<code>boss-map.jpg</code>, <code>talent-*.png</code>) existem na árvore local, e esses testes esperam a arte ausente.</td></tr>
+<tr><td><code>clickPower.spec.js:41</code> (combo de 11 cliques em 1,5 s)</td><td>Falhou só na execução com instrumentação de cobertura. Rodado de novo sem cobertura, o arquivo passou inteiro (5 de 5). É sensível ao tempo, e a feature não mudou código do jogo.</td></tr>
+</table></div>
+</main>
+</body>
+</html>
