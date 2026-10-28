@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/blue-green-deploy/design.md`
-**Status**: Draft
+**Status**: In Progress
 
 ---
 
@@ -90,9 +90,9 @@ T15 → T16
 
 **Done when**:
 
-- [ ] `git archive --format=tar HEAD:backend | docker build -t infinity-grove-backend:test -` succeeds with no file from the working tree
-- [ ] The image tags are pinned to versions pulled during the task
-- [ ] A container of the image on the compose network, with `SPRING_DATASOURCE_URL` and `JWT_SECRET` set, answers 401 on `/progress`
+- [x] `git archive --format=tar HEAD:backend | docker build -t infinity-grove-backend:test -` succeeds with no file from the working tree
+- [x] The image tags are pinned to versions pulled during the task
+- [x] A container of the image on the compose network, with `SPRING_DATASOURCE_URL` and `JWT_SECRET` set, answers 401 on `/progress`
 
 **Tests**: none
 **Gate**: build
