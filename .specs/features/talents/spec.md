@@ -160,14 +160,14 @@ Price of the upgrade from level `n` to `n+1`, in copper: `round(300 x 1.6^n)`, s
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| TAL-01 | P1: tree read, price curve (AC 1, 2, 4, 5) | Specify | Pending |
-| TAL-02 | P1: upgrade, wallet, idempotency, concurrency (AC 3, 6, 12) | Specify | Pending |
-| TAL-03 | P1: refusals and auth (AC 7-11) | Specify | Pending |
-| TAL-04 | P1: storage and isolation (AC 13) | Specify | Pending |
-| TAL-05 | P1: power talents in combat (game AC 1-3, 12) | Specify | Pending |
-| TAL-06 | P1: break talents in combat (game AC 4-6, 10-11) | Specify | Pending |
-| TAL-07 | P1: time talents in combat (game AC 7-9) | Specify | Pending |
-| TAL-08 | P2: Talentos screen (screen AC 1-10) | Specify | Pending |
+| TAL-01 | P1: tree read, price curve (AC 1, 2, 4, 5) | Done | Verified |
+| TAL-02 | P1: upgrade, wallet, idempotency, concurrency (AC 3, 6, 12) | Done | Verified |
+| TAL-03 | P1: refusals and auth (AC 7-11) | Done | Verified |
+| TAL-04 | P1: storage and isolation (AC 13) | Done | Verified |
+| TAL-05 | P1: power talents in combat (game AC 1-3, 12) | Done | Verified |
+| TAL-06 | P1: break talents in combat (game AC 4-6, 10-11) | Done | Verified |
+| TAL-07 | P1: time talents in combat (game AC 7-9) | Done | Verified |
+| TAL-08 | P2: Talentos screen (screen AC 1-10) | Done | Verified |
 
 **Coverage:** 8 total, 0 mapped to tasks, 8 unmapped
 

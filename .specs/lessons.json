@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 52,
+  "next_id": 56,
   "lessons": [
     {
       "id": "L-001",
@@ -926,6 +926,78 @@
       ],
       "created": "2026-10-28T18:07:57Z",
       "last_seen": "2026-10-28T18:07:57Z"
+    },
+    {
+      "id": "L-052",
+      "key": "spec_deviation::a change to a verified feature s catalog or scope must amend its spec or add a decision in state md in the same commit a commit message is not a spec",
+      "text": "A change to a verified feature's catalog or scope must amend its spec or add a decision in STATE.md in the same commit; a commit message is not a spec.",
+      "signal": "spec_deviation",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "talents"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "b443844 4a4f86f 08be5c9 (spec)"
+      ],
+      "created": "2026-10-28T18:32:27Z",
+      "last_seen": "2026-10-28T18:32:27Z"
+    },
+    {
+      "id": "L-053",
+      "key": "surviving_mutant::an ac that says an upgrade counts on the next x needs a test that upgrades then starts x again and asserts the new value",
+      "text": "An AC that says an upgrade counts on the next X needs a test that upgrades, then starts X again and asserts the new value.",
+      "signal": "surviving_mutant",
+      "scope": "game/tests",
+      "status": "candidate",
+      "features": [
+        "talents"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/src/adapters/phaser/ClickerGame.test.js:3166 G6 (game/tests)"
+      ],
+      "created": "2026-10-28T18:32:27Z",
+      "last_seen": "2026-10-28T18:32:27Z"
+    },
+    {
+      "id": "L-054",
+      "key": "spec_precision_gap::when a value comes from a catalog that can change name the test after the behaviour not the number and retitle fixtures when a spec note supersedes it",
+      "text": "When a value comes from a catalog that can change, name the test after the behaviour, not the number, and retitle fixtures when a spec note supersedes it.",
+      "signal": "spec_precision_gap",
+      "scope": "game/tests",
+      "status": "candidate",
+      "features": [
+        "talents"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/src/domain/talents/talents.test.js:158 (game/tests)"
+      ],
+      "created": "2026-10-28T18:32:27Z",
+      "last_seen": "2026-10-28T18:32:27Z"
+    },
+    {
+      "id": "L-055",
+      "key": "spec_precision_gap::a decision that adds an endpoint or screen text states the status code response body and exact texts or tests pin outcomes no spec owns",
+      "text": "A decision that adds an endpoint or screen text states the status code, response body and exact texts, or tests pin outcomes no spec owns.",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "talents"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "AD-017 POST /talents/reset (spec)"
+      ],
+      "created": "2026-10-28T18:32:27Z",
+      "last_seen": "2026-10-28T18:32:27Z"
     }
   ]
 }

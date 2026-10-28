@@ -318,6 +318,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: game/e2e/bossMap.spec.js fallback (game/e2e)
 - last seen: 2026-10-28T18:07:57Z
 
+### L-052 - A change to a verified feature's catalog or scope must amend its spec or add a decision in STATE.md in the same commit; a commit message is not a spec.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: talents
+- evidence: b443844 4a4f86f 08be5c9 (spec)
+- last seen: 2026-10-28T18:32:27Z
+
+### L-053 - An AC that says an upgrade counts on the next X needs a test that upgrades, then starts X again and asserts the new value.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game/tests` · harmful: 0
+- features: talents
+- evidence: game/src/adapters/phaser/ClickerGame.test.js:3166 G6 (game/tests)
+- last seen: 2026-10-28T18:32:27Z
+
+### L-054 - When a value comes from a catalog that can change, name the test after the behaviour, not the number, and retitle fixtures when a spec note supersedes it.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `game/tests` · harmful: 0
+- features: talents
+- evidence: game/src/domain/talents/talents.test.js:158 (game/tests)
+- last seen: 2026-10-28T18:32:27Z
+
+### L-055 - A decision that adds an endpoint or screen text states the status code, response body and exact texts, or tests pin outcomes no spec owns.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: talents
+- evidence: AD-017 POST /talents/reset (spec)
+- last seen: 2026-10-28T18:32:27Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

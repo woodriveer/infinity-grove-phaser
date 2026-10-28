@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Spec**: `.specs/features/talents/spec.md`
-**Status**: In progress
+**Status**: Done
 
 The design is inline (no `design.md`): the backend follows the equipment feature (ADR 0008, flat `domain` / `port` / `usecase` / `service` / `adapter` packages of the project, which the `kotlin-backend-ddd` rules are mapped onto), the game follows ADR 0007 (`domain` / `application` / `adapters`).
 
