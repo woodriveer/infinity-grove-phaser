@@ -418,8 +418,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests: `--rollback` saves the new state and exits 0; with no previous slot it exits 1; with the lock taken it exits 1 with `Um deploy está em andamento; tente de novo em instantes`; an unknown flag prints the usage and exits 1
-- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
+- [x] Tests: `--rollback` saves the new state and exits 0; with no previous slot it exits 1; with the lock taken it exits 1 with `Um deploy está em andamento; tente de novo em instantes`; an unknown flag prints the usage and exits 1
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
