@@ -227,6 +227,7 @@ const failures = [
 //  Every check before the chapter: a fault in its route stops the run there
 const early = [
     ['cadastro', 'POST /users', { status: 201, body: { user: {} } }, 'FALHOU: cadastro: 201 com accessToken / 201 sem accessToken', 0],
+    ['login', 'POST /users/login', { status: 500, body: null }, 'FALHOU: login: 200 / 500', 1],
     ['progresso inicial', 'GET /progress', { status: 200, body: { chapter: 2, stage: 1 } }, 'FALHOU: progresso inicial: capítulo 1 etapa 1 / capítulo 2 etapa 1', 2],
     ['carteira', 'GET /wallet', { status: 500, body: null }, 'FALHOU: carteira: 200 / 500', 3],
     ['talentos', 'GET /talents', { status: 500, body: null }, 'FALHOU: talentos: 200 / 500', 4],

@@ -155,6 +155,15 @@ for (const failure of failures)
     });
 }
 
+test('a failed redeploy of the active commit keeps its image', async () =>
+{
+    const { timeline, deps } = machine({ failing: ['docker run'] });
+
+    await deployBackend({ ...deps, root: repo(), hash: OLD });
+
+    assert.deepEqual(commands(timeline, 'docker image rm'), []);
+});
+
 test('a failed deploy of the commit kept as previous keeps its image', async () =>
 {
     const { timeline, deps } = machine({ failing: ['docker run'] });
