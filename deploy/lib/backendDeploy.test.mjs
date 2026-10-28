@@ -151,8 +151,19 @@ for (const failure of failures)
             commands(timeline, ' rm -sf '),
             failure.removed ? ['docker compose -f backend/docker-compose.yml --profile deploy rm -sf backend-green'] : []
         );
+        assert.deepEqual(commands(timeline, 'docker image rm'), failure.removed ? ['docker image rm infinity-grove-backend:bbbbbbb'] : []);
     });
 }
+
+test('a failed deploy of the commit kept as previous keeps its image', async () =>
+{
+    const { timeline, deps } = machine({ failing: ['docker run'] });
+    const state = { ...STATE, previous: { slot: 'green', commit: NEW, stoppedAt: 999_000 } };
+
+    await deployBackend({ ...deps, root: repo(), state });
+
+    assert.deepEqual(commands(timeline, 'docker image rm'), []);
+});
 
 test('a readiness timeout gives up at 180 s and runs no suite', async () =>
 {

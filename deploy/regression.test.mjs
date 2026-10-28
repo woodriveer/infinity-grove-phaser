@@ -224,6 +224,47 @@ const failures = [
     }
 ];
 
+//  Every check before the chapter: a fault in its route stops the run there
+const early = [
+    ['cadastro', 'POST /users', { status: 201, body: { user: {} } }, 'FALHOU: cadastro: 201 com accessToken / 201 sem accessToken', 0],
+    ['progresso inicial', 'GET /progress', { status: 200, body: { chapter: 2, stage: 1 } }, 'FALHOU: progresso inicial: capítulo 1 etapa 1 / capítulo 2 etapa 1', 2],
+    ['carteira', 'GET /wallet', { status: 500, body: null }, 'FALHOU: carteira: 200 / 500', 3],
+    ['talentos', 'GET /talents', { status: 500, body: null }, 'FALHOU: talentos: 200 / 500', 4],
+    ['heróis', 'GET /heroes', { status: 500, body: null }, 'FALHOU: heróis: 200 / 500', 5],
+    ['equipamentos', 'GET /equipment', { status: 500, body: null }, 'FALHOU: equipamentos: 200 / 500', 6],
+    ['auto clique inicial', 'GET /auto-click', { status: 200, body: { level: 0, resets: 1 } }, 'FALHOU: auto clique inicial: nível 0 e resets 0 / nível 0 e resets 1', 7]
+];
+
+for (const [check, route, answer, line, checks] of early)
+{
+    test(`a wrong answer in "${check}" prints FALHOU and stops there`, async () =>
+    {
+        const backend = fakeBackend({ faults: { [route]: answer } });
+        const { ok, lines, ...result } = await suite(backend);
+
+        assert.equal(ok, false);
+        assert.equal(result.checks, checks);
+        assert.deepEqual(lines, [line]);
+        assert.equal(backend.requests.at(-1), check === 'cadastro' ? route : 'DELETE /users/{username}');
+    });
+}
+
+test('a wrong level in "auto clique inicial" fails it too', async () =>
+{
+    const backend = fakeBackend({ faults: { 'GET /auto-click': { status: 200, body: { level: 1, resets: 0 } } } });
+    const { lines } = await suite(backend);
+
+    assert.deepEqual(lines, ['FALHOU: auto clique inicial: nível 0 e resets 0 / nível 1 e resets 0']);
+});
+
+test('a wrong stage in "progresso inicial" fails it too', async () =>
+{
+    const backend = fakeBackend({ faults: { 'GET /progress': { status: 200, body: { chapter: 1, stage: 2 } } } });
+    const { lines } = await suite(backend);
+
+    assert.deepEqual(lines, ['FALHOU: progresso inicial: capítulo 1 etapa 1 / capítulo 1 etapa 2']);
+});
+
 //  The second reset and the second auto click fail only after the first one answered, so the fault is applied by count
 const countedFault = (backend, route, nth, answer) =>
 {
@@ -357,6 +398,14 @@ test('the CLI exits 0 when every check passes', async () =>
     {
         server.close();
     }
+});
+
+test('the CLI with no base URL prints the usage and exits 1', async () =>
+{
+    const { code, stdout } = await cli([]);
+
+    assert.equal(code, 1);
+    assert.equal(stdout, 'Uso: node regression.mjs <url base>\n');
 });
 
 test('the CLI exits 1 when a check fails', async () =>

@@ -183,6 +183,27 @@ test('waitReady is false at 180 s', async () =>
     assert.equal(clock.now(), 180000);
 });
 
+//  Only a 401 proves Spring and its security are up: another answer may come from something else on the port
+test('waitReady keeps polling on a 200, a 403 and a 404 until the 401', async () =>
+{
+    const clock = fakeClock();
+    const answers = [200, 403, 404, 401];
+    const fetch = async () => ({ status: answers.shift() });
+
+    assert.equal(await waitReady(fetch, 'green', clock), true);
+    assert.equal(answers.length, 0);
+    assert.equal(clock.now(), 6000);
+});
+
+test('waitReady is false at 180 s when the slot only answers 200', async () =>
+{
+    const clock = fakeClock();
+    const fetch = async () => ({ status: 200 });
+
+    assert.equal(await waitReady(fetch, 'green', clock), false);
+    assert.equal(clock.now(), 180000);
+});
+
 test('waitReady still takes a 401 that comes just before 180 s', async () =>
 {
     const clock = fakeClock();

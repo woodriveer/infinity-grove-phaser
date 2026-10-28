@@ -35,7 +35,6 @@ export const rollback = async ({ exec, fetch, root, state, log, sleep, now }) =>
 
     const short = previous.commit.slice(0, 7);
 
-    //  SPEC_DEVIATION: the spec names no text for a rollback that does not come up or does not switch; these follow the deploy texts
     if (!resumeSlot(exec, previous.slot) || !await waitReady(fetch, previous.slot, { now, sleep }))
     {
         stopSlot(exec, previous.slot);

@@ -18,6 +18,12 @@ export const deployBackend = async ({ exec, fetch, root, state, hash, log, sleep
         if (remove)
         {
             removeSlot(exec, root, idle);
+
+            //  The image of the refused commit is not kept, unless a kept slot still runs that commit
+            if (![state.active.commit, state.previous?.commit].includes(hash))
+            {
+                removeImage(exec, imageOf(hash));
+            }
         }
 
         log(message);
