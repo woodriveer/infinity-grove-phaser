@@ -14,6 +14,7 @@ class InfinityGroveWsApplication {
     fun clock(): Clock = Clock.systemUTC()
 }
 
+/** Starts the game backend; the blue-green deploy runs it from the image of one commit. */
 fun main(args: Array<String>) {
     runApplication<InfinityGroveWsApplication>(*args)
 }
