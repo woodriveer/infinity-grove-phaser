@@ -32,6 +32,59 @@ services:
       postgres:
         condition: service_healthy
 
+  # Blue-green deploy (profile deploy): two backend slots behind the proxy, and Dozzle for the logs.
+  # The slots and Dozzle bind to 127.0.0.1 only; the tunnel reaches the backend through the proxy.
+  backend-blue:
+    image: ${BLUE_IMAGE:-infinity-grove-backend:blue}
+    container_name: infinity-grove-backend-blue
+    profiles: [ deploy ]
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/infinity_grove
+      JWT_SECRET: ${JWT_SECRET:-}
+    ports:
+      - "127.0.0.1:18081:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend-green:
+    image: ${GREEN_IMAGE:-infinity-grove-backend:green}
+    container_name: infinity-grove-backend-green
+    profiles: [ deploy ]
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/infinity_grove
+      JWT_SECRET: ${JWT_SECRET:-}
+    ports:
+      - "127.0.0.1:18082:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # deploy/nginx/default.conf names the active slot; a switch rewrites it and runs nginx -s reload
+  proxy:
+    image: nginx:1.31.8-alpine
+    container_name: infinity-grove-proxy
+    profiles: [ deploy ]
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PROXY_PORT:-8080}:80"
+    volumes:
+      - ../deploy/nginx:/etc/nginx/conf.d:ro
+
+  dozzle:
+    image: amir20/dozzle:v11.3.5
+    container_name: infinity-grove-dozzle
+    profiles: [ deploy ]
+    restart: unless-stopped
+    environment:
+      DOZZLE_FILTER: name=infinity-grove
+    ports:
+      - "127.0.0.1:8888:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
 volumes:
   postgres_data:
   pgadmin_data:

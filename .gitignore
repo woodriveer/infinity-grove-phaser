@@ -1,2 +1,5 @@
 .env
 .publish-state
+.deploy-state
+.deploy.lock
+deploy/nginx/default.conf

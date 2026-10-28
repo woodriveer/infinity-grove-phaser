@@ -116,9 +116,9 @@ T15 → T16
 
 **Done when**:
 
-- [ ] `docker compose --profile deploy config -q` passes, and `start.sh` still starts only postgres and pgadmin
-- [ ] With a hand-written conf, `up -d --wait postgres dozzle backend-blue proxy` makes `localhost:8080/progress` answer 401
-- [ ] `http://127.0.0.1:8888` shows the `infinity-grove-*` containers; ports 8888, 18081 and 18082 are bound to `127.0.0.1` only (`docker ps` output in the commit body)
+- [x] `docker compose --profile deploy config -q` passes, and `start.sh` still starts only postgres and pgadmin
+- [x] With a hand-written conf, `up -d --wait postgres dozzle backend-blue proxy` makes `localhost:8080/progress` answer 401
+- [x] `http://127.0.0.1:8888` shows the `infinity-grove-*` containers; ports 8888, 18081 and 18082 are bound to `127.0.0.1` only (`docker ps` output in the commit body)
 
 **Tests**: none
 **Gate**: build
