@@ -242,8 +242,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests: `buildImage` pipes the `git archive --format=tar <hash>:backend` output into `docker build -t infinity-grove-backend:<hash> -`; `startSlot` sets `<SLOT>_IMAGE` and recreates only that service; `waitReady` is true on the first 401, keeps polling on a refused connection and on 5xx, and is false at 180 s (fake clock)
-- [ ] Gate check passes: `node --test deploy/`
+- [x] Tests: `buildImage` pipes the `git archive --format=tar <hash>:backend` output into `docker build -t infinity-grove-backend:<hash> -`; `startSlot` sets `<SLOT>_IMAGE` and recreates only that service; `waitReady` is true on the first 401, keeps polling on a refused connection and on 5xx, and is false at 180 s (fake clock)
+- [x] Gate check passes: `node --test deploy/`
 
 **Tests**: unit
 **Gate**: quick
