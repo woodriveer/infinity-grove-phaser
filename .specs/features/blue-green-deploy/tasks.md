@@ -318,8 +318,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests with fakes: success switches to the idle slot, logs `Deploy <h> ativo no slot <slot>`, waits 10 s, stops the old slot, and sets `active`, `previous` (with `stoppedAt`) and `handled`; a build failure, a readiness timeout, a failed suite and a failed switch each log their exact text, remove the new slot (except the build failure, where no slot exists), never stop the active one, and set only `handled`
-- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"`
+- [x] Tests with fakes: success switches to the idle slot, logs `Deploy <h> ativo no slot <slot>`, waits 10 s, stops the old slot, and sets `active`, `previous` (with `stoppedAt`) and `handled`; a build failure, a readiness timeout, a failed suite and a failed switch each log their exact text, remove the new slot (except the build failure, where no slot exists), never stop the active one, and set only `handled`
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"`
 
 **Tests**: unit
 **Gate**: quick
