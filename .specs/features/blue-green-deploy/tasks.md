@@ -192,8 +192,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Tests: `backend/src/...` is backend only; `game/src/a.js` and `game/wrangler.jsonc` are game; `game/src/a.test.js`, `game/e2e/x.js` and `README.md` are neither; a mixed list is both; `changedFiles` calls `git diff --name-only <from> <to>`
-- [ ] Gate check passes: `node --test deploy/`
+- [x] Tests: `backend/src/...` is backend only; `game/src/a.js` and `game/wrangler.jsonc` are game; `game/src/a.test.js`, `game/e2e/x.js` and `README.md` are neither; a mixed list is both; `changedFiles` calls `git diff --name-only <from> <to>`
+- [x] Gate check passes: `node --test deploy/`
 
 **Tests**: unit
 **Gate**: quick
