@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# Starts everything (start.sh), opens a public Cloudflare quick tunnel to the backend and publishes the latest game
-# to the Worker pointing at that tunnel. The tunnel address changes on every run, so a fresh run always redeploys.
-# When a previous run is still up (backend listening, its tunnel alive), nothing is restarted: the game is published
-# again only if its code changed since the last publish, and a backend change asks for a restart.
+# Starts the blue-green stack (Postgres, the active backend slot, the nginx proxy, Dozzle), opens a public Cloudflare
+# quick tunnel to the proxy, publishes the Worker of the last handled commit through it and starts the deploy watcher,
+# which deploys every new commit on origin/main (deploy/watcher.mjs). Only commit trees go out, never the working tree.
+# The first run (no .deploy-state) builds origin/main into the blue slot. A second run while one is up only prints its
+# tunnel and active slot.
 # Usage: ./publish.sh [--no-deploy] [--force]
-#   --no-deploy  only starts the stack and the tunnel and prints its address
-#   --force      publishes even when the game did not change
-set -e
+#   --no-deploy  does not publish the Worker on start (the watcher still runs)
+#   --force      with a run already up, publishes the Worker of the handled commit again
+set -eo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BACKEND_PORT=8080
-FRONTEND_PORT=8081
+PROXY_PORT=8080
+PROXY=infinity-grove-proxy
+COMPOSE=(docker compose -f backend/docker-compose.yml --profile deploy)
 TUNNEL_LOG="$(mktemp)"
-# What the last publish used: the tunnel and the fingerprints of the game and the backend it ran with
-STATE="$ROOT/.publish-state"
 PIDS=()
 DEPLOY=1
 FORCE=0
@@ -24,42 +24,14 @@ for arg in "$@"; do
   esac
 done
 
+cd "$ROOT"
+
+docker info >/dev/null 2>&1 || { echo "Docker is not running"; exit 1; }
 command -v cloudflared >/dev/null || { echo "cloudflared not found (winget install Cloudflare.cloudflared)"; exit 1; }
 
 # PIDs listening on a TCP port (Windows netstat output)
 listening() {
   netstat -ano 2>/dev/null | tr -d '\r' | awk -v p=":$1" '$2 ~ p"$" && $4 == "LISTENING" { print $5 }' | sort -u
-}
-
-# One hash of every file (tracked or new, not ignored, tests left out) under the given paths, plus the extra files given
-# after `--`; the working tree is what gets published, so uncommitted changes count
-fingerprint() {
-  local paths=() extra=()
-  while [ $# -gt 0 ] && [ "$1" != "--" ]; do paths+=("$1"); shift; done
-  [ "$1" = "--" ] && shift
-  extra=("$@")
-  (
-    cd "$ROOT"
-    { git ls-files -co --exclude-standard -- "${paths[@]}" | grep -vE '\.test\.js$'; for f in "${extra[@]}"; do [ -f "$f" ] && echo "$f"; done; } \
-      | sort -u | while IFS= read -r f; do [ -f "$f" ] && sha256sum "$f"; done | sha256sum | cut -d' ' -f1
-  )
-}
-
-game_fingerprint() {
-  fingerprint game/src game/public game/worker game/index.html game/vite.config.js game/package.json game/wrangler.jsonc game/scripts/deploy.mjs \
-    -- game/.env game/.env.pages game/.env.production
-}
-
-backend_fingerprint() {
-  fingerprint backend/src/main backend/build.gradle.kts
-}
-
-state_get() {
-  [ -f "$STATE" ] && grep -E "^$1=" "$STATE" | head -n 1 | cut -d= -f2-
-}
-
-save_state() {
-  printf 'TUNNEL=%s\nGAME=%s\nBACKEND=%s\n' "$1" "$2" "$3" >"$STATE"
 }
 
 # A quick tunnel that is gone answers 530 or nothing; the backend behind a live one answers (401 without a token)
@@ -69,88 +41,119 @@ tunnel_alive() {
   [ -n "$code" ] && [ "$code" != "000" ] && [ "${code:0:1}" != "5" ]
 }
 
-publish_game() {
-  echo "Publishing the game..."
-  (cd "$ROOT/game" && { [ -d node_modules ] || npm install; } && BACKEND_URL="$1" npm run deploy)
+# One field of .deploy-state by its dotted path (active.slot); empty when the file or the field is missing
+state_get() {
+  [ -f .deploy-state ] || return 0
+  node -e 'const s = JSON.parse(require("fs").readFileSync(".deploy-state", "utf8"));
+const v = process.argv[1].split(".").reduce((o, k) => o?.[k], s);
+if (v != null) process.stdout.write(String(v));' "$1"
+}
+
+# Writes the state of this run: the active slot and commit, the handled commit and the tunnel (previous is kept)
+save_state() {
+  node --input-type=module -e 'import { readState, writeState } from "./deploy/lib/state.mjs";
+const [slot, commit, handled, tunnel] = process.argv.slice(1);
+const state = readState(".deploy-state");
+writeState(".deploy-state", { active: { slot, commit }, previous: state?.previous ?? null, handled, tunnel });' "$@"
+}
+
+# The Worker built from the commit tree (deploy/lib/workerPublish.mjs), pointing at the tunnel
+publish_worker() {
+  echo "Publishing the Worker of ${1:0:7}..."
+  node --input-type=module -e 'import { publishWorker } from "./deploy/lib/workerPublish.mjs";
+import { run } from "./deploy/lib/run.mjs";
+const [hash, tunnel] = process.argv.slice(1);
+process.exit(publishWorker({ exec: run, root: process.cwd(), hash, tunnel, log: console.log }) ? 0 : 1);' "$1" "$2"
   echo "Published: https://infinity-grove.yan-tapajos.workers.dev/"
 }
 
-# A previous run is still up: reuse its backend and tunnel instead of failing on the busy port
-if [ -n "$(listening "$BACKEND_PORT")" ]; then
-  TUNNEL="$(state_get TUNNEL)"
-  if [ -z "$TUNNEL" ] || ! tunnel_alive "$TUNNEL"; then
-    echo "Port $BACKEND_PORT is already in use and no live tunnel of a previous publish was found; stop the running backend first."
-    exit 1
-  fi
-  echo "Reusing the running backend and its tunnel: $TUNNEL"
-
-  if [ "$(backend_fingerprint)" != "$(state_get BACKEND)" ]; then
-    echo "The backend code changed since it was started: stop the running publish (Ctrl+C) and run ./publish.sh again to restart it."
-    exit 1
-  fi
-
-  GAME="$(game_fingerprint)"
-  if [ "$DEPLOY" = 0 ]; then
-    echo "Backend tunnel: $TUNNEL"
-  elif [ "$FORCE" = 0 ] && [ "$GAME" = "$(state_get GAME)" ]; then
-    echo "Nothing new to publish: the Worker already serves this game code through $TUNNEL"
-  else
-    publish_game "$TUNNEL"
-    save_state "$TUNNEL" "$GAME" "$(state_get BACKEND)"
-  fi
+# A run is already up (its tunnel answers): nothing is restarted
+TUNNEL="$(state_get tunnel)"
+if [ -n "$TUNNEL" ] && tunnel_alive "$TUNNEL"; then
+  ACTIVE="$(state_get active.commit)"
+  echo "Already running: tunnel $TUNNEL, slot $(state_get active.slot) (${ACTIVE:0:7})"
+  [ "$FORCE" = 1 ] && publish_worker "$(state_get handled)" "$TUNNEL"
   exit 0
 fi
 
-# gradlew leaves the backend JVM behind when it is killed, so stop whatever still listens on the app ports
-free_ports() {
-  for port in "$BACKEND_PORT" "$FRONTEND_PORT"; do
-    for pid in $(listening "$port"); do
-      taskkill //F //PID "$pid" >/dev/null 2>&1 || true
-    done
-  done
-}
+if [ -n "$(listening "$PROXY_PORT")" ] && [ "$(docker inspect -f '{{.State.Running}}' "$PROXY" 2>/dev/null)" != "true" ]; then
+  echo "Port $PROXY_PORT is in use by another process; stop it first (an old bootRun?)."
+  exit 1
+fi
 
 cleanup() {
-  echo "Stopping services..."
+  local status=$?
+  trap - EXIT INT TERM
+  echo "Stopping the watcher, the tunnel and the deploy containers..."
   for pid in "${PIDS[@]}"; do
     kill "$pid" 2>/dev/null || true
   done
-  free_ports
-  rm -f "$TUNNEL_LOG" "$STATE"
+  "${COMPOSE[@]}" stop proxy dozzle backend-blue backend-green >/dev/null 2>&1 || true
+  rm -f "$TUNNEL_LOG"
+  exit "$status"
 }
 trap cleanup EXIT INT TERM
 
-BACKEND="$(backend_fingerprint)"
+git fetch origin main || echo "Could not fetch origin/main; using the last fetched commit"
 
-"$ROOT/start.sh" &
-PIDS+=($!)
+# A deploy cut short by a restart leaves its lock behind; no watcher runs now
+rm -f .deploy.lock
 
-echo "Waiting for the backend on :$BACKEND_PORT..."
-until curl -s -o /dev/null "http://localhost:$BACKEND_PORT/progress"; do
-  sleep 3
-done
+# Local only: the same default signing key as start.sh; both slots get it, so tokens survive a switch
+export JWT_SECRET="${JWT_SECRET:-dev-only-insecure-secret-change-me-0123456789}"
 
-echo "Opening the tunnel..."
-cloudflared tunnel --url "http://localhost:$BACKEND_PORT" >"$TUNNEL_LOG" 2>&1 &
-PIDS+=($!)
-
-BACKEND_URL=""
-for _ in $(seq 1 30); do
-  BACKEND_URL="$(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' "$TUNNEL_LOG" | head -n 1 || true)"
-  [ -n "$BACKEND_URL" ] && break
-  sleep 1
-done
-[ -n "$BACKEND_URL" ] || { echo "The tunnel did not give an address:"; cat "$TUNNEL_LOG"; exit 1; }
-echo "Backend tunnel: $BACKEND_URL"
-
-# A new tunnel is a new address, so the Worker must be published again even when the game did not change
-if [ "$DEPLOY" = 1 ]; then
-  GAME="$(game_fingerprint)"
-  publish_game "$BACKEND_URL"
-  save_state "$BACKEND_URL" "$GAME" "$BACKEND"
+if [ -f .deploy-state ]; then
+  SLOT="$(state_get active.slot)"
+  COMMIT="$(state_get active.commit)"
+  HANDLED="$(state_get handled)"
 else
-  save_state "$BACKEND_URL" "" "$BACKEND"
+  SLOT=blue
+  COMMIT="$(git rev-parse origin/main)"
+  HANDLED="$COMMIT"
+fi
+IMAGE="infinity-grove-backend:${COMMIT:0:7}"
+IMAGE_VAR="$(echo "$SLOT" | tr '[:lower:]' '[:upper:]')_IMAGE"
+
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+  echo "Building $IMAGE from the commit tree..."
+  git archive --format=tar "$COMMIT:backend" | docker build -t "$IMAGE" -
 fi
 
-echo "Running. Ctrl+C stops the backend and the tunnel."
+# The proxy conf names only the active slot, and nginx resolves it on start, so the slot comes up first
+node --input-type=module -e 'import { writeConf } from "./deploy/lib/proxy.mjs"; writeConf("deploy/nginx", process.argv[1]);' "$SLOT"
+echo "Starting Postgres, Dozzle and backend-$SLOT ($IMAGE)..."
+env "$IMAGE_VAR=$IMAGE" "${COMPOSE[@]}" up -d --wait postgres dozzle "backend-$SLOT"
+"${COMPOSE[@]}" up -d --wait proxy
+docker exec "$PROXY" nginx -s reload >/dev/null
+
+echo "Waiting for the backend behind the proxy on :$PROXY_PORT..."
+for _ in $(seq 1 60); do
+  [ "$(curl -s -o /dev/null -m 5 -w '%{http_code}' "http://127.0.0.1:$PROXY_PORT/progress" || true)" = 401 ] && break
+  sleep 3
+done
+[ "$(curl -s -o /dev/null -m 5 -w '%{http_code}' "http://127.0.0.1:$PROXY_PORT/progress" || true)" = 401 ] \
+  || { echo "The backend did not answer 401 on /progress in 180 s"; exit 1; }
+
+echo "Opening the tunnel..."
+cloudflared tunnel --url "http://127.0.0.1:$PROXY_PORT" >"$TUNNEL_LOG" 2>&1 &
+PIDS+=($!)
+
+TUNNEL=""
+for _ in $(seq 1 30); do
+  TUNNEL="$(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' "$TUNNEL_LOG" | head -n 1 || true)"
+  [ -n "$TUNNEL" ] && break
+  sleep 1
+done
+[ -n "$TUNNEL" ] || { echo "The tunnel did not give an address:"; cat "$TUNNEL_LOG"; exit 1; }
+echo "Backend tunnel: $TUNNEL"
+save_state "$SLOT" "$COMMIT" "$HANDLED" "$TUNNEL"
+
+# A new tunnel is a new address, so the Worker is published again
+[ "$DEPLOY" = 1 ] && publish_worker "$HANDLED" "$TUNNEL"
+
+node deploy/watcher.mjs &
+PIDS+=($!)
+
+echo "Running: slot $SLOT (${COMMIT:0:7}), proxy http://localhost:$PROXY_PORT, Dozzle http://localhost:8888."
+echo "The watcher deploys every new commit on origin/main. Ctrl+C stops the watcher, the tunnel and the deploy containers."
 wait

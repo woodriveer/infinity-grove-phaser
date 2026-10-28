@@ -2,7 +2,7 @@
 import { join } from 'node:path';
 import { switchTo } from './proxy.mjs';
 import { runRegression } from './regressionRun.mjs';
-import { buildImage, imageOf, otherSlot, removeSlot, startSlot, stopSlot, waitReady } from './slots.mjs';
+import { buildImage, imageOf, otherSlot, removeImage, removeSlot, startSlot, stopSlot, waitReady } from './slots.mjs';
 
 const DRAIN_MS = 10000;
 
@@ -50,6 +50,12 @@ export const deployBackend = async ({ exec, fetch, root, state, hash, log, sleep
     //  Requests still on the old upstream finish before it stops
     await sleep(DRAIN_MS);
     stopSlot(exec, active);
+
+    //  The idle slot was still the previous one (a deploy within 5 min): its container was recreated, so its image would never be swept
+    if (state.previous && imageOf(state.previous.commit) !== imageOf(hash))
+    {
+        removeImage(exec, imageOf(state.previous.commit));
+    }
 
     return {
         ok: true,

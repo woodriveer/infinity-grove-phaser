@@ -443,8 +443,8 @@ T15 → T16
 
 **Done when**:
 
-- [ ] Live, recorded in the commit body: the first run with no state builds `origin/main` into `blue` and publishes the Worker; a backend commit pushed afterwards goes live while a 100 ms `/progress` poller sees no failure, and the tunnel address does not change; a README-only commit builds nothing; a commit whose `/account/reset` answers 500 (local throwaway branch fast-forwarded and reverted) is refused with the old slot serving; `./deploy.sh --rollback` within 5 min brings the old commit back; the old container is gone after 5 min
-- [ ] Gate check passes: `node --test "deploy/**/*.test.mjs"` (live checks above)
+- [x] Live, recorded in the commit body: the first run with no state builds `origin/main` into `blue` and publishes the Worker; a backend commit pushed afterwards goes live while a 100 ms `/progress` poller sees no failure, and the tunnel address does not change; a README-only commit builds nothing; a commit whose `/account/reset` answers 500 (local throwaway branch fast-forwarded and reverted) is refused with the old slot serving; `./deploy.sh --rollback` within 5 min brings the old commit back; the old container is gone after 5 min
+- [x] Gate check passes: `node --test "deploy/**/*.test.mjs"` (live checks above)
 
 **Tests**: e2e
 **Gate**: full

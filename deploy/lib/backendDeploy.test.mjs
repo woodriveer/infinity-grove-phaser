@@ -173,3 +173,26 @@ test('a failed suite never touches the proxy', async () =>
 
     assert.deepEqual(commands(timeline, 'infinity-grove-proxy'), []);
 });
+
+//  A deploy within 5 min of the last one lands in the slot still kept as previous: that container is recreated, so its image goes too
+test('a deploy into the slot kept as previous removes that older image', async () =>
+{
+    const PREV = 'ccccccc3333333333333333333333333333333333';
+    const { timeline, deps } = machine();
+    const state = { ...STATE, previous: { slot: 'green', commit: PREV, stoppedAt: 999_000 } };
+
+    const result = await deployBackend({ ...deps, root: repo(), state });
+
+    assert.deepEqual(commands(timeline, 'docker image rm'), ['docker image rm infinity-grove-backend:ccccccc']);
+    assert.deepEqual(result.state.previous, { slot: 'blue', commit: OLD, stoppedAt: 1_010_000 });
+});
+
+test('a deploy of the commit kept as previous keeps its image', async () =>
+{
+    const { timeline, deps } = machine();
+    const state = { ...STATE, previous: { slot: 'green', commit: NEW, stoppedAt: 999_000 } };
+
+    await deployBackend({ ...deps, root: repo(), state });
+
+    assert.deepEqual(commands(timeline, 'docker image rm'), []);
+});
