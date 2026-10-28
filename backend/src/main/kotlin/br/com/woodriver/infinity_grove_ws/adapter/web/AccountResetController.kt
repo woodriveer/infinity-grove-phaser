@@ -31,8 +31,6 @@ class AccountResetController(
         principal: Principal,
         @RequestBody body: Map<String, Any?>,
     ): ResetResponse {
-        // Broken on purpose to check that the blue-green deploy refuses it (T15); reverted right after
-        if (body.isNotEmpty()) error("account reset broken on purpose")
         val fromChapter = body["fromChapter"] as? Int ?: throw ResetRequestException("fromChapter must be an integer")
         return ResetResponse.from(resetAccount.reset(principal.name, fromChapter))
     }
