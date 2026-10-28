@@ -41,6 +41,10 @@ describe('the rarity frames in the stylesheet', () => {
             expect(still(selector)).toContain('animation: none');
             expect(still(selector)).toContain('box-shadow');
         });
-        expect(still('.piece-tile[data-effect="fantasy"]::after {')).toContain('animation: none');
+        //  Every selector of a list counts: the light sweep (::before) and the twinkle (::after) of the EPIC frame
+        [ '.piece-tile[data-effect="fantasy"]::before', '.piece-tile[data-effect="fantasy"]::after {' ].forEach((selector) => {
+            expect(still(selector)).toContain('animation: none');
+        });
+        expect(still('.piece-tile.rarity-legendary,')).toContain('animation: none');
     });
 });
