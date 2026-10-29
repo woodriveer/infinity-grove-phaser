@@ -93,7 +93,7 @@ The auto click (spec auto-click) only helps while the player watches the fight. 
 | --- | --- | --- | --- |
 | BGF-01 | P1: Fight behind hero screens (AC 1, 2, 4, 5) | Execute | Implementing |
 | BGF-02 | P1: Fight behind hero screens (AC 3) | Execute | Implementing |
-| BGF-03 | P1: Hidden tab (AC 1-5, 7, edge cases) - ticker | Execute | Pending |
+| BGF-03 | P1: Hidden tab (AC 1-5, 7, edge cases) - ticker | Execute | Implementing |
 | BGF-04 | P1: Hidden tab (AC 2, 6) - wiring into the game | Execute | Pending |
 
 **Coverage:** 4 total, 4 mapped to tasks, 0 unmapped
