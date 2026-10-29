@@ -3,6 +3,7 @@ import { ClickerGame } from './adapters/phaser/ClickerGame';
 import { Game } from 'phaser';
 import { MainMenu } from './adapters/phaser/MainMenu';
 import { Preloader } from './adapters/phaser/Preloader';
+import { runInBackground, startTicker } from './adapters/phaser/backgroundFight';
 import { services } from './composition';
 import * as Phaser from 'phaser';
 
@@ -39,6 +40,15 @@ const config = {
 };
 
 const game = new Game(config);
+
+//  The fight goes on in a hidden tab (spec background-fight); the scenes step without drawing
+runInBackground({
+    document,
+    startTicker,
+    now: () => performance.now(),
+    loopFrame: () => game.loop.frame,
+    step: (time, delta) => game.scene.update(time, delta)
+});
 
 //  Test hook: lets Playwright read canvas-rendered state. Stripped from production builds.
 if (import.meta.env.DEV)

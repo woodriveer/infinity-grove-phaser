@@ -86,3 +86,51 @@ test.describe('Auto click', () => {
         expect(await health(page)).toBe(1000);
     });
 });
+
+//  Spec background-fight. A headless page is never hidden: the test stops the Phaser loop, as the browser does by holding
+//  requestAnimationFrame, and reports the page hidden or visible again.
+const setHidden = (page, hidden) => page.evaluate((value) => {
+    const game = window.__PHASER_GAME__;
+
+    game.loop.sleep();
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => value });
+    document.dispatchEvent(new Event('visibilitychange'));
+}, hidden);
+
+test.describe('Auto click in a hidden tab', () => {
+    test('keeps hitting the monster while the page is hidden and the Phaser loop is stopped', async ({ page }) => {
+        await startGame(page, 2);
+        await setHidden(page, true);
+        const frame = await page.evaluate(() => window.__PHASER_GAME__.loop.frame);
+        const hidden = await health(page);
+
+        await expect.poll(() => health(page), { timeout: 5000 }).toBeLessThan(hidden);
+        expect(await page.evaluate(() => window.__PHASER_GAME__.loop.frame)).toBe(frame);
+    });
+
+    test('fires no auto click while the fight is paused with Esc and the page is hidden', async ({ page }) => {
+        await startGame(page, 2);
+        await page.keyboard.press('Escape');
+        await expect(page.locator('.pause-menu')).toBeVisible();
+        await setHidden(page, true);
+        const paused = await health(page);
+
+        await page.waitForTimeout(2500);
+
+        expect(await health(page)).toBe(paused);
+    });
+
+    test('stops the background ticker once the page is visible again', async ({ page }) => {
+        await startGame(page, 2);
+        await setHidden(page, true);
+        const hidden = await health(page);
+        await expect.poll(() => health(page), { timeout: 5000 }).toBeLessThan(hidden);
+
+        //  The Phaser loop stays asleep, so only the ticker could still hit
+        await setHidden(page, false);
+        const shown = await health(page);
+        await page.waitForTimeout(2500);
+
+        expect(await health(page)).toBe(shown);
+    });
+});
