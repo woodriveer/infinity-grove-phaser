@@ -112,11 +112,11 @@ test.describe('Chapter map', () => {
         expect(await states(page)).toEqual([ 'current', ...Array(10).fill('locked') ]);
     });
 
-    test('pauses the fight while the map is open and resumes it on close', async ({ page }) => {
+    test('keeps the fight running while the map is open and after it closes', async ({ page }) => {
         await startGame(page);
         await openMap(page);
 
-        expect(await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').paused)).toBe(true);
+        expect(await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').paused)).toBe(false);
 
         await page.getByTestId('hero-close').click();
 

@@ -29,7 +29,7 @@ const catalog = () => ({
 
 const farmState = () => ({ bosses: [ { kind: 'MINIBOSS', stage: 1 }, { kind: 'CHAPTER_BOSS' } ], chapterBossWinsLeft: 10 });
 
-const createUi = ({ list = catalog(), farmGet = farmState(), pause = true, equipmentList = { capacity: 100, pieces: [] }, wallet = 1_000_000, skillState, talentList = { talents: [] } } = {}) => {
+const createUi = ({ list = catalog(), farmGet = farmState(), equipmentList = { capacity: 100, pieces: [] }, wallet = 1_000_000, skillState, talentList = { talents: [] } } = {}) => {
     const talentGateway = {
         list: vi.fn(() => (talentList instanceof Error ? Promise.reject(talentList) : Promise.resolve(talentList))),
         upgrade: vi.fn()
@@ -68,7 +68,7 @@ const createUi = ({ list = catalog(), farmGet = farmState(), pause = true, equip
         },
         time: { delayedCall: vi.fn((delay, callback) => { timers.push({ delay, callback }); }) }
     };
-    const hooks = { pause: vi.fn(() => pause), resume: vi.fn(), startFarm: vi.fn(), walletCopper: vi.fn(() => wallet), useSkill: vi.fn(), skillState };
+    const hooks = { startFarm: vi.fn(), walletCopper: vi.fn(() => wallet), useSkill: vi.fn(), skillState };
     const heroes = createHeroCollection({ gateway: heroesGateway });
     const farm = createFarmSession({ gateway: farmGateway });
     const equipment = createEquipmentCollection({ gateway: equipmentGateway });
@@ -102,50 +102,43 @@ describe('HeroUi HUD', () => {
     });
 });
 
-describe('HeroUi pause', () => {
-    it('opening a panel pauses the fight and closing it resumes', async () => {
+describe('HeroUi panel', () => {
+    it('opening a panel shows it and closing it hides it', async () => {
         const ctx = createUi();
 
         await open(ctx, 'heroes');
 
-        expect(ctx.hooks.pause).toHaveBeenCalledTimes(1);
         expect(ctx.query('.hero-panel').hidden).toBe(false);
         expect(ctx.ui.isOpen).toBe(true);
 
         ctx.testid('hero-close').click();
 
-        expect(ctx.hooks.resume).toHaveBeenCalledTimes(1);
         expect(ctx.query('.hero-panel').hidden).toBe(true);
         expect(ctx.ui.isOpen).toBe(false);
     });
 
-    it('switching screens keeps one pause and one resume', async () => {
+    it('switching screens keeps the panel open on the new screen until it closes', async () => {
         const ctx = createUi();
 
         await open(ctx, 'heroes');
         ctx.ui.show('bag');
         await flush();
+
+        expect(ctx.ui.isOpen).toBe(true);
+        expect(ctx.query('.hero-title').textContent).toBe('Mochila');
+
         ctx.ui.close();
 
-        expect(ctx.hooks.pause).toHaveBeenCalledTimes(1);
-        expect(ctx.hooks.resume).toHaveBeenCalledTimes(1);
-    });
-
-    it('does not resume a fight that was already paused when the panel opened', async () => {
-        const ctx = createUi({ pause: false });
-
-        await open(ctx, 'heroes');
-        ctx.ui.close();
-
-        expect(ctx.hooks.resume).not.toHaveBeenCalled();
+        expect(ctx.ui.isOpen).toBe(false);
     });
 
     it('close without an open panel does nothing', () => {
-        const { ui, hooks } = createUi();
+        const ctx = createUi();
 
-        ui.close();
+        ctx.ui.close();
 
-        expect(hooks.resume).not.toHaveBeenCalled();
+        expect(ctx.ui.isOpen).toBe(false);
+        expect(ctx.query('.hero-panel').hidden).toBe(true);
     });
 });
 
@@ -302,13 +295,12 @@ describe('HeroUi Rever chefes', () => {
         expect(ctx.testid('farm-entry-chapter-boss').textContent).toContain('10 vitórias restantes hoje');
     });
 
-    it('closes the panel, resumes the fight and starts the farm fight of the chosen boss', async () => {
+    it('closes the panel and starts the farm fight of the chosen boss', async () => {
         const ctx = createUi();
         await open(ctx, 'farm');
 
         ctx.testid('farm-entry-miniboss-1').click();
 
-        expect(ctx.hooks.resume).toHaveBeenCalledTimes(1);
         expect(ctx.hooks.startFarm).toHaveBeenCalledWith({ kind: 'MINIBOSS', stage: 1 });
         expect(ctx.ui.isOpen).toBe(false);
     });
@@ -413,7 +405,7 @@ const pointsOf = (available, spent = 0) => ({ earned: available + spent, spent, 
 const talentsAnswer = (levels = {}, available = 1) => ({ talents: talentTree(levels), points: pointsOf(available) });
 
 describe('HeroUi Talentos', () => {
-    it('opens the window titled Talentos with the points line, the four columns and pauses the fight', async () => {
+    it('opens the window titled Talentos with the points line, the four columns', async () => {
         const ctx = createUi({ talentList: talentsAnswer({}, 3) });
 
         await open(ctx, 'talents');
@@ -421,7 +413,6 @@ describe('HeroUi Talentos', () => {
         expect(ctx.query('.hero-title').textContent).toBe('Talentos');
         expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 3');
         expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-branch-title') ]).map((node) => node.textContent)).toEqual([ 'Tempo', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
-        expect(ctx.hooks.pause).toHaveBeenCalledTimes(1);
     });
 
     it('sends the upgrade with fromLevel 0, shows Nível 1/10 and Pontos de talento: 0', async () => {
@@ -766,7 +757,7 @@ describe('HeroUi Rever chefes map', () => {
     const beaten = (...stages) => ({ bosses: stages.map((stage) => ({ kind: 'MINIBOSS', stage })), chapterBossWinsLeft: 10 });
     const states = (ctx) => ctx.root.flatMap((node) => [ ...node.querySelectorAll('.farm-map .map-node') ]).map((node) => node.getAttribute('data-state'));
 
-    it('opens the map of the chapter the player is in, titled Caminho do Capítulo <n>, and pauses the fight', async () => {
+    it('opens the map of the chapter the player is in, titled Caminho do Capítulo <n>', async () => {
         const ctx = createUi({ farmGet: beaten(1, 2, 3) });
 
         ctx.hooks.mapPosition = vi.fn(() => ({ chapter: 3, stage: 4, kind: 'PHASE', stageCount: 10, completed: false }));
@@ -774,7 +765,6 @@ describe('HeroUi Rever chefes map', () => {
         await open(ctx, 'farm');
 
         expect(ctx.testid('farm-map-title').textContent).toBe('Caminho do Capítulo 3');
-        expect(ctx.hooks.pause).toHaveBeenCalledTimes(1);
         expect(states(ctx)).toEqual([ 'defeated', 'defeated', 'defeated', 'current', ...Array(7).fill('locked') ]);
     });
 
@@ -796,7 +786,6 @@ describe('HeroUi Rever chefes map', () => {
 
         expect(ctx.hooks.startFarm).toHaveBeenCalledWith({ kind: 'MINIBOSS', stage: 2 });
         expect(ctx.query('.hero-panel').hidden).toBe(true);
-        expect(ctx.hooks.resume).toHaveBeenCalledTimes(1);
     });
 });
 
@@ -953,12 +942,11 @@ const piece = (extra = {}) => ({
 });
 
 describe('HeroUi Equipamento', () => {
-    it('loads the heroes and the pieces, pauses the fight and lists the slots and the bag', async () => {
+    it('loads the heroes and the pieces and lists the slots and the bag', async () => {
         const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece(), piece({ id: 'w1', slot: 'WEAPON', clickDamage: 3, heroId: 'kael' }) ] } });
 
         await open(ctx, 'equipment');
 
-        expect(ctx.hooks.pause).toHaveBeenCalledTimes(1);
         expect(ctx.equipmentGateway.list).toHaveBeenCalledTimes(1);
         expect(ctx.query('.hero-title').textContent).toBe('Equipamento');
         expect(ctx.testid('equip-hero-kael')).not.toBeNull();

@@ -74,13 +74,12 @@ const NOTICE_HTML = '<div class="hud-box hud-notice"><div class="card-notice" da
 //  It is plain DOM placed with scene.add.dom.
 //  Collaborators: heroes (heroCollection), equipment (equipmentCollection), talents (talentCollection), farm (farmSession) and the scene hooks
 //    walletCopper() -> the copper the player holds, to disable what costs more;
-//    pause() -> true when it paused the fight, false when the fight was already paused; resume() undoes a pause that pause() made;
 //    startFarm(boss) starts the farm fight of the chosen boss;
 //    useSkill(slot) uses a skill of the leader (optional); skillState(slot) -> { state, seconds } of a slot of the leader (optional);
 //    mapPosition() -> { chapter, stage, kind, stageCount, completed } where the player stands, for the chapter map (optional).
 export class HeroUi
 {
-    constructor (scene, { heroes, equipment, talents, farm, pause, resume, startFarm, walletCopper, useSkill, skillState, mapPosition })
+    constructor (scene, { heroes, equipment, talents, farm, startFarm, walletCopper, useSkill, skillState, mapPosition })
     {
         this.scene = scene;
         this.heroes = heroes;
@@ -89,9 +88,8 @@ export class HeroUi
         this.talentBusy = false;
         this.equipBusy = false;
         this.farm = farm;
-        this.hooks = { pause, resume, startFarm, walletCopper, useSkill, skillState, mapPosition };
+        this.hooks = { startFarm, walletCopper, useSkill, skillState, mapPosition };
         this.open = false;
-        this.pausedByUs = false;
         this.view = 0;
         this.noticeId = 0;
 
@@ -143,7 +141,7 @@ export class HeroUi
         return this.open;
     }
 
-    //  Opens a screen by id and pauses the fight while it is open
+    //  Opens a screen by id; the fight keeps running behind it (spec background-fight)
     async show (screen, options = {})
     {
         const { title } = SCREENS.find(({ id }) => id === screen);
@@ -152,7 +150,6 @@ export class HeroUi
         if (!this.open)
         {
             this.open = true;
-            this.pausedByUs = this.hooks.pause();
             this.panel.hidden = false;
             this.panelElement.updateSize?.();
         }
@@ -234,13 +231,6 @@ export class HeroUi
         this.screen = null;
         this.panel.hidden = true;
         this.body.replaceChildren();
-
-        if (this.pausedByUs)
-        {
-            this.hooks.resume();
-        }
-
-        this.pausedByUs = false;
     }
 
     setError (text)

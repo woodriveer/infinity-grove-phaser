@@ -41,7 +41,8 @@ test.describe('Hero screens', () => {
         await expect(page.locator('.hero-card.is-grey')).toHaveCount(4);
         await expect(page.getByTestId('hero-card-kael')).not.toHaveClass(/is-grey/);
         await expect(page.getByTestId('hero-card-vex')).toHaveClass(/is-grey/);
-        expect(await fightPaused(page)).toBe(true);
+        //  Spec background-fight: a hero screen does not pause the fight
+        expect(await fightPaused(page)).toBe(false);
 
         await page.getByTestId('hero-card-vex').click();
 

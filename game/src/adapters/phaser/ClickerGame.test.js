@@ -1980,23 +1980,50 @@ describe('ClickerGame hero screens', () => {
         expect(testid(ctx, 'skill-slot-1').querySelector('.skill-slot-cooldown').textContent).toBe('10s');
     });
 
-    it('opening a hero screen freezes the fight and closing it resumes', async () => {
+    //  Spec background-fight: only the pause menu freezes the fight
+    it('opening a hero screen leaves the fight running: not paused, timers and tweens on', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        await openPanel(ctx, 'equipment');
+
+        //  The test clock and tween manager start with no paused flag; a pause sets it to true
+        expect(ctx.scene.paused).toBe(false);
+        expect(ctx.scene.time.paused).not.toBe(true);
+        expect(ctx.scene.tweens.paused).not.toBe(true);
+    });
+
+    it('runs the boss countdown behind an open hero screen', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        await openPanel(ctx, 'talents');
+        ctx.scene.update(0, 1001);
+
+        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 29');
+    });
+
+    it('a click on the canvas does not hit while a hero screen is open, and hits again once it closes', async () => {
         const ctx = await createScene({ start: bossStart() });
 
         await openPanel(ctx, 'heroes');
         ctx.click();
-        ctx.scene.update(0, 30000);
 
-        expect(ctx.scene.time.paused).toBe(true);
-        expect(ctx.scene.tweens.paused).toBe(true);
         expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth);
-        expect(ctx.scene.monster).not.toBeNull();
 
         testid(ctx, 'hero-close').click();
         ctx.click();
 
-        expect(ctx.scene.time.paused).toBe(false);
+        expect(ctx.scene.paused).toBe(false);
         expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 1);
+    });
+
+    it('opening a hero screen keeps a fight the player paused with Esc paused', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.handlers['keydown-ESC']();
+        await openPanel(ctx, 'talents');
+
+        expect(ctx.scene.paused).toBe(true);
+        expect(ctx.scene.time.paused).toBe(true);
     });
 
     it('closing a hero screen does not resume a fight the player paused with Esc', async () => {
@@ -2814,15 +2841,16 @@ describe('ClickerGame click combo', () => {
         expect(combo(ctx)).toBe('Combo x5 · +5%');
     });
 
-    it('freezes the 1500 ms while a hero screen is open', async () => {
+    //  Spec background-fight: the fight, and the 1500 ms of the combo with it, runs behind a hero screen
+    it('runs the 1500 ms out while a hero screen is open', async () => {
         const ctx = await createScene({ start: big() });
 
         clickTimes(ctx, 5);
         ctx.control('[data-testid="hud-heroes"]').click();
         await flush();
-        ctx.scene.update(0, 10000);
+        ctx.scene.update(0, 1500);
 
-        expect(combo(ctx)).toBe('Combo x5 · +5%');
+        expect(combo(ctx)).toBe('');
     });
 
     it('keeps the streak and its timer when a skill is used, and gives the skill hit no combo', async () => {
@@ -3770,6 +3798,21 @@ describe('ClickerGame auto click', () => {
 
         expect(ctx.texts).toHaveLength(2);
         expect(ctx.texts.every((text) => text.style.fontSize === 48)).toBe(true);
+    });
+
+    it('keeps hitting every 500 ms while the Talentos or Equipamento screen is open', async () => {
+        for (const screen of [ 'talents', 'equipment' ])
+        {
+            const ctx = await createScene({ start: atChapter(2, 1000) });
+
+            ctx.control(`[data-testid="hud-${screen}"]`).click();
+            await flush();
+            ctx.scene.update(0, 1000);
+
+            expect(ctx.scene.heroUi.isOpen).toBe(true);
+            expect(ctx.texts).toHaveLength(2);
+            expect(ctx.scene.monster.health).toBeLessThan(1000);
+        }
     });
 
     it('fires nothing before 500 ms', async () => {

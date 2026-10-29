@@ -33,6 +33,20 @@ test.describe('Auto click', () => {
         await expect.poll(() => health(page), { timeout: 5000 }).toBeLessThan(1000);
     });
 
+    //  Spec background-fight: the fight runs behind the hero screens
+    for (const [ screen, title ] of [ [ 'talents', 'Talentos' ], [ 'equipment', 'Equipamento' ] ])
+    {
+        test(`keeps hitting while the ${title} screen is open`, async ({ page }) => {
+            await startGame(page, 2);
+
+            await page.getByTestId(`hud-${screen}`).click();
+            await expect(page.locator('.hero-title')).toHaveText(title);
+            const opened = await health(page);
+
+            await expect.poll(() => health(page), { timeout: 5000 }).toBeLessThan(opened);
+        });
+    }
+
     test('shows 500 ms, Cristais: 0 and a disabled Melhorar: 250 ms (10 cristais)', async ({ page }) => {
         await startGame(page, 2);
 

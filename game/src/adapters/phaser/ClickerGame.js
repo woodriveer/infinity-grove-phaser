@@ -433,8 +433,6 @@ export class ClickerGame extends Scene
             talents: this.talents,
             farm: this.farm,
             walletCopper: () => walletCopper(this.wallet.display()),
-            pause: () => this.pauseForMenu(),
-            resume: () => this.resumeFromMenu(),
             startFarm: (boss) => this.startFarm(boss),
             useSkill: (slot) => this.useSkill(slot),
             skillState: (slot) => this.skillState(slot),
@@ -537,26 +535,6 @@ export class ClickerGame extends Scene
     {
         this.heroes.applyDrop(drop);
         this.heroUi.showDrop(drop);
-    }
-
-    //  A hero screen freezes the fight like the pause menu; returns false when the player had already paused it (Esc)
-    pauseForMenu ()
-    {
-        if (this.paused)
-        {
-            return false;
-        }
-
-        this.paused = true;
-        this.time.paused = true;
-        this.tweens.paused = true;
-
-        return true;
-    }
-
-    resumeFromMenu ()
-    {
-        this.resumeFight();
     }
 
     //  Freezes the fight: clicks, the boss countdown, timers and tweens all stop until the player resumes
@@ -984,9 +962,10 @@ export class ClickerGame extends Scene
         ]));
     }
 
+    //  The fight runs behind an open hero screen, but a click on the canvas around the panel does not hit
     hitMonster (pointer)
     {
-        if (this.paused || !this.monster || this.monster.dead)
+        if (this.paused || this.heroUi.isOpen || !this.monster || this.monster.dead)
         {
             return;
         }

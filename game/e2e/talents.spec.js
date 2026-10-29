@@ -117,13 +117,13 @@ test.describe('Talentos screen', () => {
         await expect(page.locator('[data-testid="talent-COMBO"] .icon-fallback')).toBeVisible();
     });
 
-    test('pauses the fight while the window is open', async ({ page }) => {
+    test('keeps the fight running while the window is open', async ({ page }) => {
         await startGame(page);
 
         await page.getByTestId('hud-talents').click();
         await expect(page.locator('.hero-panel')).toBeVisible();
 
-        expect(await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').paused)).toBe(true);
+        expect(await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').paused)).toBe(false);
     });
 });
 
