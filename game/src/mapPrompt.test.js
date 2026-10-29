@@ -11,7 +11,7 @@ const rowOf = (label) => prompt.split('\n').find((line) => line.startsWith(`| ${
 
 describe('the map prompt', () => {
     it('names the file of the map, the one the screen loads', () => {
-        expect(MAP_IMAGE).toBe('assets/ui/boss-map.jpg');
+        expect(MAP_IMAGE).toBe('assets/boss-map.jpg');
         expect(prompt).toContain('boss-map.jpg');
     });
 

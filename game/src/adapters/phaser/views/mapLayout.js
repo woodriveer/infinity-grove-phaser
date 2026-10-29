@@ -2,7 +2,7 @@
 //  `PROMPTS_ASSETS_UI.md` asks the painter for; the painted map will not hit them exactly, so they are recalibrated once the image exists.
 export const MAP_SIZE = { width: 880, height: 495 };
 
-export const MAP_IMAGE = 'assets/ui/boss-map.jpg';
+export const MAP_IMAGE = 'assets/boss-map.jpg';
 
 //  The 10 minibosses and the chapter boss
 export const MAP_STOPS = {

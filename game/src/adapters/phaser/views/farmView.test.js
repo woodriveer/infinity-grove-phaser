@@ -128,10 +128,10 @@ describe('renderFarm', () => {
         expect(nodes[10].style.top).toBe('16%');
     });
 
-    it('uses assets/ui/boss-map.jpg as the background and draws no trail while it loads', () => {
+    it('uses assets/boss-map.jpg as the background and draws no trail while it loads', () => {
         const screen = show();
 
-        expect(screen.querySelector('.farm-map-image').getAttribute('src')).toBe('assets/ui/boss-map.jpg');
+        expect(screen.querySelector('.farm-map-image').getAttribute('src')).toBe('assets/boss-map.jpg');
         expect(find(screen, 'farm-map').classList.contains('is-fallback')).toBe(false);
     });
 
