@@ -33,7 +33,7 @@
 The main session is the orchestrator; the agents live in `.claude/agents/`. For a new feature:
 
 1. `product-owner` (Opus, high) writes spec, design and fully detailed tasks with `tlc-spec-driven`; the user approves them.
-2. Each task goes to its owner: `kotlin-backend-dev` (Haiku, high) for `backend/`, `test-engineer` (Haiku, high) for test tasks; `game/src` tasks are done by the main session.
+2. Each task goes to its owner: `kotlin-backend-dev` (Haiku, high) for `backend/`, `game-dev` (Haiku, high) for `game/`, `test-engineer` (Haiku, high) for test tasks.
 3. `ui-artist` reviews every change the player can see and writes `ui-review.md`; findings become tasks.
 4. A fresh `test-engineer` runs as the Verifier (it must not have authored the feature in that context).
 5. `product-owner` accepts or rejects against the spec.
