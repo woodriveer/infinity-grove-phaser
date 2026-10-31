@@ -821,7 +821,7 @@ if (level >= 2)
 
 ---
 
-### T14: Style of the star tiers, levels and star power [ ]
+### T14: Style of the star tiers, levels and star power [x]
 
 **Owner**: game-dev
 **What**: The CSS of the Visual spec (design) so the new classes render as specified (ASC-08, spec AC 1, 2, 4, 6).
@@ -905,8 +905,8 @@ if (level >= 2)
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `git diff game/public/style.css` shows only added lines.
-- [ ] The build passes.
+- [x] `git diff game/public/style.css` shows only added lines.
+- [x] The build passes.
 
 **Commit**: `style(game): color the star tiers and skill levels`
 

@@ -2358,3 +2358,69 @@ button:disabled {
     position: static;
     transform: none;
 }
+
+/* ══ Hero ascension: star tiers, skill levels and star power ══ */
+
+/* 4 to 6 stars: purple text (the EPIC family) */
+.hero-stars.is-ascended {
+    color: #7a3fa0;
+    font-weight: 800;
+}
+
+/* 7 to 9 stars: a gold chip (the LEGENDARY frame gold and glow) */
+.hero-stars.is-exalted {
+    display: inline-block;
+    width: fit-content;
+    padding: 0 8px;
+    border-radius: 999px;
+    color: #201e1d;
+    background: #d9a521;
+    font-weight: 800;
+    box-shadow: 0 0 6px rgb(255 214 90 / 0.6);
+}
+
+.skill-level {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #7a3fa0;
+    background: #efe4f5;
+}
+
+.skill-level[data-level="3"] {
+    color: #201e1d;
+    background: #d9a521;
+}
+
+/* Mirror of .skill-key on the right corner of the art */
+.skill-level-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    display: grid;
+    place-items: center;
+    height: 20px;
+    padding: 0 6px;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    color: var(--color-bg);
+    border-radius: 6px;
+    background: #7a3fa0;
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+.skill-level-badge[data-level="3"] {
+    color: #201e1d;
+    background: #d9a521;
+    opacity: 1;
+}
+
+.hero-star-power {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-neutral-800);
+}
