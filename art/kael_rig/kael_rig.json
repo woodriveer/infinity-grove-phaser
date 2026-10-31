@@ -1,0 +1,48 @@
+{
+    "size": [ 1024, 1024 ],
+    "reference": "../kael_position.jpg",
+    "bones": [
+        { "name": "root", "parent": null, "pivot": [ 600, 545 ] },
+        { "name": "spine", "parent": "root", "pivot": [ 605, 525 ] },
+        { "name": "neck", "parent": "spine", "pivot": [ 690, 295 ] },
+        { "name": "cape", "parent": "spine", "pivot": [ 640, 245 ] },
+        { "name": "tabard", "parent": "root", "pivot": [ 585, 520 ] },
+        { "name": "sword_shoulder", "parent": "spine", "pivot": [ 540, 262 ] },
+        { "name": "sword_elbow", "parent": "sword_shoulder", "pivot": [ 410, 335 ] },
+        { "name": "sword_wrist", "parent": "sword_elbow", "pivot": [ 300, 430 ] },
+        { "name": "shield_shoulder", "parent": "spine", "pivot": [ 760, 300 ] },
+        { "name": "shield_elbow", "parent": "shield_shoulder", "pivot": [ 745, 420 ] },
+        { "name": "shield_hand", "parent": "shield_elbow", "pivot": [ 735, 520 ] },
+        { "name": "back_hip", "parent": "root", "pivot": [ 470, 560 ] },
+        { "name": "back_knee", "parent": "back_hip", "pivot": [ 400, 700 ] },
+        { "name": "back_ankle", "parent": "back_knee", "pivot": [ 290, 870 ] },
+        { "name": "front_hip", "parent": "root", "pivot": [ 655, 560 ] },
+        { "name": "front_knee", "parent": "front_hip", "pivot": [ 775, 690 ] },
+        { "name": "front_ankle", "parent": "front_knee", "pivot": [ 720, 865 ] }
+    ],
+    "parts": [
+        { "name": "cape", "bone": "cape", "cloth": true, "sheet": "kael_sheet_5.jpg", "part": 2, "from": [ [ 380, 255 ], [ 60, 440 ] ], "to": [ [ 640, 245 ], [ 45, 600 ] ], "z": 0 },
+
+        { "name": "back_thigh", "bone": "back_hip", "sheet": "kael_sheet_4.jpg", "part": 4, "from": [ [ 130, 410 ], [ 340, 490 ] ], "to": [ [ 470, 560 ], [ 400, 700 ] ], "z": 1 },
+        { "name": "back_shin", "bone": "back_knee", "sheet": "kael_sheet_4.jpg", "part": 5, "from": [ [ 545, 375 ], [ 720, 520 ] ], "to": [ [ 400, 700 ], [ 290, 880 ] ], "z": 2 },
+        { "name": "back_boot", "bone": "back_ankle", "sheet": "kael_sheet_4.jpg", "part": 6, "from": [ [ 895, 375 ], [ 900, 525 ] ], "to": [ [ 290, 870 ], [ 265, 960 ] ], "flip": true, "z": 3 },
+
+        { "name": "front_thigh", "bone": "front_hip", "sheet": "kael_sheet_4.jpg", "part": 1, "from": [ [ 130, 165 ], [ 350, 225 ] ], "to": [ [ 655, 560 ], [ 775, 690 ] ], "z": 4 },
+        { "name": "front_shin", "bone": "front_knee", "sheet": "kael_sheet_4.jpg", "part": 2, "from": [ [ 615, 110 ], [ 600, 290 ] ], "to": [ [ 775, 690 ], [ 720, 870 ] ], "z": 5 },
+        { "name": "front_boot", "bone": "front_ankle", "sheet": "kael_sheet_4.jpg", "part": 3, "from": [ [ 875, 110 ], [ 880, 260 ] ], "to": [ [ 720, 865 ], [ 735, 945 ] ], "z": 6 },
+
+        { "name": "pelvis", "bone": "root", "sheet": "kael_sheet_1.jpg", "part": 5, "from": [ [ 583, 370 ], [ 560, 495 ] ], "to": [ [ 605, 505 ], [ 585, 610 ] ], "squash": 0.85, "z": 7 },
+        { "name": "tabard", "bone": "tabard", "sheet": "kael_sheet_1.jpg", "part": 6, "from": [ [ 835, 300 ], [ 845, 545 ] ], "to": [ [ 585, 520 ], [ 555, 800 ] ], "z": 8 },
+        { "name": "torso", "bone": "spine", "sheet": "kael_sheet_1.jpg", "part": 4, "from": [ [ 245, 285 ], [ 230, 525 ] ], "to": [ [ 690, 290 ], [ 605, 525 ] ], "squash": 0.92, "z": 9 },
+
+        { "name": "shield_upper_arm", "bone": "shield_shoulder", "sheet": "kael_sheet_3.jpg", "part": 3, "from": [ [ 130, 130 ], [ 110, 285 ] ], "to": [ [ 760, 300 ], [ 745, 420 ] ], "z": 10 },
+        { "name": "shield_forearm", "bone": "shield_elbow", "sheet": "kael_sheet_3.jpg", "part": 1, "from": [ [ 255, 170 ], [ 480, 160 ] ], "to": [ [ 745, 420 ], [ 735, 520 ] ], "z": 11 },
+        { "name": "head", "bone": "neck", "sheet": "kael_sheet_1.jpg", "part": 1, "from": [ [ 230, 210 ], [ 245, 32 ] ], "to": [ [ 690, 300 ], [ 710, 135 ] ], "z": 12 },
+        { "name": "head_shout", "bone": "neck", "hidden": true, "sheet": "kael_sheet_1.jpg", "part": 2, "from": [ [ 537, 210 ], [ 552, 32 ] ], "to": [ [ 690, 300 ], [ 710, 135 ] ], "z": 12 },
+        { "name": "shield", "bone": "shield_hand", "sheet": "kael_sheet_3.jpg", "part": 6, "from": [ [ 635, 305 ], [ 635, 540 ] ], "to": [ [ 845, 295 ], [ 845, 660 ] ], "squash": 0.55, "z": 13 },
+
+        { "name": "sword_upper_arm", "bone": "sword_shoulder", "sheet": "kael_sheet_2.jpg", "part": 1, "from": [ [ 160, 95 ], [ 360, 125 ] ], "to": [ [ 540, 262 ], [ 410, 335 ] ], "z": 14 },
+        { "name": "sword", "bone": "sword_wrist", "sheet": "kael_sheet_5.jpg", "part": 1, "from": [ [ 118, 135 ], [ 905, 140 ] ], "to": [ [ 220, 375 ], [ 815, 805 ] ], "z": 15 },
+        { "name": "sword_forearm", "bone": "sword_elbow", "sheet": "kael_sheet_2.jpg", "part": 2, "from": [ [ 445, 100 ], [ 765, 100 ] ], "to": [ [ 410, 335 ], [ 305, 435 ] ], "z": 16 }
+    ]
+}
