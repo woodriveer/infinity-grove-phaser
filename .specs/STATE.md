@@ -138,6 +138,22 @@
 - **Date**: 2026-10-23
 - **Status**: active; supersedes the 9-talent tree, the 1 point a level for every talent and the phase point of AD-013
 
+### AD-018
+- **Decision**: A player fights with a team: the leader (still `player_cards.leader_id`) plus up to 4 allies in ally slots bought with copper (1, 2, 3, 4 ouro). Slot n opens on the first win of the chapter 4 + n boss (`cleared_chapters`). The backend stores the bought slots and the allies per account and keeps them through account resets (`GET /heroes` team fields, `PUT /team`, `POST /team/slots` with `fromSlots`). The team fights only while the campaign is at chapter 5 or later. Allies hit in the browser once a second with a new damage type TEAM: leader's element, own stars and worn pieces, resisted only by a new enemy attribute `team_resistance` (0 to 90, expand migration). Each ally brings a passive while it fights. While allies are drawn, the leader stands at the tip of an attack formation with the allies behind it, above and below (spec `hero-team`).
+- **Reason**: Owner request and answers of 2026-10-30 ("montar equipes de 5 heróis"; team only from chapter 5; slots bought one per chapter; a damage type of its own); `characters` deferred the team ("one active leader now, team later; the leader is stored as a single value").
+- **Trade-off**: Ally damage is computed in the browser like the click (AD-002), so a forged client can claim more. Slots 2 to 4 need the chapter 6 to 8 bosses of AD-019. The slot prices rely on the coin drops of AD-019. The unique key of `enemies` must change without breaking the running backend.
+- **Scope**: `backend` hero, team and enemy code, `game/src/domain/combat`, `game/src/domain/heroes`, the Equipe screen, `ClickerGame`
+- **Date**: 2026-10-30
+- **Status**: active (owner answers 2026-10-30 and 2026-10-31; Q33 to Q35 kept as defaults the owner did not object to); ships after `campaign-chapters`; supersedes the single-leader scope of `characters` and adds a damage type beside PHYSICAL and MAGICAL (`elements`, `hero-skills`)
+
+### AD-019
+- **Decision**: The campaign runs to chapter 15 (`ChapterOrder.MAX_CHAPTER = 15`): the chapter 5 boss opens chapter 6 and only the chapter 15 boss completes. Chapters 6 to 15 grow health x2 and defenses +3 per chapter (caps 80, critical resistance 70), and the player's 5-chapter element order repeats. Every health value becomes a 64-bit integer from the database (expand/contract under AD-016) to the game. The reset pays as many crystals as the chapter left (no cap at 5; completed pays 15). On-screen damage and HP numbers abbreviate from 1 000 with K, M, B, T. Coin drops per kill become `2m-6m` (phase), `8m-20m` (miniboss) and `30m-70m` (boss), with `m = 2^(c-1)` up to chapter 8 and `128 + 32(c-8)` after. A first run earns about 1 ouro by the chapter 5 boss and 10 ouro by the chapter 8 boss (spec `campaign-chapters`).
+- **Reason**: Owner request and answers of 2026-10-30 ("os próximos capítulos vão aumentando de dificuldade"; overflow must never be a limit; crystals keep growing with the chapter; the ally slots of AD-018 must be affordable on a first run); `hero-team` slots and `miniboss-adds` need chapters past 5 and 10.
+- **Trade-off**: The curve is not balance-tested. Players completed at chapter 5 move to chapter 6 and lose the chapter 5 farm list (AD-008). A reset pays up to three times more crystals than AD-015 planned. The health columns need two migrations (expand, then contract after a good deploy). The game's numbers stay exact only up to 2^53 - 1. Coins grow about 9 times faster by chapter 8 than before, and the refine costs stay as they are.
+- **Scope**: `backend` `ChapterOrder`, `ChapterDefinition`, `ChapterSeeder`, `AccountReset`, every class carrying health; `backend/src/main/resources/db/migration`; `game/src/domain/campaign/accountReset.js`, `game/src/domain/combat/monster.js` and the damage number format
+- **Date**: 2026-10-30
+- **Status**: active (owner answers 2026-10-30 and 2026-10-31); supersedes "only chapter 5 completes" of AD-008 and the reward cap 5 of AD-015
+
 ## Handoff
 
 - **Feature**: five features from the owner's batch of 2026-10-21, all game side except two backend pieces: `combat-hud`, `click-power`, `talents`, `equipment-ui`, `boss-map` (`.specs/features/*`)
