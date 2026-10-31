@@ -54,6 +54,7 @@ test.describe('Bulk sell', () => {
 
         await expect(page.getByTestId('bulk-sell-summary')).toHaveText('Selecionadas: 2 · Total: 3 prata');
         await expect(page.getByTestId('equip-piece-c1')).toHaveAttribute('aria-pressed', 'true');
+        await expect(page.getByTestId('equip-piece-c1')).toHaveClass(/is-selected/);
         await expect(page.getByTestId('equip-piece-c1').locator('.piece-check')).toHaveText('✓');
         await expect(page.getByTestId('equip-piece-e1')).toHaveAttribute('aria-pressed', 'false');
         await expect(page.getByTestId('equip-piece-e1').locator('.piece-check')).toHaveCount(0);
@@ -149,6 +150,7 @@ test.describe('Bulk sell', () => {
         await expect(page.getByTestId('bulk-sell-confirm')).toHaveCount(0);
         await expect(page.getByTestId('equip-piece-c1')).toHaveAttribute('aria-pressed', 'true');
         await expect(page.getByTestId('bulk-sell-submit')).toBeVisible();
+        await expect(page.getByTestId('bulk-sell-cancel')).toBeVisible();
         expect(sellCalls(backend.calls)).toHaveLength(0);
     });
 
@@ -276,6 +278,7 @@ test.describe('Bulk sell', () => {
         const buttons = page.locator('[data-testid="equipment-list"] button');
 
         await expect(buttons.first()).toBeDisabled();
+        await expect(page.getByTestId('bulk-sell-confirm-yes')).toBeDisabled();
 
         const count = await buttons.count();
 
@@ -315,5 +318,59 @@ test.describe('Bulk sell', () => {
 
         await expect(page.getByTestId('equip-sell-notice')).toHaveText('1 peça vendida por 1 prata');
         await expect(page.getByTestId('equipment-empty')).toHaveText('Nenhum equipamento ainda. Vença chefes para encontrar peças.');
+    });
+
+    test('a piece that drops while selection mode is on shows unselected at the next redraw and the selection stays', async ({ page }) => {
+        await startGame(page);
+        await openEquipment(page);
+
+        await startSelling(page);
+        await page.getByTestId('equip-piece-c1').click();
+
+        //  The drop enters the game through the call the backend answer of a won boss uses; the open window is not redrawn by it
+        await page.evaluate((drop) => window.__PHASER_GAME__.scene.getScene('ClickerGame').receiveEquipmentDrop(drop), {
+            piece: { ...piece('n1', 'RING', 'RARE'), sellPrice: 300 }, sold: false
+        });
+
+        //  The next redraw is the question of the sale; the selection does not change
+        await page.getByTestId('bulk-sell-submit').click();
+        await page.getByTestId('bulk-sell-confirm-no').click();
+
+        await expect(page.getByTestId('equip-piece-n1')).toHaveAttribute('aria-pressed', 'false');
+        await expect(page.getByTestId('equip-piece-c1')).toHaveAttribute('aria-pressed', 'true');
+        await expect(page.getByTestId('bulk-sell-summary')).toHaveText('Selecionadas: 1 · Total: 1 prata');
+        await expect(page.locator('.equip-bag-title')).toHaveText('Mochila (5)');
+    });
+
+    test('the answer of a sale that arrives after the window was closed draws nothing', async ({ page }) => {
+        await startGame(page);
+
+        //  Holds the answer of the sale until the window is closed; the fake backend then answers as usual
+        let release;
+        const held = new Promise((resolve) => { release = resolve; });
+
+        await page.route('**/api/equipment/sell', async (route) => {
+            await held;
+            await route.fallback();
+        });
+        await openEquipment(page);
+
+        await startSelling(page);
+        await page.getByTestId('equip-piece-c1').click();
+        await page.getByTestId('bulk-sell-submit').click();
+        await page.getByTestId('bulk-sell-confirm-yes').click();
+        await page.getByTestId('hero-close').click();
+        release();
+
+        //  The sale is paid on the server and the HUD wallet follows it; the closed window stays closed and draws nothing
+        await expect(walletText(page)).toHaveText('Gold: 0 Silver: 1 Copper: 50');
+        await expect(page.locator('.hero-panel')).toBeHidden();
+        await expect(page.locator('.hero-body > *')).toHaveCount(0);
+
+        await openEquipment(page);
+
+        await expect(page.locator('.equip-bag-title')).toHaveText('Mochila (3)');
+        await expect(page.getByTestId('equip-sell-notice')).toHaveCount(0);
+        await expect(page.getByTestId('bulk-sell-bar')).toHaveCount(0);
     });
 });

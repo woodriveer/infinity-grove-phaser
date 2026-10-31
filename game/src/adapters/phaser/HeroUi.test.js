@@ -1161,6 +1161,7 @@ describe('HeroUi bulk sell', () => {
 
         expect(ctx.testid('piece-detail')).toBeNull();
         expect(pressed(ctx, 'c1')).toBe('true');
+        expect(ctx.testid('equip-piece-c1').classList.contains('is-selected')).toBe(true);
         expect(summary(ctx)).toBe('Selecionadas: 1 · Total: 1 prata');
         expect(ctx.testid('bulk-sell-start')).toBeNull();
     });
@@ -1231,6 +1232,7 @@ describe('HeroUi bulk sell', () => {
         expect(pressed(ctx, 'c1')).toBe('true');
         expect(summary(ctx)).toBe('Selecionadas: 2 · Total: 3 prata');
         expect(ctx.testid('bulk-sell-submit')).not.toBeNull();
+        expect(ctx.testid('bulk-sell-cancel')).not.toBeNull();
     });
 
     it('Sim, vender sells the selection in bag order in one request and shows the notice', async () => {
@@ -1316,6 +1318,21 @@ describe('HeroUi bulk sell', () => {
 
         pick(ctx, 'c1');
         ctx.ui.close();
+        await open(ctx, 'equipment');
+
+        expect(ctx.testid('bulk-sell-bar')).toBeNull();
+        expect(ctx.testid('bulk-sell-start')).not.toBeNull();
+        expect(ctx.testid('equip-piece-c1').classList.contains('is-selected')).toBe(false);
+    });
+
+    it('opening another screen leaves selection mode', async () => {
+        const ctx = await start();
+
+        pick(ctx, 'c1');
+        await open(ctx, 'bag');
+
+        expect(ctx.query('.hero-title').textContent).toBe('Mochila');
+
         await open(ctx, 'equipment');
 
         expect(ctx.testid('bulk-sell-bar')).toBeNull();
