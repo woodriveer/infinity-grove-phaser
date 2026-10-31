@@ -1,4 +1,4 @@
-import { bagEntries, FUSION_SIZE, MAX_STARS } from '../../../domain/heroes/heroes';
+import { bagEntries, FUSION_SIZE, MAX_STARS, starsClass } from '../../../domain/heroes/heroes';
 import { renderSkillList } from './catalogView';
 import { el, starsText } from './dom';
 
@@ -36,7 +36,7 @@ export const renderBagEntry = (entry, hero, { onFuse }) =>
 
     text.append(
         el('strong', 'hero-name', entry.heroName),
-        el('div', 'hero-stars', `Estrelas: ${starsText(entry.stars)}`),
+        el('div', [ 'hero-stars', starsClass(entry.stars) ].filter(Boolean).join(' '), `Estrelas: ${starsText(entry.stars)}`),
         el('div', 'bag-copies', `Cópias: ${entry.copies}`),
         el('div', 'bag-needed', fusible ? `Para fundir: ${entry.copies}/${FUSION_SIZE}` : 'Estrela máxima: não pode ser fundida')
     );

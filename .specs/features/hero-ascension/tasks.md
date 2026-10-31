@@ -691,7 +691,7 @@ const slotText = (ctx, number) => slot(ctx, number).querySelector('.skill-slot-c
 
 ---
 
-### T11: Bag entries of 4 to 9 stars [ ]
+### T11: Bag entries of 4 to 9 stars [x]
 
 **Owner**: game-dev
 **What**: The bag detail reads the new cap of 9 and draws the star tiers (ASC-07 AC 4 to 6; ASC-08 AC 1, 2).
@@ -720,7 +720,7 @@ const slotText = (ctx, number) => slot(ctx, number).querySelector('.skill-slot-c
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The four new cases and the renamed one pass; the whole Vitest suite passes.
+- [x] The four new cases pass (the renamed case was done in T4); the whole Vitest suite passes.
 
 **Commit**: `feat(game): list and detail bag cards of up to 9 stars`
 
