@@ -3,6 +3,7 @@
 //  It damages the `Monster` it is given and returns the hits so the scene can show their numbers and handle a kill.
 import { clickDamage, hitDamage, tickDamage } from './skillDamage';
 import { skillOf } from './skillCatalog';
+import { levelFactor } from './skillLevel';
 
 const TICK_MS = 1000;
 const NO_USE = { used: false, hits: [], countdown: { extendMs: 0 } };
@@ -45,31 +46,39 @@ export class SkillCombat
         this.target = monster && !monster.dead ? monster : null;
     }
 
-    //  Starts an effect, or restarts its duration without stacking it
-    start (list, id, label, ms, owner = {})
+    //  Starts an effect, or restarts its duration without stacking it; `factor` is the level factor it is cast with
+    start (list, id, label, ms, owner = {}, factor = 1)
     {
         const running = list.find((effect) => effect.id === id);
 
         if (running)
         {
             running.remainingMs = ms;
+            running.factor = factor;
         }
         else
         {
-            list.push({ id, label, remainingMs: ms, seq: this.sequence++, ...owner });
+            list.push({ id, label, remainingMs: ms, seq: this.sequence++, factor, ...owner });
         }
     }
 
-    //  Starts a damage over time on the monster, or restarts it; a stacking one gains a stack up to its maximum
-    startDot (skill, attacker, owner = {})
+    //  The level factor of each running effect on the player and the monster, by effect id (an id not listed is 1)
+    factors ()
     {
-        const { id, percent, count, maxStacks = 1 } = skill.ticks;
+        return Object.fromEntries([ ...this.buffs, ...this.debuffs ].map((effect) => [ effect.id, effect.factor ?? 1 ]));
+    }
+
+    //  Starts a damage over time on the monster, or restarts it; a stacking one gains a stack up to its maximum. `factor` scales its percent.
+    startDot (skill, attacker, owner = {}, factor = 1)
+    {
+        const { id, count, maxStacks = 1 } = skill.ticks;
+        const percent = skill.ticks.percent * factor;
         const running = this.dots.find((dot) => dot.id === id);
         const ms = count * TICK_MS;
 
         if (running)
         {
-            Object.assign(running, { attacker, remainingMs: ms, stacks: Math.min(maxStacks, running.stacks + 1) });
+            Object.assign(running, { attacker, percent, remainingMs: ms, stacks: Math.min(maxStacks, running.stacks + 1) });
         }
         else
         {
@@ -135,7 +144,8 @@ export class SkillCombat
         this.follow(monster);
 
         const result = clickDamage({
-            attacker, buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), random: this.random, boss, multiplier, forceCritical
+            attacker, buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), random: this.random, boss, multiplier, forceCritical,
+            factors: this.factors()
         });
 
         monster.hit(result.damage);
@@ -143,8 +153,9 @@ export class SkillCombat
         return result;
     }
 
-    //  Uses a skill: refused while locked, cooling or without a living monster; otherwise it lands its hits and starts the cooldown
-    use ({ heroId, slot, unlocked, attacker, monster, boss })
+    //  Uses a skill: refused while locked, cooling or without a living monster; otherwise it lands its hits and starts the cooldown.
+    //  `level` (1 to 3) scales the hits, the effects, the damage over time, the aimed shot and the countdown extension.
+    use ({ heroId, slot, unlocked, level = 1, attacker, monster, boss })
     {
         const skill = skillOf(heroId, slot);
 
@@ -157,15 +168,16 @@ export class SkillCombat
         this.cooldowns.set(`${heroId}:${slot}`, skill.cooldownMs);
 
         const owner = { heroId, slot };
+        const factor = levelFactor(level);
 
         if (skill.buff)
         {
-            this.start(this.buffs, skill.buff.id, skill.label, skill.buff.ms, owner);
+            this.start(this.buffs, skill.buff.id, skill.label, skill.buff.ms, owner, factor);
         }
 
         if (skill.debuff)
         {
-            this.start(this.debuffs, skill.debuff.id, skill.label, skill.debuff.ms, owner);
+            this.start(this.debuffs, skill.debuff.id, skill.label, skill.debuff.ms, owner, factor);
         }
 
         const hits = [];
@@ -178,8 +190,9 @@ export class SkillCombat
             }
 
             const result = hitDamage({
-                attacker, percent, armorPierce, damageType: skill.damageType, vsDarkness: skill.vsDarkness,
-                buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), random: this.random, boss
+                attacker, percent: percent * factor, armorPierce, damageType: skill.damageType, vsDarkness: skill.vsDarkness,
+                buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), random: this.random, boss,
+                factors: this.factors()
             });
 
             monster.hit(result.damage);
@@ -188,12 +201,12 @@ export class SkillCombat
 
         if (skill.ticks && !monster.dead)
         {
-            this.startDot(skill, attacker, owner);
+            this.startDot(skill, attacker, owner, factor);
         }
 
         if (skill.cast)
         {
-            this.cast = { key: `${heroId}:${slot}`, remainingMs: skill.cast.ms, skill, attacker, boss };
+            this.cast = { key: `${heroId}:${slot}`, remainingMs: skill.cast.ms, skill, attacker, boss, factor };
         }
 
         //  Stun and Root stop the countdown of a boss only; a phase monster has none
@@ -202,7 +215,7 @@ export class SkillCombat
             this.freezeMs = Math.max(this.freezeMs, skill.stunMs ?? 0, skill.rootMs ?? 0);
         }
 
-        return { used: true, hits, countdown: { extendMs: boss ? skill.countdownExtendMs ?? 0 : 0 } };
+        return { used: true, hits, countdown: { extendMs: boss ? (skill.countdownExtendMs ?? 0) * factor : 0 } };
     }
 
     //  The part of a frame of `ms` the boss countdown runs; call it before `advance`, which uses up the stop
@@ -287,8 +300,9 @@ export class SkillCombat
     {
         const { skill, attacker } = this.cast;
         const result = hitDamage({
-            attacker, percent: skill.cast.hit.percent, damageType: skill.damageType, forceCritical: true,
-            buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), random: this.random, boss
+            attacker, percent: skill.cast.hit.percent * this.cast.factor, damageType: skill.damageType, forceCritical: true,
+            buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), random: this.random, boss,
+            factors: this.factors()
         });
 
         this.cast = null;
@@ -302,7 +316,7 @@ export class SkillCombat
     {
         const damage = tickDamage({
             attacker: dot.attacker, percent: dot.percent * dot.stacks, damageType: dot.damageType,
-            buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), boss
+            buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), boss, factors: this.factors()
         });
 
         monster.hit(damage);

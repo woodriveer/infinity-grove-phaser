@@ -455,7 +455,7 @@ const factorOf = (factors, id) => factors?.[id] ?? 1;
 
 ---
 
-### T7: Skills used at a level [ ]
+### T7: Skills used at a level [x]
 
 **Owner**: game-dev
 **What**: `SkillCombat.use` takes the skill level and scales hits, the aimed shot, ticks, effects and Carrilhão by `levelFactor(level)`, leaving every timing value unchanged (ASC-03, spec AC 1, 5, 9; ASC-04, spec AC 6 to 8, 10).
@@ -510,7 +510,7 @@ const factorOf = (factors, id) => factors?.[id] ?? 1;
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 63 existing cases pass unchanged and the 20 new ones pass; the whole Vitest suite passes.
+- [x] The 63 existing cases pass unchanged and the 20 new ones pass; the whole Vitest suite passes. (`skillCombat.test.js` holds 59 existing cases, all pass unchanged; 59 + 20 = 79.)
 
 **Commit**: `feat(game): use hero skills at their level`
 

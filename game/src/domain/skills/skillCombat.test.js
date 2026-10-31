@@ -669,3 +669,205 @@ describe('boss control and the time shield', () => {
         expect(use(combat(), monsterOf(), 'kael', 1, { boss: true }).countdown).toEqual({ extendMs: 0 });
     });
 });
+
+describe('skill levels', () => {
+    const hitsOf = (skills, monster, heroId, slot, extra = {}) => use(skills, monster, heroId, slot, extra).hits;
+    const clickOf = (skills, monster) => skills.click({ attacker: PLAYER, monster, boss: false });
+
+    it('Corte Dimensional lands 18.75 at level 2 and 22.5 at level 3', () => {
+        expect(hitsOf(combat(), monsterOf(), 'kael', 1, { level: 2 })).toEqual([ { damage: 18.75, critical: false } ]);
+        expect(hitsOf(combat(), monsterOf(), 'kael', 1, { level: 3 })).toEqual([ { damage: 22.5, critical: false } ]);
+    });
+
+    it('Corte Dimensional keeps its +30 armor pierce at level 2: 12.1875 against physical defense 50', () => {
+        const [ hit ] = hitsOf(combat(), monsterOf(1000, stats('FIRE', 50)), 'kael', 1, { level: 2 });
+
+        expect(hit.damage).toBeCloseTo(12.1875, 9);
+    });
+
+    it('Investida do Baluarte lands 6 at level 3 and still stops a boss countdown for 3 s', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        expect(hitsOf(skills, monster, 'kael', 2, { level: 3, boss: true })).toEqual([ { damage: 6, critical: false } ]);
+        expect(skills.countdownMs(5000)).toBe(2000);
+    });
+
+    it('Flecha Dupla lands two hits of 3.75 at level 2', () => {
+        expect(hitsOf(combat(), monsterOf(), 'lyra', 1, { level: 2 })).toEqual([ { damage: 3.75, critical: false }, { damage: 3.75, critical: false } ]);
+    });
+
+    it('Tiro Preciso at level 2 lands an aimed critical hit of 75 after its 2 s cast', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'lyra', 2, { level: 2 });
+
+        expect(skills.advance(1999, { monster }).hits).toEqual([]);
+        expect(skills.advance(1, { monster }).hits).toEqual([ { damage: 75, critical: true } ]);
+    });
+
+    it('Chuva de Meteoros lands 31.25 at level 2 and 37.5 at level 3', () => {
+        expect(hitsOf(combat(), monsterOf(), 'orina', 3, { level: 2 })).toEqual([ { damage: 31.25, critical: false } ]);
+        expect(hitsOf(combat(), monsterOf(), 'orina', 3, { level: 3 })).toEqual([ { damage: 37.5, critical: false } ]);
+    });
+
+    it('Luz Divina lands 10 at level 2 and 16.2 at level 3 on a DARKNESS monster', () => {
+        expect(hitsOf(combat(), monsterOf(), 'seraphine', 2, { level: 2 })[0].damage).toBeCloseTo(10, 9);
+        expect(hitsOf(combat(), monsterOf(1000, stats('DARKNESS')), 'seraphine', 2, { level: 3 })[0].damage).toBeCloseTo(12 * 0.9 * 1.5, 9);
+    });
+
+    it('Golpe Sangrento at level 3 lands 9, then six Bleed ticks of 2.25', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        expect(hitsOf(skills, monster, 'vex', 3, { level: 3 }).map((hit) => hit.damage)).toEqual([ 9 ]);
+
+        const ticks = skills.advance(6000, { monster }).hits.map((hit) => hit.damage);
+
+        expect(ticks).toHaveLength(6);
+        ticks.forEach((damage) => expect(damage).toBeCloseTo(2.25, 9));
+        expect(skills.advance(1000, { monster }).hits).toEqual([]);
+    });
+
+    it('Tempestade Arcana at level 3 lands six ticks of 3 and no seventh', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'orina', 2, { level: 3 });
+
+        const ticks = skills.advance(10000, { monster }).hits.map((hit) => hit.damage);
+
+        expect(ticks).toHaveLength(6);
+        ticks.forEach((damage) => expect(damage).toBeCloseTo(3, 9));
+    });
+
+    it('Bomba de Veneno at level 2 ticks 1.25 per stack for 8 ticks', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'vex', 1, { level: 2 });
+
+        const ticks = skills.advance(8000, { monster }).hits.map((hit) => hit.damage);
+
+        expect(ticks).toHaveLength(8);
+        ticks.forEach((damage) => expect(damage).toBeCloseTo(1.25, 9));
+    });
+
+    it('Ventos Ligeiros at level 2 makes a Base-1 click 1.625 for 12 s', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'lyra', 3, { level: 2 });
+
+        expect(clickOf(skills, monster).damage).toBeCloseTo(1.625, 9);
+        skills.advance(11999, { monster });
+        expect(clickOf(skills, monster).damage).toBeCloseTo(1.625, 9);
+        skills.advance(1, { monster });
+        expect(clickOf(skills, monster).damage).toBe(1);
+    });
+
+    it('Bênção da Grande Árvore at level 3 makes a Base-1 click 1.99375 (1.375 x 1.45)', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'seraphine', 1, { level: 3 });
+
+        expect(clickOf(skills, monster).damage).toBeCloseTo(1.99375, 9);
+    });
+
+    it('Bomba de Fumaça at level 3 adds 22.5 critical points', () => {
+        const hit = combat(() => 0.32);
+        const monster = monsterOf();
+
+        use(hit, monster, 'vex', 2, { level: 3 });
+
+        expect(clickOf(hit, monster)).toEqual({ damage: 2, critical: true });
+
+        const miss = combat(() => 0.33);
+        const other = monsterOf();
+
+        use(miss, other, 'vex', 2, { level: 3 });
+
+        expect(clickOf(miss, other).critical).toBe(false);
+    });
+
+    it('Brado Aterrador at level 3 removes 45 physical defense: a click on defense 50 deals 0.95, and 0.8 at level 1', () => {
+        const high = combat();
+        const highMonster = monsterOf(1000, stats('FIRE', 50));
+
+        use(high, highMonster, 'kael', 3, { level: 3 });
+
+        expect(clickOf(high, highMonster).damage).toBeCloseTo(0.95, 9);
+
+        const low = combat();
+        const lowMonster = monsterOf(1000, stats('FIRE', 50));
+
+        use(low, lowMonster, 'kael', 3, { level: 1 });
+
+        expect(clickOf(low, lowMonster).damage).toBeCloseTo(0.8, 9);
+    });
+
+    it('Prisão de Espinhos at level 2 multiplies Chuva de Meteoros at level 2 by 1.3125: 41.015625', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'orina', 1, { level: 2 });
+
+        expect(hitsOf(skills, monster, 'orina', 3, { level: 2 })[0].damage).toBeCloseTo(41.015625, 9);
+    });
+
+    it('Carrilhão da Aurora adds 5000 ms at level 2 and 6000 ms at level 3 on a boss, and nothing on a phase monster', () => {
+        expect(use(combat(), monsterOf(), 'seraphine', 3, { level: 2, boss: true }).countdown.extendMs).toBe(5000);
+        expect(use(combat(), monsterOf(), 'seraphine', 3, { level: 3, boss: true }).countdown.extendMs).toBe(6000);
+        expect(use(combat(), monsterOf(), 'seraphine', 3, { level: 2, boss: false }).countdown.extendMs).toBe(0);
+    });
+
+    it('a skill used without a level is level 1', () => {
+        expect(hitsOf(combat(), monsterOf(), 'kael', 1)).toEqual([ { damage: 15, critical: false } ]);
+    });
+
+    it('the cooldown, the duration, the cast, the Root and the tick count do not change with the level', () => {
+        const corte = combat();
+
+        use(corte, monsterOf(), 'kael', 1, { level: 3 });
+        expect(corte.slotState('kael', 1, true)).toEqual({ state: 'cooling', seconds: 20 });
+
+        const ventos = combat();
+        const ventosMonster = monsterOf();
+
+        use(ventos, ventosMonster, 'lyra', 3, { level: 3 });
+        expect(ventos.effects()).toEqual([ { label: 'Ventos Ligeiros', seconds: 12 } ]);
+
+        const prisao = combat();
+
+        use(prisao, monsterOf(), 'orina', 1, { level: 3, boss: true });
+        expect(prisao.countdownMs(5000)).toBe(3000);
+
+        const tempestade = combat();
+        const tempestadeMonster = monsterOf();
+
+        use(tempestade, tempestadeMonster, 'orina', 2, { level: 3 });
+        expect(tempestade.advance(10000, { monster: tempestadeMonster }).hits).toHaveLength(6);
+    });
+
+    it('a restarted effect takes the factor of the restart', () => {
+        const skills = combat();
+
+        skills.start(skills.buffs, 'ventos', 'Ventos Ligeiros', 12000, {}, 1.25);
+        skills.start(skills.buffs, 'ventos', 'Ventos Ligeiros', 12000, {}, 1.5);
+
+        expect(skills.buffs).toHaveLength(1);
+        expect(skills.factors()).toEqual({ ventos: 1.5 });
+    });
+
+    it('an effect keeps the factor it was cast with when the next skill is used at another level', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'lyra', 3, { level: 1 });
+        use(skills, monster, 'lyra', 1, { level: 3 });
+
+        expect(clickOf(skills, monster).damage).toBeCloseTo(1.5, 9);
+    });
+});
