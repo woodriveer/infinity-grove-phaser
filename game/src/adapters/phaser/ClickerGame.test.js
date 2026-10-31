@@ -2230,20 +2230,6 @@ describe('ClickerGame farm mode', () => {
 
         killAll(ctx);
         await flush();
-
-        expect(ctx.scene.farmBoss).toBeNull();
-        expect(label(ctx)).toBe('Stage 3/10  Phase 1/5');
-        expect(testid(ctx, 'card-notice').hidden).toBe(true);
-        expect(farmGateway.get.mock.calls.length).toBe(loads + 1);
-    });
-
-    it('a win lost to a network failure keeps the loop going', async () => {
-        const ctx = await createScene({ start: midCampaign() });
-        farmGateway.win.mockRejectedValue(new ApiError('Cannot reach the server. Try again later.'));
-        ctx.scene.startFarm(miniboss);
-
-        killAll(ctx);
-        await flush();
         advance(ctx);
 
         expect(ctx.scene.farmBoss).toBe(miniboss);
@@ -2257,6 +2243,20 @@ describe('ClickerGame farm mode', () => {
         farmGateway.win.mockRejectedValue(new ApiError('Not beaten', { status: 409, code: 'BOSS_NOT_AVAILABLE' }));
         ctx.scene.startFarm(miniboss);
         const loads = farmGateway.get.mock.calls.length;
+
+        killAll(ctx);
+        await flush();
+
+        expect(ctx.scene.farmBoss).toBeNull();
+        expect(label(ctx)).toBe('Stage 3/10  Phase 1/5');
+        expect(testid(ctx, 'card-notice').hidden).toBe(true);
+        expect(farmGateway.get.mock.calls.length).toBe(loads + 1);
+    });
+
+    it('a win lost to a network failure keeps the loop going', async () => {
+        const ctx = await createScene({ start: midCampaign() });
+        farmGateway.win.mockRejectedValue(new ApiError('Cannot reach the server. Try again later.'));
+        ctx.scene.startFarm(miniboss);
 
         killAll(ctx);
         await flush();

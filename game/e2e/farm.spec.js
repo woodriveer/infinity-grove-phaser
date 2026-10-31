@@ -19,6 +19,8 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 const startGame = async (page, backendOptions) => {
     const backend = await mockBackend(page, { users: { yan: 'secret123' }, definition: FAST_BOSSES, progress: { yan: COMPLETED }, ...backendOptions });
+    //  A completed campaign unlocks the auto click, which would win the 2 health bosses before the click of the test
+    await page.addInitScript(() => localStorage.setItem('infinity-grove.auto-click', 'off'));
     const menu = await openMainMenu(page);
 
     await fillCredentials(menu, 'yan', 'secret123');
