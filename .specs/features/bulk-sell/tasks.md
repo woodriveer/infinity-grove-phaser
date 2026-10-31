@@ -781,7 +781,7 @@ Imports: `bagPieces`, `selectedInBag`, `toggleRarity`, `toggleSelected` and `sel
 
 ---
 
-### T11: Styles of the selection mode [ ]
+### T11: Styles of the selection mode [x]
 
 **Owner**: game-dev
 **Goal**: Style the bag header, the bar, the rarity buttons, the selected and locked tiles and the check badge as the design table says (BSL-10, BSL-12, BSL-14, BSL-17, BSL-26).

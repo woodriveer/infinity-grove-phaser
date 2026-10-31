@@ -2040,6 +2040,124 @@ button:disabled {
     background: var(--color-accent-2-200);
 }
 
+/* The bulk sale: bag header, selection bar, selected and locked tiles */
+
+.bag-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.bulk-sell-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--color-divider);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+}
+
+.bulk-sell-summary {
+    font-family: var(--font-heading);
+    font-size: 15px;
+}
+
+.bulk-sell-rarities,
+.bulk-sell-actions,
+.bulk-sell-confirm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.bulk-sell-rarity {
+    padding: 4px 12px;
+    font-size: 13px;
+    border-left: 4px solid var(--rarity-color);
+}
+
+.bulk-sell-rarity.rarity-common {
+    --rarity-color: var(--color-neutral-400);
+}
+
+.bulk-sell-rarity.rarity-uncommon {
+    --rarity-color: #5da048;
+}
+
+.bulk-sell-rarity.rarity-rare {
+    --rarity-color: #3f8fd1;
+}
+
+.bulk-sell-rarity.rarity-epic {
+    --rarity-color: #9b59d0;
+}
+
+.bulk-sell-rarity.rarity-legendary {
+    --rarity-color: #d9a521;
+}
+
+.bulk-sell-rarity[aria-pressed="true"] {
+    font-weight: 700;
+    background: var(--color-neutral-300);
+}
+
+.bulk-sell-bar .equip-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.bulk-sell-submit,
+.bulk-sell-yes {
+    color: var(--color-bg);
+    background: var(--color-accent);
+    border-color: transparent;
+    box-shadow: var(--shadow-md);
+}
+
+.bulk-sell-submit:hover:not(:disabled),
+.bulk-sell-yes:hover:not(:disabled) {
+    background: var(--color-accent-600);
+}
+
+.bulk-sell-question {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-accent-800);
+}
+
+.piece-tile.is-selected {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 6px;
+    transform: translateY(-2px);
+}
+
+.piece-check {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--color-bg);
+    border: 2px solid var(--color-bg);
+    border-radius: 50%;
+    background: var(--color-accent);
+    pointer-events: none;
+}
+
+.piece-tile.is-locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 /* ══ Rever chefes: the chapter as a map ══ */
 
 .farm-screen {
