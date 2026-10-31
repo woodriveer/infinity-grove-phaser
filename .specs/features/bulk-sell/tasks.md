@@ -366,7 +366,7 @@ ADR line: in `backend/docs/adr/0008-equipment.md`, paragraph **Actions**, after 
 
 ---
 
-### T5: equipmentApi.sellMany [ ]
+### T5: equipmentApi.sellMany [x]
 
 **Owner**: game-dev
 **Goal**: The HTTP adapter posts the selected ids to `/equipment/sell` and returns the whole answer (BSL-23).

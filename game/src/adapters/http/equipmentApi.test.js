@@ -55,6 +55,20 @@ describe('equipmentApi', () => {
         expect(httpClient.post).toHaveBeenCalledWith('/equipment/p1/sell');
     });
 
+    it('sellMany posts the piece ids to /equipment/sell and returns the equipment, the wallet, sold and earned', async () => {
+        const answer = { ...change, sold: 2, earned: 200 };
+        httpClient.post.mockResolvedValue({ data: answer });
+
+        await expect(equipmentApi.sellMany([ 'p1', 'p 2' ])).resolves.toEqual(answer);
+        expect(httpClient.post).toHaveBeenCalledWith('/equipment/sell', { pieceIds: [ 'p1', 'p 2' ] });
+    });
+
+    it('sellMany lets a refusal reach the caller', async () => {
+        httpClient.post.mockRejectedValue(new Error('404'));
+
+        await expect(equipmentApi.sellMany([ 'x' ])).rejects.toThrow('404');
+    });
+
     it('encodes the piece id in the path', async () => {
         httpClient.post.mockResolvedValue({ data: change });
 
