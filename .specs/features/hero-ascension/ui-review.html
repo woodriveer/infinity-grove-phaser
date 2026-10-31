@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Ascensão de heróis (4★ a 9★)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Ascensão de heróis (4★ a 9★)</h1>
+                <div class="meta">
+                    <code>.specs/features/hero-ascension</code> · commits <code>T10 a T16 (até 82eea42 + trabalho local)</code> · 2026-10-31 · local, fake backend (Playwright, Chromium)
+                </div>
+            </div>
+            
+            <span class="chip verdict ok">APROVADO</span>
+        </div>
+        <p style="margin-top:16px">A interface de ascensão cumpre os valores da tarefa T17: roxo #7a3fa0 para 4★ a 6★, chip dourado #d9a521 com texto #201e1d e brilho para 7★ a 9★, linhas Nível N, selo Nv. N na barra e linha Poder das estrelas, todos medidos nos estilos computados. Há um único defeito pequeno (chip dourado do catálogo 6px fora da coluna de texto) e três sugestões. O dano de habilidade em combate (T9) não foi avaliado: não muda a tela.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">21</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">42</div><div class="l">capturas (desktop + celular)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">1</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Tier 4 a 6: texto roxo #7a3fa0, peso 800 (medido: rgb(122, 63, 160), 5,79:1 sobre #f5ead8 e 5,15:1 sobre #ebddc5) <code>style.css:2365</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Tier 7 a 9: chip #d9a521, texto #201e1d (7,40:1), brilho 0 0 6px rgb(255 214 90 / 0.6), raio 999px, padding 0 8px, peso 800 (medido) <code>style.css:2371</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Pílula Nível 1 e 2: roxo sobre #efe4f5 (5,61:1), 12px, peso 700; Nível 3 vira chip dourado com texto escuro (medido nas linhas do detalhe e da mochila) <code>Visual spec .skill-level</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Textos de habilidade: Nível 1, Nível 2 · +25% de poder, Nível 3 · +50% de poder; as bloqueadas não mostram nível <code>ASC-08</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Selo da barra: Nv. N no canto superior direito (top 4px, right 4px, altura 20px, Caprasimo 12px); nível 2 roxo com texto #f5ead8 (5,79:1, opacidade 0,9), nível 3 dourado com #201e1d e opacidade 1; sem selo no nível 1; Q, W, E seguem legíveis à esquerda <code>Visual spec .skill-level-badge</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Linha Poder das estrelas: 13px, peso 700, cor #474238, quebra dentro da coluna 1fr (scrollWidth = clientWidth = 544px) em 5★ e 9★ <code>ASC-08 AC 7 a 9</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Mochila com entradas 4★ a 9★, chip dourado em Estrelas: 9★ e texto Estrela máxima: não pode ser fundida <code>ASC-07</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Fusão: linhas de 3★ até 8★ e resultado Nova carta: Kael Raizférrea 9★ · Brado Aterrador no nível 3, tudo em português <code>D11, ASC-08</code></span></li>
+            <li class="no"><span class="mark">✗</span><span>Chip dourado do catálogo alinha com o texto da carta <code>Visual spec .hero-stars.is-exalted</code> — o fundo do chip começa 6px à esquerda do nome e do elemento (achado #1)</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>Barra de habilidades do líder</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/11-skill-bar-3-desktop.png" target="_blank"><img src="ui-review/11-skill-bar-3-desktop.png" alt="Líder com 3★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Líder com 3★</span>
+                        <span class="d">Sem selo de nível: igual ao jogo de antes.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/21-skill-bar-5-desktop.png" target="_blank"><img src="ui-review/21-skill-bar-5-desktop.png" alt="Líder com 5★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Líder com 5★</span>
+                        <span class="d">Nv. 2 roxo nas habilidades 1 e 2; a 3 fica sem selo (nível 1). Q, W, E legíveis à esquerda.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/31-skill-bar-8-desktop.png" target="_blank"><img src="ui-review/31-skill-bar-8-desktop.png" alt="Líder com 8★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Líder com 8★</span>
+                        <span class="d">Nv. 3 dourado em 1 e 2, Nv. 2 roxo (opacidade 0,9) na 3.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/41-skill-bar-9-desktop.png" target="_blank"><img src="ui-review/41-skill-bar-9-desktop.png" alt="Líder com 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Líder com 9★</span>
+                        <span class="d">Três selos Nv. 3 dourados no canto superior direito, espelhando a tecla à esquerda.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/11-skill-bar-3-phone.png" target="_blank"><img src="ui-review/11-skill-bar-3-phone.png" alt="Líder com 3★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Líder com 3★</span>
+                        <span class="d">Sem selo de nível: igual ao jogo de antes.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/21-skill-bar-5-phone.png" target="_blank"><img src="ui-review/21-skill-bar-5-phone.png" alt="Líder com 5★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Líder com 5★</span>
+                        <span class="d">Nv. 2 roxo nas habilidades 1 e 2; a 3 fica sem selo (nível 1). Q, W, E legíveis à esquerda.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/31-skill-bar-8-phone.png" target="_blank"><img src="ui-review/31-skill-bar-8-phone.png" alt="Líder com 8★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Líder com 8★</span>
+                        <span class="d">Nv. 3 dourado em 1 e 2, Nv. 2 roxo (opacidade 0,9) na 3.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/41-skill-bar-9-phone.png" target="_blank"><img src="ui-review/41-skill-bar-9-phone.png" alt="Líder com 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Líder com 9★</span>
+                        <span class="d">Três selos Nv. 3 dourados no canto superior direito, espelhando a tecla à esquerda.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Catálogo de heróis</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/12-catalog-3-desktop.png" target="_blank"><img src="ui-review/12-catalog-3-desktop.png" alt="Catálogo, Kael 3★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Catálogo, Kael 3★</span>
+                        <span class="d">Cartas lado a lado: 3★ marrom (Kael), 2★ marrom, 4★ e 6★ roxos, 7★ chip dourado com brilho.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/22-catalog-5-desktop.png" target="_blank"><img src="ui-review/22-catalog-5-desktop.png" alt="Catálogo, Kael 5★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Catálogo, Kael 5★</span>
+                        <span class="d">Kael com 5★ em roxo; Orina 7★ em chip dourado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/32-catalog-8-desktop.png" target="_blank"><img src="ui-review/32-catalog-8-desktop.png" alt="Catálogo, Kael 8★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Catálogo, Kael 8★</span>
+                        <span class="d">Kael 8★ em chip dourado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/42-catalog-9-desktop.png" target="_blank"><img src="ui-review/42-catalog-9-desktop.png" alt="Catálogo, Kael 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Catálogo, Kael 9★</span>
+                        <span class="d">Kael 9★ em chip dourado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #1</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/12-catalog-3-phone.png" target="_blank"><img src="ui-review/12-catalog-3-phone.png" alt="Catálogo, Kael 3★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Catálogo, Kael 3★</span>
+                        <span class="d">Cartas lado a lado: 3★ marrom (Kael), 2★ marrom, 4★ e 6★ roxos, 7★ chip dourado com brilho.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/22-catalog-5-phone.png" target="_blank"><img src="ui-review/22-catalog-5-phone.png" alt="Catálogo, Kael 5★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Catálogo, Kael 5★</span>
+                        <span class="d">Kael com 5★ em roxo; Orina 7★ em chip dourado.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/32-catalog-8-phone.png" target="_blank"><img src="ui-review/32-catalog-8-phone.png" alt="Catálogo, Kael 8★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Catálogo, Kael 8★</span>
+                        <span class="d">Kael 8★ em chip dourado.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/42-catalog-9-phone.png" target="_blank"><img src="ui-review/42-catalog-9-phone.png" alt="Catálogo, Kael 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Catálogo, Kael 9★</span>
+                        <span class="d">Kael 9★ em chip dourado.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #1</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Detalhe do herói</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/13-detail-3-desktop.png" target="_blank"><img src="ui-review/13-detail-3-desktop.png" alt="Detalhe 3★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 3★</span>
+                        <span class="d">Estrelas em marrom, linha Poder das estrelas, habilidades em Nível 1.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/23-detail-5-desktop.png" target="_blank"><img src="ui-review/23-detail-5-desktop.png" alt="Detalhe 5★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 5★</span>
+                        <span class="d">Estrelas roxas; Nível 2 · +25% de poder nas duas primeiras, Nível 1 na terceira; a linha de poder quebra dentro da coluna.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/33-detail-8-desktop.png" target="_blank"><img src="ui-review/33-detail-8-desktop.png" alt="Detalhe 8★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 8★</span>
+                        <span class="d">Chip dourado; Nível 3 · +50% de poder (dourado) e Nível 2 (roxo).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/43-detail-9-desktop.png" target="_blank"><img src="ui-review/43-detail-9-desktop.png" alt="Detalhe 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 9★</span>
+                        <span class="d">Chip dourado e três pílulas Nível 3 douradas.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/13-detail-3-phone.png" target="_blank"><img src="ui-review/13-detail-3-phone.png" alt="Detalhe 3★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 3★</span>
+                        <span class="d">Estrelas em marrom, linha Poder das estrelas, habilidades em Nível 1.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/23-detail-5-phone.png" target="_blank"><img src="ui-review/23-detail-5-phone.png" alt="Detalhe 5★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 5★</span>
+                        <span class="d">Estrelas roxas; Nível 2 · +25% de poder nas duas primeiras, Nível 1 na terceira; a linha de poder quebra dentro da coluna.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/33-detail-8-phone.png" target="_blank"><img src="ui-review/33-detail-8-phone.png" alt="Detalhe 8★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 8★</span>
+                        <span class="d">Chip dourado; Nível 3 · +50% de poder (dourado) e Nível 2 (roxo).</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/43-detail-9-phone.png" target="_blank"><img src="ui-review/43-detail-9-phone.png" alt="Detalhe 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 9★</span>
+                        <span class="d">Chip dourado e três pílulas Nível 3 douradas.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Mochila</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/51-bag-desktop.png" target="_blank"><img src="ui-review/51-bag-desktop.png" alt="Mochila com entradas de 0 a 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Mochila com entradas de 0 a 9★</span>
+                        <span class="d">Entradas 4★ a 9★ listadas, com xN. As estrelas ficam em tinta escura, sem a cor da faixa (ver sugestão).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/52-bag-detail-9-desktop.png" target="_blank"><img src="ui-review/52-bag-detail-9-desktop.png" alt="Detalhe 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 9★</span>
+                        <span class="d">Chip dourado em Estrelas: 9★ e texto Estrela máxima: não pode ser fundida; sem botão de fusão.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/53-bag-detail-4-desktop.png" target="_blank"><img src="ui-review/53-bag-detail-4-desktop.png" alt="Detalhe 4★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 4★</span>
+                        <span class="d">Estrelas: 4★ em roxo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/54-bag-detail-8-can-fuse-desktop.png" target="_blank"><img src="ui-review/54-bag-detail-8-can-fuse-desktop.png" alt="Detalhe 8★ com 3 cópias" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 8★ com 3 cópias</span>
+                        <span class="d">Chip dourado, Para fundir: 3/3 e botão Ir para a fusão.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/51-bag-phone.png" target="_blank"><img src="ui-review/51-bag-phone.png" alt="Mochila com entradas de 0 a 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Mochila com entradas de 0 a 9★</span>
+                        <span class="d">Entradas 4★ a 9★ listadas, com xN. As estrelas ficam em tinta escura, sem a cor da faixa (ver sugestão).</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/52-bag-detail-9-phone.png" target="_blank"><img src="ui-review/52-bag-detail-9-phone.png" alt="Detalhe 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 9★</span>
+                        <span class="d">Chip dourado em Estrelas: 9★ e texto Estrela máxima: não pode ser fundida; sem botão de fusão.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/53-bag-detail-4-phone.png" target="_blank"><img src="ui-review/53-bag-detail-4-phone.png" alt="Detalhe 4★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 4★</span>
+                        <span class="d">Estrelas: 4★ em roxo.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/54-bag-detail-8-can-fuse-phone.png" target="_blank"><img src="ui-review/54-bag-detail-8-can-fuse-phone.png" alt="Detalhe 8★ com 3 cópias" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Detalhe 8★ com 3 cópias</span>
+                        <span class="d">Chip dourado, Para fundir: 3/3 e botão Ir para a fusão.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Fusão</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/61-fusion-rows-desktop.png" target="_blank"><img src="ui-review/61-fusion-rows-desktop.png" alt="Linhas de fusão acima de 3★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Linhas de fusão acima de 3★</span>
+                        <span class="d">3★→4★, 5★→6★ (4/3), 8★→9★, 6★→7★ e 0★→1★.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/62-fusion-hover-desktop.png" target="_blank"><img src="ui-review/62-fusion-hover-desktop.png" alt="Botão Fundir com hover" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Botão Fundir com hover</span>
+                        <span class="d">Estado de hover do botão terracota, igual ao resto do jogo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/63-fusion-result-9-desktop.png" target="_blank"><img src="ui-review/63-fusion-result-9-desktop.png" alt="Resultado 8★→9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Resultado 8★→9★</span>
+                        <span class="d">Nova carta: Kael Raizférrea 9★ · Brado Aterrador no nível 3; a linha de 8★ sumiu e a barra de habilidades atrás já mostra Nv. 3.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/64-fusion-result-7-desktop.png" target="_blank"><img src="ui-review/64-fusion-result-7-desktop.png" alt="Resultado 6★→7★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Resultado 6★→7★</span>
+                        <span class="d">Resultado da Lyra com a habilidade levantada pela estrela.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/65-fusion-result-4-desktop.png" target="_blank"><img src="ui-review/65-fusion-result-4-desktop.png" alt="Resultado 3★→4★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Resultado 3★→4★</span>
+                        <span class="d">Texto cabe numa linha também no celular.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/61-fusion-rows-phone.png" target="_blank"><img src="ui-review/61-fusion-rows-phone.png" alt="Linhas de fusão acima de 3★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Linhas de fusão acima de 3★</span>
+                        <span class="d">3★→4★, 5★→6★ (4/3), 8★→9★, 6★→7★ e 0★→1★.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/62-fusion-hover-phone.png" target="_blank"><img src="ui-review/62-fusion-hover-phone.png" alt="Botão Fundir com hover" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Botão Fundir com hover</span>
+                        <span class="d">Estado de hover do botão terracota, igual ao resto do jogo.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/63-fusion-result-9-phone.png" target="_blank"><img src="ui-review/63-fusion-result-9-phone.png" alt="Resultado 8★→9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Resultado 8★→9★</span>
+                        <span class="d">Nova carta: Kael Raizférrea 9★ · Brado Aterrador no nível 3; a linha de 8★ sumiu e a barra de habilidades atrás já mostra Nv. 3.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/64-fusion-result-7-phone.png" target="_blank"><img src="ui-review/64-fusion-result-7-phone.png" alt="Resultado 6★→7★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Resultado 6★→7★</span>
+                        <span class="d">Resultado da Lyra com a habilidade levantada pela estrela.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/65-fusion-result-4-phone.png" target="_blank"><img src="ui-review/65-fusion-result-4-phone.png" alt="Resultado 3★→4★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Resultado 3★→4★</span>
+                        <span class="d">Texto cabe numa linha também no celular.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#1 · Baixa</span><strong>Chip dourado sai 6px da coluna de texto na carta do catálogo</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Catálogo de heróis, cartas de 7★ a 9★ (desktop e celular)</dd>
+                    <dt>O que está errado</dt><dd>O fundo do chip começa em x≈571 enquanto o nome e o elemento começam em x≈576: o texto das outras linhas tem <code>padding: 0 6px</code> (<code>.hero-card .hero-stars</code>) e o chip troca isso por <code>padding: 0 8px</code> sem recuo, então o 7★ não alinha com o texto da carta.</dd>
+                    <dt>Como deveria ficar</dt><dd>O fundo do chip alinhado com a coluna de texto, por exemplo <code>.hero-card .hero-stars.is-exalted { margin-left: 6px; }</code>. No detalhe e na mochila o chip já está alinhado e não muda.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css</code> (perto da linha 2371)</dd>
+                </dl>
+            </div>
+            <a href="ui-review/12-catalog-3-desktop.png" target="_blank"><img src="ui-review/12-catalog-3-desktop.png" alt="Captura do achado #1"></a>
+        </article>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>Na lista da Mochila e nas linhas da Fusão (3★ → 4★) as estrelas de 4★ a 9★ continuam em tinta escura; usar roxo/dourado ali também ajudaria a ler a faixa de relance. Não estava na spec, por isso não bloqueia.</span></li>
+            <li><span class="mark">✦</span><span>O resultado da fusão repete o nível atual da habilidade do herói: depois de um 9★, fundir 3★→4★ mostra Corte Dimensional no nível 3. Está de acordo com D11 (nível da resposta), mas pode soar estranho; considerar mostrar só o nível da carta.</span></li>
+            <li><span class="mark">✦</span><span>No celular (canvas reduzido a 390 px) o selo Nv. N e a tecla Q ficam com cerca de 5 px de texto; o mesmo vale para a tecla já existente, então não é regressão. Um zoom em telas estreitas ajudaria todo o HUD.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Nenhum 404, erro de página ou requisição falha nos fluxos de mochila e fusão (<code>clean</code>). Nas telas do jogo aparece só o aviso do Chrome <code>GL Driver Message: GPU stall due to ReadPixels</code> (WebGL do Phaser em modo headless), que não vem desta feature.</span></li>
+        </ul>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-10-31</footer>
+</main>
+</body>
+</html>

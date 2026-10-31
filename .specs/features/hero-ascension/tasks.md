@@ -1000,7 +1000,7 @@ Update the comment above `HEROES` to say cards have 0 to 9 stars.
 
 ---
 
-### T17: Visual review of the ascension UI [ ]
+### T17: Visual review of the ascension UI [x]
 
 **Owner**: ui-artist
 **What**: Review every player-visible change against the design's Visual spec and write the findings (ASC-08).
@@ -1022,7 +1022,7 @@ Update the comment above `HEROES` to say cards have 0 to 9 stars.
 **Gate**: `test -s .specs/features/hero-ascension/ui-review.md`
 **Done when**:
 
-- [ ] `ui-review.md` exists with a verdict and covers the six states of step 1 and the reference values of step 2.
+- [x] `ui-review.html` (the ui-artist report, replacing `ui-review.md`) exists with a verdict and covers the six states of step 1 and the reference values of step 2.
 
 **Commit**: `docs(hero-ascension): add the ui review`
 
