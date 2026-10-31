@@ -162,8 +162,14 @@ describe('describeTalentEffect', () => {
 
 describe('talentIconName and the branch titles', () => {
     it('names the 8 icons as the asset prompts do', () => {
-        expect([ 'MINIBOSS_TIME', 'BOSS_TIME', 'PHYSICAL_BREAK', 'MAGICAL_BREAK', 'CRIT_RESIST_BREAK', 'CLICK_DAMAGE', 'CRIT_CHANCE', 'CRIT_DAMAGE' ].map(talentIconName)).toEqual([
+        expect([ 'MINIBOSS_TIME', 'BOSS_TIME', 'PHYSICAL_BREAK', 'MAGICAL_BREAK', 'CRIT_RESIST_BREAK', 'CLICK_DAMAGE', 'CRIT_CHANCE', 'CRIT_DAMAGE' ].map((id) => talentIconName(id))).toEqual([
             'talent-miniboss-time', 'talent-boss-time', 'talent-break-physical', 'talent-break-magical', 'talent-break-crit', 'talent-click-damage', 'talent-crit-chance', 'talent-crit-damage'
+        ]);
+    });
+
+    it('names the icons of the combo and flat click damage talents and suffixes grades 2 and 3', () => {
+        expect([ talentIconName('COMBO'), talentIconName('CLICK_FLAT_DAMAGE', 1), talentIconName('COMBO', 2), talentIconName('CLICK_FLAT_DAMAGE', 3) ]).toEqual([
+            'talent-combo', 'talent-click-flat-damage', 'talent-combo-g2', 'talent-click-flat-damage-g3'
         ]);
     });
 

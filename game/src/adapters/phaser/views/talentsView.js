@@ -41,7 +41,11 @@ const renderCard = (talent, available, { busy, onUpgrade }) =>
         text.append(button);
     }
 
-    card.append(iconWithFallback(talentIconName(talent.baseId ?? talent.id), GLYPHS[talent.branch], 'talent-icon'), text);
+    const baseId = talent.baseId ?? talent.id;
+    const grade = talent.grade ?? 1;
+
+    //  A grade without its own file shows the icon of grade 1
+    card.append(iconWithFallback(talentIconName(baseId, grade), GLYPHS[talent.branch], 'talent-icon', grade > 1 ? talentIconName(baseId) : null), text);
 
     return card;
 };

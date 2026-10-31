@@ -82,7 +82,7 @@ export const describeTalentEffect = ({ branch, unit, value }) =>
     return `${branch === 'BREAK' ? '-' : '+'}${value} pontos`;
 };
 
-//  The file of the icon of a talent in assets/ui (the names of PROMPTS_ASSETS_UI.md)
+//  The file of the icon of a talent in assets (the names of PROMPTS_ASSETS_UI.md)
 const ICON_NAMES = {
     MINIBOSS_TIME: 'miniboss-time',
     BOSS_TIME: 'boss-time',
@@ -96,4 +96,6 @@ const ICON_NAMES = {
     CLICK_FLAT_DAMAGE: 'click-flat-damage'
 };
 
-export const talentIconName = (talentId) => `talent-${ICON_NAMES[talentId] ?? talentId.toLowerCase()}`;
+//  Grade 1 keeps the plain file; grades 2 and 3 have their own file with the suffix `-g2` / `-g3`
+export const talentIconName = (talentId, grade = 1) =>
+    `talent-${ICON_NAMES[talentId] ?? talentId.toLowerCase()}${grade > 1 ? `-g${grade}` : ''}`;

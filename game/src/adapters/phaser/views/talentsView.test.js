@@ -167,7 +167,7 @@ describe('renderTalents', () => {
         const screen = show();
         const icon = screen.querySelector('[data-testid="talent-CLICK_DAMAGE"] .icon');
 
-        expect(icon.querySelector('img').getAttribute('src')).toBe('assets/ui/talent-click-damage.png');
+        expect(icon.querySelector('img').getAttribute('src')).toBe('assets/talent-click-damage.png');
 
         icon.querySelector('img').dispatchEvent(new Event('error'));
 

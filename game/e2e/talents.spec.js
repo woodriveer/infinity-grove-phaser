@@ -109,6 +109,8 @@ test.describe('Talentos screen', () => {
     });
 
     test('draws a mark in place of the icons while the art does not exist', async ({ page }) => {
+        //  Some talent icons are painted already: every one is served as missing here
+        await page.route('**/assets/talent-*.png', (route) => route.fulfill({ status: 404 }));
         await startGame(page);
 
         await page.getByTestId('hud-talents').click();

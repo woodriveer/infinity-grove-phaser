@@ -2,7 +2,7 @@
 
 Prompts para gerar, no Gemini, os assets da **interface**: o mapa do menu "Rever chefes", os ícones das 4 peças de equipamento e os ícones da árvore de talentos. Os personagens e as habilidades continuam em `PROMPTS_ASSETS.md`.
 
-Total: **1 mapa + 4 ícones de equipamento + 8 ícones de talento = 13 imagens.**
+Total: **1 mapa + 4 ícones de equipamento + 10 ícones de talento + 20 ícones dos graus 2 e 3 = 35 imagens.**
 
 ## Como usar
 
@@ -11,7 +11,7 @@ Total: **1 mapa + 4 ícones de equipamento + 8 ícones de talento = 13 imagens.*
 3. O mapa **não** usa fundo magenta: é uma imagem inteira, exportada em **JPG** (qualidade 85 ou mais).
 4. Se a imagem vier com texto, moldura ou número, repita pedindo: *"No text, no numbers, no letters, no frame, no UI."*
 5. Os prompts estão em inglês porque costumam render melhor; as explicações estão em português.
-6. Salve os arquivos em `game/public/assets/ui/` com **exatamente** os nomes indicados abaixo. Enquanto um arquivo não existir, o jogo mostra um desenho de reserva (ícone simples ou o caminho desenhado em CSS), então nada quebra.
+6. Salve os arquivos em `game/public/assets/` com **exatamente** os nomes indicados abaixo. Enquanto um arquivo não existir, o jogo mostra um desenho de reserva (ícone simples ou o caminho desenhado em CSS), então nada quebra.
 7. Depois de gerar o mapa, me mande a imagem: eu ajusto no código as posições dos 11 pontos (fases e chefe) para casarem com o caminho que o Gemini desenhou.
 
 ---
@@ -155,7 +155,7 @@ small hanging leaf charms.
 
 ## 3. Ícones da árvore de talentos
 
-Três ramos, cada um com um tema de cor para o jogo reconhecer de relance: **Tempo** (azul-turquesa), **Quebra de defesa** (vermelho-brasa) e **Poder do clique** (dourado).
+Quatro ramos, cada um com um tema de cor para o jogo reconhecer de relance: **Tempo** (azul-turquesa), **Quebra de defesa** (vermelho-brasa), **Poder do clique** (dourado) e **Combo** (esmeralda e dourado).
 
 ### Ramo Tempo
 
@@ -224,11 +224,87 @@ hot core, tiny flying sparks and leaf fragments, an explosive burst shape that
 reads as a critical hit.
 ```
 
+### Ramo Poder do clique (continuação)
+
+#### 3.9 Dano direto do clique — `talent-click-flat-damage.png`
+```
+[ESTILO DOS ÍCONES]
+OBJECT: a single golden gauntlet fingertip tapping down onto a glowing green-gold
+rune stone, a round impact crater with a bright golden shockwave ring on the
+stone, a heavy blunt hit feeling, small golden sparks. No text, no numbers.
+```
+
+### Ramo Combo
+
+O Combo tem cor própria: **verde-esmeralda com dourado** (a seiva da Grande Árvore).
+
+#### 3.10 Limite de dano do combo — `talent-combo.png`
+```
+[ESTILO DOS ÍCONES]
+OBJECT: a glowing emerald-green chain of three linked rings rising diagonally,
+each ring brighter than the one before, topped by a golden upward arrow-shaped
+leaf, golden sap sparks along the chain, wooden root band holding the rings.
+```
+
+---
+
+## 4. Ícones dos graus 2 e 3
+
+Cada talento tem 3 graus e cada grau tem seu ícone. O **grau 1** é o arquivo normal das seções 3.1 a 3.10. Os graus 2 e 3 usam o **mesmo objeto**, ficando mais nobres a cada grau, e a **cor do ramo continua a mesma** (turquesa, vermelho-brasa, dourado, esmeralda), para o jogador reconhecer o talento de relance.
+
+**Como gerar (melhor resultado):** anexe no Gemini o ícone do grau 1 já pronto e peça: *"Redraw this exact icon as GRADE 2 (or 3) using the block below, same object, same pose, same colors."* Sem imagem de referência, cole **ESTILO DOS ÍCONES + o OBJECT da seção 3 do talento + o bloco do grau**, nessa ordem.
+
+### Bloco GRAU 2 (colar depois do OBJECT)
+```
+GRADE 2 (improved): same object and same pose as the base version, but the
+materials are upgraded: polished silver-steel and bright metal replace plain
+iron and wood, an extra ornamental detail (a small engraved leaf rune band), a
+brighter and larger glow in the branch color, and a few more sparks. A small
+silver-bordered gem is added on the object. Still clearly the same icon.
+```
+
+### Bloco GRAU 3 (colar depois do OBJECT)
+```
+GRADE 3 (legendary): same object and same pose as the base version, but fully
+legendary: gleaming gold and ornate filigree, a radiant halo of light behind the
+object, a small golden laurel of leaves around its base, a larger faceted gem
+glowing in the branch color, intense glow and many floating sparks and tiny
+leaf particles. Looks like the rarest, most powerful version. Still clearly the
+same icon, still centered and inside the safe margin.
+```
+
+### Arquivos por talento e grau
+
+| Talento | Grau 2 | Grau 3 | Detalhe extra do grau (pode juntar ao bloco) |
+|---|---|---|---|
+| Tempo do miniboss (3.1) | `talent-miniboss-time-g2.png` | `talent-miniboss-time-g3.png` | G2: areia com brilho mais forte; G3: chifres dourados na tampa |
+| Tempo do chefe (3.2) | `talent-boss-time-g2.png` | `talent-boss-time-g3.png` | G2: coroa de prata; G3: coroa dourada com gemas e areia que flutua |
+| Quebra física (3.3) | `talent-break-physical-g2.png` | `talent-break-physical-g3.png` | G2: rachadura maior, escudo de aço; G3: escudo dourado partido em 2 metades com luz saindo |
+| Quebra mágica (3.4) | `talent-break-magical-g2.png` | `talent-break-magical-g3.png` | G2: runa extra e mais cacos; G3: barreira dupla se estilhaçando com núcleo brilhante |
+| Quebra de crítico (3.5) | `talent-break-crit-g2.png` | `talent-break-crit-g3.png` | G2: elo de aço com faísca maior; G3: elo dourado explodindo em estrela |
+| Dano de clique (3.6) | `talent-click-damage-g2.png` | `talent-click-damage-g3.png` | G2: luva de aço e 2 anéis de onda; G3: luva dourada e 3 anéis de onda com raios |
+| Chance de crítico (3.7) | `talent-crit-chance-g2.png` | `talent-crit-chance-g3.png` | G2: mira com 2 estrelas; G3: mira dourada com asas de folhas |
+| Dano crítico (3.8) | `talent-crit-damage-g2.png` | `talent-crit-damage-g3.png` | G2: explosão com mais espinhos; G3: explosão dourada gigante com núcleo branco |
+| Dano direto do clique (3.9) | `talent-click-flat-damage-g2.png` | `talent-click-flat-damage-g3.png` | G2: runa com 2 rachaduras de luz; G3: runa dourada partida, coluna de luz subindo |
+| Limite do combo (3.10) | `talent-combo-g2.png` | `talent-combo-g3.png` | G2: 4 elos; G3: 5 elos com flecha de ouro e halo |
+
+Exemplo completo (Dano de clique, grau 3):
+```
+[ESTILO DOS ÍCONES]
+OBJECT: a golden gauntlet fist with a pointing index finger pressing down, a
+golden shockwave ring and sparks around the fingertip, fist plated in gold with
+green leaf engravings.
+[Bloco GRAU 3]
+EXTRA: a gold gauntlet with three golden shockwave rings and light rays.
+```
+
+Enquanto o arquivo de um grau não existir, o jogo mostra o ícone do grau 1 (e, se este também faltar, o desenho de reserva).
+
 ---
 
 ## Checklist de arquivos
 
-Todos em `game/public/assets/ui/`:
+Todos em `game/public/assets/`:
 
 | Arquivo | Formato | Fundo |
 |---|---|---|
@@ -237,6 +313,8 @@ Todos em `game/public/assets/ui/`:
 | `talent-miniboss-time.png`, `talent-boss-time.png` | PNG 1:1 | transparente |
 | `talent-break-physical.png`, `talent-break-magical.png`, `talent-break-crit.png` | PNG 1:1 | transparente |
 | `talent-click-damage.png`, `talent-crit-chance.png`, `talent-crit-damage.png` | PNG 1:1 | transparente |
+| `talent-click-flat-damage.png`, `talent-combo.png` | PNG 1:1 | transparente |
+| `talent-<nome>-g2.png` e `talent-<nome>-g3.png` dos 10 talentos (seção 4) | PNG 1:1 | transparente |
 
 ## Coisas que NÃO precisam de asset (feitas em CSS no jogo)
 

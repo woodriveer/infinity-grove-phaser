@@ -33,7 +33,7 @@ describe('renderPieceTile', () => {
     it('shows the icon of the slot of the piece', () => {
         const srcs = [ 'WEAPON', 'ARMOR', 'RING', 'AMULET' ].map((slot) => tile('COMMON', { slot }).querySelector('img').getAttribute('src'));
 
-        expect(srcs).toEqual([ 'assets/ui/slot-weapon.png', 'assets/ui/slot-armor.png', 'assets/ui/slot-ring.png', 'assets/ui/slot-amulet.png' ]);
+        expect(srcs).toEqual([ 'assets/slot-weapon.png', 'assets/slot-armor.png', 'assets/slot-ring.png', 'assets/slot-amulet.png' ]);
     });
 
     it('shows +<refine> above 0 and nothing at +0', () => {
@@ -75,6 +75,6 @@ describe('renderEmptyTile', () => {
         expect(node.disabled).toBe(true);
         expect(node.querySelector('.piece-empty').textContent).toBe('vazio');
         expect(node.getAttribute('data-testid')).toBe('equip-slot-kael-RING');
-        expect(node.querySelector('img').getAttribute('src')).toBe('assets/ui/slot-ring.png');
+        expect(node.querySelector('img').getAttribute('src')).toBe('assets/slot-ring.png');
     });
 });
