@@ -2,8 +2,9 @@ import { applyEquipmentDrop, SLOTS } from '../../domain/equipment/equipment';
 
 //  The pieces of the player as the backend sees them (worn and in the bag), kept in step with every action.
 //  Port (ADR 0007):
-//    gateway  { list(), equip(pieceId, heroId), unequip(pieceId), refine(pieceId), reroll(pieceId, affix), sell(pieceId) }  the backend /equipment calls.
-//             list, equip and unequip resolve with { capacity, pieces }; refine, reroll and sell with { equipment, wallet }.
+//    gateway  { list(), equip(pieceId, heroId), unequip(pieceId), refine(pieceId), reroll(pieceId, affix), sell(pieceId), sellMany(pieceIds) }  the backend /equipment calls.
+//             list, equip and unequip resolve with { capacity, pieces }; refine, reroll and sell with { equipment, wallet };
+//             sellMany resolves with { equipment, wallet, sold, earned }.
 //             Each rejects with an ApiError.
 export const createEquipmentCollection = ({ gateway }) =>
 {
@@ -133,6 +134,26 @@ export const createEquipmentCollection = ({ gateway }) =>
         sell: async (pieceId) =>
         {
             adoptChange(await gateway.sell(pieceId));
+        },
+
+        //  Sells every piece of `pieceIds` in one request (all or nothing on the backend) and resolves with { sold, earned } (earned in copper).
+        //  A failure reads the list again (the truth) and rejects with the failure, even when that read fails too.
+        sellMany: async (pieceIds) =>
+        {
+            try
+            {
+                const { equipment, wallet, sold, earned } = await gateway.sellMany(pieceIds);
+
+                adoptChange({ equipment, wallet });
+
+                return { sold, earned };
+            }
+            catch (error)
+            {
+                await load().catch(() => {});
+
+                throw error;
+            }
         },
 
         //  A piece the backend dropped joins the list at once, without another request; one sold because the bag was full does not

@@ -19,7 +19,8 @@ describe('equipmentCollection', () => {
             unequip: vi.fn(),
             refine: vi.fn(),
             reroll: vi.fn(),
-            sell: vi.fn()
+            sell: vi.fn(),
+            sellMany: vi.fn()
         };
         collection = createEquipmentCollection({ gateway });
         changes = vi.fn();
@@ -151,6 +152,44 @@ describe('equipmentCollection', () => {
             expect(wallets).not.toHaveBeenCalled();
             expect(collection.pieces().map(({ id }) => id)).toEqual([ 'a', 'b' ]);
             expect(changes).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('sellMany', () => {
+        beforeEach(async () => {
+            await collection.load();
+            changes.mockClear();
+        });
+
+        it('sends the ids, takes the pieces, reports the wallet and resolves with sold and earned', async () => {
+            gateway.sellMany.mockResolvedValue({ equipment: equipment(piece('b')), wallet, sold: 1, earned: 100 });
+
+            await expect(collection.sellMany([ 'a' ])).resolves.toEqual({ sold: 1, earned: 100 });
+
+            expect(gateway.sellMany).toHaveBeenCalledWith([ 'a' ]);
+            expect(collection.pieces().map(({ id }) => id)).toEqual([ 'b' ]);
+            expect(wallets).toHaveBeenCalledWith(wallet);
+            expect(changes).toHaveBeenCalledTimes(1);
+        });
+
+        it('a refused sale reads the list again, reports no wallet and rejects', async () => {
+            gateway.sellMany.mockRejectedValue(new ApiError('Piece not found', { status: 404, code: 'EQUIPMENT_NOT_FOUND' }));
+            gateway.list.mockResolvedValue(equipment(piece('b')));
+
+            await expect(collection.sellMany([ 'a', 'b' ])).rejects.toMatchObject({ code: 'EQUIPMENT_NOT_FOUND' });
+
+            expect(gateway.list).toHaveBeenCalledTimes(2);
+            expect(collection.pieces().map(({ id }) => id)).toEqual([ 'b' ]);
+            expect(wallets).not.toHaveBeenCalled();
+        });
+
+        it('still rejects with the sale failure when the list cannot be read again', async () => {
+            gateway.sellMany.mockRejectedValue(new ApiError('Piece not found', { status: 404, code: 'EQUIPMENT_NOT_FOUND' }));
+            gateway.list.mockRejectedValue(new ApiError('down', { status: 500 }));
+
+            await expect(collection.sellMany([ 'a' ])).rejects.toMatchObject({ code: 'EQUIPMENT_NOT_FOUND' });
+
+            expect(collection.pieces().map(({ id }) => id)).toEqual([ 'a', 'b' ]);
         });
     });
 

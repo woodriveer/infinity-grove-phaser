@@ -175,8 +175,8 @@ IDs follow the order of the criteria: BSL-01 to BSL-09 for "Sell a batch of piec
 | BSL-21 | P1: Confirm and sell | T8, T9, T10, T12 | Pending |
 | BSL-22 | P1: Confirm and sell | T10, T12 | Pending |
 | BSL-23 | P1: Confirm and sell | T5, T7, T10, T12 | Implementing |
-| BSL-24 | P1: Confirm and sell | T6, T7, T9, T10, T12 | Pending |
-| BSL-25 | P1: Confirm and sell | T6, T7, T10, T12 | Pending |
+| BSL-24 | P1: Confirm and sell | T6, T7, T9, T10, T12 | Implementing |
+| BSL-25 | P1: Confirm and sell | T6, T7, T10, T12 | Implementing |
 | BSL-26 | P2: Select by rarity | T8, T11, T12 | Pending |
 | BSL-27 | P2: Select by rarity | T7, T10, T12 | Pending |
 | BSL-28 | P2: Select by rarity | T7, T10, T12 | Pending |

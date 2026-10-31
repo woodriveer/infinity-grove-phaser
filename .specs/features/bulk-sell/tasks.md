@@ -405,7 +405,7 @@ Header comment: add the line `//  sellMany([pieceId]) -> { equipment, wallet, so
 
 ---
 
-### T6: equipmentCollection.sellMany [ ]
+### T6: equipmentCollection.sellMany [x]
 
 **Owner**: game-dev
 **Goal**: The collection sells a batch, adopts the answer, reports the wallet, and on a failure reads the list again before rejecting (BSL-24, BSL-25).
