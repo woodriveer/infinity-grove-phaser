@@ -394,7 +394,7 @@ The separator is ` · ` (space, U+00B7 middle dot, space), the same as `Combo x1
 
 ---
 
-### T6: Effect strength as a factor in the damage formulas [ ]
+### T6: Effect strength as a factor in the damage formulas [x]
 
 **Owner**: game-dev
 **What**: Let each running effect carry a factor that scales its strength, with factor 1 giving today's numbers (ASC-04, spec AC 6, 7).
@@ -449,7 +449,7 @@ const factorOf = (factors, id) => factors?.[id] ?? 1;
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] Every existing `skillDamage.test.js` case passes unchanged and the eight new ones pass; the whole Vitest suite passes.
+- [x] Every existing `skillDamage.test.js` case passes unchanged and the eight new ones pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): scale the skill effects by a level factor`
 
