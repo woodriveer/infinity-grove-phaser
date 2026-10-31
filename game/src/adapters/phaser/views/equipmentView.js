@@ -102,12 +102,16 @@ export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, onStartS
         screen.append(renderLeaderStats(stats));
     }
 
-    //  A tile with the tooltip of its piece; a click calls `onClick` (by default it opens the piece with its actions)
+    //  A tile with the tooltip of its piece; a click calls `onClick` (by default it opens the piece with its actions). In selection mode
+    //  no tile has a tooltip: it would cover the selection bar
     const tileOf = (piece, testid, onClick = onSelect) =>
     {
         const tile = renderPieceTile(piece, { testid, onClick });
 
-        attachPieceTooltip(tile, piece, heroes);
+        if (!selection)
+        {
+            attachPieceTooltip(tile, piece, heroes);
+        }
 
         return tile;
     };

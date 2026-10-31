@@ -1052,7 +1052,7 @@ The border is 2 px in every state, so a press does not move the labels.
 
 ---
 
-### T15: Hide the piece tooltip in selection mode
+### T15: Hide the piece tooltip in selection mode [x]
 
 **Owner**: game-dev
 **Goal**: While selection mode is on no piece tooltip opens, so it never covers the bar (review finding #3). A click on a bag tile still toggles its piece, and outside selection mode the tooltip works as before.
@@ -1094,8 +1094,8 @@ const tileOf = (piece, testid, onClick = onSelect) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The new test passes, and the existing tooltip tests pass unchanged.
-- [ ] `npm test`, `npm run build` and the three e2e files pass.
+- [x] The new test passes, and the existing tooltip tests pass unchanged.
+- [x] `npm test`, `npm run build` and the three e2e files pass.
 
 **Commit**: `fix(game): hide the piece tooltip in selection mode`
 

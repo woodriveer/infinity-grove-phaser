@@ -323,6 +323,16 @@ describe('renderEquipment selection mode', () => {
         expect(find(screen, 'equip-transfer-kael')).toBeNull();
     });
 
+    it('hides the tooltip on hover in selection mode, for a bag tile and for a worn tile', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }), ring() ], [ hero('kael'), hero('lyra') ], { onSelect: vi.fn(), selection: selecting() });
+
+        find(screen, 'equip-piece-r1').dispatchEvent(new Event('pointerenter'));
+        expect(find(screen, 'piece-tooltip')).toBeNull();
+
+        find(screen, 'equip-slot-kael-WEAPON').dispatchEvent(new Event('pointerenter'));
+        expect(find(screen, 'piece-tooltip')).toBeNull();
+    });
+
     it('passes the state of each rarity to the bar', () => {
         const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), selection: selecting([ 'r1' ]) });
 
