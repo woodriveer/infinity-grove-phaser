@@ -601,6 +601,25 @@ export async function mockBackend (page, {
             return route.fulfill({ json: equipmentBody(username) });
         }
 
+        //  POST /equipment/sell { pieceIds }: every listed piece or none (EquipmentController.sellAll)
+        if (method === 'POST' && path === '/equipment/sell') {
+            const ids = body.pieceIds;
+
+            if (!Array.isArray(ids) || ids.some((id) => typeof id !== 'string')) { return route.fulfill(problem(400, 'pieceIds must be a list of piece ids')); }
+            if (ids.length === 0 || ids.length > 100 || new Set(ids).size !== ids.length) { return route.fulfill(problem(400, 'Invalid sell batch', 'INVALID_SELL_BATCH')); }
+
+            const chosen = ids.map((id) => pieces.find((candidate) => candidate.id === id));
+
+            if (chosen.some((candidate) => !candidate)) { return route.fulfill(problem(404, 'Piece not found', 'EQUIPMENT_NOT_FOUND')); }
+
+            const wallet = walletOf(username);
+            const earned = chosen.reduce((sum, candidate) => sum + pieceView(candidate).sellPrice, 0);
+
+            wallet.copper += earned;
+            chosen.forEach((candidate) => pieces.splice(pieces.indexOf(candidate), 1));
+            return route.fulfill({ json: { equipment: equipmentBody(username), wallet: coins(wallet.copper), sold: chosen.length, earned } });
+        }
+
         const action = path.match(/^\/equipment\/([^/]+)\/(equip|unequip|refine|reroll|sell)$/);
         const piece = action && pieces.find((candidate) => candidate.id === decodeURIComponent(action[1]));
 

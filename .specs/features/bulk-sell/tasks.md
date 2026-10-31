@@ -831,7 +831,7 @@ Write each rule over several lines in the file's existing style (one declaration
 
 ---
 
-### T12: e2e of the bulk sale [ ]
+### T12: e2e of the bulk sale [x]
 
 **Owner**: test-engineer
 **Goal**: Prove every player-visible criterion in the browser against the fake backend, which learns `POST /equipment/sell` (BSL-10 to BSL-30).
@@ -903,8 +903,8 @@ const sellCalls = (calls) => calls.filter(({ method, path }) => method === 'POST
 **Gate**: full - `cd game && npx playwright test e2e/bulkSell.spec.js e2e/equipment.spec.js e2e/equipmentUi.spec.js`
 **Done when**:
 
-- [ ] The 12 cases of `bulkSell.spec.js` pass, and `equipment.spec.js` and `equipmentUi.spec.js` pass unchanged.
-- [ ] `cd game && npm test` passes.
+- [x] The 12 cases of `bulkSell.spec.js` pass, and `equipment.spec.js` and `equipmentUi.spec.js` pass unchanged.
+- [x] `cd game && npm test` passes.
 
 **Commit**: `test(game): cover the bulk sale end to end`
 
