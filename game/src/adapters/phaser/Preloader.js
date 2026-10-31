@@ -1,6 +1,9 @@
 import { Scene } from 'phaser';
 import { HERO_IDS } from '../../domain/heroes/heroes';
 
+//  One coin sheet per metal, all laid out by coin.json
+export const COIN_METALS = [ 'gold', 'silver', 'copper' ];
+
 export class Preloader extends Scene
 {
     constructor ()
@@ -35,7 +38,7 @@ export class Preloader extends Scene
 
         this.load.image('background', 'background.png');
         this.load.image('logo', 'cc-logo.png');
-        this.load.atlas('coin', 'coin-copper.png', 'coin.json');
+        COIN_METALS.forEach((metal) => this.load.atlas(`coin_${metal}`, `coin-${metal}.png`, 'coin.json'));
         HERO_IDS.forEach((id) => this.load.image(`hero_${id}`, `heroes/${id}_sprite.png`));
     }
 
@@ -44,17 +47,20 @@ export class Preloader extends Scene
         //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
         //  For example, we will define our 'coin' animation here, so we can use it in other scenes:
 
-        this.anims.create({
-            key: 'rotate',
-            frames: this.anims.generateFrameNames('coin', { prefix: 'coin_', start: 1, end: 7, zeroPad: 2 }),
-            frameRate: 16,
-            repeat: -1
-        });
+        COIN_METALS.forEach((metal) =>
+        {
+            this.anims.create({
+                key: `rotate_${metal}`,
+                frames: this.anims.generateFrameNames(`coin_${metal}`, { prefix: 'coin_', start: 1, end: 7, zeroPad: 2 }),
+                frameRate: 16,
+                repeat: -1
+            });
 
-        this.anims.create({
-            key: 'vanish',
-            frames: this.anims.generateFrameNames('coin', { prefix: 'vanish_', start: 1, end: 4 }),
-            frameRate: 10
+            this.anims.create({
+                key: `vanish_${metal}`,
+                frames: this.anims.generateFrameNames(`coin_${metal}`, { prefix: 'vanish_', start: 1, end: 4 }),
+                frameRate: 10
+            });
         });
 
         //  When all the assets are loaded go to the next scene.

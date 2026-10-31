@@ -681,6 +681,14 @@ describe('ClickerGame coin drops', () => {
         expect(ctx.sprites).toHaveLength(0);
     });
 
+    it('flies a silver coin when each coin carries 100 copper or more', async () => {
+        const ctx = await loadedScene(walletResponse(undefined, { 1: [500, 1] }));
+
+        kill(ctx);
+
+        expect(ctx.sprites.map((coin) => coin.key)).toEqual(Array(5).fill('coin_silver'));
+    });
+
     it('spawns one rotating coin per copper of the drop at the monster center when the monster dies', async () => {
         const ctx = await loadedScene(walletResponse(undefined, { 1: [3, 1] }));
 
@@ -688,7 +696,7 @@ describe('ClickerGame coin drops', () => {
 
         expect(ctx.sprites).toHaveLength(3);
         ctx.sprites.forEach((coin) => {
-            expect([ coin.x, coin.y, coin.key, coin.anim ]).toEqual([ 670, 440, 'coin', 'rotate' ]);
+            expect([ coin.x, coin.y, coin.key, coin.anim ]).toEqual([ 670, 440, 'coin_copper', 'rotate_copper' ]);
         });
     });
 

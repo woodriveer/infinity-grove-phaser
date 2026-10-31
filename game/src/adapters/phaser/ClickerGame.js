@@ -29,6 +29,8 @@ const LOGO = { x: 82, y: 44, width: 136 };
 //  The wallet pill sits in the top-right corner; coins fly to its centre
 const WALLET = { x: 890, y: 44 };
 const COINS = [ [ 'gold', 'Gold' ], [ 'silver', 'Silver' ], [ 'copper', 'Copper' ] ];
+//  The sheet of a flying coin by the copper it carries: silver from 100 copper, gold from 100 silver
+const coinMetal = (copper) => (copper >= 10000 ? 'gold' : copper >= 100 ? 'silver' : 'copper');
 const COIN = { duration: 600, stagger: 100, maxFlying: 5 };
 const WALLET_SYNC_MS = 10000;
 //  Phaser measures a DOM element once, when it is added, and centres it on that size: every element whose content changes sits in a
@@ -1182,7 +1184,8 @@ export class ClickerGame extends Scene
 
         for (let i = 0; i < count; i++)
         {
-            const coin = this.add.sprite(MONSTER.x, MONSTER.y, 'coin').play('rotate');
+            const metal = coinMetal(share + (i < extra ? 1 : 0));
+            const coin = this.add.sprite(MONSTER.x, MONSTER.y, `coin_${metal}`).play(`rotate_${metal}`);
 
             this.coinsFlying += 1;
             this.tweens.add({
