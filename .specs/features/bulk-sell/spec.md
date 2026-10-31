@@ -169,11 +169,11 @@ IDs follow the order of the criteria: BSL-01 to BSL-09 for "Sell a batch of piec
 | BSL-15 | P1: Select pieces in the bag | T7, T8, T9, T12 | Implementing |
 | BSL-16 | P1: Select pieces in the bag | T8, T10, T12 | Implementing |
 | BSL-17 | P1: Select pieces in the bag | T9, T10, T11, T12 | Implementing |
-| BSL-18 | P1: Select pieces in the bag | T10, T12 | Pending |
-| BSL-19 | P1: Select pieces in the bag | T10, T12 | Pending |
+| BSL-18 | P1: Select pieces in the bag | T10, T12 | Implementing |
+| BSL-19 | P1: Select pieces in the bag | T10, T12 | Implementing |
 | BSL-20 | P1: Confirm and sell | T7, T8, T10, T12 | Implementing |
 | BSL-21 | P1: Confirm and sell | T8, T9, T10, T12 | Implementing |
-| BSL-22 | P1: Confirm and sell | T10, T12 | Pending |
+| BSL-22 | P1: Confirm and sell | T10, T12 | Implementing |
 | BSL-23 | P1: Confirm and sell | T5, T7, T10, T12 | Implementing |
 | BSL-24 | P1: Confirm and sell | T6, T7, T9, T10, T12 | Implementing |
 | BSL-25 | P1: Confirm and sell | T6, T7, T10, T12 | Implementing |

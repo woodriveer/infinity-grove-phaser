@@ -672,7 +672,7 @@ Rules, in the order of the function:
 
 ---
 
-### T10: Selection state in HeroUi [ ]
+### T10: Selection state in HeroUi [x]
 
 **Owner**: game-dev
 **Goal**: `HeroUi` runs the selection state machine (Off, Selecting, Confirming, Sending), sells through `equipment.sellMany` and shows the notice or the error (BSL-12 to BSL-25, BSL-27, BSL-28).

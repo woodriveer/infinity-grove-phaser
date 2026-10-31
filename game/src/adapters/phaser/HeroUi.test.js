@@ -45,7 +45,8 @@ const createUi = ({ list = catalog(), farmGet = farmState(), equipmentList = { c
         unequip: vi.fn(),
         refine: vi.fn(),
         reroll: vi.fn(),
-        sell: vi.fn()
+        sell: vi.fn(),
+        sellMany: vi.fn()
     };
     const farmGateway = { get: vi.fn(() => (farmGet instanceof Error ? Promise.reject(farmGet) : Promise.resolve(farmGet))), win: vi.fn() };
     const timers = [];
@@ -1083,6 +1084,235 @@ describe('HeroUi Equipamento', () => {
         await flush();
 
         expect(ctx.query('.hero-body').childElementCount).toBe(0);
+    });
+});
+
+describe('HeroUi bulk sell', () => {
+    const bagged = (id, rarity, sellPrice, extra = {}) => ({ id, slot: 'RING', rarity, refine: 0, heroId: null, sellPrice, refineCost: 500, rerollCost: null, affixes: [], ...extra });
+    const c1 = bagged('c1', 'COMMON', 100);
+    const c2 = bagged('c2', 'COMMON', 100);
+    const u1 = bagged('u1', 'UNCOMMON', 200);
+    const w1 = bagged('w1', 'RARE', 100, { slot: 'WEAPON', clickDamage: 3, heroId: 'kael' });
+    const list = (...pieces) => ({ capacity: 100, pieces });
+    const start = async (pieces = [ c1, c2, u1, w1 ]) => {
+        const ctx = createUi({ equipmentList: list(...pieces) });
+
+        await open(ctx, 'equipment');
+        ctx.testid('bulk-sell-start').click();
+
+        return ctx;
+    };
+    const pick = (ctx, ...ids) => ids.forEach((id) => ctx.testid(`equip-piece-${id}`).click());
+    const pressed = (ctx, id) => ctx.testid(`equip-piece-${id}`).getAttribute('aria-pressed');
+    const summary = (ctx) => ctx.testid('bulk-sell-summary').textContent;
+
+    it('Vender várias enters selection mode and a tile click selects instead of opening the piece', async () => {
+        const ctx = await start();
+
+        pick(ctx, 'c1');
+
+        expect(ctx.testid('piece-detail')).toBeNull();
+        expect(pressed(ctx, 'c1')).toBe('true');
+        expect(summary(ctx)).toBe('Selecionadas: 1 · Total: 1 prata');
+        expect(ctx.testid('bulk-sell-start')).toBeNull();
+    });
+
+    it('a second click on a tile unselects it and disables Vender selecionadas', async () => {
+        const ctx = await start();
+
+        pick(ctx, 'c1', 'c1');
+
+        expect(pressed(ctx, 'c1')).toBe('false');
+        expect(summary(ctx)).toBe('Selecionadas: 0 · Total: 0 cobre');
+        expect(ctx.testid('bulk-sell-submit').disabled).toBe(true);
+    });
+
+    it('a rarity button selects every bag piece of that rarity and a second click unselects them', async () => {
+        const ctx = await start();
+
+        ctx.testid('bulk-sell-rarity-COMMON').click();
+
+        expect(pressed(ctx, 'c1')).toBe('true');
+        expect(pressed(ctx, 'c2')).toBe('true');
+        expect(pressed(ctx, 'u1')).toBe('false');
+        expect(summary(ctx)).toBe('Selecionadas: 2 · Total: 2 prata');
+        expect(ctx.testid('bulk-sell-rarity-COMMON').getAttribute('aria-pressed')).toBe('true');
+
+        ctx.testid('bulk-sell-rarity-COMMON').click();
+
+        expect(summary(ctx)).toBe('Selecionadas: 0 · Total: 0 cobre');
+    });
+
+    it('a rarity button keeps the pieces of other rarities selected', async () => {
+        const ctx = await start();
+
+        pick(ctx, 'u1');
+        ctx.testid('bulk-sell-rarity-COMMON').click();
+
+        expect(summary(ctx)).toBe('Selecionadas: 3 · Total: 4 prata');
+    });
+
+    it('worn tiles are disabled and Transferir conjunto hides in selection mode', async () => {
+        const ctx = await start();
+
+        expect(ctx.testid('equip-slot-kael-WEAPON').disabled).toBe(true);
+        expect(ctx.testid('equip-transfer-kael')).toBeNull();
+    });
+
+    it('Vender selecionadas asks before selling and sends nothing', async () => {
+        const ctx = await start();
+
+        pick(ctx, 'c1', 'u1');
+        ctx.testid('bulk-sell-submit').click();
+
+        expect(ctx.testid('bulk-sell-question').textContent).toBe('Vender 2 peças por 3 prata?');
+        expect(ctx.equipmentGateway.sellMany).not.toHaveBeenCalled();
+        expect(ctx.testid('equip-piece-c1').disabled).toBe(true);
+        expect(ctx.testid('bulk-sell-rarity-COMMON').disabled).toBe(true);
+        expect(ctx.testid('bulk-sell-cancel')).toBeNull();
+    });
+
+    it('Não closes the question and keeps the selection', async () => {
+        const ctx = await start();
+
+        pick(ctx, 'c1', 'u1');
+        ctx.testid('bulk-sell-submit').click();
+        ctx.testid('bulk-sell-confirm-no').click();
+
+        expect(ctx.testid('bulk-sell-question')).toBeNull();
+        expect(pressed(ctx, 'c1')).toBe('true');
+        expect(summary(ctx)).toBe('Selecionadas: 2 · Total: 3 prata');
+        expect(ctx.testid('bulk-sell-submit')).not.toBeNull();
+    });
+
+    it('Sim, vender sells the selection in bag order in one request and shows the notice', async () => {
+        const ctx = await start();
+
+        ctx.equipmentGateway.sellMany.mockResolvedValue({ equipment: list(c2, w1), wallet: { gold: 0, silver: 3, copper: 50 }, sold: 2, earned: 300 });
+        pick(ctx, 'u1', 'c1');
+        ctx.testid('bulk-sell-submit').click();
+        ctx.testid('bulk-sell-confirm-yes').click();
+        await flush();
+
+        expect(ctx.equipmentGateway.sellMany).toHaveBeenCalledTimes(1);
+        expect(ctx.equipmentGateway.sellMany).toHaveBeenCalledWith([ 'c1', 'u1' ]);
+        expect(ctx.testid('equip-sell-notice').textContent).toBe('2 peças vendidas por 3 prata');
+        expect(ctx.testid('bulk-sell-bar')).toBeNull();
+        expect(ctx.testid('bulk-sell-start')).not.toBeNull();
+        expect(ctx.query('.equip-bag-title').textContent).toBe('Mochila (1)');
+        expect(ctx.testid('equip-piece-c1')).toBeNull();
+        expect(ctx.query('.hero-error').hidden).toBe(true);
+    });
+
+    it('every equipment button is disabled while the sale runs and a second click sends nothing', async () => {
+        const ctx = await start();
+        let finish;
+
+        ctx.equipmentGateway.sellMany.mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
+        pick(ctx, 'c1');
+        ctx.testid('bulk-sell-submit').click();
+        ctx.testid('bulk-sell-confirm-yes').click();
+
+        const buttons = ctx.root.flatMap((node) => [ ...node.querySelectorAll('.equip-screen button') ]);
+
+        expect(buttons.length).toBeGreaterThan(0);
+        expect(buttons.every((node) => node.disabled)).toBe(true);
+
+        ctx.testid('bulk-sell-confirm-yes').click();
+
+        expect(ctx.equipmentGateway.sellMany).toHaveBeenCalledTimes(1);
+
+        finish({ equipment: list(c2, u1, w1), wallet: { gold: 0, silver: 1, copper: 0 }, sold: 1, earned: 100 });
+        await flush();
+
+        expect(ctx.testid('equip-sell-notice').textContent).toBe('1 peça vendida por 1 prata');
+    });
+
+    it('a failed sale reads the list again, shows the error and keeps only the selected pieces still in the bag', async () => {
+        const ctx = await start();
+
+        ctx.equipmentGateway.sellMany.mockRejectedValue(new ApiError('Piece not found', { status: 404, code: 'EQUIPMENT_NOT_FOUND' }));
+        ctx.equipmentGateway.list.mockResolvedValue(list(c2, u1, w1));
+        pick(ctx, 'c1', 'u1');
+        ctx.testid('bulk-sell-submit').click();
+        ctx.testid('bulk-sell-confirm-yes').click();
+        await flush();
+
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível concluir a ação.');
+        expect(ctx.query('.hero-error').hidden).toBe(false);
+        expect(ctx.equipmentGateway.list).toHaveBeenCalledTimes(2);
+        expect(ctx.testid('bulk-sell-bar')).not.toBeNull();
+        expect(ctx.testid('equip-piece-c1')).toBeNull();
+        expect(pressed(ctx, 'u1')).toBe('true');
+        expect(summary(ctx)).toBe('Selecionadas: 1 · Total: 2 prata');
+        expect(ctx.testid('bulk-sell-question')).toBeNull();
+    });
+
+    it('Cancelar leaves selection mode and a tile click opens the piece again', async () => {
+        const ctx = await start();
+
+        pick(ctx, 'c1');
+        ctx.testid('bulk-sell-cancel').click();
+
+        expect(ctx.testid('bulk-sell-bar')).toBeNull();
+        expect(ctx.testid('bulk-sell-start')).not.toBeNull();
+        expect(ctx.testid('equip-piece-c1').getAttribute('aria-pressed')).toBeNull();
+
+        pick(ctx, 'c1');
+
+        expect(ctx.testid('piece-detail')).not.toBeNull();
+    });
+
+    it('closing the window leaves selection mode', async () => {
+        const ctx = await start();
+
+        pick(ctx, 'c1');
+        ctx.ui.close();
+        await open(ctx, 'equipment');
+
+        expect(ctx.testid('bulk-sell-bar')).toBeNull();
+        expect(ctx.testid('bulk-sell-start')).not.toBeNull();
+        expect(ctx.testid('equip-piece-c1').classList.contains('is-selected')).toBe(false);
+    });
+
+    it('the answer of a sale that arrives after the window was closed draws nothing', async () => {
+        const ctx = await start();
+        let finish;
+
+        ctx.equipmentGateway.sellMany.mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
+        pick(ctx, 'c1');
+        ctx.testid('bulk-sell-submit').click();
+        ctx.testid('bulk-sell-confirm-yes').click();
+        ctx.ui.close();
+        finish({ equipment: list(c2, u1, w1), wallet: { gold: 0, silver: 1, copper: 0 }, sold: 1, earned: 100 });
+        await flush();
+
+        expect(ctx.query('.hero-body').childElementCount).toBe(0);
+    });
+
+    it('selling every piece shows the empty text with the notice', async () => {
+        const ctx = await start([ c1 ]);
+
+        ctx.equipmentGateway.sellMany.mockResolvedValue({ equipment: list(), wallet: { gold: 0, silver: 1, copper: 0 }, sold: 1, earned: 100 });
+        pick(ctx, 'c1');
+        ctx.testid('bulk-sell-submit').click();
+        ctx.testid('bulk-sell-confirm-yes').click();
+        await flush();
+
+        expect(ctx.testid('equip-sell-notice').textContent).toBe('1 peça vendida por 1 prata');
+        expect(ctx.testid('equipment-empty')).not.toBeNull();
+    });
+
+    it('a piece dropped while selecting shows unselected and the selection stays', async () => {
+        const ctx = await start();
+
+        pick(ctx, 'c1');
+        ctx.equipment.applyDrop({ piece: bagged('n1', 'RARE', 300), sold: false });
+        pick(ctx, 'u1');
+
+        expect(pressed(ctx, 'n1')).toBe('false');
+        expect(pressed(ctx, 'c1')).toBe('true');
+        expect(summary(ctx)).toBe('Selecionadas: 2 · Total: 3 prata');
     });
 });
 

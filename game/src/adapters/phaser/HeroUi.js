@@ -1,3 +1,4 @@
+import { bagPieces, selectedInBag, sellNotice as sellNoticeText, toggleRarity, toggleSelected } from '../../domain/equipment/bulkSell';
 import { dropLabel, wornBy } from '../../domain/equipment/equipment';
 import { leaderStats } from '../../domain/equipment/leaderStats';
 import { renderBag, renderBagEntry } from './views/bagView';
@@ -87,6 +88,7 @@ export class HeroUi
         this.talents = talents;
         this.talentBusy = false;
         this.equipBusy = false;
+        this.sellMode = null;
         this.farm = farm;
         this.hooks = { startFarm, walletCopper, useSkill, skillState, mapPosition };
         this.open = false;
@@ -155,6 +157,7 @@ export class HeroUi
         }
 
         this.screen = screen;
+        this.sellMode = null;
         this.title.textContent = title;
         this.setError('');
 
@@ -229,6 +232,7 @@ export class HeroUi
         this.view += 1;
         this.open = false;
         this.screen = null;
+        this.sellMode = null;
         this.panel.hidden = true;
         this.body.replaceChildren();
     }
@@ -343,7 +347,7 @@ export class HeroUi
     }
 
     //  The attributes of the leader, the slots of every hero and the bag, or one piece with its actions (`selected` is a piece id)
-    render_equipment ({ selected = null, notice = null } = {})
+    render_equipment ({ selected = null, notice = null, sellNotice = null } = {})
     {
         const piece = this.equipment.pieces().find((candidate) => candidate.id === selected);
         const owned = this.heroes.heroes();
@@ -354,9 +358,12 @@ export class HeroUi
             this.body.replaceChildren(renderEquipment(this.equipment.pieces(), owned, {
                 stats,
                 notice,
+                sellNotice,
                 busy: this.equipBusy,
                 onSelect: (picked) => this.render_equipment({ selected: picked.id }),
-                onTransfer: (fromHeroId, toHeroId) => this.transferSet(fromHeroId, toHeroId)
+                onTransfer: (fromHeroId, toHeroId) => this.transferSet(fromHeroId, toHeroId),
+                onStartSelling: () => this.startSelling(),
+                selection: this.sellingOptions()
             }));
             this.backButton.hidden = true;
 
@@ -437,6 +444,111 @@ export class HeroUi
             if (view === this.view)
             {
                 this.setError(EQUIPMENT_FAILED);
+            }
+        }
+    }
+
+    //  The bulk sale. `sellMode` is null (mode off) or { ids: Set<string>, confirming }. Selecting only changes the selection; `Sim, vender`
+    //  sends one request for the pieces still in the bag, in bag order. The screen is busy (`equipBusy`) while it runs.
+    sellingOptions ()
+    {
+        if (!this.sellMode)
+        {
+            return null;
+        }
+
+        return {
+            ids: this.sellMode.ids,
+            confirming: this.sellMode.confirming,
+            onToggle: (piece) => this.toggleSale(piece.id),
+            onRarity: (rarity) => this.toggleSaleRarity(rarity),
+            onSubmit: () => this.askSale(),
+            onCancel: () => this.cancelSale(),
+            onConfirm: () => this.sellSelected(),
+            onDecline: () => this.declineSale()
+        };
+    }
+
+    startSelling ()
+    {
+        this.setError('');
+        this.sellMode = { ids: new Set(), confirming: false };
+        this.render_equipment();
+    }
+
+    toggleSale (pieceId)
+    {
+        this.sellMode = { ...this.sellMode, ids: toggleSelected(this.sellMode.ids, pieceId) };
+        this.render_equipment();
+    }
+
+    toggleSaleRarity (rarity)
+    {
+        this.sellMode = { ...this.sellMode, ids: toggleRarity(this.sellMode.ids, bagPieces(this.equipment.pieces()), rarity) };
+        this.render_equipment();
+    }
+
+    askSale ()
+    {
+        this.sellMode = { ...this.sellMode, confirming: true };
+        this.render_equipment();
+    }
+
+    declineSale ()
+    {
+        this.sellMode = { ...this.sellMode, confirming: false };
+        this.render_equipment();
+    }
+
+    cancelSale ()
+    {
+        this.setError('');
+        this.sellMode = null;
+        this.render_equipment();
+    }
+
+    //  Sells the selection in one request. On success the selection ends and the notice shows the sale; on a failure the error line shows and
+    //  the pieces still in the bag stay selected. An answer that arrives after the window was closed (or moved on) draws nothing.
+    async sellSelected ()
+    {
+        if (this.equipBusy || !this.sellMode)
+        {
+            return;
+        }
+
+        const view = this.view;
+        const ids = selectedInBag(this.sellMode.ids, this.equipment.pieces());
+        let sellNotice = null;
+
+        this.equipBusy = true;
+        this.render_equipment();
+
+        try
+        {
+            const { sold, earned } = await this.equipment.sellMany(ids);
+
+            if (view === this.view)
+            {
+                this.setError('');
+                this.sellMode = null;
+                sellNotice = sellNoticeText(sold, earned);
+            }
+        }
+        catch
+        {
+            if (view === this.view)
+            {
+                this.setError(EQUIPMENT_FAILED);
+                this.sellMode = { ids: new Set(selectedInBag(this.sellMode.ids, this.equipment.pieces())), confirming: false };
+            }
+        }
+        finally
+        {
+            this.equipBusy = false;
+
+            if (view === this.view && this.screen === 'equipment')
+            {
+                this.render_equipment({ sellNotice });
             }
         }
     }
