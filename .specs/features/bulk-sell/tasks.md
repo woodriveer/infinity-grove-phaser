@@ -463,7 +463,7 @@ Port comment (lines 4-7): add `sellMany(pieceIds)` to the gateway list and `sell
 
 ---
 
-### T7: Selection rules (domain/equipment/bulkSell.js) [ ]
+### T7: Selection rules (domain/equipment/bulkSell.js) [x]
 
 **Owner**: game-dev
 **Goal**: Pure functions for the selection: the bag, totals, toggles, rarity state, request order and the three Portuguese texts (BSL-14, BSL-15, BSL-20, BSL-23 to BSL-25, BSL-27 to BSL-30).
