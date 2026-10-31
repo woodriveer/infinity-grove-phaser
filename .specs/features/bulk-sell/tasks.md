@@ -613,7 +613,7 @@ div.bulk-sell-bar [data-testid=bulk-sell-bar]
 
 ---
 
-### T9: Selection mode in renderEquipment [ ]
+### T9: Selection mode in renderEquipment [x]
 
 **Owner**: game-dev
 **Goal**: `renderEquipment` shows `Vender várias`, the selection bar, selected and locked tiles, and the sell notice, including on the empty screen (BSL-10 to BSL-15, BSL-17, BSL-21, BSL-24).

@@ -1,5 +1,7 @@
+import { bagPieces, RARITY_ORDER, rarityState, selectedInBag, sellTotal } from '../../../domain/equipment/bulkSell';
 import { describeAffix, formatCopper, pieceLines, pieceTitle, SLOT_LABELS, SLOTS } from '../../../domain/equipment/equipment';
 import { el } from './dom';
+import { renderBulkSellBar } from './bulkSellView';
 import { attachPieceTooltip } from './pieceTooltip';
 import { renderEmptyTile, renderPieceTile } from './pieceTile';
 
@@ -52,21 +54,33 @@ export const renderEquipmentUnavailable = () => el('p', 'hero-empty', UNAVAILABL
 //  The screen: the attribute panel of the leader (`stats` = { name, lines }, absent without a leader), the four slots of every owned hero,
 //  then the bag. `onSelect(piece)` fires when a worn or bagged piece is clicked. A hero that wears a piece has the button `Transferir conjunto`
 //  (when another hero is owned): it offers `Para <nome>` per other hero and `onTransfer(fromHeroId, toHeroId)` fires for the one picked.
-//  `notice` is a line shown at the top (the result of a transfer); `busy` disables every button while a request runs.
-export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, stats = null, notice = null, busy = false }) =>
+//  `notice` is a line shown at the top (the result of a transfer); `sellNotice` is the line of the last bulk sale, under it; `busy` disables every button while a request runs.
+//  `onStartSelling()` fires for `Vender várias`. `selection` is null (mode off) or { ids: Set<string>, confirming, onToggle(piece), onRarity(rarity), onSubmit(),
+//  onCancel(), onConfirm(), onDecline() }: a bag click toggles its piece, the worn pieces are locked and the selection bar is shown.
+export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, onStartSelling, stats = null, notice = null, sellNotice = null, busy = false, selection = null }) =>
 {
     if (pieces.length === 0)
     {
         const empty = el('p', 'hero-empty', EMPTY_TEXT, { testid: 'equipment-empty' });
 
-        if (!stats)
+        if (!stats && !sellNotice)
         {
             return empty;
         }
 
         const wrapper = el('div', 'equip-screen');
 
-        wrapper.append(renderLeaderStats(stats), empty);
+        if (sellNotice)
+        {
+            wrapper.append(el('p', 'equip-notice', sellNotice, { testid: 'equip-sell-notice' }));
+        }
+
+        if (stats)
+        {
+            wrapper.append(renderLeaderStats(stats));
+        }
+
+        wrapper.append(empty);
 
         return wrapper;
     }
@@ -78,15 +92,20 @@ export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, stats = 
         screen.append(el('p', 'equip-notice', notice, { testid: 'equip-transfer-notice' }));
     }
 
+    if (sellNotice)
+    {
+        screen.append(el('p', 'equip-notice', sellNotice, { testid: 'equip-sell-notice' }));
+    }
+
     if (stats)
     {
         screen.append(renderLeaderStats(stats));
     }
 
-    //  A tile with the tooltip of its piece; a click opens the piece with its actions
-    const tileOf = (piece, testid) =>
+    //  A tile with the tooltip of its piece; a click calls `onClick` (by default it opens the piece with its actions)
+    const tileOf = (piece, testid, onClick = onSelect) =>
     {
-        const tile = renderPieceTile(piece, { testid, onClick: onSelect });
+        const tile = renderPieceTile(piece, { testid, onClick });
 
         attachPieceTooltip(tile, piece, heroes);
 
@@ -103,7 +122,7 @@ export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, stats = 
 
         heading.append(el('strong', 'equip-hero-name', hero.name));
 
-        if (wearsSomething && owned.length > 1)
+        if (wearsSomething && owned.length > 1 && !selection)
         {
             heading.append(renderTransfer(hero, owned, onTransfer));
         }
@@ -115,17 +134,78 @@ export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, stats = 
             const testid = `equip-slot-${hero.id}-${slot}`;
             const cell = el('div', 'equip-slot-cell');
 
-            cell.append(el('span', 'equip-slot-name', SLOT_LABELS[slot]), worn ? tileOf(worn, testid) : renderEmptyTile(slot, { testid }));
+            const cellTile = worn ? tileOf(worn, testid) : renderEmptyTile(slot, { testid });
+
+            if (worn && selection)
+            {
+                cellTile.disabled = true;
+                cellTile.classList.add('is-locked');
+            }
+
+            cell.append(el('span', 'equip-slot-name', SLOT_LABELS[slot]), cellTile);
             block.append(cell);
         });
         screen.append(block);
     });
 
-    const bag = pieces.filter((piece) => !piece.heroId);
+    const bag = bagPieces(pieces);
     const grid = el('div', 'bag-grid', '', { testid: 'equipment-bag' });
+    const header = el('div', 'bag-header');
 
-    screen.append(el('strong', 'equip-bag-title', `Mochila (${bag.length})`));
-    bag.forEach((piece) => grid.append(tileOf(piece, `equip-piece-${piece.id}`)));
+    header.append(el('strong', 'equip-bag-title', `Mochila (${bag.length})`));
+
+    if (!selection && bag.length > 0)
+    {
+        const start = el('button', 'equip-button', 'Vender várias', { type: 'button', testid: 'bulk-sell-start' });
+
+        start.addEventListener('click', () => onStartSelling?.());
+        header.append(start);
+    }
+
+    screen.append(header);
+
+    if (selection)
+    {
+        screen.append(renderBulkSellBar({
+            count: selectedInBag(selection.ids, pieces).length,
+            total: sellTotal(bag, selection.ids),
+            rarities: RARITY_ORDER.map((rarity) => ({ rarity, ...rarityState(selection.ids, bag, rarity) })),
+            confirming: selection.confirming,
+            onRarity: selection.onRarity,
+            onSubmit: selection.onSubmit,
+            onCancel: selection.onCancel,
+            onConfirm: selection.onConfirm,
+            onDecline: selection.onDecline
+        }));
+    }
+
+    //  In selection mode a bag tile toggles its piece and carries the check mark when selected; it is disabled while the question shows
+    const bagTile = (piece) =>
+    {
+        const testid = `equip-piece-${piece.id}`;
+
+        if (!selection)
+        {
+            return tileOf(piece, testid);
+        }
+
+        const tile = tileOf(piece, testid, selection.onToggle);
+        const selected = selection.ids.has(piece.id);
+
+        tile.setAttribute('aria-pressed', selected ? 'true' : 'false');
+
+        if (selected)
+        {
+            tile.classList.add('is-selected');
+            tile.append(el('span', 'piece-check', '✓'));
+        }
+
+        tile.disabled = selection.confirming;
+
+        return tile;
+    };
+
+    bag.forEach((piece) => grid.append(bagTile(piece)));
     screen.append(grid);
 
     if (busy)

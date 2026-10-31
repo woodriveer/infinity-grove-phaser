@@ -247,6 +247,117 @@ describe('renderEquipment transfer', () => {
     });
 });
 
+describe('renderEquipment selection mode', () => {
+    const selecting = (ids = [], extra = {}) => ({
+        ids: new Set(ids), confirming: false, onToggle: vi.fn(), onRarity: vi.fn(), onSubmit: vi.fn(), onCancel: vi.fn(), onConfirm: vi.fn(), onDecline: vi.fn(), ...extra
+    });
+    const find = (screen, id) => screen.querySelector(`[data-testid="${id}"]`);
+
+    it('shows Vender várias in the bag header when the bag holds a piece and calls onStartSelling', () => {
+        const onStartSelling = vi.fn();
+        const start = find(renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), onStartSelling }), 'bulk-sell-start');
+
+        expect(start.textContent).toBe('Vender várias');
+        expect(start.parentElement.classList.contains('bag-header')).toBe(true);
+
+        start.click();
+
+        expect(onStartSelling).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows no Vender várias when every piece is worn', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }) ], heroes, { onSelect: vi.fn() });
+
+        expect(find(screen, 'bulk-sell-start')).toBeNull();
+        expect(screen.querySelector('.equip-bag-title').textContent).toBe('Mochila (0)');
+    });
+
+    it('shows the bar and hides Vender várias in selection mode', () => {
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), selection: selecting() });
+
+        expect(find(screen, 'bulk-sell-bar')).not.toBeNull();
+        expect(find(screen, 'bulk-sell-start')).toBeNull();
+        expect(find(screen, 'bulk-sell-summary').textContent).toBe('Selecionadas: 0 · Total: 0 cobre');
+    });
+
+    it('a click on a bag tile calls onToggle and not onSelect', () => {
+        const onSelect = vi.fn();
+        const selection = selecting();
+
+        find(renderEquipment([ ring() ], heroes, { onSelect, selection }), 'equip-piece-r1').click();
+
+        expect(selection.onToggle).toHaveBeenCalledTimes(1);
+        expect(selection.onToggle).toHaveBeenCalledWith(expect.objectContaining({ id: 'r1' }));
+        expect(onSelect).not.toHaveBeenCalled();
+    });
+
+    it('marks a selected tile with is-selected, aria-pressed and a check mark', () => {
+        const screen = renderEquipment([ ring(), ring({ id: 'r2' }) ], heroes, { onSelect: vi.fn(), selection: selecting([ 'r1' ]) });
+        const selected = find(screen, 'equip-piece-r1');
+        const other = find(screen, 'equip-piece-r2');
+
+        expect(selected.classList.contains('is-selected')).toBe(true);
+        expect(selected.getAttribute('aria-pressed')).toBe('true');
+        expect(selected.querySelector('.piece-check').textContent).toBe('✓');
+        expect(other.getAttribute('aria-pressed')).toBe('false');
+        expect(other.classList.contains('is-selected')).toBe(false);
+        expect(other.querySelector('.piece-check')).toBeNull();
+    });
+
+    it('tiles carry no aria-pressed outside selection mode', () => {
+        expect(find(renderEquipment([ ring() ], heroes, { onSelect: vi.fn() }), 'equip-piece-r1').getAttribute('aria-pressed')).toBeNull();
+    });
+
+    it('sums only the selected bag pieces in the summary', () => {
+        const screen = renderEquipment([ ring(), ring({ id: 'r2' }), weapon({ id: 'w2' }) ], heroes, { onSelect: vi.fn(), selection: selecting([ 'r1', 'w2' ]) });
+
+        expect(find(screen, 'bulk-sell-summary').textContent).toBe('Selecionadas: 2 · Total: 8 prata 50 cobre');
+    });
+
+    it('disables the worn tiles and hides Transferir conjunto in selection mode', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }), ring() ], [ hero('kael'), hero('lyra') ], { onSelect: vi.fn(), onTransfer: vi.fn(), selection: selecting() });
+        const worn = find(screen, 'equip-slot-kael-WEAPON');
+
+        expect(worn.disabled).toBe(true);
+        expect(worn.classList.contains('is-locked')).toBe(true);
+        expect(find(screen, 'equip-transfer-kael')).toBeNull();
+    });
+
+    it('passes the state of each rarity to the bar', () => {
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), selection: selecting([ 'r1' ]) });
+
+        expect(find(screen, 'bulk-sell-rarity-COMMON').getAttribute('aria-pressed')).toBe('true');
+        expect(find(screen, 'bulk-sell-rarity-LEGENDARY').disabled).toBe(true);
+    });
+
+    it('disables the bag tiles and shows the question while confirming', () => {
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), selection: selecting([ 'r1' ], { confirming: true }) });
+
+        expect(find(screen, 'equip-piece-r1').disabled).toBe(true);
+        expect(find(screen, 'bulk-sell-question').textContent).toBe('Vender 1 peça por 1 prata?');
+    });
+
+    it('shows the sell notice at the top', () => {
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), sellNotice: '2 peças vendidas por 3 prata', stats: { name: 'Kael', lines: [] } });
+
+        expect(find(screen, 'equip-sell-notice').textContent).toBe('2 peças vendidas por 3 prata');
+        expect(screen.firstElementChild.getAttribute('data-testid')).toBe('equip-sell-notice');
+    });
+
+    it('shows the sell notice with the empty text when no piece is left', () => {
+        const screen = renderEquipment([], heroes, { onSelect: vi.fn(), sellNotice: '1 peça vendida por 1 prata' });
+
+        expect(find(screen, 'equip-sell-notice').textContent).toBe('1 peça vendida por 1 prata');
+        expect(find(screen, 'equipment-empty').textContent).toBe('Nenhum equipamento ainda. Vença chefes para encontrar peças.');
+    });
+
+    it('disables the bar buttons while a request runs', () => {
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), selection: selecting([ 'r1' ]), busy: true });
+
+        expect([ ...screen.querySelectorAll('button') ].every((node) => node.disabled)).toBe(true);
+    });
+});
+
 describe('renderEquipmentUnavailable', () => {
     it('says the equipment is unavailable', () => {
         const node = renderEquipmentUnavailable();
