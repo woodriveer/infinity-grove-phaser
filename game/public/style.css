@@ -2169,7 +2169,7 @@ button:disabled {
 
 .piece-tile.is-selected {
     outline: 3px solid var(--color-accent);
-    outline-offset: 4px;
+    outline-offset: 2px;
     transform: translateY(-2px);
 }
 
