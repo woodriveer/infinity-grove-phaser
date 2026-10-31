@@ -15,6 +15,14 @@ class EquipmentExceptionsTest {
     }
 
     @Test
+    fun `a bad sell batch is a request error with its own code`() {
+        val e = InvalidSellBatchException("x")
+
+        assertIs<EquipmentRequestException>(e)
+        assertEquals("INVALID_SELL_BATCH", e.code)
+    }
+
+    @Test
     fun `a missing piece is a plain business exception with its own code`() {
         val e = EquipmentNotFoundException("p1")
 

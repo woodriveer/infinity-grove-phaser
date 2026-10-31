@@ -89,7 +89,7 @@ T11 → T12
 
 ## Task Breakdown
 
-### T1: SellBatch value and its exception [ ]
+### T1: SellBatch value and its exception [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: A domain value that accepts 1 to 100 distinct piece ids and refuses anything else with `INVALID_SELL_BATCH` (BSL-05).
@@ -157,8 +157,8 @@ data class SellBatch(
 **Gate**: quick - `cd backend && ./gradlew test --tests '*SellBatchTest' --tests '*EquipmentExceptionsTest'`
 **Done when**:
 
-- [ ] The 5 test cases pass; `EquipmentExceptionsTest` keeps its 3 earlier cases.
-- [ ] `cd backend && ./gradlew ktlintCheck` passes.
+- [x] The 5 test cases pass; `EquipmentExceptionsTest` keeps its 3 earlier cases.
+- [x] `cd backend && ./gradlew ktlintCheck` passes.
 
 **Commit**: `feat(backend): add the sell batch value`
 

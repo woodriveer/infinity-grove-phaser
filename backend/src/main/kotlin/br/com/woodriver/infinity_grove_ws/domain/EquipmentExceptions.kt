@@ -11,6 +11,10 @@ class InvalidAffixException(
     count: Int,
 ) : EquipmentRequestException("INVALID_AFFIX", "Affix $index does not exist, the piece has $count")
 
+class InvalidSellBatchException(
+    reason: String,
+) : EquipmentRequestException("INVALID_SELL_BATCH", "Sell batch is invalid: $reason")
+
 /** The piece does not exist or belongs to another account (404); the two cases look the same on purpose. */
 class EquipmentNotFoundException(
     pieceId: String,
