@@ -6,9 +6,9 @@ The bag holds up to 100 pieces and bosses drop one on every win (AD-008), so it 
 
 ## Goals
 
-- [ ] The player selects several bag pieces and sells them with one confirmation and one request: N pieces take N + 3 clicks (`Vender várias`, N tiles, `Vender selecionadas`, `Sim, vender`).
-- [ ] Every bag piece of one rarity is selected with one click, so selling all COMMON pieces takes 4 clicks whatever their number.
-- [ ] A batch sale is all-or-nothing on the server: either every listed piece is sold and paid once, or nothing changes.
+- [x] The player selects several bag pieces and sells them with one confirmation and one request: N pieces take N + 3 clicks (`Vender várias`, N tiles, `Vender selecionadas`, `Sim, vender`).
+- [x] Every bag piece of one rarity is selected with one click, so selling all COMMON pieces takes 4 clicks whatever their number.
+- [x] A batch sale is all-or-nothing on the server: either every listed piece is sold and paid once, or nothing changes.
 
 ## Out of Scope
 
@@ -27,7 +27,7 @@ The bag holds up to 100 pieces and bosses drop one on every win (AD-008), so it 
 
 ## Assumptions & Open Questions
 
-Every ambiguity is resolved or recorded here - nothing is left silently unclear. The user approved D1 to D12 as recommended on 2026-10-31.
+Every ambiguity is resolved or recorded here - nothing is left silently unclear. The user approved D1 to D12 as recommended on 2026-10-31. D13 and D14 were taken by the product owner at acceptance (2026-10-31) to close the Verifier's open items; the owner can still overrule them.
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
@@ -43,6 +43,8 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 | D10 Entry point and labels | Button `Vender várias` beside `Mochila (<n>)`; bar texts `Selecionadas: <k> · Total: <total>` (middle dot U+00B7), `Vender selecionadas`, `Cancelar`; the check mark `✓` on a selected tile | User decision (approved as recommended, 2026-10-31). Lesson L-010: every on-screen text is stated in full | y |
 | D11 Request order | The game sends the selected ids in the order of the bag, not the order of the clicks | User decision (approved as recommended, 2026-10-31). Deterministic request; tests can pin it | y |
 | D12 Response | `POST /equipment/sell` answers `{ equipment, wallet, sold, earned }`; `sold` (int) and `earned` (copper, long) are always present | User decision (approved as recommended, 2026-10-31). The notice uses the server's numbers, not a client sum (AD-009); lesson L-018: no absent-vs-null ambiguity | y |
+| D13 Scope of the lock during a sale (SP-1) | BSL-23 disables every button of the window body (the bag tiles, the worn tiles, `Vender várias` and the whole bulk-sell bar with its rarity, submit, cancel and confirmation buttons); the window's close button (`hero-close`) stays enabled | Product owner at acceptance (2026-10-31). The first wording ("every button of the Equipamento window") contradicted BSL-19 and its edge case, which require closing the window while a sale runs and drawing nothing when the late answer arrives. The wording now names the region; the shipped behaviour is unchanged | n |
+| D14 Test level of BSL-19 "another screen is opened" | Unit test only (`game/src/adapters/phaser/HeroUi.test.js:1328`, kills sensor mutant G3); the close half keeps its e2e (`game/e2e/bulkSell.spec.js:127`) | Product owner at acceptance (2026-10-31). The open panel covers the HUD buttons, so a player cannot open another screen while Equipamento is open. The only other caller is the farm chapter-boss end (`ClickerGame.js:1131`), which calls the same `HeroUi.show()` that clears the selection for every screen change; an e2e there would test the farm's end trigger, not this rule | n |
 | Sell price | Same rule as the single sale: `100 * rarity index * (1 + 0.5 * refine)` copper, rounded down (`equipment` spec) | Existing rule, unchanged | y |
 | Player-facing text | Portuguese | AD-007 | y |
 | Single sale | `POST /equipment/{id}/sell` and the `Vender (<preço>)` button of the piece detail stay as they are | Existing behaviour (EQP-40 to EQP-43) | y |
@@ -109,7 +111,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 1. WHEN the player clicks `Vender selecionadas` THEN the game SHALL show the confirmation `data-testid="bulk-sell-confirm"` with the question `Vender <k> peças por <total>?` (`Vender 1 peça por <total>?` when k is 1, `data-testid="bulk-sell-question"`) and the buttons `Sim, vender` (`bulk-sell-confirm-yes`) and `Não` (`bulk-sell-confirm-no`), and SHALL send no request.  <!-- event-driven -->
 2. WHILE the confirmation shows the bag tiles and the rarity buttons SHALL be disabled and `Vender selecionadas` and `Cancelar` SHALL not show.  <!-- state-driven -->
 3. WHEN the player clicks `Não` THEN the game SHALL hide the confirmation, show `Vender selecionadas` and `Cancelar` again and keep the selection.  <!-- event-driven -->
-4. WHEN the player clicks `Sim, vender` THEN the game SHALL send one `POST /equipment/sell` whose `pieceIds` are the selected ids in the order of the bag, and SHALL disable every button of the Equipamento window until the answer arrives.  <!-- event-driven -->
+4. WHEN the player clicks `Sim, vender` THEN the game SHALL send one `POST /equipment/sell` whose `pieceIds` are the selected ids in the order of the bag, and SHALL disable every button of the window body (the bag and worn tiles and every button of the bulk-sell bar and its confirmation) until the answer arrives, leaving the window's close button enabled (BSL-19, D13).  <!-- event-driven -->
 5. WHEN the sale succeeds THEN the game SHALL leave selection mode and show the bag without the sold pieces, the title `Mochila (<n>)` with the new count, the notice `<sold> peças vendidas por <earned>` (`1 peça vendida por <earned>` when sold is 1, `data-testid="equip-sell-notice"`) from the server's `sold` and `earned`, and the wallet the server answered.  <!-- event-driven -->
 6. IF the sale fails THEN the game SHALL read the equipment again from the server, show the error line `Não foi possível concluir a ação.`, stay in selection mode and keep selected only the selected pieces that are still in the bag.  <!-- unwanted-behavior -->
 
@@ -170,7 +172,7 @@ IDs follow the order of the criteria: BSL-01 to BSL-09 for "Sell a batch of piec
 | BSL-16 | P1: Select pieces in the bag | T8, T10, T12 | Verified |
 | BSL-17 | P1: Select pieces in the bag | T9, T10, T11, T12 | Verified |
 | BSL-18 | P1: Select pieces in the bag | T10, T12 | Verified |
-| BSL-19 | P1: Select pieces in the bag | T10, T12 | Verified |
+| BSL-19 | P1: Select pieces in the bag | T10, T12 | Verified ("another screen" at unit level, D14) |
 | BSL-20 | P1: Confirm and sell | T7, T8, T10, T12 | Verified |
 | BSL-21 | P1: Confirm and sell | T8, T9, T10, T12 | Verified |
 | BSL-22 | P1: Confirm and sell | T10, T12 | Verified |
@@ -191,6 +193,21 @@ IDs follow the order of the criteria: BSL-01 to BSL-09 for "Sell a batch of piec
 
 ## Success Criteria
 
-- [ ] Selling every COMMON piece of the bag takes 4 clicks (`Vender várias`, `Comum`, `Vender selecionadas`, `Sim, vender`) and one request, whatever the number of pieces.
-- [ ] An integration test that sends the same batch twice at once reads one 200, one 404 and the copper credited once.
-- [ ] No batch request changes the bag or the wallet when it answers 400 or 404.
+- [x] Selling every COMMON piece of the bag takes 4 clicks (`Vender várias`, `Comum`, `Vender selecionadas`, `Sim, vender`) and one request, whatever the number of pieces.
+- [x] An integration test that sends the same batch twice at once reads one 200, one 404 and the copper credited once.
+- [x] No batch request changes the bag or the wallet when it answers 400 or 404.
+
+---
+
+## Acceptance
+
+**Verdict**: ACCEPTED by the product owner on 2026-10-31, against `validation.md` (PASS, diff range `445a55b..1f7041f`, 30/30 BSL criteria, sensor 12/12 killed) and `ui-review.html` (APROVADO after T13 to T16 and fix `250360c`).
+
+| Goal / success criterion | Evidence |
+| ------------------------ | -------- |
+| N pieces sold with N + 3 clicks and one request | `game/e2e/bulkSell.spec.js:43` (2 tiles, one `POST /equipment/sell` with `{ pieceIds: [ 'c1', 'u1' ] }`) |
+| Every COMMON sold with 4 clicks and one request | `game/e2e/bulkSell.spec.js:245` |
+| All-or-nothing on the server; 400 and 404 change nothing | `EquipmentBatchSellIT.kt:96-102`, `:111-112`, `:124-129`; `EquipmentServiceTest.kt:420-424` |
+| Same batch twice at once: one 200, one 404, copper credited once | `EquipmentBatchSellIT.kt:143-161` |
+
+Open items of the Verifier, closed: gap 1 by D14 (unit coverage accepted), SP-1 by D13 (BSL-23 wording). Gaps 3 to 7 of `validation.md` are notes, not spec gaps; none becomes a task.
