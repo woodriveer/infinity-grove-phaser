@@ -71,6 +71,7 @@ const afterOutcome = (progress, outcome, definition) => {
 
 //  Hero cards contract (HeroController, FarmController, the drops of ProgressController): the five README heroes, a bag per player,
 //  the chapter order that follows the starting element, the 1 % and 10 % drops and the daily chapter boss limit.
+//  Cards have 0 to 9 stars; 3 cards of the same hero and stars (0 to 8) fuse into 1 card of the next stars (hero-ascension).
 const skill = (slot, name, type, cooldownSeconds, image) => ({ slot, name, type, effect: `Efeito de ${name}`, cooldownSeconds, image });
 
 const HEROES = [
@@ -118,8 +119,11 @@ const newCards = (start = 'FIRE', overrides = {}) => {
     return { start, leader: first, copies: { [`${first}:0`]: 1 }, cleared: new Set(), winsDay: null, winsToday: 0, lastFarmWin: null, ...overrides, ...(overrides.cleared && { cleared: new Set(overrides.cleared) }) };
 };
 
+const STAR_LEVELS = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 const copiesOf = (cards, heroId, stars) => cards.copies[`${heroId}:${stars}`] ?? 0;
-const starsOf = (cards, heroId) => [ 3, 2, 1, 0 ].find((stars) => copiesOf(cards, heroId, stars) > 0) ?? 0;
+const starsOf = (cards, heroId) => [ 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 ].find((stars) => copiesOf(cards, heroId, stars) > 0) ?? 0;
+//  Skill level (spec hero-ascension): 0 locked, else 1 + floor((stars - slot) / 3); one skill rises per star from 4 to 9
+const skillLevel = (stars, slot) => (stars < slot ? 0 : 1 + Math.floor((stars - slot) / 3));
 const winsLeft = (cards) => Math.max(0, DAILY_CHAPTER_BOSS_WINS - (cards.winsDay === utcDay() ? cards.winsToday : 0));
 
 const heroView = (cards, hero) => {
@@ -128,10 +132,10 @@ const heroView = (cards, hero) => {
     return {
         ...hero,
         chapter: chapterElements(cards.start).indexOf(hero.element) + 1,
-        owned: [ 0, 1, 2, 3 ].some((level) => copiesOf(cards, hero.id, level) > 0),
+        owned: STAR_LEVELS.some((level) => copiesOf(cards, hero.id, level) > 0),
         stars,
-        copies: { 0: copiesOf(cards, hero.id, 0), 1: copiesOf(cards, hero.id, 1), 2: copiesOf(cards, hero.id, 2), 3: copiesOf(cards, hero.id, 3) },
-        skills: hero.skills.map((candidate) => ({ ...candidate, unlocked: stars >= candidate.slot }))
+        copies: Object.fromEntries(STAR_LEVELS.map((level) => [ level, copiesOf(cards, hero.id, level) ])),
+        skills: hero.skills.map((candidate) => ({ ...candidate, unlocked: stars >= candidate.slot, level: skillLevel(stars, candidate.slot) }))
     };
 };
 
@@ -569,7 +573,7 @@ export async function mockBackend (page, {
             const hero = HEROES.find((candidate) => candidate.id === decodeURIComponent(fuse[1]));
 
             if (!hero) { return route.fulfill(problem(404, `Hero '${fuse[1]}' not found`, 'HERO_NOT_FOUND')); }
-            if (![ 0, 1, 2 ].includes(body.stars)) { return route.fulfill(problem(400, 'Fusion is invalid', 'INVALID_FUSION')); }
+            if (![ 0, 1, 2, 3, 4, 5, 6, 7, 8 ].includes(body.stars)) { return route.fulfill(problem(400, 'Fusion is invalid', 'INVALID_FUSION')); }
             if (copiesOf(cards, hero.id, body.stars) < FUSION_SIZE) { return route.fulfill(problem(409, 'Fewer than 3 cards', 'NOT_ENOUGH_CARDS')); }
 
             cards.copies[`${hero.id}:${body.stars}`] -= FUSION_SIZE;

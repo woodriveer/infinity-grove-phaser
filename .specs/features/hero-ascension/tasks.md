@@ -912,7 +912,7 @@ if (level >= 2)
 
 ---
 
-### T15: Fake backend for stars up to 9 [ ]
+### T15: Fake backend for stars up to 9 [x]
 
 **Owner**: test-engineer
 **What**: The e2e fake backend answers copies 0 to 9, skill `level` and fusions of 0 to 8 stars like the real backend after T3 (ASC-01, ASC-02 contract in the browser tests).
@@ -949,7 +949,7 @@ Update the comment above `HEROES` to say cards have 0 to 9 stars.
 **Gate**: full - `cd game && npx playwright test e2e/heroes.spec.js e2e/skills.spec.js e2e/skillsAll.spec.js e2e/clickPower.spec.js e2e/farm.spec.js e2e/drops.spec.js e2e/combatHud.spec.js`
 **Done when**:
 
-- [ ] The seven suites pass with no test edited.
+- [x] The seven suites pass with no test edited.
 
 **Commit**: `test(game): let the fake backend fuse hero cards up to 9 stars`
 
