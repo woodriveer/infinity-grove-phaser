@@ -163,21 +163,21 @@ IDs follow the order of the criteria: BSL-01 to BSL-09 for "Sell a batch of piec
 | BSL-09 | P1: Sell a batch of pieces | T4 | Pending |
 | BSL-10 | P1: Select pieces in the bag | T9, T11, T12 | Pending |
 | BSL-11 | P1: Select pieces in the bag | T9, T11, T12 | Pending |
-| BSL-12 | P1: Select pieces in the bag | T8, T9, T10, T11, T12 | Pending |
+| BSL-12 | P1: Select pieces in the bag | T8, T9, T10, T11, T12 | Implementing |
 | BSL-13 | P1: Select pieces in the bag | T9, T10, T12 | Pending |
 | BSL-14 | P1: Select pieces in the bag | T7, T9, T10, T11, T12 | Implementing |
 | BSL-15 | P1: Select pieces in the bag | T7, T8, T9, T12 | Implementing |
-| BSL-16 | P1: Select pieces in the bag | T8, T10, T12 | Pending |
+| BSL-16 | P1: Select pieces in the bag | T8, T10, T12 | Implementing |
 | BSL-17 | P1: Select pieces in the bag | T9, T10, T11, T12 | Pending |
 | BSL-18 | P1: Select pieces in the bag | T10, T12 | Pending |
 | BSL-19 | P1: Select pieces in the bag | T10, T12 | Pending |
 | BSL-20 | P1: Confirm and sell | T7, T8, T10, T12 | Implementing |
-| BSL-21 | P1: Confirm and sell | T8, T9, T10, T12 | Pending |
+| BSL-21 | P1: Confirm and sell | T8, T9, T10, T12 | Implementing |
 | BSL-22 | P1: Confirm and sell | T10, T12 | Pending |
 | BSL-23 | P1: Confirm and sell | T5, T7, T10, T12 | Implementing |
 | BSL-24 | P1: Confirm and sell | T6, T7, T9, T10, T12 | Implementing |
 | BSL-25 | P1: Confirm and sell | T6, T7, T10, T12 | Implementing |
-| BSL-26 | P2: Select by rarity | T8, T11, T12 | Pending |
+| BSL-26 | P2: Select by rarity | T8, T11, T12 | Implementing |
 | BSL-27 | P2: Select by rarity | T7, T10, T12 | Implementing |
 | BSL-28 | P2: Select by rarity | T7, T10, T12 | Implementing |
 | BSL-29 | P2: Select by rarity | T7, T8, T12 | Implementing |

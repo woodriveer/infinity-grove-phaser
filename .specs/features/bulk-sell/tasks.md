@@ -542,7 +542,7 @@ The separator in `selectionSummary` is ` · ` (space, U+00B7, space).
 
 ---
 
-### T8: Selection bar view (views/bulkSellView.js) [ ]
+### T8: Selection bar view (views/bulkSellView.js) [x]
 
 **Owner**: game-dev
 **Goal**: Render the bar of selection mode: summary, five rarity buttons, `Vender selecionadas` and `Cancelar`, or the confirmation with `Sim, vender` and `Não` (BSL-12, BSL-15, BSL-16, BSL-20, BSL-21, BSL-26, BSL-29, BSL-30).
