@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Venda em lote</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+:root[data-theme="dark"] { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Venda em lote</h1>
+<p class="sub">Feature <code>bulk-sell</code> · release <code>v0.1.0</code> · intervalo <code>445a55b..8a8d89a</code> (19 commits da feature) · Verifier em <code>1f7041f</code> (<code>validation.md</code> em <code>4f8b9d7</code>) · aceite do product-owner em <code>8a8d89a</code> · números medidos em <code>8a8d89a</code> numa cópia limpa da árvore · 31/10/2026</p>
+
+<p><span class="verdict">Verifier: PASS</span> &nbsp;com uma exceção documentada (BSL-19 "outra tela aberta" só tem teste unitário, aceita pelo product-owner na decisão D14) · 30 de 30 critérios BSL · sensor: 12 mutantes injetados, 12 mortos na árvore final (o mutante G3 sobreviveu até o teste que fechou a lacuna) · <strong>product-owner: ACEITO</strong> · revisão de UI aprovada: <a href="ui-review.html">ui-review.html</a></p>
+
+<h2>Resumo</h2>
+<div class="cards">
+    <div class="card"><div class="n">+663 / −33</div><div class="l">linhas de código de produção (13 arquivos)</div></div>
+    <div class="card"><div class="n">+1352 / −3</div><div class="l">linhas de teste (13 arquivos)</div></div>
+    <div class="card"><div class="n">23 + 61</div><div class="l">testes novos: backend + jogo (unitários)</div></div>
+    <div class="card"><div class="n">17</div><div class="l">cenários e2e novos, todos passaram</div></div>
+</div>
+
+<h2>Commits da feature</h2>
+<p class="sub">O intervalo <code>445a55b..8a8d89a</code> tem commits intercalados de outras frentes (ascensão de heróis até 9 estrelas, ferramental dos agentes). Eles ficam fora de todas as contas abaixo. Cada número vem de <code>git diff-tree --numstat</code> por commit, somado.</p>
+<div class="scroll"><table>
+<tr><th>Commit</th><th>Tipo</th><th>O que faz</th></tr>
+<tr><td><code>611cb30</code></td><td>feat(game)</td><td>chamada de venda em lote na API de equipamento</td></tr>
+<tr><td><code>593d271</code></td><td>feat(backend)</td><td>valor SellBatch</td></tr>
+<tr><td><code>708ea18</code></td><td>feat(backend)</td><td>PlayerEquipment.removeAll</td></tr>
+<tr><td><code>b3d2f5c</code></td><td>feat(game)</td><td>venda em lote na coleção de equipamento</td></tr>
+<tr><td><code>67064ff</code></td><td>feat(backend)</td><td>venda em lote em uma transação</td></tr>
+<tr><td><code>3425cc7</code></td><td>feat(game)</td><td>regras de seleção</td></tr>
+<tr><td><code>c8fa52c</code></td><td>feat(game)</td><td>barra de seleção</td></tr>
+<tr><td><code>5bc8762</code></td><td>feat(game)</td><td>modo de seleção na tela Equipamento</td></tr>
+<tr><td><code>9d06cbb</code></td><td>feat(backend)</td><td>POST /equipment/sell</td></tr>
+<tr><td><code>d229089</code></td><td>feat(game)</td><td>venda em lote a partir da tela Equipamento</td></tr>
+<tr><td><code>586a50a</code></td><td>style(game)</td><td>estilo do modo de seleção</td></tr>
+<tr><td><code>21bc424</code></td><td>test(game)</td><td>e2e da venda em lote</td></tr>
+<tr><td><code>a916c3d</code></td><td>style(game)</td><td>barra compacta e fixa</td></tr>
+<tr><td><code>60196fc</code></td><td>style(game)</td><td>ponto e estado pressionado nos botões de raridade</td></tr>
+<tr><td><code>c8856cc</code></td><td>fix(game)</td><td>esconde a dica da peça no modo de seleção</td></tr>
+<tr><td><code>847a7ad</code></td><td>fix(game)</td><td>blocos dos heróis parados ao abrir o modo</td></tr>
+<tr><td><code>250360c</code></td><td>fix(game)</td><td>contornos das peças marcadas separados</td></tr>
+<tr><td><code>0b1f13d</code></td><td>test(game)</td><td>queda e resposta tardia da venda</td></tr>
+<tr><td><code>1f7041f</code></td><td>test(backend)</td><td>código do id ausente no lote</td></tr>
+</table></div>
+<p class="sub">Documentos da feature (<code>spec.md</code>, <code>design.md</code>, <code>tasks.md</code>, <code>validation.md</code>, <code>ui-review.html</code>) e o ADR <code>0008-equipment.md</code> não contam como código.</p>
+
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Área</th><th class="num">Arquivos</th><th class="num">Adicionadas</th><th class="num">Removidas</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td class="num">6</td><td class="num">107</td><td class="num">1</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes, <code>game/public/style.css</code>)</td><td class="num">7</td><td class="num">556</td><td class="num">32</td></tr>
+</table></div>
+<p class="sub">Backend: <code>SellBatch.kt</code>, <code>EquipmentExceptions.kt</code>, <code>PlayerEquipment.kt</code>, <code>EquipmentService.kt</code>, <code>EquipmentUseCase.kt</code>, <code>EquipmentController.kt</code>. Jogo: <code>equipmentApi.js</code>, <code>equipmentCollection.js</code>, <code>bulkSell.js</code>, <code>bulkSellView.js</code>, <code>equipmentView.js</code>, <code>HeroUi.js</code>, <code>style.css</code>. Sem migração de banco (AD-016 não se aplica).</p>
+
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th class="num">Arquivos</th><th class="num">Linhas +/−</th><th class="num">Testes novos</th><th class="num">Total após a execução</th><th>Resultado</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>, JUnit + Testcontainers)</td><td class="num">5</td><td class="num">+328 / −1</td><td class="num">23</td><td class="num">879</td><td class="ok">879 passaram, 0 falharam</td></tr>
+<tr><td>Jogo unitário (<code>game/src/**/*.test.js</code>, Vitest)</td><td class="num">6</td><td class="num">+629 / −2</td><td class="num">61</td><td class="num">1406</td><td>1403 passaram, 3 falharam (fora da feature, ver abaixo)</td></tr>
+<tr><td>E2E (<code>game/e2e</code>, Playwright, backend falso, com cobertura)</td><td class="num">2</td><td class="num">+395 / −0</td><td class="num">17</td><td class="num">149</td><td>145 passaram, 2 falharam (fora da feature), 2 ignorados</td></tr>
+<tr><td>Deploy (<code>deploy/**/*.test.mjs</code>, node:test)</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">119</td><td class="ok">119 passaram, 0 falharam</td></tr>
+</table></div>
+<p class="sub">Testes novos contados pelas linhas adicionadas com <code>@Test</code> (Kotlin) e <code>it(</code>/<code>test(</code> (JS) nos commits da feature. O Verifier registrou 1408 testes unitários do jogo e 147 e2e na sua rodada; a diferença para os totais acima não foi investigada; aqui a medição usou o commit <code>8a8d89a</code> limpo, sem as alterações locais não commitadas do jogo.</p>
+
+<h2>Cobertura</h2>
+<div class="scroll"><table>
+<tr><th>Medida</th><th>Projeto</th><th>Arquivos da feature</th></tr>
+<tr><td>Unitário backend (JaCoCo, linhas / branches)</td><td>99,13% (2727 de 2751) / 92,91% (813 de 875)</td><td>100,00% (187 de 187) / 93,75% (70 de 75) · 6 classes Kotlin</td></tr>
+<tr><td>Unitário jogo (Vitest v8, linhas / branches)</td><td>96,69% (2372 de 2453) / 94,73% (1061 de 1120)</td><td>97,32% (509 de 523) / 90,23% (194 de 215) · 6 arquivos de <code>game/src</code></td></tr>
+<tr><td>E2E jogo (istanbul, linhas / branches)</td><td>91,47% (2222 de 2429) / 74,13% (662 de 893)</td><td>92,73% (485 de 523) / 77,02% (124 de 161) · os mesmos 6 arquivos</td></tr>
+<tr><td>Deploy (node:test, linhas / branches)</td><td colspan="2">98,25% / 96,72% (a feature não mexe em <code>deploy/</code>)</td></tr>
+</table></div>
+<p class="sub">Os arquivos da feature incluem <code>HeroUi.js</code> inteiro (unitário 95,03% de linhas, e2e 92,19%) e <code>equipmentView.js</code> inteiro. <code>bulkSell.js</code> e <code>bulkSellView.js</code> têm 100% de linhas e branches em unitário e e2e. A cobertura e2e é um limite inferior: uma página recarregada dentro do teste perde o que contou antes. O <code>style.css</code> não entra na medição de linhas. A execução do jogo unitário usou <code>--coverage.reportOnFailure=true</code> porque os 3 testes fora da feature impedem o relatório padrão.</p>
+
+<h2>Cenários e2e (<code>e2e/bulkSell.spec.js</code>)</h2>
+<div class="scroll"><table>
+<tr><th>Cenário</th><th>Resultado</th></tr>
+<tr><td>Seleciona duas peças e vende em um pedido</td><td class="ok">passou</td></tr>
+<tr><td>Clique no bloco em modo de seleção não abre a peça; segundo clique desmarca</td><td class="ok">passou</td></tr>
+<tr><td>Peças equipadas não podem ser marcadas e Transferir conjunto some</td><td class="ok">passou</td></tr>
+<tr><td>Cancelar sai do modo e o clique abre a peça de novo</td><td class="ok">passou</td></tr>
+<tr><td>Fechar a janela sai do modo de seleção</td><td class="ok">passou</td></tr>
+<tr><td>Não mantém a seleção e não envia nada</td><td class="ok">passou</td></tr>
+<tr><td>Blocos e botões de raridade ficam desativados enquanto a pergunta aparece</td><td class="ok">passou</td></tr>
+<tr><td>Venda recusada mantém peças e seleção e mostra o erro</td><td class="ok">passou</td></tr>
+<tr><td>Peça vendida em outra aba faz a venda falhar, sai da mochila e mantém as outras marcadas</td><td class="ok">passou</td></tr>
+<tr><td>Botões de raridade marcam e desmarcam todas as peças da raridade</td><td class="ok">passou</td></tr>
+<tr><td>A barra mostra os cinco botões de raridade na ordem</td><td class="ok">passou</td></tr>
+<tr><td>Vender todas as comuns custa quatro cliques</td><td class="ok">passou</td></tr>
+<tr><td>Durante a venda todos os botões ficam desativados e uma segunda confirmação não envia nada</td><td class="ok">passou</td></tr>
+<tr><td>Vender a última peça da mochila com um herói equipado mostra Mochila (0) sem Vender várias</td><td class="ok">passou</td></tr>
+<tr><td>Vender a última peça mostra o texto de vazio com o aviso</td><td class="ok">passou</td></tr>
+<tr><td>Peça que cai com o modo ligado aparece desmarcada e a seleção continua</td><td class="ok">passou</td></tr>
+<tr><td>A resposta de uma venda que chega depois de a janela fechar não desenha nada</td><td class="ok">passou</td></tr>
+</table></div>
+
+<h2>Testes que falham e não são da feature</h2>
+<ul>
+<li><strong>Unitário, 3 falhas</strong> em <code>ClickerGame.test.js</code>, bloco "ClickerGame farm mode": "a win refused as too fast pays nothing but keeps the farm going", "a win lost to a network failure keeps the loop going" e "a refused win ends the farm without a notice and reloads the farm state". O teste commitado usa a variável <code>loads</code> fora do escopo e um <code>advance</code> que lê <code>callback</code> de um objeto indefinido. O arquivo não foi tocado pela feature (último commit <code>8f35e27</code>, fora do intervalo) e há correções locais não commitadas do usuário nele.</li>
+<li><strong>E2E, 2 falhas</strong> em <code>farm.spec.js</code> (linhas 61 e 82): o clique no canvas do menu não segue o fluxo do "Rever chefes" no commit <code>8a8d89a</code>. A feature não toca o farm, e <code>farm.spec.js</code> também tem alterações locais não commitadas do usuário. Os 17 cenários de <code>bulkSell.spec.js</code> passaram. Os 2 testes ignorados são pré-existentes.</li>
+</ul>
+
+<h2>Ressalvas do Verifier aceitas</h2>
+<ul>
+<li><strong>BSL-19 "outra tela aberta":</strong> só teste unitário (<code>HeroUi.test.js:1328</code>); o painel aberto cobre os botões do HUD, então o jogador não alcança outra tela (decisão D14).</li>
+<li><strong>SP-1:</strong> a regra BSL-23 passou a nomear a região bloqueada na venda (corpo da janela; o botão de fechar continua ativo), decisão D13. O comportamento entregue não mudou.</li>
+<li>A queda durante a seleção é testada com uma injeção direta (<code>ClickerGame.receiveEquipmentDrop</code>), e o teste de corrida (BSL-08) foi rodado uma vez no Verifier.</li>
+</ul>
+
+<h2>Deploy e produção</h2>
+<ul>
+<li>Tudo em <code>origin/main</code>; o watcher tratou <code>8a8d89a</code>. Backend ativo no slot <code>green</code> (commit <code>1f7041f</code>), proxy e Postgres no ar, Worker publicado.</li>
+<li>Produção (<code>https://infinity-grove.yan-tapajos.workers.dev/</code>): o jogo carrega e a conta de teste entra. A tela Equipamento mostra <strong>Vender várias</strong>; o modo de seleção abre com a barra, os cinco botões de raridade, o contador e o total (1 peça = "Total: 1 prata"), o ✓ aparece no bloco marcado e <strong>Cancelar</strong> sai do modo. Todas as chamadas <code>/api/*</code> (wallet, heroes, equipment, talents, progress) responderam 200 e o console não teve erros.</li>
+<li><code>POST /equipment/sell</code> pelo túnel responde 401 sem token (a rota existe e exige login). A venda real não foi executada em produção para não apagar peças da conta de teste.</li>
+</ul>
+<p class="sub">O site só fica no ar enquanto o <code>publish.sh</code> roda.</p>
+</main>
+</body>
+</html>
