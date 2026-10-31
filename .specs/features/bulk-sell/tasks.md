@@ -210,7 +210,7 @@ fun removeAll(pieceIds: List<String>): PlayerEquipment {
 
 ---
 
-### T3: SellPiecesUseCase and EquipmentService.sellAll [ ]
+### T3: SellPiecesUseCase and EquipmentService.sellAll [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Sell a batch in one transaction under the player lock: validate the batch, find every piece, credit the sum once, delete the rows (BSL-01 to BSL-05, BSL-08).
@@ -283,8 +283,8 @@ Imports to add in `EquipmentService.kt`: `<kt>.domain.SellBatch`, `<kt>.usecase.
 **Gate**: quick - `cd backend && ./gradlew test --tests '*EquipmentServiceTest'`
 **Done when**:
 
-- [ ] The 7 new cases and every earlier `EquipmentServiceTest` case pass.
-- [ ] `cd backend && ./gradlew ktlintCheck` passes.
+- [x] The 7 new cases and every earlier `EquipmentServiceTest` case pass.
+- [x] `cd backend && ./gradlew ktlintCheck` passes.
 
 **Commit**: `feat(backend): sell a batch of pieces in one transaction`
 

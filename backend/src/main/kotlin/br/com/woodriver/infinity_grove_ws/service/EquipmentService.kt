@@ -6,17 +6,20 @@ import br.com.woodriver.infinity_grove_ws.domain.MaxRefineException
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCardsMissingException
 import br.com.woodriver.infinity_grove_ws.domain.PlayerEquipment
+import br.com.woodriver.infinity_grove_ws.domain.SellBatch
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.port.ChanceRollerPort
 import br.com.woodriver.infinity_grove_ws.port.EquipmentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
+import br.com.woodriver.infinity_grove_ws.usecase.BatchSale
 import br.com.woodriver.infinity_grove_ws.usecase.EquipPieceUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.EquipmentChange
 import br.com.woodriver.infinity_grove_ws.usecase.ListEquipmentUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.RefinePieceUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.RerollAffixUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.SellPieceUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.SellPiecesUseCase
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -35,7 +38,8 @@ class EquipmentService(
     EquipPieceUseCase,
     RefinePieceUseCase,
     RerollAffixUseCase,
-    SellPieceUseCase {
+    SellPieceUseCase,
+    SellPiecesUseCase {
     override fun list(username: String): PlayerEquipment {
         logger.info("Listing equipment username={}", username)
         requireUser(username)
@@ -113,6 +117,23 @@ class EquipmentService(
         walletAccess.save(wallet)
         logger.info("Sold username={} piece={} copper={}", username, pieceId, piece.sellPrice())
         return EquipmentChange(store(before, before.remove(pieceId)), wallet)
+    }
+
+    override fun sellAll(
+        username: String,
+        pieceIds: List<String>,
+    ): BatchSale {
+        logger.info("Batch sell requested username={} count={}", username, pieceIds.size)
+        val batch = SellBatch(pieceIds)
+        lockPlayer(username)
+        val before = load(username)
+        val sold = batch.pieceIds.map(before::find)
+        val earned = sold.sumOf { it.sellPrice() }
+        val after = before.removeAll(batch.pieceIds)
+        val wallet = walletAccess.lock(username).plus(earned)
+        walletAccess.save(wallet)
+        logger.info("Sold batch username={} pieces={} copper={}", username, sold.size, earned)
+        return BatchSale(store(before, after), wallet, sold.size, earned)
     }
 
     /** Writes the pieces [after] changed or removed compared to [before]. */

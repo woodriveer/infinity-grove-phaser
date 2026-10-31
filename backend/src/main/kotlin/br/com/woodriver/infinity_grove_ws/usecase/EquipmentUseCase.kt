@@ -53,3 +53,19 @@ interface SellPieceUseCase {
         pieceId: String,
     ): EquipmentChange
 }
+
+/** The pieces and the wallet after a batch sale, how many pieces were sold and the copper they paid. */
+data class BatchSale(
+    val equipment: PlayerEquipment,
+    val wallet: Wallet,
+    val sold: Int,
+    val earned: Long,
+)
+
+interface SellPiecesUseCase {
+    /** Sells every piece of [pieceIds] (taking worn ones off their hero) and credits the sum of their sell prices, in one transaction; one id the player does not own sells nothing. */
+    fun sellAll(
+        username: String,
+        pieceIds: List<String>,
+    ): BatchSale
+}

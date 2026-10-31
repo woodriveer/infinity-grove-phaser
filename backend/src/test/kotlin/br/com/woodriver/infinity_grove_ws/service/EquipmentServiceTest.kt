@@ -18,6 +18,7 @@ import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.HeroNotOwnedException
 import br.com.woodriver.infinity_grove_ws.domain.HeroSeed
 import br.com.woodriver.infinity_grove_ws.domain.InvalidAffixException
+import br.com.woodriver.infinity_grove_ws.domain.InvalidSellBatchException
 import br.com.woodriver.infinity_grove_ws.domain.MaxRefineException
 import br.com.woodriver.infinity_grove_ws.domain.NotEnoughCopperException
 import br.com.woodriver.infinity_grove_ws.domain.Piece
@@ -374,5 +375,93 @@ class EquipmentServiceTest {
 
         assertEquals(10L, wallets.wallets.getValue("yan").copper)
         assertEquals(1, pieces.pieces.size)
+    }
+
+    @Test
+    fun `sellAll removes every listed piece and credits the sum of their prices`() {
+        player()
+        weapon("c")
+        weapon("r", refine = 4, rarity = Rarity.RARE)
+        weapon("u", rarity = Rarity.UNCOMMON)
+        weapon("keep")
+        funded(50)
+
+        val sale = service.sellAll("yan", listOf("c", "r", "u"))
+
+        assertEquals(3, sale.sold)
+        assertEquals(1200L, sale.earned)
+        assertEquals(1250L, sale.wallet.copper)
+        assertEquals(1250L, wallets.wallets.getValue("yan").copper)
+        assertEquals(setOf("keep"), pieces.pieces.keys)
+        assertEquals(listOf("keep"), sale.equipment.pieces.map { it.id })
+    }
+
+    @Test
+    fun `sellAll of a worn piece takes it off the hero and sells it`() {
+        player()
+        weapon("w")
+        service.equip("yan", "w", "kael")
+        funded(0)
+
+        val sale = service.sellAll("yan", listOf("w"))
+
+        assertEquals(100L, sale.wallet.copper)
+        assertEquals(emptyList<Piece>(), sale.equipment.worn("kael"))
+        assertEquals(0, pieces.pieces.size)
+    }
+
+    @Test
+    fun `sellAll with one id the player does not own sells nothing and credits nothing`() {
+        player()
+        weapon("a")
+        funded(10)
+        Piece("theirs", "other", Slot.WEAPON, Rarity.COMMON, 3, 0, emptyList()).also { pieces.save(it) }
+
+        assertFailsWith<EquipmentNotFoundException> { service.sellAll("yan", listOf("a", "theirs")) }
+        assertFailsWith<EquipmentNotFoundException> { service.sellAll("yan", listOf("a", "ghost")) }
+
+        assertEquals(10L, wallets.wallets.getValue("yan").copper)
+        assertEquals(setOf("a", "theirs"), pieces.pieces.keys)
+    }
+
+    @Test
+    fun `sellAll of a batch already sold is not found and pays once`() {
+        player()
+        weapon("a")
+        weapon("b")
+        funded(0)
+
+        assertEquals(200L, service.sellAll("yan", listOf("a", "b")).wallet.copper)
+        assertFailsWith<EquipmentNotFoundException> { service.sellAll("yan", listOf("a", "b")) }
+
+        assertEquals(200L, wallets.wallets.getValue("yan").copper)
+    }
+
+    @Test
+    fun `sellAll of an empty or repeating batch is refused and changes nothing`() {
+        player()
+        weapon("a")
+        funded(10)
+
+        assertFailsWith<InvalidSellBatchException> { service.sellAll("yan", emptyList()) }
+        assertFailsWith<InvalidSellBatchException> { service.sellAll("yan", listOf("a", "a")) }
+
+        assertEquals(10L, wallets.wallets.getValue("yan").copper)
+        assertEquals(setOf("a"), pieces.pieces.keys)
+    }
+
+    @Test
+    fun `sellAll creates the missing wallet before crediting`() {
+        player()
+        weapon("a")
+
+        assertEquals(100L, service.sellAll("yan", listOf("a")).wallet.copper)
+    }
+
+    @Test
+    fun `sellAll for an unknown user or a player without cards fails`() {
+        assertFailsWith<UserNotFoundException> { service.sellAll("ghost", listOf("a")) }
+        users.save(User("yan", "hash", 1L, 1L))
+        assertFailsWith<PlayerCardsMissingException> { service.sellAll("yan", listOf("a")) }
     }
 }
