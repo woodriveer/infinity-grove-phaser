@@ -139,7 +139,7 @@ Selection mode of the Equipamento window, bag part (the leader panel and hero bl
 Mochila (4)                                      <- .bag-header (flex, space-between); the button `Vender várias` sits at the right when mode is off
 ┌─ .bulk-sell-bar (sticky at the top of .hero-window) ────────────┐
 │ Selecionadas: 2 · Total: 3 prata     (Vender selecionadas) (Cancelar) │  row 1: .bulk-sell-summary, heading font 15px; .bulk-sell-actions at the right
-│ |Comum| |Incomum| |Raro| |Épico| |Lendário|                    │  row 2: .bulk-sell-rarities, pills 13px, dot in the rarity colour
+│ (•)Comum (•)Incomum (•)Raro (•)Épico (•)Lendário               │  row 2: .bulk-sell-rarities, pills 13px, dot in the rarity colour
 │   - or, while confirming, row 1 is -                           │
 │ Vender 2 peças por 3 prata?  (Sim, vender) (Não)               │  .bulk-sell-confirm at the right of row 1; question bold accent-800
 └────────────────────────────────────────────────────────────────┘
@@ -150,7 +150,7 @@ Mochila (4)                                      <- .bag-header (flex, space-bet
 | --- | --- | --- | --- |
 | `Vender várias` (`bulk-sell-start`) | `.equip-button` (pill, 15px heading font, 8px 18px padding) | as `.equip-button` | hidden in selection mode; absent with no unworn piece |
 | `.bulk-sell-bar` | flex row that wraps, gap 8px 14px, padding 8px 14px, radius `var(--radius-md)`, 1px border, `position: sticky; top: 0` in `.hero-window`, shadow `var(--shadow-md)`; at 1280x720 about 82 px high | background `var(--color-surface)` `#ebddc5`, border `var(--color-divider)` | present only in selection mode |
-| Rarity button (`bulk-sell-rarity-<R>`) | `.equip-button`, padding 4px 12px, font 13px, 4px left border | left border: COMMON `#c0b6a5`, UNCOMMON `#5da048`, RARE `#3f8fd1`, EPIC `#9b59d0`, LEGENDARY `#d9a521` (the tile frame colours) | `aria-pressed="true"`: background `var(--color-neutral-300)` `#dcd3c4`, weight 700; disabled: opacity 0.5, cursor not-allowed |
+| Rarity button (`bulk-sell-rarity-<R>`) | `.equip-button`, padding 4px 12px 4px 10px, font 13px, 2px border, a 9px dot in front of the label (`::before`) | dot: COMMON `#c0b6a5`, UNCOMMON `#5da048`, RARE `#3f8fd1`, EPIC `#9b59d0`, LEGENDARY `#d9a521` (the tile frame colours), with a 1px ring of 35% text colour | `aria-pressed="true"`: background 25% of the rarity colour over `var(--color-bg)`, border in the rarity colour, weight 700; disabled: opacity 0.5, cursor not-allowed |
 | `Vender selecionadas` / `Sim, vender` | `.equip-button` | text `var(--color-bg)` `#f5ead8` on `var(--color-accent)` `#c67139`, hover `var(--color-accent-600)` `#b2622d`, shadow `var(--shadow-md)` | disabled: opacity 0.5, cursor not-allowed |
 | `Cancelar` / `Não` | `.equip-button` | as `.equip-button` | hidden while confirming (`Cancelar`) |
 | Question (`bulk-sell-question`) | 15px, weight 700 | `var(--color-accent-800)` `#643312` | - |

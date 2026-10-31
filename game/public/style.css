@@ -2091,9 +2091,23 @@ button:disabled {
 }
 
 .bulk-sell-rarity {
-    padding: 4px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px 4px 10px;
     font-size: 13px;
-    border-left: 4px solid var(--rarity-color);
+    border: 2px solid var(--color-divider);
+}
+
+/* The rarity colour is a dot in front of the label; the thin ring keeps the grey of COMMON visible on the cream */
+.bulk-sell-rarity::before {
+    content: '';
+    flex: none;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--rarity-color);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-text) 35%, transparent);
 }
 
 .bulk-sell-rarity.rarity-common {
@@ -2116,9 +2130,12 @@ button:disabled {
     --rarity-color: #d9a521;
 }
 
-.bulk-sell-rarity[aria-pressed="true"] {
+/* Pressed: a quarter of the rarity colour as fill, the whole colour as border, bold. The selector is one level deeper than
+   `.equip-button:hover`, so the fill stays while the pointer is on it */
+.bulk-sell-bar .bulk-sell-rarity[aria-pressed="true"] {
     font-weight: 700;
-    background: var(--color-neutral-300);
+    border-color: var(--rarity-color);
+    background: color-mix(in srgb, var(--rarity-color) 25%, var(--color-bg));
 }
 
 .bulk-sell-bar .equip-button:disabled {

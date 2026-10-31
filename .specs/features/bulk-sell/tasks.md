@@ -990,7 +990,7 @@ Keep the `display: flex; flex-wrap: wrap; align-items: center; gap: 6px` of `.bu
 
 ---
 
-### T14: Rarity buttons with a dot and a stronger pressed state
+### T14: Rarity buttons with a dot and a stronger pressed state [x]
 
 **Owner**: game-dev
 **Goal**: Each rarity button shows its rarity as a coloured dot instead of the curved 4 px left border, and a pressed button reads at a glance: a fill at about 25 % of the rarity colour, a 2 px border in that colour and bold text (review finding #2).
@@ -1044,9 +1044,9 @@ The border is 2 px in every state, so a press does not move the labels.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] Each rarity button shows a dot in its colour and has no left border.
-- [ ] A pressed button has a fill near 25 % of its colour, a 2 px border in that colour and bold text; an unpressed one has the same 2 px border width, so nothing moves on press.
-- [ ] `npm test` and `npm run build` pass, and the three e2e files still pass.
+- [x] Each rarity button shows a dot in its colour and has no left border.
+- [x] A pressed button has a fill near 25 % of its colour, a 2 px border in that colour and bold text; an unpressed one has the same 2 px border width, so nothing moves on press.
+- [x] `npm test` and `npm run build` pass, and the three e2e files still pass.
 
 **Commit**: `style(game): give the rarity buttons a dot and a stronger pressed state`
 
