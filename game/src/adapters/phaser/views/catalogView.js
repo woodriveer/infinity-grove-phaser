@@ -1,5 +1,10 @@
-import { ELEMENT_LABELS } from '../../../domain/heroes/heroes';
+import { ELEMENT_LABELS, starsClass } from '../../../domain/heroes/heroes';
+import { starPowerText } from '../../../domain/heroes/starBonus';
+import { skillLevelOf, skillLevelText } from '../../../domain/skills/skillLevel';
 import { art, el, sprite, starsText } from './dom';
+
+//  The stars of a hero: the tier class (is-ascended from 4 stars, is-exalted from 7) only for an owned hero
+const starsClassName = (hero) => [ 'hero-stars', hero.owned ? starsClass(hero.stars) : '' ].filter(Boolean).join(' ');
 
 //  One skill with its art, name, type, effect and cooldown, marked unlocked or locked. Locked skills are shown all the same.
 export const renderSkillRow = (skill) =>
@@ -16,6 +21,14 @@ export const renderSkillRow = (skill) =>
         document.createTextNode(' '),
         el('span', 'skill-state', skill.unlocked ? 'Liberada' : 'Bloqueada')
     );
+
+    const level = skillLevelOf(skill);
+
+    if (level >= 1)
+    {
+        text.append(document.createTextNode(' '), el('span', 'skill-level', skillLevelText(level), { 'data-level': String(level) }));
+    }
+
     row.append(art(skill.image, skill.name, 'skill-art'), text);
 
     return row;
@@ -44,7 +57,7 @@ export const renderCatalog = (heroes, { onSelect }) =>
             sprite(hero.id, hero.name, 'hero-portrait'),
             el('span', 'hero-name', hero.name),
             el('span', 'hero-meta', ELEMENT_LABELS[hero.element]),
-            el('span', 'hero-stars', hero.owned ? starsText(hero.stars) : 'Não obtido')
+            el('span', starsClassName(hero), hero.owned ? starsText(hero.stars) : 'Não obtido')
         );
         card.addEventListener('click', () => onSelect(hero));
         grid.append(card);
@@ -58,12 +71,14 @@ export const renderHeroDetail = (hero) =>
 {
     const detail = el('div', 'hero-detail', '', { testid: 'hero-detail' });
     const text = el('div', 'hero-detail-text');
+    const power = hero.owned ? starPowerText(hero.stars) : '';
 
     text.append(
         el('strong', 'hero-name', hero.name),
         el('div', 'hero-class', `Classe: ${hero.heroClass}`),
         el('div', 'hero-element', `Elemento: ${ELEMENT_LABELS[hero.element]}`),
-        el('div', 'hero-stars', hero.owned ? `Estrelas: ${starsText(hero.stars)}` : 'Não obtido'),
+        el('div', starsClassName(hero), hero.owned ? `Estrelas: ${starsText(hero.stars)}` : 'Não obtido'),
+        ...(power ? [ el('div', 'hero-star-power', power, { testid: 'hero-star-power' }) ] : []),
         el('div', 'hero-bonus', `Bônus de líder: ${hero.leaderBonus}`)
     );
     detail.append(sprite(hero.id, hero.name, 'hero-detail-portrait'), text, renderSkillList(hero));

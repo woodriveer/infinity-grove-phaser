@@ -82,4 +82,13 @@ describe('attachSkillTooltip', () => {
         expect(above.querySelector('.skill-tooltip').classList.contains('is-above')).toBe(true);
         expect(below.querySelector('.skill-tooltip').classList.contains('is-below')).toBe(true);
     });
+
+    it('the tooltip of a level 2 skill carries its level', () => {
+        const node = document.createElement('div');
+
+        attachSkillTooltip(node, () => ({ ...skill, unlocked: true, level: 2 }));
+        enter(node);
+
+        expect(node.querySelector('.skill-tooltip .skill-level').textContent).toBe('Nível 2 · +25% de poder');
+    });
 });

@@ -73,7 +73,7 @@ T3 → T4 → T5 → T6 → T7 → T8
 ### Phase 4: Game scene, views and style
 
 ```
-T8 → T9 → T10 → T11 → T12 → T13 → T14
+T8 → T10 → T11 → T12 → T13 → T14 → T9 (T9 deferred: it waits for the owner's ClickerGame.js edits; T10-T14 do not need its code, so it runs after T14)
 ```
 
 ### Phase 5: e2e
@@ -645,7 +645,7 @@ const slotText = (ctx, number) => slot(ctx, number).querySelector('.skill-slot-c
 
 ---
 
-### T10: Skill rows, star tiers and star power on the hero screens [ ]
+### T10: Skill rows, star tiers and star power on the hero screens [x]
 
 **Owner**: game-dev
 **What**: The skill row shows `Nível <L>`, the catalog card and hero detail draw 4 to 6 stars with `is-ascended` and 7 to 9 with `is-exalted`, and the hero detail shows the star power line (ASC-08, spec AC 1 to 5, 7 to 9).
@@ -685,7 +685,7 @@ const slotText = (ctx, number) => slot(ctx, number).querySelector('.skill-slot-c
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The ten cases pass; the whole Vitest suite passes.
+- [x] The ten cases pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): show the skill level and star power on the hero screens`
 
