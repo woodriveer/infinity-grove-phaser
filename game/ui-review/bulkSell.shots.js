@@ -40,6 +40,22 @@ test('bulk sell', async ({ page }, testInfo) => {
         await route.fulfill({ json: { equipment: lastBag, wallet: coins(START_COPPER + earned), sold: sold.length, earned } });
     });
 
+    //  Console, page errors and failed requests of the whole run, printed at the end for the report
+    const problems = [];
+
+    page.on('console', (message) => {
+        if ([ 'error', 'warning' ].includes(message.type())) {
+            problems.push(`console.${message.type()}: ${message.text()}`);
+        }
+    });
+    page.on('pageerror', (error) => problems.push(`pageerror: ${error.message}`));
+    page.on('requestfailed', (request) => problems.push(`requestfailed: ${request.url()} ${request.failure()?.errorText}`));
+    page.on('response', (response) => {
+        if (response.status() >= 400) {
+            problems.push(`http ${response.status()}: ${response.url()}`);
+        }
+    });
+
     const menu = await openMainMenu(page);
 
     await fillCredentials(menu, 'yan', 'secret123');
@@ -67,7 +83,8 @@ test('bulk sell', async ({ page }, testInfo) => {
     await shot(page, testInfo, '04-worn-locked');
 
     await page.getByTestId('equip-piece-b11').hover();
-    await expect(page.getByTestId('piece-tooltip')).toBeVisible();
+    //  Since c8856cc the tooltip stays hidden in selection mode
+    await expect(page.getByTestId('piece-tooltip')).toBeHidden();
     await shot(page, testInfo, '05-tooltip');
     await page.mouse.move(0, 0);
 
@@ -75,12 +92,20 @@ test('bulk sell', async ({ page }, testInfo) => {
     await page.mouse.move(0, 0);
     await shot(page, testInfo, '06-rarity-pressed');
 
+    //  Finding #1: the bar must stay at the top of the window while the bag scrolls, and the second row must be reachable
+    await page.locator('.hero-window').evaluate((node) => { node.scrollTop = node.scrollHeight; });
+    await page.waitForTimeout(200);
+    await shot(page, testInfo, '07-scrolled');
+    await page.locator('.hero-window').evaluate((node) => { node.scrollTop = 0; });
+
     await page.getByTestId('bulk-sell-submit').click();
     await expect(page.getByTestId('bulk-sell-question')).toBeVisible();
-    await shot(page, testInfo, '07-confirmation');
+    await shot(page, testInfo, '08-confirmation');
 
     await page.getByTestId('bulk-sell-confirm-yes').click();
     await expect(page.getByTestId('equip-sell-notice')).toBeVisible();
     await page.mouse.move(0, 0);
-    await shot(page, testInfo, '08-success');
+    await shot(page, testInfo, '09-success');
+
+    console.log(`CONSOLE-REPORT (${testInfo.project.name}): ${problems.length ? problems.join(' | ') : 'clean'}`);
 });

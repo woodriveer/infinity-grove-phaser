@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -106,17 +107,17 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
             <div>
                 <h1>Venda em lote</h1>
                 <div class="meta">
-                    <code>.specs/features/bulk-sell</code> · commits <code>611cb30..586a50a</code> · 2026-10-31 · servidor de desenvolvimento com o backend falso dos e2e
+                    <code>.specs/features/bulk-sell</code> · reavaliação após <code>a916c3d, 60196fc, c8856cc, 847a7ad</code> (T13-T16) · 2026-10-31 · servidor de desenvolvimento com o backend falso dos e2e
                 </div>
             </div>
             <span class="chip verdict ok">APROVADO</span>
         </div>
-        <p style="margin-top:16px">Sem defeito bloqueante. Revisão refeita no novo formato: os 5 achados e as 2 sugestões da revisão anterior (commit 75d008f) foram conferidos nas novas capturas e todos continuam valendo (renumerados por severidade). Como a rota <code>POST /equipment/sell</code> ainda não está no backend falso commitado, a venda é simulada com <code>page.route</code> em <code>game/ui-review/bulkSell.shots.js</code>; o texto do aviso vem dessa simulação. Cenário: 3 peças equipadas e 14 na mochila, todas as raridades.</p>
+        <p style="margin-top:16px">Os achados #1 a #4 da revisão anterior estão resolvidos, cada um conferido numa nova captura. O #5 (escala no celular) continua como problema conhecido, anterior à feature e sem bloqueio. Há um achado novo de severidade baixa (#6): os contornos de peças selecionadas vizinhas se sobrepõem cerca de 2 px, como o desenvolvedor avisou; julgado como defeito leve que não bloqueia. A venda é simulada com <code>page.route</code> em <code>game/ui-review/bulkSell.shots.js</code> porque a rota <code>POST /equipment/sell</code> não está no backend falso. O estado 05 mudou (o tooltip agora deve ficar oculto) e foi adicionada a captura 07 (janela rolada). Cenário: 3 peças equipadas e 14 na mochila, todas as raridades.</p>
         <div class="stats">
-            <div class="stat"><div class="n">8</div><div class="l">telas e estados verificados</div></div>
-            <div class="stat"><div class="n">16</div><div class="l">capturas (desktop + celular)</div></div>
+            <div class="stat"><div class="n">9</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">18</div><div class="l">capturas (desktop + celular)</div></div>
             <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
-            <div class="stat"><div class="n">5</div><div class="l">achados médios e baixos</div></div>
+            <div class="stat"><div class="n">2</div><div class="l">achados em aberto (baixos); 4 resolvidos</div></div>
         </div>
     </section>
 
@@ -125,10 +126,11 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
         <ul class="checks">
             <li class="yes"><span class="mark">✓</span><span>Vender várias fica à direita de Mochila (n) e some no modo seleção <code>design.md</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Peças selecionadas com contorno de destaque e selo de check; peças equipadas esmaecidas e não selecionáveis <code>spec.md</code></span></li>
-            <li class="yes"><span class="mark">✓</span><span>Barra com Selecionadas: k · Total, cinco raridades (Comum, Incomum, Raro, Épico, Lendário), Vender selecionadas (desabilitado com 0) e Cancelar <code>design.md</code></span></li>
-            <li class="yes"><span class="mark">✓</span><span>Confirmação Vender 5 peças por 17 prata 50 cobre? com Sim, vender e Não, no lugar das ações <code>spec.md</code></span></li>
-            <li class="yes"><span class="mark">✓</span><span>Aviso de sucesso 5 peças vendidas por 17 prata 50 cobre na pílula verde <code>.equip-notice</code>; singular e plural tratados <code>spec.md</code></span></li>
-            <li class="yes"><span class="mark">✓</span><span>Todo o texto em português (AD-007); paleta, fonte de títulos, botões em pílula e molduras iguais ao restante da tela Equipamento <code>AD-007</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Barra com Selecionadas: k · Total, cinco raridades, Vender selecionadas (desabilitado com 0) e Cancelar, agora em duas linhas <code>design.md</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Transferir conjunto some no modo seleção, mantendo o espaço <code>BSL-17</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Confirmação Vender 5 peças por 17 prata 50 cobre? com Sim, vender e Não <code>spec.md</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Aviso de sucesso 5 peças vendidas por 17 prata 50 cobre na pílula verde <code>spec.md</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Todo o texto em português; paleta, fontes e molduras iguais ao restante da tela Equipamento <code>AD-007</code></span></li>
         </ul>
     </section>
 
@@ -141,60 +143,68 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <a href="ui-review/01-bag-desktop.png" target="_blank"><img src="ui-review/01-bag-desktop.png" alt="Mochila, modo seleção desligado" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Mochila, modo seleção desligado</span>
-                        <span class="d">Mochila (14) com o botão Vender várias à direita do título; botões Transferir conjunto visíveis.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #4</span></span>
+                        <span class="d">Mochila (14) com Vender várias à direita do título e os botões Transferir conjunto.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/02-selection-empty-desktop.png" target="_blank"><img src="ui-review/02-selection-empty-desktop.png" alt="Modo seleção ligado, 0 selecionadas" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Modo seleção ligado, 0 selecionadas</span>
-                        <span class="d">Barra com resumo, cinco raridades, Vender selecionadas desabilitado e Cancelar. A janela sobe e a mochila sai de vista.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #4</span></span>
+                        <span class="d">Barra de duas linhas (resumo e ações; raridades com ponto colorido). Os blocos dos heróis mantêm a altura; só o botão Transferir conjunto some.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">resolvido #4</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/03-selected-desktop.png" target="_blank"><img src="ui-review/03-selected-desktop.png" alt="Três peças selecionadas" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Três peças selecionadas</span>
-                        <span class="d">Contorno terracota e selo de check nas peças marcadas; peças equipadas esmaecidas.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #1</span></span>
+                        <span class="d">Contorno terracota e selo de check; a mochila cabe ao lado da barra.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">resolvido #1</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/04-worn-locked-desktop.png" target="_blank"><img src="ui-review/04-worn-locked-desktop.png" alt="Clique em peça equipada (travada)" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Clique em peça equipada (travada)</span>
-                        <span class="d">Peça equipada não é selecionada, o resumo continua em 3; só o tooltip aparece.</span>
+                        <span class="d">Peça equipada não é selecionada, o resumo continua em 3.</span>
                         <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
-                    <a href="ui-review/05-tooltip-desktop.png" target="_blank"><img src="ui-review/05-tooltip-desktop.png" alt="Tooltip em modo seleção" loading="lazy"></a>
+                    <a href="ui-review/05-tooltip-desktop.png" target="_blank"><img src="ui-review/05-tooltip-desktop.png" alt="Cursor sobre uma peça no modo seleção" loading="lazy"></a>
                     <figcaption>
-                        <span class="t">Tooltip em modo seleção</span>
-                        <span class="d">Tooltip da peça sob o cursor cobre as raridades e os botões da barra.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #3</span></span>
+                        <span class="t">Cursor sobre uma peça no modo seleção</span>
+                        <span class="d">Nenhum tooltip abre; a barra fica livre.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">resolvido #3</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/06-rarity-pressed-desktop.png" target="_blank"><img src="ui-review/06-rarity-pressed-desktop.png" alt="Botão de raridade pressionado (Raro)" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Botão de raridade pressionado (Raro)</span>
-                        <span class="d">Todas as peças raras da mochila marcadas; o botão Raro mal se distingue dos demais.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #2</span></span>
+                        <span class="d">Raro com preenchimento azul, borda de 2 px e negrito; 5 peças marcadas. Contornos de peças vizinhas se tocam.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">resolvido #2</span><span class="chip sev-baixa">achado #6</span></span>
                     </figcaption>
                 </figure>
                 <figure>
-                    <a href="ui-review/07-confirmation-desktop.png" target="_blank"><img src="ui-review/07-confirmation-desktop.png" alt="Confirmação" loading="lazy"></a>
+                    <a href="ui-review/07-scrolled-desktop.png" target="_blank"><img src="ui-review/07-scrolled-desktop.png" alt="Janela rolada até o fim" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Janela rolada até o fim</span>
+                        <span class="d">A segunda fileira da mochila fica inteira e alcançável; a barra é sticky (top: 0), embora com 14 peças a rolagem seja curta.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">resolvido #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/08-confirmation-desktop.png" target="_blank"><img src="ui-review/08-confirmation-desktop.png" alt="Confirmação" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Confirmação</span>
-                        <span class="d">Pergunta Vender 5 peças por 17 prata 50 cobre? com Sim, vender e Não; peças e raridades desabilitadas.</span>
+                        <span class="d">Vender 5 peças por 17 prata 50 cobre? com Sim, vender e Não; as peças selecionadas mantêm opacidade total.</span>
                         <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
-                    <a href="ui-review/08-success-desktop.png" target="_blank"><img src="ui-review/08-success-desktop.png" alt="Aviso de sucesso" loading="lazy"></a>
+                    <a href="ui-review/09-success-desktop.png" target="_blank"><img src="ui-review/09-success-desktop.png" alt="Aviso de sucesso" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Aviso de sucesso</span>
                         <span class="d">Pílula verde 5 peças vendidas por 17 prata 50 cobre; mochila com 9 peças, modo desligado.</span>
@@ -207,7 +217,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <a href="ui-review/01-bag-phone.png" target="_blank"><img src="ui-review/01-bag-phone.png" alt="Mochila, modo seleção desligado" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Mochila, modo seleção desligado</span>
-                        <span class="d">Mochila (14) com o botão Vender várias à direita do título; botões Transferir conjunto visíveis.</span>
+                        <span class="d">Mochila (14) com Vender várias à direita do título e os botões Transferir conjunto.</span>
                         <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
@@ -215,52 +225,60 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <a href="ui-review/02-selection-empty-phone.png" target="_blank"><img src="ui-review/02-selection-empty-phone.png" alt="Modo seleção ligado, 0 selecionadas" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Modo seleção ligado, 0 selecionadas</span>
-                        <span class="d">Barra com resumo, cinco raridades, Vender selecionadas desabilitado e Cancelar. A janela sobe e a mochila sai de vista.</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                        <span class="d">Barra de duas linhas (resumo e ações; raridades com ponto colorido). Os blocos dos heróis mantêm a altura; só o botão Transferir conjunto some.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">resolvido #4</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/03-selected-phone.png" target="_blank"><img src="ui-review/03-selected-phone.png" alt="Três peças selecionadas" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Três peças selecionadas</span>
-                        <span class="d">Contorno terracota e selo de check nas peças marcadas; peças equipadas esmaecidas.</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #5</span></span>
+                        <span class="d">Contorno terracota e selo de check; a mochila cabe ao lado da barra.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">resolvido #1</span><span class="chip sev-baixa">achado #5</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/04-worn-locked-phone.png" target="_blank"><img src="ui-review/04-worn-locked-phone.png" alt="Clique em peça equipada (travada)" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Clique em peça equipada (travada)</span>
-                        <span class="d">Peça equipada não é selecionada, o resumo continua em 3; só o tooltip aparece.</span>
+                        <span class="d">Peça equipada não é selecionada, o resumo continua em 3.</span>
                         <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
-                    <a href="ui-review/05-tooltip-phone.png" target="_blank"><img src="ui-review/05-tooltip-phone.png" alt="Tooltip em modo seleção" loading="lazy"></a>
+                    <a href="ui-review/05-tooltip-phone.png" target="_blank"><img src="ui-review/05-tooltip-phone.png" alt="Cursor sobre uma peça no modo seleção" loading="lazy"></a>
                     <figcaption>
-                        <span class="t">Tooltip em modo seleção</span>
-                        <span class="d">Tooltip da peça sob o cursor cobre as raridades e os botões da barra.</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #3</span></span>
+                        <span class="t">Cursor sobre uma peça no modo seleção</span>
+                        <span class="d">Nenhum tooltip abre; a barra fica livre.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">resolvido #3</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/06-rarity-pressed-phone.png" target="_blank"><img src="ui-review/06-rarity-pressed-phone.png" alt="Botão de raridade pressionado (Raro)" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Botão de raridade pressionado (Raro)</span>
-                        <span class="d">Todas as peças raras da mochila marcadas; o botão Raro mal se distingue dos demais.</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #2</span></span>
+                        <span class="d">Raro com preenchimento azul, borda de 2 px e negrito; 5 peças marcadas. Contornos de peças vizinhas se tocam.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">resolvido #2</span><span class="chip sev-baixa">achado #5</span></span>
                     </figcaption>
                 </figure>
                 <figure>
-                    <a href="ui-review/07-confirmation-phone.png" target="_blank"><img src="ui-review/07-confirmation-phone.png" alt="Confirmação" loading="lazy"></a>
+                    <a href="ui-review/07-scrolled-phone.png" target="_blank"><img src="ui-review/07-scrolled-phone.png" alt="Janela rolada até o fim" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Janela rolada até o fim</span>
+                        <span class="d">A segunda fileira da mochila fica inteira e alcançável; a barra é sticky (top: 0), embora com 14 peças a rolagem seja curta.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">resolvido #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/08-confirmation-phone.png" target="_blank"><img src="ui-review/08-confirmation-phone.png" alt="Confirmação" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Confirmação</span>
-                        <span class="d">Pergunta Vender 5 peças por 17 prata 50 cobre? com Sim, vender e Não; peças e raridades desabilitadas.</span>
+                        <span class="d">Vender 5 peças por 17 prata 50 cobre? com Sim, vender e Não; as peças selecionadas mantêm opacidade total.</span>
                         <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
-                    <a href="ui-review/08-success-phone.png" target="_blank"><img src="ui-review/08-success-phone.png" alt="Aviso de sucesso" loading="lazy"></a>
+                    <a href="ui-review/09-success-phone.png" target="_blank"><img src="ui-review/09-success-phone.png" alt="Aviso de sucesso" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Aviso de sucesso</span>
                         <span class="d">Pílula verde 5 peças vendidas por 17 prata 50 cobre; mochila com 9 peças, modo desligado.</span>
@@ -275,78 +293,92 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
         <h2>Achados</h2>
         <article class="finding">
             <div>
-                <div class="top"><span class="chip sev-media">#1 · Média</span><strong>A barra empurra a mochila para fora da janela</strong></div>
+                <div class="top"><span class="chip sev-baixa">#6 · Baixa</span><strong>Contornos de peças vizinhas selecionadas se tocam</strong></div>
                 <dl>
-                    <dt>Tela</dt><dd>Equipamento, modo seleção (desktop 1280×720)</dd>
-                    <dt>O que está errado</dt><dd>A barra tem cerca de 112 px (cerca de 140 px com a confirmação). Com 14 peças só a primeira fileira aparece inteira e a segunda é cortada pela borda da janela; o jogador precisa rolar para ver as peças que está escolhendo. Com a mochila cheia o problema cresce.</dd>
-                    <dt>Como deveria ficar</dt><dd>As peças continuam visíveis ao lado da barra: barra fixa no topo da área rolável (<code>position: sticky</code>) ou resumo e ações compactos na mesma linha.</dd>
-                    <dt>Arquivo</dt><dd><code>game/public/style.css (.bulk-sell-bar)</code></dd>
+                    <dt>Tela</dt><dd>Equipamento, modo seleção (desktop; só com peças adjacentes marcadas)</dd>
+                    <dt>O que está errado</dt><dd>As peças têm 56 px com vão de 12 px e o contorno de 3 px a 4 px de distância ocupa 7 px por lado: 14 px contra 12 px, cerca de 2 px de sobreposição. Visto de perto (06) os contornos se fundem numa faixa terracota entre as peças. Cada peça ainda se lê pelo check e pelo retângulo arredondado, por isso não bloqueia.</dd>
+                    <dt>Como deveria ficar</dt><dd><code>outline-offset: 2px</code> (5 px por lado, 10 px contra 12 px) deixa um vão de 2 px; ou aumentar o gap da grade da mochila para 16 px.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (.piece-tile.is-selected)</code></dd>
                 </dl>
             </div>
-            <a href="ui-review/03-selected-desktop.png" target="_blank"><img src="ui-review/03-selected-desktop.png" alt="Captura do achado #1"></a>
+            <a href="ui-review/06-rarity-pressed-desktop.png" target="_blank"><img src="ui-review/06-rarity-pressed-desktop.png" alt="Captura do achado #6"></a>
         </article>
         <article class="finding">
             <div>
-                <div class="top"><span class="chip sev-baixa">#2 · Baixa</span><strong>Pílulas de raridade: borda esquerda vira um crescente e o estado pressionado é fraco</strong></div>
+                <div class="top"><span class="chip sev-baixa">#5 · Baixa · conhecido</span><strong>Celular: a barra e as peças ficam minúsculas</strong></div>
                 <dl>
-                    <dt>Tela</dt><dd>Equipamento, barra de venda (desktop e celular)</dd>
-                    <dt>O que está errado</dt><dd>Como a pílula é totalmente arredondada, a borda esquerda de 4 px segue a curva e parece um fio curvo; Comum (<code>#c0b6a5</code>) quase some. O botão pressionado (<code>aria-pressed="true"</code>) quase não difere dos vizinhos, então não dá para saber quais raridades estão ligadas.</dd>
-                    <dt>Como deveria ficar</dt><dd>Um ponto colorido ou <code>box-shadow: inset 4px 0 0</code> com raio menor; estado pressionado forte (preenchimento na cor da raridade a cerca de 25% ou borda de 2 px, mais negrito).</dd>
-                    <dt>Arquivo</dt><dd><code>game/public/style.css (.bulk-sell-rarity*)</code></dd>
+                    <dt>Tela</dt><dd>Equipamento, modo seleção (celular 390×844)</dd>
+                    <dt>O que está errado</dt><dd>Problema anterior à feature, mantido e sem bloqueio: o DOM do jogo é reduzido como um todo na largura de celular; as pílulas e o resumo renderizam em torno de 5–6 px e as peças em cerca de 24 px. A barra compacta da correção #1 ajuda, mas a escala continua pequena.</dd>
+                    <dt>Como deveria ficar</dt><dd>Aumentar a escala do DOM em viewports estreitas (tarefa futura, fora do escopo de T13-T16).</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (escala do DOM em telas estreitas)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/03-selected-phone.png" target="_blank"><img src="ui-review/03-selected-phone.png" alt="Captura do achado #5"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip ok">#1 · Resolvido</span><strong>A barra empurrava a mochila para fora da janela</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Equipamento, modo seleção</dd>
+                    <dt>O que está errado</dt><dd>Resolvido (a916c3d). A barra agora tem cerca de 84 px em duas linhas e é <code>position: sticky; top: 0</code>. Com 14 peças a segunda fileira aparece quase inteira (03) e, rolando até o fim (07), fica totalmente alcançável. Observação: com esta mochila a rolagem é curta (cerca de 68 px), então o efeito sticky em si não aparece nas capturas; está no CSS.</dd>
+                    <dt>Como deveria ficar</dt><dd>Nada a fazer.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css e equipmentView.js</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/07-scrolled-desktop.png" target="_blank"><img src="ui-review/07-scrolled-desktop.png" alt="Captura do achado #1"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip ok">#2 · Resolvido</span><strong>Pílulas de raridade: borda curva e estado pressionado fraco</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Equipamento, modo seleção</dd>
+                    <dt>O que está errado</dt><dd>Resolvido (60196fc). Cada pílula tem um ponto colorido no lugar do fio curvo; Raro pressionado ganha preenchimento azul, borda de 2 px e negrito, claramente distinto dos vizinhos (06).</dd>
+                    <dt>Como deveria ficar</dt><dd>Nada a fazer.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css e equipmentView.js</code></dd>
                 </dl>
             </div>
             <a href="ui-review/06-rarity-pressed-desktop.png" target="_blank"><img src="ui-review/06-rarity-pressed-desktop.png" alt="Captura do achado #2"></a>
         </article>
         <article class="finding">
             <div>
-                <div class="top"><span class="chip sev-baixa">#3 · Baixa</span><strong>Tooltip cobre a barra no modo seleção</strong></div>
+                <div class="top"><span class="chip ok">#3 · Resolvido</span><strong>Tooltip cobria a barra no modo seleção</strong></div>
                 <dl>
-                    <dt>Tela</dt><dd>Equipamento, modo seleção (desktop e celular)</dd>
-                    <dt>O que está errado</dt><dd>Ao passar o cursor numa peça da primeira fileira, o tooltip aparece acima dela e cobre as raridades e as ações (Raro Amuleto +1 sobre a barra).</dd>
-                    <dt>Como deveria ficar</dt><dd>Esconder <code>.piece-tooltip</code> enquanto o modo seleção está ligado, ou abri-lo abaixo da peça.</dd>
-                    <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/equipmentView.js ou CSS do tooltip</code></dd>
+                    <dt>Tela</dt><dd>Equipamento, modo seleção</dd>
+                    <dt>O que está errado</dt><dd>Resolvido (c8856cc). O cursor sobre uma peça não abre mais o tooltip; a barra fica livre (05). Fora do modo seleção o tooltip segue como antes.</dd>
+                    <dt>Como deveria ficar</dt><dd>Nada a fazer.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css e equipmentView.js</code></dd>
                 </dl>
             </div>
             <a href="ui-review/05-tooltip-desktop.png" target="_blank"><img src="ui-review/05-tooltip-desktop.png" alt="Captura do achado #3"></a>
         </article>
         <article class="finding">
             <div>
-                <div class="top"><span class="chip sev-baixa">#4 · Baixa</span><strong>Salto de layout ao entrar no modo seleção</strong></div>
+                <div class="top"><span class="chip ok">#4 · Resolvido</span><strong>Salto de layout ao entrar no modo seleção</strong></div>
                 <dl>
-                    <dt>Tela</dt><dd>Equipamento (desktop)</dd>
-                    <dt>O que está errado</dt><dd>Os botões Transferir conjunto somem, os blocos dos heróis encolhem cerca de 20 px cada e a janela inteira sobe (compare 01 e 02); o botão que o jogador acabou de clicar se mexe.</dd>
-                    <dt>Como deveria ficar</dt><dd>Altura das linhas fixa: <code>visibility: hidden</code> em vez de remover os botões, ou <code>min-height</code> em <code>.hero-block</code>.</dd>
-                    <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/equipmentView.js e game/public/style.css</code></dd>
+                    <dt>Tela</dt><dd>Equipamento, modo seleção</dd>
+                    <dt>O que está errado</dt><dd>Resolvido (847a7ad). Os blocos dos heróis mantêm a altura (cerca de 94 px em 01 e 02) e os títulos não se movem; só o botão some. A janela sobe cerca de 10 px porque a barra é maior que o botão Vender várias, o que é esperado.</dd>
+                    <dt>Como deveria ficar</dt><dd>Nada a fazer.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css e equipmentView.js</code></dd>
                 </dl>
             </div>
             <a href="ui-review/02-selection-empty-desktop.png" target="_blank"><img src="ui-review/02-selection-empty-desktop.png" alt="Captura do achado #4"></a>
-        </article>
-        <article class="finding">
-            <div>
-                <div class="top"><span class="chip sev-baixa">#5 · Baixa</span><strong>Celular: a barra e as peças ficam minúsculas</strong></div>
-                <dl>
-                    <dt>Tela</dt><dd>Equipamento, modo seleção (celular 390×844)</dd>
-                    <dt>O que está errado</dt><dd>O DOM do jogo é reduzido como um todo na largura de celular (vale para todas as telas): as pílulas de 13 px e o resumo de 15 px renderizam em torno de 5–6 px e as peças em cerca de 24 px, difícil de ler e tocar. Não é causado por esta feature, mas ela traz o primeiro controle com muitos alvos pequenos.</dd>
-                    <dt>Como deveria ficar</dt><dd>Aumentar a escala do DOM em viewports estreitas (tarefa futura). Não bloqueia.</dd>
-                    <dt>Arquivo</dt><dd><code>game/public/style.css (escala do DOM em telas estreitas)</code></dd>
-                </dl>
-            </div>
-            <a href="ui-review/03-selected-phone.png" target="_blank"><img src="ui-review/03-selected-phone.png" alt="Captura do achado #5"></a>
         </article>
     </section>
 
     <section class="panel">
         <h2>Sugestões</h2>
         <ul class="checks">
-            <li><span class="mark">✦</span><span>Na confirmação todas as peças ficam desabilitadas e esmaecem, e os contornos e checks das selecionadas empalidecem; manter as selecionadas em opacidade total mostra a que a pergunta se refere.</span></li>
-            <li><span class="mark">✦</span><span>O contorno selecionado de 3 px com offset de 6 px encosta no contorno da peça vizinha selecionada (vão de cerca de 8 px) e várias peças em fila viram uma mancha; um offset de 4 px as separa.</span></li>
-            <li><span class="mark">✦</span><span>Depois de vender a última peça, o texto de mochila vazia está correto, mas a janela encolhe para uma caixa pequena; aceitável.</span></li>
+            <li><span class="mark">✦</span><span>A janela (centralizada) sobe cerca de 10 px ao entrar no modo seleção; fixá-la pelo topo eliminaria o último movimento.</span></li>
+            <li><span class="mark">✦</span><span>Depois de vender a última peça o texto de mochila vazia está correto, mas a janela encolhe para uma caixa pequena; aceitável.</span></li>
         </ul>
     </section>
 
     <section class="panel">
         <h2>Console e recursos</h2>
-        <p class="empty">Nenhum erro nem recurso faltando na revisão anterior no Chrome (sem 404, sem erros). Nesta rodada o Playwright não coletou o console, então não foi remedido.</p>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Sem 404, sem <code>pageerror</code>, sem <code>requestfailed</code> e sem resposta HTTP 4xx/5xx nas duas execuções (desktop e celular); coletado com <code>page.on</code> em <code>game/ui-review/bulkSell.shots.js</code>.</span></li>
+            <li class="no"><span class="mark">!</span><span><code>GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels</code> — aviso do WebGL do Chromium sem GPU, 4 vezes por execução; vem do canvas do Phaser nas capturas, não da feature.</span></li>
+        </ul>
     </section>
 
     <footer>Revisão do ui-artist · 2026-10-31</footer>
