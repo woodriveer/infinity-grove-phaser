@@ -96,7 +96,7 @@ class EquipmentBatchSellIT : IntegrationTestBase() {
             .then()
             .statusCode(404)
             .body("code", equalTo("EQUIPMENT_NOT_FOUND"))
-        sell("""{"pieceIds":["a","ghost"]}""").then().statusCode(404)
+        sell("""{"pieceIds":["a","ghost"]}""").then().statusCode(404).body("code", equalTo("EQUIPMENT_NOT_FOUND"))
 
         assertEquals(2L, jpaPieceRepository.count())
         assertEquals(10L, copper())
