@@ -146,7 +146,7 @@ The `init` check (`stars in 0..MAX_STARS`) stays as written; it now allows 0 to 
 
 ---
 
-### T2: Report the level of every skill [ ]
+### T2: Report the level of every skill [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Add `level` to every skill of `GET /heroes` and of the fusion answer: 0 locked, else `1 + (stars - slot) / 3` (ASC-01 AC 3).
@@ -205,8 +205,8 @@ JSON: each skill object gains `"level": <int>`; nothing else changes.
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The six test cases pass and the whole backend suite passes.
-- [ ] `git diff` touches no file under `backend/src/main/resources/db/migration`.
+- [x] The six test cases pass and the whole backend suite passes.
+- [x] `git diff` touches no file under `backend/src/main/resources/db/migration`.
 
 **Commit**: `feat(backend): answer the level of each hero skill`
 

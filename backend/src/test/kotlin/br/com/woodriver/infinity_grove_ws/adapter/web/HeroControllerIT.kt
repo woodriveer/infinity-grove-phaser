@@ -83,6 +83,22 @@ class HeroControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `GET heroes answers the level of every skill`() {
+        val token = register()
+        give("yan", "kael", 4, 1)
+
+        asUser(token)
+            .get("/heroes")
+            .then()
+            .statusCode(200)
+            .body("heroes[0].stars", equalTo(4))
+            .body("heroes[0].copies.4", equalTo(1))
+            .body("heroes[0].skills.level", equalTo(listOf(2, 1, 1)))
+            .body("heroes[0].skills.unlocked", equalTo(listOf(true, true, true)))
+            .body("heroes[1].skills.level", equalTo(listOf(0, 0, 0)))
+    }
+
+    @Test
     fun `fuse answers the updated hero and unlocks the first skill`() {
         val token = register()
         give("yan", "kael", 0, 3)
@@ -107,6 +123,17 @@ class HeroControllerIT : IntegrationTestBase() {
             .statusCode(200)
             .body("stars", equalTo(3))
             .body("skills.unlocked", equalTo(listOf(true, true, true)))
+    }
+
+    @Test
+    fun `fuse answers the level of every skill`() {
+        val token = register()
+        give("yan", "kael", 0, 3)
+
+        fuse(token, "kael", """{"stars":0}""")
+            .then()
+            .statusCode(200)
+            .body("skills.level", equalTo(listOf(1, 0, 0)))
     }
 
     @Test

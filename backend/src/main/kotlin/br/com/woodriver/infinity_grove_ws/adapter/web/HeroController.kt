@@ -23,6 +23,7 @@ data class SkillResponse(
     val cooldownSeconds: Int,
     val image: String,
     val unlocked: Boolean,
+    val level: Int,
 ) {
     companion object {
         fun from(view: SkillView) =
@@ -34,6 +35,7 @@ data class SkillResponse(
                 cooldownSeconds = view.skill.cooldownSeconds,
                 image = view.skill.image,
                 unlocked = view.unlocked,
+                level = view.level,
             )
     }
 }
