@@ -2,3 +2,8 @@
 .deploy-state
 .deploy.lock
 deploy/nginx/default.conf
+.idea/
+.vscode/
+.claude/worktrees/
+node_modules/
+__pycache__/
