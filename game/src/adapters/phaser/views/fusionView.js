@@ -1,4 +1,4 @@
-import { availableFusions, FUSION_SIZE } from '../../../domain/heroes/heroes';
+import { availableFusions, FUSION_SIZE, isAscended } from '../../../domain/heroes/heroes';
 import { el, starsText } from './dom';
 
 //  The fusion screen: one row per fusion the bag can do now (3 copies of a hero and stars), each with a Fundir button;
@@ -33,6 +33,6 @@ export const renderFusion = (heroes, { onFuse, selected = null }) =>
     return list;
 };
 
-//  The card a fusion made
-export const renderFusionResult = ({ heroName, stars }) =>
-    el('div', 'fusion-result', `Nova carta: ${heroName} ${starsText(stars)}`, { testid: 'fusion-result' });
+//  The card a fusion made; from 4 stars it names the one skill the new star raised and its new level
+export const renderFusionResult = ({ heroName, stars, skillName = '', level = 0 }) =>
+    el('div', 'fusion-result', `Nova carta: ${heroName} ${starsText(stars)}${isAscended(stars) && skillName && level >= 1 ? ` · ${skillName} no nível ${level}` : ''}`, { testid: 'fusion-result' });

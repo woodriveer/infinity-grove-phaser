@@ -253,6 +253,41 @@ describe('HeroUi Fusão', () => {
         expect(ctx.testid('fusion-result')).toBeNull();
         expect(ctx.testid('fusion-list')).not.toBeNull();
     });
+
+    it('a 3 star fusion names skill 1 at level 2', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 3: 3 }), hero('lyra') ] } });
+        ctx.heroesGateway.fuse.mockResolvedValue(hero('kael', { 4: 1 }, { stars: 4, skills: skills(true, true, true).map((skill, index) => ({ ...skill, level: [ 2, 1, 1 ][index] })) }));
+        await open(ctx, 'fusion');
+
+        ctx.testid('fusion-button-kael-3').click();
+        await flush();
+
+        expect(ctx.testid('fusion-result').textContent).toBe('Nova carta: Hero kael 4★ · Skill 1 no nível 2');
+    });
+
+    it('a 5 star fusion names skill 3 at level 2', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 5: 3 }, { stars: 5 }), hero('lyra') ] } });
+        ctx.heroesGateway.fuse.mockResolvedValue(hero('kael', { 6: 1 }, { stars: 6, skills: skills(true, true, true).map((skill) => ({ ...skill, level: 2 })) }));
+        await open(ctx, 'fusion');
+
+        ctx.testid('fusion-button-kael-5').click();
+        await flush();
+
+        expect(ctx.testid('fusion-result').textContent).toBe('Nova carta: Hero kael 6★ · Skill 3 no nível 2');
+    });
+
+    it('a failed 3 star fusion shows the Portuguese error and keeps the row', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 3: 3 }), hero('lyra') ] } });
+        ctx.heroesGateway.fuse.mockRejectedValue(new ApiError('Fewer than 3 cards', { status: 409, code: 'NOT_ENOUGH_CARDS' }));
+        await open(ctx, 'fusion');
+
+        ctx.testid('fusion-button-kael-3').click();
+        await flush();
+
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível fundir as cartas.');
+        expect(ctx.testid('fusion-row-kael-3').querySelector('.fusion-copies').textContent).toBe('3/3');
+        expect(ctx.testid('fusion-result')).toBeNull();
+    });
 });
 
 describe('HeroUi Líder', () => {

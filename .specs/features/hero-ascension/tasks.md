@@ -726,7 +726,7 @@ const slotText = (ctx, number) => slot(ctx, number).querySelector('.skill-slot-c
 
 ---
 
-### T12: Fusion rows and result past 3 stars [ ]
+### T12: Fusion rows and result past 3 stars [x]
 
 **Owner**: game-dev
 **What**: The Fusão screen lists the 3 to 8 star rows and the result names the one skill the new star raised (ASC-07 AC 1 to 3, 7).
@@ -772,7 +772,7 @@ The rows need no change: `availableFusions` already lists stars 0 to 8 after T4.
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The eight cases pass; the whole Vitest suite passes.
+- [x] The eight cases pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): fuse hero cards past 3 stars on the Fusão screen`
 

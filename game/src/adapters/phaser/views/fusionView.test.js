@@ -57,4 +57,43 @@ describe('renderFusionResult', () => {
         expect(result.getAttribute('data-testid')).toBe('fusion-result');
         expect(result.textContent).toBe('Nova carta: Kael Raizférrea 2★');
     });
+
+    it('the result of a fusion to 4 to 9 stars names the raised skill and its level', () => {
+        expect(renderFusionResult({ heroName: 'Kael Raizférrea', stars: 4, skillName: 'Corte Dimensional', level: 2 }).textContent)
+            .toBe('Nova carta: Kael Raizférrea 4★ · Corte Dimensional no nível 2');
+        expect(renderFusionResult({ heroName: 'Kael Raizférrea', stars: 9, skillName: 'Brado Aterrador', level: 3 }).textContent)
+            .toBe('Nova carta: Kael Raizférrea 9★ · Brado Aterrador no nível 3');
+    });
+
+    it('the result of a fusion to 1 to 3 stars reads as before', () => {
+        expect(renderFusionResult({ heroName: 'Kael Raizférrea', stars: 3, skillName: 'Brado Aterrador', level: 1 }).textContent)
+            .toBe('Nova carta: Kael Raizférrea 3★');
+    });
+
+    it('a 4 star result without a skill name reads only the card', () => {
+        expect(renderFusionResult({ heroName: 'Kael Raizférrea', stars: 4, level: 2 }).textContent).toBe('Nova carta: Kael Raizférrea 4★');
+    });
+});
+
+describe('renderFusion past 3 stars', () => {
+    it('lists a 3 star row as 3★ → 4★ with 3/3, and a click fuses it', () => {
+        const onFuse = vi.fn();
+        const list = renderFusion([ hero('kael', { 3: 3 }) ], { onFuse });
+        const row = list.querySelector('[data-testid="fusion-row-kael-3"]');
+
+        expect(row.querySelector('.fusion-name').textContent).toBe('Hero kael 3★ → 4★');
+        expect(row.querySelector('.fusion-copies').textContent).toBe('3/3');
+        expect(list.querySelector('[data-testid="fusion-button-kael-3"]').textContent).toBe('Fundir');
+
+        list.querySelector('[data-testid="fusion-button-kael-3"]').click();
+
+        expect(onFuse).toHaveBeenCalledWith('kael', 3);
+    });
+
+    it('lists the 8 star row and never a 9 star row', () => {
+        const list = renderFusion([ hero('kael', { 8: 3, 9: 3 }) ], { onFuse: vi.fn() });
+
+        expect(list.querySelector('[data-testid="fusion-row-kael-8"] .fusion-name').textContent).toBe('Hero kael 8★ → 9★');
+        expect(list.querySelector('[data-testid="fusion-row-kael-9"]')).toBeNull();
+    });
 });

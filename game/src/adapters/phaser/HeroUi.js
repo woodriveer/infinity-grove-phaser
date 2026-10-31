@@ -1,6 +1,7 @@
 import { bagPieces, selectedInBag, sellNotice as sellNoticeText, toggleRarity, toggleSelected } from '../../domain/equipment/bulkSell';
 import { dropLabel, wornBy } from '../../domain/equipment/equipment';
 import { leaderStats } from '../../domain/equipment/leaderStats';
+import { raisedSkillSlot, skillLevelOf } from '../../domain/skills/skillLevel';
 import { renderBag, renderBagEntry } from './views/bagView';
 import { renderCatalog, renderHeroDetail } from './views/catalogView';
 import { renderEquipment, renderEquipmentUnavailable, renderLeaderStats, renderPieceDetail } from './views/equipmentView';
@@ -296,7 +297,13 @@ export class HeroUi
             if (view === this.view)
             {
                 this.setError('');
-                this.render_fusion({ selected: { heroId, stars }, result: { heroName: hero.name, stars: stars + 1 } });
+
+                const raised = hero.skills?.find((skill) => skill.slot === raisedSkillSlot(stars + 1));
+
+                this.render_fusion({
+                    selected: { heroId, stars },
+                    result: { heroName: hero.name, stars: stars + 1, skillName: raised?.name ?? '', level: skillLevelOf(raised) }
+                });
             }
         }
         catch
