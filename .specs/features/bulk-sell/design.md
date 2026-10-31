@@ -1,7 +1,7 @@
 # Bulk Sell Design
 
 **Spec**: `.specs/features/bulk-sell/spec.md`
-**Status**: Draft (defaults D1 to D12 wait for the user's approval)
+**Status**: Approved (the user approved D1 to D12 of the spec on 2026-10-31)
 
 ---
 

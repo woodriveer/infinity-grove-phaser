@@ -16,7 +16,7 @@ The bag holds up to 100 pieces and bosses drop one on every win (AD-008), so it 
 | ------- | ------ |
 | Selling hero cards | Cards have no sell price; duplicates already feed the fusion (`characters`) |
 | Selecting worn pieces in the bulk mode | A worn piece is the player's build; the single `Vender` of the piece detail still sells it (EQP-41) |
-| A `Selecionar tudo` button | The rarity buttons cover the common case; selling the whole bag at once is the riskiest click (pending decision D4) |
+| A `Selecionar tudo` button | The rarity buttons cover the common case; selling the whole bag at once is the riskiest click (User decision D4) |
 | Item lock / favourite pieces | Still deferred, as in `equipment` |
 | Undo or buyback of a sale | No sale history exists; the confirmation step is the guard |
 | Automatic selling rules (sell every COMMON drop) | Not asked |
@@ -27,27 +27,27 @@ The bag holds up to 100 pieces and bosses drop one on every win (AD-008), so it 
 
 ## Assumptions & Open Questions
 
-Every ambiguity is resolved or recorded here - nothing is left silently unclear. Rows marked `n` are defaults chosen by the product owner and wait for the user's approval.
+Every ambiguity is resolved or recorded here - nothing is left silently unclear. The user approved D1 to D12 as recommended on 2026-10-31.
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
-| D1 Which pieces can be selected | Only bag pieces (no `heroId`). In selection mode the worn tiles are disabled. The server still accepts a worn id and sells it after leaving the slot empty, the same rule as the single sale (EQP-41) | Selling a worn piece by accident breaks the build and changes the leader's damage; one server rule for both sale paths | n |
-| D2 Hero cards | Not part of the feature | Cards have no price and are consumed by the fusion | n |
-| D3 Confirmation | Always: `Vender <k> peças por <total>?` (`Vender 1 peça por <total>?` for one) with `Sim, vender` and `Não`; no request before `Sim, vender` | A batch sale cannot be undone; one extra click is cheap next to the clicks saved | n |
-| D4 Shortcuts | P2: five rarity buttons (`Comum` to `Lendário`) that select every bag piece of that rarity, and unselect them when all were selected. No `Selecionar tudo` | Covers "sell all the junk" in one click without making the whole bag one click away | n |
-| D5 Batch size | 1 to 100 ids per request (`SellBatch.MAX_SIZE = 100`, the bag capacity); 0, more than 100 or a repeated id is 400 `INVALID_SELL_BATCH` | A player never owns more than 100 pieces, so a valid client never needs two requests | n |
-| D6 Atomicity | All-or-nothing: one id that is missing or belongs to another account answers 404 `EQUIPMENT_NOT_FOUND` and sells nothing | A half-done sale leaves the player unsure what was sold; one transaction under the player lock (AD-009) costs nothing extra | n |
-| D7 Repeated id | Rejected with 400, never deduplicated | The game never sends one; a repeat is a client bug the server should surface | n |
-| D8 After the sale | Success: selection mode ends, the bag shows without the sold pieces and the notice `<n> peças vendidas por <total>` (`1 peça vendida por <total>`). Failure: the list is read again, the error line `Não foi possível concluir a ação.` shows, selection mode stays with only the selected pieces still in the bag | Success needs a visible receipt; after a failure the player can retry without picking again | n |
-| D9 Warning for EPIC and LEGENDARY pieces | No extra warning; the question shows the count and the total | The tiles show the rarity frame; the total of a LEGENDARY piece is visibly larger | n |
-| D10 Entry point and labels | Button `Vender várias` beside `Mochila (<n>)`; bar texts `Selecionadas: <k> · Total: <total>` (middle dot U+00B7), `Vender selecionadas`, `Cancelar`; the check mark `✓` on a selected tile | Lesson L-010: every on-screen text is stated in full | n |
-| D11 Request order | The game sends the selected ids in the order of the bag, not the order of the clicks | Deterministic request; tests can pin it | n |
-| D12 Response | `POST /equipment/sell` answers `{ equipment, wallet, sold, earned }`; `sold` (int) and `earned` (copper, long) are always present | The notice uses the server's numbers, not a client sum (AD-009); lesson L-018: no absent-vs-null ambiguity | n |
+| D1 Which pieces can be selected | Only bag pieces (no `heroId`). In selection mode the worn tiles are disabled. The server still accepts a worn id and sells it after leaving the slot empty, the same rule as the single sale (EQP-41) | User decision (approved as recommended, 2026-10-31). Selling a worn piece by accident breaks the build and changes the leader's damage; one server rule for both sale paths | y |
+| D2 Hero cards | Not part of the feature | User decision (approved as recommended, 2026-10-31). Cards have no price and are consumed by the fusion | y |
+| D3 Confirmation | Always: `Vender <k> peças por <total>?` (`Vender 1 peça por <total>?` for one) with `Sim, vender` and `Não`; no request before `Sim, vender` | User decision (approved as recommended, 2026-10-31). A batch sale cannot be undone; one extra click is cheap next to the clicks saved | y |
+| D4 Shortcuts | P2: five rarity buttons (`Comum` to `Lendário`) that select every bag piece of that rarity, and unselect them when all were selected. No `Selecionar tudo` | User decision (approved as recommended, 2026-10-31). Covers "sell all the junk" in one click without making the whole bag one click away | y |
+| D5 Batch size | 1 to 100 ids per request (`SellBatch.MAX_SIZE = 100`, the bag capacity); 0, more than 100 or a repeated id is 400 `INVALID_SELL_BATCH` | User decision (approved as recommended, 2026-10-31). A player never owns more than 100 pieces, so a valid client never needs two requests | y |
+| D6 Atomicity | All-or-nothing: one id that is missing or belongs to another account answers 404 `EQUIPMENT_NOT_FOUND` and sells nothing | User decision (approved as recommended, 2026-10-31). A half-done sale leaves the player unsure what was sold; one transaction under the player lock (AD-009) costs nothing extra | y |
+| D7 Repeated id | Rejected with 400, never deduplicated | User decision (approved as recommended, 2026-10-31). The game never sends one; a repeat is a client bug the server should surface | y |
+| D8 After the sale | Success: selection mode ends, the bag shows without the sold pieces and the notice `<n> peças vendidas por <total>` (`1 peça vendida por <total>`). Failure: the list is read again, the error line `Não foi possível concluir a ação.` shows, selection mode stays with only the selected pieces still in the bag | User decision (approved as recommended, 2026-10-31). Success needs a visible receipt; after a failure the player can retry without picking again | y |
+| D9 Warning for EPIC and LEGENDARY pieces | No extra warning; the question shows the count and the total | User decision (approved as recommended, 2026-10-31). The tiles show the rarity frame; the total of a LEGENDARY piece is visibly larger | y |
+| D10 Entry point and labels | Button `Vender várias` beside `Mochila (<n>)`; bar texts `Selecionadas: <k> · Total: <total>` (middle dot U+00B7), `Vender selecionadas`, `Cancelar`; the check mark `✓` on a selected tile | User decision (approved as recommended, 2026-10-31). Lesson L-010: every on-screen text is stated in full | y |
+| D11 Request order | The game sends the selected ids in the order of the bag, not the order of the clicks | User decision (approved as recommended, 2026-10-31). Deterministic request; tests can pin it | y |
+| D12 Response | `POST /equipment/sell` answers `{ equipment, wallet, sold, earned }`; `sold` (int) and `earned` (copper, long) are always present | User decision (approved as recommended, 2026-10-31). The notice uses the server's numbers, not a client sum (AD-009); lesson L-018: no absent-vs-null ambiguity | y |
 | Sell price | Same rule as the single sale: `100 * rarity index * (1 + 0.5 * refine)` copper, rounded down (`equipment` spec) | Existing rule, unchanged | y |
 | Player-facing text | Portuguese | AD-007 | y |
 | Single sale | `POST /equipment/{id}/sell` and the `Vender (<preço>)` button of the piece detail stay as they are | Existing behaviour (EQP-40 to EQP-43) | y |
 
-**Open questions:** none - all resolved or logged above (D1 to D12 wait for the user's approval).
+**Open questions:** none - all resolved; D1 to D12 approved by the user.
 
 ---
 
