@@ -100,4 +100,20 @@ describe('leaderStats', () => {
     it('does not read the pieces of another hero: only the pieces it is given count', () => {
         expect(lines({ leader: kael(), pieces: [] }).clickDamage).toBe('Dano de clique: 1.0');
     });
+
+    it('reads Kael with 4 stars as 1.7, 45% and x2.75', () => {
+        const kaelLines = lines({ leader: kael(4) });
+
+        expect(kaelLines.clickDamage).toBe('Dano de clique: 1.7');
+        expect(kaelLines.critChance).toBe('Chance de crítico: 45%');
+        expect(kaelLines.critDamage).toBe('Dano crítico: x2.75');
+    });
+
+    it('reads Kael with 9 stars as 3.2, 70% and x4', () => {
+        const kaelLines = lines({ leader: kael(9) });
+
+        expect(kaelLines.clickDamage).toBe('Dano de clique: 3.2');
+        expect(kaelLines.critChance).toBe('Chance de crítico: 70%');
+        expect(kaelLines.critDamage).toBe('Dano crítico: x4');
+    });
 });

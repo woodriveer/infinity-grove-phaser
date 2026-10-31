@@ -516,7 +516,7 @@ const factorOf = (factors, id) => factors?.[id] ?? 1;
 
 ---
 
-### T8: Star bonus rows 4 to 9 and the star power text [ ]
+### T8: Star bonus rows 4 to 9 and the star power text [x]
 
 **Owner**: game-dev
 **What**: Add the Star Bonus rows 4 to 9 and the text of the hero detail line (ASC-06, spec AC 1 to 5; ASC-08, spec AC 7 to 9).
@@ -574,7 +574,7 @@ export const starPowerText = (stars) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The new cases and the renamed one pass; the whole Vitest suite passes.
+- [x] The new cases and the renamed one pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): raise the star bonus of 4 to 9 star leaders`
 

@@ -85,6 +85,16 @@ describe('leaderAttacker', () => {
         expect(attacker.critChance).toBe(100);
     });
 
+    it.each([
+        [ 4, 1.7, 45, 2.75 ], [ 5, 2.0, 50, 3 ], [ 6, 2.3, 55, 3.25 ], [ 7, 2.6, 60, 3.5 ], [ 8, 2.9, 65, 3.75 ], [ 9, 3.2, 70, 4 ]
+    ])('gives a leader with %i stars and no equipment the Star Bonus table values', (stars, baseDamage, critChance, critMultiplier) => {
+        const attacker = leaderAttacker({ leader: { element: 'FIRE', stars } });
+
+        expect(attacker.baseDamage).toBeCloseTo(baseDamage, 9);
+        expect(attacker.critChance).toBeCloseTo(critChance, 9);
+        expect(attacker.critMultiplier).toBeCloseTo(critMultiplier, 9);
+    });
+
     it('ignores the talents that are not about the click', () => {
         const attacker = leaderAttacker({ leader: { element: 'FIRE', stars: 0 }, talents: [ { id: 'BOSS_TIME', value: 9 }, { id: 'PHYSICAL_BREAK', value: 9 } ] });
 
