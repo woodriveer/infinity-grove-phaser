@@ -137,10 +137,21 @@ class HeroServiceTest {
     fun `fuse with invalid stars leaves the bag unchanged`() {
         val before = player(extra = mapOf(CopyKey("kael", 0) to 2))
 
-        assertFailsWith<InvalidFusionException> { service.fuse("yan", "kael", 3) }
+        assertFailsWith<InvalidFusionException> { service.fuse("yan", "kael", 9) }
         assertFailsWith<InvalidFusionException> { service.fuse("yan", "kael", -1) }
 
         assertEquals(before, cards.cards.getValue("yan"))
+    }
+
+    @Test
+    fun `fuse of three 3-star cards returns a 4-star hero with levels 2, 1 and 1`() {
+        player(extra = mapOf(CopyKey("kael", 3) to 3))
+
+        val hero = service.fuse("yan", "kael", 3)
+
+        assertEquals(4, hero.stars)
+        assertEquals(mapOf(0 to 1, 1 to 0, 2 to 0, 3 to 0, 4 to 1, 5 to 0, 6 to 0, 7 to 0, 8 to 0, 9 to 0), hero.copies)
+        assertEquals(listOf(2, 1, 1), hero.skills.map { it.level })
     }
 
     @Test

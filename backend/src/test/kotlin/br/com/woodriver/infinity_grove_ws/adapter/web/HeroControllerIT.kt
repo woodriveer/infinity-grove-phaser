@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.adapter.repository.CardCopyEntity
+import br.com.woodriver.infinity_grove_ws.adapter.repository.WalletEntity
 import br.com.woodriver.infinity_grove_ws.domain.CopyKey
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
@@ -146,11 +147,11 @@ class HeroControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `fuse with stars missing, negative or three answers 400 INVALID_FUSION`() {
+    fun `fuse with stars missing, negative, nine or more, or a string answers 400 INVALID_FUSION`() {
         val token = register()
-        give("yan", "kael", 3, 5)
+        give("yan", "kael", 9, 5)
 
-        listOf("{}", """{"stars":-1}""", """{"stars":3}""", """{"stars":"0"}""").forEach { body ->
+        listOf("{}", """{"stars":-1}""", """{"stars":9}""", """{"stars":10}""", """{"stars":"0"}""").forEach { body ->
             fuse(token, "kael", body).then().statusCode(400).body("code", equalTo("INVALID_FUSION"))
         }
     }
@@ -246,5 +247,89 @@ class HeroControllerIT : IntegrationTestBase() {
             .body("heroes[0].owned", equalTo(false))
             .body("leaderId", equalTo("lyra"))
         fuse(ana, "kael", """{"stars":0}""").then().statusCode(409)
+    }
+
+    @Test
+    fun `fuse of three 3-star cards answers a 4-star hero with levels 2, 1 and 1`() {
+        val token = register()
+        give("yan", "kael", 3, 3)
+
+        fuse(token, "kael", """{"stars":3}""")
+            .then()
+            .statusCode(200)
+            .body("stars", equalTo(4))
+            .body("copies.3", equalTo(0))
+            .body("copies.4", equalTo(1))
+            .body("skills.level", equalTo(listOf(2, 1, 1)))
+    }
+
+    @Test
+    fun `fuse of three 8-star cards answers stars 9 and level 3 on every skill`() {
+        val token = register()
+        give("yan", "kael", 8, 3)
+
+        fuse(token, "kael", """{"stars":8}""")
+            .then()
+            .statusCode(200)
+            .body("stars", equalTo(9))
+            .body("copies.9", equalTo(1))
+            .body("skills.unlocked", equalTo(listOf(true, true, true)))
+            .body("skills.level", equalTo(listOf(3, 3, 3)))
+    }
+
+    @Test
+    fun `fuse of 4 stars without three copies answers 409 NOT_ENOUGH_CARDS and keeps the bag`() {
+        val token = register()
+        give("yan", "kael", 4, 2)
+
+        fuse(token, "kael", """{"stars":4}""").then().statusCode(409).body("code", equalTo("NOT_ENOUGH_CARDS"))
+
+        assertEquals(2, jpaCardCopyRepository.findAllByUsername("yan").single { it.stars == 4 }.copies)
+    }
+
+    @Test
+    fun `two simultaneous fusions of the same three 3-star cards give exactly one 200 and one 409`() {
+        val token = register()
+        give("yan", "kael", 3, 3)
+        val pool = Executors.newFixedThreadPool(2)
+        val start = CountDownLatch(1)
+
+        val calls =
+            (1..2).map {
+                pool.submit<Int> {
+                    start.await(5, TimeUnit.SECONDS)
+                    fuse(token, "kael", """{"stars":3}""").statusCode()
+                }
+            }
+        start.countDown()
+        val statuses = calls.map { it.get(15, TimeUnit.SECONDS) }.sorted()
+        pool.shutdown()
+
+        assertEquals(listOf(200, 409), statuses)
+        val rows = jpaCardCopyRepository.findAllByUsername("yan")
+        assertEquals(1, rows.single { it.stars == 4 }.copies)
+        assertEquals(0, rows.count { it.stars == 3 })
+    }
+
+    @Test
+    fun `a 3-star fusion leaves the wallet, the leader and the other copies unchanged`() {
+        val token = register()
+        jpaWalletRepository.save(WalletEntity("yan", 900))
+        give("yan", "lyra", 0, 2)
+        give("yan", "kael", 3, 3)
+
+        fuse(token, "kael", """{"stars":3}""").then().statusCode(200)
+
+        asUser(token)
+            .get("/wallet")
+            .then()
+            .body("wallet.gold", equalTo(0))
+            .body("wallet.silver", equalTo(9))
+            .body("wallet.copper", equalTo(0))
+        asUser(token)
+            .get("/heroes")
+            .then()
+            .body("leaderId", equalTo("kael"))
+            .body("heroes[1].copies.0", equalTo(2))
     }
 }

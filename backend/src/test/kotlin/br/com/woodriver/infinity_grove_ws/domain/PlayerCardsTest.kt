@@ -100,14 +100,54 @@ class PlayerCardsTest {
     }
 
     @Test
-    fun `a three-star card cannot be fused`() {
-        assertFailsWith<InvalidFusionException> { holding(stars = 3, count = 5).fuse("kael", 3) }
+    fun `a nine-star card cannot be fused`() {
+        assertFailsWith<InvalidFusionException> { holding(stars = 9, count = 5).fuse("kael", 9) }
     }
 
     @Test
-    fun `stars outside 0 to 2 are an invalid fusion`() {
+    fun `stars outside 0 to 8 are an invalid fusion`() {
         assertFailsWith<InvalidFusionException> { withBlank(3).fuse("kael", -1) }
-        assertFailsWith<InvalidFusionException> { withBlank(3).fuse("kael", 4) }
+        assertFailsWith<InvalidFusionException> { withBlank(3).fuse("kael", 9) }
+        assertFailsWith<InvalidFusionException> { withBlank(3).fuse("kael", 10) }
+    }
+
+    @Test
+    fun `three three-star cards fuse into a four-star card`() {
+        val fused = holding(stars = 3, count = 3).fuse("kael", 3)
+
+        assertEquals(mapOf(CopyKey("kael", 4) to 1), fused.copies)
+        assertEquals(4, fused.starsOf("kael"))
+    }
+
+    @Test
+    fun `three cards of every stars from 3 to 8 fuse into one card of the next stars`() {
+        (3..8).forEach { stars ->
+            val fused = holding(stars, 3).fuse("kael", stars)
+
+            assertEquals(mapOf(CopyKey("kael", stars + 1) to 1), fused.copies)
+            assertEquals(stars + 1, fused.starsOf("kael"))
+        }
+    }
+
+    @Test
+    fun `three eight-star cards fuse into a nine-star card`() {
+        val fused = holding(stars = 8, count = 3).fuse("kael", 8)
+
+        assertEquals(mapOf(CopyKey("kael", 9) to 1), fused.copies)
+        assertEquals(9, fused.starsOf("kael"))
+    }
+
+    @Test
+    fun `four three-star cards fuse once into one three-star and one four-star card`() {
+        val fused = holding(stars = 3, count = 4).fuse("kael", 3)
+
+        assertEquals(mapOf(CopyKey("kael", 3) to 1, CopyKey("kael", 4) to 1), fused.copies)
+    }
+
+    @Test
+    fun `fewer than three copies of 3 to 8 stars is not enough`() {
+        assertFailsWith<NotEnoughCardsException> { holding(stars = 3, count = 2).fuse("kael", 3) }
+        assertFailsWith<NotEnoughCardsException> { holding(stars = 8, count = 2).fuse("kael", 8) }
     }
 
     @Test
@@ -165,7 +205,21 @@ class PlayerCardsTest {
     }
 
     @Test
-    fun `a four-star card cannot be fused yet`() {
-        assertFailsWith<InvalidFusionException> { holding(stars = 4, count = 3).fuse("kael", 4) }
+    fun `a nine-star hero still fuses its blank cards and stays at nine stars`() {
+        val cards = PlayerCards("yan", Element.FIRE, "kael", mapOf(CopyKey("kael", 9) to 1, CopyKey("kael", 0) to 3))
+
+        val fused = cards.fuse("kael", 0)
+
+        assertEquals(1, fused.copiesOf("kael", 1))
+        assertEquals(1, fused.copiesOf("kael", 9))
+        assertEquals(9, fused.starsOf("kael"))
+    }
+
+    @Test
+    fun `a dropped blank card leaves a nine-star hero at nine stars`() {
+        val cards = holding(stars = 9, count = 1).add("kael")
+
+        assertEquals(9, cards.starsOf("kael"))
+        assertEquals(1, cards.copiesOf("kael", 0))
     }
 }

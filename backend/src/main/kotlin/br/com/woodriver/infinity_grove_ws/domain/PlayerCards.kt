@@ -71,8 +71,8 @@ data class PlayerCards(
         const val FUSION_SIZE = 3
         const val MAX_STARS = 9
 
-        /** The highest stars a fusion takes: 2 until hero-ascension T3 opens the fusions of 3 to 8 stars. */
-        const val LAST_FUSIBLE_STARS = 2
+        /** The highest stars a fusion takes: 3 copies of 8 stars make the 9-star card. */
+        const val LAST_FUSIBLE_STARS = 8
 
         /** A new player: one blank card of the hero of [startingElement], who is also the leader. */
         fun start(

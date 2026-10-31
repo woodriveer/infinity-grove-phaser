@@ -212,7 +212,7 @@ JSON: each skill object gains `"level": <int>`; nothing else changes.
 
 ---
 
-### T3: Open the fusions of 3 to 8 stars [ ]
+### T3: Open the fusions of 3 to 8 stars [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Let 3 copies of 3 to 8 stars fuse into 1 copy of the next stars (ASC-02, spec P1 "Fuse past 3 stars on the backend" AC 4 to 12).
@@ -254,8 +254,8 @@ JSON: each skill object gains `"level": <int>`; nothing else changes.
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 14 new test cases and the 4 updated ones pass; the whole backend suite passes.
-- [ ] Step 1 was done and its outcome is in the commit body when the deploy was not live.
+- [x] The 14 new test cases and the 4 updated ones pass; the whole backend suite passes.
+- [x] Step 1 was done and its outcome is in the commit body when the deploy was not live.
 
 **Commit**: `feat(backend): fuse hero cards up to 9 stars`
 

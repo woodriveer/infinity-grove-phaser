@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.adapter.repository.AutoClickRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.CardCopyEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.CrystalRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.EquipmentRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.ProgressEntity
@@ -10,6 +11,7 @@ import br.com.woodriver.infinity_grove_ws.adapter.repository.TalentRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.WalletEntity
 import br.com.woodriver.infinity_grove_ws.domain.Affix
 import br.com.woodriver.infinity_grove_ws.domain.AffixType
+import br.com.woodriver.infinity_grove_ws.domain.CopyKey
 import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.Rarity
 import br.com.woodriver.infinity_grove_ws.domain.Slot
@@ -267,5 +269,20 @@ class AccountResetControllerIT : IntegrationTestBase() {
             .statusCode(200)
             .body("level", equalTo(1))
             .body("intervalMs", equalTo(250))
+    }
+
+    @Test
+    fun `a reset keeps a nine-star hero at nine stars with level 3 skills`() {
+        atChapter(3)
+        jpaCardCopyRepository.save(CardCopyEntity.from("yan", CopyKey("kael", 9), 1))
+
+        reset(3).statusCode(200)
+
+        asUser()
+            .get("/heroes")
+            .then()
+            .statusCode(200)
+            .body("heroes[0].stars", equalTo(9))
+            .body("heroes[0].skills.level", equalTo(listOf(3, 3, 3)))
     }
 }
