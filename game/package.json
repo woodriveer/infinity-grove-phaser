@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:coverage": "vitest run --coverage",
-    "test:e2e:coverage": "node scripts/e2eCoverage.mjs"
+    "test:e2e:coverage": "node scripts/e2eCoverage.mjs",
+    "ui:shots": "playwright test --config ui-review.config.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",
