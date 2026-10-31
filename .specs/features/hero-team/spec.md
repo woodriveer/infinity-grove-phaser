@@ -74,7 +74,7 @@ Proposed (Q27 to Q30). Slot 0 is always the leader. Ally slots 1 to 4 are bought
 Owner decisions Q5 and Q7. Default of Q34 for what else applies.
 
 - **Ally Base** = `(1 + ally weapon click damage, refined) x (1 + ally CLICK_DAMAGE_PCT from its own worn pieces / 100)`.
-- **Star multiplier** by the ally's stars: 0 stars **2**, 1 star **4**, 2 stars **6**, 3 stars **8**; 4, 5 and 6 stars **10**, **12** and **14** once `hero-ascension` lets heroes pass 3 stars (AD-020, pending owner approval).
+- **Star multiplier** by the ally's stars: 0 stars **2**, 1 star **4**, 2 stars **6**, 3 stars **8**; 4 to 9 stars **10**, **12**, **14**, **16**, **18** and **20** once `hero-ascension` lets heroes pass 3 stars (AD-020; the 9-star cap is an owner decision, these six numbers are the product owner's default D6).
 - **Ally hit** = `Ally Base x star multiplier x element multiplier (leader's element against the monster's) x (1 - monster team resistance / 100) x boss factor x team factor`, where:
   - boss factor = `1 + ally BOSS_DAMAGE_PCT / 100` on a miniboss or chapter boss, else 1;
   - team factor = 1.25 while Seraphine is a fighting ally, else 1.
