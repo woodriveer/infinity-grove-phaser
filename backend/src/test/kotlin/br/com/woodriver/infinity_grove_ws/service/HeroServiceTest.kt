@@ -56,19 +56,29 @@ class HeroServiceTest {
     }
 
     @Test
-    fun `list reports copies per stars 0 to 3, ownership and stars`() {
+    fun `list reports copies per stars 0 to 9, ownership and stars`() {
         player(extra = mapOf(CopyKey("kael", 0) to 2, CopyKey("kael", 2) to 1, CopyKey("lyra", 0) to 1))
 
         val view = service.list("yan").heroes.associateBy { it.hero.id }
 
-        assertEquals(mapOf(0 to 2, 1 to 0, 2 to 1, 3 to 0), view.getValue("kael").copies)
+        assertEquals(mapOf(0 to 2, 1 to 0, 2 to 1, 3 to 0, 4 to 0, 5 to 0, 6 to 0, 7 to 0, 8 to 0, 9 to 0), view.getValue("kael").copies)
         assertEquals(2, view.getValue("kael").stars)
         assertTrue(view.getValue("kael").owned)
-        assertEquals(mapOf(0 to 1, 1 to 0, 2 to 0, 3 to 0), view.getValue("lyra").copies)
+        assertEquals(mapOf(0 to 1, 1 to 0, 2 to 0, 3 to 0, 4 to 0, 5 to 0, 6 to 0, 7 to 0, 8 to 0, 9 to 0), view.getValue("lyra").copies)
         assertTrue(view.getValue("lyra").owned)
         assertEquals(0, view.getValue("lyra").stars)
         assertFalse(view.getValue("orina").owned)
-        assertEquals(mapOf(0 to 0, 1 to 0, 2 to 0, 3 to 0), view.getValue("orina").copies)
+        assertEquals(mapOf(0 to 0, 1 to 0, 2 to 0, 3 to 0, 4 to 0, 5 to 0, 6 to 0, 7 to 0, 8 to 0, 9 to 0), view.getValue("orina").copies)
+    }
+
+    @Test
+    fun `list reports a 9 star hero with copies up to 9`() {
+        player(extra = mapOf(CopyKey("kael", 9) to 1))
+
+        val kael = service.list("yan").heroes.single { it.hero.id == "kael" }
+
+        assertEquals(9, kael.stars)
+        assertEquals(mapOf(0 to 1, 1 to 0, 2 to 0, 3 to 0, 4 to 0, 5 to 0, 6 to 0, 7 to 0, 8 to 0, 9 to 1), kael.copies)
     }
 
     @Test
@@ -99,7 +109,7 @@ class HeroServiceTest {
         val hero = service.fuse("yan", "kael", 0)
 
         assertEquals(1, hero.stars)
-        assertEquals(mapOf(0 to 0, 1 to 1, 2 to 0, 3 to 0), hero.copies)
+        assertEquals(mapOf(0 to 0, 1 to 1, 2 to 0, 3 to 0, 4 to 0, 5 to 0, 6 to 0, 7 to 0, 8 to 0, 9 to 0), hero.copies)
         assertEquals(mapOf(CopyKey("kael", 1) to 1), cards.cards.getValue("yan").copies)
     }
 

@@ -73,6 +73,7 @@ class HeroControllerIT : IntegrationTestBase() {
             .body("heroes[2].stars", equalTo(0))
             .body("heroes[2].copies.0", equalTo(1))
             .body("heroes[2].copies.3", equalTo(0))
+            .body("heroes[2].copies.9", equalTo(0))
             .body("heroes[2].skills", hasSize<Any>(3))
             .body("heroes[2].skills.unlocked", equalTo(listOf(false, false, false)))
             .body("heroes[2].skills[0].name", equalTo("Prisão de Espinhos"))

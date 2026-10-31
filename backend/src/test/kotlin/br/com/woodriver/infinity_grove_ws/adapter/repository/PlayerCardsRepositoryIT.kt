@@ -86,4 +86,14 @@ class PlayerCardsRepositoryIT : IntegrationTestBase() {
         assertEquals(0, jpaCardCopyRepository.findAllByUsername("yan").size)
         assertEquals(1, jpaCardCopyRepository.findAllByUsername("ana").size)
     }
+
+    @Test
+    fun `a copy of 9 stars is saved and read back`() {
+        val saved = cards(copies = mapOf(CopyKey("kael", 9) to 1, CopyKey("kael", 0) to 2))
+
+        repository.save(saved)
+
+        assertEquals(saved, repository.findForUpdate("yan"))
+        assertEquals(9, repository.findForUpdate("yan")?.starsOf("kael"))
+    }
 }

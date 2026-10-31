@@ -92,7 +92,7 @@ T16 → T17
 
 ## Task Breakdown
 
-### T1: Store copies of 0 to 9 stars, fusion still capped at 2 [ ]
+### T1: Store copies of 0 to 9 stars, fusion still capped at 2 [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Raise the stored stars range to 0 to 9 and give the fusion its own cap, still 2, so this deploy reads 4 to 9 star copies before any can be written (ASC-01 AC 1, 2; design Deploy Order step A).
@@ -139,8 +139,8 @@ The `init` check (`stars in 0..MAX_STARS`) stays as written; it now allows 0 to 
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The five new test cases pass; the renamed and extended tests pass; the whole backend suite passes.
-- [ ] `POST /heroes/kael/fuse` with `{"stars":3}` still answers 400 `INVALID_FUSION` (the existing `HeroControllerIT` case proves it).
+- [x] The five new test cases pass; the renamed and extended tests pass; the whole backend suite passes.
+- [x] `POST /heroes/kael/fuse` with `{"stars":3}` still answers 400 `INVALID_FUSION` (the existing `HeroControllerIT` case proves it).
 
 **Commit**: `feat(backend): store hero cards of up to 9 stars`
 

@@ -2,7 +2,7 @@ package br.com.woodriver.infinity_grove_ws.domain
 
 import org.slf4j.LoggerFactory
 
-/** A stack of identical cards: [stars] 0 is a blank card, 3 the best a hero can reach. */
+/** A stack of identical cards: [stars] 0 is a blank card, 9 the best a hero can reach. */
 data class CopyKey(
     val heroId: String,
     val stars: Int,
@@ -42,7 +42,7 @@ data class PlayerCards(
         heroId: String,
         stars: Int,
     ): PlayerCards {
-        if (stars !in 0 until MAX_STARS) throw InvalidFusionException("stars $stars cannot be fused")
+        if (stars !in 0..LAST_FUSIBLE_STARS) throw InvalidFusionException("stars $stars cannot be fused")
         if (copiesOf(heroId, stars) < FUSION_SIZE) throw NotEnoughCardsException(heroId, stars)
         logger.info("Fusing cards username={} hero={} stars={}", username, heroId, stars)
         val spent = withCopies(heroId, stars, copiesOf(heroId, stars) - FUSION_SIZE)
@@ -69,7 +69,10 @@ data class PlayerCards(
     companion object {
         private val logger = LoggerFactory.getLogger(PlayerCards::class.java)
         const val FUSION_SIZE = 3
-        const val MAX_STARS = 3
+        const val MAX_STARS = 9
+
+        /** The highest stars a fusion takes: 2 until hero-ascension T3 opens the fusions of 3 to 8 stars. */
+        const val LAST_FUSIBLE_STARS = 2
 
         /** A new player: one blank card of the hero of [startingElement], who is also the leader. */
         fun start(

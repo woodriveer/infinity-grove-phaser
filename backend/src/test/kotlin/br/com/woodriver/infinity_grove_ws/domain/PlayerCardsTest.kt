@@ -145,8 +145,27 @@ class PlayerCardsTest {
     }
 
     @Test
-    fun `counts below one and stars above three are rejected`() {
+    fun `counts below one and stars above nine are rejected`() {
         assertFailsWith<IllegalArgumentException> { PlayerCards("yan", Element.FIRE, "kael", mapOf(CopyKey("kael", 0) to 0)) }
-        assertFailsWith<IllegalArgumentException> { PlayerCards("yan", Element.FIRE, "kael", mapOf(CopyKey("kael", 4) to 1)) }
+        assertFailsWith<IllegalArgumentException> { PlayerCards("yan", Element.FIRE, "kael", mapOf(CopyKey("kael", 10) to 1)) }
+    }
+
+    @Test
+    fun `cards of 4 to 9 stars are kept and the stars of the hero are the highest`() {
+        val cards = PlayerCards("yan", Element.FIRE, "kael", mapOf(CopyKey("kael", 3) to 1, CopyKey("kael", 9) to 2))
+
+        assertEquals(9, cards.starsOf("kael"))
+        assertEquals(2, cards.copiesOf("kael", 9))
+    }
+
+    @Test
+    fun `a card of 10 stars or of negative stars is rejected`() {
+        assertFailsWith<IllegalArgumentException> { PlayerCards("yan", Element.FIRE, "kael", mapOf(CopyKey("kael", 10) to 1)) }
+        assertFailsWith<IllegalArgumentException> { PlayerCards("yan", Element.FIRE, "kael", mapOf(CopyKey("kael", -1) to 1)) }
+    }
+
+    @Test
+    fun `a four-star card cannot be fused yet`() {
+        assertFailsWith<InvalidFusionException> { holding(stars = 4, count = 3).fuse("kael", 4) }
     }
 }
