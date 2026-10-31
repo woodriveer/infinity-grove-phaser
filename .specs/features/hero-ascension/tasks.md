@@ -261,7 +261,7 @@ JSON: each skill object gains `"level": <int>`; nothing else changes.
 
 ---
 
-### T4: Game star ranges up to 9 [ ]
+### T4: Game star ranges up to 9 [x]
 
 **Owner**: game-dev
 **What**: Raise the game's star ranges (bag 0 to 9, fusion rows 0 to 8) and add the star tier helpers (ASC-07 AC 1, 4, 6; ASC-08 AC 1, 2).
@@ -311,7 +311,8 @@ Also update the header comment on line 2 to `copies: { 0: n, ..., 9: n }`.
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The six new cases and the renamed one pass; the whole Vitest suite passes.
+- [x] The six new cases and the renamed one pass; the whole Vitest suite passes.
+- [x] Also done here (coordinator decision, 2026-10-31): `bagView.test.js` step 2 of T11 (the stars 9 rename) and the `fusionView.test.js` empty-state case, input `{ 0: 2, 9: 5 }`, so the suite stays green. T11 skips its step 2.
 
 **Commit**: `feat(game): count hero stars up to 9`
 
@@ -705,7 +706,7 @@ const slotText = (ctx, number) => slot(ctx, number).querySelector('.skill-slot-c
 **Steps**:
 
 1. Make the change.
-2. In `bagView.test.js` rename the test at lines 75-81 to `a 9 star entry cannot be fused: Estrela máxima and no button` and build it with `stars: 9` and `hero('kael', { 9: 1 }, { stars: 9 })`.
+2. In `bagView.test.js` rename the test at lines 75-81 to `a 9 star entry cannot be fused: Estrela máxima and no button` and build it with `stars: 9` and `hero('kael', { 9: 1 }, { stars: 9 })`. **Done in T4; skip this step in T11.**
 3. Write the test cases.
 
 **Tests**: unit

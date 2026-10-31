@@ -72,9 +72,9 @@ describe('renderBagEntry', () => {
         expect(onFuse).toHaveBeenCalledWith(ready);
     });
 
-    it('has no way to the fusion screen for a three star card, which cannot be fused', () => {
-        const maxed = { ...entry, stars: 3, copies: 1 };
-        const detail = renderBagEntry(maxed, hero('kael', { 3: 1 }, { stars: 3 }), { onFuse: vi.fn() });
+    it('a 9 star entry cannot be fused: Estrela máxima and no button', () => {
+        const maxed = { ...entry, stars: 9, copies: 1 };
+        const detail = renderBagEntry(maxed, hero('kael', { 9: 1 }, { stars: 9 }), { onFuse: vi.fn() });
 
         expect(detail.querySelector('[data-testid="bag-go-fusion"]')).toBeNull();
         expect(detail.querySelector('.bag-needed').textContent).toBe('Estrela máxima: não pode ser fundida');

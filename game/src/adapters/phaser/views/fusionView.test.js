@@ -22,7 +22,7 @@ describe('renderFusion', () => {
     });
 
     it('says there is no fusion available when no hero has 3 copies', () => {
-        const view = renderFusion([ hero('kael', { 0: 2, 3: 5 }), hero('lyra') ], { onFuse: vi.fn() });
+        const view = renderFusion([ hero('kael', { 0: 2, 9: 5 }), hero('lyra') ], { onFuse: vi.fn() });
 
         expect(view.getAttribute('data-testid')).toBe('fusion-empty');
         expect(view.textContent).toBe('Nenhuma fusão disponível');

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyDrop, availableFusions, bagEntries, bossLabel, copiesOf, ELEMENT_LABELS, fusionRows, STARTING_CHOICES, unlockedSlots } from './heroes';
+import { applyDrop, availableFusions, bagEntries, bossLabel, copiesOf, ELEMENT_LABELS, fusionRows, isAscended, MAX_STARS, STARTING_CHOICES, starsClass, unlockedSlots } from './heroes';
 
 const hero = (id, copies = {}, extra = {}) => ({
     id, name: `Hero ${id}`, element: 'FIRE', owned: Object.values(copies).some((n) => n > 0), stars: 0,
@@ -37,16 +37,17 @@ describe('bagEntries', () => {
 });
 
 describe('fusionRows', () => {
-    it('has one row per hero and stars 0 to 2, never 3', () => {
+    it('has one row per hero and stars 0 to 8, never 9', () => {
         const rows = fusionRows([ hero('kael'), hero('lyra') ]);
 
         expect(rows.map((row) => [ row.heroId, row.stars ])).toEqual([
-            [ 'kael', 0 ], [ 'kael', 1 ], [ 'kael', 2 ], [ 'lyra', 0 ], [ 'lyra', 1 ], [ 'lyra', 2 ]
+            [ 'kael', 0 ], [ 'kael', 1 ], [ 'kael', 2 ], [ 'kael', 3 ], [ 'kael', 4 ], [ 'kael', 5 ], [ 'kael', 6 ], [ 'kael', 7 ], [ 'kael', 8 ],
+            [ 'lyra', 0 ], [ 'lyra', 1 ], [ 'lyra', 2 ], [ 'lyra', 3 ], [ 'lyra', 4 ], [ 'lyra', 5 ], [ 'lyra', 6 ], [ 'lyra', 7 ], [ 'lyra', 8 ]
         ]);
     });
 
     it('can fuse from 3 copies and not with 2', () => {
-        const rows = fusionRows([ hero('kael', { 0: 2, 1: 3, 2: 7 }) ]);
+        const rows = fusionRows([ hero('kael', { 0: 2, 1: 3, 2: 7 }) ]).filter((row) => row.stars <= 2);
 
         expect(rows.map((row) => [ row.copies, row.canFuse ])).toEqual([ [ 2, false ], [ 3, true ], [ 7, true ] ]);
     });
@@ -114,13 +115,47 @@ describe('labels', () => {
 });
 
 describe('availableFusions', () => {
-    it('keeps only the (hero, stars) pairs with 3 or more copies', () => {
+    it('keeps only the (hero, stars) pairs with 3 or more copies, 3 stars included', () => {
         const rows = availableFusions([ hero('kael', { 0: 2, 1: 3, 2: 4, 3: 9 }), hero('lyra', { 0: 3 }) ]);
 
-        expect(rows.map(({ heroId, stars }) => `${heroId}:${stars}`)).toEqual([ 'kael:1', 'kael:2', 'lyra:0' ]);
+        expect(rows.map(({ heroId, stars }) => `${heroId}:${stars}`)).toEqual([ 'kael:1', 'kael:2', 'kael:3', 'lyra:0' ]);
+    });
+
+    it('offers a 3 star row with 3 copies and never a 9 star row', () => {
+        expect(availableFusions([ hero('kael', { 3: 3, 9: 5 }) ])).toEqual([
+            { heroId: 'kael', heroName: 'Hero kael', stars: 3, copies: 3, canFuse: true }
+        ]);
+    });
+
+    it('offers the 8 star row', () => {
+        expect(availableFusions([ hero('kael', { 8: 3 }) ]).map((row) => row.stars)).toEqual([ 8 ]);
     });
 
     it('is empty when no pair has 3 copies', () => {
         expect(availableFusions([ hero('kael', { 0: 2 }), hero('lyra') ])).toEqual([]);
+    });
+});
+
+describe('star tiers', () => {
+    it('bagEntries lists the entries of 4 to 9 stars', () => {
+        expect(bagEntries([ hero('kael', { 4: 1, 9: 2 }) ])).toEqual([
+            { heroId: 'kael', heroName: 'Hero kael', stars: 4, copies: 1 },
+            { heroId: 'kael', heroName: 'Hero kael', stars: 9, copies: 2 }
+        ]);
+    });
+
+    it('MAX_STARS is 9', () => {
+        expect(MAX_STARS).toBe(9);
+    });
+
+    it('isAscended is false up to 3 stars and true from 4 to 9', () => {
+        expect([ 0, 1, 2, 3 ].map(isAscended)).toEqual([ false, false, false, false ]);
+        expect([ 4, 5, 6, 7, 8, 9 ].map(isAscended)).toEqual([ true, true, true, true, true, true ]);
+    });
+
+    it('starsClass is empty up to 3 stars, is-ascended from 4 to 6 and is-exalted from 7 to 9', () => {
+        expect([ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ].map(starsClass)).toEqual([
+            '', '', '', '', 'is-ascended', 'is-ascended', 'is-ascended', 'is-exalted', 'is-exalted', 'is-exalted'
+        ]);
     });
 });

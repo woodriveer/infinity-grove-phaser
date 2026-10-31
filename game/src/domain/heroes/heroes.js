@@ -1,11 +1,14 @@
 //  The rules the game applies to the heroes payload of the backend (GET /heroes). Pure JavaScript: no Phaser, so every rule is unit-tested.
-//  A hero is { id, name, element, owned, stars, copies: { 0: n, 1: n, 2: n, 3: n }, skills: [ { slot, unlocked, ... } ], ... }.
-//  A card has 0 to 3 stars; 3 cards of the same hero and stars (0 to 2) fuse into 1 card of the next stars.
+//  A hero is { id, name, element, owned, stars, copies: { 0: n, ..., 9: n }, skills: [ { slot, unlocked, ... } ], ... }.
+//  A card has 0 to 9 stars; 3 cards of the same hero and stars (0 to 8) fuse into 1 card of the next stars.
 export const FUSION_SIZE = 3;
-export const MAX_STARS = 3;
+export const MAX_STARS = 9;
+//  From 4 stars a hero is above the old cap and its stars text is purple; from 7 stars it is a gold chip (spec hero-ascension, Star Colours)
+export const ASCENDED_FROM = 4;
+export const EXALTED_FROM = 7;
 
-const ALL_STARS = [ 0, 1, 2, 3 ];
-const FUSIBLE_STARS = [ 0, 1, 2 ];
+const ALL_STARS = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
+const FUSIBLE_STARS = [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ];
 
 export const ELEMENT_LABELS = { FIRE: 'Fogo', WATER: 'Água', NATURE: 'Natureza', LIGHT: 'Luz', DARKNESS: 'Escuridão' };
 
@@ -39,6 +42,11 @@ export const availableFusions = (heroes) => fusionRows(heroes).filter((row) => r
 
 //  The skill slots a hero with `stars` stars has unlocked: slot n opens at n stars
 export const unlockedSlots = (stars) => [ 1, 2, 3 ].filter((slot) => stars >= slot);
+
+export const isAscended = (stars) => stars >= ASCENDED_FROM;
+
+//  The class of a .hero-stars element: '' for 0 to 3 stars, 'is-ascended' for 4 to 6, 'is-exalted' for 7 to 9
+export const starsClass = (stars) => (stars >= EXALTED_FROM ? 'is-exalted' : stars >= ASCENDED_FROM ? 'is-ascended' : '');
 
 //  A dropped card adds one copy and owns the hero; the list it came from is not changed
 export const applyDrop = (heroes, { heroId, stars = 0 }) => heroes.map((hero) => (hero.id === heroId
