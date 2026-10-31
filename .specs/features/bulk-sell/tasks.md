@@ -910,10 +910,269 @@ const sellCalls = (calls) => calls.filter(({ method, path }) => method === 'POST
 
 ---
 
+## UI review fixes
+
+Fixes of the findings #1 to #4 of `.specs/features/bulk-sell/ui-review.html` (the phone scale, finding #5, is out of scope). Owner for all four: game-dev. They run in this order: T13 and T14 touch the same CSS block. Each task is one commit, pushed right after it, and each lists the review finding it closes.
+
+### T13: Compact and sticky selection bar, and the selected tiles
+
+**Owner**: game-dev
+**Goal**: At the desktop size of the window the bar takes two short rows (summary and actions on the first, rarity buttons on the second) and stays at the top of the Equipamento window while the bag scrolls, so the second row of bag tiles stays reachable (review finding #1). Two suggestions of the same review are done in the same block: a selected tile keeps full opacity while the question shows, and its outline sits 4 px off the tile.
+**Where**: `game/public/style.css`
+**Also changes**: `.specs/features/bulk-sell/design.md` (the layout sketch and the rows of the bar and of the selected tile in the design table)
+**Read first**: `game/public/style.css:983-990` (`.hero-window`, the scroll area), `:2052-2075` (`.bulk-sell-bar`, groups), `:2131-2136` (`.piece-tile.is-selected`), `game/src/adapters/phaser/views/bulkSellView.js` (DOM order: summary, rarity row, then actions or confirm), `.specs/features/bulk-sell/ui-review.html` (finding #1 and the two suggestions)
+**Depends on**: T11
+**Requirement**: BSL-12, BSL-15, BSL-21. No criterion of the spec covers the height of the bar: the acceptance is review finding #1 and its "Como deveria ficar".
+
+**Contract** (replace the `.bulk-sell-bar` rule and the summary rule, change the group rule and the selected tile rule, add the disabled rule after the selected tile):
+
+```css
+.bulk-sell-bar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    padding: 8px 14px;
+    border: 1px solid var(--color-divider);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-md);
+}
+
+.bulk-sell-summary {
+    margin-right: auto;
+    font-family: var(--font-heading);
+    font-size: 15px;
+}
+
+.bulk-sell-rarities {
+    order: 1;
+    flex: 1 0 100%;
+}
+
+.bulk-sell-actions,
+.bulk-sell-confirm {
+    margin-left: auto;
+}
+
+.piece-tile.is-selected {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 4px;
+    transform: translateY(-2px);
+}
+
+.piece-tile.is-selected:disabled {
+    opacity: 1;
+}
+```
+
+Keep the `display: flex; flex-wrap: wrap; align-items: center; gap: 6px` of `.bulk-sell-rarities`, `.bulk-sell-actions` and `.bulk-sell-confirm` (the shared group rule stays). Write each rule over several lines in the file's existing style (one declaration per line, 4-space indent), with the comment `/* The bulk sale ... */` block unchanged.
+
+**Steps**:
+
+1. Apply the rules above.
+2. Run the gate, then check the bar in the browser at 1280x720 with 14 bag pieces: the bar is at most two rows high, and it stays on top while the bag scrolls.
+3. Update the design rows that name the old layout (`design.md`, the sketch and the table rows of `.bulk-sell-bar` and of the selected tile).
+
+**Tests**: none (stylesheet; the matrix says build gate plus the `ui-artist` review)
+**Gate**: build - `cd game && npm test && npm run build`
+**Done when**:
+
+- [ ] The bar is two rows at most at the desktop size: summary and actions on one row, rarity buttons on the other.
+- [ ] `.bulk-sell-bar` is sticky at the top of `.hero-window` and the bag tiles scroll under it.
+- [ ] A selected tile keeps full opacity while the question shows, and its outline is 4 px off the tile.
+- [ ] `npm test` and `npm run build` pass, and `npx playwright test e2e/bulkSell.spec.js e2e/equipmentUi.spec.js e2e/equipment.spec.js` still passes.
+
+**Commit**: `style(game): compact and sticky selection bar, tidier selected tiles`
+
+---
+
+### T14: Rarity buttons with a dot and a stronger pressed state
+
+**Owner**: game-dev
+**Goal**: Each rarity button shows its rarity as a coloured dot instead of the curved 4 px left border, and a pressed button reads at a glance: a fill at about 25 % of the rarity colour, a 2 px border in that colour and bold text (review finding #2).
+**Where**: `game/public/style.css` (`.bulk-sell-rarity`, `.bulk-sell-rarity.rarity-*`, `.bulk-sell-rarity[aria-pressed="true"]`)
+**Also changes**: `.specs/features/bulk-sell/design.md` (the rarity button row of the table and its sketch line)
+**Read first**: `game/public/style.css:1423-1426` (`.equip-button:hover`), `:2076-2105` (rarity rules), `game/src/adapters/phaser/views/bulkSellView.js` (`rarityButton`: the label is the text, the class is `rarity-<lower>`), `.specs/features/bulk-sell/ui-review.html` (finding #2)
+**Depends on**: T13
+**Requirement**: BSL-26, BSL-30
+
+**Contract** (replace `.bulk-sell-rarity` and `.bulk-sell-rarity[aria-pressed="true"]`, keep the five `.rarity-*` colour rules):
+
+```css
+.bulk-sell-rarity {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px 4px 10px;
+    font-size: 13px;
+    border: 2px solid var(--color-divider);
+}
+
+/* The rarity colour is a dot in front of the label; the thin ring keeps the grey of COMMON visible on the cream */
+.bulk-sell-rarity::before {
+    content: '';
+    flex: none;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--rarity-color);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-text) 35%, transparent);
+}
+
+/* Pressed: a quarter of the rarity colour as fill, the whole colour as border, bold. The selector is one level deeper than
+   `.equip-button:hover`, so the fill stays while the pointer is on it */
+.bulk-sell-bar .bulk-sell-rarity[aria-pressed="true"] {
+    font-weight: 700;
+    border-color: var(--rarity-color);
+    background: color-mix(in srgb, var(--rarity-color) 25%, var(--color-bg));
+}
+```
+
+The border is 2 px in every state, so a press does not move the labels.
+
+**Steps**:
+
+1. Apply the rules above.
+2. Run the gate, then check in the browser: a dot in each colour, the pressed pill clearly tinted with its border, COMMON still visible.
+3. Update the design rows of the rarity button (`design.md`: the dot instead of the left border, the pressed state).
+
+**Tests**: none (stylesheet; the matrix says build gate plus the `ui-artist` review)
+**Gate**: build - `cd game && npm test && npm run build`
+**Done when**:
+
+- [ ] Each rarity button shows a dot in its colour and has no left border.
+- [ ] A pressed button has a fill near 25 % of its colour, a 2 px border in that colour and bold text; an unpressed one has the same 2 px border width, so nothing moves on press.
+- [ ] `npm test` and `npm run build` pass, and the three e2e files still pass.
+
+**Commit**: `style(game): give the rarity buttons a dot and a stronger pressed state`
+
+---
+
+### T15: Hide the piece tooltip in selection mode
+
+**Owner**: game-dev
+**Goal**: While selection mode is on no piece tooltip opens, so it never covers the bar (review finding #3). A click on a bag tile still toggles its piece, and outside selection mode the tooltip works as before.
+**Where**: `game/src/adapters/phaser/views/equipmentView.js` (`tileOf` inside `renderEquipment`)
+**Also changes**: `game/src/adapters/phaser/views/equipmentView.test.js`
+**Read first**: `game/src/adapters/phaser/views/equipmentView.js:53-63` (`tileOf`), `:99-106` (`bagTile`), `game/src/adapters/phaser/views/pieceTooltip.js:39-70` (`attachPieceTooltip`), `equipmentView.test.js:101-175` (tooltip tests) and `:250-260` (selection helper), `.specs/features/bulk-sell/ui-review.html` (finding #3)
+**Depends on**: T9
+**Requirement**: BSL-12, BSL-13. No criterion of the spec covers the tooltip: the acceptance is review finding #3.
+
+**Contract** (`tileOf` in `renderEquipment`; `selection` is already in its scope):
+
+```js
+const tileOf = (piece, testid, onClick = onSelect) =>
+{
+    const tile = renderPieceTile(piece, { testid, onClick });
+
+    //  The tooltip would cover the selection bar, so selection mode attaches none (bag and worn tiles alike)
+    if (!selection)
+    {
+        attachPieceTooltip(tile, piece, heroes);
+    }
+
+    return tile;
+};
+```
+
+**Steps**:
+
+1. Change `tileOf` as above.
+2. Add to the `renderEquipment selection mode` describe of `equipmentView.test.js`: `hides the tooltip on hover in selection mode, for a bag tile and for a worn tile`. Select the mode, dispatch `pointerenter` on `equip-piece-r1` (a ring in the bag) and on `equip-slot-kael-WEAPON` (a worn weapon), and expect `[data-testid="piece-tooltip"]` to be null after each.
+3. Run the gate.
+
+**Tests**: unit (jsdom)
+**Test cases** (`equipmentView.test.js`):
+
+- `renderEquipment selection mode` - `hides the tooltip on hover in selection mode, for a bag tile and for a worn tile`: `renderEquipment([ weapon({ heroId: 'kael' }), ring() ], [ hero('kael'), hero('lyra') ], { onSelect: vi.fn(), selection: selecting() })`; `find(screen, 'equip-piece-r1').dispatchEvent(new Event('pointerenter'))` and the same on `equip-slot-kael-WEAPON`; `find(screen, 'piece-tooltip')` is null after each.
+- `renderEquipment tiles and tooltip` (existing): `shows the tooltip of a bag tile on hover` keeps passing outside selection mode.
+
+**Gate**: quick - `cd game && npm test`
+**Done when**:
+
+- [ ] The new test passes, and the existing tooltip tests pass unchanged.
+- [ ] `npm test`, `npm run build` and the three e2e files pass.
+
+**Commit**: `fix(game): hide the piece tooltip in selection mode`
+
+---
+
+### T16: Keep the hero blocks still when selection mode opens
+
+**Owner**: game-dev
+**Goal**: The place of `Transferir conjunto` stays in selection mode, so the hero blocks keep their height and the window does not jump when the mode opens (review finding #4). The button itself stays hidden (BSL-17).
+**Where**: `game/src/adapters/phaser/views/equipmentView.js` (new `renderTransferSpace`, the heading of each hero in `renderEquipment`), `game/public/style.css` (`.equip-transfer.is-space`)
+**Also changes**: `game/src/adapters/phaser/views/equipmentView.test.js`
+**Read first**: `game/src/adapters/phaser/views/equipmentView.js:17-37` (`renderTransfer`), `:121-125` (the heading of a hero), `game/src/adapters/phaser/views/dom.js:4-21` (`el`: the attributes object, `testid` becomes `data-testid`; read only), `game/public/style.css:1327-1335` (`.equip-hero`), `:2019-2026` (`.equip-hero-heading`), `.specs/features/bulk-sell/spec.md` (BSL-17), `.specs/features/bulk-sell/ui-review.html` (finding #4)
+**Depends on**: T9
+**Requirement**: BSL-17
+
+**Contract**:
+
+```js
+//  The place of `Transferir conjunto` in selection mode: a hidden copy of the button, with the same size, no test id and out of the tab order,
+//  so the hero block keeps its height and the window does not move
+const renderTransferSpace = () =>
+{
+    const box = el('div', 'equip-transfer is-space');
+    const ghost = el('button', 'equip-button', 'Transferir conjunto', { type: 'button', tabindex: '-1', disabled: '' });
+
+    ghost.setAttribute('aria-hidden', 'true');
+    box.append(ghost);
+
+    return box;
+};
+```
+
+In `renderEquipment`, the heading of a hero becomes:
+
+```js
+if (wearsSomething && owned.length > 1)
+{
+    heading.append(selection ? renderTransferSpace() : renderTransfer(hero, owned, onTransfer));
+}
+```
+
+In `style.css`, next to the transfer rules:
+
+```css
+/* In selection mode the button is hidden but keeps its box, so the hero block keeps its height */
+.equip-transfer.is-space .equip-button {
+    visibility: hidden;
+}
+```
+
+**Steps**:
+
+1. Add `renderTransferSpace` and change the heading as above; add the CSS rule.
+2. Add the tests below to `equipmentView.test.js`.
+3. Run the gate, then measure in the browser: the `.equip-hero` blocks have the same heights before and after `bulk-sell-start`.
+
+**Tests**: unit (jsdom)
+**Test cases** (`equipmentView.test.js`):
+
+- `renderEquipment selection mode` - `keeps the place of Transferir conjunto in selection mode without the button`: `renderEquipment([ weapon({ heroId: 'kael' }), ring() ], [ hero('kael'), hero('lyra') ], { onSelect: vi.fn(), onTransfer: vi.fn(), selection: selecting() })`; `find(screen, 'equip-transfer-kael')` is null; `screen.querySelector('[data-testid="equip-hero-kael"] .equip-transfer.is-space button')` is not null, has `aria-hidden` `'true'` and `disabled` true, and no `data-testid`.
+- `renderEquipment transfer` - `outside selection mode the hero shows the real button and no place holder`: `renderEquipment([ weapon({ heroId: 'kael' }) ], [ hero('kael'), hero('lyra') ], { onSelect: vi.fn(), onTransfer: vi.fn() })`; `find(screen, 'equip-transfer-kael').textContent` is `'Transferir conjunto'` and `screen.querySelector('.is-space')` is null.
+
+**Gate**: quick - `cd game && npm test`
+**Done when**:
+
+- [ ] The two new tests pass, and the existing transfer tests and `HeroUi.test.js` (`worn tiles are disabled and Transferir conjunto hides in selection mode`) pass unchanged.
+- [ ] Measured in the browser at 1280x720: the hero blocks keep their height when selection mode opens.
+- [ ] `npm test`, `npm run build` and the three e2e files pass.
+
+**Commit**: `fix(game): keep the hero blocks still when selection mode opens`
+
+---
+
 ## Phase Execution Map
 
 ```
-Phase 1 → Phase 2 → Phase 3 → Phase 4
+Phase 1 → Phase 2 → Phase 3 → Phase 4 → UI review fixes
 
 Phase 1:  T1 → T3
           T2 → T3
@@ -926,6 +1185,11 @@ Phase 3:  T7 → T8 → T9 → T10
           T9 → T11
 Phase 4:  T10 → T12
           T11 → T12
+UI review fixes:
+          T11 → T13
+          T13 → T14
+          T9 → T15
+          T9 → T16
 ```
 
 Execution is sequential: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12. Twelve tasks pack into two batches of whole phases (Phases 1-2: 7 tasks; Phases 3-4: 5 tasks), so the orchestrator offers batch sub-agents. The backend batch goes to `kotlin-backend-dev` (T1-T4), the game tasks to `game-dev` (T5-T11), T12 to `test-engineer`; then `ui-artist` reviews the screen and a fresh `test-engineer` runs as the Verifier.
