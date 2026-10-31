@@ -154,6 +154,14 @@
 - **Date**: 2026-10-30
 - **Status**: active (owner answers 2026-10-30 and 2026-10-31); supersedes "only chapter 5 completes" of AD-008 and the reward cap 5 of AD-015
 
+### AD-020
+- **Decision**: Heroes reach 6 stars with the existing fusion (3 copies of 3, 4 or 5 stars make 1 copy of the next stars, cards only). Every skill of a hero has a level: 0 locked, 1 at 1 to 3 stars, `stars - 2` at 4 to 6; the backend answers it as `skills[].level`. A skill used at level L multiplies its damage percents and effect strength by `1 + 0.25 x (L - 1)`; cooldowns and durations never change. The leader's star bonus gains rows 4 to 6 (+70/+100/+130 % click damage, +35/+40/+45 critical chance, +75/+100/+125 % critical damage), and the `hero-team` ally star multiplier gains 10, 12, 14. The backend first ships a version that reads 0 to 6 star copies, then opens the fusions of 3 to 5 stars, so a rollback never lands on a backend that throws on a 4-star copy (spec `hero-ascension`).
+- **Reason**: Owner request of 2026-10-31 ("poder fazer upgrade no herói além de 3 estrelas, dessa maneira vai aumentando os níveis da skill e o poder do herói"); the previous backend rejects stored copies above 3 stars.
+- **Trade-off**: 729 blank cards for one 6-star hero is not balance-tested; the skill level rule exists on both sides (backend answers it, the game falls back to 1); a game still on the previous version gives a 4-star leader no star bonus until the Worker is republished.
+- **Scope**: `backend` `PlayerCards`, `HeroView`, `HeroController`; `game/src/domain/heroes`, `game/src/domain/skills`, the hero views and the skill bar; `hero-team` Ally Damage
+- **Date**: 2026-10-31
+- **Status**: proposed (defaults D1 to D12 of the spec, pending owner approval); supersedes "A 3-star card cannot be fused" of `characters` and extends the star factor of AD-012 and the star multiplier of AD-018
+
 ## Handoff
 
 - **Feature**: five features from the owner's batch of 2026-10-21, all game side except two backend pieces: `combat-hud`, `click-power`, `talents`, `equipment-ui`, `boss-map` (`.specs/features/*`)
