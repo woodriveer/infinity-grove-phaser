@@ -157,10 +157,10 @@ IDs follow the order of the criteria: BSL-01 to BSL-09 for "Sell a batch of piec
 | BSL-03 | P1: Sell a batch of pieces | T2, T3, T4 | Implementing |
 | BSL-04 | P1: Sell a batch of pieces | T2, T3, T4 | Implementing |
 | BSL-05 | P1: Sell a batch of pieces | T1, T3, T4 | Implementing |
-| BSL-06 | P1: Sell a batch of pieces | T4 | Pending |
-| BSL-07 | P1: Sell a batch of pieces | T4 | Pending |
+| BSL-06 | P1: Sell a batch of pieces | T4 | Implementing |
+| BSL-07 | P1: Sell a batch of pieces | T4 | Implementing |
 | BSL-08 | P1: Sell a batch of pieces | T3, T4 | Implementing |
-| BSL-09 | P1: Sell a batch of pieces | T4 | Pending |
+| BSL-09 | P1: Sell a batch of pieces | T4 | Implementing |
 | BSL-10 | P1: Select pieces in the bag | T9, T11, T12 | Implementing |
 | BSL-11 | P1: Select pieces in the bag | T9, T11, T12 | Implementing |
 | BSL-12 | P1: Select pieces in the bag | T8, T9, T10, T11, T12 | Implementing |

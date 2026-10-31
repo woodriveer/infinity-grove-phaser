@@ -17,9 +17,9 @@ A click deals the same damage for every player. Bosses now drop pieces of equipm
 
 **Lock order.** `progress` then `player_cards` then `wallets`. Every equipment action takes the `player_cards` row first (the player lock), so drops and actions of one player run one after the other; the wallet is taken second and only by actions that spend or earn copper. `POST /wallet/sync` takes only `wallets`, so there is no cycle.
 
-**Actions.** `GET /equipment`, `POST /equipment/{id}/equip { heroId }` (hero must be owned), `/unequip`, `/refine` (cost `floor(500 * 1.7^n)` copper times the rarity multiplier, +10 maximum), `/reroll { affix }` (from +5, 5000 copper, a type the piece lacks) and `/sell` (`100 * rarity index * (1 + 0.5 * refine)` copper). Refine, reroll and sell answer `{ equipment, wallet }` so the game shows the new total at once. A piece that is missing or belongs to another account is 404 `EQUIPMENT_NOT_FOUND`.
+**Actions.** `GET /equipment`, `POST /equipment/{id}/equip { heroId }` (hero must be owned), `/unequip`, `/refine` (cost `floor(500 * 1.7^n)` copper times the rarity multiplier, +10 maximum), `/reroll { affix }` (from +5, 5000 copper, a type the piece lacks) and `/sell` (`100 * rarity index * (1 + 0.5 * refine)` copper), and POST /equipment/sell { pieceIds } (1 to 100 distinct ids, all-or-nothing, answers { equipment, wallet, sold, earned }). Refine, reroll and sell answer `{ equipment, wallet }` so the game shows the new total at once. A piece that is missing or belongs to another account is 404 `EQUIPMENT_NOT_FOUND`.
 
-**Errors.** `EquipmentRequestException` 400 (`INVALID_AFFIX`), `EquipmentNotFoundException` 404, `EquipmentConflictException` 409 (`NOT_ENOUGH_COPPER`, `MAX_REFINE`, `REFINE_TOO_LOW`, `NO_AFFIX_LEFT`) and `HERO_NOT_OWNED` from the hero side, through `ApiExceptionHandler` (ADR 0003).
+**Errors.** `EquipmentRequestException` 400 (`INVALID_AFFIX`, `INVALID_SELL_BATCH`), `EquipmentNotFoundException` 404, `EquipmentConflictException` 409 (`NOT_ENOUGH_COPPER`, `MAX_REFINE`, `REFINE_TOO_LOW`, `NO_AFFIX_LEFT`) and `HERO_NOT_OWNED` from the hero side, through `ApiExceptionHandler` (ADR 0003).
 
 ## Consequences
 

@@ -2,12 +2,14 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.PlayerEquipment
+import br.com.woodriver.infinity_grove_ws.usecase.BatchSale
 import br.com.woodriver.infinity_grove_ws.usecase.EquipPieceUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.EquipmentChange
 import br.com.woodriver.infinity_grove_ws.usecase.ListEquipmentUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.RefinePieceUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.RerollAffixUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.SellPieceUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.SellPiecesUseCase
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -42,6 +44,26 @@ data class EquipmentChangeResponse(
     }
 }
 
+/** The pieces and the wallet after a batch sale, the number of pieces sold and the copper credited. */
+data class BatchSaleResponse(
+    val equipment: EquipmentResponse,
+    val wallet: CoinsResponse,
+    val sold: Int,
+    val earned: Long,
+) {
+    companion object {
+        fun from(
+            sale: BatchSale,
+            rules: EquipmentRules,
+        ) = BatchSaleResponse(
+            EquipmentResponse.from(sale.equipment, rules),
+            CoinsResponse.from(sale.wallet.coins()),
+            sale.sold,
+            sale.earned,
+        )
+    }
+}
+
 @RestController
 @RequestMapping("/equipment")
 class EquipmentController(
@@ -50,6 +72,7 @@ class EquipmentController(
     private val refinePiece: RefinePieceUseCase,
     private val rerollAffix: RerollAffixUseCase,
     private val sellPiece: SellPieceUseCase,
+    private val sellPieces: SellPiecesUseCase,
     private val rules: EquipmentRules,
 ) {
     @GetMapping
@@ -93,4 +116,14 @@ class EquipmentController(
         principal: Principal,
         @PathVariable id: String,
     ) = EquipmentChangeResponse.from(sellPiece.sell(principal.name, id), rules)
+
+    @PostMapping("/sell")
+    fun sellAll(
+        principal: Principal,
+        @RequestBody body: Map<String, Any?>,
+    ): BatchSaleResponse {
+        val raw = body["pieceIds"] as? List<*> ?: throw IllegalArgumentException("pieceIds must be a list of piece ids")
+        val pieceIds = raw.map { it as? String ?: throw IllegalArgumentException("pieceIds must hold only strings") }
+        return BatchSaleResponse.from(sellPieces.sellAll(principal.name, pieceIds), rules)
+    }
 }

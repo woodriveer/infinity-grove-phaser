@@ -290,7 +290,7 @@ Imports to add in `EquipmentService.kt`: `<kt>.domain.SellBatch`, `<kt>.usecase.
 
 ---
 
-### T4: POST /equipment/sell endpoint [ ]
+### T4: POST /equipment/sell endpoint [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Expose the batch sale at `POST /equipment/sell` with the response `{ equipment, wallet, sold, earned }` and prove the 400, 401, 404, race and single-sale cases on the real database (BSL-01 to BSL-09).
@@ -359,8 +359,8 @@ ADR line: in `backend/docs/adr/0008-equipment.md`, paragraph **Actions**, after 
 **Gate**: full - `cd backend && ./gradlew build`
 **Done when**:
 
-- [ ] The 8 cases pass; `EquipmentSellIT` passes unchanged.
-- [ ] `cd backend && ./gradlew build` passes (all tests and ktlint).
+- [x] The 8 cases pass; `EquipmentSellIT` passes unchanged.
+- [x] `cd backend && ./gradlew build` passes (all tests and ktlint).
 
 **Commit**: `feat(backend): add POST /equipment/sell for a batch of pieces`
 
