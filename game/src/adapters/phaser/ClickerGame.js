@@ -287,6 +287,9 @@ export class ClickerGame extends Scene
         this.resetError = null;
         this.resetDialog.hidden = false;
         this.showResetDialog();
+
+        //  The dialog was hidden when Phaser measured it, so the size it centres on is 0 until measured again
+        this.resetDialogElement.updateSize();
     }
 
     showResetDialog ()

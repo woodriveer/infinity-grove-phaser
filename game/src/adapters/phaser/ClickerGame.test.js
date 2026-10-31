@@ -4087,6 +4087,16 @@ describe('ClickerGame account reset', () => {
         expect(cancel(ctx).textContent).toBe('Cancelar');
     });
 
+    it('measures the dialog again when it opens so it stays centred', async () => {
+        const ctx = await createScene({ start: atChapter(4) });
+
+        resetButton(ctx).click();
+
+        expect(ctx.scene.resetDialogElement.updateSize).toHaveBeenCalledTimes(1);
+        expect(ctx.scene.resetDialogElement.x).toBe(512);
+        expect(ctx.scene.resetDialogElement.y).toBe(384);
+    });
+
     it('closes the dialog on Cancelar and sends nothing', async () => {
         const ctx = await createScene({ start: atChapter(4) });
         resetButton(ctx).click();

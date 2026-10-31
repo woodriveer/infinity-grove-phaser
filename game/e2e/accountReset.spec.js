@@ -31,6 +31,9 @@ test.describe('Account reset', () => {
         await expect(page.getByTestId('reset-account')).toHaveText('Resetar conta (+3 cristais)');
         await page.getByTestId('reset-account').click();
         await expect(page.getByTestId('reset-question')).toContainText('Você ganha 3 cristais.');
+        //  Both buttons sit inside the window, not off the edge of the canvas
+        await expect(page.getByTestId('reset-confirm')).toBeInViewport({ ratio: 1 });
+        await expect(page.getByTestId('reset-cancel')).toBeInViewport({ ratio: 1 });
         await page.getByTestId('reset-cancel').click();
 
         await expect(page.getByTestId('reset-dialog')).toBeHidden();
