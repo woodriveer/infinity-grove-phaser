@@ -152,36 +152,36 @@ IDs follow the order of the criteria: BSL-01 to BSL-09 for "Sell a batch of piec
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| BSL-01 | P1: Sell a batch of pieces | T3, T4 | Implementing |
-| BSL-02 | P1: Sell a batch of pieces | T3, T4 | Implementing |
-| BSL-03 | P1: Sell a batch of pieces | T2, T3, T4 | Implementing |
-| BSL-04 | P1: Sell a batch of pieces | T2, T3, T4 | Implementing |
-| BSL-05 | P1: Sell a batch of pieces | T1, T3, T4 | Implementing |
-| BSL-06 | P1: Sell a batch of pieces | T4 | Implementing |
-| BSL-07 | P1: Sell a batch of pieces | T4 | Implementing |
-| BSL-08 | P1: Sell a batch of pieces | T3, T4 | Implementing |
-| BSL-09 | P1: Sell a batch of pieces | T4 | Implementing |
-| BSL-10 | P1: Select pieces in the bag | T9, T11, T12 | Implementing |
-| BSL-11 | P1: Select pieces in the bag | T9, T11, T12 | Implementing |
-| BSL-12 | P1: Select pieces in the bag | T8, T9, T10, T11, T12 | Implementing |
-| BSL-13 | P1: Select pieces in the bag | T9, T10, T12 | Implementing |
-| BSL-14 | P1: Select pieces in the bag | T7, T9, T10, T11, T12 | Implementing |
-| BSL-15 | P1: Select pieces in the bag | T7, T8, T9, T12 | Implementing |
-| BSL-16 | P1: Select pieces in the bag | T8, T10, T12 | Implementing |
-| BSL-17 | P1: Select pieces in the bag | T9, T10, T11, T12 | Implementing |
-| BSL-18 | P1: Select pieces in the bag | T10, T12 | Implementing |
-| BSL-19 | P1: Select pieces in the bag | T10, T12 | Implementing |
-| BSL-20 | P1: Confirm and sell | T7, T8, T10, T12 | Implementing |
-| BSL-21 | P1: Confirm and sell | T8, T9, T10, T12 | Implementing |
-| BSL-22 | P1: Confirm and sell | T10, T12 | Implementing |
-| BSL-23 | P1: Confirm and sell | T5, T7, T10, T12 | Implementing |
-| BSL-24 | P1: Confirm and sell | T6, T7, T9, T10, T12 | Implementing |
-| BSL-25 | P1: Confirm and sell | T6, T7, T10, T12 | Implementing |
-| BSL-26 | P2: Select by rarity | T8, T11, T12 | Implementing |
-| BSL-27 | P2: Select by rarity | T7, T10, T12 | Implementing |
-| BSL-28 | P2: Select by rarity | T7, T10, T12 | Implementing |
-| BSL-29 | P2: Select by rarity | T7, T8, T12 | Implementing |
-| BSL-30 | P2: Select by rarity | T7, T8, T12 | Implementing |
+| BSL-01 | P1: Sell a batch of pieces | T3, T4 | Verified |
+| BSL-02 | P1: Sell a batch of pieces | T3, T4 | Verified |
+| BSL-03 | P1: Sell a batch of pieces | T2, T3, T4 | Verified |
+| BSL-04 | P1: Sell a batch of pieces | T2, T3, T4 | Verified |
+| BSL-05 | P1: Sell a batch of pieces | T1, T3, T4 | Verified |
+| BSL-06 | P1: Sell a batch of pieces | T4 | Verified |
+| BSL-07 | P1: Sell a batch of pieces | T4 | Verified |
+| BSL-08 | P1: Sell a batch of pieces | T3, T4 | Verified |
+| BSL-09 | P1: Sell a batch of pieces | T4 | Verified |
+| BSL-10 | P1: Select pieces in the bag | T9, T11, T12 | Verified |
+| BSL-11 | P1: Select pieces in the bag | T9, T11, T12 | Verified |
+| BSL-12 | P1: Select pieces in the bag | T8, T9, T10, T11, T12 | Verified |
+| BSL-13 | P1: Select pieces in the bag | T9, T10, T12 | Verified |
+| BSL-14 | P1: Select pieces in the bag | T7, T9, T10, T11, T12 | Verified |
+| BSL-15 | P1: Select pieces in the bag | T7, T8, T9, T12 | Verified |
+| BSL-16 | P1: Select pieces in the bag | T8, T10, T12 | Verified |
+| BSL-17 | P1: Select pieces in the bag | T9, T10, T11, T12 | Verified |
+| BSL-18 | P1: Select pieces in the bag | T10, T12 | Verified |
+| BSL-19 | P1: Select pieces in the bag | T10, T12 | Verified |
+| BSL-20 | P1: Confirm and sell | T7, T8, T10, T12 | Verified |
+| BSL-21 | P1: Confirm and sell | T8, T9, T10, T12 | Verified |
+| BSL-22 | P1: Confirm and sell | T10, T12 | Verified |
+| BSL-23 | P1: Confirm and sell | T5, T7, T10, T12 | Verified |
+| BSL-24 | P1: Confirm and sell | T6, T7, T9, T10, T12 | Verified |
+| BSL-25 | P1: Confirm and sell | T6, T7, T10, T12 | Verified |
+| BSL-26 | P2: Select by rarity | T8, T11, T12 | Verified |
+| BSL-27 | P2: Select by rarity | T7, T10, T12 | Verified |
+| BSL-28 | P2: Select by rarity | T7, T10, T12 | Verified |
+| BSL-29 | P2: Select by rarity | T7, T8, T12 | Verified |
+| BSL-30 | P2: Select by rarity | T7, T8, T12 | Verified |
 
 **ID format:** `BSL-<NN>`
 

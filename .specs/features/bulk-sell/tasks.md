@@ -399,7 +399,7 @@ Header comment: add the line `//  sellMany([pieceId]) -> { equipment, wallet, so
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 2 new cases pass and the game unit suite passes (no existing case removed).
+- [x] The 2 new cases pass and the game unit suite passes (no existing case removed).
 
 **Commit**: `feat(game): add the batch sale call to the equipment api`
 
@@ -457,7 +457,7 @@ Port comment (lines 4-7): add `sellMany(pieceIds)` to the gateway list and `sell
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 3 new cases pass and the game unit suite passes.
+- [x] The 3 new cases pass and the game unit suite passes.
 
 **Commit**: `feat(game): sell a batch of pieces from the equipment collection`
 
@@ -536,7 +536,7 @@ The separator in `selectionSummary` is ` · ` (space, U+00B7, space).
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 13 cases pass; `architecture.test.js` passes (the module imports only `./equipment`).
+- [x] The 13 cases pass; `architecture.test.js` passes (the module imports only `./equipment`).
 
 **Commit**: `feat(game): add the selection rules of the bulk sale`
 
@@ -606,8 +606,8 @@ div.bulk-sell-bar [data-testid=bulk-sell-bar]
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 11 cases pass and the game unit suite passes.
-- [ ] `views/dom.js` and `views/pieceTile.js` are unchanged (`git diff --stat` shows neither from this task).
+- [x] The 11 cases pass and the game unit suite passes.
+- [x] `views/dom.js` and `views/pieceTile.js` are unchanged (`git diff --stat` shows neither from this task).
 
 **Commit**: `feat(game): add the selection bar of the bulk sale`
 
@@ -665,8 +665,8 @@ Rules, in the order of the function:
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 13 new cases pass and every earlier `equipmentView.test.js` case passes unchanged.
-- [ ] `views/dom.js` and `views/pieceTile.js` are unchanged by this task.
+- [x] The 13 new cases pass and every earlier `equipmentView.test.js` case passes unchanged.
+- [x] `views/dom.js` and `views/pieceTile.js` are unchanged by this task.
 
 **Commit**: `feat(game): show the selection mode in the Equipamento screen`
 
@@ -774,8 +774,8 @@ Imports: `bagPieces`, `selectedInBag`, `toggleRarity`, `toggleSelected` and `sel
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 15 new cases pass and every earlier `HeroUi.test.js` case passes unchanged.
-- [ ] `ClickerGame.js` is not edited (the wallet already flows through `equipment.onWallet`).
+- [x] The 15 new cases pass and every earlier `HeroUi.test.js` case passes unchanged.
+- [x] `ClickerGame.js` is not edited (the wallet already flows through `equipment.onWallet`).
 
 **Commit**: `feat(game): run the bulk sale from the Equipamento screen`
 
@@ -824,8 +824,8 @@ Write each rule over several lines in the file's existing style (one declaration
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `npm run build` succeeds and `npm test` passes.
-- [ ] Every class of the design table exists in `style.css`: `bag-header`, `bulk-sell-bar`, `bulk-sell-summary`, `bulk-sell-rarities`, `bulk-sell-actions`, `bulk-sell-confirm`, `bulk-sell-rarity`, `bulk-sell-submit`, `bulk-sell-yes`, `bulk-sell-question`, `is-selected`, `piece-check`, `is-locked`.
+- [x] `npm run build` succeeds and `npm test` passes.
+- [x] Every class of the design table exists in `style.css`: `bag-header`, `bulk-sell-bar`, `bulk-sell-summary`, `bulk-sell-rarities`, `bulk-sell-actions`, `bulk-sell-confirm`, `bulk-sell-rarity`, `bulk-sell-submit`, `bulk-sell-yes`, `bulk-sell-question`, `is-selected`, `piece-check`, `is-locked`.
 
 **Commit**: `style(game): style the selection mode of the bag`
 

@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 56,
+  "next_id": 59,
   "lessons": [
     {
       "id": "L-001",
@@ -998,6 +998,60 @@
       ],
       "created": "2026-10-28T18:32:27Z",
       "last_seen": "2026-10-28T18:32:27Z"
+    },
+    {
+      "id": "L-056",
+      "key": "surviving_mutant::assert a state reset through the screen change path the spec names not only through close a show reset survived until a unit test opened another screen while selection was on",
+      "text": "Assert a state reset through the screen-change path the spec names, not only through close: a show() reset survived until a unit test opened another screen while selection was on.",
+      "signal": "surviving_mutant",
+      "scope": "game-ui-state",
+      "status": "candidate",
+      "features": [
+        "bulk-sell"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/src/adapters/phaser/HeroUi.js:161 (mutant G3, validation.md) (game-ui-state)"
+      ],
+      "created": "2026-10-31T17:51:19Z",
+      "last_seen": "2026-10-31T17:51:19Z"
+    },
+    {
+      "id": "L-057",
+      "key": "spec_precision_gap::name the region a rule covers every button of the body vs of the window when a close button stays live during a pending request",
+      "text": "Name the region a rule covers ('every button of the body' vs 'of the window') when a close button stays live during a pending request.",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "bulk-sell"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "bulk-sell/spec.md BSL-23 (SP-1) (spec)"
+      ],
+      "created": "2026-10-31T17:51:20Z",
+      "last_seen": "2026-10-31T17:51:20Z"
+    },
+    {
+      "id": "L-058",
+      "key": "ac_gap::a screen change criterion needs an e2e path the player can reach check the path is clickable before writing the scenario the open panel intercepts hud clicks",
+      "text": "A screen-change criterion needs an e2e path the player can reach; check the path is clickable before writing the scenario (the open panel intercepts HUD clicks).",
+      "signal": "ac_gap",
+      "scope": "e2e",
+      "status": "candidate",
+      "features": [
+        "bulk-sell"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "bulk-sell/spec.md BSL-19 (e2e)"
+      ],
+      "created": "2026-10-31T17:51:20Z",
+      "last_seen": "2026-10-31T17:51:20Z"
     }
   ]
 }

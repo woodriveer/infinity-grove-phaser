@@ -342,6 +342,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: AD-017 POST /talents/reset (spec)
 - last seen: 2026-10-28T18:32:27Z
 
+### L-056 - Assert a state reset through the screen-change path the spec names, not only through close: a show() reset survived until a unit test opened another screen while selection was on.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game-ui-state` · harmful: 0
+- features: bulk-sell
+- evidence: game/src/adapters/phaser/HeroUi.js:161 (mutant G3, validation.md) (game-ui-state)
+- last seen: 2026-10-31T17:51:19Z
+
+### L-057 - Name the region a rule covers ('every button of the body' vs 'of the window') when a close button stays live during a pending request.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: bulk-sell
+- evidence: bulk-sell/spec.md BSL-23 (SP-1) (spec)
+- last seen: 2026-10-31T17:51:20Z
+
+### L-058 - A screen-change criterion needs an e2e path the player can reach; check the path is clickable before writing the scenario (the open panel intercepts HUD clicks).
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `e2e` · harmful: 0
+- features: bulk-sell
+- evidence: bulk-sell/spec.md BSL-19 (e2e)
+- last seen: 2026-10-31T17:51:20Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
