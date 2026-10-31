@@ -1101,7 +1101,7 @@ const tileOf = (piece, testid, onClick = onSelect) =>
 
 ---
 
-### T16: Keep the hero blocks still when selection mode opens
+### T16: Keep the hero blocks still when selection mode opens [x]
 
 **Owner**: game-dev
 **Goal**: The place of `Transferir conjunto` stays in selection mode, so the hero blocks keep their height and the window does not jump when the mode opens (review finding #4). The button itself stays hidden (BSL-17).
@@ -1161,9 +1161,9 @@ In `style.css`, next to the transfer rules:
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The two new tests pass, and the existing transfer tests and `HeroUi.test.js` (`worn tiles are disabled and Transferir conjunto hides in selection mode`) pass unchanged.
-- [ ] Measured in the browser at 1280x720: the hero blocks keep their height when selection mode opens.
-- [ ] `npm test`, `npm run build` and the three e2e files pass.
+- [x] The two new tests pass, and the existing transfer tests and `HeroUi.test.js` (`worn tiles are disabled and Transferir conjunto hides in selection mode`) pass unchanged.
+- [x] Measured in the browser at 1280x720: the hero blocks keep their height when selection mode opens.
+- [x] `npm test`, `npm run build` and the three e2e files pass.
 
 **Commit**: `fix(game): keep the hero blocks still when selection mode opens`
 

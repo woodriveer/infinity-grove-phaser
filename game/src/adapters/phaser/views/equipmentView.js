@@ -37,6 +37,19 @@ const renderTransfer = (hero, owned, onTransfer) =>
     return box;
 };
 
+//  The place of `Transferir conjunto` in selection mode: a hidden copy of the button (same size, no test id, out of the tab order), so the
+//  hero block keeps its height and the window does not move when the mode opens
+const renderTransferSpace = () =>
+{
+    const box = el('div', 'equip-transfer is-space');
+    const ghost = el('button', 'equip-button', 'Transferir conjunto', { type: 'button', tabindex: '-1', disabled: '' });
+
+    ghost.setAttribute('aria-hidden', 'true');
+    box.append(ghost);
+
+    return box;
+};
+
 //  The attribute panel of the leader: `Atributos de <nome>` and one line per attribute ({ id, text } from `leaderStats`)
 export const renderLeaderStats = ({ name, lines }) =>
 {
@@ -56,7 +69,7 @@ export const renderEquipmentUnavailable = () => el('p', 'hero-empty', UNAVAILABL
 //  (when another hero is owned): it offers `Para <nome>` per other hero and `onTransfer(fromHeroId, toHeroId)` fires for the one picked.
 //  `notice` is a line shown at the top (the result of a transfer); `sellNotice` is the line of the last bulk sale, under it; `busy` disables every button while a request runs.
 //  `onStartSelling()` fires for `Vender várias`. `selection` is null (mode off) or { ids: Set<string>, confirming, onToggle(piece), onRarity(rarity), onSubmit(),
-//  onCancel(), onConfirm(), onDecline() }: a bag click toggles its piece, the worn pieces are locked and the selection bar is shown.
+//  onCancel(), onConfirm(), onDecline() }: a bag click toggles its piece, the worn pieces are locked, the selection bar is shown and the button `Transferir conjunto` is hidden (its place stays).
 export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, onStartSelling, stats = null, notice = null, sellNotice = null, busy = false, selection = null }) =>
 {
     if (pieces.length === 0)
@@ -126,9 +139,9 @@ export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, onStartS
 
         heading.append(el('strong', 'equip-hero-name', hero.name));
 
-        if (wearsSomething && owned.length > 1 && !selection)
+        if (wearsSomething && owned.length > 1)
         {
-            heading.append(renderTransfer(hero, owned, onTransfer));
+            heading.append(selection ? renderTransferSpace() : renderTransfer(hero, owned, onTransfer));
         }
 
         block.append(heading);

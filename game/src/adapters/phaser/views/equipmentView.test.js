@@ -323,6 +323,26 @@ describe('renderEquipment selection mode', () => {
         expect(find(screen, 'equip-transfer-kael')).toBeNull();
     });
 
+    it('keeps the place of Transferir conjunto in selection mode, hidden and without a test id', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }), ring() ], [ hero('kael'), hero('lyra') ], { onSelect: vi.fn(), onTransfer: vi.fn(), selection: selecting() });
+        const space = screen.querySelector('[data-testid="equip-hero-kael"] .equip-transfer.is-space');
+        const ghost = space.querySelector('button');
+
+        expect(find(screen, 'equip-transfer-kael')).toBeNull();
+        expect(ghost.textContent).toBe('Transferir conjunto');
+        expect(ghost.getAttribute('aria-hidden')).toBe('true');
+        expect(ghost.disabled).toBe(true);
+        expect(ghost.hasAttribute('data-testid')).toBe(false);
+        expect(screen.querySelector('[data-testid="equip-hero-lyra"] .is-space')).toBeNull();
+    });
+
+    it('outside selection mode the hero shows the real button and no place holder', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }) ], [ hero('kael'), hero('lyra') ], { onSelect: vi.fn(), onTransfer: vi.fn() });
+
+        expect(find(screen, 'equip-transfer-kael').textContent).toBe('Transferir conjunto');
+        expect(screen.querySelector('.is-space')).toBeNull();
+    });
+
     it('hides the tooltip on hover in selection mode, for a bag tile and for a worn tile', () => {
         const screen = renderEquipment([ weapon({ heroId: 'kael' }), ring() ], [ hero('kael'), hero('lyra') ], { onSelect: vi.fn(), selection: selecting() });
 

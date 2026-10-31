@@ -2030,6 +2030,11 @@ button:disabled {
     gap: 4px;
 }
 
+/* In selection mode the button is hidden but keeps its box, so the hero block keeps its height */
+.equip-transfer.is-space .equip-button {
+    visibility: hidden;
+}
+
 .equip-notice {
     margin: 0;
     padding: 10px 16px;
