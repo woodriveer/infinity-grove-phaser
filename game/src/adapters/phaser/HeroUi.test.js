@@ -254,6 +254,19 @@ describe('HeroUi Fusão', () => {
         expect(ctx.testid('fusion-list')).not.toBeNull();
     });
 
+    it('shows the Nv. 2 badge on slot 1 after the leader fuses to 4 stars, without reloading', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 3: 3 }), hero('lyra') ] } });
+        ctx.heroesGateway.fuse.mockResolvedValue(hero('kael', { 4: 1 }, { stars: 4, skills: skills(true, true, true).map((skill, index) => ({ ...skill, level: [ 2, 1, 1 ][index] })) }));
+        await open(ctx, 'fusion');
+
+        ctx.testid('fusion-button-kael-3').click();
+        await flush();
+
+        expect(ctx.testid('skill-level-1').textContent).toBe('Nv. 2');
+        expect(ctx.testid('skill-level-2')).toBeNull();
+        expect(ctx.heroesGateway.list).toHaveBeenCalledTimes(1);
+    });
+
     it('a 3 star fusion names skill 1 at level 2', async () => {
         const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 3: 3 }), hero('lyra') ] } });
         ctx.heroesGateway.fuse.mockResolvedValue(hero('kael', { 4: 1 }, { stars: 4, skills: skills(true, true, true).map((skill, index) => ({ ...skill, level: [ 2, 1, 1 ][index] })) }));

@@ -10,6 +10,13 @@ const leader = (...unlocked) => ({
 
 const slots = (bar) => [ ...bar.querySelectorAll('.skill-slot') ];
 
+const leaderWithLevels = (levels) => ({
+    id: 'kael',
+    skills: levels.map((level, index) => ({
+        slot: index + 1, name: `Skill ${index + 1}`, type: 'Ataque', effect: 'x', cooldownSeconds: 10, image: `art_${index + 1}`, unlocked: true, level
+    }))
+});
+
 describe('renderSkillBar', () => {
     it('shows three slots with the art, name and cooldown seconds of each skill', () => {
         const bar = renderSkillBar(leader(true, false, false));
@@ -46,6 +53,40 @@ describe('renderSkillBar', () => {
 
     it('shows no slot without a leader', () => {
         expect(slots(renderSkillBar(null))).toHaveLength(0);
+    });
+
+    it('shows Nv. 2 on the slots of level 2 of a 5 star leader and none on its level 1 slot', () => {
+        const bar = renderSkillBar(leaderWithLevels([ 2, 2, 1 ]));
+
+        expect(bar.querySelector('[data-testid="skill-level-1"]').textContent).toBe('Nv. 2');
+        expect(bar.querySelector('[data-testid="skill-level-1"]').getAttribute('data-level')).toBe('2');
+        expect(bar.querySelector('[data-testid="skill-level-2"]').textContent).toBe('Nv. 2');
+        expect(bar.querySelector('[data-testid="skill-level-2"]').getAttribute('data-level')).toBe('2');
+        expect(bar.querySelector('[data-testid="skill-level-3"]')).toBeNull();
+    });
+
+    it('shows Nv. 3 with data-level 3 on every slot of a 9 star leader', () => {
+        const bar = renderSkillBar(leaderWithLevels([ 3, 3, 3 ]));
+
+        [ 1, 2, 3 ].forEach((slot) => {
+            const badge = bar.querySelector(`[data-testid="skill-level-${slot}"]`);
+
+            expect(badge.textContent).toBe('Nv. 3');
+            expect(badge.getAttribute('data-level')).toBe('3');
+        });
+    });
+
+    it('shows no badge on a level 1 slot, on a slot without a level or on a locked slot', () => {
+        const bar = renderSkillBar({
+            id: 'kael',
+            skills: [
+                { slot: 1, name: 'Skill 1', type: 'Ataque', effect: 'x', cooldownSeconds: 10, image: 'art_1', unlocked: true, level: 1 },
+                { slot: 2, name: 'Skill 2', type: 'Ataque', effect: 'x', cooldownSeconds: 20, image: 'art_2', unlocked: true },
+                { slot: 3, name: 'Skill 3', type: 'Ataque', effect: 'x', cooldownSeconds: 30, image: 'art_3', unlocked: false, level: 3 }
+            ]
+        });
+
+        expect(bar.querySelectorAll('.skill-level-badge')).toHaveLength(0);
     });
 
     it('calls onUse with the slot number when an unlocked slot is clicked', () => {

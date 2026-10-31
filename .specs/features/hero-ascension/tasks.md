@@ -778,7 +778,7 @@ The rows need no change: `availableFusions` already lists stars 0 to 8 after T4.
 
 ---
 
-### T13: Level badge on the skill bar [ ]
+### T13: Level badge on the skill bar [x]
 
 **Owner**: game-dev
 **What**: An unlocked skill bar slot of level 2 or 3 shows `Nv. <L>` with `data-level` (ASC-08 AC 6; ASC-07 AC 8).
@@ -815,7 +815,7 @@ if (level >= 2)
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The four cases pass; the whole Vitest suite passes.
+- [x] The four cases pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): show the skill level on the skill bar`
 

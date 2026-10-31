@@ -1,3 +1,4 @@
+import { skillLevelOf } from '../../../domain/skills/skillLevel';
 import { art, el, sprite } from './dom';
 import { attachSkillTooltip } from './skillTooltip';
 
@@ -39,6 +40,13 @@ export const renderSkillBar = (leader, { onUse } = {}) =>
         }
         else
         {
+            const level = skillLevelOf(skill);
+
+            if (level >= 2)
+            {
+                slot.append(el('span', 'skill-level-badge', `Nv. ${level}`, { testid: `skill-level-${skill.slot}`, 'data-level': String(level) }));
+            }
+
             slot.addEventListener('click', () => onUse?.(skill.slot));
         }
 
