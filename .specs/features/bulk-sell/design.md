@@ -137,25 +137,24 @@ Selection mode of the Equipamento window, bag part (the leader panel and hero bl
 
 ```
 Mochila (4)                                      <- .bag-header (flex, space-between); the button `Vender várias` sits at the right when mode is off
-┌─ .bulk-sell-bar ───────────────────────────────────────────────┐
-│ Selecionadas: 2 · Total: 3 prata                               │  .bulk-sell-summary, heading font 15px
-│ |Comum| |Incomum| |Raro| |Épico| |Lendário|                    │  .bulk-sell-rarities, pills 13px, 4px left border in the rarity colour
-│ (Vender selecionadas) (Cancelar)                               │  .bulk-sell-actions; Vender selecionadas in accent fill
-│   - or, while confirming -                                     │
-│ Vender 2 peças por 3 prata?  (Sim, vender) (Não)               │  .bulk-sell-confirm; question bold accent-800
+┌─ .bulk-sell-bar (sticky at the top of .hero-window) ────────────┐
+│ Selecionadas: 2 · Total: 3 prata     (Vender selecionadas) (Cancelar) │  row 1: .bulk-sell-summary, heading font 15px; .bulk-sell-actions at the right
+│ |Comum| |Incomum| |Raro| |Épico| |Lendário|                    │  row 2: .bulk-sell-rarities, pills 13px, dot in the rarity colour
+│   - or, while confirming, row 1 is -                           │
+│ Vender 2 peças por 3 prata?  (Sim, vender) (Não)               │  .bulk-sell-confirm at the right of row 1; question bold accent-800
 └────────────────────────────────────────────────────────────────┘
-[c1 ✓] [c2] [u1 ✓] [e1]                                          <- tiles; selected: 3px accent outline at 6px offset, lifted 2px, round ✓ badge top-right
+[c1 ✓] [c2] [u1 ✓] [e1]                                          <- tiles; selected: 3px accent outline at 4px offset, lifted 2px, round ✓ badge top-right, full opacity while confirming
 ```
 
 | Element | Size and style | Colours | States |
 | --- | --- | --- | --- |
 | `Vender várias` (`bulk-sell-start`) | `.equip-button` (pill, 15px heading font, 8px 18px padding) | as `.equip-button` | hidden in selection mode; absent with no unworn piece |
-| `.bulk-sell-bar` | column, gap 8px, padding 10px 14px, radius `var(--radius-md)`, 1px border | background `var(--color-surface)` `#ebddc5`, border `var(--color-divider)` | present only in selection mode |
+| `.bulk-sell-bar` | flex row that wraps, gap 8px 14px, padding 8px 14px, radius `var(--radius-md)`, 1px border, `position: sticky; top: 0` in `.hero-window`, shadow `var(--shadow-md)`; at 1280x720 about 82 px high | background `var(--color-surface)` `#ebddc5`, border `var(--color-divider)` | present only in selection mode |
 | Rarity button (`bulk-sell-rarity-<R>`) | `.equip-button`, padding 4px 12px, font 13px, 4px left border | left border: COMMON `#c0b6a5`, UNCOMMON `#5da048`, RARE `#3f8fd1`, EPIC `#9b59d0`, LEGENDARY `#d9a521` (the tile frame colours) | `aria-pressed="true"`: background `var(--color-neutral-300)` `#dcd3c4`, weight 700; disabled: opacity 0.5, cursor not-allowed |
 | `Vender selecionadas` / `Sim, vender` | `.equip-button` | text `var(--color-bg)` `#f5ead8` on `var(--color-accent)` `#c67139`, hover `var(--color-accent-600)` `#b2622d`, shadow `var(--shadow-md)` | disabled: opacity 0.5, cursor not-allowed |
 | `Cancelar` / `Não` | `.equip-button` | as `.equip-button` | hidden while confirming (`Cancelar`) |
 | Question (`bulk-sell-question`) | 15px, weight 700 | `var(--color-accent-800)` `#643312` | - |
-| Selected tile (`.piece-tile.is-selected`) | outline 3px at offset 6px (outside the RARE/EPIC/LEGENDARY rings, which reach 4px), `translateY(-2px)` | outline `var(--color-accent)` `#c67139` | - |
+| Selected tile (`.piece-tile.is-selected`) | outline 3px at offset 4px, `translateY(-2px)` | outline `var(--color-accent)` `#c67139` | full opacity while the question shows (`.piece-tile.is-selected:disabled`) |
 | Check badge (`.piece-check`) | 20x20 circle at top -8px, right -8px, z-index 3, glyph `✓` 13px weight 800, 2px border | text `var(--color-bg)` on `var(--color-accent)`, border `var(--color-bg)` | only on selected tiles |
 | Locked worn tile (`.piece-tile.is-locked`) | opacity 0.45, cursor not-allowed | unchanged frame | selection mode only |
 | Sell notice (`equip-sell-notice`) | existing `.equip-notice` pill | `var(--color-accent-2-900)` on `var(--color-accent-2-200)` | after a successful sale |

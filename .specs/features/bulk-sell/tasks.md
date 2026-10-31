@@ -914,7 +914,7 @@ const sellCalls = (calls) => calls.filter(({ method, path }) => method === 'POST
 
 Fixes of the findings #1 to #4 of `.specs/features/bulk-sell/ui-review.html` (the phone scale, finding #5, is out of scope). Owner for all four: game-dev. They run in this order: T13 and T14 touch the same CSS block. Each task is one commit, pushed right after it, and each lists the review finding it closes.
 
-### T13: Compact and sticky selection bar, and the selected tiles
+### T13: Compact and sticky selection bar, and the selected tiles [x]
 
 **Owner**: game-dev
 **Goal**: At the desktop size of the window the bar takes two short rows (summary and actions on the first, rarity buttons on the second) and stays at the top of the Equipamento window while the bag scrolls, so the second row of bag tiles stays reachable (review finding #1). Two suggestions of the same review are done in the same block: a selected tile keeps full opacity while the question shows, and its outline sits 4 px off the tile.
@@ -981,10 +981,10 @@ Keep the `display: flex; flex-wrap: wrap; align-items: center; gap: 6px` of `.bu
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The bar is two rows at most at the desktop size: summary and actions on one row, rarity buttons on the other.
-- [ ] `.bulk-sell-bar` is sticky at the top of `.hero-window` and the bag tiles scroll under it.
-- [ ] A selected tile keeps full opacity while the question shows, and its outline is 4 px off the tile.
-- [ ] `npm test` and `npm run build` pass, and `npx playwright test e2e/bulkSell.spec.js e2e/equipmentUi.spec.js e2e/equipment.spec.js` still passes.
+- [x] The bar is two rows at most at the desktop size: summary and actions on one row, rarity buttons on the other.
+- [x] `.bulk-sell-bar` is sticky at the top of `.hero-window` and the bag tiles scroll under it.
+- [x] A selected tile keeps full opacity while the question shows, and its outline is 4 px off the tile.
+- [x] `npm test` and `npm run build` pass, and `npx playwright test e2e/bulkSell.spec.js e2e/equipmentUi.spec.js e2e/equipment.spec.js` still passes.
 
 **Commit**: `style(game): compact and sticky selection bar, tidier selected tiles`
 
