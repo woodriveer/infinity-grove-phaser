@@ -101,6 +101,29 @@ class PlayerEquipmentTest {
     }
 
     @Test
+    fun `removeAll drops every listed piece and keeps the others`() {
+        val updated = equipment(piece("a"), piece("b"), piece("c")).removeAll(listOf("c", "a"))
+
+        assertEquals(listOf("b"), updated.pieces.map { it.id })
+    }
+
+    @Test
+    fun `removeAll drops a worn piece and leaves its slot empty`() {
+        val updated = equipment(piece("a", heroId = "kael"), piece("b")).removeAll(listOf("a"))
+
+        assertTrue(updated.worn("kael").isEmpty())
+        assertEquals(listOf("b"), updated.pieces.map { it.id })
+    }
+
+    @Test
+    fun `removeAll with one unknown id is not found and the original keeps every piece`() {
+        val before = equipment(piece("a"), piece("b"))
+
+        assertFailsWith<EquipmentNotFoundException> { before.removeAll(listOf("a", "x")) }
+        assertEquals(listOf("a", "b"), before.pieces.map { it.id })
+    }
+
+    @Test
     fun `replace swaps the piece with the same id`() {
         val before = equipment(piece("a"), piece("b"))
         val refined = before.find("a").copy(refine = 1)

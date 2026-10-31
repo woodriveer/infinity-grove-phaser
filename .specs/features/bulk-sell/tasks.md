@@ -164,7 +164,7 @@ data class SellBatch(
 
 ---
 
-### T2: PlayerEquipment.removeAll [ ]
+### T2: PlayerEquipment.removeAll [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Drop several pieces in one value change; one unknown id fails the whole call and leaves the value unchanged (BSL-03, BSL-04).
@@ -203,8 +203,8 @@ fun removeAll(pieceIds: List<String>): PlayerEquipment {
 **Gate**: quick - `cd backend && ./gradlew test --tests '*PlayerEquipmentTest'`
 **Done when**:
 
-- [ ] The 3 new cases and every earlier `PlayerEquipmentTest` case pass.
-- [ ] `cd backend && ./gradlew ktlintCheck` passes.
+- [x] The 3 new cases and every earlier `PlayerEquipmentTest` case pass.
+- [x] `cd backend && ./gradlew ktlintCheck` passes.
 
 **Commit**: `feat(backend): remove several pieces from the player equipment at once`
 

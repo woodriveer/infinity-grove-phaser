@@ -70,6 +70,14 @@ data class PlayerEquipment(
         return copy(pieces = pieces.filter { it.id != pieceId })
     }
 
+    /** Drops every piece of [pieceIds]; worn ones leave the slot of their hero empty. One id the player does not own fails the call and drops nothing. */
+    fun removeAll(pieceIds: List<String>): PlayerEquipment {
+        pieceIds.forEach { find(it) }
+        logger.info("Removing username={} pieces={}", username, pieceIds.size)
+        val gone = pieceIds.toSet()
+        return copy(pieces = pieces.filter { it.id !in gone })
+    }
+
     private companion object {
         private val logger = LoggerFactory.getLogger(PlayerEquipment::class.java)
     }
