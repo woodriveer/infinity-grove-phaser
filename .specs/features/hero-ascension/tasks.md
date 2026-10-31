@@ -318,7 +318,7 @@ Also update the header comment on line 2 to `copies: { 0: n, ..., 9: n }`.
 
 ---
 
-### T5: Skill level rules [ ]
+### T5: Skill level rules [x]
 
 **Owner**: game-dev
 **What**: A pure module with the level factor, the level of a payload skill, the slot a star raised and the on-screen text (ASC-03 AC 1; ASC-05 AC 12; ASC-07 AC 2; ASC-08 AC 3 to 5).
@@ -388,7 +388,7 @@ The separator is ` · ` (space, U+00B7 middle dot, space), the same as `Combo x1
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The six cases pass; the whole Vitest suite passes.
+- [x] The six cases pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): add the hero skill level rules`
 
