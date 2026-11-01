@@ -26,3 +26,7 @@ This deletes every player, wallet, card and piece of equipment of the local data
 ```
 
 Integration tests start their own PostgreSQL with Testcontainers (Docker must run) and apply the same migrations.
+
+## Deploy
+
+In production the backend runs as the blue-green slots `backend-blue` and `backend-green` behind the Traefik proxy (`infinity-grove-proxy`, `localhost:8080`). `./publish.sh` and the deploy watcher in `deploy/` switch the slots; see the root `CLAUDE.md`.
