@@ -1,0 +1,4454 @@
+{
+  ".claude/skills/tlc-spec-driven/scripts/check_commit.py": {
+    "mtime": 1792237344.378781,
+    "seen": 1793499840.0435762,
+    "ast_hash": "22c2287a8d6a292f7ad0b591976c34ff",
+    "semantic_hash": "22c2287a8d6a292f7ad0b591976c34ff"
+  },
+  ".claude/skills/tlc-spec-driven/scripts/lessons.py": {
+    "mtime": 1792237344.378781,
+    "seen": 1793499840.043588,
+    "ast_hash": "4034140055ef90b619ad7171883a3b7f",
+    "semantic_hash": "4034140055ef90b619ad7171883a3b7f"
+  },
+  ".claude/skills/tlc-spec-driven/scripts/validate_spec.py": {
+    "mtime": 1792237344.378781,
+    "seen": 1793499840.0435932,
+    "ast_hash": "6a274de5b6c714e50da40a523e5e4486",
+    "semantic_hash": "6a274de5b6c714e50da40a523e5e4486"
+  },
+  ".claude/skills/tlc-spec-driven/scripts/validate_state.py": {
+    "mtime": 1792237344.3797815,
+    "seen": 1793499840.043596,
+    "ast_hash": "ad2b4e4f925d39b55e67d7f07735e601",
+    "semantic_hash": "ad2b4e4f925d39b55e67d7f07735e601"
+  },
+  ".claude/skills/tlc-spec-driven/scripts/validate_tasks.py": {
+    "mtime": 1792237344.3807807,
+    "seen": 1793499840.0435991,
+    "ast_hash": "03dd35699a452eb9b5e136fd6ee704e7",
+    "semantic_hash": "03dd35699a452eb9b5e136fd6ee704e7"
+  },
+  ".specs/lessons.json": {
+    "mtime": 1793469080.300187,
+    "seen": 1793499840.0436008,
+    "ast_hash": "6107f17cc0e8ff329fb5f05607b5f6f9",
+    "semantic_hash": "6107f17cc0e8ff329fb5f05607b5f6f9"
+  },
+  "art/kael_rig/kael_rig.json": {
+    "mtime": 1792884572.8785214,
+    "seen": 1793499840.0436025,
+    "ast_hash": "9019d329ba9824f0f40b0c1d1a33e880",
+    "semantic_hash": "9019d329ba9824f0f40b0c1d1a33e880"
+  },
+  "art/tools/assemble_rig.py": {
+    "mtime": 1792884581.0490477,
+    "seen": 1793499840.0436037,
+    "ast_hash": "7761b54ac608f18a239785cddcb99ba4",
+    "semantic_hash": "7761b54ac608f18a239785cddcb99ba4"
+  },
+  "art/tools/cutout_hero.py": {
+    "mtime": 1792869852.996164,
+    "seen": 1793499840.043605,
+    "ast_hash": "127f3b401f25daf94c836fb5f31b5562",
+    "semantic_hash": "127f3b401f25daf94c836fb5f31b5562"
+  },
+  "art/tools/export_rig.py": {
+    "mtime": 1792884591.874349,
+    "seen": 1793499840.0436068,
+    "ast_hash": "393a4b6fe92c4f148bbd4a50eb37e1ad",
+    "semantic_hash": "393a4b6fe92c4f148bbd4a50eb37e1ad"
+  },
+  "art/tools/extract_parts.py": {
+    "mtime": 1792884346.3430986,
+    "seen": 1793499840.0436084,
+    "ast_hash": "72ba6235c5ab476516490ec0cf408790",
+    "semantic_hash": "72ba6235c5ab476516490ec0cf408790"
+  },
+  "backend/build.gradle.kts": {
+    "mtime": 1793133741.604969,
+    "seen": 1793499840.0436118,
+    "ast_hash": "cb8c9663ca9ed2a22042345ef1baffed",
+    "semantic_hash": "cb8c9663ca9ed2a22042345ef1baffed"
+  },
+  "backend/docker-compose.yml": {
+    "mtime": 1793175649.1132777,
+    "seen": 1793499840.0436141,
+    "ast_hash": "780ae9c37b81302ba9236fc691e48191",
+    "semantic_hash": "780ae9c37b81302ba9236fc691e48191"
+  },
+  "backend/gradlew": {
+    "mtime": 1792226638.7019513,
+    "seen": 1793499840.043617,
+    "ast_hash": "a43be8432bac3ffd05b3769aa42fe996",
+    "semantic_hash": "a43be8432bac3ffd05b3769aa42fe996"
+  },
+  "backend/settings.gradle.kts": {
+    "mtime": 1792226638.6864374,
+    "seen": 1793499840.0436199,
+    "ast_hash": "490ddd7eaacdb06c2d9787c51c35baa9",
+    "semantic_hash": "490ddd7eaacdb06c2d9787c51c35baa9"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/InfinityGroveWsApplication.kt": {
+    "mtime": 1793178063.0441818,
+    "seen": 1793499840.0436218,
+    "ast_hash": "2ec2e827c54fd03e9594b87612e959e8",
+    "semantic_hash": "2ec2e827c54fd03e9594b87612e959e8"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/AutoClickConfig.kt": {
+    "mtime": 1793096005.0353286,
+    "seen": 1793499840.0436232,
+    "ast_hash": "bd76df2b109f8aeff379e93e56298ad2",
+    "semantic_hash": "bd76df2b109f8aeff379e93e56298ad2"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/CardConfig.kt": {
+    "mtime": 1792340335.719431,
+    "seen": 1793499840.0436249,
+    "ast_hash": "f7f0a4e5f021a7ed4312a6c2daee61b4",
+    "semantic_hash": "f7f0a4e5f021a7ed4312a6c2daee61b4"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/ChapterSeeder.kt": {
+    "mtime": 1792449020.5507846,
+    "seen": 1793499840.0436273,
+    "ast_hash": "220b18285f1b6a52bb706a086a490a1b",
+    "semantic_hash": "220b18285f1b6a52bb706a086a490a1b"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/EquipmentConfig.kt": {
+    "mtime": 1792352228.3720062,
+    "seen": 1793499840.0436296,
+    "ast_hash": "cf198a0fabf0285c84e002f3362fcfc5",
+    "semantic_hash": "cf198a0fabf0285c84e002f3362fcfc5"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/HeroSeeder.kt": {
+    "mtime": 1792319908.1204572,
+    "seen": 1793499840.043632,
+    "ast_hash": "b9ce75271676dc0a9af8c30361851741",
+    "semantic_hash": "b9ce75271676dc0a9af8c30361851741"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/TalentConfig.kt": {
+    "mtime": 1792747021.4245389,
+    "seen": 1793499840.0436342,
+    "ast_hash": "f97ab631362adf807f419c31312195d0",
+    "semantic_hash": "f97ab631362adf807f419c31312195d0"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/WalletConfig.kt": {
+    "mtime": 1792449356.5468707,
+    "seen": 1793499840.0436363,
+    "ast_hash": "b9f3fb6ab948e8a0376ca62cb85972d5",
+    "semantic_hash": "b9f3fb6ab948e8a0376ca62cb85972d5"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/AutoClickRepository.kt": {
+    "mtime": 1793095910.3733804,
+    "seen": 1793499840.0436375,
+    "ast_hash": "5c8e35a9832e99569298967cb6f93e25",
+    "semantic_hash": "5c8e35a9832e99569298967cb6f93e25"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ChapterEntities.kt": {
+    "mtime": 1792448843.8548546,
+    "seen": 1793499840.0436387,
+    "ast_hash": "5490fa30c632e10cd350f72120052061",
+    "semantic_hash": "5490fa30c632e10cd350f72120052061"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ChapterRepository.kt": {
+    "mtime": 1792448853.3379254,
+    "seen": 1793499840.0436404,
+    "ast_hash": "02d42a002659831d2569b4da49948d1f",
+    "semantic_hash": "02d42a002659831d2569b4da49948d1f"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/CrystalRepository.kt": {
+    "mtime": 1793095910.3388088,
+    "seen": 1793499840.0436416,
+    "ast_hash": "ee7266f985b4372a3a1024117c47549c",
+    "semantic_hash": "ee7266f985b4372a3a1024117c47549c"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/DropRuleEntity.kt": {
+    "mtime": 1792448589.4148839,
+    "seen": 1793499840.043643,
+    "ast_hash": "a707df83906e6ce14258e159295c139f",
+    "semantic_hash": "a707df83906e6ce14258e159295c139f"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/DropRuleRepository.kt": {
+    "mtime": 1792448593.6252618,
+    "seen": 1793499840.0436442,
+    "ast_hash": "eae6763262757e21656132cd0effeb9f",
+    "semantic_hash": "eae6763262757e21656132cd0effeb9f"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/EnemyRepository.kt": {
+    "mtime": 1792448712.5385027,
+    "seen": 1793499840.0436454,
+    "ast_hash": "5191cec913c83eb72689d11d5da54cb9",
+    "semantic_hash": "5191cec913c83eb72689d11d5da54cb9"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/EquipmentRepository.kt": {
+    "mtime": 1792352007.485481,
+    "seen": 1793499840.0436468,
+    "ast_hash": "03fb5c43434c364a30ea0340e4b71e79",
+    "semantic_hash": "03fb5c43434c364a30ea0340e4b71e79"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/HeroEntities.kt": {
+    "mtime": 1792319779.7390735,
+    "seen": 1793499840.043648,
+    "ast_hash": "2a0b3a3bb44a725e652e6e9a538ff1cc",
+    "semantic_hash": "2a0b3a3bb44a725e652e6e9a538ff1cc"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/HeroRepository.kt": {
+    "mtime": 1792319846.448697,
+    "seen": 1793499840.0436492,
+    "ast_hash": "5b4776c9dcf7bf6ce721cd188e03ac11",
+    "semantic_hash": "5b4776c9dcf7bf6ce721cd188e03ac11"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/JpaUserRepository.kt": {
+    "mtime": 1792230631.2533896,
+    "seen": 1793499840.0436504,
+    "ast_hash": "ebab3260a89bf84748324b941af83a3e",
+    "semantic_hash": "ebab3260a89bf84748324b941af83a3e"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/PieceEntity.kt": {
+    "mtime": 1792351811.744279,
+    "seen": 1793499840.0436516,
+    "ast_hash": "13ba9a2bee23c0c6e44a4e8d43bbd443",
+    "semantic_hash": "13ba9a2bee23c0c6e44a4e8d43bbd443"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/PlayerCardsEntities.kt": {
+    "mtime": 1792319973.5899048,
+    "seen": 1793499840.043653,
+    "ast_hash": "2d933aab8c0c2d8cf8362ecb24f5d86b",
+    "semantic_hash": "2d933aab8c0c2d8cf8362ecb24f5d86b"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/PlayerCardsRepository.kt": {
+    "mtime": 1792320053.3167903,
+    "seen": 1793499840.0436544,
+    "ast_hash": "1d51bee8c4d57190285a97f575b31fb8",
+    "semantic_hash": "1d51bee8c4d57190285a97f575b31fb8"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ProgressEntity.kt": {
+    "mtime": 1792263772.4238698,
+    "seen": 1793499840.0436556,
+    "ast_hash": "4d42ff0decbb76814799733922d4a089",
+    "semantic_hash": "4d42ff0decbb76814799733922d4a089"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ProgressRepository.kt": {
+    "mtime": 1792263776.8568275,
+    "seen": 1793499840.0436566,
+    "ast_hash": "a64cfdf6f1e6c0df58d0913f49fe3fa2",
+    "semantic_hash": "a64cfdf6f1e6c0df58d0913f49fe3fa2"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/RefreshTokenEntity.kt": {
+    "mtime": 1792239414.8545117,
+    "seen": 1793499840.043658,
+    "ast_hash": "29acd0ebe3cbdec42a19460ea4b979a6",
+    "semantic_hash": "29acd0ebe3cbdec42a19460ea4b979a6"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/RefreshTokenRepository.kt": {
+    "mtime": 1792239521.0539916,
+    "seen": 1793499840.0436592,
+    "ast_hash": "613a61cad3bda5add9181cfdb9c24020",
+    "semantic_hash": "613a61cad3bda5add9181cfdb9c24020"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ResetRepository.kt": {
+    "mtime": 1793130651.2312942,
+    "seen": 1793499840.0436606,
+    "ast_hash": "34ac3cf8eda44a4b049ce444a3eea2dd",
+    "semantic_hash": "34ac3cf8eda44a4b049ce444a3eea2dd"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/TalentRepository.kt": {
+    "mtime": 1792747021.4260392,
+    "seen": 1793499840.0436618,
+    "ast_hash": "6ac49ac863751bfe1c44526e5bd4edb6",
+    "semantic_hash": "6ac49ac863751bfe1c44526e5bd4edb6"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/UserEntity.kt": {
+    "mtime": 1792230630.1478407,
+    "seen": 1793499840.043664,
+    "ast_hash": "5ea57b8067b9c8b48e842dec59b6c9cd",
+    "semantic_hash": "5ea57b8067b9c8b48e842dec59b6c9cd"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/UserRepository.kt": {
+    "mtime": 1792230632.3475554,
+    "seen": 1793499840.043665,
+    "ast_hash": "db62ccabc50bb6d812c9726b2dfcf44a",
+    "semantic_hash": "db62ccabc50bb6d812c9726b2dfcf44a"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/WalletEntities.kt": {
+    "mtime": 1792449182.1114266,
+    "seen": 1793499840.0436661,
+    "ast_hash": "a13d7dbf86965183563d0d9ac358a1af",
+    "semantic_hash": "a13d7dbf86965183563d0d9ac358a1af"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/WalletRepository.kt": {
+    "mtime": 1792449200.2134323,
+    "seen": 1793499840.0436673,
+    "ast_hash": "eb8fb5a579a4310c7fe72463957e0243",
+    "semantic_hash": "eb8fb5a579a4310c7fe72463957e0243"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/BCryptPasswordHasher.kt": {
+    "mtime": 1792230633.440912,
+    "seen": 1793499840.0436685,
+    "ast_hash": "fbea5b8267f99a8079247fe6193113b6",
+    "semantic_hash": "fbea5b8267f99a8079247fe6193113b6"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/JwtAccessTokenIssuer.kt": {
+    "mtime": 1792239349.5366912,
+    "seen": 1793499840.0436695,
+    "ast_hash": "35cb25f42ed0706bbce38924d1405a6f",
+    "semantic_hash": "35cb25f42ed0706bbce38924d1405a6f"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/SecurityConfig.kt": {
+    "mtime": 1792239811.6473155,
+    "seen": 1793499840.0436704,
+    "ast_hash": "06d22e6d3b6dfc438a35d3a760404c39",
+    "semantic_hash": "06d22e6d3b6dfc438a35d3a760404c39"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/SecurityProperties.kt": {
+    "mtime": 1792245467.0307717,
+    "seen": 1793499840.0436716,
+    "ast_hash": "a3afd1017b42d6c4584c2f1b5834e872",
+    "semantic_hash": "a3afd1017b42d6c4584c2f1b5834e872"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/Sha256RefreshTokenSecrets.kt": {
+    "mtime": 1792239388.89425,
+    "seen": 1793499840.0436726,
+    "ast_hash": "716d2aa2472edd32f1fc2cba28141df8",
+    "semantic_hash": "716d2aa2472edd32f1fc2cba28141df8"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/AccountResetController.kt": {
+    "mtime": 1793178430.9503849,
+    "seen": 1793499840.0436738,
+    "ast_hash": "e77cc9e7aa60bfd3ca28a4a4a5e549ee",
+    "semantic_hash": "e77cc9e7aa60bfd3ca28a4a4a5e549ee"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/ApiExceptionHandler.kt": {
+    "mtime": 1793130912.741005,
+    "seen": 1793499840.0436752,
+    "ast_hash": "e4ee9b1364def5fe74207b1321e206dc",
+    "semantic_hash": "e4ee9b1364def5fe74207b1321e206dc"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/AuthController.kt": {
+    "mtime": 1792239658.7868557,
+    "seen": 1793499840.0436761,
+    "ast_hash": "ed07962e8420ebbbc726f89d59e79ffb",
+    "semantic_hash": "ed07962e8420ebbbc726f89d59e79ffb"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/AutoClickController.kt": {
+    "mtime": 1793130834.0183125,
+    "seen": 1793499840.0436773,
+    "ast_hash": "5e83d82522c8082c242c3e76a3e185f1",
+    "semantic_hash": "5e83d82522c8082c242c3e76a3e185f1"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentController.kt": {
+    "mtime": 1793447815.0207071,
+    "seen": 1793499840.0436788,
+    "ast_hash": "048149e529930826d7310640c26e1b59",
+    "semantic_hash": "048149e529930826d7310640c26e1b59"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentResponses.kt": {
+    "mtime": 1792352322.4427576,
+    "seen": 1793499840.04368,
+    "ast_hash": "c57c2c07aa916b04345f7513ac17c7c9",
+    "semantic_hash": "c57c2c07aa916b04345f7513ac17c7c9"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/FarmController.kt": {
+    "mtime": 1792352521.3262117,
+    "seen": 1793499840.0436814,
+    "ast_hash": "003c0245b4db2b47f9634d1e72a4800b",
+    "semantic_hash": "003c0245b4db2b47f9634d1e72a4800b"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/HeroController.kt": {
+    "mtime": 1793451376.5406964,
+    "seen": 1793499840.0436826,
+    "ast_hash": "2b09576e8d185d59a68b605728046edf",
+    "semantic_hash": "2b09576e8d185d59a68b605728046edf"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/ProgressController.kt": {
+    "mtime": 1792671143.903473,
+    "seen": 1793499840.0436833,
+    "ast_hash": "1f7229298ceacdfa0e610ea36476f1c8",
+    "semantic_hash": "1f7229298ceacdfa0e610ea36476f1c8"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/TalentController.kt": {
+    "mtime": 1792747501.2899444,
+    "seen": 1793499840.0436847,
+    "ast_hash": "d5057a13294a8fab107c87a03a100b3f",
+    "semantic_hash": "d5057a13294a8fab107c87a03a100b3f"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/UserController.kt": {
+    "mtime": 1792320270.1762178,
+    "seen": 1793499840.0436854,
+    "ast_hash": "56e02eeb1fbe93b85e77322858c2980d",
+    "semantic_hash": "56e02eeb1fbe93b85e77322858c2980d"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/WalletController.kt": {
+    "mtime": 1792449356.5368679,
+    "seen": 1793499840.0436866,
+    "ast_hash": "fad8e80054d9bb529a2b588a3c6b370b",
+    "semantic_hash": "fad8e80054d9bb529a2b588a3c6b370b"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AccountReset.kt": {
+    "mtime": 1793130550.6825726,
+    "seen": 1793499840.0436878,
+    "ast_hash": "5d77d931a9fd6d0c27dbc9f56f4808e4",
+    "semantic_hash": "5d77d931a9fd6d0c27dbc9f56f4808e4"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AutoClick.kt": {
+    "mtime": 1793130727.463191,
+    "seen": 1793499840.043689,
+    "ast_hash": "8471275a9ea6ab0d5ba77c5663db9b04",
+    "semantic_hash": "8471275a9ea6ab0d5ba77c5663db9b04"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AutoClickExceptions.kt": {
+    "mtime": 1793096117.5435872,
+    "seen": 1793499840.04369,
+    "ast_hash": "00890894b7b850ad531579ee9607d01d",
+    "semantic_hash": "00890894b7b850ad531579ee9607d01d"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/BossRecord.kt": {
+    "mtime": 1792319463.9851348,
+    "seen": 1793499840.0436912,
+    "ast_hash": "a26f6863b1dcac9aa6546303a0004aba",
+    "semantic_hash": "a26f6863b1dcac9aa6546303a0004aba"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/BusinessException.kt": {
+    "mtime": 1792448151.660352,
+    "seen": 1793499840.0436924,
+    "ast_hash": "ba5693a0ea189a2b0475878c4333657e",
+    "semantic_hash": "ba5693a0ea189a2b0475878c4333657e"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/CardDrops.kt": {
+    "mtime": 1792340242.0657618,
+    "seen": 1793499840.0436935,
+    "ast_hash": "923032d148c94f056af156d4948e73f9",
+    "semantic_hash": "923032d148c94f056af156d4948e73f9"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Chapter.kt": {
+    "mtime": 1792630468.035276,
+    "seen": 1793499840.0436945,
+    "ast_hash": "b04b57fa5dc362375c5a8e9b4840ee7a",
+    "semantic_hash": "b04b57fa5dc362375c5a8e9b4840ee7a"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterOrder.kt": {
+    "mtime": 1792319430.7134602,
+    "seen": 1793499840.0436957,
+    "ast_hash": "6595a858f41d79ff9b6dd7131d10b6ee",
+    "semantic_hash": "6595a858f41d79ff9b6dd7131d10b6ee"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/DropQueue.kt": {
+    "mtime": 1792447962.3166006,
+    "seen": 1793499840.0436966,
+    "ast_hash": "f743c2b9447e4a8d68ebe192cd323650",
+    "semantic_hash": "f743c2b9447e4a8d68ebe192cd323650"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/DropTable.kt": {
+    "mtime": 1792447951.9648917,
+    "seen": 1793499840.0436976,
+    "ast_hash": "eebb59623797ccf07e062d514db9100b",
+    "semantic_hash": "eebb59623797ccf07e062d514db9100b"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Equipment.kt": {
+    "mtime": 1792707001.584001,
+    "seen": 1793499840.0436988,
+    "ast_hash": "1b02b1ffc96ec744e11d8651aea911ae",
+    "semantic_hash": "1b02b1ffc96ec744e11d8651aea911ae"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/EquipmentDrop.kt": {
+    "mtime": 1792352215.9194407,
+    "seen": 1793499840.0437,
+    "ast_hash": "32a5c8fa0a95c5ac5b21513bf31a37ea",
+    "semantic_hash": "32a5c8fa0a95c5ac5b21513bf31a37ea"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/EquipmentExceptions.kt": {
+    "mtime": 1793447381.7835238,
+    "seen": 1793499840.043701,
+    "ast_hash": "1e16aeb30be66c17400035f0320bba93",
+    "semantic_hash": "1e16aeb30be66c17400035f0320bba93"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Farm.kt": {
+    "mtime": 1792352521.3262117,
+    "seen": 1793499840.0437021,
+    "ast_hash": "f725a79f4e93311f9748fa1b60973b75",
+    "semantic_hash": "f725a79f4e93311f9748fa1b60973b75"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Hero.kt": {
+    "mtime": 1792319223.8692594,
+    "seen": 1793499840.0437033,
+    "ast_hash": "9f9d0c7efb5806e7d3701e12e2fa3ec7",
+    "semantic_hash": "9f9d0c7efb5806e7d3701e12e2fa3ec7"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroExceptions.kt": {
+    "mtime": 1792319376.0778782,
+    "seen": 1793499840.0437045,
+    "ast_hash": "90b0164f1f101b8bdfaf31716ebf6dc7",
+    "semantic_hash": "90b0164f1f101b8bdfaf31716ebf6dc7"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroSeed.kt": {
+    "mtime": 1792605371.3472948,
+    "seen": 1793499840.0437057,
+    "ast_hash": "a34a3f991cc5fbed7aa13096abb6b7d1",
+    "semantic_hash": "a34a3f991cc5fbed7aa13096abb6b7d1"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroView.kt": {
+    "mtime": 1793451375.5004191,
+    "seen": 1793499840.0437067,
+    "ast_hash": "81122e43bdcf523b5f584601a776727b",
+    "semantic_hash": "81122e43bdcf523b5f584601a776727b"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PieceRoller.kt": {
+    "mtime": 1792707001.585432,
+    "seen": 1793499840.0437078,
+    "ast_hash": "fcadffbd6cbf560a9fe31d381326c0ab",
+    "semantic_hash": "fcadffbd6cbf560a9fe31d381326c0ab"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerCards.kt": {
+    "mtime": 1793451760.120562,
+    "seen": 1793499840.043709,
+    "ast_hash": "cf253a5d80fa62a75b929217b6660c1c",
+    "semantic_hash": "cf253a5d80fa62a75b929217b6660c1c"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerEquipment.kt": {
+    "mtime": 1793447496.172388,
+    "seen": 1793499840.04371,
+    "ast_hash": "89760184a1f1e8027ba37576206f730f",
+    "semantic_hash": "89760184a1f1e8027ba37576206f730f"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Progress.kt": {
+    "mtime": 1792328058.4954128,
+    "seen": 1793499840.043711,
+    "ast_hash": "d2af47ec82ccc6025a97e3040f6077f1",
+    "semantic_hash": "d2af47ec82ccc6025a97e3040f6077f1"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/RefreshToken.kt": {
+    "mtime": 1792238988.9838514,
+    "seen": 1793499840.0437133,
+    "ast_hash": "7d8cb8b823d6c66619b570040c1da7ac",
+    "semantic_hash": "7d8cb8b823d6c66619b570040c1da7ac"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/SellBatch.kt": {
+    "mtime": 1793447383.0128174,
+    "seen": 1793499840.0437143,
+    "ast_hash": "af46dd5def4d9b0b7b506836cdb8aff4",
+    "semantic_hash": "af46dd5def4d9b0b7b506836cdb8aff4"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/TalentExceptions.kt": {
+    "mtime": 1792747501.2553575,
+    "seen": 1793499840.0437155,
+    "ast_hash": "51f162051effd24f899a34475368b97d",
+    "semantic_hash": "51f162051effd24f899a34475368b97d"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt": {
+    "mtime": 1793095828.1678782,
+    "seen": 1793499840.0437167,
+    "ast_hash": "5d145d6b55802bfcb00d26d817e8541b",
+    "semantic_hash": "5d145d6b55802bfcb00d26d817e8541b"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/User.kt": {
+    "mtime": 1792230864.1521437,
+    "seen": 1793499840.0437179,
+    "ast_hash": "4bd38797675cf2e6ad5d6a3b9b6c9fa7",
+    "semantic_hash": "4bd38797675cf2e6ad5d6a3b9b6c9fa7"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Wallet.kt": {
+    "mtime": 1792448151.660352,
+    "seen": 1793499840.0437188,
+    "ast_hash": "0be1728094bea007507708139d7e6a65",
+    "semantic_hash": "0be1728094bea007507708139d7e6a65"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/AutoClickPorts.kt": {
+    "mtime": 1793095910.3077357,
+    "seen": 1793499840.0437202,
+    "ast_hash": "86eec736eacf8d219bbb9ac2c4c11547",
+    "semantic_hash": "86eec736eacf8d219bbb9ac2c4c11547"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/DropRollerPort.kt": {
+    "mtime": 1792255214.8227148,
+    "seen": 1793499840.0437212,
+    "ast_hash": "c693178d1f30ff8d6cff9e85c591ed8d",
+    "semantic_hash": "c693178d1f30ff8d6cff9e85c591ed8d"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/DropRuleRepositoryPort.kt": {
+    "mtime": 1792448586.1599548,
+    "seen": 1793499840.0437222,
+    "ast_hash": "a2539f69f3df50fe8493146106bd46bb",
+    "semantic_hash": "a2539f69f3df50fe8493146106bd46bb"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/EquipmentRepositoryPort.kt": {
+    "mtime": 1792351806.789387,
+    "seen": 1793499840.0437233,
+    "ast_hash": "73b4aa3912a73e2549a70a4bcbc47e50",
+    "semantic_hash": "73b4aa3912a73e2549a70a4bcbc47e50"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/HeroPorts.kt": {
+    "mtime": 1792319675.1433344,
+    "seen": 1793499840.0437243,
+    "ast_hash": "368734a7c8cc01c4a78b218abbf0bc52",
+    "semantic_hash": "368734a7c8cc01c4a78b218abbf0bc52"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/IdGeneratorPort.kt": {
+    "mtime": 1792352214.7612846,
+    "seen": 1793499840.0437253,
+    "ast_hash": "8df0e6387e49cec478da1761022d2604",
+    "semantic_hash": "8df0e6387e49cec478da1761022d2604"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/PasswordHasherPort.kt": {
+    "mtime": 1792230623.054892,
+    "seen": 1793499840.0437264,
+    "ast_hash": "13d68917b74557abb64e2ff55cc69c53",
+    "semantic_hash": "13d68917b74557abb64e2ff55cc69c53"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/ProgressPorts.kt": {
+    "mtime": 1792263579.0921738,
+    "seen": 1793499840.0437272,
+    "ast_hash": "a14bd70c308aa3bf7725a21da14ab5c6",
+    "semantic_hash": "a14bd70c308aa3bf7725a21da14ab5c6"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/ResetRepositoryPort.kt": {
+    "mtime": 1793130651.1967392,
+    "seen": 1793499840.0437284,
+    "ast_hash": "3a1cd013f802a0e9fed94fa0c76681e2",
+    "semantic_hash": "3a1cd013f802a0e9fed94fa0c76681e2"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/SessionPorts.kt": {
+    "mtime": 1792239016.4974906,
+    "seen": 1793499840.043729,
+    "ast_hash": "bad3d10b46f9ecc40e94142ab9dd8758",
+    "semantic_hash": "bad3d10b46f9ecc40e94142ab9dd8758"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/TalentRepositoryPort.kt": {
+    "mtime": 1792747021.4295425,
+    "seen": 1793499840.0437303,
+    "ast_hash": "26b1d2492e67b335e5f83a779c89af4f",
+    "semantic_hash": "26b1d2492e67b335e5f83a779c89af4f"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/UserRepositoryPort.kt": {
+    "mtime": 1792230621.9692562,
+    "seen": 1793499840.0437317,
+    "ast_hash": "e083c56fcf03c81df90ee661d5d8bf9f",
+    "semantic_hash": "e083c56fcf03c81df90ee661d5d8bf9f"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/WalletRepositoryPort.kt": {
+    "mtime": 1792255379.682524,
+    "seen": 1793499840.0437326,
+    "ast_hash": "0471e3b4e330905d71a182fd7967c0e6",
+    "semantic_hash": "0471e3b4e330905d71a182fd7967c0e6"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/AccountResetService.kt": {
+    "mtime": 1793130727.5408692,
+    "seen": 1793499840.0437338,
+    "ast_hash": "24691c869ace4db3f7d2d1ffa23fcbb4",
+    "semantic_hash": "24691c869ace4db3f7d2d1ffa23fcbb4"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/AutoClickService.kt": {
+    "mtime": 1793130727.4732122,
+    "seen": 1793499840.0437348,
+    "ast_hash": "7a464d5ab885b42138799e9d7983ae10",
+    "semantic_hash": "7a464d5ab885b42138799e9d7983ae10"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/CardRewards.kt": {
+    "mtime": 1792340269.7029142,
+    "seen": 1793499840.043736,
+    "ast_hash": "ffbb7ed4c1441c6a328d1ee54e0f7099",
+    "semantic_hash": "ffbb7ed4c1441c6a328d1ee54e0f7099"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/EquipmentRewards.kt": {
+    "mtime": 1792630468.0332727,
+    "seen": 1793499840.0437372,
+    "ast_hash": "4a1da2df4219e6eafee07082654917ba",
+    "semantic_hash": "4a1da2df4219e6eafee07082654917ba"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/EquipmentService.kt": {
+    "mtime": 1793447581.1852252,
+    "seen": 1793499840.0437381,
+    "ast_hash": "58f478848bb4f1aec864f098346f0109",
+    "semantic_hash": "58f478848bb4f1aec864f098346f0109"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/FarmService.kt": {
+    "mtime": 1792630468.0342736,
+    "seen": 1793499840.0437388,
+    "ast_hash": "90fbce96bda36b8fd1446855f28125d3",
+    "semantic_hash": "90fbce96bda36b8fd1446855f28125d3"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/HeroService.kt": {
+    "mtime": 1792325416.5643191,
+    "seen": 1793499840.0437398,
+    "ast_hash": "7e1bb30083f2afd0eb16662bcd068a6d",
+    "semantic_hash": "7e1bb30083f2afd0eb16662bcd068a6d"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/ProgressService.kt": {
+    "mtime": 1792671143.8878965,
+    "seen": 1793499840.043741,
+    "ast_hash": "76f4a090570f756dcb871773dd535b4b",
+    "semantic_hash": "76f4a090570f756dcb871773dd535b4b"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/SessionService.kt": {
+    "mtime": 1792239453.143836,
+    "seen": 1793499840.0437422,
+    "ast_hash": "f4014e8f872874aa9fdd73b49d7134c9",
+    "semantic_hash": "f4014e8f872874aa9fdd73b49d7134c9"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/TalentService.kt": {
+    "mtime": 1792747021.4310443,
+    "seen": 1793499840.0437431,
+    "ast_hash": "0f043da2270419afbb172559dd1c0014",
+    "semantic_hash": "0f043da2270419afbb172559dd1c0014"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/UserService.kt": {
+    "mtime": 1792353365.078672,
+    "seen": 1793499840.0437446,
+    "ast_hash": "aff3c97d673aba74281cc0cfc4bfc7ee",
+    "semantic_hash": "aff3c97d673aba74281cc0cfc4bfc7ee"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/WalletAccess.kt": {
+    "mtime": 1792449356.5077326,
+    "seen": 1793499840.0437455,
+    "ast_hash": "5ec27f19c7e13a6fb40722f0f1508a83",
+    "semantic_hash": "5ec27f19c7e13a6fb40722f0f1508a83"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/WalletService.kt": {
+    "mtime": 1792449356.4982197,
+    "seen": 1793499840.0437467,
+    "ast_hash": "b201a67571de67c8e8b45209e9ecfaa9",
+    "semantic_hash": "b201a67571de67c8e8b45209e9ecfaa9"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/AccountResetUseCase.kt": {
+    "mtime": 1793130727.5127723,
+    "seen": 1793499840.043748,
+    "ast_hash": "cf799f67ac145f60a5d268a2cfabf77f",
+    "semantic_hash": "cf799f67ac145f60a5d268a2cfabf77f"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/AutoClickUseCase.kt": {
+    "mtime": 1793096004.9915783,
+    "seen": 1793499840.043749,
+    "ast_hash": "edc95f7694f245dc76097b592a3b47e7",
+    "semantic_hash": "edc95f7694f245dc76097b592a3b47e7"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/EquipmentUseCase.kt": {
+    "mtime": 1793447576.3450272,
+    "seen": 1793499840.0437503,
+    "ast_hash": "6ae965cfc1798b2e2d3e2a18c3dc8cf4",
+    "semantic_hash": "6ae965cfc1798b2e2d3e2a18c3dc8cf4"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/FarmUseCase.kt": {
+    "mtime": 1792320745.3857832,
+    "seen": 1793499840.0437515,
+    "ast_hash": "a87ce9c15c5fe50ef4d0f619c7cc0e09",
+    "semantic_hash": "a87ce9c15c5fe50ef4d0f619c7cc0e09"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/HeroUseCase.kt": {
+    "mtime": 1792320529.8319173,
+    "seen": 1793499840.0437527,
+    "ast_hash": "c0866e67fac84b490734f65baf731be9",
+    "semantic_hash": "c0866e67fac84b490734f65baf731be9"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/ProgressUseCase.kt": {
+    "mtime": 1792671143.901471,
+    "seen": 1793499840.0437536,
+    "ast_hash": "8687d87f4ddb003b1b62c67db2f371fc",
+    "semantic_hash": "8687d87f4ddb003b1b62c67db2f371fc"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/SessionUseCase.kt": {
+    "mtime": 1792239038.926568,
+    "seen": 1793499840.0437548,
+    "ast_hash": "84a5634f52ec6619a104355c24057761",
+    "semantic_hash": "84a5634f52ec6619a104355c24057761"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/TalentUseCase.kt": {
+    "mtime": 1792747021.4326627,
+    "seen": 1793499840.0437558,
+    "ast_hash": "67a051f3486879b2092efe0c64371018",
+    "semantic_hash": "67a051f3486879b2092efe0c64371018"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/UserUseCase.kt": {
+    "mtime": 1792320240.4239862,
+    "seen": 1793499840.0437567,
+    "ast_hash": "2dc7047f8bd18f05462f7c7deb12ec1d",
+    "semantic_hash": "2dc7047f8bd18f05462f7c7deb12ec1d"
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/WalletUseCase.kt": {
+    "mtime": 1792449356.524737,
+    "seen": 1793499840.043758,
+    "ast_hash": "e6b0f674279a241067082f46e707db00",
+    "semantic_hash": "e6b0f674279a241067082f46e707db00"
+  },
+  "backend/src/main/resources/application.yaml": {
+    "mtime": 1793096004.9483414,
+    "seen": 1793499840.0437589,
+    "ast_hash": "5c33125d84614c7707081d7e722f0727",
+    "semantic_hash": "5c33125d84614c7707081d7e722f0727"
+  },
+  "backend/src/main/resources/db/migration/V1__schema.sql": {
+    "mtime": 1792449784.960996,
+    "seen": 1793499840.04376,
+    "ast_hash": "d917e3338c9056d8aaac8f370bd390df",
+    "semantic_hash": "d917e3338c9056d8aaac8f370bd390df"
+  },
+  "backend/src/main/resources/db/migration/V2__lyra_leader_bonus.sql": {
+    "mtime": 1792605371.3499,
+    "seen": 1793499840.0437615,
+    "ast_hash": "9a51abca3b1491c33d5977907b01ba3e",
+    "semantic_hash": "9a51abca3b1491c33d5977907b01ba3e"
+  },
+  "backend/src/main/resources/db/migration/V3__player_talents.sql": {
+    "mtime": 1792605849.9148004,
+    "seen": 1793499840.0437622,
+    "ast_hash": "b10217e52a9247c45a433db9d75fe079",
+    "semantic_hash": "b10217e52a9247c45a433db9d75fe079"
+  },
+  "backend/src/main/resources/db/migration/V4__monster_health_growth.sql": {
+    "mtime": 1792630598.0998406,
+    "seen": 1793499840.0437632,
+    "ast_hash": "1e48e5f4faf4c160984a351b3fa92fb1",
+    "semantic_hash": "1e48e5f4faf4c160984a351b3fa92fb1"
+  },
+  "backend/src/main/resources/db/migration/V5__talent_point_awards.sql": {
+    "mtime": 1792670884.5568101,
+    "seen": 1793499840.0437646,
+    "ast_hash": "9514a4aa17b5c5bde5c3d1a77e6ed100",
+    "semantic_hash": "9514a4aa17b5c5bde5c3d1a77e6ed100"
+  },
+  "backend/src/main/resources/db/migration/V6__auto_click.sql": {
+    "mtime": 1793095910.2761598,
+    "seen": 1793499840.0437655,
+    "ast_hash": "33e41fc800e62d651ab8a37983a65d34",
+    "semantic_hash": "33e41fc800e62d651ab8a37983a65d34"
+  },
+  "backend/src/main/resources/db/migration/V7__player_resets.sql": {
+    "mtime": 1793130651.1664734,
+    "seen": 1793499840.0437665,
+    "ast_hash": "0f56b51412fb5f300cf56a15036d3de9",
+    "semantic_hash": "0f56b51412fb5f300cf56a15036d3de9"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/Fakes.kt": {
+    "mtime": 1793130738.0529056,
+    "seen": 1793499840.0437677,
+    "ast_hash": "d3c619ea87633872ccf64f082a4b969c",
+    "semantic_hash": "d3c619ea87633872ccf64f082a4b969c"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/InfinityGroveWsApplicationTests.kt": {
+    "mtime": 1792230903.2249796,
+    "seen": 1793499840.0437691,
+    "ast_hash": "8668116af99b515b0a22ecd77314c699",
+    "semantic_hash": "8668116af99b515b0a22ecd77314c699"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/IntegrationTestBase.kt": {
+    "mtime": 1792749758.1649716,
+    "seen": 1793499840.04377,
+    "ast_hash": "85e146a460107ca156ea20f26807223d",
+    "semantic_hash": "85e146a460107ca156ea20f26807223d"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/LogCapture.kt": {
+    "mtime": 1793100293.163608,
+    "seen": 1793499840.043771,
+    "ast_hash": "d198310cd70d8476aea0b73735519643",
+    "semantic_hash": "d198310cd70d8476aea0b73735519643"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/CardConfigTest.kt": {
+    "mtime": 1792340269.7089505,
+    "seen": 1793499840.0437722,
+    "ast_hash": "cb7b864333cf3f82a0adea8561459d5e",
+    "semantic_hash": "cb7b864333cf3f82a0adea8561459d5e"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/ChapterSeederIT.kt": {
+    "mtime": 1792449012.046804,
+    "seen": 1793499840.0437732,
+    "ast_hash": "404e92cd58f4ec2b6ac47ffd8e41ef2c",
+    "semantic_hash": "404e92cd58f4ec2b6ac47ffd8e41ef2c"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/EquipmentConfigTest.kt": {
+    "mtime": 1792352157.0872107,
+    "seen": 1793499840.0437744,
+    "ast_hash": "97f94cbf6ca8bd8a814626547bc77e34",
+    "semantic_hash": "97f94cbf6ca8bd8a814626547bc77e34"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/HeroSeederIT.kt": {
+    "mtime": 1792319908.1532834,
+    "seen": 1793499840.0437758,
+    "ast_hash": "fabe5fa50bb3a8a555a28952c6487037",
+    "semantic_hash": "fabe5fa50bb3a8a555a28952c6487037"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/AutoClickRepositoryIT.kt": {
+    "mtime": 1793095920.7418008,
+    "seen": 1793499840.043777,
+    "ast_hash": "ab4909a9c04a3315e587ef6bca19f26c",
+    "semantic_hash": "ab4909a9c04a3315e587ef6bca19f26c"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ChapterRepositoryIT.kt": {
+    "mtime": 1792449993.6118166,
+    "seen": 1793499840.043778,
+    "ast_hash": "9d0640cf1ee51282e172f1436349d165",
+    "semantic_hash": "9d0640cf1ee51282e172f1436349d165"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/DropRuleRepositoryIT.kt": {
+    "mtime": 1792448582.4762273,
+    "seen": 1793499840.0437791,
+    "ast_hash": "5baa50775b0450c4569e9735230fdc30",
+    "semantic_hash": "5baa50775b0450c4569e9735230fdc30"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/EnemyRepositoryIT.kt": {
+    "mtime": 1792448719.0908577,
+    "seen": 1793499840.04378,
+    "ast_hash": "74f556554f49c386553c148fcdd6d789",
+    "semantic_hash": "74f556554f49c386553c148fcdd6d789"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/EquipmentRepositoryIT.kt": {
+    "mtime": 1792449908.5601373,
+    "seen": 1793499840.043781,
+    "ast_hash": "dfc4d69060798a2a1e80d82a8dd9bbc5",
+    "semantic_hash": "dfc4d69060798a2a1e80d82a8dd9bbc5"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/HeroRepositoryIT.kt": {
+    "mtime": 1792319846.4762557,
+    "seen": 1793499840.0437865,
+    "ast_hash": "fb153666e57df2ade202b8952c4d8c14",
+    "semantic_hash": "fb153666e57df2ade202b8952c4d8c14"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/LyraLeaderBonusMigrationIT.kt": {
+    "mtime": 1792606931.9056883,
+    "seen": 1793499840.0437877,
+    "ast_hash": "c1045b51f780aead437ad7bb903b7325",
+    "semantic_hash": "c1045b51f780aead437ad7bb903b7325"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/MonsterHealthMigrationIT.kt": {
+    "mtime": 1792673020.802855,
+    "seen": 1793499840.0437891,
+    "ast_hash": "550e68ce63ed250c8fae4adb1abdb171",
+    "semantic_hash": "550e68ce63ed250c8fae4adb1abdb171"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/PlayerCardsRepositoryIT.kt": {
+    "mtime": 1793451117.067933,
+    "seen": 1793499840.04379,
+    "ast_hash": "ec9022ae7cd2a07d88e91e8c1f774ba8",
+    "semantic_hash": "ec9022ae7cd2a07d88e91e8c1f774ba8"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ProgressRepositoryIT.kt": {
+    "mtime": 1792449908.5611353,
+    "seen": 1793499840.043791,
+    "ast_hash": "fa837f7a90b3e10604f9ca9a51237ae6",
+    "semantic_hash": "fa837f7a90b3e10604f9ca9a51237ae6"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/RefreshTokenRepositoryIT.kt": {
+    "mtime": 1792449908.5621364,
+    "seen": 1793499840.0437925,
+    "ast_hash": "f4cb4d94ecdac095cf2f6b2c63e4f4ff",
+    "semantic_hash": "f4cb4d94ecdac095cf2f6b2c63e4f4ff"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ResetRepositoryIT.kt": {
+    "mtime": 1793130651.2659535,
+    "seen": 1793499840.0437934,
+    "ast_hash": "d8747f6cf9fae7ae9fd97c1b5ad4f9e9",
+    "semantic_hash": "d8747f6cf9fae7ae9fd97c1b5ad4f9e9"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/SchemaConstraintsIT.kt": {
+    "mtime": 1792452168.4185412,
+    "seen": 1793499840.0437942,
+    "ast_hash": "4d2f2d28e5d25e0db5d02fda56a4e03f",
+    "semantic_hash": "4d2f2d28e5d25e0db5d02fda56a4e03f"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/SchemaValidationIT.kt": {
+    "mtime": 1792452125.4711478,
+    "seen": 1793499840.043795,
+    "ast_hash": "e2bb58bf71eaa02c54c4e16c51d894ac",
+    "semantic_hash": "e2bb58bf71eaa02c54c4e16c51d894ac"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/TalentPointsMigrationIT.kt": {
+    "mtime": 1792673020.843068,
+    "seen": 1793499840.0437965,
+    "ast_hash": "f8ce33d1b4313426480be6f99c2c2456",
+    "semantic_hash": "f8ce33d1b4313426480be6f99c2c2456"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/TalentRepositoryIT.kt": {
+    "mtime": 1792670966.434683,
+    "seen": 1793499840.0437975,
+    "ast_hash": "cb4be953cfe2c5db433ca2f4a913e18c",
+    "semantic_hash": "cb4be953cfe2c5db433ca2f4a913e18c"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/WalletRepositoryIT.kt": {
+    "mtime": 1792449908.5621364,
+    "seen": 1793499840.0437984,
+    "ast_hash": "c80e998c36094a94de356367e32a302d",
+    "semantic_hash": "c80e998c36094a94de356367e32a302d"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/JwtAccessTokenIssuerTest.kt": {
+    "mtime": 1792239349.6886122,
+    "seen": 1793499840.0437994,
+    "ast_hash": "82dac1862e36fe8bc125641035723058",
+    "semantic_hash": "82dac1862e36fe8bc125641035723058"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/SecurityPropertiesStartupTest.kt": {
+    "mtime": 1792245422.595888,
+    "seen": 1793499840.0438006,
+    "ast_hash": "e34abf3d607fb61dd8a2d7e14429e6c9",
+    "semantic_hash": "e34abf3d607fb61dd8a2d7e14429e6c9"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/SecurityPropertiesTest.kt": {
+    "mtime": 1792239258.3437245,
+    "seen": 1793499840.0438015,
+    "ast_hash": "ff0a2450d9445bb47484447051c77c59",
+    "semantic_hash": "ff0a2450d9445bb47484447051c77c59"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/Sha256RefreshTokenSecretsTest.kt": {
+    "mtime": 1792239388.8582263,
+    "seen": 1793499840.043803,
+    "ast_hash": "abd1d05586089db50e97f6396566c50d",
+    "semantic_hash": "abd1d05586089db50e97f6396566c50d"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/AccountResetControllerIT.kt": {
+    "mtime": 1793451835.4116485,
+    "seen": 1793499840.043804,
+    "ast_hash": "827a0b27b3d3c70123e744a8c112867e",
+    "semantic_hash": "827a0b27b3d3c70123e744a8c112867e"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/ApiExceptionHandlerTest.kt": {
+    "mtime": 1792352701.84435,
+    "seen": 1793499840.0438051,
+    "ast_hash": "cdf635b4d8afb13b4afff7cb80037046",
+    "semantic_hash": "cdf635b4d8afb13b4afff7cb80037046"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/AuthControllerIT.kt": {
+    "mtime": 1792320265.9531372,
+    "seen": 1793499840.0438063,
+    "ast_hash": "15b8906c3b176810d7d4cd71c4c14ba0",
+    "semantic_hash": "15b8906c3b176810d7d4cd71c4c14ba0"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/AutoClickControllerIT.kt": {
+    "mtime": 1793096139.5325446,
+    "seen": 1793499840.0438073,
+    "ast_hash": "3ff09b92e4da1633a50bf170fd137768",
+    "semantic_hash": "3ff09b92e4da1633a50bf170fd137768"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/CardsAtomicityIT.kt": {
+    "mtime": 1792324135.5722218,
+    "seen": 1793499840.0438085,
+    "ast_hash": "54d91f8d80d3effd93b7931f32d39e07",
+    "semantic_hash": "54d91f8d80d3effd93b7931f32d39e07"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/CardsFlowIT.kt": {
+    "mtime": 1792328673.1449661,
+    "seen": 1793499840.0438092,
+    "ast_hash": "a0d40ad4891658f83888502cdffe68b3",
+    "semantic_hash": "a0d40ad4891658f83888502cdffe68b3"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentBatchSellIT.kt": {
+    "mtime": 1793464321.5177786,
+    "seen": 1793499840.0438125,
+    "ast_hash": "cb540207c25ba80dc82ee9f54ebd09a0",
+    "semantic_hash": "cb540207c25ba80dc82ee9f54ebd09a0"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentControllerIT.kt": {
+    "mtime": 1792352744.3025577,
+    "seen": 1793499840.043814,
+    "ast_hash": "ca09c1631b43e098fb68ba392e6b4173",
+    "semantic_hash": "ca09c1631b43e098fb68ba392e6b4173"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentDropFlowIT.kt": {
+    "mtime": 1792630767.8485138,
+    "seen": 1793499840.043815,
+    "ast_hash": "cea15f75b13eaf92fe6912dd819468dc",
+    "semantic_hash": "cea15f75b13eaf92fe6912dd819468dc"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentRefineIT.kt": {
+    "mtime": 1792449932.9240572,
+    "seen": 1793499840.0438156,
+    "ast_hash": "6944e374ce62dc2d075e38d15fbd8ae7",
+    "semantic_hash": "6944e374ce62dc2d075e38d15fbd8ae7"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentRerollIT.kt": {
+    "mtime": 1792707017.0314298,
+    "seen": 1793499840.043817,
+    "ast_hash": "edb1d232fdb9953af26451a18102b2cd",
+    "semantic_hash": "edb1d232fdb9953af26451a18102b2cd"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentSellIT.kt": {
+    "mtime": 1792449932.9245646,
+    "seen": 1793499840.0438178,
+    "ast_hash": "aea779388ff88e816d37d478ee6d16d6",
+    "semantic_hash": "aea779388ff88e816d37d478ee6d16d6"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/FarmControllerIT.kt": {
+    "mtime": 1792671299.525639,
+    "seen": 1793499840.043819,
+    "ast_hash": "0f93c2e664ef87200a16465d020de8ad",
+    "semantic_hash": "0f93c2e664ef87200a16465d020de8ad"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/HeroControllerIT.kt": {
+    "mtime": 1793451817.4113317,
+    "seen": 1793499840.0438201,
+    "ast_hash": "28af0a743cdb460316bb0743e387ea97",
+    "semantic_hash": "28af0a743cdb460316bb0743e387ea97"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/ProgressControllerIT.kt": {
+    "mtime": 1792747021.437687,
+    "seen": 1793499840.043821,
+    "ast_hash": "3719c2d960e0263c07a415f7f9c2eba4",
+    "semantic_hash": "3719c2d960e0263c07a415f7f9c2eba4"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/SecurityIT.kt": {
+    "mtime": 1792320265.954147,
+    "seen": 1793499840.043822,
+    "ast_hash": "febfa8153b4eb700742cca19ee194af3",
+    "semantic_hash": "febfa8153b4eb700742cca19ee194af3"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/TalentControllerIT.kt": {
+    "mtime": 1793095863.262597,
+    "seen": 1793499840.0438251,
+    "ast_hash": "a0fcb5e1b09cc5278bec0a8e073a7a0c",
+    "semantic_hash": "a0fcb5e1b09cc5278bec0a8e073a7a0c"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/UserControllerIT.kt": {
+    "mtime": 1792320270.476295,
+    "seen": 1793499840.043826,
+    "ast_hash": "f893d063aac05c10af64b3716cc381bf",
+    "semantic_hash": "f893d063aac05c10af64b3716cc381bf"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/WalletControllerIT.kt": {
+    "mtime": 1792449932.9265707,
+    "seen": 1793499840.0438278,
+    "ast_hash": "2349d7b13ada351ad39854a4f64e45c0",
+    "semantic_hash": "2349d7b13ada351ad39854a4f64e45c0"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/WalletFlowIT.kt": {
+    "mtime": 1792449524.8391504,
+    "seen": 1793499840.0438287,
+    "ast_hash": "63b7d0f0867b98526e0ac7106cb8e41a",
+    "semantic_hash": "63b7d0f0867b98526e0ac7106cb8e41a"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/AccountResetTest.kt": {
+    "mtime": 1793130565.9003215,
+    "seen": 1793499840.0438297,
+    "ast_hash": "5c0b49287b6ecd63ebf898b306c32127",
+    "semantic_hash": "5c0b49287b6ecd63ebf898b306c32127"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/AutoClickTest.kt": {
+    "mtime": 1793100293.1661234,
+    "seen": 1793499840.043831,
+    "ast_hash": "68382afa92db05ed432f225ecf8f942b",
+    "semantic_hash": "68382afa92db05ed432f225ecf8f942b"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/BossRecordTest.kt": {
+    "mtime": 1792319464.0170653,
+    "seen": 1793499840.043832,
+    "ast_hash": "b76554fd902e5c756f3e5011910ec14b",
+    "semantic_hash": "b76554fd902e5c756f3e5011910ec14b"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/CardDropsTest.kt": {
+    "mtime": 1792340337.6813667,
+    "seen": 1793499840.043833,
+    "ast_hash": "47ea75e3cea6043b2a9cfe03fbf8c937",
+    "semantic_hash": "47ea75e3cea6043b2a9cfe03fbf8c937"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterOrderTest.kt": {
+    "mtime": 1792319430.7456431,
+    "seen": 1793499840.0438342,
+    "ast_hash": "d6853ff6945355e99222284a8355fdfa",
+    "semantic_hash": "d6853ff6945355e99222284a8355fdfa"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterTest.kt": {
+    "mtime": 1792630644.281615,
+    "seen": 1793499840.0438354,
+    "ast_hash": "fbdbadb07be1bfae11af0ec970f1026e",
+    "semantic_hash": "fbdbadb07be1bfae11af0ec970f1026e"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/DropQueueTest.kt": {
+    "mtime": 1792447977.6511476,
+    "seen": 1793499840.0438364,
+    "ast_hash": "08cabc21bec15e0096b5448952bf5c16",
+    "semantic_hash": "08cabc21bec15e0096b5448952bf5c16"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/DropTableTest.kt": {
+    "mtime": 1792447977.8852909,
+    "seen": 1793499840.0438375,
+    "ast_hash": "1aa71893e013aa4408fc73b32e7449b5",
+    "semantic_hash": "1aa71893e013aa4408fc73b32e7449b5"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/EnemyStatsTest.kt": {
+    "mtime": 1792287282.4060194,
+    "seen": 1793499840.0438385,
+    "ast_hash": "2e179f1767005310505c6f9be2d047d3",
+    "semantic_hash": "2e179f1767005310505c6f9be2d047d3"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/EquipmentExceptionsTest.kt": {
+    "mtime": 1793447386.8979225,
+    "seen": 1793499840.0438395,
+    "ast_hash": "8a3bc993befe0c8f1e8f4580d8d99a5b",
+    "semantic_hash": "8a3bc993befe0c8f1e8f4580d8d99a5b"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/EquipmentTest.kt": {
+    "mtime": 1792707001.58701,
+    "seen": 1793499840.043841,
+    "ast_hash": "f488b6785f454f7458ed3a74babba49b",
+    "semantic_hash": "f488b6785f454f7458ed3a74babba49b"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroExceptionsTest.kt": {
+    "mtime": 1792319401.5867567,
+    "seen": 1793499840.0438418,
+    "ast_hash": "83779aeaa51572dc148282f8d2c88874",
+    "semantic_hash": "83779aeaa51572dc148282f8d2c88874"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroSeedTest.kt": {
+    "mtime": 1792605398.1008544,
+    "seen": 1793499840.0438428,
+    "ast_hash": "6ba047934a88a79186870f53583d3ae9",
+    "semantic_hash": "6ba047934a88a79186870f53583d3ae9"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroTest.kt": {
+    "mtime": 1792319223.900323,
+    "seen": 1793499840.0438437,
+    "ast_hash": "df5fbca28021606e729b799d3a42d6fb",
+    "semantic_hash": "df5fbca28021606e729b799d3a42d6fb"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroViewTest.kt": {
+    "mtime": 1793451379.9475799,
+    "seen": 1793499840.043845,
+    "ast_hash": "ae2641f974ab95250d75915a798f822f",
+    "semantic_hash": "ae2641f974ab95250d75915a798f822f"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/PieceRollerTest.kt": {
+    "mtime": 1792707001.5880108,
+    "seen": 1793499840.043846,
+    "ast_hash": "f47161d065293b62600af92b70455973",
+    "semantic_hash": "f47161d065293b62600af92b70455973"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerCardsTest.kt": {
+    "mtime": 1793451782.295553,
+    "seen": 1793499840.0438468,
+    "ast_hash": "8c50da38e6a786b51a6c68e3ed8ddbdd",
+    "semantic_hash": "8c50da38e6a786b51a6c68e3ed8ddbdd"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerEquipmentTest.kt": {
+    "mtime": 1793447498.1538796,
+    "seen": 1793499840.043848,
+    "ast_hash": "a5f7c26cc45971794d69e4a7d54eec58",
+    "semantic_hash": "a5f7c26cc45971794d69e4a7d54eec58"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/ProgressTest.kt": {
+    "mtime": 1792328081.8007588,
+    "seen": 1793499840.043849,
+    "ast_hash": "c465f09b2023e2d0e62aa8a63e29fb0b",
+    "semantic_hash": "c465f09b2023e2d0e62aa8a63e29fb0b"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/RefreshTokenTest.kt": {
+    "mtime": 1792238978.8221903,
+    "seen": 1793499840.04385,
+    "ast_hash": "f2a3894e354732d758941f6524339a7f",
+    "semantic_hash": "f2a3894e354732d758941f6524339a7f"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/SellBatchTest.kt": {
+    "mtime": 1793447386.1358962,
+    "seen": 1793499840.043851,
+    "ast_hash": "357a386e22b0eba5548d25d30532be60",
+    "semantic_hash": "357a386e22b0eba5548d25d30532be60"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/TalentsTest.kt": {
+    "mtime": 1793095863.5466447,
+    "seen": 1793499840.0438523,
+    "ast_hash": "7f3ba633dc6d22c48986f961339771a2",
+    "semantic_hash": "7f3ba633dc6d22c48986f961339771a2"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/UserTest.kt": {
+    "mtime": 1792230884.021661,
+    "seen": 1793499840.0438533,
+    "ast_hash": "d0218215c3f487de35a1be696275c4a2",
+    "semantic_hash": "d0218215c3f487de35a1be696275c4a2"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/WalletTest.kt": {
+    "mtime": 1792448145.4990232,
+    "seen": 1793499840.0438545,
+    "ast_hash": "69c13ac9b301113f8c3ba74b07e3561e",
+    "semantic_hash": "69c13ac9b301113f8c3ba74b07e3561e"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/AccountResetServiceTest.kt": {
+    "mtime": 1793130913.4581678,
+    "seen": 1793499840.0438557,
+    "ast_hash": "650f05d3d006730f39e2ee2b247d1e48",
+    "semantic_hash": "650f05d3d006730f39e2ee2b247d1e48"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/AutoClickServiceTest.kt": {
+    "mtime": 1793130738.0544531,
+    "seen": 1793499840.0438564,
+    "ast_hash": "c7c9acb1299823e914267f2771e39740",
+    "semantic_hash": "c7c9acb1299823e914267f2771e39740"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/EquipmentRewardsTest.kt": {
+    "mtime": 1792707121.4638093,
+    "seen": 1793499840.0438573,
+    "ast_hash": "0e7c81414552a6633503150a5f4d5a6a",
+    "semantic_hash": "0e7c81414552a6633503150a5f4d5a6a"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/EquipmentServiceTest.kt": {
+    "mtime": 1793447587.906069,
+    "seen": 1793499840.0438588,
+    "ast_hash": "9373aef61661fd00af1e2f2ceebd7eef",
+    "semantic_hash": "9373aef61661fd00af1e2f2ceebd7eef"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/FarmServiceTest.kt": {
+    "mtime": 1792449365.0843842,
+    "seen": 1793499840.0438597,
+    "ast_hash": "984997127cb0ba3203e661906e7788eb",
+    "semantic_hash": "984997127cb0ba3203e661906e7788eb"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/HeroServiceTest.kt": {
+    "mtime": 1793451795.8199332,
+    "seen": 1793499840.043861,
+    "ast_hash": "35d0e2c04d9f06de5b98600d92ddfbcc",
+    "semantic_hash": "35d0e2c04d9f06de5b98600d92ddfbcc"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/ProgressServiceTest.kt": {
+    "mtime": 1792747021.4411964,
+    "seen": 1793499840.043862,
+    "ast_hash": "934a3a29d8224379a674bb5182fb0993",
+    "semantic_hash": "934a3a29d8224379a674bb5182fb0993"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/SessionServiceTest.kt": {
+    "mtime": 1792239121.8764617,
+    "seen": 1793499840.0438628,
+    "ast_hash": "da7c8f13c8c0510f2c88bee0bf49ff6e",
+    "semantic_hash": "da7c8f13c8c0510f2c88bee0bf49ff6e"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/TalentServiceTest.kt": {
+    "mtime": 1792747021.4421978,
+    "seen": 1793499840.0438638,
+    "ast_hash": "b50003528a784f778dcd7d486af24a20",
+    "semantic_hash": "b50003528a784f778dcd7d486af24a20"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/UserServiceTest.kt": {
+    "mtime": 1792353516.4637752,
+    "seen": 1793499840.0438652,
+    "ast_hash": "769e67b1252a8dd6ac93b33e201f2492",
+    "semantic_hash": "769e67b1252a8dd6ac93b33e201f2492"
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/WalletServiceTest.kt": {
+    "mtime": 1792449392.8466504,
+    "seen": 1793499840.0438664,
+    "ast_hash": "e5411407949f8b513b9c9b7eb6b1bb00",
+    "semantic_hash": "e5411407949f8b513b9c9b7eb6b1bb00"
+  },
+  "deploy.sh": {
+    "mtime": 1793176638.0188577,
+    "seen": 1793499840.0438673,
+    "ast_hash": "2170e8a2e71c9a76b639c702869db565",
+    "semantic_hash": "2170e8a2e71c9a76b639c702869db565"
+  },
+  "deploy/deploy.mjs": {
+    "mtime": 1793176613.1656039,
+    "seen": 1793499840.0438683,
+    "ast_hash": "e151bd0812f9cd374dc4a66e27e356a8",
+    "semantic_hash": "e151bd0812f9cd374dc4a66e27e356a8"
+  },
+  "deploy/deploy.test.mjs": {
+    "mtime": 1793176626.22686,
+    "seen": 1793499840.0438695,
+    "ast_hash": "408cbabfd258152c6fc65e18ff845915",
+    "semantic_hash": "408cbabfd258152c6fc65e18ff845915"
+  },
+  "deploy/lib/backendDeploy.mjs": {
+    "mtime": 1793179471.6117983,
+    "seen": 1793499840.0438707,
+    "ast_hash": "c6f8185da64991c735bb9c03b2ca220f",
+    "semantic_hash": "c6f8185da64991c735bb9c03b2ca220f"
+  },
+  "deploy/lib/backendDeploy.test.mjs": {
+    "mtime": 1793180358.0311904,
+    "seen": 1793499840.0438716,
+    "ast_hash": "0c56c0b187d1707c6165910fbaccd5fe",
+    "semantic_hash": "0c56c0b187d1707c6165910fbaccd5fe"
+  },
+  "deploy/lib/changes.mjs": {
+    "mtime": 1793175797.772103,
+    "seen": 1793499840.043874,
+    "ast_hash": "2e2d63ab4a379687ebdf5dcc4aa57a7f",
+    "semantic_hash": "2e2d63ab4a379687ebdf5dcc4aa57a7f"
+  },
+  "deploy/lib/changes.test.mjs": {
+    "mtime": 1793175797.801496,
+    "seen": 1793499840.0438762,
+    "ast_hash": "b39d500e17ea9c3ad11b9f2308dc11cf",
+    "semantic_hash": "b39d500e17ea9c3ad11b9f2308dc11cf"
+  },
+  "deploy/lib/previous.mjs": {
+    "mtime": 1793179538.106113,
+    "seen": 1793499840.0438783,
+    "ast_hash": "a14b8cdaf2fb76ca66cb5e7bf066c8b2",
+    "semantic_hash": "a14b8cdaf2fb76ca66cb5e7bf066c8b2"
+  },
+  "deploy/lib/previous.test.mjs": {
+    "mtime": 1793176419.654809,
+    "seen": 1793499840.043881,
+    "ast_hash": "9db8e10f2339ac8a93a96b513d04e79a",
+    "semantic_hash": "9db8e10f2339ac8a93a96b513d04e79a"
+  },
+  "deploy/lib/proxy.mjs": {
+    "mtime": 1793177890.3580356,
+    "seen": 1793499840.0438836,
+    "ast_hash": "244e2374117588d660606e13dfffc743",
+    "semantic_hash": "244e2374117588d660606e13dfffc743"
+  },
+  "deploy/lib/proxy.test.mjs": {
+    "mtime": 1793177911.799262,
+    "seen": 1793499840.0438857,
+    "ast_hash": "2824398e00ac123e0566af936fb97799",
+    "semantic_hash": "2824398e00ac123e0566af936fb97799"
+  },
+  "deploy/lib/regressionRun.mjs": {
+    "mtime": 1793176268.687034,
+    "seen": 1793499840.0438886,
+    "ast_hash": "6e773e7fba6e38417be92775558e4f92",
+    "semantic_hash": "6e773e7fba6e38417be92775558e4f92"
+  },
+  "deploy/lib/regressionRun.test.mjs": {
+    "mtime": 1793176279.0796807,
+    "seen": 1793499840.0438912,
+    "ast_hash": "c81c16cf18b89b9ad212c289195c7bc7",
+    "semantic_hash": "c81c16cf18b89b9ad212c289195c7bc7"
+  },
+  "deploy/lib/run.mjs": {
+    "mtime": 1793176480.4440207,
+    "seen": 1793499840.0438938,
+    "ast_hash": "b1a0c2ff0d98052c6c6f6e2e5f2a7ae8",
+    "semantic_hash": "b1a0c2ff0d98052c6c6f6e2e5f2a7ae8"
+  },
+  "deploy/lib/run.test.mjs": {
+    "mtime": 1793176480.4450207,
+    "seen": 1793499840.0438964,
+    "ast_hash": "436b9c5547ac5aa5c7903a4556aba186",
+    "semantic_hash": "436b9c5547ac5aa5c7903a4556aba186"
+  },
+  "deploy/lib/slots.mjs": {
+    "mtime": 1793177673.007061,
+    "seen": 1793499840.0438986,
+    "ast_hash": "1be0c89c7878f6e0388b74f20d1e96a1",
+    "semantic_hash": "1be0c89c7878f6e0388b74f20d1e96a1"
+  },
+  "deploy/lib/slots.test.mjs": {
+    "mtime": 1793179492.1329887,
+    "seen": 1793499840.0439012,
+    "ast_hash": "f936cfec124e59c20612e67ace49d930",
+    "semantic_hash": "f936cfec124e59c20612e67ace49d930"
+  },
+  "deploy/lib/state.mjs": {
+    "mtime": 1793175772.7046218,
+    "seen": 1793499840.0439038,
+    "ast_hash": "84205937e743bfb97ba902b1b6a09759",
+    "semantic_hash": "84205937e743bfb97ba902b1b6a09759"
+  },
+  "deploy/lib/state.test.mjs": {
+    "mtime": 1793175772.732257,
+    "seen": 1793499840.0439057,
+    "ast_hash": "8a23a98545724dfb814c7c876f52c563",
+    "semantic_hash": "8a23a98545724dfb814c7c876f52c563"
+  },
+  "deploy/lib/workerPublish.mjs": {
+    "mtime": 1793176980.1308606,
+    "seen": 1793499840.0439086,
+    "ast_hash": "7217a5b7f92fbbf81a9f309ca3829b26",
+    "semantic_hash": "7217a5b7f92fbbf81a9f309ca3829b26"
+  },
+  "deploy/lib/workerPublish.test.mjs": {
+    "mtime": 1793176974.2993798,
+    "seen": 1793499840.043911,
+    "ast_hash": "c84143d52dbbd092eee6f92ba62551f8",
+    "semantic_hash": "c84143d52dbbd092eee6f92ba62551f8"
+  },
+  "deploy/regression.mjs": {
+    "mtime": 1793176175.341854,
+    "seen": 1793499840.0439138,
+    "ast_hash": "a0fdc78c7846cd0e218d1447f30103f1",
+    "semantic_hash": "a0fdc78c7846cd0e218d1447f30103f1"
+  },
+  "deploy/regression.test.mjs": {
+    "mtime": 1793180358.028168,
+    "seen": 1793499840.0439162,
+    "ast_hash": "f5b773718dc8c64e37fd38d02ba783cf",
+    "semantic_hash": "f5b773718dc8c64e37fd38d02ba783cf"
+  },
+  "deploy/watcher.mjs": {
+    "mtime": 1793176551.7866592,
+    "seen": 1793499840.043919,
+    "ast_hash": "55eb0c0ce1972e45a5487593d181407c",
+    "semantic_hash": "55eb0c0ce1972e45a5487593d181407c"
+  },
+  "deploy/watcher.test.mjs": {
+    "mtime": 1793176581.9744322,
+    "seen": 1793499840.0439217,
+    "ast_hash": "127f7e92a3b0762762fe2524f9501263",
+    "semantic_hash": "127f7e92a3b0762762fe2524f9501263"
+  },
+  "game/e2e/accountReset.spec.js": {
+    "mtime": 1793477420.8627803,
+    "seen": 1793499840.0439243,
+    "ast_hash": "464885deba7696982d9a02828b797e34",
+    "semantic_hash": "464885deba7696982d9a02828b797e34"
+  },
+  "game/e2e/auth.spec.js": {
+    "mtime": 1793133681.0147035,
+    "seen": 1793499840.0439267,
+    "ast_hash": "9c3f2f76381cf980f6adbd08b323d5c7",
+    "semantic_hash": "9c3f2f76381cf980f6adbd08b323d5c7"
+  },
+  "game/e2e/autoClick.spec.js": {
+    "mtime": 1793314023.1469624,
+    "seen": 1793499840.0439284,
+    "ast_hash": "b0e653f1dc9667f9d822442a1700d01c",
+    "semantic_hash": "b0e653f1dc9667f9d822442a1700d01c"
+  },
+  "game/e2e/bossMap.spec.js": {
+    "mtime": 1793313495.4107914,
+    "seen": 1793499840.0439296,
+    "ast_hash": "0c390bd5656cb341a65389f336c8e4b7",
+    "semantic_hash": "0c390bd5656cb341a65389f336c8e4b7"
+  },
+  "game/e2e/bulkSell.spec.js": {
+    "mtime": 1793465117.8864899,
+    "seen": 1793499840.0439305,
+    "ast_hash": "bda509430662b7ae1efcb113bab3d917",
+    "semantic_hash": "bda509430662b7ae1efcb113bab3d917"
+  },
+  "game/e2e/clickPower.spec.js": {
+    "mtime": 1793133681.0669608,
+    "seen": 1793499840.0439317,
+    "ast_hash": "f51bacf8ad5b2ad56601e31225b51e6c",
+    "semantic_hash": "f51bacf8ad5b2ad56601e31225b51e6c"
+  },
+  "game/e2e/combatHud.spec.js": {
+    "mtime": 1793133681.0820158,
+    "seen": 1793499840.0439327,
+    "ast_hash": "56cd898448e7d5b288b9b584a01d3ed3",
+    "semantic_hash": "56cd898448e7d5b288b9b584a01d3ed3"
+  },
+  "game/e2e/drops.spec.js": {
+    "mtime": 1793133681.1024752,
+    "seen": 1793499840.0439339,
+    "ast_hash": "ecca72886823ece0a515c53eef51126a",
+    "semantic_hash": "ecca72886823ece0a515c53eef51126a"
+  },
+  "game/e2e/elements.spec.js": {
+    "mtime": 1793133681.124059,
+    "seen": 1793499840.0439353,
+    "ast_hash": "1e174f3c3ab98869b041dd13235e877b",
+    "semantic_hash": "1e174f3c3ab98869b041dd13235e877b"
+  },
+  "game/e2e/equipment.spec.js": {
+    "mtime": 1793133681.1401064,
+    "seen": 1793499840.0439367,
+    "ast_hash": "7c36938bf2ae9f704f28f61266b685c5",
+    "semantic_hash": "7c36938bf2ae9f704f28f61266b685c5"
+  },
+  "game/e2e/equipmentUi.spec.js": {
+    "mtime": 1793133681.1561987,
+    "seen": 1793499840.0439382,
+    "ast_hash": "815ba2b6c8c78c4e579e50882bd04532",
+    "semantic_hash": "815ba2b6c8c78c4e579e50882bd04532"
+  },
+  "game/e2e/farm.spec.js": {
+    "mtime": 1793449106.5460606,
+    "seen": 1793499840.0439394,
+    "ast_hash": "4d71a0b6685099f554f880f06b5dbe25",
+    "semantic_hash": "4d71a0b6685099f554f880f06b5dbe25"
+  },
+  "game/e2e/heroAscension.spec.js": {
+    "mtime": 1793464355.8451557,
+    "seen": 1793499840.0439403,
+    "ast_hash": "285a545867b1ee7543ac7aaf2de2c6a5",
+    "semantic_hash": "285a545867b1ee7543ac7aaf2de2c6a5"
+  },
+  "game/e2e/heroes.spec.js": {
+    "mtime": 1793313495.4340925,
+    "seen": 1793499840.0439413,
+    "ast_hash": "ede6e338ead42e662449eb036da824bf",
+    "semantic_hash": "ede6e338ead42e662449eb036da824bf"
+  },
+  "game/e2e/session.spec.js": {
+    "mtime": 1793133681.2034295,
+    "seen": 1793499840.0439427,
+    "ast_hash": "2a595994160b786ac4820367418c592c",
+    "semantic_hash": "2a595994160b786ac4820367418c592c"
+  },
+  "game/e2e/skills.spec.js": {
+    "mtime": 1793133681.2210112,
+    "seen": 1793499840.0439436,
+    "ast_hash": "dcd27de5fdd6eadb6c0627b7b3eb66f0",
+    "semantic_hash": "dcd27de5fdd6eadb6c0627b7b3eb66f0"
+  },
+  "game/e2e/skillsAll.spec.js": {
+    "mtime": 1793133681.2370496,
+    "seen": 1793499840.043945,
+    "ast_hash": "66c7ffbf7726b2a71b70d5cf5bdd545b",
+    "semantic_hash": "66c7ffbf7726b2a71b70d5cf5bdd545b"
+  },
+  "game/e2e/stages.spec.js": {
+    "mtime": 1793133681.2541115,
+    "seen": 1793499840.0439463,
+    "ast_hash": "e43cec69dbc21abea22936b19c161974",
+    "semantic_hash": "e43cec69dbc21abea22936b19c161974"
+  },
+  "game/e2e/support/coverage.js": {
+    "mtime": 1793133680.9627974,
+    "seen": 1793499840.0439475,
+    "ast_hash": "e9b0459c7965a67a1322b65a47c4912c",
+    "semantic_hash": "e9b0459c7965a67a1322b65a47c4912c"
+  },
+  "game/e2e/support/fakeBackend.js": {
+    "mtime": 1793463792.3409758,
+    "seen": 1793499840.0439498,
+    "ast_hash": "3295113bf826a6dd3b1e0c6597030aa8",
+    "semantic_hash": "3295113bf826a6dd3b1e0c6597030aa8"
+  },
+  "game/e2e/support/game.js": {
+    "mtime": 1792328330.092468,
+    "seen": 1793499840.043952,
+    "ast_hash": "23c4dc1dda5fb91a8c53841a5ef13207",
+    "semantic_hash": "23c4dc1dda5fb91a8c53841a5ef13207"
+  },
+  "game/e2e/talents.spec.js": {
+    "mtime": 1793449106.6700318,
+    "seen": 1793499840.0439541,
+    "ast_hash": "7ce74cb0761cf58922e03eb970c72c1b",
+    "semantic_hash": "7ce74cb0761cf58922e03eb970c72c1b"
+  },
+  "game/package.json": {
+    "mtime": 1793448809.421857,
+    "seen": 1793499840.0439563,
+    "ast_hash": "3d69da63a36ce0ea89d104206ddeeddc",
+    "semantic_hash": "3d69da63a36ce0ea89d104206ddeeddc"
+  },
+  "game/playwright.config.js": {
+    "mtime": 1793133681.471729,
+    "seen": 1793499840.0439584,
+    "ast_hash": "386e088658958064620c2ff064b9284d",
+    "semantic_hash": "386e088658958064620c2ff064b9284d"
+  },
+  "game/public/assets/coin.json": {
+    "mtime": 1792225944.761803,
+    "seen": 1793499840.0439613,
+    "ast_hash": "09f6a97014dbd160f5312104707f7765",
+    "semantic_hash": "09f6a97014dbd160f5312104707f7765"
+  },
+  "game/public/assets/heroes/kael_rig.json": {
+    "mtime": 1792884600.454291,
+    "seen": 1793499840.0439637,
+    "ast_hash": "0e252c7c69dbde054b4bd1afa836278f",
+    "semantic_hash": "0e252c7c69dbde054b4bd1afa836278f"
+  },
+  "game/scripts/deploy.mjs": {
+    "mtime": 1792270423.6739528,
+    "seen": 1793499840.0439663,
+    "ast_hash": "c99c571f1686938dcbda0b0dd36017a7",
+    "semantic_hash": "c99c571f1686938dcbda0b0dd36017a7"
+  },
+  "game/scripts/e2eCoverage.mjs": {
+    "mtime": 1793133681.3205588,
+    "seen": 1793499840.0439684,
+    "ast_hash": "f4aaa526c6c8fa7c0223e3a86095ac66",
+    "semantic_hash": "f4aaa526c6c8fa7c0223e3a86095ac66"
+  },
+  "game/src/adapters/http/accountResetApi.js": {
+    "mtime": 1793131253.0137103,
+    "seen": 1793499840.04397,
+    "ast_hash": "11a425eeb9f6ba1b3e62018a5476eb66",
+    "semantic_hash": "11a425eeb9f6ba1b3e62018a5476eb66"
+  },
+  "game/src/adapters/http/accountResetApi.test.js": {
+    "mtime": 1793131281.2671032,
+    "seen": 1793499840.043971,
+    "ast_hash": "afd46d5ce97d19c6fddb6501384e1322",
+    "semantic_hash": "afd46d5ce97d19c6fddb6501384e1322"
+  },
+  "game/src/adapters/http/authApi.js": {
+    "mtime": 1792264189.5788574,
+    "seen": 1793499840.0439725,
+    "ast_hash": "202b057cc1090a6d38539fc53b2946dd",
+    "semantic_hash": "202b057cc1090a6d38539fc53b2946dd"
+  },
+  "game/src/adapters/http/authApi.test.js": {
+    "mtime": 1792264189.5948334,
+    "seen": 1793499840.043974,
+    "ast_hash": "306f0372f28bfe1f5bd91ad988a42858",
+    "semantic_hash": "306f0372f28bfe1f5bd91ad988a42858"
+  },
+  "game/src/adapters/http/autoClickApi.js": {
+    "mtime": 1793096417.785559,
+    "seen": 1793499840.043975,
+    "ast_hash": "52645ffd71f48ddf6ae818acb39e883b",
+    "semantic_hash": "52645ffd71f48ddf6ae818acb39e883b"
+  },
+  "game/src/adapters/http/autoClickApi.test.js": {
+    "mtime": 1793096417.820855,
+    "seen": 1793499840.0439763,
+    "ast_hash": "166171c39413f5c0ec481d997c459633",
+    "semantic_hash": "166171c39413f5c0ec481d997c459633"
+  },
+  "game/src/adapters/http/config.js": {
+    "mtime": 1792232646.7441082,
+    "seen": 1793499840.0439773,
+    "ast_hash": "09f417dd3a8ffc0a272cc93ea0b91128",
+    "semantic_hash": "09f417dd3a8ffc0a272cc93ea0b91128"
+  },
+  "game/src/adapters/http/config.test.js": {
+    "mtime": 1792233638.3266656,
+    "seen": 1793499840.0439785,
+    "ast_hash": "a3342f8ce60c9ca944fd8202539babce",
+    "semantic_hash": "a3342f8ce60c9ca944fd8202539babce"
+  },
+  "game/src/adapters/http/equipmentApi.js": {
+    "mtime": 1793447402.248737,
+    "seen": 1793499840.0439794,
+    "ast_hash": "5b6ecb9b1d103df40c36eba14640a3be",
+    "semantic_hash": "5b6ecb9b1d103df40c36eba14640a3be"
+  },
+  "game/src/adapters/http/equipmentApi.test.js": {
+    "mtime": 1793447403.4870846,
+    "seen": 1793499840.0439806,
+    "ast_hash": "35cd3f105fb68f958a86fea29e93e8d4",
+    "semantic_hash": "35cd3f105fb68f958a86fea29e93e8d4"
+  },
+  "game/src/adapters/http/farmApi.js": {
+    "mtime": 1792321098.8486404,
+    "seen": 1793499840.0439818,
+    "ast_hash": "d05c7f5436e67abdb048aab67ed7df5b",
+    "semantic_hash": "d05c7f5436e67abdb048aab67ed7df5b"
+  },
+  "game/src/adapters/http/farmApi.test.js": {
+    "mtime": 1792321103.9595456,
+    "seen": 1793499840.0439825,
+    "ast_hash": "c5c3e522d30e31db063acd8adeea4f96",
+    "semantic_hash": "c5c3e522d30e31db063acd8adeea4f96"
+  },
+  "game/src/adapters/http/heroesApi.js": {
+    "mtime": 1792321076.3527153,
+    "seen": 1793499840.0439837,
+    "ast_hash": "269d1c37d1d3a17e460a9ab0d6df1b93",
+    "semantic_hash": "269d1c37d1d3a17e460a9ab0d6df1b93"
+  },
+  "game/src/adapters/http/heroesApi.test.js": {
+    "mtime": 1792321080.8417375,
+    "seen": 1793499840.043985,
+    "ast_hash": "71d923d7551e721100e624e7000939fd",
+    "semantic_hash": "71d923d7551e721100e624e7000939fd"
+  },
+  "game/src/adapters/http/httpClient.js": {
+    "mtime": 1792264177.3734918,
+    "seen": 1793499840.0439858,
+    "ast_hash": "5366958c1243b37547ee0704c0897726",
+    "semantic_hash": "5366958c1243b37547ee0704c0897726"
+  },
+  "game/src/adapters/http/httpClient.test.js": {
+    "mtime": 1792264189.579858,
+    "seen": 1793499840.043987,
+    "ast_hash": "a80886bebdcf76f55e83326653726c29",
+    "semantic_hash": "a80886bebdcf76f55e83326653726c29"
+  },
+  "game/src/adapters/http/progressApi.js": {
+    "mtime": 1792264765.7254665,
+    "seen": 1793499840.043988,
+    "ast_hash": "7b7a3dd378547afeb01a9dea6bd838f5",
+    "semantic_hash": "7b7a3dd378547afeb01a9dea6bd838f5"
+  },
+  "game/src/adapters/http/progressApi.test.js": {
+    "mtime": 1792264771.45758,
+    "seen": 1793499840.043989,
+    "ast_hash": "c2b82ee33b76296e3eec6f688e70e731",
+    "semantic_hash": "c2b82ee33b76296e3eec6f688e70e731"
+  },
+  "game/src/adapters/http/talentApi.js": {
+    "mtime": 1792747031.3878274,
+    "seen": 1793499840.0439901,
+    "ast_hash": "51721606e7546d8c9f3b64e78035098c",
+    "semantic_hash": "51721606e7546d8c9f3b64e78035098c"
+  },
+  "game/src/adapters/http/talentApi.test.js": {
+    "mtime": 1792747080.6722202,
+    "seen": 1793499840.0439916,
+    "ast_hash": "445c33f27b4f397d9579416d5b7d476f",
+    "semantic_hash": "445c33f27b4f397d9579416d5b7d476f"
+  },
+  "game/src/adapters/http/userApi.js": {
+    "mtime": 1792321059.8176675,
+    "seen": 1793499840.0439925,
+    "ast_hash": "f03442d007893a655779ffc151e5f771",
+    "semantic_hash": "f03442d007893a655779ffc151e5f771"
+  },
+  "game/src/adapters/http/userApi.test.js": {
+    "mtime": 1792321059.818667,
+    "seen": 1793499840.0439937,
+    "ast_hash": "fe69de62d960c0bd5272a07f6adfe355",
+    "semantic_hash": "fe69de62d960c0bd5272a07f6adfe355"
+  },
+  "game/src/adapters/http/walletApi.js": {
+    "mtime": 1792264180.0293262,
+    "seen": 1793499840.0439951,
+    "ast_hash": "8005a61f17789eb8954c3f56e4f031ec",
+    "semantic_hash": "8005a61f17789eb8954c3f56e4f031ec"
+  },
+  "game/src/adapters/http/walletApi.test.js": {
+    "mtime": 1792264189.5958323,
+    "seen": 1793499840.0439975,
+    "ast_hash": "77e50185942a7379ee7dc74291ed9af1",
+    "semantic_hash": "77e50185942a7379ee7dc74291ed9af1"
+  },
+  "game/src/adapters/phaser/Boot.js": {
+    "mtime": 1792225944.6533077,
+    "seen": 1793499840.0439994,
+    "ast_hash": "d68221b2a63eaa3cb4f4d495fe8d2152",
+    "semantic_hash": "d68221b2a63eaa3cb4f4d495fe8d2152"
+  },
+  "game/src/adapters/phaser/ClickerGame.js": {
+    "mtime": 1793477416.1732008,
+    "seen": 1793499840.0440023,
+    "ast_hash": "9a18dd57e7ecbf3c35ebe77594f6a93a",
+    "semantic_hash": "9a18dd57e7ecbf3c35ebe77594f6a93a"
+  },
+  "game/src/adapters/phaser/ClickerGame.test.js": {
+    "mtime": 1793477418.7212236,
+    "seen": 1793499840.0440047,
+    "ast_hash": "5e6a1b3db3f701311156283947ada84a",
+    "semantic_hash": "5e6a1b3db3f701311156283947ada84a"
+  },
+  "game/src/adapters/phaser/HeroUi.js": {
+    "mtime": 1793454465.784723,
+    "seen": 1793499840.044007,
+    "ast_hash": "3810b6e4dffe7758f669f2e76a173cfd",
+    "semantic_hash": "3810b6e4dffe7758f669f2e76a173cfd"
+  },
+  "game/src/adapters/phaser/HeroUi.test.js": {
+    "mtime": 1793464318.454692,
+    "seen": 1793499840.0440094,
+    "ast_hash": "d87216af1f23715e05458fba13a14f8b",
+    "semantic_hash": "d87216af1f23715e05458fba13a14f8b"
+  },
+  "game/src/adapters/phaser/MainMenu.js": {
+    "mtime": 1792334443.6881826,
+    "seen": 1793499840.0440114,
+    "ast_hash": "b6854c32b86306d1f7c5a8ab2d232c1d",
+    "semantic_hash": "b6854c32b86306d1f7c5a8ab2d232c1d"
+  },
+  "game/src/adapters/phaser/MainMenu.test.js": {
+    "mtime": 1792334449.8403728,
+    "seen": 1793499840.0440123,
+    "ast_hash": "a8e62ef946eda5498478fa919e2dcd9e",
+    "semantic_hash": "a8e62ef946eda5498478fa919e2dcd9e"
+  },
+  "game/src/adapters/phaser/Preloader.js": {
+    "mtime": 1793449106.7013955,
+    "seen": 1793499840.0440135,
+    "ast_hash": "9fc55bb34519b6e50137f170a4b7cdcb",
+    "semantic_hash": "9fc55bb34519b6e50137f170a4b7cdcb"
+  },
+  "game/src/adapters/phaser/backgroundFight.js": {
+    "mtime": 1793313971.9153206,
+    "seen": 1793499840.0440152,
+    "ast_hash": "48980a7eb30b75d438fbea14f8306e74",
+    "semantic_hash": "48980a7eb30b75d438fbea14f8306e74"
+  },
+  "game/src/adapters/phaser/backgroundFight.test.js": {
+    "mtime": 1793313963.6683757,
+    "seen": 1793499840.0440164,
+    "ast_hash": "60444ed9308100cf851a385f099df6d7",
+    "semantic_hash": "60444ed9308100cf851a385f099df6d7"
+  },
+  "game/src/adapters/phaser/views/autoClickView.js": {
+    "mtime": 1793096602.016457,
+    "seen": 1793499840.0440173,
+    "ast_hash": "ccb7ed4dd526710dc6ddccfa466505b9",
+    "semantic_hash": "ccb7ed4dd526710dc6ddccfa466505b9"
+  },
+  "game/src/adapters/phaser/views/autoClickView.test.js": {
+    "mtime": 1793096610.9708223,
+    "seen": 1793499840.0440185,
+    "ast_hash": "78bea617bf89f98a81ba31a74a59b6ee",
+    "semantic_hash": "78bea617bf89f98a81ba31a74a59b6ee"
+  },
+  "game/src/adapters/phaser/views/bagView.js": {
+    "mtime": 1793454380.3587217,
+    "seen": 1793499840.0440197,
+    "ast_hash": "97808c54915c58b3db4583558e334e00",
+    "semantic_hash": "97808c54915c58b3db4583558e334e00"
+  },
+  "game/src/adapters/phaser/views/bagView.test.js": {
+    "mtime": 1793454380.6408286,
+    "seen": 1793499840.0440223,
+    "ast_hash": "f920022a2df18d7f21b065ed67ce07c2",
+    "semantic_hash": "f920022a2df18d7f21b065ed67ce07c2"
+  },
+  "game/src/adapters/phaser/views/bulkSellView.js": {
+    "mtime": 1793447684.064212,
+    "seen": 1793499840.0440242,
+    "ast_hash": "a34ec1fa09d40bbc397db98c43f24d25",
+    "semantic_hash": "a34ec1fa09d40bbc397db98c43f24d25"
+  },
+  "game/src/adapters/phaser/views/bulkSellView.test.js": {
+    "mtime": 1793447692.0804327,
+    "seen": 1793499840.044027,
+    "ast_hash": "b3538eed53713aa1895d16d4a3380451",
+    "semantic_hash": "b3538eed53713aa1895d16d4a3380451"
+  },
+  "game/src/adapters/phaser/views/catalogView.js": {
+    "mtime": 1793454292.520746,
+    "seen": 1793499840.0440292,
+    "ast_hash": "9422bd9a5460ebf0ee143c04bff08ea0",
+    "semantic_hash": "9422bd9a5460ebf0ee143c04bff08ea0"
+  },
+  "game/src/adapters/phaser/views/catalogView.test.js": {
+    "mtime": 1793454310.8030415,
+    "seen": 1793499840.044031,
+    "ast_hash": "08e6efde88fd4dc96555e2bc194e2c92",
+    "semantic_hash": "08e6efde88fd4dc96555e2bc194e2c92"
+  },
+  "game/src/adapters/phaser/views/dom.js": {
+    "mtime": 1793449106.7081532,
+    "seen": 1793499840.044033,
+    "ast_hash": "a86a4dbbe5643aeb99abc324a479eaa4",
+    "semantic_hash": "a86a4dbbe5643aeb99abc324a479eaa4"
+  },
+  "game/src/adapters/phaser/views/elementWheel.js": {
+    "mtime": 1792603486.8652916,
+    "seen": 1793499840.044035,
+    "ast_hash": "fff7e8565d77a2deba9a2d7427507896",
+    "semantic_hash": "fff7e8565d77a2deba9a2d7427507896"
+  },
+  "game/src/adapters/phaser/views/elementWheel.test.js": {
+    "mtime": 1792603392.761253,
+    "seen": 1793499840.044037,
+    "ast_hash": "eb58e402e43170cc2b1b68668c416df3",
+    "semantic_hash": "eb58e402e43170cc2b1b68668c416df3"
+  },
+  "game/src/adapters/phaser/views/equipmentView.js": {
+    "mtime": 1793452118.937565,
+    "seen": 1793499840.0440392,
+    "ast_hash": "9d5daba2437e353e872eb6f75dad454a",
+    "semantic_hash": "9d5daba2437e353e872eb6f75dad454a"
+  },
+  "game/src/adapters/phaser/views/equipmentView.test.js": {
+    "mtime": 1793452128.9333687,
+    "seen": 1793499840.0440419,
+    "ast_hash": "cfe0c12ef0b04a8dfa67d938e074d82b",
+    "semantic_hash": "cfe0c12ef0b04a8dfa67d938e074d82b"
+  },
+  "game/src/adapters/phaser/views/farmView.js": {
+    "mtime": 1792610387.5201824,
+    "seen": 1793499840.0440447,
+    "ast_hash": "1156738324f8c864ae3564e9ebf2301c",
+    "semantic_hash": "1156738324f8c864ae3564e9ebf2301c"
+  },
+  "game/src/adapters/phaser/views/farmView.test.js": {
+    "mtime": 1792814788.0093167,
+    "seen": 1793499840.0440474,
+    "ast_hash": "e9b8c7215d4a7a3c8e3c32b34d2dab15",
+    "semantic_hash": "e9b8c7215d4a7a3c8e3c32b34d2dab15"
+  },
+  "game/src/adapters/phaser/views/fusionView.js": {
+    "mtime": 1793454465.4786353,
+    "seen": 1793499840.04405,
+    "ast_hash": "e162048e6aacaee87e322e32d5a5a439",
+    "semantic_hash": "e162048e6aacaee87e322e32d5a5a439"
+  },
+  "game/src/adapters/phaser/views/fusionView.test.js": {
+    "mtime": 1793454466.1006458,
+    "seen": 1793499840.0440524,
+    "ast_hash": "60f33d533186224a0043e55a86e53dcf",
+    "semantic_hash": "60f33d533186224a0043e55a86e53dcf"
+  },
+  "game/src/adapters/phaser/views/leaderView.js": {
+    "mtime": 1792321511.4368916,
+    "seen": 1793499840.0440543,
+    "ast_hash": "3bb0a3eb4acd8b62eb773ec16cd8a0a0",
+    "semantic_hash": "3bb0a3eb4acd8b62eb773ec16cd8a0a0"
+  },
+  "game/src/adapters/phaser/views/leaderView.test.js": {
+    "mtime": 1792321515.7646396,
+    "seen": 1793499840.0440567,
+    "ast_hash": "d71250b8e8f46edc2f33ec414e79c2da",
+    "semantic_hash": "d71250b8e8f46edc2f33ec414e79c2da"
+  },
+  "game/src/adapters/phaser/views/mapLayout.js": {
+    "mtime": 1792814787.9860275,
+    "seen": 1793499840.044059,
+    "ast_hash": "e23b44dd7652fa51ac288f1b09a4fa0c",
+    "semantic_hash": "e23b44dd7652fa51ac288f1b09a4fa0c"
+  },
+  "game/src/adapters/phaser/views/pieceTile.js": {
+    "mtime": 1792608364.5484657,
+    "seen": 1793499840.0440617,
+    "ast_hash": "e7e19626ff1b26095eec8387c462a4b2",
+    "semantic_hash": "e7e19626ff1b26095eec8387c462a4b2"
+  },
+  "game/src/adapters/phaser/views/pieceTile.test.js": {
+    "mtime": 1793449106.7106917,
+    "seen": 1793499840.0440645,
+    "ast_hash": "f1a56b33ddaf05173e09b3a98d3d2a7b",
+    "semantic_hash": "f1a56b33ddaf05173e09b3a98d3d2a7b"
+  },
+  "game/src/adapters/phaser/views/pieceTooltip.js": {
+    "mtime": 1792628868.1367404,
+    "seen": 1793499840.044067,
+    "ast_hash": "4ac4596a95dde0e21e7fdf320248e215",
+    "semantic_hash": "4ac4596a95dde0e21e7fdf320248e215"
+  },
+  "game/src/adapters/phaser/views/pieceTooltip.test.js": {
+    "mtime": 1792628879.8751824,
+    "seen": 1793499840.044069,
+    "ast_hash": "8c7d1e5b043720dd4bc452156a092a66",
+    "semantic_hash": "8c7d1e5b043720dd4bc452156a092a66"
+  },
+  "game/src/adapters/phaser/views/resetView.js": {
+    "mtime": 1793131371.5562859,
+    "seen": 1793499840.0440717,
+    "ast_hash": "707707b765990f1ecba99964f6d7272e",
+    "semantic_hash": "707707b765990f1ecba99964f6d7272e"
+  },
+  "game/src/adapters/phaser/views/skillBar.js": {
+    "mtime": 1793454568.0947993,
+    "seen": 1793499840.0440748,
+    "ast_hash": "e5193b478e84044b92a01178121291c0",
+    "semantic_hash": "e5193b478e84044b92a01178121291c0"
+  },
+  "game/src/adapters/phaser/views/skillBar.test.js": {
+    "mtime": 1793454568.3394718,
+    "seen": 1793499840.0440772,
+    "ast_hash": "4be44284f6d1975816ca48e3a8105988",
+    "semantic_hash": "4be44284f6d1975816ca48e3a8105988"
+  },
+  "game/src/adapters/phaser/views/skillEffects.js": {
+    "mtime": 1792603602.104911,
+    "seen": 1793499840.0440795,
+    "ast_hash": "da9290e761a8da6ead4c6320e9a8c844",
+    "semantic_hash": "da9290e761a8da6ead4c6320e9a8c844"
+  },
+  "game/src/adapters/phaser/views/skillEffects.test.js": {
+    "mtime": 1792603670.3122592,
+    "seen": 1793499840.0440822,
+    "ast_hash": "9932770eb51f4426c58c5c4a2c7719ef",
+    "semantic_hash": "9932770eb51f4426c58c5c4a2c7719ef"
+  },
+  "game/src/adapters/phaser/views/skillTooltip.js": {
+    "mtime": 1792603602.0584393,
+    "seen": 1793499840.0440845,
+    "ast_hash": "1d5382c901c2417678cd8560095dc394",
+    "semantic_hash": "1d5382c901c2417678cd8560095dc394"
+  },
+  "game/src/adapters/phaser/views/skillTooltip.test.js": {
+    "mtime": 1793454310.8055553,
+    "seen": 1793499840.044087,
+    "ast_hash": "3a62ec5f239832e283abdbb05ba5c29e",
+    "semantic_hash": "3a62ec5f239832e283abdbb05ba5c29e"
+  },
+  "game/src/adapters/phaser/views/talentsView.js": {
+    "mtime": 1793449106.7155428,
+    "seen": 1793499840.0440896,
+    "ast_hash": "f026e19ef494f8706f0f0cc69c88d3dc",
+    "semantic_hash": "f026e19ef494f8706f0f0cc69c88d3dc"
+  },
+  "game/src/adapters/phaser/views/talentsView.test.js": {
+    "mtime": 1793449106.7179048,
+    "seen": 1793499840.044092,
+    "ast_hash": "4392c4da2a5c96329549a3a104facefd",
+    "semantic_hash": "4392c4da2a5c96329549a3a104facefd"
+  },
+  "game/src/adapters/storage/autoClickPreference.js": {
+    "mtime": 1793096460.1908612,
+    "seen": 1793499840.0440948,
+    "ast_hash": "8ea68969a4d40f83ffd488748e44f935",
+    "semantic_hash": "8ea68969a4d40f83ffd488748e44f935"
+  },
+  "game/src/adapters/storage/autoClickPreference.test.js": {
+    "mtime": 1793096464.2505612,
+    "seen": 1793499840.0440972,
+    "ast_hash": "45244314ecb9b96f295fbb7e28f25639",
+    "semantic_hash": "45244314ecb9b96f295fbb7e28f25639"
+  },
+  "game/src/adapters/storage/sessionStore.js": {
+    "mtime": 1792239904.333256,
+    "seen": 1793499840.0441103,
+    "ast_hash": "87c50dcee39dba1221f8a273cba80446",
+    "semantic_hash": "87c50dcee39dba1221f8a273cba80446"
+  },
+  "game/src/adapters/storage/sessionStore.test.js": {
+    "mtime": 1792239904.4993124,
+    "seen": 1793499840.0441132,
+    "ast_hash": "34a89291cae968d667444840588498fb",
+    "semantic_hash": "34a89291cae968d667444840588498fb"
+  },
+  "game/src/application/ApiError.js": {
+    "mtime": 1792264712.9308343,
+    "seen": 1793499840.044116,
+    "ast_hash": "2815603dad472a131e9a768931641146",
+    "semantic_hash": "2815603dad472a131e9a768931641146"
+  },
+  "game/src/application/ApiError.test.js": {
+    "mtime": 1792264712.931834,
+    "seen": 1793499840.0441172,
+    "ast_hash": "d5c0b677ae03a7f3bf3921d8e63acba0",
+    "semantic_hash": "d5c0b677ae03a7f3bf3921d8e63acba0"
+  },
+  "game/src/application/accountReset/accountReset.js": {
+    "mtime": 1793131253.1107364,
+    "seen": 1793499840.0441186,
+    "ast_hash": "3e327e4af1c6b69a3856c0faf2bb5110",
+    "semantic_hash": "3e327e4af1c6b69a3856c0faf2bb5110"
+  },
+  "game/src/application/accountReset/accountReset.test.js": {
+    "mtime": 1793131281.2982497,
+    "seen": 1793499840.0441198,
+    "ast_hash": "69126b82ba81903c1fa9f8cc98813e3c",
+    "semantic_hash": "69126b82ba81903c1fa9f8cc98813e3c"
+  },
+  "game/src/application/autoClick/autoClickState.js": {
+    "mtime": 1793131252.9719815,
+    "seen": 1793499840.044121,
+    "ast_hash": "e30f60d4f393565c1176fc87e663ff3f",
+    "semantic_hash": "e30f60d4f393565c1176fc87e663ff3f"
+  },
+  "game/src/application/autoClick/autoClickState.test.js": {
+    "mtime": 1793131281.2274582,
+    "seen": 1793499840.0441222,
+    "ast_hash": "efe18bc8045e041efe188564d97dae47",
+    "semantic_hash": "efe18bc8045e041efe188564d97dae47"
+  },
+  "game/src/application/campaign/campaignSession.js": {
+    "mtime": 1793131252.970981,
+    "seen": 1793499840.0441236,
+    "ast_hash": "2f9d5703473503ed751a035e3297f079",
+    "semantic_hash": "2f9d5703473503ed751a035e3297f079"
+  },
+  "game/src/application/campaign/campaignSession.test.js": {
+    "mtime": 1793131281.2269537,
+    "seen": 1793499840.0441263,
+    "ast_hash": "2aae919e12b681d779d21bface0644a8",
+    "semantic_hash": "2aae919e12b681d779d21bface0644a8"
+  },
+  "game/src/application/equipment/equipmentCollection.js": {
+    "mtime": 1793447485.22913,
+    "seen": 1793499840.0441287,
+    "ast_hash": "fbd018d96ff2dbe433bcc3c0bde89b80",
+    "semantic_hash": "fbd018d96ff2dbe433bcc3c0bde89b80"
+  },
+  "game/src/application/equipment/equipmentCollection.test.js": {
+    "mtime": 1793447488.305264,
+    "seen": 1793499840.0441308,
+    "ast_hash": "39caa7e2b055793c9a3d78f7cfd88bb0",
+    "semantic_hash": "39caa7e2b055793c9a3d78f7cfd88bb0"
+  },
+  "game/src/application/farm/farmSession.js": {
+    "mtime": 1792321260.456142,
+    "seen": 1793499840.0441334,
+    "ast_hash": "9fc2ee002b932db2bc6debf884951d48",
+    "semantic_hash": "9fc2ee002b932db2bc6debf884951d48"
+  },
+  "game/src/application/farm/farmSession.test.js": {
+    "mtime": 1792353849.783675,
+    "seen": 1793499840.0441353,
+    "ast_hash": "325c40bd5427e97e742e5764cea45496",
+    "semantic_hash": "325c40bd5427e97e742e5764cea45496"
+  },
+  "game/src/application/heroes/heroCollection.js": {
+    "mtime": 1792321229.8024018,
+    "seen": 1793499840.044138,
+    "ast_hash": "4d1347c91017123e94ca4b8ed1302a04",
+    "semantic_hash": "4d1347c91017123e94ca4b8ed1302a04"
+  },
+  "game/src/application/heroes/heroCollection.test.js": {
+    "mtime": 1792321239.561533,
+    "seen": 1793499840.0441408,
+    "ast_hash": "9525be537e55a3f2fc102b3a0a609429",
+    "semantic_hash": "9525be537e55a3f2fc102b3a0a609429"
+  },
+  "game/src/application/session/sessionManager.js": {
+    "mtime": 1792264130.3165698,
+    "seen": 1793499840.0441437,
+    "ast_hash": "78a418ec8cf9f35018450a0654348aab",
+    "semantic_hash": "78a418ec8cf9f35018450a0654348aab"
+  },
+  "game/src/application/session/sessionManager.test.js": {
+    "mtime": 1792264135.3489082,
+    "seen": 1793499840.0441458,
+    "ast_hash": "d0a34af1951fa5ab7a7bd62854dada14",
+    "semantic_hash": "d0a34af1951fa5ab7a7bd62854dada14"
+  },
+  "game/src/application/talents/talentCollection.js": {
+    "mtime": 1792747031.4063766,
+    "seen": 1793499840.044148,
+    "ast_hash": "533b59a7b2162dbcf2f1d3bf81f160f0",
+    "semantic_hash": "533b59a7b2162dbcf2f1d3bf81f160f0"
+  },
+  "game/src/application/talents/talentCollection.test.js": {
+    "mtime": 1792747080.698771,
+    "seen": 1793499840.0441492,
+    "ast_hash": "436aeb6fd5b534e3bb613c496bd4e1d7",
+    "semantic_hash": "436aeb6fd5b534e3bb613c496bd4e1d7"
+  },
+  "game/src/application/wallet/walletSync.js": {
+    "mtime": 1792664650.5633779,
+    "seen": 1793499840.0441506,
+    "ast_hash": "19016ef19a5a3af1509a9221e87826bc",
+    "semantic_hash": "19016ef19a5a3af1509a9221e87826bc"
+  },
+  "game/src/application/wallet/walletSync.test.js": {
+    "mtime": 1792353747.6415308,
+    "seen": 1793499840.0441518,
+    "ast_hash": "c61da16230256bdbb3acf2d96ba6e19b",
+    "semantic_hash": "c61da16230256bdbb3acf2d96ba6e19b"
+  },
+  "game/src/architecture.test.js": {
+    "mtime": 1793060354.4975312,
+    "seen": 1793499840.0441527,
+    "ast_hash": "640a708b056230189f4c8d654c929fbb",
+    "semantic_hash": "640a708b056230189f4c8d654c929fbb"
+  },
+  "game/src/composition.js": {
+    "mtime": 1793131252.9719815,
+    "seen": 1793499840.044154,
+    "ast_hash": "c40b2bde83fa87191af4fb99b8eaf83e",
+    "semantic_hash": "c40b2bde83fa87191af4fb99b8eaf83e"
+  },
+  "game/src/composition.test.js": {
+    "mtime": 1793131281.225952,
+    "seen": 1793499840.044155,
+    "ast_hash": "a22516704736884ea9dd4cd1a6ac43be",
+    "semantic_hash": "a22516704736884ea9dd4cd1a6ac43be"
+  },
+  "game/src/domain/campaign/accountReset.js": {
+    "mtime": 1793131183.300067,
+    "seen": 1793499840.044157,
+    "ast_hash": "0bac3f46dd5d70e49d8c40deb120f45b",
+    "semantic_hash": "0bac3f46dd5d70e49d8c40deb120f45b"
+  },
+  "game/src/domain/campaign/accountReset.test.js": {
+    "mtime": 1793131183.3431175,
+    "seen": 1793499840.0441592,
+    "ast_hash": "f660fe4b8e0a53bd3cc2c1af88c24180",
+    "semantic_hash": "f660fe4b8e0a53bd3cc2c1af88c24180"
+  },
+  "game/src/domain/campaign/bossCountdown.js": {
+    "mtime": 1792570112.387992,
+    "seen": 1793499840.0441618,
+    "ast_hash": "c10f805443f1833c1aedb21e6cd45745",
+    "semantic_hash": "c10f805443f1833c1aedb21e6cd45745"
+  },
+  "game/src/domain/campaign/bossCountdown.test.js": {
+    "mtime": 1792570118.117252,
+    "seen": 1793499840.0441644,
+    "ast_hash": "ae0889cff6246f759b3463fbf1fafd29",
+    "semantic_hash": "ae0889cff6246f759b3463fbf1fafd29"
+  },
+  "game/src/domain/campaign/bossMap.js": {
+    "mtime": 1792609637.1368308,
+    "seen": 1793499840.0441668,
+    "ast_hash": "302157fcf095102bc3b3d219a6dea1a6",
+    "semantic_hash": "302157fcf095102bc3b3d219a6dea1a6"
+  },
+  "game/src/domain/campaign/bossMap.test.js": {
+    "mtime": 1792609648.6409192,
+    "seen": 1793499840.0441692,
+    "ast_hash": "3a6d7b27e58ff09c8ac39bc503670304",
+    "semantic_hash": "3a6d7b27e58ff09c8ac39bc503670304"
+  },
+  "game/src/domain/campaign/campaign.js": {
+    "mtime": 1792450306.8545208,
+    "seen": 1793499840.0441716,
+    "ast_hash": "0260dd25857433c1940e366832c3fd66",
+    "semantic_hash": "0260dd25857433c1940e366832c3fd66"
+  },
+  "game/src/domain/campaign/campaign.test.js": {
+    "mtime": 1792450281.3566723,
+    "seen": 1793499840.0441742,
+    "ast_hash": "7f3bee1dabc33f1e309ae7029551cdad",
+    "semantic_hash": "7f3bee1dabc33f1e309ae7029551cdad"
+  },
+  "game/src/domain/combat/autoClick.js": {
+    "mtime": 1793131183.25533,
+    "seen": 1793499840.0441763,
+    "ast_hash": "464e478948768b112ef618294d5effe5",
+    "semantic_hash": "464e478948768b112ef618294d5effe5"
+  },
+  "game/src/domain/combat/autoClick.test.js": {
+    "mtime": 1793096277.984471,
+    "seen": 1793499840.0441792,
+    "ast_hash": "10a57304a0ff8ceb564e19a9034fdb18",
+    "semantic_hash": "10a57304a0ff8ceb564e19a9034fdb18"
+  },
+  "game/src/domain/combat/combo.js": {
+    "mtime": 1792671472.3031359,
+    "seen": 1793499840.044182,
+    "ast_hash": "5b6b5f527a40fa04d42d7cfcf27e499d",
+    "semantic_hash": "5b6b5f527a40fa04d42d7cfcf27e499d"
+  },
+  "game/src/domain/combat/combo.test.js": {
+    "mtime": 1792671472.3036368,
+    "seen": 1793499840.0441837,
+    "ast_hash": "256fa8b74a9017a712f9ea1c9dc5b904",
+    "semantic_hash": "256fa8b74a9017a712f9ea1c9dc5b904"
+  },
+  "game/src/domain/combat/damage.js": {
+    "mtime": 1792570112.3869927,
+    "seen": 1793499840.0441852,
+    "ast_hash": "792a771b1e8a9c116f93dee08cfc0736",
+    "semantic_hash": "792a771b1e8a9c116f93dee08cfc0736"
+  },
+  "game/src/domain/combat/damage.test.js": {
+    "mtime": 1792570112.387992,
+    "seen": 1793499840.0441864,
+    "ast_hash": "9b252728d7773b8f37e2fd551ce80a99",
+    "semantic_hash": "9b252728d7773b8f37e2fd551ce80a99"
+  },
+  "game/src/domain/combat/elements.js": {
+    "mtime": 1792287588.4763272,
+    "seen": 1793499840.0441875,
+    "ast_hash": "189afd2f4b0c7ec3f65bf65514d5cbf4",
+    "semantic_hash": "189afd2f4b0c7ec3f65bf65514d5cbf4"
+  },
+  "game/src/domain/combat/elements.test.js": {
+    "mtime": 1792287588.3719888,
+    "seen": 1793499840.0441887,
+    "ast_hash": "6c5de7b8c096e3e072aeb5ecdeaa335b",
+    "semantic_hash": "6c5de7b8c096e3e072aeb5ecdeaa335b"
+  },
+  "game/src/domain/combat/leaderAttacker.js": {
+    "mtime": 1792606335.4535463,
+    "seen": 1793499840.04419,
+    "ast_hash": "f4fc73b46165030f1f7f513b33c4fe26",
+    "semantic_hash": "f4fc73b46165030f1f7f513b33c4fe26"
+  },
+  "game/src/domain/combat/leaderAttacker.test.js": {
+    "mtime": 1793454178.420598,
+    "seen": 1793499840.0441911,
+    "ast_hash": "78a85ff4a83200c14eb886d8cbc40c8a",
+    "semantic_hash": "78a85ff4a83200c14eb886d8cbc40c8a"
+  },
+  "game/src/domain/combat/monster.js": {
+    "mtime": 1792603291.1489232,
+    "seen": 1793499840.0441926,
+    "ast_hash": "1795e19ee8ca6ae73126c7820ee0f647",
+    "semantic_hash": "1795e19ee8ca6ae73126c7820ee0f647"
+  },
+  "game/src/domain/combat/monster.test.js": {
+    "mtime": 1792603254.8227367,
+    "seen": 1793499840.0441937,
+    "ast_hash": "3eb7916808e03d8ae86d373faeea20b5",
+    "semantic_hash": "3eb7916808e03d8ae86d373faeea20b5"
+  },
+  "game/src/domain/economy/walletLedger.js": {
+    "mtime": 1792664650.5633779,
+    "seen": 1793499840.0441947,
+    "ast_hash": "837f2585c90450e11a8a66a8dea4e4b8",
+    "semantic_hash": "837f2585c90450e11a8a66a8dea4e4b8"
+  },
+  "game/src/domain/economy/walletLedger.test.js": {
+    "mtime": 1792664657.05283,
+    "seen": 1793499840.0441961,
+    "ast_hash": "5c1388fd012118c9b90d5bc4cef4b125",
+    "semantic_hash": "5c1388fd012118c9b90d5bc4cef4b125"
+  },
+  "game/src/domain/equipment/bulkSell.js": {
+    "mtime": 1793447577.2275276,
+    "seen": 1793499840.044197,
+    "ast_hash": "aaf69112d42778ad467fa898a7968fdf",
+    "semantic_hash": "aaf69112d42778ad467fa898a7968fdf"
+  },
+  "game/src/domain/equipment/bulkSell.test.js": {
+    "mtime": 1793447582.3621364,
+    "seen": 1793499840.044198,
+    "ast_hash": "f767e63971bd535269d9ea5c27611142",
+    "semantic_hash": "f767e63971bd535269d9ea5c27611142"
+  },
+  "game/src/domain/equipment/equipment.js": {
+    "mtime": 1792675716.7326822,
+    "seen": 1793499840.0441992,
+    "ast_hash": "eece92034132082edb60a6137402be71",
+    "semantic_hash": "eece92034132082edb60a6137402be71"
+  },
+  "game/src/domain/equipment/equipment.test.js": {
+    "mtime": 1792675716.733684,
+    "seen": 1793499840.0442004,
+    "ast_hash": "0055f61b1a3bb5aa675bef9fac6f672a",
+    "semantic_hash": "0055f61b1a3bb5aa675bef9fac6f672a"
+  },
+  "game/src/domain/equipment/leaderStats.js": {
+    "mtime": 1792608145.370703,
+    "seen": 1793499840.0442014,
+    "ast_hash": "02fa0230e336a3bfebaeeef0b09a74ac",
+    "semantic_hash": "02fa0230e336a3bfebaeeef0b09a74ac"
+  },
+  "game/src/domain/equipment/leaderStats.test.js": {
+    "mtime": 1793454178.4221025,
+    "seen": 1793499840.0442028,
+    "ast_hash": "31ff585b7e88e0732d08a487cbb7f67d",
+    "semantic_hash": "31ff585b7e88e0732d08a487cbb7f67d"
+  },
+  "game/src/domain/heroes/heroes.js": {
+    "mtime": 1793452518.6225638,
+    "seen": 1793499840.044204,
+    "ast_hash": "924ebffc4a5d1bc5e8cac0f828cf3bb3",
+    "semantic_hash": "924ebffc4a5d1bc5e8cac0f828cf3bb3"
+  },
+  "game/src/domain/heroes/heroes.test.js": {
+    "mtime": 1793452534.8039987,
+    "seen": 1793499840.0442054,
+    "ast_hash": "664dc13742ebdb2fe56d63490f609a83",
+    "semantic_hash": "664dc13742ebdb2fe56d63490f609a83"
+  },
+  "game/src/domain/heroes/leaderBonus.js": {
+    "mtime": 1792604997.750477,
+    "seen": 1793499840.044208,
+    "ast_hash": "4fe7c31fcf41f45515794aaa1dd3de18",
+    "semantic_hash": "4fe7c31fcf41f45515794aaa1dd3de18"
+  },
+  "game/src/domain/heroes/leaderBonus.test.js": {
+    "mtime": 1792604999.9535742,
+    "seen": 1793499840.0442104,
+    "ast_hash": "a7cbcc868855744dbb93c0d5de1b73b1",
+    "semantic_hash": "a7cbcc868855744dbb93c0d5de1b73b1"
+  },
+  "game/src/domain/heroes/starBonus.js": {
+    "mtime": 1793454094.7087195,
+    "seen": 1793499840.0442128,
+    "ast_hash": "7e7439d9c80204fd5c031dd7ac5bc556",
+    "semantic_hash": "7e7439d9c80204fd5c031dd7ac5bc556"
+  },
+  "game/src/domain/heroes/starBonus.test.js": {
+    "mtime": 1793454178.420598,
+    "seen": 1793499840.0442152,
+    "ast_hash": "5c86eeee3926f221d364bb9a40a03603",
+    "semantic_hash": "5c86eeee3926f221d364bb9a40a03603"
+  },
+  "game/src/domain/skills/skillCatalog.js": {
+    "mtime": 1792569957.7009065,
+    "seen": 1793499840.0442178,
+    "ast_hash": "c2d542fe9aa398b35c66cc2e2ad6ac9a",
+    "semantic_hash": "c2d542fe9aa398b35c66cc2e2ad6ac9a"
+  },
+  "game/src/domain/skills/skillCatalog.test.js": {
+    "mtime": 1792571911.8936262,
+    "seen": 1793499840.0442204,
+    "ast_hash": "4c70a566492f6708a327568aeb1ce2f8",
+    "semantic_hash": "4c70a566492f6708a327568aeb1ce2f8"
+  },
+  "game/src/domain/skills/skillCombat.js": {
+    "mtime": 1793452892.3818603,
+    "seen": 1793499840.0442224,
+    "ast_hash": "7f6467099fa9c11bf15ee4936bf2d940",
+    "semantic_hash": "7f6467099fa9c11bf15ee4936bf2d940"
+  },
+  "game/src/domain/skills/skillCombat.test.js": {
+    "mtime": 1793452955.1789217,
+    "seen": 1793499840.044224,
+    "ast_hash": "80c382982ff74d9b47f171e1be248184",
+    "semantic_hash": "80c382982ff74d9b47f171e1be248184"
+  },
+  "game/src/domain/skills/skillDamage.js": {
+    "mtime": 1793452780.1268067,
+    "seen": 1793499840.044226,
+    "ast_hash": "6f6a9aa162959b7ffdcd90ac3dc77f99",
+    "semantic_hash": "6f6a9aa162959b7ffdcd90ac3dc77f99"
+  },
+  "game/src/domain/skills/skillDamage.test.js": {
+    "mtime": 1793452796.1882737,
+    "seen": 1793499840.044228,
+    "ast_hash": "42de041591315cf22e912b112abb9091",
+    "semantic_hash": "42de041591315cf22e912b112abb9091"
+  },
+  "game/src/domain/skills/skillLevel.js": {
+    "mtime": 1793452677.7152958,
+    "seen": 1793499840.0442307,
+    "ast_hash": "533ecd20ee2b10e3d93165c4732a90fa",
+    "semantic_hash": "533ecd20ee2b10e3d93165c4732a90fa"
+  },
+  "game/src/domain/skills/skillLevel.test.js": {
+    "mtime": 1793452685.8462005,
+    "seen": 1793499840.0442328,
+    "ast_hash": "ecb0e52e6014126a924aa36b922e5e7a",
+    "semantic_hash": "ecb0e52e6014126a924aa36b922e5e7a"
+  },
+  "game/src/domain/talents/talents.js": {
+    "mtime": 1793449106.7200704,
+    "seen": 1793499840.044235,
+    "ast_hash": "5a5fd50f524dbf92b809b70409ed5449",
+    "semantic_hash": "5a5fd50f524dbf92b809b70409ed5449"
+  },
+  "game/src/domain/talents/talents.test.js": {
+    "mtime": 1793449106.7216756,
+    "seen": 1793499840.0442371,
+    "ast_hash": "52847d544cbb9a9960ecccdf068a7e2e",
+    "semantic_hash": "52847d544cbb9a9960ecccdf068a7e2e"
+  },
+  "game/src/main.js": {
+    "mtime": 1793314012.5100594,
+    "seen": 1793499840.044239,
+    "ast_hash": "685d71cef9438b0f0bd2075c5198235b",
+    "semantic_hash": "685d71cef9438b0f0bd2075c5198235b"
+  },
+  "game/src/mapPrompt.test.js": {
+    "mtime": 1792814788.0734847,
+    "seen": 1793499840.044241,
+    "ast_hash": "6c2271856464b801bbd271b7b2e0ebb3",
+    "semantic_hash": "6c2271856464b801bbd271b7b2e0ebb3"
+  },
+  "game/src/rarityFrames.test.js": {
+    "mtime": 1793209769.8521144,
+    "seen": 1793499840.0442438,
+    "ast_hash": "bfcecddb64b8f8ac0bbad8bbc1bbd66d",
+    "semantic_hash": "bfcecddb64b8f8ac0bbad8bbc1bbd66d"
+  },
+  "game/src/scenes/ClickerGame.js": {
+    "mtime": 1792427399.9184835,
+    "seen": 1793499840.0442464,
+    "ast_hash": "92b336cd2376417390b378a7c8d3477b",
+    "semantic_hash": "92b336cd2376417390b378a7c8d3477b"
+  },
+  "game/ui-review.config.js": {
+    "mtime": 1793448810.5179503,
+    "seen": 1793499840.044249,
+    "ast_hash": "2e80de48e557f714f4857f823bfeba80",
+    "semantic_hash": "2e80de48e557f714f4857f823bfeba80"
+  },
+  "game/ui-review/bulkSell.shots.js": {
+    "mtime": 1793452477.3362002,
+    "seen": 1793499840.0442522,
+    "ast_hash": "ea096416b0763f35f33be68fff99e0b4",
+    "semantic_hash": "ea096416b0763f35f33be68fff99e0b4"
+  },
+  "game/ui-review/heroAscension.shots.js": {
+    "mtime": 1793467668.6395147,
+    "seen": 1793499840.0442548,
+    "ast_hash": "1ae4debdcaa190fffed585320f2fc6b1",
+    "semantic_hash": "1ae4debdcaa190fffed585320f2fc6b1"
+  },
+  "game/ui-review/support/shots.js": {
+    "mtime": 1793448775.4210093,
+    "seen": 1793499840.044257,
+    "ast_hash": "4ae2ff7346c448734bbdba35a0eeac58",
+    "semantic_hash": "4ae2ff7346c448734bbdba35a0eeac58"
+  },
+  "game/vite.config.js": {
+    "mtime": 1793133657.1782193,
+    "seen": 1793499840.0442593,
+    "ast_hash": "5bd2fe78ba4995fb848901c799e1a1c3",
+    "semantic_hash": "5bd2fe78ba4995fb848901c799e1a1c3"
+  },
+  "game/vitest.config.js": {
+    "mtime": 1793133657.0119593,
+    "seen": 1793499840.0442617,
+    "ast_hash": "4c8a8df0e382476793e84f50f3ebf55a",
+    "semantic_hash": "4c8a8df0e382476793e84f50f3ebf55a"
+  },
+  "game/worker/index.js": {
+    "mtime": 1792271147.9856446,
+    "seen": 1793499840.044264,
+    "ast_hash": "ee6991fbae164ee92f956ee5d3e5fa0c",
+    "semantic_hash": "ee6991fbae164ee92f956ee5d3e5fa0c"
+  },
+  "publish.sh": {
+    "mtime": 1793177724.4275668,
+    "seen": 1793499840.044267,
+    "ast_hash": "bcb30e6455d04996981cac870860885a",
+    "semantic_hash": "bcb30e6455d04996981cac870860885a"
+  },
+  "skills-lock.json": {
+    "mtime": 1792237346.194328,
+    "seen": 1793499840.0442698,
+    "ast_hash": "3435a22c73365bb456dda4d32fbef75f",
+    "semantic_hash": "3435a22c73365bb456dda4d32fbef75f"
+  },
+  "start.sh": {
+    "mtime": 1792241066.9020176,
+    "seen": 1793499840.0442727,
+    "ast_hash": "135060ec177adf3826471044ea0ea171",
+    "semantic_hash": "135060ec177adf3826471044ea0ea171"
+  },
+  ".claude/agents/game-dev.md": {
+    "mtime": 1793391121.117086,
+    "seen": 1793499840.0442755,
+    "ast_hash": "d88625ed02b48d93b77ae14d3c1f1438",
+    "semantic_hash": "d88625ed02b48d93b77ae14d3c1f1438"
+  },
+  ".claude/agents/gitops.md": {
+    "mtime": 1793322500.0090568,
+    "seen": 1793499840.0442777,
+    "ast_hash": "e9c5db6ca3199bb6193e6cd68a09e4ff",
+    "semantic_hash": "e9c5db6ca3199bb6193e6cd68a09e4ff"
+  },
+  ".claude/agents/kotlin-backend-dev.md": {
+    "mtime": 1793322475.1360333,
+    "seen": 1793499840.0442805,
+    "ast_hash": "61aea41aacf531d08a09d87a2ff54c88",
+    "semantic_hash": "61aea41aacf531d08a09d87a2ff54c88"
+  },
+  ".claude/agents/product-owner.md": {
+    "mtime": 1793391125.137724,
+    "seen": 1793499840.0442832,
+    "ast_hash": "0c5ca9f487d87181dd155e8131781ba0",
+    "semantic_hash": "0c5ca9f487d87181dd155e8131781ba0"
+  },
+  ".claude/agents/test-engineer.md": {
+    "mtime": 1793322486.474139,
+    "seen": 1793499840.0442858,
+    "ast_hash": "39b4447af57b57b9c361dba6a194edfc",
+    "semantic_hash": "39b4447af57b57b9c361dba6a194edfc"
+  },
+  ".claude/agents/ui-artist.md": {
+    "mtime": 1793449039.3640614,
+    "seen": 1793499840.0442882,
+    "ast_hash": "d23cfba014e67b3820c9e744cf82b068",
+    "semantic_hash": "d23cfba014e67b3820c9e744cf82b068"
+  },
+  ".claude/skills/tlc-spec-driven/SKILL.md": {
+    "mtime": 1792237344.3712685,
+    "seen": 1793499840.0442908,
+    "ast_hash": "2bbb2f59a383737851cf77a44e2168a3",
+    "semantic_hash": "2bbb2f59a383737851cf77a44e2168a3"
+  },
+  ".claude/skills/tlc-spec-driven/references/code-analysis.md": {
+    "mtime": 1792237344.3722684,
+    "seen": 1793499840.0442934,
+    "ast_hash": "315766b8b5478a7946bcc7b940bcb69d",
+    "semantic_hash": "315766b8b5478a7946bcc7b940bcb69d"
+  },
+  ".claude/skills/tlc-spec-driven/references/coding-principles.md": {
+    "mtime": 1792237344.3722684,
+    "seen": 1793499840.0442958,
+    "ast_hash": "82cc7ec53cae98f48711079f90279968",
+    "semantic_hash": "82cc7ec53cae98f48711079f90279968"
+  },
+  ".claude/skills/tlc-spec-driven/references/context-limits.md": {
+    "mtime": 1792237344.37327,
+    "seen": 1793499840.0442977,
+    "ast_hash": "99329520fb495873de5791154a2a472d",
+    "semantic_hash": "99329520fb495873de5791154a2a472d"
+  },
+  ".claude/skills/tlc-spec-driven/references/design.md": {
+    "mtime": 1792237344.37327,
+    "seen": 1793499840.0442998,
+    "ast_hash": "249d98d9411581aee4a5446aaaaf2f7f",
+    "semantic_hash": "249d98d9411581aee4a5446aaaaf2f7f"
+  },
+  ".claude/skills/tlc-spec-driven/references/discuss.md": {
+    "mtime": 1792237344.3742683,
+    "seen": 1793499840.0443015,
+    "ast_hash": "b34474b26848952784535ebf9f575bad",
+    "semantic_hash": "b34474b26848952784535ebf9f575bad"
+  },
+  ".claude/skills/tlc-spec-driven/references/implement.md": {
+    "mtime": 1792237344.3742683,
+    "seen": 1793499840.0443037,
+    "ast_hash": "805eedf17a016cc0f7f02c7c37aec1b4",
+    "semantic_hash": "805eedf17a016cc0f7f02c7c37aec1b4"
+  },
+  ".claude/skills/tlc-spec-driven/references/lessons.md": {
+    "mtime": 1792237344.3752687,
+    "seen": 1793499840.0443048,
+    "ast_hash": "84fa19bec4ec18ef743e1c40506b622f",
+    "semantic_hash": "84fa19bec4ec18ef743e1c40506b622f"
+  },
+  ".claude/skills/tlc-spec-driven/references/memory.md": {
+    "mtime": 1792237344.3752687,
+    "seen": 1793499840.0443072,
+    "ast_hash": "d9a37f5060b8448998e6293acaf2803e",
+    "semantic_hash": "d9a37f5060b8448998e6293acaf2803e"
+  },
+  ".claude/skills/tlc-spec-driven/references/specify.md": {
+    "mtime": 1792237344.3762693,
+    "seen": 1793499840.0443103,
+    "ast_hash": "28443b4faead0e4d1243bff1865cf1a8",
+    "semantic_hash": "28443b4faead0e4d1243bff1865cf1a8"
+  },
+  ".claude/skills/tlc-spec-driven/references/sub-agents.md": {
+    "mtime": 1792237344.3767736,
+    "seen": 1793499840.0443127,
+    "ast_hash": "4aa4dfed00c359dc46c63c30a9d0ac22",
+    "semantic_hash": "4aa4dfed00c359dc46c63c30a9d0ac22"
+  },
+  ".claude/skills/tlc-spec-driven/references/tasks.md": {
+    "mtime": 1792237344.3767736,
+    "seen": 1793499840.0443156,
+    "ast_hash": "acd9fb73c6f5ceb28fd89a4674aa5041",
+    "semantic_hash": "acd9fb73c6f5ceb28fd89a4674aa5041"
+  },
+  ".claude/skills/tlc-spec-driven/references/validate.md": {
+    "mtime": 1792237344.3777769,
+    "seen": 1793499840.0443182,
+    "ast_hash": "3266b8bcc61b560a05d49f6b73bff6b0",
+    "semantic_hash": "3266b8bcc61b560a05d49f6b73bff6b0"
+  },
+  ".claude/templates/ui-review.html": {
+    "mtime": 1793448727.1512413,
+    "seen": 1793499840.0443208,
+    "ast_hash": "ed902f4366f40cd89ff7cc84438d64f5",
+    "semantic_hash": "ed902f4366f40cd89ff7cc84438d64f5"
+  },
+  ".specs/LESSONS.md": {
+    "mtime": 1793469080.300187,
+    "seen": 1793499840.0443227,
+    "ast_hash": "4dd810a1d98ef3ac6f15f137f4ec4636",
+    "semantic_hash": "4dd810a1d98ef3ac6f15f137f4ec4636"
+  },
+  ".specs/STATE.md": {
+    "mtime": 1793483404.752379,
+    "seen": 1793499840.0443249,
+    "ast_hash": "0a12800bc038c38821c8b22d5b0085af",
+    "semantic_hash": "0a12800bc038c38821c8b22d5b0085af"
+  },
+  ".specs/features/account-reset/design.md": {
+    "mtime": 1793130480.0908456,
+    "seen": 1793499840.0443258,
+    "ast_hash": "a6e149f283e307f839f244033eedde6d",
+    "semantic_hash": "a6e149f283e307f839f244033eedde6d"
+  },
+  ".specs/features/account-reset/report.html": {
+    "mtime": 1793133502.2374096,
+    "seen": 1793499840.0443273,
+    "ast_hash": "ab079b365be0fc0710e7d464e9fb6b2d",
+    "semantic_hash": "ab079b365be0fc0710e7d464e9fb6b2d"
+  },
+  ".specs/features/account-reset/spec.md": {
+    "mtime": 1793133442.6253762,
+    "seen": 1793499840.0443285,
+    "ast_hash": "a2f54db15c121a520ee903521f47d6c4",
+    "semantic_hash": "a2f54db15c121a520ee903521f47d6c4"
+  },
+  ".specs/features/account-reset/tasks.md": {
+    "mtime": 1793133442.6632292,
+    "seen": 1793499840.04433,
+    "ast_hash": "6034b186686fa7d340ad73fdca05ad95",
+    "semantic_hash": "6034b186686fa7d340ad73fdca05ad95"
+  },
+  ".specs/features/account-reset/validation.md": {
+    "mtime": 1793133404.713091,
+    "seen": 1793499840.0443313,
+    "ast_hash": "b5a5261ae9f866c85c280bc51f5a9b07",
+    "semantic_hash": "b5a5261ae9f866c85c280bc51f5a9b07"
+  },
+  ".specs/features/auto-click/design.md": {
+    "mtime": 1793095632.1025515,
+    "seen": 1793499840.0443323,
+    "ast_hash": "c5c226bc71a7677c47a6af050c2a01e2",
+    "semantic_hash": "c5c226bc71a7677c47a6af050c2a01e2"
+  },
+  ".specs/features/auto-click/spec.md": {
+    "mtime": 1793102387.937297,
+    "seen": 1793499840.0443342,
+    "ast_hash": "5fc0dcadf6fdc82aac85c92b0cd404ca",
+    "semantic_hash": "5fc0dcadf6fdc82aac85c92b0cd404ca"
+  },
+  ".specs/features/auto-click/tasks.md": {
+    "mtime": 1793101612.833264,
+    "seen": 1793499840.0443363,
+    "ast_hash": "44c7834f0401dd3c7fdb0f619d62cfd0",
+    "semantic_hash": "44c7834f0401dd3c7fdb0f619d62cfd0"
+  },
+  ".specs/features/auto-click/validation.md": {
+    "mtime": 1793102343.2584677,
+    "seen": 1793499840.0443392,
+    "ast_hash": "8c77a09d8ddcd846023497d26a64548b",
+    "semantic_hash": "8c77a09d8ddcd846023497d26a64548b"
+  },
+  ".specs/features/background-fight/spec.md": {
+    "mtime": 1793314923.8670669,
+    "seen": 1793499840.044342,
+    "ast_hash": "0c9807b02766cef0243d94c356425e83",
+    "semantic_hash": "0c9807b02766cef0243d94c356425e83"
+  },
+  ".specs/features/blue-green-deploy/design.md": {
+    "mtime": 1793180917.6683428,
+    "seen": 1793499840.044344,
+    "ast_hash": "ff32a28d47926427a544beded2c53fc9",
+    "semantic_hash": "ff32a28d47926427a544beded2c53fc9"
+  },
+  ".specs/features/blue-green-deploy/report.html": {
+    "mtime": 1793181171.7557054,
+    "seen": 1793499840.0443463,
+    "ast_hash": "f2cf95f6fa4f1b5325cf461e9614c65c",
+    "semantic_hash": "f2cf95f6fa4f1b5325cf461e9614c65c"
+  },
+  ".specs/features/blue-green-deploy/spec.md": {
+    "mtime": 1793180922.9104967,
+    "seen": 1793499840.0443485,
+    "ast_hash": "2dbbe0cf405c28d62726c6707bb3d1b3",
+    "semantic_hash": "2dbbe0cf405c28d62726c6707bb3d1b3"
+  },
+  ".specs/features/blue-green-deploy/tasks.md": {
+    "mtime": 1793180917.5894375,
+    "seen": 1793499840.0443501,
+    "ast_hash": "41e54259e9eacca122d9ec149f71409e",
+    "semantic_hash": "41e54259e9eacca122d9ec149f71409e"
+  },
+  ".specs/features/blue-green-deploy/validation.md": {
+    "mtime": 1793180882.0709121,
+    "seen": 1793499840.044352,
+    "ast_hash": "9258847830edb1d12ca9d6a5cd8f7a8a",
+    "semantic_hash": "9258847830edb1d12ca9d6a5cd8f7a8a"
+  },
+  ".specs/features/boss-map/report.html": {
+    "mtime": 1793212402.9291594,
+    "seen": 1793499840.044354,
+    "ast_hash": "3ce11a398a6c4f17826baafe2a26309a",
+    "semantic_hash": "3ce11a398a6c4f17826baafe2a26309a"
+  },
+  ".specs/features/boss-map/spec.md": {
+    "mtime": 1793210876.3024294,
+    "seen": 1793499840.0443559,
+    "ast_hash": "fd6f32b772455f660c332c7b6c7628fa",
+    "semantic_hash": "fd6f32b772455f660c332c7b6c7628fa"
+  },
+  ".specs/features/boss-map/tasks.md": {
+    "mtime": 1793210876.3024294,
+    "seen": 1793499840.0443583,
+    "ast_hash": "0326c5d663773dd7dcca19a4b222f865",
+    "semantic_hash": "0326c5d663773dd7dcca19a4b222f865"
+  },
+  ".specs/features/boss-map/validation.md": {
+    "mtime": 1793210875.7787435,
+    "seen": 1793499840.0443609,
+    "ast_hash": "e94f4f488ce49ed9b5f9b20c8fa23db6",
+    "semantic_hash": "e94f4f488ce49ed9b5f9b20c8fa23db6"
+  },
+  ".specs/features/bulk-sell/design.md": {
+    "mtime": 1793451665.1336708,
+    "seen": 1793499840.0443635,
+    "ast_hash": "2d731d90698f6185f09ac03c77222d3c",
+    "semantic_hash": "2d731d90698f6185f09ac03c77222d3c"
+  },
+  ".specs/features/bulk-sell/report.html": {
+    "mtime": 1793473467.2340758,
+    "seen": 1793499840.0443666,
+    "ast_hash": "1aa8218633d69f90cef123eb78a654c5",
+    "semantic_hash": "1aa8218633d69f90cef123eb78a654c5"
+  },
+  ".specs/features/bulk-sell/spec.md": {
+    "mtime": 1793471569.0515177,
+    "seen": 1793499840.0443692,
+    "ast_hash": "d1ed8f1758550cb0605fd327f117a584",
+    "semantic_hash": "d1ed8f1758550cb0605fd327f117a584"
+  },
+  ".specs/features/bulk-sell/tasks.md": {
+    "mtime": 1793467881.587065,
+    "seen": 1793499840.0443711,
+    "ast_hash": "0645036f7936c35f709fe8c02908c6bd",
+    "semantic_hash": "0645036f7936c35f709fe8c02908c6bd"
+  },
+  ".specs/features/bulk-sell/ui-review.html": {
+    "mtime": 1793452583.486555,
+    "seen": 1793499840.0443738,
+    "ast_hash": "1a382614c880ecfb7ab45b66191b0adf",
+    "semantic_hash": "1a382614c880ecfb7ab45b66191b0adf"
+  },
+  ".specs/features/bulk-sell/validation.md": {
+    "mtime": 1793469083.0950015,
+    "seen": 1793499840.0443766,
+    "ast_hash": "9ea3faa9bffaf363516f58489a1cda0e",
+    "semantic_hash": "9ea3faa9bffaf363516f58489a1cda0e"
+  },
+  ".specs/features/campaign-chapters/design.md": {
+    "mtime": 1793405182.4019709,
+    "seen": 1793499840.0443792,
+    "ast_hash": "7656c063811bd931fbf40c587bfa897c",
+    "semantic_hash": "7656c063811bd931fbf40c587bfa897c"
+  },
+  ".specs/features/campaign-chapters/spec.md": {
+    "mtime": 1793405492.858543,
+    "seen": 1793499840.0443814,
+    "ast_hash": "e723da0ee472421edecdf7594489d928",
+    "semantic_hash": "e723da0ee472421edecdf7594489d928"
+  },
+  ".specs/features/campaign-chapters/tasks.md": {
+    "mtime": 1793405477.9160144,
+    "seen": 1793499840.0443838,
+    "ast_hash": "5af359affcb81e4b9eaaf95ec9268688",
+    "semantic_hash": "5af359affcb81e4b9eaaf95ec9268688"
+  },
+  ".specs/features/characters/design.md": {
+    "mtime": 1792319205.8709924,
+    "seen": 1793499840.0443861,
+    "ast_hash": "1d85d7210af36fefd420f4ba8585c536",
+    "semantic_hash": "1d85d7210af36fefd420f4ba8585c536"
+  },
+  ".specs/features/characters/spec.md": {
+    "mtime": 1792325416.5693216,
+    "seen": 1793499840.0443885,
+    "ast_hash": "fb27c4fb2abd22c601f9702cdcfdb9f0",
+    "semantic_hash": "fb27c4fb2abd22c601f9702cdcfdb9f0"
+  },
+  ".specs/features/characters/tasks.md": {
+    "mtime": 1792325416.5668192,
+    "seen": 1793499840.044391,
+    "ast_hash": "c6cb62f63cb34ec1b01037bb21962e0d",
+    "semantic_hash": "c6cb62f63cb34ec1b01037bb21962e0d"
+  },
+  ".specs/features/characters/validation.md": {
+    "mtime": 1792325382.402912,
+    "seen": 1793499840.0443938,
+    "ast_hash": "9d34efd09c694bca373cdb7d8bf4386b",
+    "semantic_hash": "9d34efd09c694bca373cdb7d8bf4386b"
+  },
+  ".specs/features/click-power/spec.md": {
+    "mtime": 1792608129.798541,
+    "seen": 1793499840.0443964,
+    "ast_hash": "11192f3f29d48e7ac5ddfb68231408b8",
+    "semantic_hash": "11192f3f29d48e7ac5ddfb68231408b8"
+  },
+  ".specs/features/click-power/validation.md": {
+    "mtime": 1792608117.2153292,
+    "seen": 1793499840.0443988,
+    "ast_hash": "22fc2cfb66aa98d260d8f6147acbbe45",
+    "semantic_hash": "22fc2cfb66aa98d260d8f6147acbbe45"
+  },
+  ".specs/features/clicker-combat/spec.md": {
+    "mtime": 1792251396.7036197,
+    "seen": 1793499840.0444014,
+    "ast_hash": "62863aab99c76ef9437ed39b1244cbcb",
+    "semantic_hash": "62863aab99c76ef9437ed39b1244cbcb"
+  },
+  ".specs/features/clicker-combat/validation.md": {
+    "mtime": 1792251573.3472562,
+    "seen": 1793499840.044404,
+    "ast_hash": "61201e3264f36b7f319611312d9b8f0e",
+    "semantic_hash": "61201e3264f36b7f319611312d9b8f0e"
+  },
+  ".specs/features/combat-hud/spec.md": {
+    "mtime": 1792606175.5504813,
+    "seen": 1793499840.0444062,
+    "ast_hash": "fb7c3c0c20ed66a697077e2cfa7fe097",
+    "semantic_hash": "fb7c3c0c20ed66a697077e2cfa7fe097"
+  },
+  ".specs/features/combat-hud/validation.md": {
+    "mtime": 1792606163.184095,
+    "seen": 1793499840.0444086,
+    "ast_hash": "9c31aac17f89604ec29928e9b6d79413",
+    "semantic_hash": "9c31aac17f89604ec29928e9b6d79413"
+  },
+  ".specs/features/drops/design.md": {
+    "mtime": 1792256069.0486283,
+    "seen": 1793499840.0444114,
+    "ast_hash": "e70eb7da364b46b2656173c9c50e8df3",
+    "semantic_hash": "e70eb7da364b46b2656173c9c50e8df3"
+  },
+  ".specs/features/drops/spec.md": {
+    "mtime": 1792257634.907948,
+    "seen": 1793499840.0444143,
+    "ast_hash": "cb2754c328681b53f18703b97212199f",
+    "semantic_hash": "cb2754c328681b53f18703b97212199f"
+  },
+  ".specs/features/drops/tasks.md": {
+    "mtime": 1792257319.9473464,
+    "seen": 1793499840.0444171,
+    "ast_hash": "a88fb2e4e516c8d9f1ccc17e0297b956",
+    "semantic_hash": "a88fb2e4e516c8d9f1ccc17e0297b956"
+  },
+  ".specs/features/drops/validation.md": {
+    "mtime": 1792257631.8187726,
+    "seen": 1793499840.0444198,
+    "ast_hash": "b3c8303a9115abac3fb232903cabac12",
+    "semantic_hash": "b3c8303a9115abac3fb232903cabac12"
+  },
+  ".specs/features/elements/design.md": {
+    "mtime": 1792287239.2812734,
+    "seen": 1793499840.0444229,
+    "ast_hash": "a42d23402c13c22e03207d59f0343c96",
+    "semantic_hash": "a42d23402c13c22e03207d59f0343c96"
+  },
+  ".specs/features/elements/spec.md": {
+    "mtime": 1792287083.2706957,
+    "seen": 1793499840.0444255,
+    "ast_hash": "2f5bb02c63a7484af8dfbe3d5f66993a",
+    "semantic_hash": "2f5bb02c63a7484af8dfbe3d5f66993a"
+  },
+  ".specs/features/elements/tasks.md": {
+    "mtime": 1792287944.7862961,
+    "seen": 1793499840.0444276,
+    "ast_hash": "bad627200d70905bebe3a472462b7a24",
+    "semantic_hash": "bad627200d70905bebe3a472462b7a24"
+  },
+  ".specs/features/elements/validation.md": {
+    "mtime": 1792288628.4374344,
+    "seen": 1793499840.0444303,
+    "ast_hash": "8d480e1a9867a2c2bc119f949991e601",
+    "semantic_hash": "8d480e1a9867a2c2bc119f949991e601"
+  },
+  ".specs/features/equipment-ui/report.html": {
+    "mtime": 1793212402.9947863,
+    "seen": 1793499840.0444334,
+    "ast_hash": "db0e9f7454beb12997d3bd681fd0d822",
+    "semantic_hash": "db0e9f7454beb12997d3bd681fd0d822"
+  },
+  ".specs/features/equipment-ui/spec.md": {
+    "mtime": 1793210581.0540025,
+    "seen": 1793499840.0444355,
+    "ast_hash": "3d13298de42ae5be592f85a2ba496dd3",
+    "semantic_hash": "3d13298de42ae5be592f85a2ba496dd3"
+  },
+  ".specs/features/equipment-ui/tasks.md": {
+    "mtime": 1793210581.1037326,
+    "seen": 1793499840.0444376,
+    "ast_hash": "3665e5ccb1121954c34f7ca6f4355ac1",
+    "semantic_hash": "3665e5ccb1121954c34f7ca6f4355ac1"
+  },
+  ".specs/features/equipment-ui/validation.md": {
+    "mtime": 1793210557.5226648,
+    "seen": 1793499840.04444,
+    "ast_hash": "de43326a3e45dec2e5898ef60371845d",
+    "semantic_hash": "de43326a3e45dec2e5898ef60371845d"
+  },
+  ".specs/features/equipment/design.md": {
+    "mtime": 1792352661.6744244,
+    "seen": 1793499840.0444424,
+    "ast_hash": "7bdd12698ef16491b61357cea03c0b62",
+    "semantic_hash": "7bdd12698ef16491b61357cea03c0b62"
+  },
+  ".specs/features/equipment/spec.md": {
+    "mtime": 1792707001.5814915,
+    "seen": 1793499840.0444443,
+    "ast_hash": "85ec5016a9806a54fef1e9e47b84abff",
+    "semantic_hash": "85ec5016a9806a54fef1e9e47b84abff"
+  },
+  ".specs/features/equipment/tasks.md": {
+    "mtime": 1792355301.347644,
+    "seen": 1793499840.0444462,
+    "ast_hash": "002899d9a19e38d72eb5168c324bd94d",
+    "semantic_hash": "002899d9a19e38d72eb5168c324bd94d"
+  },
+  ".specs/features/equipment/validation.md": {
+    "mtime": 1792355622.1982088,
+    "seen": 1793499840.0444481,
+    "ast_hash": "705073c79feed0b13a2841731a14fd11",
+    "semantic_hash": "705073c79feed0b13a2841731a14fd11"
+  },
+  ".specs/features/hero-ascension/design.md": {
+    "mtime": 1793447706.6470728,
+    "seen": 1793499840.0444503,
+    "ast_hash": "3afa2d84f0d658975968d745004c0e2f",
+    "semantic_hash": "3afa2d84f0d658975968d745004c0e2f"
+  },
+  ".specs/features/hero-ascension/spec.md": {
+    "mtime": 1793447649.4637306,
+    "seen": 1793499840.0444531,
+    "ast_hash": "880eb19eff3e0fe22b75c6e31eaa32e3",
+    "semantic_hash": "880eb19eff3e0fe22b75c6e31eaa32e3"
+  },
+  ".specs/features/hero-ascension/tasks.md": {
+    "mtime": 1793467966.2581964,
+    "seen": 1793499840.0444562,
+    "ast_hash": "488270d01f1a35952c62b98f310aa40e",
+    "semantic_hash": "488270d01f1a35952c62b98f310aa40e"
+  },
+  ".specs/features/hero-ascension/ui-review.html": {
+    "mtime": 1793467958.53768,
+    "seen": 1793499840.0444584,
+    "ast_hash": "cf2f8709984fe874052c9ae72913b0b6",
+    "semantic_hash": "cf2f8709984fe874052c9ae72913b0b6"
+  },
+  ".specs/features/hero-skills/context.md": {
+    "mtime": 1792515383.4726853,
+    "seen": 1793499840.0444717,
+    "ast_hash": "1a4b05c540ebb7b0dd49822983640119",
+    "semantic_hash": "1a4b05c540ebb7b0dd49822983640119"
+  },
+  ".specs/features/hero-skills/design.md": {
+    "mtime": 1792569807.6113791,
+    "seen": 1793499840.0444746,
+    "ast_hash": "af32c2786be5c1f1a1d5c05532958eb1",
+    "semantic_hash": "af32c2786be5c1f1a1d5c05532958eb1"
+  },
+  ".specs/features/hero-skills/spec.md": {
+    "mtime": 1792571926.9649649,
+    "seen": 1793499840.044477,
+    "ast_hash": "ce9f088e3f1265cdb5be9b19200663dd",
+    "semantic_hash": "ce9f088e3f1265cdb5be9b19200663dd"
+  },
+  ".specs/features/hero-skills/tasks.md": {
+    "mtime": 1792571926.965966,
+    "seen": 1793499840.0444798,
+    "ast_hash": "7884302eb061b8e4bdf9dcffcbd16a19",
+    "semantic_hash": "7884302eb061b8e4bdf9dcffcbd16a19"
+  },
+  ".specs/features/hero-skills/validation.md": {
+    "mtime": 1792573137.3439214,
+    "seen": 1793499840.0444822,
+    "ast_hash": "b64f50390144dfb99c3c3da57872292a",
+    "semantic_hash": "b64f50390144dfb99c3c3da57872292a"
+  },
+  ".specs/features/hero-team/spec.md": {
+    "mtime": 1793448049.2571182,
+    "seen": 1793499840.0444846,
+    "ast_hash": "13df932c5633661270180db053e48bba",
+    "semantic_hash": "13df932c5633661270180db053e48bba"
+  },
+  ".specs/features/miniboss-adds/spec.md": {
+    "mtime": 1793405081.213184,
+    "seen": 1793499840.0444872,
+    "ast_hash": "9184874dc046b490cc6d08616e8df6ba",
+    "semantic_hash": "9184874dc046b490cc6d08616e8df6ba"
+  },
+  ".specs/features/monster-death/spec.md": {
+    "mtime": 1792252186.6089628,
+    "seen": 1793499840.0444896,
+    "ast_hash": "60bfcc1d96f2b0179974854c0bc54469",
+    "semantic_hash": "60bfcc1d96f2b0179974854c0bc54469"
+  },
+  ".specs/features/monster-death/validation.md": {
+    "mtime": 1792252173.782451,
+    "seen": 1793499840.044492,
+    "ast_hash": "ed065df09f9b451c72cbd923f2375237",
+    "semantic_hash": "ed065df09f9b451c72cbd923f2375237"
+  },
+  ".specs/features/normalized-schema/context.md": {
+    "mtime": 1792445920.6918,
+    "seen": 1793499840.0444946,
+    "ast_hash": "4d4f24e8f00ed85b28ee213b9260580d",
+    "semantic_hash": "4d4f24e8f00ed85b28ee213b9260580d"
+  },
+  ".specs/features/normalized-schema/design.md": {
+    "mtime": 1792447714.578215,
+    "seen": 1793499840.044497,
+    "ast_hash": "ba92260cfc1faa567d417a72b025c97f",
+    "semantic_hash": "ba92260cfc1faa567d417a72b025c97f"
+  },
+  ".specs/features/normalized-schema/spec.md": {
+    "mtime": 1792453892.0847008,
+    "seen": 1793499840.0444996,
+    "ast_hash": "828a3011271b37597bea8f5f24154f46",
+    "semantic_hash": "828a3011271b37597bea8f5f24154f46"
+  },
+  ".specs/features/normalized-schema/tasks.md": {
+    "mtime": 1792453892.082694,
+    "seen": 1793499840.0445025,
+    "ast_hash": "bfd24e1beaa4fa46a95954c24e66429d",
+    "semantic_hash": "bfd24e1beaa4fa46a95954c24e66429d"
+  },
+  ".specs/features/normalized-schema/validation.md": {
+    "mtime": 1792453867.392745,
+    "seen": 1793499840.0445051,
+    "ast_hash": "219d7ab6185982e4676d575715a29b9c",
+    "semantic_hash": "219d7ab6185982e4676d575715a29b9c"
+  },
+  ".specs/features/persistent-session/design.md": {
+    "mtime": 1792238693.9649098,
+    "seen": 1793499840.0445082,
+    "ast_hash": "c9dda48b639a9569cb347d4ae9050527",
+    "semantic_hash": "c9dda48b639a9569cb347d4ae9050527"
+  },
+  ".specs/features/persistent-session/spec.md": {
+    "mtime": 1792238114.485906,
+    "seen": 1793499840.0445116,
+    "ast_hash": "b5ef09d5bd547e6be506d4b8beae1280",
+    "semantic_hash": "b5ef09d5bd547e6be506d4b8beae1280"
+  },
+  ".specs/features/persistent-session/tasks.md": {
+    "mtime": 1792241198.1563838,
+    "seen": 1793499840.044514,
+    "ast_hash": "cdd5f5657a4f933e375cbab1f2a2212f",
+    "semantic_hash": "cdd5f5657a4f933e375cbab1f2a2212f"
+  },
+  ".specs/features/persistent-session/validation.md": {
+    "mtime": 1792245594.3442888,
+    "seen": 1793499840.0445166,
+    "ast_hash": "d56031eb2fa8c83b4ceb990f307d129f",
+    "semantic_hash": "d56031eb2fa8c83b4ceb990f307d129f"
+  },
+  ".specs/features/stages/design.md": {
+    "mtime": 1792266076.4091158,
+    "seen": 1793499840.0445194,
+    "ast_hash": "47f44a5cea6ae20386c62a6b0cd7b1cf",
+    "semantic_hash": "47f44a5cea6ae20386c62a6b0cd7b1cf"
+  },
+  ".specs/features/stages/spec.md": {
+    "mtime": 1792266076.4001133,
+    "seen": 1793499840.044522,
+    "ast_hash": "5c54c85c1c9e34dd5a0c144d600c9026",
+    "semantic_hash": "5c54c85c1c9e34dd5a0c144d600c9026"
+  },
+  ".specs/features/stages/tasks.md": {
+    "mtime": 1792266076.4091158,
+    "seen": 1793499840.0445235,
+    "ast_hash": "0a774eb12ef4314623e2fd8f5ea3d343",
+    "semantic_hash": "0a774eb12ef4314623e2fd8f5ea3d343"
+  },
+  ".specs/features/stages/validation.md": {
+    "mtime": 1792266058.6930974,
+    "seen": 1793499840.0445251,
+    "ast_hash": "e74670e7c41b94de2fe2b00b984db5b0",
+    "semantic_hash": "e74670e7c41b94de2fe2b00b984db5b0"
+  },
+  ".specs/features/talent-points/spec.md": {
+    "mtime": 1793209839.1283119,
+    "seen": 1793499840.0445282,
+    "ast_hash": "73a42d0be3eade9e1a2ceae141b40429",
+    "semantic_hash": "73a42d0be3eade9e1a2ceae141b40429"
+  },
+  ".specs/features/talent-points/tasks.md": {
+    "mtime": 1792672911.29871,
+    "seen": 1793499840.0445304,
+    "ast_hash": "8ea700452e7ec9e0a605b8b60d3b9836",
+    "semantic_hash": "8ea700452e7ec9e0a605b8b60d3b9836"
+  },
+  ".specs/features/talent-points/validation.md": {
+    "mtime": 1792674154.5198731,
+    "seen": 1793499840.044533,
+    "ast_hash": "aadede9e572a6043b4f99dac28b880ee",
+    "semantic_hash": "aadede9e572a6043b4f99dac28b880ee"
+  },
+  ".specs/features/talents/report.html": {
+    "mtime": 1793212402.9004836,
+    "seen": 1793499840.0445356,
+    "ast_hash": "d4656dd99200885745781d0cb683405d",
+    "semantic_hash": "d4656dd99200885745781d0cb683405d"
+  },
+  ".specs/features/talents/spec.md": {
+    "mtime": 1793212346.8283157,
+    "seen": 1793499840.0445383,
+    "ast_hash": "fbb46bb41cc1a78ec0c6879277506266",
+    "semantic_hash": "fbb46bb41cc1a78ec0c6879277506266"
+  },
+  ".specs/features/talents/tasks.md": {
+    "mtime": 1793212346.8373165,
+    "seen": 1793499840.0445411,
+    "ast_hash": "c4743a773686ee9292fc66adbb7faa36",
+    "semantic_hash": "c4743a773686ee9292fc66adbb7faa36"
+  },
+  ".specs/features/talents/validation.md": {
+    "mtime": 1793212338.1532593,
+    "seen": 1793499840.0445428,
+    "ast_hash": "df00dcddee92e9ba0b42b46aea2194ad",
+    "semantic_hash": "df00dcddee92e9ba0b42b46aea2194ad"
+  },
+  ".specs/features/unified-damage/design.md": {
+    "mtime": 1793483984.9479978,
+    "seen": 1793499840.044544,
+    "ast_hash": "b05cd95ce18dcb94d202bf146816e638",
+    "semantic_hash": "b05cd95ce18dcb94d202bf146816e638"
+  },
+  ".specs/features/unified-damage/spec.md": {
+    "mtime": 1793483251.7527144,
+    "seen": 1793499840.044545,
+    "ast_hash": "8a208db0e8b15b892b9295554b3af234",
+    "semantic_hash": "8a208db0e8b15b892b9295554b3af234"
+  },
+  ".specs/features/unified-damage/tasks.md": {
+    "mtime": 1793484004.7683914,
+    "seen": 1793499840.0445464,
+    "ast_hash": "514e7698a2bbff674ac5b8fc725b1dad",
+    "semantic_hash": "514e7698a2bbff674ac5b8fc725b1dad"
+  },
+  ".specs/features/wallet/design.md": {
+    "mtime": 1792255102.7818127,
+    "seen": 1793499840.0445473,
+    "ast_hash": "c9362a27d1664a200a56461ced030d48",
+    "semantic_hash": "c9362a27d1664a200a56461ced030d48"
+  },
+  ".specs/features/wallet/spec.md": {
+    "mtime": 1792256240.7483635,
+    "seen": 1793499840.0445485,
+    "ast_hash": "867d07f9337ded2bc7bb0994c8fc7aa6",
+    "semantic_hash": "867d07f9337ded2bc7bb0994c8fc7aa6"
+  },
+  ".specs/features/wallet/tasks.md": {
+    "mtime": 1792255842.2228923,
+    "seen": 1793499840.0445497,
+    "ast_hash": "fb2170a46fcc92dc1c92dbef092c39a1",
+    "semantic_hash": "fb2170a46fcc92dc1c92dbef092c39a1"
+  },
+  ".specs/features/wallet/validation.md": {
+    "mtime": 1792256238.6706638,
+    "seen": 1793499840.0445507,
+    "ast_hash": "54d6fab764b4d6e21058eb67e4414dac",
+    "semantic_hash": "54d6fab764b4d6e21058eb67e4414dac"
+  },
+  "CHANGELOG.md": {
+    "mtime": 1793472345.6853845,
+    "seen": 1793499840.0445518,
+    "ast_hash": "499b1dc1ff3ac92cad13e7d8f1e4fdd6",
+    "semantic_hash": "499b1dc1ff3ac92cad13e7d8f1e4fdd6"
+  },
+  "CLAUDE.md": {
+    "mtime": 1793449043.2759316,
+    "seen": 1793499840.0445535,
+    "ast_hash": "b92d1c916feea034d49fd58c5f390a10",
+    "semantic_hash": "b92d1c916feea034d49fd58c5f390a10"
+  },
+  "GEMINI.md": {
+    "mtime": 1792251939.0083523,
+    "seen": 1793499840.0445547,
+    "ast_hash": "b530613536af8e282c52f2bcc1a2f80d",
+    "semantic_hash": "b530613536af8e282c52f2bcc1a2f80d"
+  },
+  "PROMPTS_ASSETS.md": {
+    "mtime": 1792083072.467455,
+    "seen": 1793499840.0445557,
+    "ast_hash": "2f3df980f3b30b48b79cf230848771fa",
+    "semantic_hash": "2f3df980f3b30b48b79cf230848771fa"
+  },
+  "PROMPTS_ASSETS_UI.md": {
+    "mtime": 1793449106.5435417,
+    "seen": 1793499840.044558,
+    "ast_hash": "eb56c5cce754b42fe89857620fc48ef9",
+    "semantic_hash": "eb56c5cce754b42fe89857620fc48ef9"
+  },
+  "backend/docs/adr/0001-logging.md": {
+    "mtime": 1792231815.985123,
+    "seen": 1793499840.0445604,
+    "ast_hash": "b32a701839e70e5c92378deaed372b8b",
+    "semantic_hash": "b32a701839e70e5c92378deaed372b8b"
+  },
+  "backend/docs/adr/0002-testing.md": {
+    "mtime": 1792231817.0569317,
+    "seen": 1793499840.0445633,
+    "ast_hash": "46ab565948f4e38bfa87483c5bf10ec6",
+    "semantic_hash": "46ab565948f4e38bfa87483c5bf10ec6"
+  },
+  "backend/docs/adr/0003-exception-handling.md": {
+    "mtime": 1792231818.1185436,
+    "seen": 1793499840.0445652,
+    "ast_hash": "6123346a4ebfe48e1040012dc0e1b85e",
+    "semantic_hash": "6123346a4ebfe48e1040012dc0e1b85e"
+  },
+  "backend/docs/adr/0004-session-tokens.md": {
+    "mtime": 1792241089.5745425,
+    "seen": 1793499840.0445676,
+    "ast_hash": "9553f5cd552a639f1f1861fd08944553",
+    "semantic_hash": "9553f5cd552a639f1f1861fd08944553"
+  },
+  "backend/docs/adr/0005-wallet-drops.md": {
+    "mtime": 1792450156.4717023,
+    "seen": 1793499840.0445702,
+    "ast_hash": "89f8b6a9f4dfe1ae54857907d3459a22",
+    "semantic_hash": "89f8b6a9f4dfe1ae54857907d3459a22"
+  },
+  "backend/docs/adr/0006-stage-progress.md": {
+    "mtime": 1792450156.4727104,
+    "seen": 1793499840.0445724,
+    "ast_hash": "9ac3d27b256144ec07ad1e19e8fb2ef0",
+    "semantic_hash": "9ac3d27b256144ec07ad1e19e8fb2ef0"
+  },
+  "backend/docs/adr/0007-hero-cards.md": {
+    "mtime": 1792340530.279528,
+    "seen": 1793499840.044575,
+    "ast_hash": "9e3ccef7c07b92544b118497ef3a55dc",
+    "semantic_hash": "9e3ccef7c07b92544b118497ef3a55dc"
+  },
+  "backend/docs/adr/0008-equipment.md": {
+    "mtime": 1793447711.5516858,
+    "seen": 1793499840.044577,
+    "ast_hash": "b7f41c1e568a720f84e3f18a2f749ea1",
+    "semantic_hash": "b7f41c1e568a720f84e3f18a2f749ea1"
+  },
+  "backend/docs/adr/0009-normalized-schema.md": {
+    "mtime": 1792450144.0070167,
+    "seen": 1793499840.0445778,
+    "ast_hash": "24a8940da1c56a251c5a146fb44cfe04",
+    "semantic_hash": "24a8940da1c56a251c5a146fb44cfe04"
+  },
+  "backend/docs/adr/0010-talents.md": {
+    "mtime": 1792606233.830671,
+    "seen": 1793499840.044579,
+    "ast_hash": "eb0b4c82c3b03edbb5dc3392a3b24764",
+    "semantic_hash": "eb0b4c82c3b03edbb5dc3392a3b24764"
+  },
+  "backend/docs/adr/0011-talent-points.md": {
+    "mtime": 1792672574.0691087,
+    "seen": 1793499840.0445807,
+    "ast_hash": "40c1be5f8628b93999f4b339d0a9c8d9",
+    "semantic_hash": "40c1be5f8628b93999f4b339d0a9c8d9"
+  },
+  "backend/readme.md": {
+    "mtime": 1792450147.4927483,
+    "seen": 1793499840.0445817,
+    "ast_hash": "968d987bb94d1d5a1bf9b76caca2101d",
+    "semantic_hash": "968d987bb94d1d5a1bf9b76caca2101d"
+  },
+  "game/docs/adr/0001-http-client-and-api-layer.md": {
+    "mtime": 1792232676.1686552,
+    "seen": 1793499840.044583,
+    "ast_hash": "a1cbb6068118c677142824434bb0e94c",
+    "semantic_hash": "a1cbb6068118c677142824434bb0e94c"
+  },
+  "game/docs/adr/0002-environment-configuration.md": {
+    "mtime": 1792232676.197755,
+    "seen": 1793499840.0445843,
+    "ast_hash": "a22b2180030553bd0326416ce466bb31",
+    "semantic_hash": "a22b2180030553bd0326416ce466bb31"
+  },
+  "game/docs/adr/0003-authentication-ui-in-main-menu.md": {
+    "mtime": 1792241110.597635,
+    "seen": 1793499840.0445857,
+    "ast_hash": "4aacd3c2d2a354aa08559aa374c8d2bf",
+    "semantic_hash": "4aacd3c2d2a354aa08559aa374c8d2bf"
+  },
+  "game/docs/adr/0004-testing-strategy.md": {
+    "mtime": 1792235108.4903765,
+    "seen": 1793499840.044587,
+    "ast_hash": "1affbba02eeb754b0392cb130bb35fcb",
+    "semantic_hash": "1affbba02eeb754b0392cb130bb35fcb"
+  },
+  "game/docs/adr/0005-persistent-session.md": {
+    "mtime": 1792241110.4535487,
+    "seen": 1793499840.0445893,
+    "ast_hash": "4a0c6bea1fe1d6c59b03223388a8f78a",
+    "semantic_hash": "4a0c6bea1fe1d6c59b03223388a8f78a"
+  },
+  "game/docs/adr/0006-wallet-and-drops.md": {
+    "mtime": 1792257310.5830739,
+    "seen": 1793499840.0445917,
+    "ast_hash": "8a2a420518fde19020b6f7f97d868c52",
+    "semantic_hash": "8a2a420518fde19020b6f7f97d868c52"
+  },
+  "game/docs/adr/0007-modular-hexagonal-game.md": {
+    "mtime": 1792263148.3202026,
+    "seen": 1793499840.0445938,
+    "ast_hash": "3cd4add4cb653aa61115a779ef9f17ee",
+    "semantic_hash": "3cd4add4cb653aa61115a779ef9f17ee"
+  },
+  "game/docs/adr/0008-stages.md": {
+    "mtime": 1792265470.9666672,
+    "seen": 1793499840.044596,
+    "ast_hash": "b287f7d83fa30ba4782adc3679f84655",
+    "semantic_hash": "b287f7d83fa30ba4782adc3679f84655"
+  },
+  "game/docs/adr/0009-hero-cards.md": {
+    "mtime": 1792323286.5531888,
+    "seen": 1793499840.0445983,
+    "ast_hash": "93f0ad2ac1a3d5a72eb616aefecfe009",
+    "semantic_hash": "93f0ad2ac1a3d5a72eb616aefecfe009"
+  },
+  "game/docs/adr/0010-equipment.md": {
+    "mtime": 1792355286.1475854,
+    "seen": 1793499840.0446005,
+    "ast_hash": "3d6d3c896e1298fa4a08e85e29b871a2",
+    "semantic_hash": "3d6d3c896e1298fa4a08e85e29b871a2"
+  },
+  "game/index.html": {
+    "mtime": 1792334327.7017968,
+    "seen": 1793499840.0446029,
+    "ast_hash": "46ab52ed34bd4da06673d9271d04ab22",
+    "semantic_hash": "46ab52ed34bd4da06673d9271d04ab22"
+  },
+  "game/readme.md": {
+    "mtime": 1793177346.166119,
+    "seen": 1793499840.0446048,
+    "ast_hash": "4d59ab2bc1a1f33ed43f384001dc6b92",
+    "semantic_hash": "4d59ab2bc1a1f33ed43f384001dc6b92"
+  },
+  ".specs/features/bulk-sell/ui-review/01-bag-desktop.png": {
+    "mtime": 1793452501.2571373,
+    "seen": 1793499840.044607,
+    "ast_hash": "3b546a57f3fbb4f54b7b7bad4cc39f8e",
+    "semantic_hash": "3b546a57f3fbb4f54b7b7bad4cc39f8e"
+  },
+  ".specs/features/bulk-sell/ui-review/01-bag-phone.png": {
+    "mtime": 1793452501.2316883,
+    "seen": 1793499840.044609,
+    "ast_hash": "395ec8e17dcf7179717ab3e1a4bebb9a",
+    "semantic_hash": "395ec8e17dcf7179717ab3e1a4bebb9a"
+  },
+  ".specs/features/bulk-sell/ui-review/02-selection-empty-desktop.png": {
+    "mtime": 1793452502.4111936,
+    "seen": 1793499840.0446117,
+    "ast_hash": "54cff4b97732e7a389ab64d4b7051c9c",
+    "semantic_hash": "54cff4b97732e7a389ab64d4b7051c9c"
+  },
+  ".specs/features/bulk-sell/ui-review/02-selection-empty-phone.png": {
+    "mtime": 1793452502.5183427,
+    "seen": 1793499840.0446146,
+    "ast_hash": "a77e1a3ee8cee33b3ca7b4a39d06bc7f",
+    "semantic_hash": "a77e1a3ee8cee33b3ca7b4a39d06bc7f"
+  },
+  ".specs/features/bulk-sell/ui-review/03-selected-desktop.png": {
+    "mtime": 1793452504.6378515,
+    "seen": 1793499840.0446172,
+    "ast_hash": "60d090b528592eb4c40ec44891f7bcab",
+    "semantic_hash": "60d090b528592eb4c40ec44891f7bcab"
+  },
+  ".specs/features/bulk-sell/ui-review/03-selected-phone.png": {
+    "mtime": 1793452504.7019107,
+    "seen": 1793499840.0446196,
+    "ast_hash": "a8c3bc37ab0b14d415d63e3f8a303e7b",
+    "semantic_hash": "a8c3bc37ab0b14d415d63e3f8a303e7b"
+  },
+  ".specs/features/bulk-sell/ui-review/04-worn-locked-desktop.png": {
+    "mtime": 1793452505.3445446,
+    "seen": 1793499840.0446224,
+    "ast_hash": "b17c351ab02f0d566874f3c8c519ea8d",
+    "semantic_hash": "b17c351ab02f0d566874f3c8c519ea8d"
+  },
+  ".specs/features/bulk-sell/ui-review/04-worn-locked-phone.png": {
+    "mtime": 1793452505.5130694,
+    "seen": 1793499840.044625,
+    "ast_hash": "dafb3ce723db3d8f60b12d3902eee3cb",
+    "semantic_hash": "dafb3ce723db3d8f60b12d3902eee3cb"
+  },
+  ".specs/features/bulk-sell/ui-review/05-tooltip-desktop.png": {
+    "mtime": 1793452506.268572,
+    "seen": 1793499840.044628,
+    "ast_hash": "2e84120a66a4d16efd2df5a2b93437df",
+    "semantic_hash": "2e84120a66a4d16efd2df5a2b93437df"
+  },
+  ".specs/features/bulk-sell/ui-review/05-tooltip-phone.png": {
+    "mtime": 1793452506.6861646,
+    "seen": 1793499840.0446305,
+    "ast_hash": "5b6ca5fd82872e30b3511213bcf73249",
+    "semantic_hash": "5b6ca5fd82872e30b3511213bcf73249"
+  },
+  ".specs/features/bulk-sell/ui-review/06-rarity-pressed-desktop.png": {
+    "mtime": 1793452507.3401704,
+    "seen": 1793499840.0446332,
+    "ast_hash": "2395afd3cfe8138364627aedd118ef59",
+    "semantic_hash": "2395afd3cfe8138364627aedd118ef59"
+  },
+  ".specs/features/bulk-sell/ui-review/06-rarity-pressed-phone.png": {
+    "mtime": 1793452507.81711,
+    "seen": 1793499840.044636,
+    "ast_hash": "8f9ac27be312da0e094131b6df504754",
+    "semantic_hash": "8f9ac27be312da0e094131b6df504754"
+  },
+  ".specs/features/bulk-sell/ui-review/07-scrolled-desktop.png": {
+    "mtime": 1793452508.2563722,
+    "seen": 1793499840.0446384,
+    "ast_hash": "b71f120c008882e2ee37c685103264c3",
+    "semantic_hash": "b71f120c008882e2ee37c685103264c3"
+  },
+  ".specs/features/bulk-sell/ui-review/07-scrolled-phone.png": {
+    "mtime": 1793452508.825606,
+    "seen": 1793499840.0446413,
+    "ast_hash": "01334ff5fd60238dc8825828dfe7d2b9",
+    "semantic_hash": "01334ff5fd60238dc8825828dfe7d2b9"
+  },
+  ".specs/features/bulk-sell/ui-review/08-confirmation-desktop.png": {
+    "mtime": 1793452509.7059233,
+    "seen": 1793499840.0446434,
+    "ast_hash": "ef8b252839afde6f5cd1bf17c11c7aa6",
+    "semantic_hash": "ef8b252839afde6f5cd1bf17c11c7aa6"
+  },
+  ".specs/features/bulk-sell/ui-review/08-confirmation-phone.png": {
+    "mtime": 1793452510.339147,
+    "seen": 1793499840.044645,
+    "ast_hash": "f790063e0e7b4c08767fc2938ea6d424",
+    "semantic_hash": "f790063e0e7b4c08767fc2938ea6d424"
+  },
+  ".specs/features/bulk-sell/ui-review/09-success-desktop.png": {
+    "mtime": 1793452510.7997363,
+    "seen": 1793499840.0446477,
+    "ast_hash": "f51bcf2302e4e9265f62ee29ee4c0565",
+    "semantic_hash": "f51bcf2302e4e9265f62ee29ee4c0565"
+  },
+  ".specs/features/bulk-sell/ui-review/09-success-phone.png": {
+    "mtime": 1793452511.334534,
+    "seen": 1793499840.0446506,
+    "ast_hash": "b2929f85fd3db9d391fdcd3b5df8b9f9",
+    "semantic_hash": "b2929f85fd3db9d391fdcd3b5df8b9f9"
+  },
+  ".specs/features/hero-ascension/ui-review/11-skill-bar-3-desktop.png": {
+    "mtime": 1793467343.5239644,
+    "seen": 1793499840.0446527,
+    "ast_hash": "47d78225b269b3a0574264ed1ecdea30",
+    "semantic_hash": "47d78225b269b3a0574264ed1ecdea30"
+  },
+  ".specs/features/hero-ascension/ui-review/11-skill-bar-3-phone.png": {
+    "mtime": 1793467343.8321433,
+    "seen": 1793499840.0446553,
+    "ast_hash": "ea00d48d1f23465a02f6e40466585db1",
+    "semantic_hash": "ea00d48d1f23465a02f6e40466585db1"
+  },
+  ".specs/features/hero-ascension/ui-review/12-catalog-3-desktop.png": {
+    "mtime": 1793467344.928806,
+    "seen": 1793499840.0446582,
+    "ast_hash": "c5a38c1d1e5345de0ac5d15477e6f51d",
+    "semantic_hash": "c5a38c1d1e5345de0ac5d15477e6f51d"
+  },
+  ".specs/features/hero-ascension/ui-review/12-catalog-3-phone.png": {
+    "mtime": 1793467345.259706,
+    "seen": 1793499840.0446603,
+    "ast_hash": "8623f9438c43ee38e25233ac5bc5350c",
+    "semantic_hash": "8623f9438c43ee38e25233ac5bc5350c"
+  },
+  ".specs/features/hero-ascension/ui-review/13-detail-3-desktop.png": {
+    "mtime": 1793467346.4997976,
+    "seen": 1793499840.0446613,
+    "ast_hash": "7fc9eb4f5306b9708f682fcfb4939874",
+    "semantic_hash": "7fc9eb4f5306b9708f682fcfb4939874"
+  },
+  ".specs/features/hero-ascension/ui-review/13-detail-3-phone.png": {
+    "mtime": 1793467346.8171513,
+    "seen": 1793499840.044663,
+    "ast_hash": "d684e8fa40dad0c150d8893ed2e6e87b",
+    "semantic_hash": "d684e8fa40dad0c150d8893ed2e6e87b"
+  },
+  ".specs/features/hero-ascension/ui-review/21-skill-bar-5-desktop.png": {
+    "mtime": 1793467360.2684288,
+    "seen": 1793499840.0446649,
+    "ast_hash": "25e76a957e691aeab28c3f380bc762df",
+    "semantic_hash": "25e76a957e691aeab28c3f380bc762df"
+  },
+  ".specs/features/hero-ascension/ui-review/21-skill-bar-5-phone.png": {
+    "mtime": 1793467360.6285977,
+    "seen": 1793499840.0446675,
+    "ast_hash": "adff0e4e6267da6cb83aaab62ef718e0",
+    "semantic_hash": "adff0e4e6267da6cb83aaab62ef718e0"
+  },
+  ".specs/features/hero-ascension/ui-review/22-catalog-5-desktop.png": {
+    "mtime": 1793467361.4993753,
+    "seen": 1793499840.04467,
+    "ast_hash": "9e0fb3b0384bbbf86f10a1e1c7108353",
+    "semantic_hash": "9e0fb3b0384bbbf86f10a1e1c7108353"
+  },
+  ".specs/features/hero-ascension/ui-review/22-catalog-5-phone.png": {
+    "mtime": 1793467361.8715825,
+    "seen": 1793499840.0446727,
+    "ast_hash": "9d5b2898437f66c47d0f35a535310a2a",
+    "semantic_hash": "9d5b2898437f66c47d0f35a535310a2a"
+  },
+  ".specs/features/hero-ascension/ui-review/23-detail-5-desktop.png": {
+    "mtime": 1793467362.701721,
+    "seen": 1793499840.0446744,
+    "ast_hash": "4990ba42f548d40fe724001bc72f15a8",
+    "semantic_hash": "4990ba42f548d40fe724001bc72f15a8"
+  },
+  ".specs/features/hero-ascension/ui-review/23-detail-5-phone.png": {
+    "mtime": 1793467363.194042,
+    "seen": 1793499840.0446756,
+    "ast_hash": "2293664055e9e45790eaedd5fd930380",
+    "semantic_hash": "2293664055e9e45790eaedd5fd930380"
+  },
+  ".specs/features/hero-ascension/ui-review/31-skill-bar-8-desktop.png": {
+    "mtime": 1793467374.9596548,
+    "seen": 1793499840.0446765,
+    "ast_hash": "be1a571ec47eac5a71bd78b78245d5c6",
+    "semantic_hash": "be1a571ec47eac5a71bd78b78245d5c6"
+  },
+  ".specs/features/hero-ascension/ui-review/31-skill-bar-8-phone.png": {
+    "mtime": 1793467375.5053902,
+    "seen": 1793499840.0446784,
+    "ast_hash": "640fd043671dc915d6f02ac77dce41be",
+    "semantic_hash": "640fd043671dc915d6f02ac77dce41be"
+  },
+  ".specs/features/hero-ascension/ui-review/32-catalog-8-desktop.png": {
+    "mtime": 1793467376.3644059,
+    "seen": 1793499840.0446799,
+    "ast_hash": "09bdb8d510480a05802bbf131d9c9d6d",
+    "semantic_hash": "09bdb8d510480a05802bbf131d9c9d6d"
+  },
+  ".specs/features/hero-ascension/ui-review/32-catalog-8-phone.png": {
+    "mtime": 1793467377.0041068,
+    "seen": 1793499840.0446813,
+    "ast_hash": "652d20368d10cb0dc1641448fc411401",
+    "semantic_hash": "652d20368d10cb0dc1641448fc411401"
+  },
+  ".specs/features/hero-ascension/ui-review/33-detail-8-desktop.png": {
+    "mtime": 1793467377.6160471,
+    "seen": 1793499840.0446825,
+    "ast_hash": "167a261105a82d45916ebddd9448f3d5",
+    "semantic_hash": "167a261105a82d45916ebddd9448f3d5"
+  },
+  ".specs/features/hero-ascension/ui-review/33-detail-8-phone.png": {
+    "mtime": 1793467378.2606142,
+    "seen": 1793499840.0446837,
+    "ast_hash": "a89513746a8f33e0b20f58944f2c92d3",
+    "semantic_hash": "a89513746a8f33e0b20f58944f2c92d3"
+  },
+  ".specs/features/hero-ascension/ui-review/41-skill-bar-9-desktop.png": {
+    "mtime": 1793467686.2578468,
+    "seen": 1793499840.0446854,
+    "ast_hash": "c9f71e1ce62e79ca537824c45ff81125",
+    "semantic_hash": "c9f71e1ce62e79ca537824c45ff81125"
+  },
+  ".specs/features/hero-ascension/ui-review/41-skill-bar-9-phone.png": {
+    "mtime": 1793467686.138101,
+    "seen": 1793499840.0446863,
+    "ast_hash": "a50bb53e9d933437de25ddd742e75a13",
+    "semantic_hash": "a50bb53e9d933437de25ddd742e75a13"
+  },
+  ".specs/features/hero-ascension/ui-review/42-catalog-9-desktop.png": {
+    "mtime": 1793467687.4511664,
+    "seen": 1793499840.044689,
+    "ast_hash": "5d9f6aff9027b09138eb79a074ba8a23",
+    "semantic_hash": "5d9f6aff9027b09138eb79a074ba8a23"
+  },
+  ".specs/features/hero-ascension/ui-review/42-catalog-9-phone.png": {
+    "mtime": 1793467687.393125,
+    "seen": 1793499840.0446916,
+    "ast_hash": "c493546941563b3bfe1c3d9afc568c10",
+    "semantic_hash": "c493546941563b3bfe1c3d9afc568c10"
+  },
+  ".specs/features/hero-ascension/ui-review/43-detail-9-desktop.png": {
+    "mtime": 1793467688.5100152,
+    "seen": 1793499840.0446942,
+    "ast_hash": "2e7d1c0a5787935576a6ff48daa63dc2",
+    "semantic_hash": "2e7d1c0a5787935576a6ff48daa63dc2"
+  },
+  ".specs/features/hero-ascension/ui-review/43-detail-9-phone.png": {
+    "mtime": 1793467688.508502,
+    "seen": 1793499840.0446973,
+    "ast_hash": "35ef7e4b5120e1fc7db58cab099a517f",
+    "semantic_hash": "35ef7e4b5120e1fc7db58cab099a517f"
+  },
+  ".specs/features/hero-ascension/ui-review/51-bag-desktop.png": {
+    "mtime": 1793467701.2511451,
+    "seen": 1793499840.0447001,
+    "ast_hash": "bc9d5a708e9dd9cca149a10c825b0595",
+    "semantic_hash": "bc9d5a708e9dd9cca149a10c825b0595"
+  },
+  ".specs/features/hero-ascension/ui-review/51-bag-phone.png": {
+    "mtime": 1793467701.2723327,
+    "seen": 1793499840.0447023,
+    "ast_hash": "aca079ca784c13a68cc3856865707561",
+    "semantic_hash": "aca079ca784c13a68cc3856865707561"
+  },
+  ".specs/features/hero-ascension/ui-review/52-bag-detail-9-desktop.png": {
+    "mtime": 1793467702.210303,
+    "seen": 1793499840.0447032,
+    "ast_hash": "28d88b3fa4bf1ede8e8842b455119d82",
+    "semantic_hash": "28d88b3fa4bf1ede8e8842b455119d82"
+  },
+  ".specs/features/hero-ascension/ui-review/52-bag-detail-9-phone.png": {
+    "mtime": 1793467702.3489003,
+    "seen": 1793499840.044705,
+    "ast_hash": "1216bb8f40616cb30f92fd0695ff3c29",
+    "semantic_hash": "1216bb8f40616cb30f92fd0695ff3c29"
+  },
+  ".specs/features/hero-ascension/ui-review/53-bag-detail-4-desktop.png": {
+    "mtime": 1793467703.712556,
+    "seen": 1793499840.0447066,
+    "ast_hash": "0d934784643adefa8232f1fd409b531a",
+    "semantic_hash": "0d934784643adefa8232f1fd409b531a"
+  },
+  ".specs/features/hero-ascension/ui-review/53-bag-detail-4-phone.png": {
+    "mtime": 1793467703.8457892,
+    "seen": 1793499840.044708,
+    "ast_hash": "16f3ccee6276a6f720905f5d53ca7b18",
+    "semantic_hash": "16f3ccee6276a6f720905f5d53ca7b18"
+  },
+  ".specs/features/hero-ascension/ui-review/54-bag-detail-8-can-fuse-desktop.png": {
+    "mtime": 1793467705.2118597,
+    "seen": 1793499840.0447094,
+    "ast_hash": "3d2372398ebba10e090cde395bf944a9",
+    "semantic_hash": "3d2372398ebba10e090cde395bf944a9"
+  },
+  ".specs/features/hero-ascension/ui-review/54-bag-detail-8-can-fuse-phone.png": {
+    "mtime": 1793467705.3000386,
+    "seen": 1793499840.0447109,
+    "ast_hash": "e2beb3625419558d81524a48bff4bd10",
+    "semantic_hash": "e2beb3625419558d81524a48bff4bd10"
+  },
+  ".specs/features/hero-ascension/ui-review/61-fusion-rows-desktop.png": {
+    "mtime": 1793467743.173066,
+    "seen": 1793499840.0447118,
+    "ast_hash": "2b923401632205f91cdf84f4c578431b",
+    "semantic_hash": "2b923401632205f91cdf84f4c578431b"
+  },
+  ".specs/features/hero-ascension/ui-review/61-fusion-rows-phone.png": {
+    "mtime": 1793467743.4874954,
+    "seen": 1793499840.0447135,
+    "ast_hash": "e1c823e7210c69080b60f20e1953fdb0",
+    "semantic_hash": "e1c823e7210c69080b60f20e1953fdb0"
+  },
+  ".specs/features/hero-ascension/ui-review/62-fusion-hover-desktop.png": {
+    "mtime": 1793467743.9995782,
+    "seen": 1793499840.044715,
+    "ast_hash": "17e9acde7d28e06d0b7105f37358dafe",
+    "semantic_hash": "17e9acde7d28e06d0b7105f37358dafe"
+  },
+  ".specs/features/hero-ascension/ui-review/62-fusion-hover-phone.png": {
+    "mtime": 1793467744.4550529,
+    "seen": 1793499840.0447164,
+    "ast_hash": "3171d1fc54683cd896728cd396e8270b",
+    "semantic_hash": "3171d1fc54683cd896728cd396e8270b"
+  },
+  ".specs/features/hero-ascension/ui-review/63-fusion-result-9-desktop.png": {
+    "mtime": 1793467745.2128217,
+    "seen": 1793499840.0447176,
+    "ast_hash": "9d8fe51cf653c0004fc2bbec122f3c43",
+    "semantic_hash": "9d8fe51cf653c0004fc2bbec122f3c43"
+  },
+  ".specs/features/hero-ascension/ui-review/63-fusion-result-9-phone.png": {
+    "mtime": 1793467745.6627274,
+    "seen": 1793499840.0447187,
+    "ast_hash": "99fb5dad4632b0a7b499d47661167c01",
+    "semantic_hash": "99fb5dad4632b0a7b499d47661167c01"
+  },
+  ".specs/features/hero-ascension/ui-review/64-fusion-result-7-desktop.png": {
+    "mtime": 1793467746.4209025,
+    "seen": 1793499840.0447202,
+    "ast_hash": "aa34e7d0b4b595ff52c89bdc4ee75ac0",
+    "semantic_hash": "aa34e7d0b4b595ff52c89bdc4ee75ac0"
+  },
+  ".specs/features/hero-ascension/ui-review/64-fusion-result-7-phone.png": {
+    "mtime": 1793467747.0192752,
+    "seen": 1793499840.0447216,
+    "ast_hash": "fb1c76b284fcb532b76406f9124de782",
+    "semantic_hash": "fb1c76b284fcb532b76406f9124de782"
+  },
+  ".specs/features/hero-ascension/ui-review/65-fusion-result-4-desktop.png": {
+    "mtime": 1793467747.6252537,
+    "seen": 1793499840.0447228,
+    "ast_hash": "488bcdabd93d546d3fa22f7124c559dc",
+    "semantic_hash": "488bcdabd93d546d3fa22f7124c559dc"
+  },
+  ".specs/features/hero-ascension/ui-review/65-fusion-result-4-phone.png": {
+    "mtime": 1793467748.101817,
+    "seen": 1793499840.0447242,
+    "ast_hash": "163a3756b2f5b16ec83b6b3edbb3e389",
+    "semantic_hash": "163a3756b2f5b16ec83b6b3edbb3e389"
+  },
+  "art/kael_charge.jpg": {
+    "mtime": 1791993712.0321572,
+    "seen": 1793499840.0447254,
+    "ast_hash": "e80bc2a30bb98794f0729ebe040cd7f8",
+    "semantic_hash": "e80bc2a30bb98794f0729ebe040cd7f8"
+  },
+  "art/kael_dimensional_cut.jpg": {
+    "mtime": 1791993256.861583,
+    "seen": 1793499840.0447266,
+    "ast_hash": "d3453e047da9799e742255dff8abfb6d",
+    "semantic_hash": "d3453e047da9799e742255dff8abfb6d"
+  },
+  "art/kael_front.jpg": {
+    "mtime": 1791989429.9936194,
+    "seen": 1793499840.0447278,
+    "ast_hash": "533231064da182c845c85d848d45be62",
+    "semantic_hash": "533231064da182c845c85d848d45be62"
+  },
+  "art/kael_position.jpg": {
+    "mtime": 1791989450.9495652,
+    "seen": 1793499840.044729,
+    "ast_hash": "030e29f15020be85ef108146499349ad",
+    "semantic_hash": "030e29f15020be85ef108146499349ad"
+  },
+  "art/kael_rig/kael_sheet_1.jpg": {
+    "mtime": 1792883154.0594106,
+    "seen": 1793499840.0447302,
+    "ast_hash": "50393c25c2965aef1e525adf5a0cb8bd",
+    "semantic_hash": "50393c25c2965aef1e525adf5a0cb8bd"
+  },
+  "art/kael_rig/kael_sheet_2.jpg": {
+    "mtime": 1792883199.5605576,
+    "seen": 1793499840.0447314,
+    "ast_hash": "cb966b97105e286297aeeece80b55442",
+    "semantic_hash": "cb966b97105e286297aeeece80b55442"
+  },
+  "art/kael_rig/kael_sheet_3.jpg": {
+    "mtime": 1792883217.3714905,
+    "seen": 1793499840.0447323,
+    "ast_hash": "74b1a4894fb067a402297d6675b9ea4f",
+    "semantic_hash": "74b1a4894fb067a402297d6675b9ea4f"
+  },
+  "art/kael_rig/kael_sheet_4.jpg": {
+    "mtime": 1792883227.8734398,
+    "seen": 1793499840.0447338,
+    "ast_hash": "6e8f03157c122d5af03b720f07414307",
+    "semantic_hash": "6e8f03157c122d5af03b720f07414307"
+  },
+  "art/kael_rig/kael_sheet_5.jpg": {
+    "mtime": 1792883236.9575887,
+    "seen": 1793499840.0447347,
+    "ast_hash": "0e104bdfba55085a88d74fac3498fa29",
+    "semantic_hash": "0e104bdfba55085a88d74fac3498fa29"
+  },
+  "art/kael_rig/parts/kael_sheet_1_01.png": {
+    "mtime": 1792884347.2652352,
+    "seen": 1793499840.0447361,
+    "ast_hash": "1197a532d866f36be973980536c44119",
+    "semantic_hash": "1197a532d866f36be973980536c44119"
+  },
+  "art/kael_rig/parts/kael_sheet_1_02.png": {
+    "mtime": 1792884347.2702508,
+    "seen": 1793499840.0447373,
+    "ast_hash": "657c933a39f9d2362cd4aa55d8ddc98a",
+    "semantic_hash": "657c933a39f9d2362cd4aa55d8ddc98a"
+  },
+  "art/kael_rig/parts/kael_sheet_1_03.png": {
+    "mtime": 1792884347.274786,
+    "seen": 1793499840.0447385,
+    "ast_hash": "43660730008005195d6a49d2109ffe18",
+    "semantic_hash": "43660730008005195d6a49d2109ffe18"
+  },
+  "art/kael_rig/parts/kael_sheet_1_04.png": {
+    "mtime": 1792884347.2834053,
+    "seen": 1793499840.0447397,
+    "ast_hash": "b4ecb6f09d8653ad41c049024f452944",
+    "semantic_hash": "b4ecb6f09d8653ad41c049024f452944"
+  },
+  "art/kael_rig/parts/kael_sheet_1_05.png": {
+    "mtime": 1792884347.2884445,
+    "seen": 1793499840.0447412,
+    "ast_hash": "dbc76a5967865c9e085c691a288e6d9a",
+    "semantic_hash": "dbc76a5967865c9e085c691a288e6d9a"
+  },
+  "art/kael_rig/parts/kael_sheet_1_06.png": {
+    "mtime": 1792884347.2946095,
+    "seen": 1793499840.044742,
+    "ast_hash": "fd2e12f3b3eb4def307a6db116133d12",
+    "semantic_hash": "fd2e12f3b3eb4def307a6db116133d12"
+  },
+  "art/kael_rig/parts/kael_sheet_1_index.png": {
+    "mtime": 1792884347.326668,
+    "seen": 1793499840.044743,
+    "ast_hash": "56dfc643aa67ed907085c01c940e6304",
+    "semantic_hash": "56dfc643aa67ed907085c01c940e6304"
+  },
+  "art/kael_rig/parts/kael_sheet_2_01.png": {
+    "mtime": 1792884347.927066,
+    "seen": 1793499840.0447443,
+    "ast_hash": "9131a8924cba61d5d9ab9720166c18f4",
+    "semantic_hash": "9131a8924cba61d5d9ab9720166c18f4"
+  },
+  "art/kael_rig/parts/kael_sheet_2_02.png": {
+    "mtime": 1792884347.9321172,
+    "seen": 1793499840.0447454,
+    "ast_hash": "131ee3362e4d5df432e0275d7ed9aa96",
+    "semantic_hash": "131ee3362e4d5df432e0275d7ed9aa96"
+  },
+  "art/kael_rig/parts/kael_sheet_2_03.png": {
+    "mtime": 1792884347.9346278,
+    "seen": 1793499840.0447464,
+    "ast_hash": "7a96cb837d38b389e72c850d2cbc7b38",
+    "semantic_hash": "7a96cb837d38b389e72c850d2cbc7b38"
+  },
+  "art/kael_rig/parts/kael_sheet_2_04.png": {
+    "mtime": 1792884347.940644,
+    "seen": 1793499840.0447476,
+    "ast_hash": "327df692b5b129cbcae00fbac7be087c",
+    "semantic_hash": "327df692b5b129cbcae00fbac7be087c"
+  },
+  "art/kael_rig/parts/kael_sheet_2_05.png": {
+    "mtime": 1792884347.9457505,
+    "seen": 1793499840.044749,
+    "ast_hash": "04f162ba83422d079f51cb7a64b4e31b",
+    "semantic_hash": "04f162ba83422d079f51cb7a64b4e31b"
+  },
+  "art/kael_rig/parts/kael_sheet_2_06.png": {
+    "mtime": 1792884347.949767,
+    "seen": 1793499840.04475,
+    "ast_hash": "db05693c37bff722c1cfb493ce3aefdb",
+    "semantic_hash": "db05693c37bff722c1cfb493ce3aefdb"
+  },
+  "art/kael_rig/parts/kael_sheet_2_07.png": {
+    "mtime": 1792884347.9543142,
+    "seen": 1793499840.0447514,
+    "ast_hash": "4e2f833733a40c8e7b62c50062797c8d",
+    "semantic_hash": "4e2f833733a40c8e7b62c50062797c8d"
+  },
+  "art/kael_rig/parts/kael_sheet_2_08.png": {
+    "mtime": 1792884347.959334,
+    "seen": 1793499840.0447528,
+    "ast_hash": "dbdd6b93877452aaed7a734392f2cb35",
+    "semantic_hash": "dbdd6b93877452aaed7a734392f2cb35"
+  },
+  "art/kael_rig/parts/kael_sheet_2_09.png": {
+    "mtime": 1792884347.9608388,
+    "seen": 1793499840.0447543,
+    "ast_hash": "2e93bbe98dd86a1fae624e7c52ea1534",
+    "semantic_hash": "2e93bbe98dd86a1fae624e7c52ea1534"
+  },
+  "art/kael_rig/parts/kael_sheet_2_index.png": {
+    "mtime": 1792884347.990996,
+    "seen": 1793499840.0447552,
+    "ast_hash": "989f7628a5feaef61a0aac362e114ce8",
+    "semantic_hash": "989f7628a5feaef61a0aac362e114ce8"
+  },
+  "art/kael_rig/parts/kael_sheet_3_01.png": {
+    "mtime": 1792884348.6806118,
+    "seen": 1793499840.0447564,
+    "ast_hash": "f69de7eab6cb42d4146e1ddeff8ff2ce",
+    "semantic_hash": "f69de7eab6cb42d4146e1ddeff8ff2ce"
+  },
+  "art/kael_rig/parts/kael_sheet_3_02.png": {
+    "mtime": 1792884348.6872406,
+    "seen": 1793499840.0447578,
+    "ast_hash": "d8537cd2eecae7e7a92b45cb01e0e6f6",
+    "semantic_hash": "d8537cd2eecae7e7a92b45cb01e0e6f6"
+  },
+  "art/kael_rig/parts/kael_sheet_3_03.png": {
+    "mtime": 1792884348.6917863,
+    "seen": 1793499840.044759,
+    "ast_hash": "5794b7e945f629d90024308ef0d8181f",
+    "semantic_hash": "5794b7e945f629d90024308ef0d8181f"
+  },
+  "art/kael_rig/parts/kael_sheet_3_04.png": {
+    "mtime": 1792884348.6983104,
+    "seen": 1793499840.04476,
+    "ast_hash": "151a19493615d2b2cb7f47e9cf6b1b85",
+    "semantic_hash": "151a19493615d2b2cb7f47e9cf6b1b85"
+  },
+  "art/kael_rig/parts/kael_sheet_3_05.png": {
+    "mtime": 1792884348.7008336,
+    "seen": 1793499840.0447612,
+    "ast_hash": "45834d931d9e46a07244f899fa45587b",
+    "semantic_hash": "45834d931d9e46a07244f899fa45587b"
+  },
+  "art/kael_rig/parts/kael_sheet_3_06.png": {
+    "mtime": 1792884348.7069995,
+    "seen": 1793499840.0447624,
+    "ast_hash": "4b2b0a9ed3c01781186f68a2a6541c6e",
+    "semantic_hash": "4b2b0a9ed3c01781186f68a2a6541c6e"
+  },
+  "art/kael_rig/parts/kael_sheet_3_07.png": {
+    "mtime": 1792884348.7135353,
+    "seen": 1793499840.0447633,
+    "ast_hash": "0da151975125a3b81f7b4401e313310e",
+    "semantic_hash": "0da151975125a3b81f7b4401e313310e"
+  },
+  "art/kael_rig/parts/kael_sheet_3_index.png": {
+    "mtime": 1792884348.7497869,
+    "seen": 1793499840.0447652,
+    "ast_hash": "6b7206a17530a6562eaeed1e4a4f5b97",
+    "semantic_hash": "6b7206a17530a6562eaeed1e4a4f5b97"
+  },
+  "art/kael_rig/parts/kael_sheet_4_01.png": {
+    "mtime": 1792884349.2461007,
+    "seen": 1793499840.0447679,
+    "ast_hash": "e9cbf597b63aa8ded71270ce8faf000c",
+    "semantic_hash": "e9cbf597b63aa8ded71270ce8faf000c"
+  },
+  "art/kael_rig/parts/kael_sheet_4_02.png": {
+    "mtime": 1792884349.2486787,
+    "seen": 1793499840.0447698,
+    "ast_hash": "5dea2e7ae26e7329a435912c3fec405e",
+    "semantic_hash": "5dea2e7ae26e7329a435912c3fec405e"
+  },
+  "art/kael_rig/parts/kael_sheet_4_03.png": {
+    "mtime": 1792884349.2521918,
+    "seen": 1793499840.0447724,
+    "ast_hash": "5b71d435d7af3a7e7f0d4a1e336b5c17",
+    "semantic_hash": "5b71d435d7af3a7e7f0d4a1e336b5c17"
+  },
+  "art/kael_rig/parts/kael_sheet_4_04.png": {
+    "mtime": 1792884349.2572157,
+    "seen": 1793499840.0447752,
+    "ast_hash": "1d8ca386df73cb6c526e5b3da05d0f65",
+    "semantic_hash": "1d8ca386df73cb6c526e5b3da05d0f65"
+  },
+  "art/kael_rig/parts/kael_sheet_4_05.png": {
+    "mtime": 1792884349.261236,
+    "seen": 1793499840.0447772,
+    "ast_hash": "daedae148f7630991e953df8a054d3a6",
+    "semantic_hash": "daedae148f7630991e953df8a054d3a6"
+  },
+  "art/kael_rig/parts/kael_sheet_4_06.png": {
+    "mtime": 1792884349.265256,
+    "seen": 1793499840.0447798,
+    "ast_hash": "4c5eb0a9f5d7114856ae628c5865ff91",
+    "semantic_hash": "4c5eb0a9f5d7114856ae628c5865ff91"
+  },
+  "art/kael_rig/parts/kael_sheet_4_index.png": {
+    "mtime": 1792884349.2928374,
+    "seen": 1793499840.0447817,
+    "ast_hash": "47e1f339eacd99292a08aa0ce926a0b4",
+    "semantic_hash": "47e1f339eacd99292a08aa0ce926a0b4"
+  },
+  "art/kael_rig/parts/kael_sheet_5_01.png": {
+    "mtime": 1792884349.84083,
+    "seen": 1793499840.0447829,
+    "ast_hash": "47c14beea948771febe4634d31dedd03",
+    "semantic_hash": "47c14beea948771febe4634d31dedd03"
+  },
+  "art/kael_rig/parts/kael_sheet_5_02.png": {
+    "mtime": 1792884349.8533974,
+    "seen": 1793499840.0447843,
+    "ast_hash": "966f310210eb565f25a142b593f3ae05",
+    "semantic_hash": "966f310210eb565f25a142b593f3ae05"
+  },
+  "art/kael_rig/parts/kael_sheet_5_03.png": {
+    "mtime": 1792884349.8644786,
+    "seen": 1793499840.0447857,
+    "ast_hash": "e6c9ca5502c132288b30786c2e78a277",
+    "semantic_hash": "e6c9ca5502c132288b30786c2e78a277"
+  },
+  "art/kael_rig/parts/kael_sheet_5_index.png": {
+    "mtime": 1792884349.8972595,
+    "seen": 1793499840.044787,
+    "ast_hash": "11c815a82f3b1592a362370378beef4f",
+    "semantic_hash": "11c815a82f3b1592a362370378beef4f"
+  },
+  "art/kael_screen.jpg": {
+    "mtime": 1791993230.4599845,
+    "seen": 1793499840.0447886,
+    "ast_hash": "ef8b89a9425c2d409e120b0476e7b302",
+    "semantic_hash": "ef8b89a9425c2d409e120b0476e7b302"
+  },
+  "art/lyra_double_shot.jpg": {
+    "mtime": 1792022300.3033705,
+    "seen": 1793499840.0447896,
+    "ast_hash": "029b7706f01a6b1ce3c86c733f221c82",
+    "semantic_hash": "029b7706f01a6b1ce3c86c733f221c82"
+  },
+  "art/lyra_focused_shot.jpg": {
+    "mtime": 1792022514.5449708,
+    "seen": 1793499840.044791,
+    "ast_hash": "c58207e0e5635465cf28d74c38605f65",
+    "semantic_hash": "c58207e0e5635465cf28d74c38605f65"
+  },
+  "art/lyra_position.jpg": {
+    "mtime": 1792021791.5987074,
+    "seen": 1793499840.0447924,
+    "ast_hash": "271085ecb1e41550125d34a91d78bda3",
+    "semantic_hash": "271085ecb1e41550125d34a91d78bda3"
+  },
+  "art/lyra_rapid_wind.jpg": {
+    "mtime": 1792022615.1930892,
+    "seen": 1793499840.0447936,
+    "ast_hash": "f3519457a63a0f3e9bfa0ca7411e05a5",
+    "semantic_hash": "f3519457a63a0f3e9bfa0ca7411e05a5"
+  },
+  "art/orina_grasp_prision.jpg": {
+    "mtime": 1792023244.022051,
+    "seen": 1793499840.0447948,
+    "ast_hash": "ea7ecbcc04651e1cac0aa63522f8f1d9",
+    "semantic_hash": "ea7ecbcc04651e1cac0aa63522f8f1d9"
+  },
+  "art/orina_meteor_storm.jpg": {
+    "mtime": 1792080902.8112588,
+    "seen": 1793499840.0447962,
+    "ast_hash": "6b9338ed113d9d1fe407c9cda9298b9d",
+    "semantic_hash": "6b9338ed113d9d1fe407c9cda9298b9d"
+  },
+  "art/orina_position.jpg": {
+    "mtime": 1792022966.2727854,
+    "seen": 1793499840.0447974,
+    "ast_hash": "005289ef89625f538af90aaa0477c304",
+    "semantic_hash": "005289ef89625f538af90aaa0477c304"
+  },
+  "art/orina_side_view_magic.jpg": {
+    "mtime": 1792023074.8439143,
+    "seen": 1793499840.0448213,
+    "ast_hash": "1e35620ef19e37a88d9df664541829ca",
+    "semantic_hash": "1e35620ef19e37a88d9df664541829ca"
+  },
+  "art/orina_side_view_no_magic.jpg": {
+    "mtime": 1792023083.657442,
+    "seen": 1793499840.0448225,
+    "ast_hash": "112945cc3d21cf00150b8fd233dc6577",
+    "semantic_hash": "112945cc3d21cf00150b8fd233dc6577"
+  },
+  "art/orina_tempest.jpg": {
+    "mtime": 1792023495.5638993,
+    "seen": 1793499840.044824,
+    "ast_hash": "4fdbfdf7149b327d1c2217d7cd7d062f",
+    "semantic_hash": "4fdbfdf7149b327d1c2217d7cd7d062f"
+  },
+  "art/seraphine_bell_ringing.jpg": {
+    "mtime": 1792082592.479292,
+    "seen": 1793499840.044825,
+    "ast_hash": "11e19b12558f959f1c7a36b0b9605cab",
+    "semantic_hash": "11e19b12558f959f1c7a36b0b9605cab"
+  },
+  "art/seraphine_blessing.jpg": {
+    "mtime": 1792081687.874421,
+    "seen": 1793499840.044828,
+    "ast_hash": "09d90d3f17c8c6ee0f4253bd624ccf1f",
+    "semantic_hash": "09d90d3f17c8c6ee0f4253bd624ccf1f"
+  },
+  "art/seraphine_holy_light.jpg": {
+    "mtime": 1792082375.7836592,
+    "seen": 1793499840.0448306,
+    "ast_hash": "ed6a015fea641b589c1b4508e4f752fd",
+    "semantic_hash": "ed6a015fea641b589c1b4508e4f752fd"
+  },
+  "art/seraphine_position.jpg": {
+    "mtime": 1792081023.1890826,
+    "seen": 1793499840.0448325,
+    "ast_hash": "41e3ad9d451c48b0af7b7cd612b910da",
+    "semantic_hash": "41e3ad9d451c48b0af7b7cd612b910da"
+  },
+  "art/seraphine_protection_globe.jpg": {
+    "mtime": 1792082583.4198153,
+    "seen": 1793499840.0448353,
+    "ast_hash": "04fec40e038f58c823cae3f9ae966969",
+    "semantic_hash": "04fec40e038f58c823cae3f9ae966969"
+  },
+  "art/vex_bleeding_blow.jpg": {
+    "mtime": 1792090607.30809,
+    "seen": 1793499840.0448375,
+    "ast_hash": "938fcff886355e17434608807ab9cfaa",
+    "semantic_hash": "938fcff886355e17434608807ab9cfaa"
+  },
+  "art/vex_poison_bomb.jpg": {
+    "mtime": 1792083022.8175986,
+    "seen": 1793499840.0448384,
+    "ast_hash": "13907c06ad198cf5840dccb7f612027c",
+    "semantic_hash": "13907c06ad198cf5840dccb7f612027c"
+  },
+  "art/vex_position.jpg": {
+    "mtime": 1792082796.0554433,
+    "seen": 1793499840.0448396,
+    "ast_hash": "236678c447b974c69f451535d684fd43",
+    "semantic_hash": "236678c447b974c69f451535d684fd43"
+  },
+  "art/vex_smoke_bomb.jpg": {
+    "mtime": 1792083235.2743013,
+    "seen": 1793499840.0448413,
+    "ast_hash": "b6d57b03e793b34a4086534162ed8b70",
+    "semantic_hash": "b6d57b03e793b34a4086534162ed8b70"
+  },
+  "game/public/assets/background.png": {
+    "mtime": 1792261586.8248305,
+    "seen": 1793499840.0448425,
+    "ast_hash": "bd8d90adb4013a097b05cc6c96f4c73c",
+    "semantic_hash": "bd8d90adb4013a097b05cc6c96f4c73c"
+  },
+  "game/public/assets/boss-map.jpg": {
+    "mtime": 1792791488.72577,
+    "seen": 1793499840.0448437,
+    "ast_hash": "2d8af4956bf91b3e8954e349483beb51",
+    "semantic_hash": "2d8af4956bf91b3e8954e349483beb51"
+  },
+  "game/public/assets/cc-logo.png": {
+    "mtime": 1792261586.8541331,
+    "seen": 1793499840.044845,
+    "ast_hash": "3241d6d4b7c67e7eede9851dd318b1bd",
+    "semantic_hash": "3241d6d4b7c67e7eede9851dd318b1bd"
+  },
+  "game/public/assets/coin-copper.png": {
+    "mtime": 1792260211.178513,
+    "seen": 1793499840.0448463,
+    "ast_hash": "e91df122447acc89aa2e849f84d4d5d3",
+    "semantic_hash": "e91df122447acc89aa2e849f84d4d5d3"
+  },
+  "game/public/assets/coin-gold.png": {
+    "mtime": 1792260251.2283633,
+    "seen": 1793499840.044849,
+    "ast_hash": "49a0252323262340aeb296350839a16e",
+    "semantic_hash": "49a0252323262340aeb296350839a16e"
+  },
+  "game/public/assets/coin-silver.png": {
+    "mtime": 1792260233.223706,
+    "seen": 1793499840.0448515,
+    "ast_hash": "0eac77e2c00944b332697d6fcd82abb2",
+    "semantic_hash": "0eac77e2c00944b332697d6fcd82abb2"
+  },
+  "game/public/assets/coin.png": {
+    "mtime": 1792225944.960816,
+    "seen": 1793499840.044854,
+    "ast_hash": "8d569df816252ef0111bbef413e61b1b",
+    "semantic_hash": "8d569df816252ef0111bbef413e61b1b"
+  },
+  "game/public/assets/heroes/kael_charge.jpg": {
+    "mtime": 1792321005.5895119,
+    "seen": 1793499840.0448568,
+    "ast_hash": "e80bc2a30bb98794f0729ebe040cd7f8",
+    "semantic_hash": "e80bc2a30bb98794f0729ebe040cd7f8"
+  },
+  "game/public/assets/heroes/kael_dimensional_cut.jpg": {
+    "mtime": 1792321005.512977,
+    "seen": 1793499840.0448601,
+    "ast_hash": "d3453e047da9799e742255dff8abfb6d",
+    "semantic_hash": "d3453e047da9799e742255dff8abfb6d"
+  },
+  "game/public/assets/heroes/kael_position.jpg": {
+    "mtime": 1792321005.2003293,
+    "seen": 1793499840.044863,
+    "ast_hash": "030e29f15020be85ef108146499349ad",
+    "semantic_hash": "030e29f15020be85ef108146499349ad"
+  },
+  "game/public/assets/heroes/kael_rig.png": {
+    "mtime": 1792884596.9142363,
+    "seen": 1793499840.0448658,
+    "ast_hash": "ab26c82034c2f69154a2734ee78db45d",
+    "semantic_hash": "ab26c82034c2f69154a2734ee78db45d"
+  },
+  "game/public/assets/heroes/kael_screen.jpg": {
+    "mtime": 1792321005.6356363,
+    "seen": 1793499840.044869,
+    "ast_hash": "ef8b89a9425c2d409e120b0476e7b302",
+    "semantic_hash": "ef8b89a9425c2d409e120b0476e7b302"
+  },
+  "game/public/assets/heroes/kael_sprite.png": {
+    "mtime": 1792328187.361487,
+    "seen": 1793499840.0448716,
+    "ast_hash": "f5bddc971bdb83dd71aef714d2a17781",
+    "semantic_hash": "f5bddc971bdb83dd71aef714d2a17781"
+  },
+  "game/public/assets/heroes/lyra_double_shot.jpg": {
+    "mtime": 1792321005.6803446,
+    "seen": 1793499840.0448744,
+    "ast_hash": "029b7706f01a6b1ce3c86c733f221c82",
+    "semantic_hash": "029b7706f01a6b1ce3c86c733f221c82"
+  },
+  "game/public/assets/heroes/lyra_focused_shot.jpg": {
+    "mtime": 1792321005.7265708,
+    "seen": 1793499840.0448773,
+    "ast_hash": "c58207e0e5635465cf28d74c38605f65",
+    "semantic_hash": "c58207e0e5635465cf28d74c38605f65"
+  },
+  "game/public/assets/heroes/lyra_position.jpg": {
+    "mtime": 1792321005.2603571,
+    "seen": 1793499840.04488,
+    "ast_hash": "271085ecb1e41550125d34a91d78bda3",
+    "semantic_hash": "271085ecb1e41550125d34a91d78bda3"
+  },
+  "game/public/assets/heroes/lyra_rapid_wind.jpg": {
+    "mtime": 1792321005.7849438,
+    "seen": 1793499840.044883,
+    "ast_hash": "f3519457a63a0f3e9bfa0ca7411e05a5",
+    "semantic_hash": "f3519457a63a0f3e9bfa0ca7411e05a5"
+  },
+  "game/public/assets/heroes/lyra_sprite.png": {
+    "mtime": 1792328191.6981153,
+    "seen": 1793499840.044886,
+    "ast_hash": "f4f44119edd7f11cbd4b6913475f541c",
+    "semantic_hash": "f4f44119edd7f11cbd4b6913475f541c"
+  },
+  "game/public/assets/heroes/orina_grasp_prision.jpg": {
+    "mtime": 1792321005.8516085,
+    "seen": 1793499840.0448885,
+    "ast_hash": "ea7ecbcc04651e1cac0aa63522f8f1d9",
+    "semantic_hash": "ea7ecbcc04651e1cac0aa63522f8f1d9"
+  },
+  "game/public/assets/heroes/orina_meteor_storm.jpg": {
+    "mtime": 1792321005.9614072,
+    "seen": 1793499840.044891,
+    "ast_hash": "6b9338ed113d9d1fe407c9cda9298b9d",
+    "semantic_hash": "6b9338ed113d9d1fe407c9cda9298b9d"
+  },
+  "game/public/assets/heroes/orina_position.jpg": {
+    "mtime": 1792321005.34918,
+    "seen": 1793499840.0448937,
+    "ast_hash": "005289ef89625f538af90aaa0477c304",
+    "semantic_hash": "005289ef89625f538af90aaa0477c304"
+  },
+  "game/public/assets/heroes/orina_sprite.png": {
+    "mtime": 1792328190.2753472,
+    "seen": 1793499840.0448966,
+    "ast_hash": "36575c7fe7f8b3175de083621382d6e2",
+    "semantic_hash": "36575c7fe7f8b3175de083621382d6e2"
+  },
+  "game/public/assets/heroes/orina_tempest.jpg": {
+    "mtime": 1792321005.9175193,
+    "seen": 1793499840.044899,
+    "ast_hash": "4fdbfdf7149b327d1c2217d7cd7d062f",
+    "semantic_hash": "4fdbfdf7149b327d1c2217d7cd7d062f"
+  },
+  "game/public/assets/heroes/seraphine_bell_ringing.jpg": {
+    "mtime": 1792321006.107447,
+    "seen": 1793499840.0449014,
+    "ast_hash": "11e19b12558f959f1c7a36b0b9605cab",
+    "semantic_hash": "11e19b12558f959f1c7a36b0b9605cab"
+  },
+  "game/public/assets/heroes/seraphine_blessing.jpg": {
+    "mtime": 1792321006.009106,
+    "seen": 1793499840.0449042,
+    "ast_hash": "09d90d3f17c8c6ee0f4253bd624ccf1f",
+    "semantic_hash": "09d90d3f17c8c6ee0f4253bd624ccf1f"
+  },
+  "game/public/assets/heroes/seraphine_holy_light.jpg": {
+    "mtime": 1792321006.0581875,
+    "seen": 1793499840.044907,
+    "ast_hash": "ed6a015fea641b589c1b4508e4f752fd",
+    "semantic_hash": "ed6a015fea641b589c1b4508e4f752fd"
+  },
+  "game/public/assets/heroes/seraphine_position.jpg": {
+    "mtime": 1792321005.4014683,
+    "seen": 1793499840.0449097,
+    "ast_hash": "41e3ad9d451c48b0af7b7cd612b910da",
+    "semantic_hash": "41e3ad9d451c48b0af7b7cd612b910da"
+  },
+  "game/public/assets/heroes/seraphine_sprite.png": {
+    "mtime": 1792328192.8830295,
+    "seen": 1793499840.0449123,
+    "ast_hash": "f18c8701fe9d7b23e0521303d7e6ea6f",
+    "semantic_hash": "f18c8701fe9d7b23e0521303d7e6ea6f"
+  },
+  "game/public/assets/heroes/vex_bleeding_blow.jpg": {
+    "mtime": 1792321006.240296,
+    "seen": 1793499840.0449152,
+    "ast_hash": "938fcff886355e17434608807ab9cfaa",
+    "semantic_hash": "938fcff886355e17434608807ab9cfaa"
+  },
+  "game/public/assets/heroes/vex_poison_bomb.jpg": {
+    "mtime": 1792321006.1526027,
+    "seen": 1793499840.044922,
+    "ast_hash": "13907c06ad198cf5840dccb7f612027c",
+    "semantic_hash": "13907c06ad198cf5840dccb7f612027c"
+  },
+  "game/public/assets/heroes/vex_position.jpg": {
+    "mtime": 1792321005.444672,
+    "seen": 1793499840.044925,
+    "ast_hash": "236678c447b974c69f451535d684fd43",
+    "semantic_hash": "236678c447b974c69f451535d684fd43"
+  },
+  "game/public/assets/heroes/vex_smoke_bomb.jpg": {
+    "mtime": 1792321006.1968381,
+    "seen": 1793499840.0449271,
+    "ast_hash": "b6d57b03e793b34a4086534162ed8b70",
+    "semantic_hash": "b6d57b03e793b34a4086534162ed8b70"
+  },
+  "game/public/assets/heroes/vex_sprite.png": {
+    "mtime": 1792328194.778756,
+    "seen": 1793499840.0449297,
+    "ast_hash": "6766702c7470bf36e06e796ce2d691d5",
+    "semantic_hash": "6766702c7470bf36e06e796ce2d691d5"
+  },
+  "game/public/assets/preloader.png": {
+    "mtime": 1792225945.0156887,
+    "seen": 1793499840.0449321,
+    "ast_hash": "e5371358cb71210d37fdecccd76df7f4",
+    "semantic_hash": "e5371358cb71210d37fdecccd76df7f4"
+  },
+  "game/public/assets/slot-amulet.png": {
+    "mtime": 1792821296.7469842,
+    "seen": 1793499840.0449347,
+    "ast_hash": "6b1186a3d90b7ceabb6b44422a1ccd87",
+    "semantic_hash": "6b1186a3d90b7ceabb6b44422a1ccd87"
+  },
+  "game/public/assets/slot-armor.png": {
+    "mtime": 1792821174.60819,
+    "seen": 1793499840.0449371,
+    "ast_hash": "16ddf58d19edd89ffe37889255046448",
+    "semantic_hash": "16ddf58d19edd89ffe37889255046448"
+  },
+  "game/public/assets/slot-ring.png": {
+    "mtime": 1792821272.6892087,
+    "seen": 1793499840.0449395,
+    "ast_hash": "93fc9a91c4391218880ce6d6f81ef9af",
+    "semantic_hash": "93fc9a91c4391218880ce6d6f81ef9af"
+  },
+  "game/public/assets/slot-weapon.png": {
+    "mtime": 1792821154.8270454,
+    "seen": 1793499840.044942,
+    "ast_hash": "54d15bbc9ae7ac2886603d1b00395a41",
+    "semantic_hash": "54d15bbc9ae7ac2886603d1b00395a41"
+  },
+  "game/public/assets/talent-boss-time.png": {
+    "mtime": 1792820952.7025602,
+    "seen": 1793499840.0449438,
+    "ast_hash": "a367fe7f572ef34d62c89635204823f3",
+    "semantic_hash": "a367fe7f572ef34d62c89635204823f3"
+  },
+  "game/public/assets/talent-break-crit.png": {
+    "mtime": 1792754136.399969,
+    "seen": 1793499840.044945,
+    "ast_hash": "45bb528b53cd49fbe5b10a399cb5e0b2",
+    "semantic_hash": "45bb528b53cd49fbe5b10a399cb5e0b2"
+  },
+  "game/public/assets/talent-break-magical.png": {
+    "mtime": 1792820989.9500349,
+    "seen": 1793499840.0449462,
+    "ast_hash": "255e8bde5fe52092a0285a420ed71d37",
+    "semantic_hash": "255e8bde5fe52092a0285a420ed71d37"
+  },
+  "game/public/assets/talent-break-physical.png": {
+    "mtime": 1792821095.879143,
+    "seen": 1793499840.0449471,
+    "ast_hash": "6e6bf3d7f18999b58922b058a528c9f4",
+    "semantic_hash": "6e6bf3d7f18999b58922b058a528c9f4"
+  },
+  "game/public/assets/talent-click-damage.png": {
+    "mtime": 1792753110.2771835,
+    "seen": 1793499840.0449486,
+    "ast_hash": "dce76b85e016e8a0c923ea3254b4a9ef",
+    "semantic_hash": "dce76b85e016e8a0c923ea3254b4a9ef"
+  },
+  "game/public/assets/talent-crit-chance.png": {
+    "mtime": 1792821046.112176,
+    "seen": 1793499840.0449495,
+    "ast_hash": "16bb34cee89ada90336915b8f9a16a9d",
+    "semantic_hash": "16bb34cee89ada90336915b8f9a16a9d"
+  },
+  "game/public/assets/talent-crit-damage.png": {
+    "mtime": 1792821019.6463838,
+    "seen": 1793499840.0449505,
+    "ast_hash": "133a0179776e5bdc7605607e41eb3a2b",
+    "semantic_hash": "133a0179776e5bdc7605607e41eb3a2b"
+  },
+  "game/public/assets/talent-miniboss-time.png": {
+    "mtime": 1792821131.4577203,
+    "seen": 1793499840.0449522,
+    "ast_hash": "3f4055c2a29d28ac6181dc23ca34ce0d",
+    "semantic_hash": "3f4055c2a29d28ac6181dc23ca34ce0d"
+  },
+  "game/public/favicon.png": {
+    "mtime": 1792225944.9796066,
+    "seen": 1793499840.0449548,
+    "ast_hash": "9dc7b245053f6aa6acbce9f80f566c0f",
+    "semantic_hash": "9dc7b245053f6aa6acbce9f80f566c0f"
+  }
+}

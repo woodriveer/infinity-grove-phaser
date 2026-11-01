@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify hook-guard search",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify hook-guard read",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"Agent-rules check: if this message changes how the agents or the workflow behave (a new rule, a correction, a preference about process, tools, models, reports, deploy or reviews), update the source of truth in the same turn: CLAUDE.md for project-wide rules, .claude/agents/<agent>.md for one agent, .claude/templates/ or the tlc-spec-driven skill when they are the target. Keep the edit minimal, do not duplicate a rule that already exists, and tell the user which file changed. Skip this for one-off task requests.\"}}'",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
