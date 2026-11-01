@@ -1,10 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { rollback, sweepPrevious } from './previous.mjs';
-import { renderConf } from './proxy.mjs';
+import { switchScript } from './proxy.mjs';
+
+const switchLine = (slot) => `docker exec -i infinity-grove-proxy sh -c ${switchScript(slot)}`;
 
 const OLD = 'aaaaaaa1111111111111111111111111111111111';
 const NEW = 'bbbbbbb2222222222222222222222222222222222';
@@ -19,8 +21,6 @@ const STATE = {
 const repo = () =>
 {
     const root = mkdtempSync(join(tmpdir(), 'deploy-previous-'));
-    mkdirSync(join(root, 'deploy', 'nginx'), { recursive: true });
-    writeFileSync(join(root, 'deploy', 'nginx', 'default.conf'), renderConf('green'));
 
     return root;
 };
@@ -98,12 +98,10 @@ test('a rollback starts the previous container, waits for 401, switches, stops t
         'docker container inspect infinity-grove-backend-blue',
         'docker start infinity-grove-backend-blue',
         'fetch http://127.0.0.1:18081/progress',
-        'docker exec infinity-grove-proxy nginx -t',
-        'docker exec infinity-grove-proxy nginx -s reload',
+        switchLine('blue'),
         'sleep 10000',
         'docker stop infinity-grove-backend-green'
     ]);
-    assert.equal(readFileSync(join(root, 'deploy', 'nginx', 'default.conf'), 'utf8'), renderConf('blue'));
     assert.deepEqual(state, {
         active: { slot: 'blue', commit: OLD },
         previous: { slot: 'green', commit: NEW, stoppedAt: STOPPED_AT + 70000 },
@@ -148,13 +146,12 @@ test('a previous slot that does not come up leaves the proxy and the active slot
     assert.equal(state, STATE);
     assert.deepEqual(timeline.filter((line) => line.includes('docker stop')), ['docker stop infinity-grove-backend-blue']);
     assert.deepEqual(timeline.filter((line) => line.includes('infinity-grove-proxy')), []);
-    assert.equal(readFileSync(join(root, 'deploy', 'nginx', 'default.conf'), 'utf8'), renderConf('green'));
 });
 
 test('a failed switch stops the previous slot again and keeps the active one', async () =>
 {
     const root = repo();
-    const { timeline, lines, deps } = machine({ failing: ['nginx -t'] });
+    const { timeline, lines, deps } = machine({ failing: ['infinity-grove-proxy'] });
 
     const { ok, state } = await rollback({ ...deps, root });
 
@@ -162,5 +159,4 @@ test('a failed switch stops the previous slot again and keeps the active one', a
     assert.deepEqual(lines, ['Rollback para aaaaaaa falhou na troca do proxy; o slot green continua ativo']);
     assert.equal(state, STATE);
     assert.deepEqual(timeline.filter((line) => line.includes('docker stop')), ['docker stop infinity-grove-backend-blue']);
-    assert.equal(readFileSync(join(root, 'deploy', 'nginx', 'default.conf'), 'utf8'), renderConf('green'));
 });

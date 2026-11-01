@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Starts the blue-green stack (Postgres, the active backend slot, the nginx proxy, Dozzle), opens a public Cloudflare
+# Starts the blue-green stack (Postgres, the active backend slot, the Traefik proxy, Dozzle), opens a public Cloudflare
 # quick tunnel to the proxy, publishes the Worker of the last handled commit through it and starts the deploy watcher,
 # which deploys every new commit on origin/main (deploy/watcher.mjs). Only commit trees go out, never the working tree.
 # The first run (no .deploy-state) builds origin/main into the blue slot. A second run while one is up only prints its
@@ -119,12 +119,12 @@ if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
   git archive --format=tar "$COMMIT:backend" | docker build -t "$IMAGE" -
 fi
 
-# The proxy conf names only the active slot, and nginx resolves it on start, so the slot comes up first
-node --input-type=module -e 'import { writeConf } from "./deploy/lib/proxy.mjs"; writeConf("deploy/nginx", process.argv[1]);' "$SLOT"
 echo "Starting Postgres, Dozzle and backend-$SLOT ($IMAGE)..."
 env "$IMAGE_VAR=$IMAGE" "${COMPOSE[@]}" up -d --wait postgres dozzle "backend-$SLOT"
 "${COMPOSE[@]}" up -d --wait proxy
-docker exec "$PROXY" nginx -s reload >/dev/null
+# The proxy conf names only the active slot; it is written into the container, as every switch does
+node --input-type=module -e 'import { switchTo } from "./deploy/lib/proxy.mjs"; import { run } from "./deploy/lib/run.mjs"; process.exit(switchTo(run, process.argv[1]) ? 0 : 1);' "$SLOT" \
+  || { echo "The proxy did not take the conf of slot $SLOT; see: docker logs $PROXY"; exit 1; }
 
 echo "Waiting for the backend behind the proxy on :$PROXY_PORT..."
 for _ in $(seq 1 60); do

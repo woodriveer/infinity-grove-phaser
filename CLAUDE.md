@@ -17,7 +17,7 @@
 
 # Deploy
 
-- The backend and the game go live from `origin/main` while `./publish.sh` runs. From the repository root it starts the blue-green stack in Docker (Postgres, the active backend slot, the nginx proxy on `localhost:8080`, Dozzle), opens the `cloudflared` quick tunnel to the proxy, publishes the game Worker through that tunnel and starts the deploy watcher (`deploy/watcher.mjs`).
+- The backend and the game go live from `origin/main` while `./publish.sh` runs. From the repository root it starts the blue-green stack in Docker (Postgres, the active backend slot, the Traefik proxy on `localhost:8080`, Dozzle), opens the `cloudflared` quick tunnel to the proxy, publishes the game Worker through that tunnel and starts the deploy watcher (`deploy/watcher.mjs`).
 - Every 60 s the watcher fetches `origin/main` and deploys the newest commit it has not handled. A commit that changes `backend/**` is built into the idle slot, checked by the regression suite (`deploy/regression.mjs`) and switched in with no downtime; a failing commit never takes traffic. A commit that changes the game republishes the Worker through the same tunnel. Any other commit is only recorded. The state is in `.deploy-state`.
 - Only the tree of a commit is deployed, never the working tree: uncommitted files never reach players.
 - After finishing a new feature/spec (Verifier PASS, everything pushed), make sure `./publish.sh` is running and the commit is on `origin/main`; the watcher deploys it within a few minutes. This step is never skipped silently: if `publish.sh` is not running and cannot be started, report that the deploy is pending.

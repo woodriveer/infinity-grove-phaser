@@ -1,5 +1,4 @@
 //  One blue-green deploy: build the commit, start it in the idle slot, wait for it, run its suite, switch the proxy, stop the old slot
-import { join } from 'node:path';
 import { switchTo } from './proxy.mjs';
 import { runRegression } from './regressionRun.mjs';
 import { buildImage, imageOf, otherSlot, removeImage, removeSlot, startSlot, stopSlot, waitReady } from './slots.mjs';
@@ -46,7 +45,7 @@ export const deployBackend = async ({ exec, fetch, root, state, hash, log, sleep
         return fail(`Deploy ${short} falhou na regressão; o slot ${active} continua ativo`);
     }
 
-    if (!switchTo(exec, join(root, 'deploy', 'nginx'), idle))
+    if (!switchTo(exec, idle))
     {
         return fail(`Deploy ${short} falhou na troca do proxy; o slot ${active} continua ativo`);
     }

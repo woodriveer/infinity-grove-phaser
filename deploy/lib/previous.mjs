@@ -1,5 +1,4 @@
 //  The previous slot: kept stopped for 5 minutes after a switch so ./deploy.sh --rollback can bring it back, then removed with its image
-import { join } from 'node:path';
 import { switchTo } from './proxy.mjs';
 import { imageOf, removeImage, removeSlot, resumeSlot, slotExists, stopSlot, waitReady } from './slots.mjs';
 
@@ -43,7 +42,7 @@ export const rollback = async ({ exec, fetch, root, state, log, sleep, now }) =>
         return { ok: false, state };
     }
 
-    if (!switchTo(exec, join(root, 'deploy', 'nginx'), previous.slot))
+    if (!switchTo(exec, previous.slot))
     {
         stopSlot(exec, previous.slot);
         log(`Rollback para ${short} falhou na troca do proxy; o slot ${active.slot} continua ativo`);

@@ -1,10 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { deployBackend } from './backendDeploy.mjs';
-import { renderConf } from './proxy.mjs';
+import { switchScript } from './proxy.mjs';
+
+const switchLine = (slot) => `docker exec -i infinity-grove-proxy sh -c ${switchScript(slot)}`;
 
 const OLD = 'aaaaaaa1111111111111111111111111111111111';
 const NEW = 'bbbbbbb2222222222222222222222222222222222';
@@ -15,12 +17,11 @@ const STATE = {
     tunnel: 'https://x.trycloudflare.com'
 };
 
-//  A repo root with the proxy conf of the active slot and a working tree suite
+//  A repo root with a working tree suite
 const repo = () =>
 {
     const root = mkdtempSync(join(tmpdir(), 'deploy-backend-'));
-    mkdirSync(join(root, 'deploy', 'nginx'), { recursive: true });
-    writeFileSync(join(root, 'deploy', 'nginx', 'default.conf'), renderConf('blue'));
+    mkdirSync(join(root, 'deploy'));
     writeFileSync(join(root, 'deploy', 'regression.mjs'), '//\n');
 
     return root;
@@ -78,13 +79,11 @@ test('a passing deploy switches to the idle slot, drains 10 s, stops the old slo
         'fetch http://127.0.0.1:18082/progress',
         `git show ${NEW}:deploy/regression.mjs`,
         timeline[5],
-        'docker exec infinity-grove-proxy nginx -t',
-        'docker exec infinity-grove-proxy nginx -s reload',
+        switchLine('green'),
         'sleep 10000',
         'docker stop infinity-grove-backend-blue'
     ]);
     assert.match(timeline[5], /^docker run --rm --name infinity-grove-regression-bbbbbbb .* http:\/\/backend-green:8080$/);
-    assert.equal(readFileSync(join(root, 'deploy', 'nginx', 'default.conf'), 'utf8'), renderConf('green'));
     assert.deepEqual(state, {
         active: { slot: 'green', commit: NEW },
         previous: { slot: 'blue', commit: OLD, stoppedAt: 1_010_000 },
@@ -126,7 +125,7 @@ const failures = [
     },
     {
         name: 'a failed switch',
-        options: { failing: ['nginx -t'] },
+        options: { failing: ['infinity-grove-proxy'] },
         line: 'Deploy bbbbbbb falhou na troca do proxy; o slot blue continua ativo',
         removed: true
     }
@@ -145,8 +144,7 @@ for (const failure of failures)
         assert.deepEqual(lines, [failure.line]);
         assert.deepEqual(state, { ...STATE, handled: NEW });
         assert.deepEqual(commands(timeline, 'docker stop'), []);
-        assert.deepEqual(commands(timeline, 'nginx -s reload'), []);
-        assert.equal(readFileSync(join(root, 'deploy', 'nginx', 'default.conf'), 'utf8'), renderConf('blue'));
+        assert.deepEqual(commands(timeline, 'infinity-grove-proxy'), failure.line.includes('troca do proxy') ? [switchLine('green')] : []);
         assert.deepEqual(
             commands(timeline, ' rm -sf '),
             failure.removed ? ['docker compose -f backend/docker-compose.yml --profile deploy rm -sf backend-green'] : []

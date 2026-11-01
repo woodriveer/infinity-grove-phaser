@@ -62,16 +62,23 @@ services:
       postgres:
         condition: service_healthy
 
-  # deploy/nginx/default.conf names the active slot; a switch rewrites it and runs nginx -s reload
+  # deploy/lib/proxy.mjs writes the active slot into /etc/traefik/dynamic from inside the container (a Windows bind mount
+  # never wakes the file watcher) and Traefik hot-reloads it; the API on :8080 stays inside the container for that check
   proxy:
-    image: nginx:1.31.8-alpine
+    image: traefik:v3.7.15
     container_name: infinity-grove-proxy
     profiles: [ deploy ]
     restart: unless-stopped
+    command:
+      - --entryPoints.web.address=:80
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+      - --api.insecure=true
+      - --accessLog=true
     ports:
       - "127.0.0.1:${PROXY_PORT:-8080}:80"
     volumes:
-      - ../deploy/nginx:/etc/nginx/conf.d:ro
+      - /etc/traefik/dynamic
 
   dozzle:
     image: amir20/dozzle:v11.3.5

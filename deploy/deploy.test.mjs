@@ -1,12 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { main } from './deploy.mjs';
-import { renderConf } from './lib/proxy.mjs';
 import { readState, writeState } from './lib/state.mjs';
 
 const OLD = 'aaaaaaa1111111111111111111111111111111111';
@@ -18,12 +17,10 @@ const STATE = {
     tunnel: 'https://abc.trycloudflare.com'
 };
 
-//  A repo root with the state, the proxy conf and a docker that has (or has not) the previous container
+//  A repo root with the state and a docker that has (or has not) the previous container
 const machine = ({ state = STATE, previousContainer = true, lockTaken = false } = {}) =>
 {
     const root = mkdtempSync(join(tmpdir(), 'deploy-main-'));
-    mkdirSync(join(root, 'deploy', 'nginx'), { recursive: true });
-    writeFileSync(join(root, 'deploy', 'nginx', 'default.conf'), renderConf('green'));
     const stateFile = join(root, '.deploy-state');
     const lockFile = join(root, '.deploy.lock');
     const lines = [];

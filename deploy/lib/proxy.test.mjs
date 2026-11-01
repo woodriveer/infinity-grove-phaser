@@ -1,91 +1,55 @@
-import { test, beforeEach } from 'node:test';
+import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { renderConf, switchTo, writeConf } from './proxy.mjs';
+import { renderConf, switchScript, switchTo } from './proxy.mjs';
 
-let dir;
-
-beforeEach(() =>
-{
-    dir = mkdtempSync(join(tmpdir(), 'deploy-proxy-'));
-});
-
-//  A fake docker that records the nginx commands and fails the ones listed
-const fakeExec = (failing = []) =>
+//  A fake docker that records each command with its stdin and exits with the given status
+const fakeExec = (status = 0) =>
 {
     const calls = [];
-    const exec = (command, args) =>
+    const exec = (command, args, options) =>
     {
-        calls.push([command, ...args].join(' '));
-        const failed = failing.some((part) => args.join(' ').endsWith(part));
+        calls.push({ line: [command, ...args.slice(0, 5)].join(' '), script: args[5], input: options?.input });
 
-        return { status: failed ? 1 : 0, stdout: '', stderr: failed ? 'nginx: [emerg]' : '' };
+        return { status, stdout: '', stderr: '' };
     };
 
     return { exec, calls };
 };
 
-const servers = (conf) => [...conf.matchAll(/server\s+([^\s;]+);/g)].map((match) => match[1]);
+const servers = (conf) => [...conf.matchAll(/url:\s+(\S+)/g)].map((match) => match[1]);
 
-test('the conf names only the given slot', () =>
+test('the conf names only the given slot behind one catch-all router on the web entry point', () =>
 {
-    assert.deepEqual(servers(renderConf('green')), ['backend-green:8080']);
-    assert.deepEqual(servers(renderConf('blue')), ['backend-blue:8080']);
-    assert.match(renderConf('green'), /proxy_pass http:\/\/backend;/);
+    assert.deepEqual(servers(renderConf('green')), ['http://backend-green:8080']);
+    assert.deepEqual(servers(renderConf('blue')), ['http://backend-blue:8080']);
+    assert.match(renderConf('blue'), /entryPoints: \[ web \]/);
+    assert.match(renderConf('blue'), /rule: PathPrefix\(`\/`\)/);
 });
 
-//  A reload closes the idle keep-alive connections of the old workers, and a request sent on one at that moment is reset
-//  (seen live: one UND_ERR_SOCKET right at a switch); with no client keep-alive no connection is idle at a reload
-test('the conf turns off client keep-alive, so a reload resets no request', () =>
+test('switchTo pipes the conf of the slot into the proxy container and reports the success', () =>
 {
-    assert.match(renderConf('green'), /^\s*keepalive_timeout 0;$/m);
-});
-
-test('writeConf writes default.conf in the dir', () =>
-{
-    writeConf(dir, 'blue');
-
-    assert.equal(readFileSync(join(dir, 'default.conf'), 'utf8'), renderConf('blue'));
-});
-
-test('switchTo writes the conf, checks it, then reloads', () =>
-{
-    writeConf(dir, 'blue');
     const { exec, calls } = fakeExec();
 
-    assert.equal(switchTo(exec, dir, 'green'), true);
-    assert.deepEqual(calls, [
-        'docker exec infinity-grove-proxy nginx -t',
-        'docker exec infinity-grove-proxy nginx -s reload'
-    ]);
-    assert.equal(readFileSync(join(dir, 'default.conf'), 'utf8'), renderConf('green'));
+    assert.equal(switchTo(exec, 'green'), true);
+    assert.deepEqual(calls, [{
+        line: 'docker exec -i infinity-grove-proxy sh -c',
+        script: switchScript('green'),
+        input: renderConf('green')
+    }]);
 });
 
-test('a failed nginx -t writes the old conf back and does not reload', () =>
+test('switchTo reports a failure when the script exits non-zero', () =>
 {
-    writeConf(dir, 'blue');
-    const { exec, calls } = fakeExec(['nginx -t']);
-
-    assert.equal(switchTo(exec, dir, 'green'), false);
-    assert.deepEqual(calls, ['docker exec infinity-grove-proxy nginx -t']);
-    assert.equal(readFileSync(join(dir, 'default.conf'), 'utf8'), renderConf('blue'));
+    assert.equal(switchTo(fakeExec(1).exec, 'green'), false);
 });
 
-test('a failed reload writes the old conf back', () =>
+test('the script keeps a backup, waits for the API to serve the slot and otherwise puts the backup back', () =>
 {
-    writeConf(dir, 'blue');
-    const { exec } = fakeExec(['-s reload']);
+    const lines = switchScript('green').split('\n');
 
-    assert.equal(switchTo(exec, dir, 'green'), false);
-    assert.equal(readFileSync(join(dir, 'default.conf'), 'utf8'), renderConf('blue'));
-});
-
-test('a failed check with no conf before leaves no conf', () =>
-{
-    const { exec } = fakeExec(['nginx -t']);
-
-    assert.equal(switchTo(exec, dir, 'green'), false);
-    assert.equal(existsSync(join(dir, 'default.conf')), false);
+    assert.match(lines[0], /cp \/etc\/traefik\/dynamic\/backend\.yml \/etc\/traefik\/dynamic\/backend\.yml\.bak/);
+    assert.match(lines[1], /cat > \S+\.tmp && mv \S+\.tmp \/etc\/traefik\/dynamic\/backend\.yml$/);
+    assert.match(lines[2], /wget -qO- http:\/\/127\.0\.0\.1:8080\/api\/http\/services\/backend@file .*grep -q 'backend-green:8080' && exit 0/);
+    assert.match(lines[3], /mv \S+\.bak \/etc\/traefik\/dynamic\/backend\.yml; else rm -f/);
+    assert.equal(lines[4], 'exit 1');
 });

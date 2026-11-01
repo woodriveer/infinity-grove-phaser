@@ -1,7 +1,6 @@
 .env
 .deploy-state
 .deploy.lock
-deploy/nginx/default.conf
 .idea/
 .vscode/
 .claude/worktrees/
