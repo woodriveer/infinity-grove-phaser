@@ -3252,10 +3252,10 @@
     "semantic_hash": "499b1dc1ff3ac92cad13e7d8f1e4fdd6"
   },
   "CLAUDE.md": {
-    "mtime": 1793449043.2759316,
-    "seen": 1793499840.0445535,
-    "ast_hash": "b92d1c916feea034d49fd58c5f390a10",
-    "semantic_hash": "b92d1c916feea034d49fd58c5f390a10"
+    "mtime": 1793522834.6236875,
+    "seen": 1793523151.7698107,
+    "ast_hash": "de39548e5c61b0d664f987f24bcff9c1",
+    "semantic_hash": ""
   },
   "GEMINI.md": {
     "mtime": 1792251939.0083523,
@@ -4450,5 +4450,23 @@
     "seen": 1793499840.0449548,
     "ast_hash": "9dc7b245053f6aa6acbce9f80f566c0f",
     "semantic_hash": "9dc7b245053f6aa6acbce9f80f566c0f"
+  },
+  ".claude/settings.json": {
+    "mtime": 1793523128.0539305,
+    "seen": 1793523151.7688644,
+    "ast_hash": "c5997ba12f76aa66d41f877fb01e62e5",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1792605371.3488686,
+    "seen": 1793523151.7698174,
+    "ast_hash": "7df8c92f341d7e2a93cb15367d8b429b",
+    "semantic_hash": ""
+  },
+  "game/package-lock.json": {
+    "mtime": 1793133647.1381056,
+    "seen": 1793523151.7701616,
+    "ast_hash": "9adfd4ccf7c21b322db0969ea75cd5ab",
+    "semantic_hash": ""
   }
 }
