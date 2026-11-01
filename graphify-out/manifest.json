@@ -72,10 +72,10 @@
     "semantic_hash": "cb8c9663ca9ed2a22042345ef1baffed"
   },
   "backend/docker-compose.yml": {
-    "mtime": 1793175649.1132777,
-    "seen": 1793499840.0436141,
-    "ast_hash": "780ae9c37b81302ba9236fc691e48191",
-    "semantic_hash": "780ae9c37b81302ba9236fc691e48191"
+    "mtime": 1793547993.3231113,
+    "seen": 1793548147.4333568,
+    "ast_hash": "3951015b66268441fa2ed525992b4515",
+    "semantic_hash": ""
   },
   "backend/gradlew": {
     "mtime": 1792226638.7019513,
@@ -775,45 +775,45 @@
   },
   "backend/src/main/resources/db/migration/V1__schema.sql": {
     "mtime": 1792449784.960996,
-    "seen": 1793499840.04376,
+    "seen": 1793548164.708787,
     "ast_hash": "d917e3338c9056d8aaac8f370bd390df",
-    "semantic_hash": "d917e3338c9056d8aaac8f370bd390df"
+    "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V2__lyra_leader_bonus.sql": {
     "mtime": 1792605371.3499,
-    "seen": 1793499840.0437615,
+    "seen": 1793548164.7087922,
     "ast_hash": "9a51abca3b1491c33d5977907b01ba3e",
-    "semantic_hash": "9a51abca3b1491c33d5977907b01ba3e"
+    "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V3__player_talents.sql": {
     "mtime": 1792605849.9148004,
-    "seen": 1793499840.0437622,
+    "seen": 1793548164.7087958,
     "ast_hash": "b10217e52a9247c45a433db9d75fe079",
-    "semantic_hash": "b10217e52a9247c45a433db9d75fe079"
+    "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V4__monster_health_growth.sql": {
     "mtime": 1792630598.0998406,
-    "seen": 1793499840.0437632,
+    "seen": 1793548164.7087984,
     "ast_hash": "1e48e5f4faf4c160984a351b3fa92fb1",
-    "semantic_hash": "1e48e5f4faf4c160984a351b3fa92fb1"
+    "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V5__talent_point_awards.sql": {
     "mtime": 1792670884.5568101,
-    "seen": 1793499840.0437646,
+    "seen": 1793548164.7088017,
     "ast_hash": "9514a4aa17b5c5bde5c3d1a77e6ed100",
-    "semantic_hash": "9514a4aa17b5c5bde5c3d1a77e6ed100"
+    "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V6__auto_click.sql": {
     "mtime": 1793095910.2761598,
-    "seen": 1793499840.0437655,
+    "seen": 1793548164.7088048,
     "ast_hash": "33e41fc800e62d651ab8a37983a65d34",
-    "semantic_hash": "33e41fc800e62d651ab8a37983a65d34"
+    "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V7__player_resets.sql": {
     "mtime": 1793130651.1664734,
-    "seen": 1793499840.0437665,
+    "seen": 1793548164.7088084,
     "ast_hash": "0f56b51412fb5f300cf56a15036d3de9",
-    "semantic_hash": "0f56b51412fb5f300cf56a15036d3de9"
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/Fakes.kt": {
     "mtime": 1793130738.0529056,
@@ -1332,22 +1332,22 @@
     "semantic_hash": "e151bd0812f9cd374dc4a66e27e356a8"
   },
   "deploy/deploy.test.mjs": {
-    "mtime": 1793176626.22686,
-    "seen": 1793499840.0438695,
-    "ast_hash": "408cbabfd258152c6fc65e18ff845915",
-    "semantic_hash": "408cbabfd258152c6fc65e18ff845915"
+    "mtime": 1793547964.623911,
+    "seen": 1793548147.5196433,
+    "ast_hash": "22d693f2292733e16072e5d71ccf3faa",
+    "semantic_hash": ""
   },
   "deploy/lib/backendDeploy.mjs": {
-    "mtime": 1793179471.6117983,
-    "seen": 1793499840.0438707,
-    "ast_hash": "c6f8185da64991c735bb9c03b2ca220f",
-    "semantic_hash": "c6f8185da64991c735bb9c03b2ca220f"
+    "mtime": 1793547941.6917872,
+    "seen": 1793548147.5196493,
+    "ast_hash": "34f59e0b00ca73409bf86dcdf2211107",
+    "semantic_hash": ""
   },
   "deploy/lib/backendDeploy.test.mjs": {
-    "mtime": 1793180358.0311904,
-    "seen": 1793499840.0438716,
-    "ast_hash": "0c56c0b187d1707c6165910fbaccd5fe",
-    "semantic_hash": "0c56c0b187d1707c6165910fbaccd5fe"
+    "mtime": 1793547974.2314985,
+    "seen": 1793548147.5196545,
+    "ast_hash": "ae04c7637a67de1354601670cb1203aa",
+    "semantic_hash": ""
   },
   "deploy/lib/changes.mjs": {
     "mtime": 1793175797.772103,
@@ -1362,28 +1362,28 @@
     "semantic_hash": "b39d500e17ea9c3ad11b9f2308dc11cf"
   },
   "deploy/lib/previous.mjs": {
-    "mtime": 1793179538.106113,
-    "seen": 1793499840.0438783,
-    "ast_hash": "a14b8cdaf2fb76ca66cb5e7bf066c8b2",
-    "semantic_hash": "a14b8cdaf2fb76ca66cb5e7bf066c8b2"
+    "mtime": 1793547941.6938152,
+    "seen": 1793548147.5205066,
+    "ast_hash": "820aa8fd3398194a4c62d85f7c94309e",
+    "semantic_hash": ""
   },
   "deploy/lib/previous.test.mjs": {
-    "mtime": 1793176419.654809,
-    "seen": 1793499840.043881,
-    "ast_hash": "9db8e10f2339ac8a93a96b513d04e79a",
-    "semantic_hash": "9db8e10f2339ac8a93a96b513d04e79a"
+    "mtime": 1793547941.6948268,
+    "seen": 1793548147.5205116,
+    "ast_hash": "959bc57b841aa259d5f73504dabc85c7",
+    "semantic_hash": ""
   },
   "deploy/lib/proxy.mjs": {
-    "mtime": 1793177890.3580356,
-    "seen": 1793499840.0438836,
-    "ast_hash": "244e2374117588d660606e13dfffc743",
-    "semantic_hash": "244e2374117588d660606e13dfffc743"
+    "mtime": 1793547941.695824,
+    "seen": 1793548147.5205154,
+    "ast_hash": "31cd5a832c08ac3bdb8fa1449a8ca112",
+    "semantic_hash": ""
   },
   "deploy/lib/proxy.test.mjs": {
-    "mtime": 1793177911.799262,
-    "seen": 1793499840.0438857,
-    "ast_hash": "2824398e00ac123e0566af936fb97799",
-    "semantic_hash": "2824398e00ac123e0566af936fb97799"
+    "mtime": 1793547941.6963303,
+    "seen": 1793548147.520519,
+    "ast_hash": "da186ea87374a8e5d759197a274f9d98",
+    "semantic_hash": ""
   },
   "deploy/lib/regressionRun.mjs": {
     "mtime": 1793176268.687034,
@@ -2532,10 +2532,10 @@
     "semantic_hash": "ee6991fbae164ee92f956ee5d3e5fa0c"
   },
   "publish.sh": {
-    "mtime": 1793177724.4275668,
-    "seen": 1793499840.044267,
-    "ast_hash": "bcb30e6455d04996981cac870860885a",
-    "semantic_hash": "bcb30e6455d04996981cac870860885a"
+    "mtime": 1793548043.4803867,
+    "seen": 1793548147.5973616,
+    "ast_hash": "71e553a8eb6322e227b173adf4980846",
+    "semantic_hash": ""
   },
   "skills-lock.json": {
     "mtime": 1792237346.194328,
@@ -2676,10 +2676,10 @@
     "semantic_hash": "4dd810a1d98ef3ac6f15f137f4ec4636"
   },
   ".specs/STATE.md": {
-    "mtime": 1793483404.752379,
-    "seen": 1793499840.0443249,
-    "ast_hash": "0a12800bc038c38821c8b22d5b0085af",
-    "semantic_hash": "0a12800bc038c38821c8b22d5b0085af"
+    "mtime": 1793548062.3669076,
+    "seen": 1793548147.6052454,
+    "ast_hash": "2ea59062fbe7fe92d6b5af83a3a398d0",
+    "semantic_hash": ""
   },
   ".specs/features/account-reset/design.md": {
     "mtime": 1793130480.0908456,
@@ -3252,9 +3252,9 @@
     "semantic_hash": "499b1dc1ff3ac92cad13e7d8f1e4fdd6"
   },
   "CLAUDE.md": {
-    "mtime": 1793522834.6236875,
-    "seen": 1793523151.7698107,
-    "ast_hash": "de39548e5c61b0d664f987f24bcff9c1",
+    "mtime": 1793548062.3179305,
+    "seen": 1793548147.6394906,
+    "ast_hash": "9c75e89306f1085e5af3e846194b9010",
     "semantic_hash": ""
   },
   "GEMINI.md": {
@@ -4461,6 +4461,24 @@
     "mtime": 1792605371.3488686,
     "seen": 1793523151.7698174,
     "ast_hash": "7df8c92f341d7e2a93cb15367d8b429b",
+    "semantic_hash": ""
+  },
+  ".specs/features/drag-equip/design.md": {
+    "mtime": 1793538080.1790175,
+    "seen": 1793548147.6184754,
+    "ast_hash": "6e7b5602e856f3355d39a772f9b75ce8",
+    "semantic_hash": ""
+  },
+  ".specs/features/drag-equip/spec.md": {
+    "mtime": 1793538031.640614,
+    "seen": 1793548147.618481,
+    "ast_hash": "f573e87c5c08bba1addf3c2b4cbb589d",
+    "semantic_hash": ""
+  },
+  ".specs/features/drag-equip/tasks.md": {
+    "mtime": 1793538369.845136,
+    "seen": 1793548147.6184843,
+    "ast_hash": "e2484c3bd73347b8b43bb32c43532f1f",
     "semantic_hash": ""
   },
   "game/package-lock.json": {
