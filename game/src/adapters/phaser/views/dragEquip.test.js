@@ -101,6 +101,13 @@ describe('attachDragToEquip', () => {
         expect(document.querySelectorAll('[data-testid="equip-piece-a1"]').length).toBe(1);
     });
 
+    it('the hero under the pointer is judged at the pointer, not at the copy beside it', () => {
+        startDrag();
+        pointer('pointermove', document, 150, 220);
+
+        expect(document.elementFromPoint).toHaveBeenLastCalledWith(150, 220);
+    });
+
     it('the ghost takes the scale of the panel the tile sits in', () => {
         //  A panel shown at 40%: the tile lays out 60 px wide and renders 24 px wide
         Object.defineProperty(tile, 'offsetWidth', { configurable: true, value: 60 });

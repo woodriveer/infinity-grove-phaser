@@ -170,7 +170,7 @@ test.describe('Drag to equip', () => {
         expect(equipCalls(calls)).toHaveLength(0);
     });
 
-    test('the ghost follows the pointer', async ({ page }) => {
+    test('the ghost follows the pointer, up and left of it', async ({ page }) => {
         await startGame(page);
         await openEquipment(page);
 
@@ -178,8 +178,9 @@ test.describe('Drag to equip', () => {
 
         const box = await page.getByTestId('piece-drag-ghost').boundingBox();
 
-        expect(Math.abs(box.x + box.width / 2 - 640)).toBeLessThanOrEqual(2);
-        expect(Math.abs(box.y + box.height / 2 - 360)).toBeLessThanOrEqual(2);
+        //  Its bottom-right corner sits 12 px up and left of the pointer, so the slot under the pointer stays visible
+        expect(Math.abs(box.x + box.width - 628)).toBeLessThanOrEqual(2);
+        expect(Math.abs(box.y + box.height - 348)).toBeLessThanOrEqual(2);
 
         await page.mouse.up();
     });
