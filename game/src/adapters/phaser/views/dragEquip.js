@@ -3,6 +3,11 @@
 //  Hero blocks carry `data-drop-hero="<heroId>"`; the hero who already wears the piece is not a target.
 export const DRAG_THRESHOLD_PX = 6;
 
+//  Edge scroll (spec D7): pointer distances in screen pixels, the step in the window's own scrollTop pixels
+export const EDGE_PX = 40;
+export const SCROLL_STEP_PX = 8;
+export const SCROLL_TICK_MS = 16;
+
 //  The one press in progress: a second pointer, or a press on another tile, is ignored while it runs
 let active = null;
 
@@ -59,6 +64,52 @@ export const attachDragToEquip = (tile, piece, onDrop) =>
         const press = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
         let ghost = null;
         let lit = null;
+        const scroller = tile.closest('.hero-window');
+        let last = press;
+        let direction = 0;
+        let timer = null;
+
+        //  -1 near the top edge, 1 near the bottom edge, 0 elsewhere or when the window is not laid out (jsdom, hidden)
+        const edge = (y) =>
+        {
+            const box = scroller?.getBoundingClientRect();
+
+            if (!box || box.height === 0)
+            {
+                return 0;
+            }
+
+            if (y - box.top <= EDGE_PX)
+            {
+                return -1;
+            }
+
+            return box.bottom - y <= EDGE_PX ? 1 : 0;
+        };
+
+        //  Restarts the timer only when the direction changes: pointer moves come faster than a tick
+        const steer = (y) =>
+        {
+            const next = edge(y);
+
+            if (next === direction)
+            {
+                return;
+            }
+
+            clearInterval(timer);
+            timer = null;
+            direction = next;
+
+            if (direction !== 0)
+            {
+                timer = setInterval(() =>
+                {
+                    scroller.scrollTop += direction * SCROLL_STEP_PX;
+                    light(heroUnder(last.x, last.y, piece));
+                }, SCROLL_TICK_MS);
+            }
+        };
 
         const light = (block) =>
         {
@@ -76,9 +127,11 @@ export const attachDragToEquip = (tile, piece, onDrop) =>
 
         const follow = (x, y) =>
         {
+            last = { x, y };
             ghost.style.left = `${x}px`;
             ghost.style.top = `${y}px`;
             light(heroUnder(x, y, piece));
+            steer(y);
         };
 
         //  Ends the press; answers whether it was a drag
@@ -88,6 +141,7 @@ export const attachDragToEquip = (tile, piece, onDrop) =>
             document.removeEventListener('pointerup', up);
             document.removeEventListener('pointercancel', cancel);
             active = null;
+            clearInterval(timer);
 
             if (!ghost)
             {

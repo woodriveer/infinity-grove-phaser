@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { attachDragToEquip, DRAG_THRESHOLD_PX } from './dragEquip';
+import { attachDragToEquip, DRAG_THRESHOLD_PX, EDGE_PX, SCROLL_STEP_PX, SCROLL_TICK_MS } from './dragEquip';
 import { renderPieceTile } from './pieceTile';
 
 const amulet = (heroId = null) => ({ id: 'a1', slot: 'AMULET', rarity: 'EPIC', refine: 3, affixes: [], heroId, sellPrice: 400 });
@@ -292,5 +292,161 @@ describe('attachDragToEquip', () => {
         tile.dispatchEvent(event);
 
         expect(event.defaultPrevented).toBe(true);
+    });
+});
+
+describe('attachDragToEquip edge scroll', () => {
+    //  The window spans y 0 to 600 on screen; it starts scrolled to 200
+    const layOut = (height = 600) => {
+        const scroller = document.querySelector('.hero-window');
+
+        scroller.getBoundingClientRect = () => ({ top: 0, bottom: height, left: 0, right: 900, width: 900, height });
+        scroller.scrollTop = 200;
+
+        return scroller;
+    };
+
+    beforeEach(() => vi.useFakeTimers());
+    //  Runs the pending fake timers first, so the click guard of a drag ended under fake timers is removed before real timers come back
+    afterEach(() => {
+        vi.runOnlyPendingTimers();
+        vi.useRealTimers();
+    });
+
+    it('exports the edge numbers', () => {
+        expect(EDGE_PX).toBe(40);
+        expect(SCROLL_STEP_PX).toBe(8);
+        expect(SCROLL_TICK_MS).toBe(16);
+    });
+
+    it('scrolls up near the top edge', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 30);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(192);
+
+        vi.advanceTimersByTime(48);
+
+        expect(scroller.scrollTop).toBe(168);
+    });
+
+    it('scrolls down near the bottom edge', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 570);
+        vi.advanceTimersByTime(32);
+
+        expect(scroller.scrollTop).toBe(216);
+    });
+
+    it('40 px from the top scrolls and 41 px does not', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 41);
+        vi.advanceTimersByTime(32);
+
+        expect(scroller.scrollTop).toBe(200);
+
+        pointer('pointermove', document, 120, 40);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(192);
+    });
+
+    it('40 px from the bottom scrolls and 41 px does not', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 559);
+        vi.advanceTimersByTime(32);
+
+        expect(scroller.scrollTop).toBe(200);
+
+        pointer('pointermove', document, 120, 560);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(208);
+    });
+
+    it('keeps scrolling while the pointer moves inside the band', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 30);
+        vi.advanceTimersByTime(8);
+        pointer('pointermove', document, 125, 32);
+        vi.advanceTimersByTime(8);
+
+        expect(scroller.scrollTop).toBe(192);
+    });
+
+    it('stops when the pointer leaves the band', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 30);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(192);
+
+        pointer('pointermove', document, 120, 300);
+        vi.advanceTimersByTime(64);
+
+        expect(scroller.scrollTop).toBe(192);
+    });
+
+    it('stops when the drag ends', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 30);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(192);
+
+        pointer('pointerup', document, 120, 30);
+        vi.advanceTimersByTime(64);
+
+        expect(scroller.scrollTop).toBe(192);
+    });
+
+    it('does not scroll a window with no height', () => {
+        const scroller = layOut(0);
+
+        startDrag();
+        pointer('pointermove', document, 120, 0);
+        vi.advanceTimersByTime(64);
+
+        expect(scroller.scrollTop).toBe(200);
+    });
+
+    it('a press that is no drag never scrolls', () => {
+        const scroller = layOut();
+
+        pointer('pointerdown', tile, 100, 30);
+        pointer('pointermove', document, 102, 30);
+        vi.advanceTimersByTime(64);
+
+        expect(scroller.scrollTop).toBe(200);
+    });
+
+    it('the light follows the block that scrolls under a still pointer', () => {
+        layOut();
+        under = lyra;
+        startDrag();
+        pointer('pointermove', document, 120, 30);
+
+        expect(lyra.classList.contains('is-drop-target')).toBe(true);
+
+        under = kael;
+        vi.advanceTimersByTime(16);
+
+        expect(kael.classList.contains('is-drop-target')).toBe(true);
+        expect(lyra.classList.contains('is-drop-target')).toBe(false);
     });
 });

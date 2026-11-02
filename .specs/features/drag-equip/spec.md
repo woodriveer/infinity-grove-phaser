@@ -188,10 +188,10 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | In Tasks |
 | DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Implementing |
 | DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Implementing |
-| DRG-27 | P2: Scroll while dragging (AC 1, up) | Tasks | In Tasks |
-| DRG-28 | P2: Scroll while dragging (AC 2, down) | Tasks | In Tasks |
-| DRG-29 | P2: Scroll while dragging (AC 3, stop) | Tasks | In Tasks |
-| DRG-30 | P2: Scroll while dragging (AC 4, highlight follows) | Tasks | In Tasks |
+| DRG-27 | P2: Scroll while dragging (AC 1, up) | Tasks | Implementing |
+| DRG-28 | P2: Scroll while dragging (AC 2, down) | Tasks | Implementing |
+| DRG-29 | P2: Scroll while dragging (AC 3, stop) | Tasks | Implementing |
+| DRG-30 | P2: Scroll while dragging (AC 4, highlight follows) | Tasks | Implementing |
 
 **Coverage:** 30 total, 30 mapped to tasks, 0 unmapped
 

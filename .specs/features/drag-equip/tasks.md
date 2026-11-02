@@ -364,7 +364,7 @@ The `afterEach` `pointercancel` ends any press a test left open, so the module-l
 
 ---
 
-### T2: Edge scroll while dragging [ ]
+### T2: Edge scroll while dragging [x]
 
 **Owner**: game-dev
 **Goal**: While a drag is within 40 px of the top or bottom edge of `.hero-window`, the window scrolls 8 px every 16 ms toward that edge and the highlight follows the block under the still pointer (DRG-27 to DRG-30).
@@ -500,8 +500,8 @@ Press at (100, 300) and move to (130, 300) to start a drag in the middle (`start
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 11 new cases pass and the 23 cases of T1 still pass.
-- [ ] `cd game && npm test` passes.
+- [x] The 11 new cases pass and the 23 cases of T1 still pass.
+- [x] `cd game && npm test` passes.
 
 **Commit**: `feat(game): scroll the equipment window while a piece is dragged near its edge`
 
