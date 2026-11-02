@@ -170,17 +170,17 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-03 | P1: Drop a piece on a hero (AC 3, piece in slot, no detail) | Tasks | Done |
 | DRG-04 | P1: Drop a piece on a hero (AC 4, replaced piece to bag) | Tasks | Done |
 | DRG-05 | P1: Drop a piece on a hero (AC 5, moved from another hero) | Tasks | Done |
-| DRG-06 | P1: Drop a piece on a hero (AC 6, leader panel) | Tasks | Implementing |
+| DRG-06 | P1: Drop a piece on a hero (AC 6, leader panel) | Tasks | Done |
 | DRG-07 | P1: Drop a piece on a hero (AC 7, failure) | Tasks | Done |
-| DRG-08 | P1: Drop a piece on a hero (AC 8, busy) | Tasks | Implementing |
+| DRG-08 | P1: Drop a piece on a hero (AC 8, busy) | Tasks | Done |
 | DRG-09 | P1: Cancel a drag (AC 1, outside every hero) | Tasks | Done |
 | DRG-10 | P1: Cancel a drag (AC 2, own wearer) | Tasks | Done |
-| DRG-11 | P1: Cancel a drag (AC 3, pointercancel) | Tasks | Implementing |
+| DRG-11 | P1: Cancel a drag (AC 3, pointercancel) | Tasks | Done |
 | DRG-12 | P1: Cancel a drag (AC 4, cleanup) | Tasks | Done |
-| DRG-13 | P1: Cancel a drag (AC 5, click swallowed) | Tasks | Implementing |
+| DRG-13 | P1: Cancel a drag (AC 5, click swallowed) | Tasks | Done |
 | DRG-14 | P1: Cancel a drag (AC 6, short press is a click) | Tasks | Done |
-| DRG-15 | P1: See what is being dragged (AC 1, ghost up and left of the pointer) | Tasks | Implementing |
-| DRG-16 | P1: See what is being dragged (AC 2, source dimmed to 0.4) | Tasks | Implementing |
+| DRG-15 | P1: See what is being dragged (AC 1, ghost up and left of the pointer) | Tasks | Done |
+| DRG-16 | P1: See what is being dragged (AC 2, source dimmed to 0.4) | Tasks | Done |
 | DRG-17 | P1: See what is being dragged (AC 3, target and slot) | Tasks | Done |
 | DRG-18 | P1: See what is being dragged (AC 4, only one target) | Tasks | Done |
 | DRG-19 | P1: See what is being dragged (AC 5, own wearer not lit) | Tasks | Done |
@@ -189,15 +189,15 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-22 | P1: Touch, pen and existing controls (AC 2, touch-action) | Tasks | Done |
 | DRG-23 | P1: Touch, pen and existing controls (AC 3, Equipar em stays) | Tasks | Done |
 | DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | Done |
-| DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Implementing |
-| DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Implementing |
-| DRG-27 | P2: Scroll while dragging (AC 1, up, also above the window) | Tasks | Implementing |
-| DRG-28 | P2: Scroll while dragging (AC 2, down, also below the window) | Tasks | Implementing |
-| DRG-29 | P2: Scroll while dragging (AC 3, stop) | Tasks | Done |
-| DRG-30 | P2: Scroll while dragging (AC 4, highlight follows) | Tasks | Implementing |
-| DRG-31 | P1: See what is being dragged (AC 7, ghost at the tile's on-screen size x 1.1) | Tasks | Implementing |
-| DRG-32 | P1: See what is being dragged (AC 8, ghost 0.6 with no valid target) | Tasks | Implementing |
-| DRG-33 | P1: See what is being dragged (AC 9, drop slot at full opacity) | Tasks | Implementing |
+| DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Needs Fix |
+| DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Done |
+| DRG-27 | P2: Scroll while dragging (AC 1, up, also above the window) | Tasks | Needs Fix |
+| DRG-28 | P2: Scroll while dragging (AC 2, down, also below the window) | Tasks | Needs Fix |
+| DRG-29 | P2: Scroll while dragging (AC 3, stop) | Tasks | Needs Fix |
+| DRG-30 | P2: Scroll while dragging (AC 4, highlight follows) | Tasks | Done |
+| DRG-31 | P1: See what is being dragged (AC 7, ghost at the tile's on-screen size x 1.1) | Tasks | Done |
+| DRG-32 | P1: See what is being dragged (AC 8, ghost 0.6 with no valid target) | Tasks | Done |
+| DRG-33 | P1: See what is being dragged (AC 9, drop slot at full opacity) | Tasks | Done |
 
 **Coverage:** 33 total, 33 mapped to tasks, 0 unmapped
 

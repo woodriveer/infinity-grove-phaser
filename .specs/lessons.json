@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 63,
+  "next_id": 65,
   "lessons": [
     {
       "id": "L-001",
@@ -1124,6 +1124,42 @@
       ],
       "created": "2026-11-02T01:55:14Z",
       "last_seen": "2026-11-02T01:55:14Z"
+    },
+    {
+      "id": "L-063",
+      "key": "surviving_mutant::pin a second pointer guard with a second primary pointer of another pointer type and count the created copies rather than reading the first match",
+      "text": "Pin a second-pointer guard with a second primary pointer of another pointer type, and count the created copies rather than reading the first match",
+      "signal": "surviving_mutant",
+      "scope": "pointer-input",
+      "status": "candidate",
+      "features": [
+        "drag-equip"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/src/adapters/phaser/views/dragEquip.js:64 (sensor S1, active guard removed; validation.md round 2) (pointer-input)"
+      ],
+      "created": "2026-11-02T03:52:11Z",
+      "last_seen": "2026-11-02T03:52:11Z"
+    },
+    {
+      "id": "L-064",
+      "key": "surviving_mutant::pin a timer that restarts on re entry leave the zone come back end the gesture and assert the step size and that the timer stops",
+      "text": "Pin a timer that restarts on re-entry: leave the zone, come back, end the gesture, and assert the step size and that the timer stops",
+      "signal": "surviving_mutant",
+      "scope": "timers",
+      "status": "candidate",
+      "features": [
+        "drag-equip"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/src/adapters/phaser/views/dragEquip.js:105 (sensor S9, timer not cleared on direction change; validation.md round 2) (timers)"
+      ],
+      "created": "2026-11-02T03:52:11Z",
+      "last_seen": "2026-11-02T03:52:11Z"
     }
   ]
 }

@@ -384,6 +384,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md DRG-06 DRG-08 DRG-11 DRG-13 DRG-28 DRG-30 (game/e2e)
 - last seen: 2026-11-02T01:55:14Z
 
+### L-063 - Pin a second-pointer guard with a second primary pointer of another pointer type, and count the created copies rather than reading the first match
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `pointer-input` · harmful: 0
+- features: drag-equip
+- evidence: game/src/adapters/phaser/views/dragEquip.js:64 (sensor S1, active guard removed; validation.md round 2) (pointer-input)
+- last seen: 2026-11-02T03:52:11Z
+
+### L-064 - Pin a timer that restarts on re-entry: leave the zone, come back, end the gesture, and assert the step size and that the timer stops
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `timers` · harmful: 0
+- features: drag-equip
+- evidence: game/src/adapters/phaser/views/dragEquip.js:105 (sensor S9, timer not cleared on direction change; validation.md round 2) (timers)
+- last seen: 2026-11-02T03:52:11Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
