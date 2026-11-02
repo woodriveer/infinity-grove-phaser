@@ -140,6 +140,7 @@ test.describe('Drag to equip', () => {
         await expect(page.getByTestId('equip-piece-a1')).toHaveClass(/is-dragging/);
         await expect(page.getByTestId('equip-hero-lyra')).toHaveClass(/is-drop-target/);
         await expect(page.getByTestId('equip-slot-lyra-AMULET')).toHaveClass(/is-drop-slot/);
+        await expect(page.getByTestId('equip-slot-lyra-AMULET')).toHaveCSS('opacity', '1');
         await expect(page.getByTestId('equip-hero-kael')).not.toHaveClass(/is-drop-target/);
         await expect(page.locator('.piece-tooltip:visible')).toHaveCount(0);
 

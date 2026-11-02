@@ -2237,7 +2237,9 @@ button:disabled {
     background: var(--color-accent-100);
 }
 
+/* The empty slot is a disabled button (button:disabled dims it); the outline is the drop cue, so the slot keeps full opacity */
 .piece-tile.is-drop-slot {
+    opacity: 1;
     outline: 3px dashed var(--color-accent);
     outline-offset: 3px;
 }
