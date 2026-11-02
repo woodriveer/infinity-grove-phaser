@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/drag-equip/spec.md`
 **Design**: `.specs/features/drag-equip/design.md`
-**Status**: Approved (owner confirmed D1 to D8 at their defaults); T1 to T6 done. Fix round 1 (T7 to T13) after the Verifier's FAIL (`validation.md`, `823f22f`) and the spec amendment of 2026-11-02 (D6, D7, DRG-15, DRG-16, DRG-27, DRG-28, new DRG-31 to DRG-33)
+**Status**: Approved (owner confirmed D1 to D8 at their defaults); T1 to T6 done. Fix round 1 (T7 to T13) after the Verifier's FAIL (`validation.md`, `823f22f`) and the spec amendment of 2026-11-02 (D6, D7, DRG-15, DRG-16, DRG-27, DRG-28, new DRG-31 to DRG-33). Fix round 2 (T14 to T16) after the Verifier's round-2 FAIL (`validation.md`, `59b841c`): two surviving mutants (S1 DRG-25, S9 DRG-27 to DRG-29) and one e2e assertion precision gap (DRG-30)
 
 Rules for every task:
 
@@ -84,6 +84,14 @@ T9 → T10
 T10 → T11
 T11 → T12
 T12 → T13
+```
+
+### Phase 5: Fix round 2 (Verifier gaps, tests only)
+
+T14 and T15 both edit `views/dragEquip.test.js` and T16 edits `game/e2e/dragEquip.spec.js`, so they run one after the other, one commit each. Three tasks: one batch.
+
+```
+T14 → T15 → T16
 ```
 
 ---
@@ -1459,6 +1467,195 @@ const touchDrag = async (page, from, to) =>
 
 ---
 
+### T14: Unit tests of a leave and re-entry of each edge band [ ]
+
+**Owner**: test-engineer
+**Goal**: A pointer that leaves an edge band and comes back scrolls the window 8 px per 16 ms, not faster, and stops at the release, in the top band and in the bottom band (DRG-27, DRG-28, DRG-29; Verifier round 2 survivor S9, gap 1).
+**Where**: `game/src/adapters/phaser/views/dragEquip.test.js`
+**Read first**: `views/dragEquip.js:96-117` (`steer`: `:105` clears the timer when the direction changes), `:144-164` (`finish`), `views/dragEquip.test.js:340-356` (`layOut`, the edge describe), `:465-493` (one pass of leave and release, which cannot see a leaked timer), `validation.md` "Fix 1"
+**Depends on**: None
+**Requirement**: DRG-27, DRG-28, DRG-29
+
+**Contract**: no production change. Two new `it` at the end of `describe('attachDragToEquip edge scroll', ...)`, after `the light follows the block that scrolls under a still pointer` (ends at `dragEquip.test.js:528`):
+
+```js
+    it('leaving and re-entering the top band scrolls 8 px per tick and stops at the release', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 30);
+        vi.advanceTimersByTime(16);
+        pointer('pointermove', document, 120, 300);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(192);
+
+        pointer('pointermove', document, 120, 30);
+
+        const before = scroller.scrollTop;
+
+        vi.advanceTimersByTime(16);
+        expect(scroller.scrollTop).toBe(before - 8);
+
+        vi.advanceTimersByTime(32);
+        expect(scroller.scrollTop).toBe(before - 24);
+
+        pointer('pointerup', document, 120, 30);
+
+        const released = scroller.scrollTop;
+
+        vi.advanceTimersByTime(64);
+        expect(scroller.scrollTop).toBe(released);
+    });
+
+    it('leaving and re-entering the bottom band scrolls 8 px per tick and stops at the release', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 570);
+        vi.advanceTimersByTime(16);
+        pointer('pointermove', document, 120, 300);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(208);
+
+        pointer('pointermove', document, 120, 570);
+
+        const before = scroller.scrollTop;
+
+        vi.advanceTimersByTime(16);
+        expect(scroller.scrollTop).toBe(before + 8);
+
+        vi.advanceTimersByTime(32);
+        expect(scroller.scrollTop).toBe(before + 24);
+
+        pointer('pointerup', document, 120, 570);
+
+        const released = scroller.scrollTop;
+
+        vi.advanceTimersByTime(64);
+        expect(scroller.scrollTop).toBe(released);
+    });
+```
+
+**Steps**:
+
+1. Insert the two cases.
+2. Run the gate.
+3. Sensor check: delete the line `clearInterval(timer);` at `dragEquip.js:105` (inside `steer`), run `cd game && npx vitest run src/adapters/phaser/views/dragEquip.test.js` and confirm both new cases fail (the window moves 16 px per tick after the re-entry, and keeps moving after the release). Restore the line; `git diff game/src` must print nothing.
+
+**Tests**: unit
+**Test cases** (`describe('attachDragToEquip edge scroll', ...)`):
+
+- `leaving and re-entering the top band scrolls 8 px per tick and stops at the release`: window at 200; press, move to y 30 and advance 16 ms (192); move to y 300 and advance 16 ms (still 192); move back to y 30 → one tick is 8 px (`before - 8`), three ticks are 24 px (`before - 24`); release, then 64 ms → unchanged.
+- `leaving and re-entering the bottom band scrolls 8 px per tick and stops at the release`: window at 200; move to y 570 and advance 16 ms (208); move to y 300 and advance 16 ms (still 208); move back to y 570 → one tick is 8 px (`before + 8`), three ticks are 24 px (`before + 24`); release, then 64 ms → unchanged.
+
+**Gate**: quick - `cd game && npm test`
+**Done when**:
+
+- [ ] The two new cases pass and every other case of `dragEquip.test.js` passes unchanged.
+- [ ] With `dragEquip.js:105` (`clearInterval(timer);` in `steer`) deleted both new cases fail; the line is restored and `git diff game/src` is empty.
+- [ ] `cd game && npm test` passes.
+
+**Commit**: `test(game): pin the edge scroll after a leave and re-entry of each band`
+
+---
+
+### T15: Unit test of a second primary pointer during a drag [ ]
+
+**Owner**: test-engineer
+**Goal**: A second primary pointer of another type (a pen) that presses during a drag starts no second drag: one copy exists, counted over every copy, and only the first pointer's release drops (DRG-25; Verifier round 2 survivor S1, gap 2).
+**Where**: `game/src/adapters/phaser/views/dragEquip.test.js`
+**Read first**: `views/dragEquip.js:62-69` (the `pointerdown` guard, `active ||` at `:64`), `views/dragEquip.test.js:266-282` (the second pointer case, a non-primary touch), `:284-290` (the press on another tile, which reads only the first copy with `ghost()`), `validation.md` "Fix 2"
+**Depends on**: T14
+**Requirement**: DRG-25
+
+**Contract**: no production change. One new `it` after `a press on another tile while one runs is ignored` (ends at `dragEquip.test.js:290`). The existing cases stay as they are; the new one counts the copies.
+
+```js
+    it('a second primary pointer of another type starts no second drag', () => {
+        under = lyra.querySelector('.equip-hero-name');
+        startDrag();
+        pointer('pointerdown', other, 300, 300, { pointerId: 2, pointerType: 'pen' });
+        pointer('pointermove', document, 340, 300, { pointerId: 2, pointerType: 'pen' });
+
+        expect(document.querySelectorAll('[data-testid="piece-drag-ghost"]').length).toBe(1);
+
+        pointer('pointerup', document, 340, 300, { pointerId: 2, pointerType: 'pen' });
+
+        expect(onDrop).not.toHaveBeenCalled();
+        expect(document.querySelectorAll('[data-testid="piece-drag-ghost"]').length).toBe(1);
+
+        pointer('pointerup', document, 120, 100, { pointerId: 1 });
+
+        expect(onDrop).toHaveBeenCalledTimes(1);
+        expect(onDrop).toHaveBeenCalledWith('lyra');
+    });
+```
+
+**Steps**:
+
+1. Insert the case after `dragEquip.test.js:290`.
+2. Run the gate.
+3. Sensor check: remove `active ||` from `dragEquip.js:64` (the line becomes `if (!event.isPrimary || event.button !== 0 || tile.disabled)`), run `cd game && npx vitest run src/adapters/phaser/views/dragEquip.test.js` and confirm the new case fails on the copy count (2 copies, expected 1). Restore the line; `git diff game/src` must print nothing.
+
+**Tests**: unit
+**Test cases** (`describe('attachDragToEquip', ...)`):
+
+- `a second primary pointer of another type starts no second drag`: a mouse drag over Lyra's name; a pen (`isPrimary` true, `pointerId` 2) presses on `other` and moves 40 px → exactly one `piece-drag-ghost` in the document; the pen release leaves one copy and drops nothing; the mouse release over Lyra → `onDrop` once with `'lyra'`.
+
+**Gate**: quick - `cd game && npm test`
+**Done when**:
+
+- [ ] The new case passes and every other case of `dragEquip.test.js` passes unchanged.
+- [ ] With `dragEquip.js:64` without `active ||` the new case fails; the line is restored and `git diff game/src` is empty.
+- [ ] `cd game && npm test` passes.
+
+**Commit**: `test(game): pin the second primary pointer of a drag`
+
+---
+
+### T16: Assert the block under the pointer in the still-pointer e2e [ ]
+
+**Owner**: test-engineer
+**Goal**: The e2e of DRG-30 asserts that the lit block is the block under the pointer after the window stops, not only that some block changed (DRG-30; Verifier round 2 gap 3, minor).
+**Where**: `game/e2e/dragEquip.spec.js`
+**Read first**: `game/e2e/dragEquip.spec.js:634-657` (`the light follows the block that scrolls under a still pointer`, `litHero`, `box`), `views/dragEquip.js:110-117` (the timer lights `last`), `validation.md` "Gap 3"
+**Depends on**: T15 (one commit at a time)
+**Requirement**: DRG-30
+
+**Contract**: no production change. In `the light follows the block that scrolls under a still pointer`, after the poll that waits for `scrollTop` 0 (`dragEquip.spec.js:652`) and before the release, add:
+
+```js
+        //  The lit block is the one under the pointer, not only some block that changed
+        const at = { x: box.x + box.width / 2, y: box.y + 30 };
+        const underPointer = () => page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest('[data-drop-hero]')?.getAttribute('data-drop-hero') ?? null, at);
+
+        expect(await litHero()).not.toBeNull();
+        expect(await litHero()).toBe(await underPointer());
+```
+
+**Steps**:
+
+1. Add the lines above.
+2. Run the gate.
+3. Sensor check (optional, to show the assertion discriminates): in `dragEquip.js:114` replace `last.x, last.y` with `press.x, press.y` inside the timer, run `cd game && npx playwright test e2e/dragEquip.spec.js -g "still pointer"` with the alt port config (`C:\Users\yan_b\AppData\Local\Temp\claude\D--Developer-infinity-grove\94d4da18-9d1b-4eae-b6dc-059d4c393e29\scratchpad\playwright.alt.config.mjs`) and confirm it fails on the new assertions. Restore the line; `git diff game/src` must print nothing.
+
+**Tests**: e2e
+**Test cases**:
+
+- `the light follows the block that scrolls under a still pointer` (strengthened): after the window is at 0, the lit hero is not null and equals the `data-drop-hero` of the block under the pointer (`document.elementFromPoint`).
+
+**Gate**: full - `cd game && npx playwright test e2e/dragEquip.spec.js` (run on the alt port, see the Steps)
+**Done when**:
+
+- [ ] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 28 tests.
+- [ ] The strengthened test fails with the timer lighting `press` instead of `last`; the line is restored and `git diff game/src` is empty.
+
+**Commit**: `test(game): assert the block under the pointer in the still-pointer scroll`
+
+---
+
 ## Task Granularity Check
 
 | Task | Scope | Status |
@@ -1476,6 +1673,9 @@ const touchDrag = async (page, from, to) =>
 | T11: cancel, click swallow, buttons e2e | 3 tests | ✅ Granular |
 | T12: second finger e2e | 1 test | ✅ Granular |
 | T13: scroll down and light e2e | 2 tests | ✅ Granular |
+| T14: leave and re-entry of each band | 2 test cases | ✅ Granular |
+| T15: second primary pointer | 1 test case | ✅ Granular |
+| T16: block under the pointer e2e | 1 assertion block in 1 test | ✅ Granular |
 
 ## Diagram-Definition Cross-Check
 
@@ -1494,6 +1694,9 @@ const touchDrag = async (page, from, to) =>
 | T11 | T10 | T10 → T11 | ✅ Match |
 | T12 | T11 | T11 → T12 | ✅ Match |
 | T13 | T12 | T12 → T13 | ✅ Match |
+| T14 | None | none | ✅ Match |
+| T15 | T14 | T14 → T15 | ✅ Match |
+| T16 | T15 | T15 → T16 | ✅ Match |
 
 ## Test Co-location Validation
 
@@ -1508,9 +1711,12 @@ const touchDrag = async (page, from, to) =>
 | T7: busy guard | Game `HeroUi` (test only) | unit | unit | ✅ OK |
 | T8: edge band | Drag helper (test only) | unit | unit | ✅ OK |
 | T9 to T13: e2e gaps | e2e | e2e | e2e | ✅ OK |
+| T14: edge band re-entry | Drag helper (test only) | unit | unit | ✅ OK |
+| T15: second primary pointer | Drag helper (test only) | unit | unit | ✅ OK |
+| T16: still-pointer e2e | e2e | e2e | e2e | ✅ OK |
 
 ## After the tasks
 
 - `ui-artist` writes `game/ui-review/dragEquip.shots.js` and `.specs/features/drag-equip/ui-review.html` with the four screens of `design.md` "Visual Design", desktop and phone. Done (`7025c1c`, re-review approved `8c90f6f`); its findings were fixed in `2891ad7`, `905270a`, `751beae`, `92abd66` and accepted into the spec on 2026-11-02 (D6, DRG-15, DRG-31 to DRG-33).
-- A fresh `test-engineer` runs as the Verifier and writes `validation.md`. Round 1 FAIL (`823f22f`); T7 to T13 are its fix tasks.
+- A fresh `test-engineer` runs as the Verifier and writes `validation.md`. Round 1 FAIL (`823f22f`); T7 to T13 are its fix tasks. Round 2 FAIL (`59b841c`); T14 to T16 are its fix tasks. After T16, a fresh `test-engineer` (round 3 of 3) re-verifies.
 - After T13, a fresh `test-engineer` (one that did not run T7 to T13) re-verifies (round 2 of 3) against the amended spec: DRG-15 checks the 12 px corner, DRG-31 to DRG-33 are new, and the sensor repeats M7. Verifier gap 7 (DRG-20 and DRG-22 have e2e only, CSS rules) needs no task.
