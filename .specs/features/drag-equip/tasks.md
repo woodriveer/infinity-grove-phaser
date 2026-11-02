@@ -507,7 +507,7 @@ Press at (100, 300) and move to (130, 300) to start a drag in the middle (`start
 
 ---
 
-### T3: Wire the drag into renderEquipment [ ]
+### T3: Wire the drag into renderEquipment [x]
 
 **Owner**: game-dev
 **Goal**: Every bag tile and every worn tile of the list is draggable when `onDrop` is given and selection mode is off, and every hero block is a drop target (DRG-01, DRG-08, DRG-24).
@@ -554,8 +554,8 @@ Empty slot tiles (`renderEmptyTile`) are not draggable: they are not built by `t
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 6 new cases pass; every existing case of `equipmentView.test.js` passes unchanged.
-- [ ] `cd game && npm test` passes.
+- [x] The 6 new cases pass; every existing case of `equipmentView.test.js` passes unchanged.
+- [x] `cd game && npm test` passes.
 
 **Commit**: `feat(game): make the equipment list tiles draggable onto hero blocks`
 

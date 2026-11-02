@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { EMPTY_TEXT, renderEquipment, renderEquipmentUnavailable, renderLeaderStats, renderPieceDetail, UNAVAILABLE_TEXT } from './equipmentView';
 
 const hero = (id, owned = true) => ({ id, name: `Hero ${id}`, owned });
@@ -509,5 +509,73 @@ describe('renderPieceDetail', () => {
     it('shows the sell price on Vender', () => {
         expect(text(detail(weapon()), 'piece-sell')).toBe('Vender (7 prata 50 cobre)');
         expect(text(detail(ring()), 'piece-sell')).toBe('Vender (1 prata)');
+    });
+});
+
+describe('renderEquipment drag to equip', () => {
+    const find = (screen, id) => screen.querySelector(`[data-testid="${id}"]`);
+    const send = (type, target, x) => target.dispatchEvent(new PointerEvent(type, {
+        bubbles: true, button: 0, pointerId: 1, isPrimary: true, clientX: x, clientY: 100
+    }));
+    const selecting = () => ({
+        ids: new Set(), confirming: false, onToggle: vi.fn(), onRarity: vi.fn(), onSubmit: vi.fn(), onCancel: vi.fn(), onConfirm: vi.fn(), onDecline: vi.fn()
+    });
+
+    afterEach(async () => {
+        delete document.elementFromPoint;
+        await new Promise((resolve) => setTimeout(resolve));
+    });
+
+    it('marks every owned hero block with data-drop-hero', () => {
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), onDrop: vi.fn() });
+
+        expect(find(screen, 'equip-hero-kael').getAttribute('data-drop-hero')).toBe('kael');
+        expect(find(screen, 'equip-hero-lyra').getAttribute('data-drop-hero')).toBe('lyra');
+    });
+
+    it('bag and worn tiles are draggable, empty slots are not', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }), ring() ], heroes, { onSelect: vi.fn(), onDrop: vi.fn() });
+
+        expect(find(screen, 'equip-piece-r1').getAttribute('data-draggable')).toBe('true');
+        expect(find(screen, 'equip-slot-kael-WEAPON').getAttribute('data-draggable')).toBe('true');
+        expect(find(screen, 'equip-slot-kael-RING').hasAttribute('data-draggable')).toBe(false);
+    });
+
+    it('no tile is draggable without onDrop', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }), ring() ], heroes, { onSelect: vi.fn() });
+
+        expect(screen.querySelector('[data-draggable]')).toBeNull();
+    });
+
+    it('no tile is draggable in selection mode', () => {
+        const screen = renderEquipment([ weapon({ heroId: 'kael' }), ring() ], heroes, { onSelect: vi.fn(), onDrop: vi.fn(), selection: selecting() });
+
+        expect(screen.querySelector('[data-draggable]')).toBeNull();
+    });
+
+    it('a drop calls onDrop with the piece and the hero', () => {
+        const onDrop = vi.fn();
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), onDrop });
+
+        document.elementFromPoint = () => find(screen, 'equip-hero-lyra');
+        send('pointerdown', find(screen, 'equip-piece-r1'), 100);
+        send('pointermove', document, 120);
+        send('pointerup', document, 120);
+
+        expect(onDrop).toHaveBeenCalledTimes(1);
+        expect(onDrop).toHaveBeenCalledWith(expect.objectContaining({ id: 'r1' }), 'lyra');
+    });
+
+    it('a busy screen starts no drag', () => {
+        const onDrop = vi.fn();
+        const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), onDrop, busy: true });
+
+        document.elementFromPoint = () => find(screen, 'equip-hero-lyra');
+        send('pointerdown', find(screen, 'equip-piece-r1'), 100);
+        send('pointermove', document, 120);
+        send('pointerup', document, 120);
+
+        expect(onDrop).not.toHaveBeenCalled();
+        expect(document.querySelector('[data-testid="piece-drag-ghost"]')).toBeNull();
     });
 });

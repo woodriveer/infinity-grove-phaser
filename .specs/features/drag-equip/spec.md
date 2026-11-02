@@ -169,7 +169,7 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-05 | P1: Drop a piece on a hero (AC 5, moved from another hero) | Tasks | In Tasks |
 | DRG-06 | P1: Drop a piece on a hero (AC 6, leader panel) | Tasks | In Tasks |
 | DRG-07 | P1: Drop a piece on a hero (AC 7, failure) | Tasks | In Tasks |
-| DRG-08 | P1: Drop a piece on a hero (AC 8, busy) | Tasks | In Tasks |
+| DRG-08 | P1: Drop a piece on a hero (AC 8, busy) | Tasks | Implementing |
 | DRG-09 | P1: Cancel a drag (AC 1, outside every hero) | Tasks | Implementing |
 | DRG-10 | P1: Cancel a drag (AC 2, own wearer) | Tasks | Implementing |
 | DRG-11 | P1: Cancel a drag (AC 3, pointercancel) | Tasks | Implementing |
@@ -185,7 +185,7 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-21 | P1: Touch, pen and existing controls (AC 1, same rules) | Tasks | Implementing |
 | DRG-22 | P1: Touch, pen and existing controls (AC 2, touch-action) | Tasks | In Tasks |
 | DRG-23 | P1: Touch, pen and existing controls (AC 3, Equipar em stays) | Tasks | In Tasks |
-| DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | In Tasks |
+| DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | Implementing |
 | DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Implementing |
 | DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Implementing |
 | DRG-27 | P2: Scroll while dragging (AC 1, up) | Tasks | Implementing |

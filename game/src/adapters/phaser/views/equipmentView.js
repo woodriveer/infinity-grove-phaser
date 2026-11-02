@@ -2,6 +2,7 @@ import { bagPieces, RARITY_ORDER, rarityState, selectedInBag, sellTotal } from '
 import { describeAffix, formatCopper, pieceLines, pieceTitle, SLOT_LABELS, SLOTS } from '../../../domain/equipment/equipment';
 import { el } from './dom';
 import { renderBulkSellBar } from './bulkSellView';
+import { attachDragToEquip } from './dragEquip';
 import { attachPieceTooltip } from './pieceTooltip';
 import { renderEmptyTile, renderPieceTile } from './pieceTile';
 
@@ -70,7 +71,8 @@ export const renderEquipmentUnavailable = () => el('p', 'hero-empty', UNAVAILABL
 //  `notice` is a line shown at the top (the result of a transfer); `sellNotice` is the line of the last bulk sale, under it; `busy` disables every button while a request runs.
 //  `onStartSelling()` fires for `Vender várias`. `selection` is null (mode off) or { ids: Set<string>, confirming, onToggle(piece), onRarity(rarity), onSubmit(),
 //  onCancel(), onConfirm(), onDecline() }: a bag click toggles its piece, the worn pieces are locked, the selection bar is shown and the button `Transferir conjunto` is hidden (its place stays).
-export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, onStartSelling, stats = null, notice = null, sellNotice = null, busy = false, selection = null }) =>
+//  `onDrop(piece, heroId)` fires when a bag or worn piece is dragged onto the block of another owned hero (spec drag-equip); no tile is draggable in selection mode.
+export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, onStartSelling, onDrop, stats = null, notice = null, sellNotice = null, busy = false, selection = null }) =>
 {
     if (pieces.length === 0)
     {
@@ -124,6 +126,11 @@ export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, onStartS
         if (!selection)
         {
             attachPieceTooltip(tile, piece, heroes);
+
+            if (onDrop)
+            {
+                attachDragToEquip(tile, piece, (heroId) => onDrop(piece, heroId));
+            }
         }
 
         return tile;
@@ -133,7 +140,7 @@ export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, onStartS
 
     owned.forEach((hero) =>
     {
-        const block = el('div', 'equip-hero', '', { testid: `equip-hero-${hero.id}` });
+        const block = el('div', 'equip-hero', '', { testid: `equip-hero-${hero.id}`, 'data-drop-hero': hero.id });
         const heading = el('div', 'equip-hero-heading');
         const wearsSomething = pieces.some((piece) => piece.heroId === hero.id);
 
