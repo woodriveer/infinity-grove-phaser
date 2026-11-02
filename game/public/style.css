@@ -2215,12 +2215,13 @@ button:disabled {
     opacity: 0.4;
 }
 
-/* The copy under the pointer lives in document.body, outside the scaled panel, so its left and top are the pointer itself */
+/* The copy under the pointer lives in document.body, outside the scaled panel, so its left and top are the pointer itself.
+   --ghost-scale (set by dragEquip.js ghostOf) is the panel's scale, so the copy is the size of the tile it came from */
 .piece-tile.piece-drag-ghost {
     position: fixed;
     z-index: 1000;
     margin: 0;
-    transform: translate(-50%, -50%) scale(1.1);
+    transform: translate(-50%, -50%) scale(calc(var(--ghost-scale, 1) * 1.1));
     box-shadow: var(--shadow-lg);
     pointer-events: none;
 }

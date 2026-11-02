@@ -101,6 +101,15 @@ describe('attachDragToEquip', () => {
         expect(document.querySelectorAll('[data-testid="equip-piece-a1"]').length).toBe(1);
     });
 
+    it('the ghost takes the scale of the panel the tile sits in', () => {
+        //  A panel shown at 40%: the tile lays out 60 px wide and renders 24 px wide
+        Object.defineProperty(tile, 'offsetWidth', { configurable: true, value: 60 });
+        tile.getBoundingClientRect = () => ({ width: 24, height: 24, top: 0, left: 0, right: 24, bottom: 24 });
+        startDrag();
+
+        expect(ghost().style.getPropertyValue('--ghost-scale')).toBe('0.4');
+    });
+
     it('lights the hero under the pointer and its slot of the piece', () => {
         under = lyra.querySelector('.equip-hero-name');
         startDrag();

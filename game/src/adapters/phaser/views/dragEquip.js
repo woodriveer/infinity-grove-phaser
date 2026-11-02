@@ -33,13 +33,16 @@ const swallowNextClick = () =>
     setTimeout(() => window.removeEventListener('click', swallow, { capture: true }));
 };
 
-//  The copy of the tile that follows the pointer: no test id of the tile, out of the tab order, hidden from screen readers
+//  The copy of the tile that follows the pointer: no test id of the tile, out of the tab order, hidden from screen readers.
+//  It lives in body, outside the scaled hero panel, so it takes the panel's scale (rendered width over layout width) from the tile
 const ghostOf = (tile) =>
 {
     const ghost = tile.cloneNode(true);
+    const scale = tile.offsetWidth ? tile.getBoundingClientRect().width / tile.offsetWidth : 1;
 
     ghost.querySelectorAll('.piece-tooltip').forEach((node) => node.remove());
     ghost.classList.add('piece-drag-ghost');
+    ghost.style.setProperty('--ghost-scale', String(scale));
     ghost.removeAttribute('data-draggable');
     ghost.setAttribute('data-testid', 'piece-drag-ghost');
     ghost.setAttribute('aria-hidden', 'true');
