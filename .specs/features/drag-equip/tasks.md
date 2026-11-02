@@ -1467,7 +1467,7 @@ const touchDrag = async (page, from, to) =>
 
 ---
 
-### T14: Unit tests of a leave and re-entry of each edge band [ ]
+### T14: Unit tests of a leave and re-entry of each edge band [x]
 
 **Owner**: test-engineer
 **Goal**: A pointer that leaves an edge band and comes back scrolls the window 8 px per 16 ms, not faster, and stops at the release, in the top band and in the bottom band (DRG-27, DRG-28, DRG-29; Verifier round 2 survivor S9, gap 1).
@@ -1553,9 +1553,9 @@ const touchDrag = async (page, from, to) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The two new cases pass and every other case of `dragEquip.test.js` passes unchanged.
-- [ ] With `dragEquip.js:105` (`clearInterval(timer);` in `steer`) deleted both new cases fail; the line is restored and `git diff game/src` is empty.
-- [ ] `cd game && npm test` passes.
+- [x] The two new cases pass and every other case of `dragEquip.test.js` passes unchanged.
+- [x] With `dragEquip.js:105` (`clearInterval(timer);` in `steer`) deleted both new cases fail; the line is restored and `git diff game/src` is empty.
+- [x] `cd game && npm test` passes.
 
 **Commit**: `test(game): pin the edge scroll after a leave and re-entry of each band`
 

@@ -191,9 +191,9 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | Done |
 | DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Needs Fix |
 | DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Done |
-| DRG-27 | P2: Scroll while dragging (AC 1, up, also above the window) | Tasks | Needs Fix |
-| DRG-28 | P2: Scroll while dragging (AC 2, down, also below the window) | Tasks | Needs Fix |
-| DRG-29 | P2: Scroll while dragging (AC 3, stop) | Tasks | Needs Fix |
+| DRG-27 | P2: Scroll while dragging (AC 1, up, also above the window) | Tasks | Implementing |
+| DRG-28 | P2: Scroll while dragging (AC 2, down, also below the window) | Tasks | Implementing |
+| DRG-29 | P2: Scroll while dragging (AC 3, stop) | Tasks | Implementing |
 | DRG-30 | P2: Scroll while dragging (AC 4, highlight follows) | Tasks | Done |
 | DRG-31 | P1: See what is being dragged (AC 7, ghost at the tile's on-screen size x 1.1) | Tasks | Done |
 | DRG-32 | P1: See what is being dragged (AC 8, ghost 0.6 with no valid target) | Tasks | Done |

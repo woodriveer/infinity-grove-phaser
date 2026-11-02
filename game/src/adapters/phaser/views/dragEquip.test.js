@@ -526,4 +526,62 @@ describe('attachDragToEquip edge scroll', () => {
         expect(kael.classList.contains('is-drop-target')).toBe(true);
         expect(lyra.classList.contains('is-drop-target')).toBe(false);
     });
+
+    it('leaving and re-entering the top band scrolls 8 px per tick and stops at the release', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 30);
+        vi.advanceTimersByTime(16);
+        pointer('pointermove', document, 120, 300);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(192);
+
+        pointer('pointermove', document, 120, 30);
+
+        const before = scroller.scrollTop;
+
+        vi.advanceTimersByTime(16);
+        expect(scroller.scrollTop).toBe(before - 8);
+
+        vi.advanceTimersByTime(32);
+        expect(scroller.scrollTop).toBe(before - 24);
+
+        pointer('pointerup', document, 120, 30);
+
+        const released = scroller.scrollTop;
+
+        vi.advanceTimersByTime(64);
+        expect(scroller.scrollTop).toBe(released);
+    });
+
+    it('leaving and re-entering the bottom band scrolls 8 px per tick and stops at the release', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 570);
+        vi.advanceTimersByTime(16);
+        pointer('pointermove', document, 120, 300);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(208);
+
+        pointer('pointermove', document, 120, 570);
+
+        const before = scroller.scrollTop;
+
+        vi.advanceTimersByTime(16);
+        expect(scroller.scrollTop).toBe(before + 8);
+
+        vi.advanceTimersByTime(32);
+        expect(scroller.scrollTop).toBe(before + 24);
+
+        pointer('pointerup', document, 120, 570);
+
+        const released = scroller.scrollTop;
+
+        vi.advanceTimersByTime(64);
+        expect(scroller.scrollTop).toBe(released);
+    });
 });
