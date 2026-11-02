@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 59,
+  "next_id": 63,
   "lessons": [
     {
       "id": "L-001",
@@ -1052,6 +1052,78 @@
       ],
       "created": "2026-10-31T17:51:20Z",
       "last_seen": "2026-10-31T17:51:20Z"
+    },
+    {
+      "id": "L-059",
+      "key": "ac_gap::amend the spec before changing an assertion to a new value a ui fix that moves a spec defined position must update the spec first",
+      "text": "Amend the spec before changing an assertion to a new value: a UI fix that moves a spec-defined position must update the spec first.",
+      "signal": "ac_gap",
+      "scope": "game/e2e",
+      "status": "candidate",
+      "features": [
+        "drag-equip"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "DRG-15 validation.md; game/e2e/dragEquip.spec.js:181-183 (game/e2e)"
+      ],
+      "created": "2026-11-02T01:55:13Z",
+      "last_seen": "2026-11-02T01:55:13Z"
+    },
+    {
+      "id": "L-060",
+      "key": "surviving_mutant::give each guard of a state machine its own test that runs without the ui disabling its trigger first",
+      "text": "Give each guard of a state machine its own test that runs without the UI disabling its trigger first.",
+      "signal": "surviving_mutant",
+      "scope": "game/unit",
+      "status": "candidate",
+      "features": [
+        "drag-equip"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M7 game/src/adapters/phaser/HeroUi.js:439 (game/unit)"
+      ],
+      "created": "2026-11-02T01:55:13Z",
+      "last_seen": "2026-11-02T01:55:13Z"
+    },
+    {
+      "id": "L-061",
+      "key": "spec_precision_gap::assert every visual value the spec or design defines and write any visual value a fix adds into the spec before merging",
+      "text": "Assert every visual value the spec or design defines, and write any visual value a fix adds into the spec before merging.",
+      "signal": "spec_precision_gap",
+      "scope": "game/e2e",
+      "status": "candidate",
+      "features": [
+        "drag-equip"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "D6 .specs/features/drag-equip/spec.md:41; game/e2e/dragEquip.spec.js:159 (game/e2e)"
+      ],
+      "created": "2026-11-02T01:55:14Z",
+      "last_seen": "2026-11-02T01:55:14Z"
+    },
+    {
+      "id": "L-062",
+      "key": "ac_gap::give each player visible acceptance criterion an e2e scenario not only a unit test",
+      "text": "Give each player-visible acceptance criterion an e2e scenario, not only a unit test.",
+      "signal": "ac_gap",
+      "scope": "game/e2e",
+      "status": "candidate",
+      "features": [
+        "drag-equip"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md DRG-06 DRG-08 DRG-11 DRG-13 DRG-28 DRG-30 (game/e2e)"
+      ],
+      "created": "2026-11-02T01:55:14Z",
+      "last_seen": "2026-11-02T01:55:14Z"
     }
   ]
 }

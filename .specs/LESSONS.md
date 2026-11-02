@@ -360,6 +360,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: bulk-sell/spec.md BSL-19 (e2e)
 - last seen: 2026-10-31T17:51:20Z
 
+### L-059 - Amend the spec before changing an assertion to a new value: a UI fix that moves a spec-defined position must update the spec first.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `game/e2e` · harmful: 0
+- features: drag-equip
+- evidence: DRG-15 validation.md; game/e2e/dragEquip.spec.js:181-183 (game/e2e)
+- last seen: 2026-11-02T01:55:13Z
+
+### L-060 - Give each guard of a state machine its own test that runs without the UI disabling its trigger first.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game/unit` · harmful: 0
+- features: drag-equip
+- evidence: M7 game/src/adapters/phaser/HeroUi.js:439 (game/unit)
+- last seen: 2026-11-02T01:55:13Z
+
+### L-061 - Assert every visual value the spec or design defines, and write any visual value a fix adds into the spec before merging.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `game/e2e` · harmful: 0
+- features: drag-equip
+- evidence: D6 .specs/features/drag-equip/spec.md:41; game/e2e/dragEquip.spec.js:159 (game/e2e)
+- last seen: 2026-11-02T01:55:14Z
+
+### L-062 - Give each player-visible acceptance criterion an e2e scenario, not only a unit test.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `game/e2e` · harmful: 0
+- features: drag-equip
+- evidence: validation.md DRG-06 DRG-08 DRG-11 DRG-13 DRG-28 DRG-30 (game/e2e)
+- last seen: 2026-11-02T01:55:14Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

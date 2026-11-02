@@ -162,36 +162,36 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| DRG-01 | P1: Drop a piece on a hero (AC 1, drag start) | Tasks | Implementing |
-| DRG-02 | P1: Drop a piece on a hero (AC 2, one request) | Tasks | Implementing |
-| DRG-03 | P1: Drop a piece on a hero (AC 3, piece in slot, no detail) | Tasks | Implementing |
-| DRG-04 | P1: Drop a piece on a hero (AC 4, replaced piece to bag) | Tasks | Implementing |
-| DRG-05 | P1: Drop a piece on a hero (AC 5, moved from another hero) | Tasks | Implementing |
-| DRG-06 | P1: Drop a piece on a hero (AC 6, leader panel) | Tasks | Implementing |
-| DRG-07 | P1: Drop a piece on a hero (AC 7, failure) | Tasks | Implementing |
-| DRG-08 | P1: Drop a piece on a hero (AC 8, busy) | Tasks | Implementing |
-| DRG-09 | P1: Cancel a drag (AC 1, outside every hero) | Tasks | Implementing |
-| DRG-10 | P1: Cancel a drag (AC 2, own wearer) | Tasks | Implementing |
-| DRG-11 | P1: Cancel a drag (AC 3, pointercancel) | Tasks | Implementing |
-| DRG-12 | P1: Cancel a drag (AC 4, cleanup) | Tasks | Implementing |
-| DRG-13 | P1: Cancel a drag (AC 5, click swallowed) | Tasks | Implementing |
-| DRG-14 | P1: Cancel a drag (AC 6, short press is a click) | Tasks | Implementing |
-| DRG-15 | P1: See what is being dragged (AC 1, ghost) | Tasks | Implementing |
-| DRG-16 | P1: See what is being dragged (AC 2, source dimmed) | Tasks | Implementing |
-| DRG-17 | P1: See what is being dragged (AC 3, target and slot) | Tasks | Implementing |
-| DRG-18 | P1: See what is being dragged (AC 4, only one target) | Tasks | Implementing |
-| DRG-19 | P1: See what is being dragged (AC 5, own wearer not lit) | Tasks | Implementing |
-| DRG-20 | P1: See what is being dragged (AC 6, no tooltip) | Tasks | Implementing |
-| DRG-21 | P1: Touch, pen and existing controls (AC 1, same rules) | Tasks | Implementing |
-| DRG-22 | P1: Touch, pen and existing controls (AC 2, touch-action) | Tasks | Implementing |
-| DRG-23 | P1: Touch, pen and existing controls (AC 3, Equipar em stays) | Tasks | Implementing |
-| DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | Implementing |
-| DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Implementing |
-| DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Implementing |
-| DRG-27 | P2: Scroll while dragging (AC 1, up) | Tasks | Implementing |
-| DRG-28 | P2: Scroll while dragging (AC 2, down) | Tasks | Implementing |
-| DRG-29 | P2: Scroll while dragging (AC 3, stop) | Tasks | Implementing |
-| DRG-30 | P2: Scroll while dragging (AC 4, highlight follows) | Tasks | Implementing |
+| DRG-01 | P1: Drop a piece on a hero (AC 1, drag start) | Tasks | Done |
+| DRG-02 | P1: Drop a piece on a hero (AC 2, one request) | Tasks | Done |
+| DRG-03 | P1: Drop a piece on a hero (AC 3, piece in slot, no detail) | Tasks | Done |
+| DRG-04 | P1: Drop a piece on a hero (AC 4, replaced piece to bag) | Tasks | Done |
+| DRG-05 | P1: Drop a piece on a hero (AC 5, moved from another hero) | Tasks | Done |
+| DRG-06 | P1: Drop a piece on a hero (AC 6, leader panel) | Tasks | Done |
+| DRG-07 | P1: Drop a piece on a hero (AC 7, failure) | Tasks | Done |
+| DRG-08 | P1: Drop a piece on a hero (AC 8, busy) | Tasks | Done |
+| DRG-09 | P1: Cancel a drag (AC 1, outside every hero) | Tasks | Done |
+| DRG-10 | P1: Cancel a drag (AC 2, own wearer) | Tasks | Done |
+| DRG-11 | P1: Cancel a drag (AC 3, pointercancel) | Tasks | Done |
+| DRG-12 | P1: Cancel a drag (AC 4, cleanup) | Tasks | Done |
+| DRG-13 | P1: Cancel a drag (AC 5, click swallowed) | Tasks | Done |
+| DRG-14 | P1: Cancel a drag (AC 6, short press is a click) | Tasks | Done |
+| DRG-15 | P1: See what is being dragged (AC 1, ghost) | Tasks | Needs Fix |
+| DRG-16 | P1: See what is being dragged (AC 2, source dimmed) | Tasks | Done |
+| DRG-17 | P1: See what is being dragged (AC 3, target and slot) | Tasks | Done |
+| DRG-18 | P1: See what is being dragged (AC 4, only one target) | Tasks | Done |
+| DRG-19 | P1: See what is being dragged (AC 5, own wearer not lit) | Tasks | Done |
+| DRG-20 | P1: See what is being dragged (AC 6, no tooltip) | Tasks | Done |
+| DRG-21 | P1: Touch, pen and existing controls (AC 1, same rules) | Tasks | Done |
+| DRG-22 | P1: Touch, pen and existing controls (AC 2, touch-action) | Tasks | Done |
+| DRG-23 | P1: Touch, pen and existing controls (AC 3, Equipar em stays) | Tasks | Done |
+| DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | Done |
+| DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Done |
+| DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Done |
+| DRG-27 | P2: Scroll while dragging (AC 1, up) | Tasks | Done |
+| DRG-28 | P2: Scroll while dragging (AC 2, down) | Tasks | Done |
+| DRG-29 | P2: Scroll while dragging (AC 3, stop) | Tasks | Done |
+| DRG-30 | P2: Scroll while dragging (AC 4, highlight follows) | Tasks | Done |
 
 **Coverage:** 30 total, 30 mapped to tasks, 0 unmapped
 
