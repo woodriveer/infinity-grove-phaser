@@ -944,7 +944,7 @@ const touchDrag = async (page, from, to) =>
 
 ---
 
-### T8: Unit tests of the edge band beyond the window [ ]
+### T8: Unit tests of the edge band beyond the window [x]
 
 **Owner**: test-engineer
 **Goal**: Pin the amended D7: a pointer above the window scrolls up, a pointer below it scrolls down, and the horizontal position does not matter (DRG-27, DRG-28; Verifier gap 6).
@@ -1008,9 +1008,9 @@ const touchDrag = async (page, from, to) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The three new cases pass and every other case of `dragEquip.test.js` passes unchanged.
-- [ ] With the mutated line 87 the first new case fails; the line is restored and `git diff game/src/adapters/phaser/views/dragEquip.js` is empty.
-- [ ] `cd game && npm test` passes.
+- [x] The three new cases pass and every other case of `dragEquip.test.js` passes unchanged.
+- [x] With the mutated line 87 the first new case fails; the line is restored and `git diff game/src/adapters/phaser/views/dragEquip.js` is empty.
+- [x] `cd game && npm test` passes.
 
 **Commit**: `test(game): pin the edge scroll of a pointer beyond the window`
 

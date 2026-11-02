@@ -415,6 +415,41 @@ describe('attachDragToEquip edge scroll', () => {
         expect(scroller.scrollTop).toBe(208);
     });
 
+    it('a pointer above the window scrolls up', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, -20);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(192);
+    });
+
+    it('a pointer below the window scrolls down', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 120, 650);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(208);
+    });
+
+    it('the band does not depend on the horizontal position', () => {
+        const scroller = layOut();
+
+        startDrag();
+        pointer('pointermove', document, 1000, 20);
+        vi.advanceTimersByTime(16);
+
+        expect(scroller.scrollTop).toBe(192);
+
+        pointer('pointermove', document, 1000, 300);
+        vi.advanceTimersByTime(32);
+
+        expect(scroller.scrollTop).toBe(192);
+    });
+
     it('keeps scrolling while the pointer moves inside the band', () => {
         const scroller = layOut();
 
