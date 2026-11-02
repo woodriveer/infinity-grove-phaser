@@ -1615,7 +1615,7 @@ const touchDrag = async (page, from, to) =>
 
 ---
 
-### T16: Assert the block under the pointer in the still-pointer e2e [ ]
+### T16: Assert the block under the pointer in the still-pointer e2e [x]
 
 **Owner**: test-engineer
 **Goal**: The e2e of DRG-30 asserts that the lit block is the block under the pointer after the window stops, not only that some block changed (DRG-30; Verifier round 2 gap 3, minor).
@@ -1627,13 +1627,15 @@ const touchDrag = async (page, from, to) =>
 **Contract**: no production change. In `the light follows the block that scrolls under a still pointer`, after the poll that waits for `scrollTop` 0 (`dragEquip.spec.js:652`) and before the release, add:
 
 ```js
-        //  The lit block is the one under the pointer, not only some block that changed
+        //  The lit block is the one under the pointer, not only some block that changed. At the top of the window the pointer is over
+        //  the header (the leader panel scrolls above the heroes), so nothing is lit: null must match too
         const at = { x: box.x + box.width / 2, y: box.y + 30 };
         const underPointer = () => page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest('[data-drop-hero]')?.getAttribute('data-drop-hero') ?? null, at);
 
-        expect(await litHero()).not.toBeNull();
         expect(await litHero()).toBe(await underPointer());
 ```
+
+The first draft asserted that a block is lit at the end. The probe showed that at `scrollTop` 0 the pointer is over the header, so the correct outcome is no lit block; the assertion is the equality, which holds for `null` too.
 
 **Steps**:
 
@@ -1649,8 +1651,8 @@ const touchDrag = async (page, from, to) =>
 **Gate**: full - `cd game && npx playwright test e2e/dragEquip.spec.js` (run on the alt port, see the Steps)
 **Done when**:
 
-- [ ] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 28 tests.
-- [ ] The strengthened test fails with the timer lighting `press` instead of `last`; the line is restored and `git diff game/src` is empty.
+- [x] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 28 tests.
+- [x] The strengthened test fails with the timer lighting `press` instead of `last`; the line is restored and `git diff game/src` is empty.
 
 **Commit**: `test(game): assert the block under the pointer in the still-pointer scroll`
 

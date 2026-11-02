@@ -651,6 +651,13 @@ test.describe('Drag to equip edge scroll', () => {
         await expect.poll(litHero).not.toBe(first);
         await expect.poll(() => win.evaluate((node) => node.scrollTop)).toBe(0);
 
+        //  The lit block is the one under the pointer, not only some block that changed. At the top of the window the pointer is over
+        //  the header (the leader panel scrolls above the heroes), so nothing is lit: null must match too
+        const at = { x: box.x + box.width / 2, y: box.y + 30 };
+        const underPointer = () => page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest('[data-drop-hero]')?.getAttribute('data-drop-hero') ?? null, at);
+
+        expect(await litHero()).toBe(await underPointer());
+
         //  Released in the letterbox, outside every block: no drop
         await page.mouse.move(20, 360, { steps: 4 });
         await page.mouse.up();
