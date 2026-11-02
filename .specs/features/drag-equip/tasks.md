@@ -755,7 +755,7 @@ body.piece-dragging .piece-tooltip {
 
 ---
 
-### T6: e2e of the drag to equip [ ]
+### T6: e2e of the drag to equip [x]
 
 **Owner**: test-engineer
 **Goal**: Prove every player-visible criterion in Chromium against the fake backend, with the mouse and with a real touch sequence (DRG-01 to DRG-30).
@@ -867,8 +867,8 @@ const touchDrag = async (page, from, to) =>
 **Gate**: full - `cd game && npm test && npx playwright test e2e/dragEquip.spec.js e2e/equipment.spec.js e2e/equipmentUi.spec.js e2e/bulkSell.spec.js`
 **Done when**:
 
-- [ ] The 19 cases of `dragEquip.spec.js` pass, and `equipment.spec.js`, `equipmentUi.spec.js` and `bulkSell.spec.js` pass unchanged.
-- [ ] `cd game && npm test` passes.
+- [x] The 19 cases of `dragEquip.spec.js` pass, and `equipment.spec.js`, `equipmentUi.spec.js` and `bulkSell.spec.js` pass unchanged.
+- [x] `cd game && npm test` passes.
 
 **Commit**: `test(game): cover the drag to equip end to end`
 
