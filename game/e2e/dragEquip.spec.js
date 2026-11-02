@@ -327,6 +327,57 @@ test.describe('Drag to equip', () => {
 
         await expect(page.getByTestId('equip-piece-a1')).toHaveAttribute('aria-pressed', 'true');
     });
+
+    test('a drop on the leader updates the attribute panel', async ({ page }) => {
+        await startGame(page);
+        await openEquipment(page);
+
+        await expect(page.getByTestId('stat-clickDamage')).toHaveText('Dano de clique: 4.6');
+
+        await drag(page, page.getByTestId('equip-slot-kael-WEAPON'), page.getByTestId('equip-hero-lyra'));
+
+        await expect(page.getByTestId('equip-slot-lyra-WEAPON')).toHaveAttribute('aria-label', 'Raro Arma +0');
+        await expect(page.getByTestId('stat-clickDamage')).toHaveText('Dano de clique: 1.1');
+
+        await drag(page, page.getByTestId('equip-slot-lyra-WEAPON'), page.getByTestId('equip-hero-kael'));
+
+        await expect(page.getByTestId('equip-slot-kael-WEAPON')).toHaveAttribute('aria-label', 'Raro Arma +0');
+        await expect(page.getByTestId('leader-stats').locator('.leader-stats-title')).toHaveText('Atributos de Kael Raizférrea');
+        await expect(page.getByTestId('stat-clickDamage')).toHaveText('Dano de clique: 4.6');
+    });
+
+    test('while the equip runs every button is disabled and no new drag starts', async ({ page }) => {
+        const calls = await startGame(page);
+        let answer;
+        const held = new Promise((resolve) => { answer = resolve; });
+
+        //  Holds the equip of a1 until the test lets it go, then hands it to the fake backend
+        await page.route('**/api/equipment/a1/equip', async (route) => {
+            await held;
+            await route.fallback();
+        });
+        await openEquipment(page);
+
+        await drag(page, page.getByTestId('equip-piece-a1'), page.getByTestId('equip-hero-lyra'));
+
+        await expect(page.getByTestId('equip-piece-c1')).toBeDisabled();
+        await expect(page.locator('.hero-body button:enabled')).toHaveCount(0);
+
+        await drag(page, page.getByTestId('equip-piece-c1'), page.getByTestId('equip-hero-lyra'), { release: false });
+
+        await expect(page.getByTestId('piece-drag-ghost')).toHaveCount(0);
+
+        await page.mouse.up();
+        answer();
+
+        await expect(page.getByTestId('equip-slot-lyra-AMULET')).toHaveAttribute('aria-label', 'Épico Amuleto +3');
+        await expect(page.getByTestId('equip-piece-c1')).toBeEnabled();
+
+        await settle(page);
+        expect(equipCalls(calls)).toHaveLength(1);
+        expect(equipCalls(calls)[0].path).toBe('/equipment/a1/equip');
+        expect(equipCalls(calls)[0].body).toEqual({ heroId: 'lyra' });
+    });
 });
 
 test.describe('Drag to equip by touch', () => {

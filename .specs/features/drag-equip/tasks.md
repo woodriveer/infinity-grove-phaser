@@ -1086,7 +1086,7 @@ const touchDrag = async (page, from, to) =>
 
 ---
 
-### T10: e2e of the leader panel and the busy screen after a drop [ ]
+### T10: e2e of the leader panel and the busy screen after a drop [x]
 
 **Owner**: test-engineer
 **Goal**: Prove in Chromium that a drop on the leader changes the attribute panel, and that while the equip request runs every button is disabled and no new drag starts (DRG-06, DRG-08).
@@ -1164,7 +1164,7 @@ const touchDrag = async (page, from, to) =>
 **Gate**: full - `cd game && npx playwright test e2e/dragEquip.spec.js`
 **Done when**:
 
-- [ ] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 22 tests.
+- [x] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 22 tests.
 
 **Commit**: `test(game): cover the leader panel and the busy screen of a drop end to end`
 
