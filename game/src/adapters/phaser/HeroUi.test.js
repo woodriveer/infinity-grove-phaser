@@ -1603,6 +1603,28 @@ describe('HeroUi drag to equip', () => {
         expect(ctx.testid('equip-piece-c1').disabled).toBe(false);
     });
 
+    //  The disabled tiles stop a second drag before it reaches dropEquip; this calls dropEquip itself, so only its own guard can stop it
+    it('a drop while an equip runs sends no second request', async () => {
+        const ctx = await start([ worn('a1', 'AMULET', null), worn('c1', 'RING', null) ]);
+        let finish;
+
+        ctx.equipmentGateway.equip.mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
+        await dragTo(ctx, 'equip-piece-a1', 'lyra');
+
+        const second = ctx.ui.dropEquip('c1', 'lyra');
+
+        await flush();
+
+        expect(ctx.equipmentGateway.equip.mock.calls).toEqual([ [ 'a1', 'lyra' ] ]);
+
+        finish({ capacity: 100, pieces: [ worn('a1', 'AMULET', 'lyra'), worn('c1', 'RING', null) ] });
+        await second;
+        await flush();
+
+        expect(ctx.equipmentGateway.equip.mock.calls).toEqual([ [ 'a1', 'lyra' ] ]);
+        expect(ctx.testid('equip-piece-c1')).not.toBeNull();
+    });
+
     it('draws nothing when the window closed before the answer', async () => {
         const ctx = await start([ worn('a1', 'AMULET', null) ]);
         let finish;

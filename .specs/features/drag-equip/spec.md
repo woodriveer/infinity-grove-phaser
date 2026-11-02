@@ -172,7 +172,7 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-05 | P1: Drop a piece on a hero (AC 5, moved from another hero) | Tasks | Done |
 | DRG-06 | P1: Drop a piece on a hero (AC 6, leader panel) | Tasks | Done |
 | DRG-07 | P1: Drop a piece on a hero (AC 7, failure) | Tasks | Done |
-| DRG-08 | P1: Drop a piece on a hero (AC 8, busy) | Tasks | Done |
+| DRG-08 | P1: Drop a piece on a hero (AC 8, busy) | Tasks | Implementing |
 | DRG-09 | P1: Cancel a drag (AC 1, outside every hero) | Tasks | Done |
 | DRG-10 | P1: Cancel a drag (AC 2, own wearer) | Tasks | Done |
 | DRG-11 | P1: Cancel a drag (AC 3, pointercancel) | Tasks | Done |

@@ -887,7 +887,7 @@ const touchDrag = async (page, from, to) =>
 
 ---
 
-### T7: Unit test that pins the busy guard of dropEquip [ ]
+### T7: Unit test that pins the busy guard of dropEquip [x]
 
 **Owner**: test-engineer
 **Goal**: A second `dropEquip` call while an equip request runs sends no second request, so the guard `if (this.equipBusy)` of `HeroUi.dropEquip` is pinned by a test (DRG-08; kills sensor mutant M7 of `validation.md`).
@@ -936,9 +936,9 @@ const touchDrag = async (page, from, to) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The new case passes and every other case of `HeroUi.test.js` passes unchanged.
-- [ ] With `HeroUi.js:439` set to `if (false)` the new case fails; the line is restored and `git diff game/src/adapters/phaser/HeroUi.js` is empty.
-- [ ] `cd game && npm test` passes.
+- [x] The new case passes and every other case of `HeroUi.test.js` passes unchanged.
+- [x] With `HeroUi.js:439` set to `if (false)` the new case fails; the line is restored and `git diff game/src/adapters/phaser/HeroUi.js` is empty.
+- [x] `cd game && npm test` passes.
 
 **Commit**: `test(game): pin the busy guard of a drop while an equip runs`
 
