@@ -1016,7 +1016,7 @@ const touchDrag = async (page, from, to) =>
 
 ---
 
-### T9: e2e of the accepted visual rules [ ]
+### T9: e2e of the accepted visual rules [x]
 
 **Owner**: test-engineer
 **Goal**: Assert in Chromium the numbers of the amended feedback: source tile at opacity 0.4, ghost at 1.1 times the tile's on-screen size, ghost at 0.6 over the wearer's own block (DRG-16, DRG-31, DRG-32). DRG-15 (corner 12 px up and left) is already asserted at `dragEquip.spec.js:173-186`, DRG-32 over the bag at `:159` and over a valid hero at `:153`, DRG-33 at `:143`; they stay as they are.
@@ -1079,8 +1079,8 @@ const touchDrag = async (page, from, to) =>
 **Gate**: full - `cd game && npx playwright test e2e/dragEquip.spec.js`
 **Done when**:
 
-- [ ] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 20 tests (19 before plus 1).
-- [ ] With `dragEquip.js:47` deleted the new test fails; the line is restored and `git diff game/src` is empty.
+- [x] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 20 tests (19 before plus 1).
+- [x] With `dragEquip.js:47` deleted the new test fails; the line is restored and `git diff game/src` is empty.
 
 **Commit**: `test(game): assert the faded source and the ghost size and fade end to end`
 

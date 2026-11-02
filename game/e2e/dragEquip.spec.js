@@ -138,6 +138,7 @@ test.describe('Drag to equip', () => {
 
         await expect(page.getByTestId('piece-drag-ghost')).toBeVisible();
         await expect(page.getByTestId('equip-piece-a1')).toHaveClass(/is-dragging/);
+        await expect(page.getByTestId('equip-piece-a1')).toHaveCSS('opacity', '0.4');
         await expect(page.getByTestId('equip-hero-lyra')).toHaveClass(/is-drop-target/);
         await expect(page.getByTestId('equip-slot-lyra-AMULET')).toHaveClass(/is-drop-slot/);
         await expect(page.getByTestId('equip-slot-lyra-AMULET')).toHaveCSS('opacity', '1');
@@ -181,6 +182,25 @@ test.describe('Drag to equip', () => {
         //  Its bottom-right corner sits 12 px up and left of the pointer, so the slot under the pointer stays visible
         expect(Math.abs(box.x + box.width - 628)).toBeLessThanOrEqual(2);
         expect(Math.abs(box.y + box.height - 348)).toBeLessThanOrEqual(2);
+
+        await page.mouse.up();
+    });
+
+    test('the ghost is the tile on screen, lifted by 1.1', async ({ page }) => {
+        await startGame(page);
+        await openEquipment(page);
+
+        const tile = await page.getByTestId('equip-piece-a1').boundingBox();
+
+        //  The 1024x768 game fits the 1280x720 viewport at 0.9375, so the 60 px tile is 56.25 px on screen; a copy at layout size would be 66 px
+        expect(tile.width).toBeLessThan(59);
+
+        await drag(page, page.getByTestId('equip-piece-a1'), { x: 640, y: 360 }, { release: false });
+
+        const box = await page.getByTestId('piece-drag-ghost').boundingBox();
+
+        expect(Math.abs(box.width - tile.width * 1.1)).toBeLessThanOrEqual(1);
+        expect(Math.abs(box.height - tile.height * 1.1)).toBeLessThanOrEqual(1);
 
         await page.mouse.up();
     });
@@ -229,6 +249,7 @@ test.describe('Drag to equip', () => {
         await drag(page, page.getByTestId('equip-slot-kael-WEAPON'), page.getByTestId('equip-hero-kael').locator('.equip-hero-name'), { release: false });
 
         await expect(page.getByTestId('equip-hero-kael')).not.toHaveClass(/is-drop-target/);
+        await expect(page.getByTestId('piece-drag-ghost')).toHaveCSS('opacity', '0.6');
 
         await page.mouse.up();
 
