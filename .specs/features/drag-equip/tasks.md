@@ -1561,7 +1561,7 @@ const touchDrag = async (page, from, to) =>
 
 ---
 
-### T15: Unit test of a second primary pointer during a drag [ ]
+### T15: Unit test of a second primary pointer during a drag [x]
 
 **Owner**: test-engineer
 **Goal**: A second primary pointer of another type (a pen) that presses during a drag starts no second drag: one copy exists, counted over every copy, and only the first pointer's release drops (DRG-25; Verifier round 2 survivor S1, gap 2).
@@ -1607,9 +1607,9 @@ const touchDrag = async (page, from, to) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The new case passes and every other case of `dragEquip.test.js` passes unchanged.
-- [ ] With `dragEquip.js:64` without `active ||` the new case fails; the line is restored and `git diff game/src` is empty.
-- [ ] `cd game && npm test` passes.
+- [x] The new case passes and every other case of `dragEquip.test.js` passes unchanged.
+- [x] With `dragEquip.js:64` without `active ||` the new case fails; the line is restored and `git diff game/src` is empty.
+- [x] `cd game && npm test` passes.
 
 **Commit**: `test(game): pin the second primary pointer of a drag`
 

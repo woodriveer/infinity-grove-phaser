@@ -289,6 +289,25 @@ describe('attachDragToEquip', () => {
         expect(ghost().getAttribute('data-slot')).toBe('AMULET');
     });
 
+    it('a second primary pointer of another type starts no second drag', () => {
+        under = lyra.querySelector('.equip-hero-name');
+        startDrag();
+        pointer('pointerdown', other, 300, 300, { pointerId: 2, pointerType: 'pen' });
+        pointer('pointermove', document, 340, 300, { pointerId: 2, pointerType: 'pen' });
+
+        expect(document.querySelectorAll('[data-testid="piece-drag-ghost"]').length).toBe(1);
+
+        pointer('pointerup', document, 340, 300, { pointerId: 2, pointerType: 'pen' });
+
+        expect(onDrop).not.toHaveBeenCalled();
+        expect(document.querySelectorAll('[data-testid="piece-drag-ghost"]').length).toBe(1);
+
+        pointer('pointerup', document, 120, 100, { pointerId: 1 });
+
+        expect(onDrop).toHaveBeenCalledTimes(1);
+        expect(onDrop).toHaveBeenCalledWith('lyra');
+    });
+
     it('the right button starts no drag', () => {
         pointer('pointerdown', tile, 100, 100, { button: 2 });
         pointer('pointermove', document, 140, 100);

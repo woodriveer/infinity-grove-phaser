@@ -189,7 +189,7 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-22 | P1: Touch, pen and existing controls (AC 2, touch-action) | Tasks | Done |
 | DRG-23 | P1: Touch, pen and existing controls (AC 3, Equipar em stays) | Tasks | Done |
 | DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | Done |
-| DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Needs Fix |
+| DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Implementing |
 | DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Done |
 | DRG-27 | P2: Scroll while dragging (AC 1, up, also above the window) | Tasks | Implementing |
 | DRG-28 | P2: Scroll while dragging (AC 2, down, also below the window) | Tasks | Implementing |
