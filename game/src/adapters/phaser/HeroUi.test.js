@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HeroUi } from './HeroUi';
 import { ApiError } from '../../application/ApiError';
 import { createEquipmentCollection } from '../../application/equipment/equipmentCollection';
@@ -1477,5 +1477,179 @@ describe('HeroUi skill bar hooks', () => {
         const ctx = createUi({ list: ownedKael() });
 
         expect(() => ctx.ui.refreshSkills()).not.toThrow();
+    });
+});
+
+describe('HeroUi drag to equip', () => {
+    const worn = (id, slot, heroId, extra = {}) => ({ id, slot, rarity: 'COMMON', refine: 0, clickDamage: slot === 'WEAPON' ? 3 : undefined, affixes: [], heroId, sellPrice: 100, refineCost: 500, ...extra });
+    const equipped = (pieces, pieceId, heroId) => ({
+        capacity: 100,
+        pieces: pieces.map((p) => {
+            const moved = pieces.find((candidate) => candidate.id === pieceId);
+
+            if (p.id === pieceId) { return { ...p, heroId }; }
+
+            return p.heroId === heroId && p.slot === moved.slot ? { ...p, heroId: null } : p;
+        })
+    });
+    const send = (type, target, x) => target.dispatchEvent(new PointerEvent(type, { bubbles: true, button: 0, pointerId: 1, isPrimary: true, clientX: x, clientY: 100 }));
+
+    //  Opens Equipamento on `pieces`; the gateway equips like the backend (the old piece of the slot goes to the bag)
+    const start = async (pieces, list = catalog()) => {
+        const ctx = createUi({ list, equipmentList: { capacity: 100, pieces } });
+
+        ctx.equipmentGateway.equip.mockImplementation(async (id, heroId) => equipped(pieces, id, heroId));
+        await open(ctx, 'equipment');
+
+        return ctx;
+    };
+
+    //  Press the tile, move 20 px and release over the block of `heroId`
+    const dragTo = async (ctx, tileId, heroId) => {
+        document.elementFromPoint = () => ctx.testid(`equip-hero-${heroId}`);
+        send('pointerdown', ctx.testid(tileId), 100);
+        send('pointermove', document, 120);
+        send('pointerup', document, 120);
+        await flush();
+    };
+
+    afterEach(() => { delete document.elementFromPoint; });
+
+    it('equips the dragged bag piece and stays on the list', async () => {
+        const ctx = await start([ worn('a1', 'AMULET', null, { rarity: 'EPIC', refine: 3 }) ]);
+
+        await dragTo(ctx, 'equip-piece-a1', 'lyra');
+
+        expect(ctx.equipmentGateway.equip.mock.calls).toEqual([ [ 'a1', 'lyra' ] ]);
+        expect(ctx.testid('equip-slot-lyra-AMULET').getAttribute('aria-label')).toBe('Épico Amuleto +3');
+        expect(ctx.testid('piece-detail')).toBeNull();
+        expect(ctx.testid('equipment-list')).not.toBeNull();
+        expect(ctx.query('.equip-bag-title').textContent).toBe('Mochila (0)');
+    });
+
+    it('moves the piece the hero wore in that slot to the bag', async () => {
+        const ctx = await start([ worn('r1', 'RING', 'kael'), worn('u1', 'RING', null, { rarity: 'UNCOMMON' }) ]);
+
+        await dragTo(ctx, 'equip-piece-u1', 'kael');
+
+        expect(ctx.testid('equip-slot-kael-RING').getAttribute('aria-label')).toBe('Incomum Anel +0');
+        expect(ctx.testid('equip-piece-r1')).not.toBeNull();
+        expect(ctx.query('.equip-bag-title').textContent).toBe('Mochila (1)');
+    });
+
+    it('moves a worn piece from another hero and leaves that slot vazio', async () => {
+        const ctx = await start([ worn('w1', 'WEAPON', 'kael') ]);
+
+        await dragTo(ctx, 'equip-slot-kael-WEAPON', 'lyra');
+
+        expect(ctx.equipmentGateway.equip.mock.calls).toEqual([ [ 'w1', 'lyra' ] ]);
+        expect(ctx.testid('equip-slot-lyra-WEAPON').getAttribute('aria-label')).toBe('Comum Arma +0');
+        expect(ctx.testid('equip-slot-kael-WEAPON').textContent).toBe('vazio');
+    });
+
+    it('updates the attribute panel of the leader', async () => {
+        const ctx = await start([ worn('w1', 'WEAPON', 'lyra', { clickDamage: 3 }) ]);
+
+        ctx.equipmentGateway.equip.mockResolvedValue({ capacity: 100, pieces: [ worn('w1', 'WEAPON', 'kael', { clickDamage: 3 }) ] });
+        expect(ctx.testid('stat-clickDamage').textContent).toBe('Dano de clique: 1.0');
+
+        await dragTo(ctx, 'equip-slot-lyra-WEAPON', 'kael');
+
+        expect(ctx.testid('stat-clickDamage').textContent).toBe('Dano de clique: 4.0');
+    });
+
+    it('a refused equip shows the error line and the pieces where they were', async () => {
+        const ctx = await start([ worn('a1', 'AMULET', null) ]);
+
+        ctx.equipmentGateway.equip.mockRejectedValue(new Error('down'));
+        await dragTo(ctx, 'equip-piece-a1', 'lyra');
+
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível concluir a ação.');
+        expect(ctx.query('.hero-error').hidden).toBe(false);
+        expect(ctx.testid('equip-piece-a1')).not.toBeNull();
+        expect(ctx.testid('equip-slot-lyra-AMULET').textContent).toBe('vazio');
+    });
+
+    it('a success clears an earlier error line', async () => {
+        const ctx = await start([ worn('a1', 'AMULET', null) ]);
+
+        ctx.equipmentGateway.equip.mockRejectedValueOnce(new Error('down'));
+        await dragTo(ctx, 'equip-piece-a1', 'lyra');
+
+        expect(ctx.query('.hero-error').hidden).toBe(false);
+
+        await dragTo(ctx, 'equip-piece-a1', 'lyra');
+
+        expect(ctx.query('.hero-error').hidden).toBe(true);
+        expect(ctx.testid('equip-slot-lyra-AMULET').getAttribute('aria-label')).toBe('Comum Amuleto +0');
+    });
+
+    it('disables the screen while the equip runs and starts no second drag', async () => {
+        const ctx = await start([ worn('a1', 'AMULET', null), worn('c1', 'RING', null) ]);
+        let finish;
+
+        ctx.equipmentGateway.equip.mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
+        await dragTo(ctx, 'equip-piece-a1', 'lyra');
+
+        expect([ ...ctx.query('.hero-body').querySelectorAll('button') ].every((button) => button.disabled)).toBe(true);
+
+        await dragTo(ctx, 'equip-piece-c1', 'lyra');
+
+        expect(ctx.equipmentGateway.equip).toHaveBeenCalledTimes(1);
+
+        finish({ capacity: 100, pieces: [ worn('a1', 'AMULET', 'lyra'), worn('c1', 'RING', null) ] });
+        await flush();
+
+        expect(ctx.testid('equip-piece-c1').disabled).toBe(false);
+    });
+
+    it('draws nothing when the window closed before the answer', async () => {
+        const ctx = await start([ worn('a1', 'AMULET', null) ]);
+        let finish;
+
+        ctx.equipmentGateway.equip.mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
+        await dragTo(ctx, 'equip-piece-a1', 'lyra');
+        ctx.ui.close();
+        finish({ capacity: 100, pieces: [ worn('a1', 'AMULET', 'lyra') ] });
+        await flush();
+
+        expect(ctx.query('.hero-body').children.length).toBe(0);
+        expect(ctx.query('.hero-error').hidden).toBe(true);
+    });
+
+    it('a redraw during a drag still drops on the hero under the pointer', async () => {
+        const ctx = await start([ worn('a1', 'AMULET', null) ]);
+
+        send('pointerdown', ctx.testid('equip-piece-a1'), 100);
+        send('pointermove', document, 120);
+        ctx.ui.render_equipment();
+        document.elementFromPoint = () => ctx.testid('equip-hero-lyra');
+        send('pointerup', document, 120);
+        await flush();
+
+        expect(ctx.equipmentGateway.equip.mock.calls).toEqual([ [ 'a1', 'lyra' ] ]);
+        expect(document.querySelector('[data-testid="piece-drag-ghost"]')).toBeNull();
+    });
+
+    it('with one owned hero a bag piece still drops on it', async () => {
+        const ctx = await start([ worn('a1', 'AMULET', null) ], { leaderId: 'kael', heroes: [ hero('kael', { 0: 3 }), hero('lyra') ] });
+
+        expect(ctx.testid('equip-hero-lyra')).toBeNull();
+
+        await dragTo(ctx, 'equip-piece-a1', 'kael');
+
+        expect(ctx.equipmentGateway.equip.mock.calls).toEqual([ [ 'a1', 'kael' ] ]);
+        expect(ctx.testid('equip-slot-kael-AMULET').getAttribute('aria-label')).toBe('Comum Amuleto +0');
+    });
+
+    it('the piece detail still equips with Equipar em', async () => {
+        const ctx = await start([ worn('a1', 'AMULET', null) ]);
+
+        ctx.testid('equip-piece-a1').click();
+        ctx.testid('piece-equip-lyra').click();
+        await flush();
+
+        expect(ctx.equipmentGateway.equip.mock.calls).toEqual([ [ 'a1', 'lyra' ] ]);
+        expect(ctx.testid('piece-worn').textContent).toBe('Equipado em Hero lyra');
     });
 });

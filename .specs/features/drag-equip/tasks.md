@@ -561,7 +561,7 @@ Empty slot tiles (`renderEmptyTile`) are not draggable: they are not built by `t
 
 ---
 
-### T4: HeroUi.dropEquip [ ]
+### T4: HeroUi.dropEquip [x]
 
 **Owner**: game-dev
 **Goal**: A drop equips the piece through `equipmentCollection.equip`, keeps the list on screen, shows the error line on a refusal and disables the screen while it runs (DRG-02 to DRG-08, edge case "window closed before the answer").
@@ -674,8 +674,8 @@ Add `afterEach` to the vitest import of the file.
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 11 new cases pass; every existing case of `HeroUi.test.js` passes unchanged.
-- [ ] `cd game && npm test` passes.
+- [x] The 11 new cases pass; every existing case of `HeroUi.test.js` passes unchanged.
+- [x] `cd game && npm test` passes.
 
 **Commit**: `feat(game): equip a piece dropped on a hero`
 

@@ -163,12 +163,12 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
 | DRG-01 | P1: Drop a piece on a hero (AC 1, drag start) | Tasks | Implementing |
-| DRG-02 | P1: Drop a piece on a hero (AC 2, one request) | Tasks | In Tasks |
-| DRG-03 | P1: Drop a piece on a hero (AC 3, piece in slot, no detail) | Tasks | In Tasks |
-| DRG-04 | P1: Drop a piece on a hero (AC 4, replaced piece to bag) | Tasks | In Tasks |
-| DRG-05 | P1: Drop a piece on a hero (AC 5, moved from another hero) | Tasks | In Tasks |
-| DRG-06 | P1: Drop a piece on a hero (AC 6, leader panel) | Tasks | In Tasks |
-| DRG-07 | P1: Drop a piece on a hero (AC 7, failure) | Tasks | In Tasks |
+| DRG-02 | P1: Drop a piece on a hero (AC 2, one request) | Tasks | Implementing |
+| DRG-03 | P1: Drop a piece on a hero (AC 3, piece in slot, no detail) | Tasks | Implementing |
+| DRG-04 | P1: Drop a piece on a hero (AC 4, replaced piece to bag) | Tasks | Implementing |
+| DRG-05 | P1: Drop a piece on a hero (AC 5, moved from another hero) | Tasks | Implementing |
+| DRG-06 | P1: Drop a piece on a hero (AC 6, leader panel) | Tasks | Implementing |
+| DRG-07 | P1: Drop a piece on a hero (AC 7, failure) | Tasks | Implementing |
 | DRG-08 | P1: Drop a piece on a hero (AC 8, busy) | Tasks | Implementing |
 | DRG-09 | P1: Cancel a drag (AC 1, outside every hero) | Tasks | Implementing |
 | DRG-10 | P1: Cancel a drag (AC 2, own wearer) | Tasks | Implementing |
@@ -184,7 +184,7 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-20 | P1: See what is being dragged (AC 6, no tooltip) | Tasks | Implementing |
 | DRG-21 | P1: Touch, pen and existing controls (AC 1, same rules) | Tasks | Implementing |
 | DRG-22 | P1: Touch, pen and existing controls (AC 2, touch-action) | Tasks | In Tasks |
-| DRG-23 | P1: Touch, pen and existing controls (AC 3, Equipar em stays) | Tasks | In Tasks |
+| DRG-23 | P1: Touch, pen and existing controls (AC 3, Equipar em stays) | Tasks | Implementing |
 | DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | Implementing |
 | DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Implementing |
 | DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Implementing |

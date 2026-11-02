@@ -370,6 +370,7 @@ export class HeroUi
                 onSelect: (picked) => this.render_equipment({ selected: picked.id }),
                 onTransfer: (fromHeroId, toHeroId) => this.transferSet(fromHeroId, toHeroId),
                 onStartSelling: () => this.startSelling(),
+                onDrop: (picked, heroId) => this.dropEquip(picked.id, heroId),
                 selection: this.sellingOptions()
             }));
             this.backButton.hidden = true;
@@ -427,6 +428,47 @@ export class HeroUi
             if (view === this.view && this.screen === 'equipment')
             {
                 this.render_equipment({ notice });
+            }
+        }
+    }
+
+    //  A piece dropped on a hero (spec drag-equip): one equip request, every equipment button disabled while it runs, then the list again
+    //  (never the piece); a refusal shows the error line and the list as it was
+    async dropEquip (pieceId, heroId)
+    {
+        if (this.equipBusy)
+        {
+            return;
+        }
+
+        const view = this.view;
+
+        this.equipBusy = true;
+        this.render_equipment();
+
+        try
+        {
+            await this.equipment.equip(pieceId, heroId);
+
+            if (view === this.view)
+            {
+                this.setError('');
+            }
+        }
+        catch
+        {
+            if (view === this.view)
+            {
+                this.setError(EQUIPMENT_FAILED);
+            }
+        }
+        finally
+        {
+            this.equipBusy = false;
+
+            if (view === this.view && this.screen === 'equipment')
+            {
+                this.render_equipment();
             }
         }
     }
