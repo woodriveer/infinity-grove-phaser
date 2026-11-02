@@ -38,14 +38,14 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 | D3 After a successful drop | The Equipamento list redraws with the piece in the hero's slot and the replaced piece (if any) in the bag; no notice, the piece detail does not open | The change is visible where the player is looking; opening the detail would undo the time saved | y |
 | D4 Drop target | The whole block of an owned hero (`equip-hero-<id>`: name, heading and its four slots). The piece goes to its own slot | A larger target is easier on a phone; the slot is not a choice | y |
 | D5 Drag threshold | 6 CSS px of straight-line distance between the press and the current pointer position, in screen pixels | Below that a press is a click, so the click that opens the detail keeps working | y |
-| D6 Feedback | A copy of the tile follows the pointer centred on it; the source tile dims to 40 % opacity; the hero block under the pointer gets an accent outline and a light accent background, and that hero's slot of the piece's slot gets a dashed accent outline; tooltips hide while dragging | The owner asked for a dragged item and a highlighted hero; the slot outline shows which piece will be replaced | y |
-| D7 Edge scrolling (P2) | While dragging within 40 px of the top or bottom edge of the window, the window scrolls 8 px every 16 ms toward that edge. The 6 px and 40 px are screen pixels (`clientX`/`clientY`); the 8 px step is the window's own `scrollTop` unit | With 4 or 5 owned heroes the bag sits below the hero blocks and both are not on screen together (window 708 px tall) | y |
+| D6 Feedback | A copy of the tile follows the pointer with its bottom-right corner 12 px left of and 12 px above the pointer; the copy is the on-screen size of the source tile (the tile's size after the panel's scale) times 1.1; the copy has opacity 0.6 while no valid hero block is under the pointer and 1 over a valid one; the source tile dims to 40 % opacity; the hero block under the pointer gets an accent outline and a light accent background, and that hero's slot of the piece's slot gets a dashed accent outline at full opacity, also when that slot is the empty `vazio` slot (a disabled button, which is otherwise at 0.45); tooltips hide while dragging. Amended 2026-11-02: the first version centred the copy on the pointer and had no size, fade or slot-opacity rule | The owner asked for a dragged item and a highlighted hero; the slot outline shows which piece will be replaced. The amendment takes the `ui-artist` findings (`ui-review.html`, re-review approved in `8c90f6f`): a centred copy covered the slot label under the pointer; a copy at layout size looked larger than the tile it left; a full-strength copy over the bag hid that releasing there cancels; a dimmed empty slot read as "not a target" | y (product owner, 2026-11-02, after the `ui-artist` re-review `8c90f6f`) |
+| D7 Edge scrolling (P2) | While dragging within 40 px of the top or bottom edge of the window, or beyond that edge, the window scrolls 8 px every 16 ms toward that edge. The bands are measured on the vertical axis only: a pointer above the window's top edge scrolls up, a pointer below its bottom edge scrolls down, and the pointer's horizontal position (inside the window, left or right of it) does not matter. The 6 px and 40 px are screen pixels (`clientX`/`clientY`); the 8 px step is the window's own `scrollTop` unit. Amended 2026-11-02: the first version did not say what a pointer beyond the edge does | With 4 or 5 owned heroes the bag sits below the hero blocks and both are not on screen together (window 708 px tall). A finger that overshoots the edge means "further that way", so scrolling stops only when the pointer comes back into the window past the band; this is what `dragEquip.js:87` and `:92` already do | y (product owner, 2026-11-02, Verifier gap 6) |
 | D8 Failure | The error line `Não foi possível concluir a ação.` (the line every equipment action already uses) and the list as it was before the drop | Same text as the button flow (lesson L-010: no new wording) | y |
 | Equip rule | `POST /equipment/<pieceId>/equip` with `{ "heroId": "<heroId>" }`; the server puts the piece on the hero and moves the piece that hero wore in that slot to the bag (EQP-12 to EQP-26) | Existing behaviour, unchanged | y |
 | Keyboard and click fallback | The `Equipar em <nome>` buttons of the piece detail stay as they are | Owner request: the existing way of equipping keeps working | y |
 | Player-facing text | No new text; the only message is the existing error line | AD-007 | y |
 
-**Open questions:** none - D1 to D8 are recorded with their defaults above and go to the owner with the spec.
+**Open questions:** none - D1 to D8 are recorded with their defaults above and go to the owner with the spec. D6 and D7 were amended on 2026-11-02 after the Verifier's FAIL (`validation.md`, commit `823f22f`); the amendment matches the code at `92abd66`, so no production code changes.
 
 ---
 
@@ -99,14 +99,17 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 
 **Acceptance Criteria**:
 
-1. WHILE a drag runs the game SHALL show a copy of the source tile with the test id `piece-drag-ghost`, centred on the pointer, and SHALL move it with every pointer move.  <!-- state-driven -->
-2. WHILE a drag runs the source tile SHALL carry the class `is-dragging`.  <!-- state-driven -->
+1. WHILE a drag runs the game SHALL show a copy of the source tile with the test id `piece-drag-ghost` whose bottom-right corner is 12 px left of and 12 px above the pointer (screen px, within 2 px), and SHALL move it with every pointer move.  <!-- state-driven -->
+2. WHILE a drag runs the source tile SHALL carry the class `is-dragging` and SHALL have opacity 0.4.  <!-- state-driven -->
 3. WHILE a drag runs with the pointer over the block of an owned hero who does not wear the dragged piece, that block SHALL carry the class `is-drop-target` and that hero's slot tile of the piece's slot SHALL carry the class `is-drop-slot`.  <!-- state-driven -->
 4. WHILE a drag runs, no block other than the one under the pointer SHALL carry `is-drop-target`, and no tile other than its slot SHALL carry `is-drop-slot`.  <!-- state-driven -->
 5. WHILE a drag runs with the pointer over the block of the hero who wears the dragged piece, that block SHALL NOT carry `is-drop-target`.  <!-- state-driven -->
 6. WHILE a drag runs the game SHALL show no piece tooltip.  <!-- state-driven -->
+7. WHILE a drag runs the copy `piece-drag-ghost` SHALL be 1.1 times the on-screen width and height of the source tile (the tile's size after the panel's scale, within 1 px).  <!-- state-driven -->
+8. WHILE a drag runs with no valid hero block under the pointer (the bag, the attribute panel, the block of the hero who wears the piece, or outside every block) the copy SHALL have opacity 0.6, and WHILE a valid hero block is under the pointer the copy SHALL have opacity 1.  <!-- state-driven -->
+9. WHILE a slot tile carries `is-drop-slot` it SHALL have opacity 1, also when it is the empty `vazio` slot that a disabled button otherwise shows at 0.45.  <!-- state-driven -->
 
-**Independent Test**: Press `a1`, move onto Lyra's block and hold: `piece-drag-ghost` is visible at the pointer, `equip-piece-a1` has `is-dragging`, `equip-hero-lyra` has `is-drop-target`, `equip-slot-lyra-AMULET` has `is-drop-slot`, `equip-hero-kael` has neither class.
+**Independent Test**: Press `a1`, move onto Lyra's block and hold: `piece-drag-ghost` is visible with its bottom-right corner 12 px up and left of the pointer, at opacity 1 and 1.1 times the tile's on-screen size; `equip-piece-a1` has `is-dragging` and opacity 0.4; `equip-hero-lyra` has `is-drop-target`; the empty `equip-slot-lyra-AMULET` has `is-drop-slot` and opacity 1; `equip-hero-kael` has neither class. Move onto the bag: the copy has opacity 0.6.
 
 ---
 
@@ -118,7 +121,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 
 **Acceptance Criteria**:
 
-1. The game SHALL apply DRG-01 to DRG-20 to touch and pen pointers with the same numbers as the mouse.  <!-- ubiquitous -->
+1. The game SHALL apply DRG-01 to DRG-20 and DRG-31 to DRG-33 to touch and pen pointers with the same numbers as the mouse.  <!-- ubiquitous -->
 2. The game SHALL give every draggable tile `touch-action: none`, so a finger drag on a tile moves the piece and does not scroll the window.  <!-- ubiquitous -->
 3. The piece detail SHALL keep its `Equipar em <nome>` buttons, and a click on one SHALL equip the piece as specified by EQP-12 to EQP-26.  <!-- ubiquitous -->
 4. WHILE bulk-sell selection mode is on, the game SHALL NOT start a drag, and a click on a bag tile SHALL toggle its selection as BSL specifies.  <!-- state-driven -->
@@ -137,8 +140,8 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 
 **Acceptance Criteria**:
 
-1. WHILE a drag runs with the pointer 40 px or less below the top edge of the window `.hero-window` the game SHALL scroll the window up by 8 px every 16 ms.  <!-- state-driven -->
-2. WHILE a drag runs with the pointer 40 px or less above the bottom edge of the window the game SHALL scroll the window down by 8 px every 16 ms.  <!-- state-driven -->
+1. WHILE a drag runs with the pointer 40 px or less below the top edge of the window `.hero-window`, or anywhere above that edge, the game SHALL scroll the window up by 8 px every 16 ms, whatever the pointer's horizontal position.  <!-- state-driven -->
+2. WHILE a drag runs with the pointer 40 px or less above the bottom edge of the window, or anywhere below that edge, the game SHALL scroll the window down by 8 px every 16 ms, whatever the pointer's horizontal position.  <!-- state-driven -->
 3. WHEN the pointer leaves those edge bands, or the drag ends THEN the game SHALL stop scrolling.  <!-- event-driven -->
 4. WHILE the window scrolls under a still pointer the game SHALL move the highlight of DRG-17 to the block now under the pointer.  <!-- state-driven -->
 
@@ -158,7 +161,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 
 ## Requirement Traceability
 
-IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a hero", DRG-09 to DRG-14 for "Cancel a drag", DRG-15 to DRG-20 for "See what is being dragged", DRG-21 to DRG-26 for "Touch, pen and the existing controls", DRG-27 to DRG-30 for "Scroll the window while dragging". The ID of a criterion is its story's first ID plus its number minus one (DRG-15 is criterion 1 of "See what is being dragged").
+IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a hero", DRG-09 to DRG-14 for "Cancel a drag", DRG-15 to DRG-20 for "See what is being dragged", DRG-21 to DRG-26 for "Touch, pen and the existing controls", DRG-27 to DRG-30 for "Scroll the window while dragging". The ID of a criterion is its story's first ID plus its number minus one (DRG-15 is criterion 1 of "See what is being dragged"). Criteria 7 to 9 of "See what is being dragged" were added on 2026-11-02 after the UI review and take the next free IDs, DRG-31 to DRG-33; existing IDs are never renumbered.
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
@@ -176,8 +179,8 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-12 | P1: Cancel a drag (AC 4, cleanup) | Tasks | Done |
 | DRG-13 | P1: Cancel a drag (AC 5, click swallowed) | Tasks | Done |
 | DRG-14 | P1: Cancel a drag (AC 6, short press is a click) | Tasks | Done |
-| DRG-15 | P1: See what is being dragged (AC 1, ghost) | Tasks | Needs Fix |
-| DRG-16 | P1: See what is being dragged (AC 2, source dimmed) | Tasks | Done |
+| DRG-15 | P1: See what is being dragged (AC 1, ghost up and left of the pointer) | Tasks | Implementing |
+| DRG-16 | P1: See what is being dragged (AC 2, source dimmed to 0.4) | Tasks | Implementing |
 | DRG-17 | P1: See what is being dragged (AC 3, target and slot) | Tasks | Done |
 | DRG-18 | P1: See what is being dragged (AC 4, only one target) | Tasks | Done |
 | DRG-19 | P1: See what is being dragged (AC 5, own wearer not lit) | Tasks | Done |
@@ -188,12 +191,15 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | Done |
 | DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Done |
 | DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Done |
-| DRG-27 | P2: Scroll while dragging (AC 1, up) | Tasks | Done |
-| DRG-28 | P2: Scroll while dragging (AC 2, down) | Tasks | Done |
+| DRG-27 | P2: Scroll while dragging (AC 1, up, also above the window) | Tasks | Implementing |
+| DRG-28 | P2: Scroll while dragging (AC 2, down, also below the window) | Tasks | Implementing |
 | DRG-29 | P2: Scroll while dragging (AC 3, stop) | Tasks | Done |
 | DRG-30 | P2: Scroll while dragging (AC 4, highlight follows) | Tasks | Done |
+| DRG-31 | P1: See what is being dragged (AC 7, ghost at the tile's on-screen size x 1.1) | Tasks | Implementing |
+| DRG-32 | P1: See what is being dragged (AC 8, ghost 0.6 with no valid target) | Tasks | Implementing |
+| DRG-33 | P1: See what is being dragged (AC 9, drop slot at full opacity) | Tasks | Implementing |
 
-**Coverage:** 30 total, 30 mapped to tasks, 0 unmapped
+**Coverage:** 33 total, 33 mapped to tasks, 0 unmapped
 
 ---
 
@@ -201,5 +207,6 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 
 - [ ] Equipping a bag piece takes one drag and one request, against three clicks today.
 - [ ] Unit tests pin the 6 px threshold, every cancel path and every class of DRG-15 to DRG-20; e2e tests drag with the mouse and with a real touch sequence.
+- [ ] Every player-visible criterion (DRG-01 to DRG-33) has an e2e scenario, including the numbers of DRG-15, DRG-16 and DRG-31 to DRG-33.
 - [ ] `equipment.spec.js`, `equipmentUi.spec.js` and `bulkSell.spec.js` pass unchanged.
 - [ ] No backend file changes.
