@@ -183,7 +183,7 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-19 | P1: See what is being dragged (AC 5, own wearer not lit) | Tasks | Implementing |
 | DRG-20 | P1: See what is being dragged (AC 6, no tooltip) | Tasks | Implementing |
 | DRG-21 | P1: Touch, pen and existing controls (AC 1, same rules) | Tasks | Implementing |
-| DRG-22 | P1: Touch, pen and existing controls (AC 2, touch-action) | Tasks | In Tasks |
+| DRG-22 | P1: Touch, pen and existing controls (AC 2, touch-action) | Tasks | Implementing |
 | DRG-23 | P1: Touch, pen and existing controls (AC 3, Equipar em stays) | Tasks | Implementing |
 | DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | Implementing |
 | DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Implementing |

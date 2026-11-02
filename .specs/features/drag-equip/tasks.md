@@ -681,7 +681,7 @@ Add `afterEach` to the vitest import of the file.
 
 ---
 
-### T5: Styles of the drag [ ]
+### T5: Styles of the drag [x]
 
 **Owner**: game-dev
 **Goal**: The look of the Visual Design table of `design.md`: grab cursor and `touch-action: none` on draggable tiles, dimmed source, ghost at the pointer, lit hero block and slot, no tooltip while dragging (DRG-15 to DRG-20, DRG-22).
@@ -748,8 +748,8 @@ body.piece-dragging .piece-tooltip {
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The block is in `style.css` after `.piece-tile.is-locked`.
-- [ ] `cd game && npm test && npm run build` passes.
+- [x] The block is in `style.css` after `.piece-tile.is-locked`.
+- [x] `cd game && npm test && npm run build` passes.
 
 **Commit**: `style(game): show the dragged piece and the hero it lands on`
 

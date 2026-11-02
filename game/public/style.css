@@ -2202,6 +2202,50 @@ button:disabled {
     cursor: not-allowed;
 }
 
+/* Drag to equip: a tile dragged onto a hero block (spec drag-equip) */
+
+.piece-tile[data-draggable="true"] {
+    cursor: grab;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+
+.piece-tile.is-dragging {
+    opacity: 0.4;
+}
+
+/* The copy under the pointer lives in document.body, outside the scaled panel, so its left and top are the pointer itself */
+.piece-tile.piece-drag-ghost {
+    position: fixed;
+    z-index: 1000;
+    margin: 0;
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: var(--shadow-lg);
+    pointer-events: none;
+}
+
+.equip-hero.is-drop-target {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+    background: var(--color-accent-100);
+}
+
+.piece-tile.is-drop-slot {
+    outline: 3px dashed var(--color-accent);
+    outline-offset: 3px;
+}
+
+body.piece-dragging,
+body.piece-dragging * {
+    cursor: grabbing !important;
+    user-select: none;
+}
+
+body.piece-dragging .piece-tooltip {
+    display: none;
+}
+
 /* ══ Rever chefes: the chapter as a map ══ */
 
 .farm-screen {
