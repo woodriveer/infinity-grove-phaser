@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Arrastar para equipar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+<div class="brand">Infinity Grove · Revisão de UI</div>
+<section class="panel"><div class="head"><div><h1>Arrastar para equipar</h1><div class="meta"><code>.specs/features/drag-equip</code> · commits <code>7272cdc..5a199b8</code> · 2026-11-02 · local (vite, Playwright, mouse)</div></div><span class="chip verdict changes">MUDANÇAS PEDIDAS</span></div>
+<p style="margin-top:16px">O arrasto funciona e o visual combina com o jogo no desktop. Risco do z-index resolvido: a cópia (no body, z-index 1000) aparece acima do contêiner DOM do Phaser, que não tem z-index, no desktop e no celular. Problema real: no celular a cópia fica enorme. O toque real (touch) não foi exercitado; as capturas do celular usam o mouse em viewport de celular.</p>
+<div class="stats"><div class="stat"><div class="n">5</div><div class="l">telas e estados verificados</div></div><div class="stat"><div class="n">10</div><div class="l">capturas (desktop + celular)</div></div><div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div><div class="stat"><div class="n">3</div><div class="l">achados médios e baixos</div></div></div></section>
+<section class="panel"><h2>Fidelidade à spec</h2><ul class="checks"><li class="yes"><span class="mark">✓</span><span>Cópia da peça centrada no ponteiro, origem a 40%, bloco do herói com contorno e fundo de destaque <code>D6</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Slot a ser substituído com contorno tracejado de destaque <code>D6</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Tooltips escondidos durante o arrasto <code>D6</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Após soltar a lista redesenha com a peça no slot, sem aviso <code>D3</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Todo o texto visível em português <code>AD-007</code></span></li>
+<li class="no"><span class="mark">✗</span><span>A cópia deve parecer o tile; no celular ela aparece cerca de 2,6 vezes maior que os tiles <code>D6 · achado #1</code></span></li></ul></section>
+<section class="panel"><h2>Capturas</h2><div class="screen"><h3>Equipamento: arrastar peça para herói</h3><div class="shots"><figure><a href="ui-review/01-rest-desktop.png" target="_blank"><img src="ui-review/01-rest-desktop.png" alt="Lista em repouso" loading="lazy"></a><figcaption><span class="t">Lista em repouso</span><span class="d">Mochila com 5 peças e dois blocos de herói, sem arrasto.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+<figure><a href="ui-review/02-drag-over-hero-desktop.png" target="_blank"><img src="ui-review/02-drag-over-hero-desktop.png" alt="Arrasto sobre herói válido (slot vazio)" loading="lazy"></a><figcaption><span class="t">Arrasto sobre herói válido (slot vazio)</span><span class="d">Cópia da peça sob o ponteiro, origem a 40%, bloco da Lyra com contorno laranja e fundo claro, slot Arma tracejado.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #3</span></span></figcaption></figure>
+<figure><a href="ui-review/03-drag-over-replace-desktop.png" target="_blank"><img src="ui-review/03-drag-over-replace-desktop.png" alt="Arrasto sobre herói que será substituído" loading="lazy"></a><figcaption><span class="t">Arrasto sobre herói que será substituído</span><span class="d">Bloco da Kael destacado; a arma equipada dela recebe o contorno tracejado.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+<figure><a href="ui-review/04-drag-invalid-spot-desktop.png" target="_blank"><img src="ui-review/04-drag-invalid-spot-desktop.png" alt="Arrasto sobre ponto inválido" loading="lazy"></a><figcaption><span class="t">Arrasto sobre ponto inválido</span><span class="d">Ponteiro fora de qualquer bloco de herói: nenhum destaque, a cópia continua seguindo o ponteiro, origem a 40%.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #2</span></span></figcaption></figure>
+<figure><a href="ui-review/05-after-drop-desktop.png" target="_blank"><img src="ui-review/05-after-drop-desktop.png" alt="Lista após soltar" loading="lazy"></a><figcaption><span class="t">Lista após soltar</span><span class="d">A arma aparece no slot Arma da Lyra, a Mochila passa a 4 peças e as peças se reorganizam sem lacuna.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure></div><div class="shots phone" style="margin-top:16px"><figure><a href="ui-review/01-rest-phone.png" target="_blank"><img src="ui-review/01-rest-phone.png" alt="Lista em repouso" loading="lazy"></a><figcaption><span class="t">Lista em repouso</span><span class="d">Mochila com 5 peças e dois blocos de herói, sem arrasto.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+<figure><a href="ui-review/02-drag-over-hero-phone.png" target="_blank"><img src="ui-review/02-drag-over-hero-phone.png" alt="Arrasto sobre herói válido (slot vazio)" loading="lazy"></a><figcaption><span class="t">Arrasto sobre herói válido (slot vazio)</span><span class="d">Cópia da peça sob o ponteiro, origem a 40%, bloco da Lyra com contorno laranja e fundo claro, slot Arma tracejado.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #1</span></span></figcaption></figure>
+<figure><a href="ui-review/03-drag-over-replace-phone.png" target="_blank"><img src="ui-review/03-drag-over-replace-phone.png" alt="Arrasto sobre herói que será substituído" loading="lazy"></a><figcaption><span class="t">Arrasto sobre herói que será substituído</span><span class="d">Bloco da Kael destacado; a arma equipada dela recebe o contorno tracejado.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #1</span></span></figcaption></figure>
+<figure><a href="ui-review/04-drag-invalid-spot-phone.png" target="_blank"><img src="ui-review/04-drag-invalid-spot-phone.png" alt="Arrasto sobre ponto inválido" loading="lazy"></a><figcaption><span class="t">Arrasto sobre ponto inválido</span><span class="d">Ponteiro fora de qualquer bloco de herói: nenhum destaque, a cópia continua seguindo o ponteiro, origem a 40%.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #1</span></span></figcaption></figure>
+<figure><a href="ui-review/05-after-drop-phone.png" target="_blank"><img src="ui-review/05-after-drop-phone.png" alt="Lista após soltar" loading="lazy"></a><figcaption><span class="t">Lista após soltar</span><span class="d">A arma aparece no slot Arma da Lyra, a Mochila passa a 4 peças e as peças se reorganizam sem lacuna.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure></div></div></section>
+<section class="panel"><h2>Achados</h2><article class="finding"><div><div class="top"><span class="chip sev-media">#1 · Média</span><strong>Cópia arrastada fica grande demais no celular</strong></div><dl><dt>Tela</dt><dd>Equipamento, arrasto (celular 390×844)</dd><dt>O que está errado</dt><dd>A cópia vive no body, fora do painel escalado pelo Phaser. No celular o painel é reduzido, então a cópia (tile inteiro mais scale 1.1) fica cerca de 2,6 vezes maior que os tiles da Mochila e cobre o bloco do herói e o slot tracejado que o jogador precisa ver. No desktop (escala próxima de 1) o tamanho está bom.</dd><dt>Como deveria ficar</dt><dd>A cópia com o mesmo tamanho visual do tile de origem: multiplicar o scale pelo fator de escala do painel (por exemplo, tile.getBoundingClientRect().width / tile.offsetWidth ao criar a cópia, aplicado no transform).</dd><dt>Arquivo</dt><dd><code>game/public/style.css (.piece-tile.piece-drag-ghost) e game/src/adapters/phaser/views/dragEquip.js (ghostOf)</code></dd></dl></div><a href="ui-review/02-drag-over-hero-phone.png" target="_blank"><img src="ui-review/02-drag-over-hero-phone.png" alt="Captura do achado #1"></a></article><article class="finding"><div><div class="top"><span class="chip sev-baixa">#2 · Baixa</span><strong>Ponto inválido sem nenhuma indicação</strong></div><dl><dt>Tela</dt><dd>Equipamento, arrasto sobre ponto inválido (desktop e celular)</dd><dt>O que está errado</dt><dd>Fora de um bloco de herói nada muda: o cursor continua grabbing e a cópia segue igual. O jogador não percebe que soltar ali cancela.</dd><dt>Como deveria ficar</dt><dd>Opcional: reduzir a opacidade da cópia ou usar cursor not-allowed fora de um alvo válido. A spec não exige; não bloqueia.</dd><dt>Arquivo</dt><dd><code>game/public/style.css (body.piece-dragging)</code></dd></dl></div><a href="ui-review/04-drag-invalid-spot-desktop.png" target="_blank"><img src="ui-review/04-drag-invalid-spot-desktop.png" alt="Captura do achado #2"></a></article><article class="finding"><div><div class="top"><span class="chip sev-baixa">#3 · Baixa</span><strong>Contorno tracejado quase some em slot vazio</strong></div><dl><dt>Tela</dt><dd>Equipamento, arrasto sobre herói (desktop)</dd><dt>O que está errado</dt><dd>O slot vazio tem opacidade reduzida e o tracejado laranja herda isso, ficando bem menos visível que o tracejado sobre a arma equipada (captura 03).</dd><dt>Como deveria ficar</dt><dd>Tracejado na cor de destaque plena também em slot vazio (por exemplo, opacity 1 em .is-drop-slot.is-empty).</dd><dt>Arquivo</dt><dd><code>game/public/style.css (.piece-tile.is-drop-slot)</code></dd></dl></div><a href="ui-review/02-drag-over-hero-desktop.png" target="_blank"><img src="ui-review/02-drag-over-hero-desktop.png" alt="Captura do achado #3"></a></article></section>
+<section class="panel"><h2>Sugestões</h2><ul class="checks"><li><span class="mark">✦</span><span>A cópia cobre o rótulo do slot (ARMADURA) enquanto passa sobre o bloco; deslocá-la para cima e à esquerda do ponteiro ajudaria a ver o slot alvo. Não é defeito.</span></li>
+<li><span class="mark">✦</span><span>Cores de destaque conferidas: contorno #c67139 e fundo #fff2eb, coerentes com o resto do jogo.</span></li></ul></section>
+<section class="panel"><h2>Console e recursos</h2><ul class="checks"><li><span class="mark">✓</span><span>Nenhum erro nem recurso faltando. Apenas avisos de desempenho do WebGL (<code>GPU stall due to ReadPixels</code>), alheios à feature.</span></li></ul></section>
+<footer>Revisão do ui-artist · 2026-11-02</footer>
+</main>
+</body>
+</html>
