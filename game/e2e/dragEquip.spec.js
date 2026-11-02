@@ -600,4 +600,59 @@ test.describe('Drag to equip edge scroll', () => {
 
         await page.mouse.up();
     });
+
+    test('scrolls the window down while a piece is held near its bottom edge', async ({ page }) => {
+        const calls = await startGame(page, { copies: ALL_FIVE });
+        await openEquipment(page);
+
+        const win = page.locator('.hero-window');
+        const end = await win.evaluate((node) => node.scrollHeight - node.clientHeight);
+
+        expect(end).toBeGreaterThan(0);
+        expect(await win.evaluate((node) => node.scrollTop)).toBe(0);
+
+        const box = await win.boundingBox();
+
+        await drag(page, page.getByTestId('equip-slot-kael-WEAPON'), { x: box.x + box.width / 2, y: box.y + box.height - 10 }, { release: false });
+
+        await expect.poll(() => win.evaluate((node) => node.scrollTop)).toBeGreaterThanOrEqual(end - 1);
+
+        const last = page.locator('.equip-hero').last();
+        const heroId = await last.getAttribute('data-drop-hero');
+        const target = await centre(last);
+
+        expect(heroId).not.toBe('kael');
+
+        await page.mouse.move(target.x, target.y, { steps: 4 });
+        await page.mouse.up();
+
+        await expect(page.getByTestId(`equip-slot-${heroId}-WEAPON`)).toHaveAttribute('aria-label', 'Raro Arma +0');
+        expect(equipCalls(calls)).toHaveLength(1);
+        expect(equipCalls(calls)[0].body).toEqual({ heroId });
+    });
+
+    test('the light follows the block that scrolls under a still pointer', async ({ page }) => {
+        await startGame(page, { copies: ALL_FIVE });
+        await openEquipment(page);
+
+        const win = page.locator('.hero-window');
+
+        await win.evaluate((node) => { node.scrollTop = node.scrollHeight; });
+        await page.getByTestId('equip-piece-a1').scrollIntoViewIfNeeded();
+
+        const box = await win.boundingBox();
+        const litHero = () => page.evaluate(() => document.querySelector('.is-drop-target')?.getAttribute('data-drop-hero') ?? null);
+
+        //  30 px below the top edge is inside the band: the window scrolls up under the pointer, which does not move again
+        await drag(page, page.getByTestId('equip-piece-a1'), { x: box.x + box.width / 2, y: box.y + 30 }, { release: false });
+
+        const first = await litHero();
+
+        await expect.poll(litHero).not.toBe(first);
+        await expect.poll(() => win.evaluate((node) => node.scrollTop)).toBe(0);
+
+        //  Released in the letterbox, outside every block: no drop
+        await page.mouse.move(20, 360, { steps: 4 });
+        await page.mouse.up();
+    });
 });

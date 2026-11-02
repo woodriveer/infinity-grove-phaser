@@ -1367,7 +1367,7 @@ const touchDrag = async (page, from, to) =>
 
 ---
 
-### T13: e2e of the scroll down and of the light under a still pointer [ ]
+### T13: e2e of the scroll down and of the light under a still pointer [x]
 
 **Owner**: test-engineer
 **Goal**: Prove in Chromium that a piece held near the bottom edge scrolls the window down to its end and can then be dropped on the last hero, and that the highlight moves to the block that scrolls under a still pointer (DRG-28, DRG-30).
@@ -1451,9 +1451,9 @@ const touchDrag = async (page, from, to) =>
 **Gate**: full - `cd game && npm test && npx playwright test e2e/dragEquip.spec.js e2e/equipment.spec.js e2e/equipmentUi.spec.js e2e/bulkSell.spec.js`
 **Done when**:
 
-- [ ] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 28 tests, and `equipment.spec.js`, `equipmentUi.spec.js` and `bulkSell.spec.js` pass unchanged.
-- [ ] With `dragEquip.js:114` deleted, `the light follows the block that scrolls under a still pointer` fails; the line is restored and `git diff game/src` is empty.
-- [ ] `cd game && npm test` passes.
+- [x] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 28 tests, and `equipment.spec.js`, `equipmentUi.spec.js` and `bulkSell.spec.js` pass unchanged.
+- [x] With `dragEquip.js:114` deleted, `the light follows the block that scrolls under a still pointer` fails; the line is restored and `git diff game/src` is empty.
+- [x] `cd game && npm test` passes.
 
 **Commit**: `test(game): cover the scroll down and the light under a still pointer end to end`
 
