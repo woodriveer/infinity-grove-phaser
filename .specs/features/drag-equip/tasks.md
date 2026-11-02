@@ -1287,7 +1287,7 @@ const touchDrag = async (page, from, to) =>
 
 ---
 
-### T12: e2e of a second finger during a touch drag [ ]
+### T12: e2e of a second finger during a touch drag [x]
 
 **Owner**: test-engineer
 **Goal**: Prove in Chromium, with a real two-finger touch sequence, that a second pointer pressed while a drag runs starts nothing and that the first finger's drop still equips (DRG-25).
@@ -1361,7 +1361,7 @@ const touchDrag = async (page, from, to) =>
 **Gate**: full - `cd game && npx playwright test e2e/dragEquip.spec.js`
 **Done when**:
 
-- [ ] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 26 tests.
+- [x] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 26 tests.
 
 **Commit**: `test(game): cover a second finger during a touch drag end to end`
 

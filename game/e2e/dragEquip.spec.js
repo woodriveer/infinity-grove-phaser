@@ -497,6 +497,53 @@ test.describe('Drag to equip by touch', () => {
 
         await expect(page.getByTestId('piece-detail')).toBeVisible();
     });
+
+    test('a second finger is ignored while a piece is dragged', async ({ page }) => {
+        const calls = await startGame(page);
+        await openEquipment(page);
+
+        //  Records the pointerId of every press, to prove the browser saw two fingers
+        await page.evaluate(() => {
+            window.__downs = [];
+            document.addEventListener('pointerdown', (event) => { window.__downs.push(event.pointerId); }, { capture: true });
+        });
+
+        const cdp = await page.context().newCDPSession(page);
+        const start = await centre(page.getByTestId('equip-piece-a1'));
+        const lyra = await centre(page.getByTestId('equip-hero-lyra'));
+        const second = await centre(page.getByTestId('equip-piece-c1'));
+
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [ { x: start.x, y: start.y, id: 0 } ] });
+
+        for (let step = 1; step <= 8; step++)
+        {
+            const x = start.x + (lyra.x - start.x) * step / 8;
+            const y = start.y + (lyra.y - start.y) * step / 8;
+
+            await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [ { x, y, id: 0 } ] });
+        }
+
+        await expect(page.getByTestId('equip-hero-lyra')).toHaveClass(/is-drop-target/);
+
+        //  The first finger holds a1 over Lyra; a second finger goes down on c1 and slides 30 px
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [ { x: lyra.x, y: lyra.y, id: 0 }, { x: second.x, y: second.y, id: 1 } ] });
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [ { x: lyra.x, y: lyra.y, id: 0 }, { x: second.x + 30, y: second.y, id: 1 } ] });
+
+        expect(await page.evaluate(() => new Set(window.__downs).size)).toBe(2);
+        await expect(page.getByTestId('piece-drag-ghost')).toHaveCount(1);
+        await expect(page.getByTestId('equip-piece-c1')).not.toHaveClass(/is-dragging/);
+        await expect(page.getByTestId('equip-hero-lyra')).toHaveClass(/is-drop-target/);
+
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+
+        await expect(page.getByTestId('equip-slot-lyra-AMULET')).toHaveAttribute('aria-label', 'Épico Amuleto +3');
+        await expect(page.getByTestId('equip-piece-c1')).toBeVisible();
+
+        await settle(page);
+        expect(equipCalls(calls)).toHaveLength(1);
+        expect(equipCalls(calls)[0].path).toBe('/equipment/a1/equip');
+        expect(equipCalls(calls)[0].body).toEqual({ heroId: 'lyra' });
+    });
 });
 
 test.describe('Drag to equip edge scroll', () => {
