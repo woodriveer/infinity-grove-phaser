@@ -33,14 +33,14 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
-| D1 Touch activation | A touch drag starts like a mouse drag: after the finger moves 6 px from where it pressed. Draggable tiles carry `touch-action: none`, so a swipe that starts on a tile drags it instead of scrolling the window; a swipe that starts anywhere else scrolls as today; a tap still opens the piece detail | One rule and one code path for every pointer; long-press needs a timer plus cancelling the browser scroll mid-gesture and cannot be checked in e2e. The scroll cost is limited to the tiles, and DRG-27 and DRG-28 scroll the window during a drag | n |
-| D2 Which pieces can be dragged | Every bag piece and every worn piece (a worn piece moves to the hero it is dropped on, the same as `Equipar em <nome>` on a worn piece today) | The detail already offers `Equipar em` for worn pieces, and the server already moves them | n |
-| D3 After a successful drop | The Equipamento list redraws with the piece in the hero's slot and the replaced piece (if any) in the bag; no notice, the piece detail does not open | The change is visible where the player is looking; opening the detail would undo the time saved | n |
-| D4 Drop target | The whole block of an owned hero (`equip-hero-<id>`: name, heading and its four slots). The piece goes to its own slot | A larger target is easier on a phone; the slot is not a choice | n |
-| D5 Drag threshold | 6 CSS px of straight-line distance between the press and the current pointer position, in screen pixels | Below that a press is a click, so the click that opens the detail keeps working | n |
-| D6 Feedback | A copy of the tile follows the pointer centred on it; the source tile dims to 40 % opacity; the hero block under the pointer gets an accent outline and a light accent background, and that hero's slot of the piece's slot gets a dashed accent outline; tooltips hide while dragging | The owner asked for a dragged item and a highlighted hero; the slot outline shows which piece will be replaced | n |
-| D7 Edge scrolling (P2) | While dragging within 40 px of the top or bottom edge of the window, the window scrolls 8 px every 16 ms toward that edge. The 6 px and 40 px are screen pixels (`clientX`/`clientY`); the 8 px step is the window's own `scrollTop` unit | With 4 or 5 owned heroes the bag sits below the hero blocks and both are not on screen together (window 708 px tall) | n |
-| D8 Failure | The error line `Não foi possível concluir a ação.` (the line every equipment action already uses) and the list as it was before the drop | Same text as the button flow (lesson L-010: no new wording) | n |
+| D1 Touch activation | A touch drag starts like a mouse drag: after the finger moves 6 px from where it pressed. Draggable tiles carry `touch-action: none`, so a swipe that starts on a tile drags it instead of scrolling the window; a swipe that starts anywhere else scrolls as today; a tap still opens the piece detail | One rule and one code path for every pointer; long-press needs a timer plus cancelling the browser scroll mid-gesture and cannot be checked in e2e. The scroll cost is limited to the tiles, and DRG-27 and DRG-28 scroll the window during a drag | y |
+| D2 Which pieces can be dragged | Every bag piece and every worn piece (a worn piece moves to the hero it is dropped on, the same as `Equipar em <nome>` on a worn piece today) | The detail already offers `Equipar em` for worn pieces, and the server already moves them | y |
+| D3 After a successful drop | The Equipamento list redraws with the piece in the hero's slot and the replaced piece (if any) in the bag; no notice, the piece detail does not open | The change is visible where the player is looking; opening the detail would undo the time saved | y |
+| D4 Drop target | The whole block of an owned hero (`equip-hero-<id>`: name, heading and its four slots). The piece goes to its own slot | A larger target is easier on a phone; the slot is not a choice | y |
+| D5 Drag threshold | 6 CSS px of straight-line distance between the press and the current pointer position, in screen pixels | Below that a press is a click, so the click that opens the detail keeps working | y |
+| D6 Feedback | A copy of the tile follows the pointer centred on it; the source tile dims to 40 % opacity; the hero block under the pointer gets an accent outline and a light accent background, and that hero's slot of the piece's slot gets a dashed accent outline; tooltips hide while dragging | The owner asked for a dragged item and a highlighted hero; the slot outline shows which piece will be replaced | y |
+| D7 Edge scrolling (P2) | While dragging within 40 px of the top or bottom edge of the window, the window scrolls 8 px every 16 ms toward that edge. The 6 px and 40 px are screen pixels (`clientX`/`clientY`); the 8 px step is the window's own `scrollTop` unit | With 4 or 5 owned heroes the bag sits below the hero blocks and both are not on screen together (window 708 px tall) | y |
+| D8 Failure | The error line `Não foi possível concluir a ação.` (the line every equipment action already uses) and the list as it was before the drop | Same text as the button flow (lesson L-010: no new wording) | y |
 | Equip rule | `POST /equipment/<pieceId>/equip` with `{ "heroId": "<heroId>" }`; the server puts the piece on the hero and moves the piece that hero wore in that slot to the bag (EQP-12 to EQP-26) | Existing behaviour, unchanged | y |
 | Keyboard and click fallback | The `Equipar em <nome>` buttons of the piece detail stay as they are | Owner request: the existing way of equipping keeps working | y |
 | Player-facing text | No new text; the only message is the existing error line | AD-007 | y |
@@ -162,7 +162,7 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| DRG-01 | P1: Drop a piece on a hero (AC 1, drag start) | Tasks | In Tasks |
+| DRG-01 | P1: Drop a piece on a hero (AC 1, drag start) | Tasks | Implementing |
 | DRG-02 | P1: Drop a piece on a hero (AC 2, one request) | Tasks | In Tasks |
 | DRG-03 | P1: Drop a piece on a hero (AC 3, piece in slot, no detail) | Tasks | In Tasks |
 | DRG-04 | P1: Drop a piece on a hero (AC 4, replaced piece to bag) | Tasks | In Tasks |
@@ -170,24 +170,24 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-06 | P1: Drop a piece on a hero (AC 6, leader panel) | Tasks | In Tasks |
 | DRG-07 | P1: Drop a piece on a hero (AC 7, failure) | Tasks | In Tasks |
 | DRG-08 | P1: Drop a piece on a hero (AC 8, busy) | Tasks | In Tasks |
-| DRG-09 | P1: Cancel a drag (AC 1, outside every hero) | Tasks | In Tasks |
-| DRG-10 | P1: Cancel a drag (AC 2, own wearer) | Tasks | In Tasks |
-| DRG-11 | P1: Cancel a drag (AC 3, pointercancel) | Tasks | In Tasks |
-| DRG-12 | P1: Cancel a drag (AC 4, cleanup) | Tasks | In Tasks |
-| DRG-13 | P1: Cancel a drag (AC 5, click swallowed) | Tasks | In Tasks |
-| DRG-14 | P1: Cancel a drag (AC 6, short press is a click) | Tasks | In Tasks |
-| DRG-15 | P1: See what is being dragged (AC 1, ghost) | Tasks | In Tasks |
-| DRG-16 | P1: See what is being dragged (AC 2, source dimmed) | Tasks | In Tasks |
-| DRG-17 | P1: See what is being dragged (AC 3, target and slot) | Tasks | In Tasks |
-| DRG-18 | P1: See what is being dragged (AC 4, only one target) | Tasks | In Tasks |
-| DRG-19 | P1: See what is being dragged (AC 5, own wearer not lit) | Tasks | In Tasks |
-| DRG-20 | P1: See what is being dragged (AC 6, no tooltip) | Tasks | In Tasks |
-| DRG-21 | P1: Touch, pen and existing controls (AC 1, same rules) | Tasks | In Tasks |
+| DRG-09 | P1: Cancel a drag (AC 1, outside every hero) | Tasks | Implementing |
+| DRG-10 | P1: Cancel a drag (AC 2, own wearer) | Tasks | Implementing |
+| DRG-11 | P1: Cancel a drag (AC 3, pointercancel) | Tasks | Implementing |
+| DRG-12 | P1: Cancel a drag (AC 4, cleanup) | Tasks | Implementing |
+| DRG-13 | P1: Cancel a drag (AC 5, click swallowed) | Tasks | Implementing |
+| DRG-14 | P1: Cancel a drag (AC 6, short press is a click) | Tasks | Implementing |
+| DRG-15 | P1: See what is being dragged (AC 1, ghost) | Tasks | Implementing |
+| DRG-16 | P1: See what is being dragged (AC 2, source dimmed) | Tasks | Implementing |
+| DRG-17 | P1: See what is being dragged (AC 3, target and slot) | Tasks | Implementing |
+| DRG-18 | P1: See what is being dragged (AC 4, only one target) | Tasks | Implementing |
+| DRG-19 | P1: See what is being dragged (AC 5, own wearer not lit) | Tasks | Implementing |
+| DRG-20 | P1: See what is being dragged (AC 6, no tooltip) | Tasks | Implementing |
+| DRG-21 | P1: Touch, pen and existing controls (AC 1, same rules) | Tasks | Implementing |
 | DRG-22 | P1: Touch, pen and existing controls (AC 2, touch-action) | Tasks | In Tasks |
 | DRG-23 | P1: Touch, pen and existing controls (AC 3, Equipar em stays) | Tasks | In Tasks |
 | DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | In Tasks |
-| DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | In Tasks |
-| DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | In Tasks |
+| DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Implementing |
+| DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Implementing |
 | DRG-27 | P2: Scroll while dragging (AC 1, up) | Tasks | In Tasks |
 | DRG-28 | P2: Scroll while dragging (AC 2, down) | Tasks | In Tasks |
 | DRG-29 | P2: Scroll while dragging (AC 3, stop) | Tasks | In Tasks |

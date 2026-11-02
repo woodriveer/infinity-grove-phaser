@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/drag-equip/spec.md`
 **Design**: `.specs/features/drag-equip/design.md`
-**Status**: Draft (waits for the owner's approval of the spec defaults D1 to D8)
+**Status**: Approved (owner confirmed D1 to D8 at their defaults); implementing
 
 Rules for every task:
 
@@ -77,7 +77,7 @@ T5 → T6
 
 ## Task Breakdown
 
-### T1: Drag helper attachDragToEquip [ ]
+### T1: Drag helper attachDragToEquip [x]
 
 **Owner**: game-dev
 **Goal**: A tile that becomes a drag after a 6 px move and calls `onDrop(heroId)` when released over a valid hero block, with every cancel path and the drag feedback (DRG-01, DRG-09 to DRG-21, DRG-25, DRG-26).
@@ -357,8 +357,8 @@ The `afterEach` `pointercancel` ends any press a test left open, so the module-l
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 23 cases of `dragEquip.test.js` pass.
-- [ ] `cd game && npm test` passes with every existing test unchanged.
+- [x] The 23 cases of `dragEquip.test.js` pass.
+- [x] `cd game && npm test` passes with every existing test unchanged.
 
 **Commit**: `feat(game): drag a piece tile onto a hero block`
 
