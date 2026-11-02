@@ -2226,6 +2226,11 @@ button:disabled {
     pointer-events: none;
 }
 
+/* No hero under the pointer: releasing there cancels the drag, so the copy fades */
+.piece-tile.piece-drag-ghost.is-no-target {
+    opacity: 0.6;
+}
+
 .equip-hero.is-drop-target {
     outline: 3px solid var(--color-accent);
     outline-offset: 2px;

@@ -149,11 +149,13 @@ test.describe('Drag to equip', () => {
 
         await expect(page.getByTestId('equip-hero-kael')).toHaveClass(/is-drop-target/);
         await expect(page.getByTestId('equip-hero-lyra')).not.toHaveClass(/is-drop-target/);
+        await expect(page.getByTestId('piece-drag-ghost')).toHaveCSS('opacity', '1');
 
         const bagPiece = await centre(page.getByTestId('equip-piece-m1'));
 
         await page.mouse.move(bagPiece.x, bagPiece.y, { steps: 4 });
 
+        await expect(page.getByTestId('piece-drag-ghost')).toHaveCSS('opacity', '0.6');
         await expect(page.locator('.is-drop-target')).toHaveCount(0);
         await expect(page.locator('.is-drop-slot')).toHaveCount(0);
         await expect(page.locator('.piece-tooltip:visible')).toHaveCount(0);

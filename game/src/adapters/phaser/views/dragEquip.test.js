@@ -142,6 +142,32 @@ describe('attachDragToEquip', () => {
         expect(document.querySelector('.is-drop-slot')).toBeNull();
     });
 
+    it('the ghost is dimmed over no hero and full over a valid one', () => {
+        under = bag;
+        startDrag();
+
+        expect(ghost().classList.contains('is-no-target')).toBe(true);
+
+        under = lyra.querySelector('.equip-hero-name');
+        pointer('pointermove', document, 130, 100);
+
+        expect(ghost().classList.contains('is-no-target')).toBe(false);
+
+        under = bag;
+        pointer('pointermove', document, 140, 100);
+
+        expect(ghost().classList.contains('is-no-target')).toBe(true);
+    });
+
+    it('the ghost is dimmed over the hero who wears the piece', () => {
+        document.body.innerHTML = '';
+        setup(amulet('kael'));
+        under = kael.querySelector('.equip-hero-name');
+        startDrag();
+
+        expect(ghost().classList.contains('is-no-target')).toBe(true);
+    });
+
     it('does not light the hero who wears the piece', () => {
         document.body.innerHTML = '';
         setup(amulet('kael'));

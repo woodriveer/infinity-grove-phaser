@@ -42,6 +42,8 @@ const ghostOf = (tile) =>
 
     ghost.querySelectorAll('.piece-tooltip').forEach((node) => node.remove());
     ghost.classList.add('piece-drag-ghost');
+    //  No hero is lit when the copy is made; light() moves the class with the hero under the pointer
+    ghost.classList.add('is-no-target');
     ghost.style.setProperty('--ghost-scale', String(scale));
     ghost.removeAttribute('data-draggable');
     ghost.setAttribute('data-testid', 'piece-drag-ghost');
@@ -126,6 +128,7 @@ export const attachDragToEquip = (tile, piece, onDrop) =>
             lit = block;
             lit?.classList.add('is-drop-target');
             lit?.querySelector(`.piece-tile[data-slot="${piece.slot}"]`)?.classList.add('is-drop-slot');
+            ghost?.classList.toggle('is-no-target', !lit);
         };
 
         const follow = (x, y) =>
