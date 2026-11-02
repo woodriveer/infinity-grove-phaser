@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 65,
+  "next_id": 67,
   "lessons": [
     {
       "id": "L-001",
@@ -1160,6 +1160,42 @@
       ],
       "created": "2026-11-02T03:52:11Z",
       "last_seen": "2026-11-02T03:52:11Z"
+    },
+    {
+      "id": "L-065",
+      "key": "surviving_mutant::drag tests must cover a piece of every slot kind a highlight that always marks the first kind survives when all fixtures drag that one kind",
+      "text": "Drag tests must cover a piece of every slot kind: a highlight that always marks the first kind survives when all fixtures drag that one kind",
+      "signal": "surviving_mutant",
+      "scope": "game-views",
+      "status": "candidate",
+      "features": [
+        "drag-equip"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/src/adapters/phaser/views/dragEquip.js:130 (sensor F6, round 3) (game-views)"
+      ],
+      "created": "2026-11-02T04:41:31Z",
+      "last_seen": "2026-11-02T04:41:31Z"
+    },
+    {
+      "id": "L-066",
+      "key": "surviving_mutant::pin a stale async answer against a close followed by a reopen of the same screen not only against the close",
+      "text": "Pin a stale async answer against a close followed by a reopen of the same screen, not only against the close",
+      "signal": "surviving_mutant",
+      "scope": "game-views",
+      "status": "candidate",
+      "features": [
+        "drag-equip"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/src/adapters/phaser/HeroUi.js:469 (sensor F8b, round 3) (game-views)"
+      ],
+      "created": "2026-11-02T04:41:31Z",
+      "last_seen": "2026-11-02T04:41:31Z"
     }
   ]
 }

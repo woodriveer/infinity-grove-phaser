@@ -396,6 +396,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: game/src/adapters/phaser/views/dragEquip.js:105 (sensor S9, timer not cleared on direction change; validation.md round 2) (timers)
 - last seen: 2026-11-02T03:52:11Z
 
+### L-065 - Drag tests must cover a piece of every slot kind: a highlight that always marks the first kind survives when all fixtures drag that one kind
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game-views` · harmful: 0
+- features: drag-equip
+- evidence: game/src/adapters/phaser/views/dragEquip.js:130 (sensor F6, round 3) (game-views)
+- last seen: 2026-11-02T04:41:31Z
+
+### L-066 - Pin a stale async answer against a close followed by a reopen of the same screen, not only against the close
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game-views` · harmful: 0
+- features: drag-equip
+- evidence: game/src/adapters/phaser/HeroUi.js:469 (sensor F8b, round 3) (game-views)
+- last seen: 2026-11-02T04:41:31Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
