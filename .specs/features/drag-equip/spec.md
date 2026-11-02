@@ -175,9 +175,9 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-08 | P1: Drop a piece on a hero (AC 8, busy) | Tasks | Implementing |
 | DRG-09 | P1: Cancel a drag (AC 1, outside every hero) | Tasks | Done |
 | DRG-10 | P1: Cancel a drag (AC 2, own wearer) | Tasks | Done |
-| DRG-11 | P1: Cancel a drag (AC 3, pointercancel) | Tasks | Done |
+| DRG-11 | P1: Cancel a drag (AC 3, pointercancel) | Tasks | Implementing |
 | DRG-12 | P1: Cancel a drag (AC 4, cleanup) | Tasks | Done |
-| DRG-13 | P1: Cancel a drag (AC 5, click swallowed) | Tasks | Done |
+| DRG-13 | P1: Cancel a drag (AC 5, click swallowed) | Tasks | Implementing |
 | DRG-14 | P1: Cancel a drag (AC 6, short press is a click) | Tasks | Done |
 | DRG-15 | P1: See what is being dragged (AC 1, ghost up and left of the pointer) | Tasks | Implementing |
 | DRG-16 | P1: See what is being dragged (AC 2, source dimmed to 0.4) | Tasks | Implementing |
@@ -190,7 +190,7 @@ IDs follow the order of the criteria: DRG-01 to DRG-08 for "Drop a piece on a he
 | DRG-23 | P1: Touch, pen and existing controls (AC 3, Equipar em stays) | Tasks | Done |
 | DRG-24 | P1: Touch, pen and existing controls (AC 4, selection mode) | Tasks | Done |
 | DRG-25 | P1: Touch, pen and existing controls (AC 5, second pointer) | Tasks | Done |
-| DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Done |
+| DRG-26 | P1: Touch, pen and existing controls (AC 6, primary only) | Tasks | Implementing |
 | DRG-27 | P2: Scroll while dragging (AC 1, up, also above the window) | Tasks | Implementing |
 | DRG-28 | P2: Scroll while dragging (AC 2, down, also below the window) | Tasks | Implementing |
 | DRG-29 | P2: Scroll while dragging (AC 3, stop) | Tasks | Done |

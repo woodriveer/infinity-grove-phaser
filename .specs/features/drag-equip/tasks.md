@@ -1170,7 +1170,7 @@ const touchDrag = async (page, from, to) =>
 
 ---
 
-### T11: e2e of pointercancel, the swallowed click and the other mouse buttons [ ]
+### T11: e2e of pointercancel, the swallowed click and the other mouse buttons [x]
 
 **Owner**: test-engineer
 **Goal**: Prove in Chromium that a `pointercancel` ends the drag with no request, that the click after a drag released on its own tile opens nothing (a scenario that fails without the click swallow), and that the right and middle buttons start no drag (DRG-11, DRG-13, DRG-26).
@@ -1280,8 +1280,8 @@ const touchDrag = async (page, from, to) =>
 **Gate**: full - `cd game && npx playwright test e2e/dragEquip.spec.js`
 **Done when**:
 
-- [ ] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 25 tests.
-- [ ] With `dragEquip.js:161` deleted, `the click after a drag released on its own tile opens nothing` fails; the line is restored and `git diff game/src` is empty.
+- [x] `cd game && npx playwright test e2e/dragEquip.spec.js` passes with 25 tests.
+- [x] With `dragEquip.js:161` deleted, `the click after a drag released on its own tile opens nothing` fails; the line is restored and `git diff game/src` is empty.
 
 **Commit**: `test(game): cover pointercancel, the swallowed click and the other buttons end to end`
 

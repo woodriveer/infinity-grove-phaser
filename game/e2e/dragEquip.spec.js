@@ -378,6 +378,87 @@ test.describe('Drag to equip', () => {
         expect(equipCalls(calls)[0].path).toBe('/equipment/a1/equip');
         expect(equipCalls(calls)[0].body).toEqual({ heroId: 'lyra' });
     });
+
+    test('a pointercancel ends the drag and sends nothing', async ({ page }) => {
+        const calls = await startGame(page);
+        await openEquipment(page);
+
+        //  Keeps the pointerId of the press, so the cancel below is the one the browser would send for it
+        await page.evaluate(() => {
+            document.addEventListener('pointerdown', (event) => { window.__pressId = event.pointerId; }, { capture: true });
+        });
+
+        await drag(page, page.getByTestId('equip-piece-a1'), page.getByTestId('equip-hero-lyra'), { release: false });
+
+        await expect(page.getByTestId('equip-hero-lyra')).toHaveClass(/is-drop-target/);
+
+        //  No mouse gesture makes Chromium cancel a pointer, so the test sends the event the browser sends when it takes the gesture
+        await page.evaluate(() => document.dispatchEvent(new PointerEvent('pointercancel', {
+            bubbles: true, pointerId: window.__pressId, isPrimary: true, pointerType: 'mouse'
+        })));
+
+        await expect(page.getByTestId('piece-drag-ghost')).toHaveCount(0);
+        await expect(page.locator('.is-drop-target')).toHaveCount(0);
+        await expect(page.getByTestId('equip-piece-a1')).not.toHaveClass(/is-dragging/);
+
+        //  The button comes up over Lyra: after the cancel this is no drop
+        await page.mouse.up();
+
+        await settle(page);
+        expect(equipCalls(calls)).toHaveLength(0);
+        await expect(page.getByTestId('equip-slot-lyra-AMULET').locator('.piece-empty')).toHaveText('vazio');
+        await expect(page.getByTestId('piece-detail')).toHaveCount(0);
+    });
+
+    test('the click after a drag released on its own tile opens nothing', async ({ page }) => {
+        const calls = await startGame(page);
+        await openEquipment(page);
+
+        const tile = await centre(page.getByTestId('equip-piece-a1'));
+
+        //  Press and release on the same tile: the browser clicks that tile, so only the swallow keeps the piece detail closed
+        await page.mouse.move(tile.x, tile.y);
+        await page.mouse.down();
+        await page.mouse.move(tile.x + 30, tile.y, { steps: 4 });
+
+        await expect(page.getByTestId('piece-drag-ghost')).toBeVisible();
+
+        await page.mouse.move(tile.x, tile.y, { steps: 4 });
+        await page.mouse.up();
+
+        await settle(page);
+        await expect(page.getByTestId('piece-detail')).toHaveCount(0);
+        await expect(page.getByTestId('piece-drag-ghost')).toHaveCount(0);
+        expect(equipCalls(calls)).toHaveLength(0);
+
+        await page.getByTestId('equip-piece-a1').click();
+
+        await expect(page.getByTestId('piece-detail')).toBeVisible();
+    });
+
+    test('the right and the middle button start no drag', async ({ page }) => {
+        const calls = await startGame(page);
+        await openEquipment(page);
+
+        const tile = await centre(page.getByTestId('equip-piece-a1'));
+        const lyra = await centre(page.getByTestId('equip-hero-lyra'));
+
+        for (const button of [ 'right', 'middle' ])
+        {
+            await page.mouse.move(tile.x, tile.y);
+            await page.mouse.down({ button });
+            await page.mouse.move(lyra.x, lyra.y, { steps: 8 });
+
+            await expect(page.getByTestId('piece-drag-ghost')).toHaveCount(0);
+            await expect(page.getByTestId('equip-hero-lyra')).not.toHaveClass(/is-drop-target/);
+
+            await page.mouse.up({ button });
+        }
+
+        await settle(page);
+        expect(equipCalls(calls)).toHaveLength(0);
+        await expect(page.getByTestId('equip-piece-a1')).toBeVisible();
+    });
 });
 
 test.describe('Drag to equip by touch', () => {
