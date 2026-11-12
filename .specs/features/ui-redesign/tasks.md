@@ -424,7 +424,7 @@ The old `.tag-element` rule is gone on purpose: the element chip gets its dot in
 
 ---
 
-### T4: Flatten a cutout onto a background colour [ ]
+### T4: Flatten a cutout onto a background colour [x]
 
 **Owner**: game-dev
 **What**: `art/tools/cutout_hero.py` gains `--background <hex>`: the cutout is flattened onto that colour, keeps its whole frame and is saved as a JPEG at quality 88; without the flag the tool behaves as today (UIR-16 AC 4, 5).
