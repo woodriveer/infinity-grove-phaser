@@ -89,12 +89,16 @@ export const tick = async ({
             writeState(stateFile, state);
         }
 
-        if (game && backendOk)
+        //  Game changes held back by a failed backend deploy ship with the next backend deploy that passes (or the next game commit)
+        const { gameHeld, ...rest } = state;
+        const publish = backendOk && (game || (backend && Boolean(gameHeld)));
+
+        if (publish)
         {
             publishWorker({ exec, root, hash, tunnel: state.tunnel, log });
         }
 
-        state = { ...state, handled: hash };
+        state = (game || gameHeld) && !publish ? { ...rest, handled: hash, gameHeld: true } : { ...rest, handled: hash };
         writeState(stateFile, state);
 
         return state;

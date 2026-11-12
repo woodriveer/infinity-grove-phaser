@@ -186,14 +186,41 @@ test('a mixed range publishes the Worker after a passed deploy', async () =>
     assert.deepEqual(acted(events), ['sweep', `deploy ${TARGET} lock=true`, `publish ${TARGET} ${TUNNEL}`]);
 });
 
-test('a mixed range does not publish the Worker after a failed deploy, and the commit is handled', async () =>
+test('a mixed range does not publish the Worker after a failed deploy, and the commit is handled with its game changes held', async () =>
 {
     const { deps, events, stateFile } = machine({ files: ['backend/build.gradle.kts', 'game/src/a.js'], deployOk: false });
 
     await tick(deps);
 
     assert.deepEqual(acted(events), ['sweep', `deploy ${TARGET} lock=true`]);
-    assert.deepEqual(readState(stateFile), { ...STATE, handled: TARGET });
+    assert.deepEqual(readState(stateFile), { ...STATE, handled: TARGET, gameHeld: true });
+});
+
+test('game changes held back by a failed deploy ship with the next backend deploy that passes', async () =>
+{
+    const fixed = machine({ target: MIDDLE, files: ['backend/src/main/kotlin/A.kt'], state: { ...STATE, handled: TARGET, gameHeld: true } });
+
+    await tick(fixed.deps);
+
+    assert.deepEqual(acted(fixed.events), ['sweep', `deploy ${MIDDLE} lock=true`, `publish ${MIDDLE} ${TUNNEL}`]);
+    assert.equal(readState(fixed.stateFile).gameHeld, undefined);
+});
+
+test('held game changes wait while no backend deploy passes', async () =>
+{
+    const docs = machine({ files: ['README.md'], state: { ...STATE, gameHeld: true } });
+
+    await tick(docs.deps);
+
+    assert.deepEqual(acted(docs.events), ['sweep']);
+    assert.deepEqual(readState(docs.stateFile), { ...STATE, handled: TARGET, gameHeld: true });
+
+    const failedAgain = machine({ files: ['backend/a.kt'], deployOk: false, state: { ...STATE, gameHeld: true } });
+
+    await tick(failedAgain.deps);
+
+    assert.deepEqual(acted(failedAgain.events), ['sweep', `deploy ${TARGET} lock=true`]);
+    assert.equal(readState(failedAgain.stateFile).gameHeld, true);
 });
 
 test('a taken lock skips the tick and leaves the lock to its owner', async () =>
