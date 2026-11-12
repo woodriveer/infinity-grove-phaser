@@ -564,7 +564,7 @@ print('ok', total)
 
 ---
 
-### T6: Plaque, tag, scroll, combo, message and notice [ ]
+### T6: Plaque, tag, scroll, combo, message and notice [x]
 
 **Owner**: game-dev
 **What**: The top HUD texts and the notice in the Grove recipes (UIR-04 AC 1 to 6).

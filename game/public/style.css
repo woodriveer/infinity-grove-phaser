@@ -546,14 +546,18 @@ button:disabled {
     display: flex;
     align-items: center;
     gap: 18px;
-    padding: 12px 22px;
+    padding: 10px 22px;
     font-family: var(--font-heading);
     font-size: 19px;
     line-height: 1.2;
     white-space: pre;
-    border-radius: 999px;
-    background: var(--color-bg);
-    box-shadow: var(--shadow-lg);
+    border-radius: 6px;
+    background: var(--panel-bg);
+    box-shadow: var(--panel-shadow);
+    font-weight: 700;
+    color: var(--ink-900);
+    background-color: var(--parchment-200);
+    border: var(--panel-border);
 }
 
 .stage-hud:empty {
@@ -561,13 +565,17 @@ button:disabled {
 }
 
 .chapter-hud {
-    padding: 6px 16px;
+    padding: 5px 14px;
     font-family: var(--font-heading);
     font-size: 16px;
     white-space: pre;
-    border-radius: 999px;
-    background: var(--color-bg);
-    box-shadow: var(--shadow-lg);
+    border-radius: 4px;
+    background: var(--panel-bg);
+    box-shadow: 0 0 0 1px var(--bronze-500), var(--shadow-lg);
+    font-weight: 700;
+    color: var(--ink-900);
+    background-color: var(--parchment-200);
+    border: 2px solid var(--wood-600);
 }
 
 .chapter-hud:empty {
@@ -578,11 +586,14 @@ button:disabled {
     padding: 6px 18px;
     font-family: var(--font-heading);
     font-size: 20px;
-    color: var(--color-accent-900);
+    color: var(--parchment-100);
     white-space: pre;
     border-radius: 999px;
-    background: var(--color-accent-300);
-    box-shadow: 0 0 0 3px var(--color-bg), var(--shadow-lg);
+    background: var(--btn-primary-bg);
+    box-shadow: var(--btn-shadow);
+    font-weight: 700;
+    background-color: var(--ember-800);
+    border: 2px solid var(--gold-400);
 }
 
 .combo-hud:empty {
@@ -652,9 +663,10 @@ button:disabled {
     font-size: 52px;
     line-height: 1.1;
     text-align: center;
-    color: var(--color-bg);
-    -webkit-text-stroke: 10px var(--color-neutral-900);
+    color: #ffd35c;
+    -webkit-text-stroke: 10px #2a1408;
     paint-order: stroke fill;
+    font-weight: 700;
 }
 
 .farm-toggle,
@@ -1021,12 +1033,15 @@ button:disabled {
 .card-notice {
     padding: 12px 24px;
     font-family: var(--font-heading);
-    font-size: 24px;
-    color: var(--color-accent-2-900);
-    border-radius: 999px;
-    background: var(--color-accent-2-200);
-    box-shadow: 0 0 0 4px var(--color-bg), var(--shadow-lg);
+    font-size: 22px;
+    color: var(--gold-200);
+    border-radius: 6px;
+    background: var(--frame-bg);
+    box-shadow: var(--frame-shadow);
     pointer-events: none;
+    font-weight: 700;
+    background-color: var(--wood-800);
+    border: var(--frame-border);
 }
 
 /* ══ Hero screens: one cream window over the dimmed fight ══ */
