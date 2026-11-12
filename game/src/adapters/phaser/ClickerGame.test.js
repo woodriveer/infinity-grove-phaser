@@ -1998,6 +1998,21 @@ describe('ClickerGame elements', () => {
         expect(enemyText(ctx)).toBe('Fire  Physical def 0%  Magical def 0%  Crit res 0%');
     });
 
+    it('marks the element chip with data-element and each defense chip with data-stat', async () => {
+        const ctx = await createScene({ start: withStats(stats('WATER', 11, 22, 33)) });
+
+        expect(ctx.hud('.enemy-stats .tag-element').getAttribute('data-element')).toBe('WATER');
+        expect([ ...ctx.hud('.enemy-stats').querySelectorAll('[data-stat]') ].map((tag) => [ tag.getAttribute('data-stat'), tag.textContent ]))
+            .toEqual([ [ 'physical', 'Physical def 11%' ], [ 'magical', 'Magical def 22%' ], [ 'crit', 'Crit res 33%' ] ]);
+    });
+
+    it('keeps the enemy line text exactly as before', async () => {
+        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
+
+        expect(enemyText(ctx)).toBe('Darkness  Physical def 30%  Magical def 30%  Crit res 30%');
+        expect(ctx.hud('.enemy-stats .tag-element').getAttribute('data-element')).toBe('DARKNESS');
+    });
+
     it('clears the attributes when the monster dies and shows the next ones when it spawns', async () => {
         const ctx = await createScene({ start: withStats(stats('NATURE')) });
 

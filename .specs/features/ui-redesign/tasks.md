@@ -762,7 +762,7 @@ Test updates in `ClickerGame.test.js` (exact replacements, nothing else):
 
 ---
 
-### T9: Enemy chips with element dot and stat icons [ ]
+### T9: Enemy chips with element dot and stat icons [x]
 
 **Owner**: game-dev
 **What**: The enemy tags carry `data-element` and `data-stat` and render as dark chips with a dot or an icon; their text stays (UIR-07).

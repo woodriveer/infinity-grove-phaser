@@ -508,7 +508,7 @@ button:disabled {
 }
 
 .hud-enemy {
-    width: 400px;
+    width: 460px;
     height: 48px;
 }
 
@@ -658,11 +658,9 @@ button:disabled {
     flex-wrap: wrap;
     justify-content: center;
     gap: 6px;
-    padding: 8px 12px;
+    padding: 0;
     white-space: pre;
-    border-radius: var(--radius-lg);
-    background: var(--color-bg);
-    box-shadow: var(--shadow-lg);
+    background: transparent;
 }
 
 .enemy-stats:empty {
@@ -682,6 +680,56 @@ button:disabled {
 
 .enemy-stats .gap {
     display: none;
+}
+
+/* The enemy chips: smaller than the hero-screen tags so the line fits 460 px (spec ui-redesign UIR-07) */
+.enemy-stats .tag {
+    gap: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+}
+
+/* The element dot of the enemy chip and of the weak element chip */
+:is(.tag-element, .weak-chip)::before {
+    content: '';
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--element-color, var(--parchment-100));
+    box-shadow: 0 0 0 1px var(--wood-900);
+}
+
+:is(.tag-element, .weak-chip)[data-element="FIRE"] { --element-color: #e8643c; }
+:is(.tag-element, .weak-chip)[data-element="WATER"] { --element-color: #3f8fd1; }
+:is(.tag-element, .weak-chip)[data-element="NATURE"] { --element-color: #4f9a3c; }
+:is(.tag-element, .weak-chip)[data-element="LIGHT"] { --element-color: #f2c94c; }
+:is(.tag-element, .weak-chip)[data-element="DARKNESS"] { --element-color: #4a3a7a; }
+
+/* The stat icons: a mask coloured by the stat */
+.tag[data-stat]::before {
+    content: '';
+    flex: none;
+    width: 12px;
+    height: 12px;
+    background-color: var(--stat-color);
+    -webkit-mask: var(--stat-icon) center / contain no-repeat;
+    mask: var(--stat-icon) center / contain no-repeat;
+}
+
+.tag[data-stat="physical"] {
+    --stat-color: #b07a3a;
+    --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 4 5v6c0 5.2 3.4 9.5 8 11 4.6-1.5 8-5.8 8-11V5z'/%3E%3C/svg%3E");
+}
+
+.tag[data-stat="magical"] {
+    --stat-color: #3f8fd1;
+    --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 4 5v6c0 5.2 3.4 9.5 8 11 4.6-1.5 8-5.8 8-11V5z'/%3E%3C/svg%3E");
+}
+
+.tag[data-stat="crit"] {
+    --stat-color: #d64541;
+    --stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='%23000' stroke-width='3'/%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3C/svg%3E");
 }
 
 .stage-message {

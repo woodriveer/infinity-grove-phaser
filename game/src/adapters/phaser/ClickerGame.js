@@ -681,13 +681,15 @@ export class ClickerGame extends Scene
         }
     }
 
-    //  "Water  Physical def 10%  Magical def 10%  Crit res 12%", one tag each; the double spaces are hidden between the tags
+    //  "Water  Physical def 10%  Magical def 10%  Crit res 12%", one chip each; the double spaces are hidden between the chips. data-element and
+    //  data-stat give each chip its dot or icon (spec ui-redesign UIR-07)
     showEnemyStats ({ element, physicalDefense, magicalDefense, critResistance })
     {
         const name = element.charAt(0) + element.slice(1).toLowerCase();
+        const stats = [ [ 'physical', `Physical def ${physicalDefense}%` ], [ 'magical', `Magical def ${magicalDefense}%` ], [ 'crit', `Crit res ${critResistance}%` ] ];
         const tags = [
-            el('span', 'tag tag-element', name),
-            ...[ `Physical def ${physicalDefense}%`, `Magical def ${magicalDefense}%`, `Crit res ${critResistance}%` ].map((text) => el('span', 'tag', text))
+            el('span', 'tag tag-element', name, { 'data-element': element }),
+            ...stats.map(([ stat, text ]) => el('span', 'tag', text, { 'data-stat': stat }))
         ];
 
         this.enemyStats.replaceChildren(...tags.flatMap((tag, index) => (index ? [ el('span', 'gap', '  '), tag ] : [ tag ])));
