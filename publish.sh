@@ -63,8 +63,9 @@ publish_worker() {
   node --input-type=module -e 'import { publishWorker } from "./deploy/lib/workerPublish.mjs";
 import { run } from "./deploy/lib/run.mjs";
 const [hash, tunnel] = process.argv.slice(1);
-process.exit(publishWorker({ exec: run, root: process.cwd(), hash, tunnel, log: console.log }) ? 0 : 1);' "$1" "$2"
-  echo "Published: https://infinity-grove.yan-tapajos.workers.dev/"
+process.exit(publishWorker({ exec: run, root: process.cwd(), hash, tunnel, log: console.log }) ? 0 : 1);' "$1" "$2" &&
+    echo "Published: https://infinity-grove.yan-tapajos.workers.dev/" ||
+    echo "Worker NOT published: the site still points at the old tunnel. Check the account of 'npx wrangler login', then run ./publish.sh --force."
 }
 
 # A run is already up (its tunnel answers): nothing is restarted
