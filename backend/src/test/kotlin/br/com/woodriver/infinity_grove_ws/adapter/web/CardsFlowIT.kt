@@ -95,13 +95,13 @@ class CardsFlowIT : IntegrationTestBase() {
             .get("/farm")
             .then()
             .body("bosses", hasSize<Any>(11))
-            .body("chapterBossWinsLeft", equalTo(9))
+            .body("chapterBossWinsLeft", equalTo(10))
         asUser(token)
             .contentType(ContentType.JSON)
             .body("""{"boss":{"kind":"CHAPTER_BOSS"},"outcome":"CLEARED"}""")
             .post("/farm/outcome")
             .then()
             .statusCode(200)
-            .body("chapterBossWinsLeft", equalTo(8))
+            .body("chapterBossWinsLeft", equalTo(9))
     }
 }

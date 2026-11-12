@@ -522,8 +522,8 @@ export async function mockBackend (page, {
         return route.fulfill(problem(404, 'Not found'));
     };
 
-    //  The drop of a won miniboss or chapter boss (the first chapter boss win always drops) and the chapter boss win it counts
-    const awardCards = (cards, encounter, chapter) => {
+    //  The drop of a won miniboss or chapter boss (the first chapter boss win always drops); only a farm chapter boss win counts for the day
+    const awardCards = (cards, encounter, chapter, fromFarm = false) => {
         if (encounter === 'PHASE') { return null; }
 
         const chapterBoss = encounter === 'CHAPTER_BOSS';
@@ -534,6 +534,9 @@ export async function mockBackend (page, {
 
         if (chapterBoss) {
             cards.cleared.add(chapter);
+        }
+
+        if (chapterBoss && fromFarm) {
             cards.winsToday = (cards.winsDay === utcDay() ? cards.winsToday : 0) + 1;
             cards.winsDay = utcDay();
         }
@@ -698,7 +701,7 @@ export async function mockBackend (page, {
 
             cards.lastFarmWin = now;
 
-            const drop = awardCards(cards, boss.kind, 1);
+            const drop = awardCards(cards, boss.kind, 1, true);
 
             return route.fulfill({ json: { drop, chapterBossWinsLeft: winsLeft(cards), equipmentDrop: awardEquipment(username, boss.kind) } });
         }

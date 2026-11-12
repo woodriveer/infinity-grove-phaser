@@ -21,6 +21,14 @@ class BossRecordTest {
     }
 
     @Test
+    fun `a campaign chapter boss win adds the chapter and no win for today`() {
+        val record = BossRecord().afterCampaignBossWin(1)
+
+        assertTrue(record.hasWon(1))
+        assertEquals(10, record.winsLeft(today, 10))
+    }
+
+    @Test
     fun `wins of the same day add up`() {
         val record = BossRecord().afterChapterBossWin(1, today).afterChapterBossWin(1, today).afterChapterBossWin(1, today)
 

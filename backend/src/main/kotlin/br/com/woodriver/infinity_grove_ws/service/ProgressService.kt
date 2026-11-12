@@ -85,7 +85,7 @@ class ProgressService(
                 logger.warn("No cards to award username={} encounter={}", username, position.encounter)
                 return NO_REWARDS
             }
-        val (updated, drop) = rewards.award(cards, position.encounter, position.chapter, position.stage)
+        val (updated, drop) = rewards.award(cards, position.encounter, position.chapter, position.stage, fromFarm = false)
         if (updated != cards) playerCardsRepository.save(updated)
         return drop to equipmentRewards.award(username, position.encounter, position.chapter)
     }

@@ -413,7 +413,7 @@ class ProgressServiceTest {
     }
 
     @Test
-    fun `the first chapter boss win drops the next chapter hero without a roll and records the win`() {
+    fun `the first chapter boss win drops the next chapter hero without a roll and records the chapter but not a daily win`() {
         playerAt(chapterBoss)
         chance = SequenceChanceRoller(0.99)
 
@@ -425,7 +425,7 @@ class ProgressServiceTest {
         assertEquals(0, chance.reads)
         val bosses = playerCards.cards.getValue("yan").bosses
         assertTrue(bosses.hasWon(1))
-        assertEquals(9, bosses.winsLeft(today, 10))
+        assertEquals(10, bosses.winsLeft(today, 10))
     }
 
     @Test
@@ -438,7 +438,7 @@ class ProgressServiceTest {
     }
 
     @Test
-    fun `a later chapter boss win with a roll of thirty percent or more drops nothing but still counts`() {
+    fun `a later chapter boss win with a roll of thirty percent or more drops nothing and spends no daily win`() {
         playerAt(chapterBoss, bosses = BossRecord(clearedChapters = setOf(1)))
         chance = SequenceChanceRoller(0.30)
 
@@ -446,7 +446,7 @@ class ProgressServiceTest {
 
         assertNull(result.drop)
         assertEquals(
-            9,
+            10,
             playerCards.cards
                 .getValue("yan")
                 .bosses

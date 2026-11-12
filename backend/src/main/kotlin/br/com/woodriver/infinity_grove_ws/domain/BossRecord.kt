@@ -34,6 +34,9 @@ data class BossRecord(
         today: LocalDate,
     ) = copy(clearedChapters = clearedChapters + chapter, winsDay = today, winsToday = winsOn(today) + 1)
 
+    /** A campaign chapter boss win clears the chapter but leaves the daily farm count alone. */
+    fun afterCampaignBossWin(chapter: Int) = copy(clearedChapters = clearedChapters + chapter)
+
     /** Records a farm win at [now]; a win less than [minIntervalMs] after the previous one is refused. */
     fun afterFarmWin(
         now: Long,

@@ -30,13 +30,15 @@ class CardRewards(
 
     /**
      * Rolls the card of a won [encounter] at [stage] of [chapter] and returns the cards with it added and the chapter boss win recorded.
-     * The [stage] sets the miniboss chance; the chapter boss ignores it.
+     * The [stage] sets the miniboss chance; the chapter boss ignores it. Only a [fromFarm] chapter boss win counts against the daily limit:
+     * the limit is there against repeated farming, not against advancing the campaign.
      */
     fun award(
         cards: PlayerCards,
         encounter: Encounter,
         chapter: Int,
         stage: Int,
+        fromFarm: Boolean,
     ): Pair<PlayerCards, CardDrop?> {
         val chapterBoss = encounter == Encounter.CHAPTER_BOSS
         val hero =
@@ -51,7 +53,10 @@ class CardRewards(
                 chance = chanceRoller::roll,
             )
         var updated = cards
-        if (chapterBoss) updated = updated.withBosses(cards.bosses.afterChapterBossWin(chapter, today()))
+        if (chapterBoss) {
+            val bosses = if (fromFarm) cards.bosses.afterChapterBossWin(chapter, today()) else cards.bosses.afterCampaignBossWin(chapter)
+            updated = updated.withBosses(bosses)
+        }
         if (hero != null) {
             updated = updated.add(hero.id)
             logger.info("Card dropped username={} hero={} source={}", cards.username, hero.id, encounter)
