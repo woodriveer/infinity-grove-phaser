@@ -502,7 +502,7 @@ print('ok')
 
 ---
 
-### T5: Re-cut the 15 skill thumbnails on dark wood [ ]
+### T5: Re-cut the 15 skill thumbnails on dark wood [x]
 
 **Owner**: game-dev
 **What**: The 15 skill images in `game/public/assets/heroes/` are regenerated from `art/` with the T4 flag, same names, `.jpg`, 512 px tall, on `#1c120c` (UIR-16 AC 1, 2).
