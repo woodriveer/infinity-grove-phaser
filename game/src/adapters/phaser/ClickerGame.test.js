@@ -1104,6 +1104,7 @@ describe('ClickerGame stages', () => {
     };
     const label = (ctx) => ctx.hud('.stage-hud').textContent;
     const timer = (ctx) => ctx.hud('.boss-timer').textContent;
+    const left = (ctx) => ctx.hud('.boss-timer').style.getPropertyValue('--timer-left');
     const message = (ctx) => ctx.hud('.stage-message').textContent;
     const bossStart = (stage = 1) => progress(stage, 'MINIBOSS', 1);
 
@@ -1178,6 +1179,63 @@ describe('ClickerGame stages', () => {
         ctx.scene.update(0, 28000);
         expect(timer(ctx)).toBe('Time: 1');
         expect(ctx.scene.monster).not.toBeNull();
+    });
+
+    it('sets --timer-left to 1.000 when a 30 s countdown starts', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        expect(left(ctx)).toBe('1.000');
+    });
+
+    it('sets --timer-left to 0.750 after 7.5 s of a 30 s countdown', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.scene.update(0, 7500);
+
+        expect(left(ctx)).toBe('0.750');
+        expect(timer(ctx)).toBe('Time: 23');
+    });
+
+    it('writes --timer-left as 0.000 in the last millisecond, never negative', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.scene.update(0, 29999);
+
+        expect(left(ctx)).toBe('0.000');
+    });
+
+    it('computes --timer-left against an extended limit', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.scene.countdown.extend(30000);
+        ctx.scene.update(0, 0);
+        expect(left(ctx)).toBe('1.000');
+
+        ctx.scene.update(0, 15000);
+        expect(left(ctx)).toBe('0.750');
+    });
+
+    it('removes --timer-left when the boss runs out of time', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.scene.update(0, 30000);
+
+        expect(left(ctx)).toBe('');
+        expect(timer(ctx)).toBe('');
+    });
+
+    it('removes --timer-left when the boss is beaten', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        killAll(ctx);
+
+        expect(left(ctx)).toBe('');
+    });
+
+    it('sets no --timer-left on a phase monster', async () => {
+        const ctx = await createScene();
+
+        expect(left(ctx)).toBe('');
     });
 
     it('moves to phase 1 of the next stage and hides the countdown when the miniboss dies in time', async () => {

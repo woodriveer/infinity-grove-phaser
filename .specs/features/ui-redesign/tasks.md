@@ -599,7 +599,7 @@ Write `background` before `background-color` in each rule (the shorthand resets 
 
 ---
 
-### T7: Boss timer ring [ ]
+### T7: Boss timer ring [x]
 
 **Owner**: game-dev
 **What**: The timer carries `--timer-left` and draws as a dark pill led by a 32 px ring (UIR-06).

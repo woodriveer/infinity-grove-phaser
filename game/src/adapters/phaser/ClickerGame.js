@@ -710,12 +710,15 @@ export class ClickerGame extends Scene
     showCountdown ()
     {
         this.bossTimer.textContent = `Time: ${this.countdown.seconds}`;
+        //  The ring of the timer fills with the share of the time left, 3 decimals (spec ui-redesign UIR-06)
+        this.bossTimer.style.setProperty('--timer-left', Math.min(1, Math.max(0, this.countdown.remainingMs / this.countdown.limitMs)).toFixed(3));
     }
 
     hideCountdown ()
     {
         this.countdown = null;
         this.bossTimer.textContent = '';
+        this.bossTimer.style.removeProperty('--timer-left');
     }
 
     update (time, delta)
