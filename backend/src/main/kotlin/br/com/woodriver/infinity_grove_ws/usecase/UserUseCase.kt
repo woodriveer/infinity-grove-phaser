@@ -14,13 +14,12 @@ interface CreateUserUseCase {
 
 interface GetUserUseCase {
     fun get(username: String): User
-
-    fun list(): List<User>
 }
 
 interface UpdateUserUseCase {
     fun updatePassword(
         username: String,
+        currentPassword: String,
         rawPassword: String,
     ): User
 }

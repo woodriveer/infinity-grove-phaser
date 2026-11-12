@@ -22,6 +22,7 @@ import br.com.woodriver.infinity_grove_ws.domain.TalentConflictException
 import br.com.woodriver.infinity_grove_ws.domain.TalentNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.TalentRequestException
 import br.com.woodriver.infinity_grove_ws.domain.UserAlreadyExistsException
+import br.com.woodriver.infinity_grove_ws.domain.UserForbiddenException
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.WalletRequestException
 import org.slf4j.LoggerFactory
@@ -43,6 +44,9 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException::class)
     fun notFound(e: UserNotFoundException) = problem(HttpStatus.NOT_FOUND, e)
+
+    @ExceptionHandler(UserForbiddenException::class)
+    fun userForbidden(e: UserForbiddenException) = problem(HttpStatus.FORBIDDEN, e)
 
     @ExceptionHandler(UserAlreadyExistsException::class)
     fun conflict(e: UserAlreadyExistsException) = problem(HttpStatus.CONFLICT, e)

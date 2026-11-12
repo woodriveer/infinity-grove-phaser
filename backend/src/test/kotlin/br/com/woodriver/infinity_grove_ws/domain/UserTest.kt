@@ -45,14 +45,19 @@ class UserTest {
 
     @Test
     fun `changePassword stores a new hash`() {
-        val user = register().changePassword("newpassword1", hasher)
+        val user = register().changePassword("password123", "newpassword1", hasher)
 
         assertEquals(hasher.hash("newpassword1"), user.password)
     }
 
     @Test
     fun `changePassword rejects short password`() {
-        assertFailsWith<IllegalArgumentException> { register().changePassword("short", hasher) }
+        assertFailsWith<IllegalArgumentException> { register().changePassword("password123", "short", hasher) }
+    }
+
+    @Test
+    fun `changePassword rejects a wrong current password`() {
+        assertFailsWith<InvalidPasswordException> { register().changePassword("wrong-password", "newpassword1", hasher) }
     }
 
     @Test

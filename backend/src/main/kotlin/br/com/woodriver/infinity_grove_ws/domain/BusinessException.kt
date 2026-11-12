@@ -24,6 +24,10 @@ class LoginUserNotFoundException(
     username: String,
 ) : LoginException("LOGIN_USER_NOT_FOUND", "User '$username' does not exist")
 
+class UserForbiddenException(
+    username: String,
+) : BusinessException("USER_FORBIDDEN", "Only the owner can access user '$username'")
+
 class InvalidPasswordException : LoginException("LOGIN_INVALID_PASSWORD", "Password is invalid")
 
 class InvalidRefreshTokenException : BusinessException("AUTH_INVALID_REFRESH_TOKEN", "Refresh token is invalid")

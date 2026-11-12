@@ -57,20 +57,15 @@ class UserService(
         return userRepository.findByUsername(username) ?: throw UserNotFoundException(username)
     }
 
-    @Transactional(readOnly = true)
-    override fun list(): List<User> {
-        logger.info("Listing users")
-        return userRepository.findAll()
-    }
-
     override fun updatePassword(
         username: String,
+        currentPassword: String,
         rawPassword: String,
     ): User {
         logger.info("Updating password username={}", username)
         val updated =
             get(username)
-                .changePassword(rawPassword, passwordHasher)
+                .changePassword(currentPassword, rawPassword, passwordHasher)
                 .save(userRepository)
         refreshTokenRepository.revokeAllByUsername(username)
         return updated

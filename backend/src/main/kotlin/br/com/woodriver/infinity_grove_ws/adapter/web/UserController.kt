@@ -4,6 +4,7 @@ import br.com.woodriver.infinity_grove_ws.domain.AuthTokens
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.InvalidStartingElementException
 import br.com.woodriver.infinity_grove_ws.domain.User
+import br.com.woodriver.infinity_grove_ws.domain.UserForbiddenException
 import br.com.woodriver.infinity_grove_ws.usecase.CreateUserUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.DeleteUserUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.GetUserUseCase
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import java.security.Principal
 
 data class CreateUserRequest(
     val username: String,
@@ -28,6 +30,7 @@ data class CreateUserRequest(
 )
 
 data class UpdatePasswordRequest(
+    val currentPassword: String,
     val password: String,
 )
 
@@ -83,30 +86,35 @@ class UserController(
         startSession.start(createUser.create(request.username, request.password, parseStartingElement(request.startingElement))),
     )
 
-    @GetMapping
-    fun list() = getUser.list().map(UserResponse::from)
-
     @GetMapping("/{username}")
     fun get(
         @PathVariable username: String,
-    ) = UserResponse.from(getUser.get(username))
+        principal: Principal,
+    ) = UserResponse.from(getUser.get(owned(username, principal)))
 
     @PutMapping("/{username}/password")
     fun updatePassword(
         @PathVariable username: String,
         @RequestBody request: UpdatePasswordRequest,
-    ) = UserResponse.from(updateUser.updatePassword(username, request.password))
+        principal: Principal,
+    ) = UserResponse.from(updateUser.updatePassword(owned(username, principal), request.currentPassword, request.password))
 
     @DeleteMapping("/{username}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(
         @PathVariable username: String,
-    ) = deleteUser.delete(username)
+        principal: Principal,
+    ) = deleteUser.delete(owned(username, principal))
 
     @PostMapping("/login")
     fun login(
         @RequestBody request: LoginRequest,
     ) = AuthResponse.from(startSession.start(loginUser.login(request.username, request.password)))
+
+    private fun owned(
+        username: String,
+        principal: Principal,
+    ): String = if (username == principal.name) username else throw UserForbiddenException(username)
 
     private fun parseStartingElement(value: String?): Element =
         Element.entries.firstOrNull { it.name == value } ?: throw InvalidStartingElementException(value)

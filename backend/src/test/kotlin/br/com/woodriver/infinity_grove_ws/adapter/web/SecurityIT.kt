@@ -28,7 +28,7 @@ class SecurityIT : IntegrationTestBase() {
         spec: RequestSpecification,
         method: String,
         path: String,
-    ): Response = spec.contentType(ContentType.JSON).body("""{"password":"newpassword1"}""").request(method, path)
+    ): Response = spec.contentType(ContentType.JSON).body("""{"currentPassword":"password123","password":"newpassword1"}""").request(method, path)
 
     private fun assertUnauthenticated(response: Response) {
         response
@@ -98,10 +98,9 @@ class SecurityIT : IntegrationTestBase() {
     fun `protected routes work with a valid token`() {
         signUp("yan").then().statusCode(201)
 
-        call(authenticated(), "GET", "/users").then().statusCode(200)
-        call(authenticated(), "GET", "/users/yan").then().statusCode(200).body("username", equalTo("yan"))
-        call(authenticated(), "PUT", "/users/yan/password").then().statusCode(200)
-        call(authenticated(), "DELETE", "/users/yan").then().statusCode(204)
+        call(authenticated("yan"), "GET", "/users/yan").then().statusCode(200).body("username", equalTo("yan"))
+        call(authenticated("yan"), "PUT", "/users/yan/password").then().statusCode(200)
+        call(authenticated("yan"), "DELETE", "/users/yan").then().statusCode(204)
     }
 
     @Test
@@ -188,12 +187,12 @@ class SecurityIT : IntegrationTestBase() {
 
     @Test
     fun `error responses still use the ProblemDetail handlers for authenticated requests`() {
-        authenticated()
+        authenticated("ghost")
             .get("/users/ghost")
             .then()
             .statusCode(404)
             .body("code", equalTo("USER_NOT_FOUND"))
-        call(authenticated(), "PUT", "/users/ghost/password").then().statusCode(404)
+        call(authenticated("ghost"), "PUT", "/users/ghost/password").then().statusCode(404)
         authenticated()
             .contentType(ContentType.JSON)
             .body("""{"username":"bob","password":"short"}""")

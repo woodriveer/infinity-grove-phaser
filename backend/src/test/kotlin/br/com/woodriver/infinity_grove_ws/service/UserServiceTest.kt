@@ -108,12 +108,10 @@ class UserServiceTest {
     }
 
     @Test
-    fun `get and list return stored users`() {
+    fun `get returns the stored user`() {
         service.create("yan", "password123", Element.FIRE)
-        service.create("ana", "password123", Element.FIRE)
 
         assertEquals("yan", service.get("yan").username)
-        assertEquals(2, service.list().size)
     }
 
     @Test
@@ -125,14 +123,14 @@ class UserServiceTest {
     fun `updatePassword stores the new hash`() {
         service.create("yan", "password123", Element.FIRE)
 
-        service.updatePassword("yan", "newpassword1")
+        service.updatePassword("yan", "password123", "newpassword1")
 
         assertEquals(hasher.hash("newpassword1"), repository.users.getValue("yan").password)
     }
 
     @Test
     fun `updatePassword fails when user is missing`() {
-        assertFailsWith<UserNotFoundException> { service.updatePassword("ghost", "newpassword1") }
+        assertFailsWith<UserNotFoundException> { service.updatePassword("ghost", "password123", "newpassword1") }
     }
 
     @Test
@@ -200,7 +198,7 @@ class UserServiceTest {
         refreshTokens.save(token("y2", "yan"))
         refreshTokens.save(token("a1", "ana"))
 
-        service.updatePassword("yan", "newpassword1")
+        service.updatePassword("yan", "password123", "newpassword1")
 
         assertTrue(refreshTokens.tokens.getValue("y1").revoked)
         assertTrue(refreshTokens.tokens.getValue("y2").revoked)
@@ -220,9 +218,21 @@ class UserServiceTest {
     fun `failed password update revokes no tokens`() {
         refreshTokens.save(token("g1", "ghost"))
 
-        assertFailsWith<UserNotFoundException> { service.updatePassword("ghost", "newpassword1") }
+        assertFailsWith<UserNotFoundException> { service.updatePassword("ghost", "password123", "newpassword1") }
 
         assertFalse(refreshTokens.tokens.getValue("g1").revoked)
+    }
+
+    @Test
+    fun `password update with a wrong current password keeps the hash and revokes no tokens`() {
+        service.create("yan", "password123", Element.FIRE)
+        val before = repository.users.getValue("yan").password
+        refreshTokens.save(token("y1", "yan"))
+
+        assertFailsWith<InvalidPasswordException> { service.updatePassword("yan", "wrong-password", "newpassword1") }
+
+        assertEquals(before, repository.users.getValue("yan").password)
+        assertFalse(refreshTokens.tokens.getValue("y1").revoked)
     }
 
     @Test
@@ -230,7 +240,7 @@ class UserServiceTest {
         service.create("yan", "password123", Element.FIRE)
         refreshTokens.save(token("y1", "yan"))
 
-        assertFailsWith<IllegalArgumentException> { service.updatePassword("yan", "short") }
+        assertFailsWith<IllegalArgumentException> { service.updatePassword("yan", "password123", "short") }
 
         assertFalse(refreshTokens.tokens.getValue("y1").revoked)
     }

@@ -117,7 +117,8 @@ abstract class IntegrationTestBase {
     protected fun users(vararg names: String) = names.forEach { jpaUserRepository.save(UserEntity(it, "hash", 1L, 1L)) }
 
     /** A request specification that carries a valid access token. */
-    protected fun authenticated(): RequestSpecification = RestAssured.given().header("Authorization", bearerToken())
+    protected fun authenticated(username: String = "test-caller"): RequestSpecification =
+        RestAssured.given().header("Authorization", bearerToken(username))
 
     @BeforeEach
     fun setUpRestAssured() {

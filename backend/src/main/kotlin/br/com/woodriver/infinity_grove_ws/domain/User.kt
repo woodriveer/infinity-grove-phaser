@@ -16,9 +16,15 @@ data class User(
     }
 
     fun changePassword(
+        currentPassword: String,
         rawPassword: String,
         passwordHasher: PasswordHasherPort,
     ): User {
+        // a stolen access token alone must not be enough to take the account
+        if (!passwordHasher.matches(currentPassword, password)) {
+            logger.warn("Password change rejected, wrong current password username={}", username)
+            throw InvalidPasswordException()
+        }
         validatePassword(rawPassword)
         logger.info("Changing password for User username={}", username)
         return copy(password = passwordHasher.hash(rawPassword))

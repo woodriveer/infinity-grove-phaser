@@ -4,7 +4,6 @@ import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.hasSize
 import org.hamcrest.Matchers.not
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
@@ -96,16 +95,10 @@ class UserControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `GET users lists and gets users`() {
-        createUser("yan")
+    fun `GET user returns the caller's own user`() {
         createUser("ana")
 
-        authenticated()
-            .get("/users")
-            .then()
-            .statusCode(200)
-            .body("$", hasSize<Any>(2))
-        authenticated()
+        authenticated("ana")
             .get("/users/ana")
             .then()
             .statusCode(200)
@@ -113,8 +106,48 @@ class UserControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `GET users no longer lists the players`() {
+        createUser("yan")
+
+        authenticated("yan").get("/users").then().statusCode(405)
+    }
+
+    @Test
+    fun `another account cannot read, change the password of or delete a user`() {
+        createUser("yan")
+        val before = jpaUserRepository.findById("yan").get().password
+
+        authenticated("ana").get("/users/yan").then().statusCode(403).body("code", equalTo("USER_FORBIDDEN"))
+        request(json("currentPassword" to "password123", "password" to "newpassword1"))
+            .header("Authorization", bearerToken("ana"))
+            .put("/users/yan/password")
+            .then()
+            .statusCode(403)
+            .body("code", equalTo("USER_FORBIDDEN"))
+        authenticated("ana").delete("/users/yan").then().statusCode(403).body("code", equalTo("USER_FORBIDDEN"))
+
+        assertEquals(before, jpaUserRepository.findById("yan").get().password)
+        assertTrue(jpaUserRepository.findById("yan").isPresent)
+    }
+
+    @Test
+    fun `PUT password with a wrong current password returns 401 and keeps the hash`() {
+        createUser()
+        val before = jpaUserRepository.findById("yan").get().password
+
+        request(json("currentPassword" to "wrong-password", "password" to "newpassword1"))
+            .header("Authorization", bearerToken("yan"))
+            .put("/users/yan/password")
+            .then()
+            .statusCode(401)
+            .body("code", equalTo("LOGIN_INVALID_PASSWORD"))
+
+        assertEquals(before, jpaUserRepository.findById("yan").get().password)
+    }
+
+    @Test
     fun `GET user returns 404 with USER_NOT_FOUND when missing`() {
-        authenticated()
+        authenticated("ghost")
             .get("/users/ghost")
             .then()
             .statusCode(404)
@@ -126,8 +159,8 @@ class UserControllerIT : IntegrationTestBase() {
         createUser()
         val before = jpaUserRepository.findById("yan").get().password
 
-        request(json("password" to "newpassword1"))
-            .header("Authorization", bearerToken())
+        request(json("currentPassword" to "password123", "password" to "newpassword1"))
+            .header("Authorization", bearerToken("yan"))
             .put("/users/yan/password")
             .then()
             .statusCode(200)
@@ -141,8 +174,8 @@ class UserControllerIT : IntegrationTestBase() {
 
     @Test
     fun `PUT password returns 404 when user is missing`() {
-        request(json("password" to "newpassword1"))
-            .header("Authorization", bearerToken())
+        request(json("currentPassword" to "password123", "password" to "newpassword1"))
+            .header("Authorization", bearerToken("ghost"))
             .put("/users/ghost/password")
             .then()
             .statusCode(404)
@@ -152,10 +185,10 @@ class UserControllerIT : IntegrationTestBase() {
     fun `DELETE removes the user`() {
         createUser()
 
-        authenticated().delete("/users/yan").then().statusCode(204)
+        authenticated("yan").delete("/users/yan").then().statusCode(204)
 
         assertTrue(jpaUserRepository.findById("yan").isEmpty)
-        authenticated().delete("/users/yan").then().statusCode(404)
+        authenticated("yan").delete("/users/yan").then().statusCode(404)
     }
 
     @Test
