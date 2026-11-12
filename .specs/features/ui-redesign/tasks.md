@@ -111,7 +111,7 @@ T29 → T30
 
 ## Task Breakdown
 
-### T1: Load Cinzel and drop Caprasimo [ ]
+### T1: Load Cinzel and drop Caprasimo [x]
 
 **Owner**: game-dev
 **What**: The page loads Cinzel 700 and Figtree 400, 600, 700, 800 instead of Caprasimo and Figtree (UIR-01 AC 1).
