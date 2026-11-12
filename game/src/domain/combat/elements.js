@@ -58,3 +58,11 @@ export const elementMultiplier = (attacker, defender) =>
 
     return BEATS[attacker] === defender ? STRONG : WEAK;
 };
+
+//  The element that hits `defender` for double, or null: LIGHT and DARKNESS take at most 1x from any element (spec ui-redesign UIR-08)
+export const weaknessOf = (defender) =>
+{
+    requireElement(defender);
+
+    return ELEMENTS.find((attacker) => elementMultiplier(attacker, defender) === STRONG) ?? null;
+};

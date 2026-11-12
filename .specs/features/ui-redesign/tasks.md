@@ -865,7 +865,7 @@ CSS: `.enemy-stats` - set `padding: 0;` `background: transparent;`; remove `bord
 
 ---
 
-### T10: The element that beats an enemy [ ]
+### T10: The element that beats an enemy [x]
 
 **Owner**: game-dev
 **What**: `weaknessOf(defender)` returns the element that hits it for double, or null (UIR-08 AC 1 to 4).

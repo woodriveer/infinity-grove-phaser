@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ELEMENTS, elementMultiplier } from './elements';
+import { ELEMENTS, elementMultiplier, weaknessOf } from './elements';
 
 //  The whole table of the spec, written out pair by pair: rows attack, columns defend
 //             FIRE  WATER NATURE LIGHT DARKNESS
@@ -36,5 +36,31 @@ describe('elementMultiplier', () => {
     it('throws for an unknown or missing defender instead of dealing 1.0', () => {
         expect(() => elementMultiplier('FIRE', 'PLASMA')).toThrow('Unknown element: PLASMA');
         expect(() => elementMultiplier('FIRE', undefined)).toThrow('Unknown element');
+    });
+});
+
+describe('weaknessOf', () => {
+    it('FIRE is weak to WATER', () => {
+        expect(weaknessOf('FIRE')).toBe('WATER');
+    });
+
+    it('WATER is weak to NATURE', () => {
+        expect(weaknessOf('WATER')).toBe('NATURE');
+    });
+
+    it('NATURE is weak to FIRE', () => {
+        expect(weaknessOf('NATURE')).toBe('FIRE');
+    });
+
+    it('LIGHT has no weakness', () => {
+        expect(weaknessOf('LIGHT')).toBeNull();
+    });
+
+    it('DARKNESS has no weakness', () => {
+        expect(weaknessOf('DARKNESS')).toBeNull();
+    });
+
+    it('rejects an unknown element', () => {
+        expect(() => weaknessOf('EARTH')).toThrow('Unknown element: EARTH');
     });
 });
