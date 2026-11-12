@@ -14,7 +14,7 @@ import { ELEMENT_LABELS } from '../../domain/heroes/heroes';
 import { SkillCombat } from '../../domain/skills/skillCombat';
 import { monsterAfterBreak, talentComboCap, talentTimeBonusMs } from '../../domain/talents/talents';
 import { HeroUi } from './HeroUi';
-import { renderAutoClick } from './views/autoClickView';
+import { autoClickIntervalText, renderAutoClick } from './views/autoClickView';
 import { RESET_ERROR_TEXT, renderResetButton, renderResetDialog, resetNoticeText } from './views/resetView';
 import { el } from './views/dom';
 import { renderElementWheel } from './views/elementWheel';
@@ -74,10 +74,17 @@ const STAGE_MESSAGE_HTML = '<div class="hud-box hud-message"><div class="stage-m
 //  The round farm button at the right end of the bar, right of the auto click button
 const FARM_TOGGLE = { x: 951, y: 686 };
 const PAUSE_MENU = { x: 512, y: 384 };
-//  Right of the element wheel, above the leader's head: the auto click switch, its interval, the crystals and the next upgrade
-//  (spec auto-click)
-const AUTO_CLICK_HUD = { x: 366, y: 200 };
-const AUTO_CLICK_HUD_HTML = '<div class="hud-box hud-auto-click"><div class="auto-click" data-testid="auto-click"></div></div>';
+//  The auto click (spec ui-redesign D1, UIR-19): a round button at the right end of the battle bar with its key A and its interval under it, and the
+//  window it opens above it with the switch, the interval, the crystals, the upgrade and the account reset. The box keeps Phaser's placement fixed.
+const AUTO_CLICK_HUD = { x: 867, y: 686 };
+const AUTO_CLICK_HUD_HTML = '<div class="hud-box hud-auto-click"><div class="auto-click" data-testid="auto-click">'
+    + '<div class="auto-click-popover" id="auto-click-popover" role="dialog" aria-label="Auto clique" data-testid="auto-click-popover" hidden></div>'
+    + '<button type="button" class="auto-click-button" data-testid="auto-click-button" data-on="false" aria-label="Auto clique" aria-haspopup="dialog"'
+    + ' aria-expanded="false" aria-controls="auto-click-popover"><span class="auto-click-key" data-testid="auto-click-key" aria-hidden="true">A</span></button>'
+    + '<span class="auto-click-rate" data-testid="auto-click-rate"></span>'
+    + '</div></div>';
+//  A key typed into a text field is text, not a shortcut
+const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [contenteditable="true"], input:not([type="checkbox"]):not([type="radio"]):not([type="button"])'));
 //  The confirmation of the account reset (spec account-reset) covers the screen like the pause menu
 const RESET_DIALOG_HTML = '<div class="reset-dialog" data-testid="reset-dialog" hidden><div class="reset-card"></div></div>';
 const FARM_TOGGLE_HTML = '<div class="hud-box hud-farm"><label class="farm-toggle"><input type="checkbox"> Farm boss</label></div>';
@@ -191,7 +198,11 @@ export class ClickerGame extends Scene
 
         //  Kills reach the backend in batches, never one request per kill
         this.time.addEvent({ delay: WALLET_SYNC_MS, loop: true, callback: () => this.tick() });
-        this.events.once('shutdown', () => this.syncOnExit());
+        this.events.once('shutdown', () =>
+        {
+            this.syncOnExit();
+            document.removeEventListener('pointerdown', this.onPressOutsideAutoClick, true);
+        });
     }
 
     //  An HTML element; returns the node that holds the text. Click-through unless it is a control.
@@ -229,14 +240,22 @@ export class ClickerGame extends Scene
         SKILL_KEYS.forEach(([ key, slot ]) => this.input.keyboard.on(`keydown-${key}`, (event) => !event?.repeat && this.useSkill(slot)));
     }
 
-    //  The auto click box is clickable HTML, hidden until the campaign is past chapter 1; it reads its state in the background
+    //  The round auto click button and its window are clickable HTML, hidden until the auto click is open; they read their state in the background
     createAutoClickHud ()
     {
         this.autoClickElement = this.add.dom(AUTO_CLICK_HUD.x, AUTO_CLICK_HUD.y).createFromHTML(AUTO_CLICK_HUD_HTML);
         this.autoClickBox = this.autoClickElement.node.querySelector('.auto-click');
+        this.autoClickWindow = this.autoClickBox.querySelector('.auto-click-popover');
+        this.autoClickButton = this.autoClickBox.querySelector('.auto-click-button');
+        this.autoClickRate = this.autoClickBox.querySelector('.auto-click-rate');
         this.autoClickBox.addEventListener('change', (event) => this.switchAutoClick(event.target.checked));
         this.autoClickBox.addEventListener('click', (event) => event.target.closest('.auto-click-upgrade') && this.upgradeAutoClick());
         this.autoClickBox.addEventListener('click', (event) => event.target.closest('.reset-account') && this.openResetDialog());
+        this.autoClickButton.addEventListener('click', () => this.toggleAutoClickWindow());
+        //  A press anywhere outside the button and its window closes the window and still does what it does (a press on the canvas hits)
+        this.onPressOutsideAutoClick = (event) => !this.autoClickBox.contains(event.target) && this.closeAutoClickWindow({ returnFocus: false });
+        document.addEventListener('pointerdown', this.onPressOutsideAutoClick, true);
+        this.input.keyboard.on('keydown-A', (event) => this.autoClickKey(event));
         this.showAutoClick();
         this.loadAutoClick();
     }
@@ -256,11 +275,75 @@ export class ClickerGame extends Scene
     showAutoClick ()
     {
         const reward = this.resetReward;
+        //  The window is drawn again on every change; a keyboard user keeps the control that had focus
+        const focused = this.autoClickWindow.contains(document.activeElement) ? document.activeElement.getAttribute('data-testid') : null;
 
         this.autoClickElement.setVisible(this.autoClickOpen);
-        this.autoClickBox.replaceChildren(...renderAutoClick({
+        this.autoClickWindow.replaceChildren(...renderAutoClick({
             enabled: this.autoClickEnabled, intervalMs: this.autoClick.intervalMs(), state: this.autoClick.state(), busy: this.upgradingAutoClick
         }), ...(reward === null ? [] : [ renderResetButton(reward) ]));
+        this.autoClickButton.setAttribute('data-on', String(this.autoClickEnabled));
+        this.autoClickRate.textContent = autoClickIntervalText(this.autoClick.intervalMs());
+
+        if (!this.autoClickOpen)
+        {
+            this.closeAutoClickWindow({ returnFocus: false });
+        }
+        else if (focused)
+        {
+            this.autoClickWindow.querySelector(`[data-testid="${focused}"]`)?.focus();
+        }
+    }
+
+    get autoClickWindowOpen ()
+    {
+        return !this.autoClickWindow.hidden;
+    }
+
+    //  The window opens with the focus on its switch, so the keyboard can use it at once
+    openAutoClickWindow ()
+    {
+        if (!this.autoClickOpen)
+        {
+            return;
+        }
+
+        this.autoClickWindow.hidden = false;
+        this.autoClickButton.setAttribute('aria-expanded', 'true');
+        this.autoClickWindow.querySelector('[data-testid="auto-click-toggle"]')?.focus();
+    }
+
+    closeAutoClickWindow ({ returnFocus = true } = {})
+    {
+        if (!this.autoClickWindowOpen)
+        {
+            return;
+        }
+
+        this.autoClickWindow.hidden = true;
+        this.autoClickButton.setAttribute('aria-expanded', 'false');
+
+        if (returnFocus)
+        {
+            this.autoClickButton.focus();
+        }
+    }
+
+    toggleAutoClickWindow ()
+    {
+        this.autoClickWindowOpen ? this.closeAutoClickWindow() : this.openAutoClickWindow();
+    }
+
+    //  The A key opens or closes the window; not while typing, not for the repeats of a held key, and not while a dialog, the pause menu or a
+    //  hero screen covers the battle bar
+    autoClickKey (event)
+    {
+        if (event?.repeat || isTextField(event?.target) || this.paused || !this.resetDialog.hidden || this.heroUi.isOpen || !this.autoClickOpen)
+        {
+            return;
+        }
+
+        this.toggleAutoClickWindow();
     }
 
     //  The dialog is clickable HTML above the HUD; its buttons confirm or cancel the reset
@@ -289,6 +372,7 @@ export class ClickerGame extends Scene
             return;
         }
 
+        this.closeAutoClickWindow({ returnFocus: false });
         this.resetError = null;
         this.resetDialog.hidden = false;
         this.showResetDialog();
@@ -422,9 +506,15 @@ export class ClickerGame extends Scene
         }
     }
 
-    //  Esc closes an open hero screen first; otherwise it opens or closes the pause menu
+    //  Esc closes the auto click window first, then an open hero screen; otherwise it opens or closes the pause menu
     escape ()
     {
+        if (this.autoClickWindowOpen)
+        {
+            this.closeAutoClickWindow();
+            return;
+        }
+
         if (this.heroUi.isOpen)
         {
             this.heroUi.close();

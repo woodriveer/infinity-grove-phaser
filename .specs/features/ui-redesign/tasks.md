@@ -1094,7 +1094,7 @@ The AD-020 rules `.skill-level-badge` and `.skill-level-badge[data-level="3"]` d
 
 ---
 
-### T14: Round auto click button, its window and the key A [ ]
+### T14: Round auto click button, its window and the key A [x]
 
 **Owner**: game-dev
 **What**: The auto click card on the left is replaced by a round button in the battle bar that opens a window with the old card's controls, by click or by the key `A` (decision D1; UIR-19).

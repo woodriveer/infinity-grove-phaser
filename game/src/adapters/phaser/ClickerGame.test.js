@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClickerGame } from './ClickerGame';
 import { ApiError } from '../../application/ApiError';
 import { createAccountReset } from '../../application/accountReset/accountReset';
@@ -3940,6 +3940,227 @@ describe('ClickerGame auto click', () => {
         toggle(ctx).dispatchEvent(new Event('change', { bubbles: true }));
     };
     const LEVEL_1 = { level: 1, maxLevel: 4, intervalMs: 250, crystals: 0, next: { level: 2, intervalMs: 150, price: 25 } };
+    //  The window, its button and the keys; `attached` is the node put in the document for the focus tests
+    let attached = null;
+    const press = (ctx, name, event) => ctx.handlers[`keydown-${name}`](event);
+    const button = (ctx) => ctx.hud('[data-testid="auto-click-button"]');
+    const popover = (ctx) => ctx.hud('[data-testid="auto-click-popover"]');
+    const attach = (ctx) =>
+    {
+        attached = autoClickElement(ctx).node;
+        document.body.append(attached);
+    };
+    afterEach(() => attached?.remove());
+
+    it('places the round auto click button at 867, 686 with the key A and the interval under it', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        expect([ autoClickElement(ctx).x, autoClickElement(ctx).y ]).toEqual([ 867, 686 ]);
+        expect(ctx.hud('[data-testid="auto-click-key"]').textContent).toBe('A');
+        expect(ctx.hud('[data-testid="auto-click-rate"]').textContent).toBe('500 ms');
+    });
+
+    it('writes 250 ms under the button at level 1', async () => {
+        const ctx = await createScene({ start: atChapter(2), autoClick: { ...AUTO_CLICK_LEVEL_0, level: 1, intervalMs: 250, next: { level: 2, intervalMs: 150, price: 25 } } });
+
+        expect(ctx.hud('[data-testid="auto-click-rate"]').textContent).toBe('250 ms');
+    });
+
+    it('marks the button on while the auto click runs and off when switched off', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        expect(button(ctx).getAttribute('data-on')).toBe('true');
+
+        switchTo(ctx, false);
+
+        expect(button(ctx).getAttribute('data-on')).toBe('false');
+    });
+
+    it('keeps the window closed until the button is pressed', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        expect(popover(ctx).hidden).toBe(true);
+        expect(button(ctx).getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('opens the window on a click with the focus on the switch', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        attach(ctx);
+
+        button(ctx).click();
+
+        expect(popover(ctx).hidden).toBe(false);
+        expect(button(ctx).getAttribute('aria-expanded')).toBe('true');
+        expect(document.activeElement).toBe(toggle(ctx));
+    });
+
+    it('holds the switch, interval, crystals and upgrade in the window, and the reset from chapter 2', async () => {
+        const ctx = await createScene({ start: atChapter(3) });
+
+        expect([ ...popover(ctx).children ].map((child) => child.getAttribute('data-testid') ?? child.querySelector('[data-testid]')?.getAttribute('data-testid'))).toEqual([
+            'auto-click-toggle', 'auto-click-interval', 'auto-click-crystals', 'auto-click-upgrade', 'reset-account'
+        ]);
+        expect(ctx.hud('[data-testid="reset-account"]').textContent).toBe('Resetar conta (+3 cristais)');
+    });
+
+    it('opens and closes the window with A, the focus back on the button', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        attach(ctx);
+
+        press(ctx, 'A', { repeat: false, target: document.body });
+
+        expect(popover(ctx).hidden).toBe(false);
+        expect(button(ctx).getAttribute('aria-expanded')).toBe('true');
+        expect(document.activeElement).toBe(toggle(ctx));
+
+        press(ctx, 'A', { repeat: false, target: document.body });
+
+        expect(popover(ctx).hidden).toBe(true);
+        expect(button(ctx).getAttribute('aria-expanded')).toBe('false');
+        expect(document.activeElement).toBe(button(ctx));
+    });
+
+    it('closes the window when the button is pressed again', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        attach(ctx);
+
+        button(ctx).click();
+        button(ctx).click();
+
+        expect(popover(ctx).hidden).toBe(true);
+        expect(document.activeElement).toBe(button(ctx));
+    });
+
+    it('closes the window with Escape and does not pause', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        button(ctx).click();
+
+        ctx.handlers['keydown-ESC']();
+
+        expect(popover(ctx).hidden).toBe(true);
+        expect(ctx.scene.paused).toBe(false);
+
+        ctx.handlers['keydown-ESC']();
+
+        expect(ctx.scene.paused).toBe(true);
+    });
+
+    it('closes the window on a press outside, without moving the focus to the button', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        attach(ctx);
+        button(ctx).click();
+
+        document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+
+        expect(popover(ctx).hidden).toBe(true);
+        expect(document.activeElement).not.toBe(button(ctx));
+    });
+
+    it('keeps the window open on a press inside it', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        attach(ctx);
+        button(ctx).click();
+
+        toggle(ctx).dispatchEvent(new Event('pointerdown', { bubbles: true }));
+
+        expect(popover(ctx).hidden).toBe(false);
+    });
+
+    it('ignores A typed into a text field', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        const field = document.createElement('input');
+
+        field.type = 'text';
+        press(ctx, 'A', { repeat: false, target: field });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('ignores the repeats of a held A', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        press(ctx, 'A', { repeat: true, target: document.body });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('ignores A while the pause menu is open', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        ctx.handlers['keydown-ESC']();
+
+        press(ctx, 'A', { repeat: false, target: document.body });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('ignores A while a hero screen is open', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        await ctx.scene.heroUi.show('heroes');
+
+        press(ctx, 'A', { repeat: false, target: document.body });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('ignores A while the auto click is locked', async () => {
+        const ctx = await createScene({ start: atChapter(1), autoClick: { ...AUTO_CLICK_LEVEL_0, resets: 0 } });
+
+        expect(autoClickElement(ctx).visible).toBe(false);
+
+        press(ctx, 'A', { repeat: false, target: document.body });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('keeps the focus on the switch when the window is drawn again', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        attach(ctx);
+        button(ctx).click();
+
+        ctx.scene.showAutoClick();
+
+        expect(document.activeElement).toBe(toggle(ctx));
+    });
+
+    it('closes the window when its reset button opens the reset dialog', async () => {
+        const ctx = await createScene({ start: atChapter(3) });
+        attach(ctx);
+        button(ctx).click();
+
+        ctx.hud('[data-testid="reset-account"]').click();
+
+        expect(popover(ctx).hidden).toBe(true);
+        expect(ctx.hud('[data-testid="reset-dialog"]').hidden).toBe(false);
+    });
+
+    it('labels the button and the window for assistive tech', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        expect(button(ctx).getAttribute('aria-label')).toBe('Auto clique');
+        expect(button(ctx).getAttribute('aria-haspopup')).toBe('dialog');
+        expect(button(ctx).getAttribute('aria-controls')).toBe('auto-click-popover');
+        expect(popover(ctx).id).toBe('auto-click-popover');
+        expect(popover(ctx).getAttribute('role')).toBe('dialog');
+        expect(popover(ctx).getAttribute('aria-label')).toBe('Auto clique');
+    });
+
+    it('binds A to nothing but the auto click window', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        expect(ctx.scene.input.keyboard.on.mock.calls.map(([ name ]) => name).sort()).toEqual([
+            'keydown-A', 'keydown-E', 'keydown-ESC', 'keydown-ONE', 'keydown-Q', 'keydown-THREE', 'keydown-TWO', 'keydown-W'
+        ]);
+    });
+
+    it('removes the outside-press listener when the scene shuts down', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        const remove = vi.spyOn(document, 'removeEventListener');
+
+        ctx.eventHandlers.shutdown();
+
+        expect(remove).toHaveBeenCalledWith('pointerdown', ctx.scene.onPressOutsideAutoClick, true);
+        remove.mockRestore();
+    });
 
     it('hits twice in 1000 ms with no click in chapter 2, at the monster centre and with one combo step each', async () => {
         const ctx = await createScene({ start: atChapter(2) });
