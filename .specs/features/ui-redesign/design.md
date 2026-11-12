@@ -2,7 +2,7 @@
 
 **Spec**: `.specs/features/ui-redesign/spec.md`
 **Reference**: `.specs/features/ui-redesign/reference.jpg`
-**Status**: Draft for the owner's approval (open questions Q1 to Q5 of the spec)
+**Status**: Draft for the owner's approval (Q1 decided as D1 on 2026-11-12: round auto click button with a window and the key `A`; Q2 to Q5 open)
 
 ---
 
@@ -10,7 +10,7 @@
 
 The game's UI is two layers, and the redesign touches each in its own way:
 
-- **DOM** (every panel, HUD text and control): plain HTML built by `game/src/adapters/phaser/HeroUi.js`, `ClickerGame.js`, `MainMenu.js` and `views/*.js`, placed over the canvas with `scene.add.dom`, styled by the single sheet `game/public/style.css`. The redesign is almost all here: new token values in `:root`, composite **recipe tokens**, and edits of the existing rules of each screen. No markup changes except three small additions (`data-stat` and `data-element` on the enemy tags, the weak element chip, the `--timer-left` property).
+- **DOM** (every panel, HUD text and control): plain HTML built by `game/src/adapters/phaser/HeroUi.js`, `ClickerGame.js`, `MainMenu.js` and `views/*.js`, placed over the canvas with `scene.add.dom`, styled by the single sheet `game/public/style.css`. The redesign is almost all here: new token values in `:root`, composite **recipe tokens**, and edits of the existing rules of each screen. No markup changes except four additions: `data-stat` and `data-element` on the enemy tags, the weak element chip, the `--timer-left` property, and the round auto click button with its window (D1), which replaces the auto click card.
 - **Canvas** (Phaser): the HP bar rectangles, the damage numbers, the menu oval and the preloader bar. Their colours and font are constants in `ClickerGame.js`, `MainMenu.js` and `Preloader.js`; the redesign changes those constants only (sizes and positions stay).
 
 ```mermaid
@@ -53,7 +53,7 @@ The look of the mock-up is reproduced with CSS: gradients for parchment and wood
 | --- | --- |
 | Google Fonts | `game/index.html` stylesheet link: Cinzel 700 and Figtree 400/600/700/800 replace Caprasimo |
 | Backend | None. Skill image names (`HeroSeed.kt`) are unchanged because the files keep their names and format |
-| Existing tests | Text, test ids and class names stay; only the colour and font literals of the HP bar, damage numbers and menu oval are updated in the named tests |
+| Existing tests | Text, test ids and class names stay; the colour and font literals of the HP bar, damage numbers and menu oval are updated in the named tests; `e2e/autoClick.spec.js` and `e2e/accountReset.spec.js` open the auto click window before they touch its controls (T15) |
 
 ---
 
@@ -99,7 +99,7 @@ The AD-020 star and level colours (`#7a3fa0`; `#d9a521` with `#201e1d`) and the 
 
 ## Contrast
 
-WCAG 2.x ratios of the computed colours. The e2e test (T26) asserts the first eight rows; the ui-artist (T28) audits the rest.
+WCAG 2.x ratios of the computed colours. The e2e test (T28) asserts the first eight rows; the ui-artist (T30) audits the rest.
 
 | # | Text (selector) | On (selector) | Text colour | Background | Ratio |
 | --- | --- | --- | --- | --- | --- |
@@ -190,15 +190,15 @@ Every rule below already exists in `style.css` unless marked *new*. The tasks gi
 | Weak element | `.hud-enemy`, `.weak-chip` *new* | chip with dot | T11 |
 | Hero rail | `.hero-hud`, `.hero-hud button`, `.hud-badge`, talents badge | parchment strip, framed squares | T12 |
 | Battle bar | `.battle-bar`, `.leader-host`, `.leader-card`, `.leader-face`, `.leader-crown`, `.leader-name`, `.leader-bonus`, `.skill-slot*`, `.skill-key`, `.skill-lock-mark` | parchment, dark frame | T13 |
-| Auto click, farm | `.auto-click`, `.auto-click-toggle*`, `.auto-click-upgrade`, `.reset-account`, `.hud-farm`, `.farm-toggle*` | parchment card, switch, primary, round button | T14 |
-| Overlays | `.pause-menu, .reset-dialog, .hero-panel`, `.pause-card, .reset-card`, `.pause-title` | dim, parchment card | T15 |
-| Hero window | `.hero-window`, `.hero-title`, `.hero-error`, `.hero-empty` | parchment panel | T19 |
-| Catalog, detail, farm list, fusion, leader | `.hero-card*`, `.hero-detail-portrait`, `.hero-bonus`, `.skill-row*`, `.skill-art`, `.skill-state`, `.farm-entry`, `.farm-wins`, `.leader-entry.is-current`, `.leader-state`, `.fusion-result` | inset cards | T20 |
-| Equipment, tiles, tooltip, bulk sale | `.equip-hero`, `.equip-slot`, `.equip-button*`, `.leader-stats`, `.piece-tile`, `.piece-tooltip`, `.equip-notice`, `.bulk-sell-bar`, `.bulk-sell-yes` | inset, dark tiles, parchment tooltip, primary | T21 |
-| Talents | `.talent-points`, `.talent-column`, `.talent-branch-title`, `.talent-card`, `.talent-grade-title` | inset, parchment-100 cards | T22 |
-| Boss map | `.farm-map`, `.farm-map-title` | wood ring + bronze ring (box-shadows) | T23 |
-| Element wheel, skill tooltip | `.element-wheel`, `.wheel-title`, `.wheel-name`, `.wheel-arrow-label`, `.skill-tooltip` | parchment panel (wheel rings as box-shadows) | T24 |
-| Main menu | `.menu-tagline`, `.auth-form input*`, `.auth-message*`, `.welcome-title`, `.welcome-start`, `.path-choice`, `.path-option*` | parchment, primary | T16 (CSS), T17 (oval), T18 (preloader) |
+| Auto click, farm | `.hud-auto-click`, `.auto-click`, `.auto-click-button` *new*, `.auto-click-key` *new*, `.auto-click-rate` *new*, `.auto-click-popover` *new*, `.auto-click-toggle*`, `.auto-click-upgrade`, `.reset-account`, `.farm-toggle*` | round buttons, parchment window, switch, primary | T14 (markup, behaviour), T16 (CSS); `.hud-farm` size and the bar positions in T13 |
+| Overlays | `.pause-menu, .reset-dialog, .hero-panel`, `.pause-card, .reset-card`, `.pause-title` | dim, parchment card | T17 |
+| Hero window | `.hero-window`, `.hero-title`, `.hero-error`, `.hero-empty` | parchment panel | T21 |
+| Catalog, detail, farm list, fusion, leader | `.hero-card*`, `.hero-detail-portrait`, `.hero-bonus`, `.skill-row*`, `.skill-art`, `.skill-state`, `.farm-entry`, `.farm-wins`, `.leader-entry.is-current`, `.leader-state`, `.fusion-result` | inset cards | T22 |
+| Equipment, tiles, tooltip, bulk sale | `.equip-hero`, `.equip-slot`, `.equip-button*`, `.leader-stats`, `.piece-tile`, `.piece-tooltip`, `.equip-notice`, `.bulk-sell-bar`, `.bulk-sell-yes` | inset, dark tiles, parchment tooltip, primary | T23 |
+| Talents | `.talent-points`, `.talent-column`, `.talent-branch-title`, `.talent-card`, `.talent-grade-title` | inset, parchment-100 cards | T24 |
+| Boss map | `.farm-map`, `.farm-map-title` | wood ring + bronze ring (box-shadows) | T25 |
+| Element wheel, skill tooltip | `.element-wheel`, `.wheel-title`, `.wheel-name`, `.wheel-arrow-label`, `.skill-tooltip` | parchment panel (wheel rings as box-shadows) | T26 |
+| Main menu | `.menu-tagline`, `.auth-form input*`, `.auth-message*`, `.welcome-title`, `.welcome-start`, `.path-choice`, `.path-option*` | parchment, primary | T18 (CSS), T19 (oval), T20 (preloader) |
 
 ---
 
@@ -266,6 +266,40 @@ url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2
 
 Cinzel 700 is already in use by the DOM headings when the first damage number is drawn (the main menu title and the HUD plaques load it), so the canvas text gets the web font; if it is not loaded yet, Phaser falls back to the browser default for that number only.
 
+### Auto click button and window (D1)
+
+- **Purpose**: the auto click as a round button in the battle bar, with the key `A`, that opens a window holding the old card's controls (UIR-19, UIR-11 AC 29).
+- **Location**: `game/src/adapters/phaser/ClickerGame.js` (`AUTO_CLICK_HUD`, `AUTO_CLICK_HUD_HTML`, `createAutoClickHud`, `showAutoClick`, `openResetDialog`, `escape`, the `shutdown` handler, three new methods); CSS in `style.css`.
+- **Reuses**: `renderAutoClick` and `renderResetButton` unchanged (the window's children); `autoClickIntervalText` for the label under the button; the `change` and `click` delegation of `this.autoClickBox` unchanged, so the switch, the upgrade and the reset button work as today.
+- **Markup** (one Phaser DOM element, box 80 x 112 at (867, 686)):
+
+```html
+<div class="hud-box hud-auto-click"><div class="auto-click" data-testid="auto-click">
+  <div class="auto-click-popover" id="auto-click-popover" role="dialog" aria-label="Auto clique" data-testid="auto-click-popover" hidden></div>
+  <button type="button" class="auto-click-button" data-testid="auto-click-button" data-on="false"
+          aria-label="Auto clique" aria-haspopup="dialog" aria-expanded="false" aria-controls="auto-click-popover">
+    <span class="auto-click-key" data-testid="auto-click-key" aria-hidden="true">A</span>
+  </button>
+  <span class="auto-click-rate" data-testid="auto-click-rate"></span>
+</div></div>
+```
+
+- **Interfaces** (scene methods):
+  - `get autoClickWindowOpen(): boolean` - `!this.autoClickPopover.hidden`.
+  - `openAutoClickWindow(): void` - nothing while the auto click is locked; shows the window, `aria-expanded="true"`, focuses `[data-testid="auto-click-toggle"]`.
+  - `closeAutoClickWindow({ returnFocus = true } = {}): void` - nothing if closed; hides it, `aria-expanded="false"`, focuses the button when `returnFocus`.
+  - `toggleAutoClickWindow(): void` - open or close.
+  - `autoClickKey(event): void` - the `keydown-A` handler: returns on `event.repeat`, on a text-field target (`isTextField`), while `this.paused`, while the reset dialog is shown, while `this.heroUi.isOpen`, or while `!this.autoClickOpen`; else toggles.
+  - `isTextField(target): boolean` (module function) - `Boolean(target?.closest?.('textarea, select, [contenteditable="true"], input:not([type="checkbox"]):not([type="radio"]):not([type="button"])'))`.
+- **Hooks into existing code**: `showAutoClick` renders into the window instead of the old box, writes `data-on` from `this.autoClickEnabled` and the rate label, closes the window when the auto click is locked and restores focus by `data-testid`; `openResetDialog` closes the window (no focus return); `escape` closes an open window first and returns; a capture-phase `pointerdown` listener on `document` closes the window for a press outside `.auto-click` (no focus return) and is removed in the existing `shutdown` handler.
+- **Look**: the button is the farm button's twin (56 px circle, dark wood, 3 px bronze ring) with a pointer icon; on: ring `#5fd35a` and a green glow; the badge copies `.skill-key`; the window is a parchment panel 240 px wide anchored 4 px inside the right edge of the box and 10 px above the button, with a tail at 28 px from its right edge pointing at the button centre.
+
+```css
+/* pointer icon of the auto click button (Lucide mouse-pointer-click, stroke #f3d58a) */
+url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f3d58a' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4.1 12 6'/%3E%3Cpath d='m5.1 8-2.9-.8'/%3E%3Cpath d='m6 12-1.9 2'/%3E%3Cpath d='M7.2 2.2 8 5.1'/%3E%3Cpath d='M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z'/%3E%3C/svg%3E")
+```
+
+
 ### Skill thumbnails
 
 - **Purpose**: remove the magenta chroma key from the 15 skill images (UIR-16).
@@ -278,14 +312,23 @@ Cinzel 700 is already in use by the DOM headings when the first damage number is
 
 ## Layout
 
-No scene coordinate changes. Box sizes that change (Phaser centres each DOM element on its box):
+Three scene coordinates change, all in the battle bar, to make room for the round auto click button (D1); every other element stays. Box sizes that change (Phaser centres each DOM element on its box):
 
 | Box | Today | New | Scene extent |
 | --- | --- | --- | --- |
 | `.hud-enemy` (ENEMY_STATS 670, 596) | 400 x 48 | 460 x 80, column | x 440..900, y 556..636 |
 | `.leader-host` (LEADER 154, 686) | 230 x 84 | 240 x 104 | x 34..274, y 634..738 |
-| `.hud-farm` (FARM_TOGGLE 918, 686) | 160 x 48 | 120 x 112 | x 858..978, y 630..742 |
+| `.skill-bar-host` (SKILL_BAR, `HeroUi.js:19`) | 474 x 100 at x 586 | 474 x 100 at **x 550** | x 313..787, y 636..736 |
+| `.hud-auto-click` (AUTO_CLICK_HUD, `ClickerGame.js:75`) | 260 x 160 at (366, 200), the card | 80 x 112 at **(867, 686)**, the round button | x 827..907, y 630..742; button circle x 839..895 |
+| `.hud-farm` (FARM_TOGGLE, `ClickerGame.js:71`) | 160 x 48 at x 918 | 80 x 112 at **x 951** | x 911..991, y 630..742; button circle x 923..979 |
+| `.auto-click-popover` (inside `.hud-auto-click`, absolute) | - | 240 wide, about 172 tall (about 205 with the reset button) | x 663..903, bottom 10 px above the button (y about 638), top about 466 (433 with reset) |
 | `.hero-hud` (HUD 956, 370) | about 96 x 422 | 98 x 478 (7 buttons of 76 x 60 px, 6 px gaps, 8 px padding, 3 px border) | x 907..1005, y 131..609 |
+
+**Battle bar, left to right** (bar x 20..1004, y 624..748, 3 px border): leader card 34..274, gap 39, skills 313..787 (three 150 px slots, unchanged), gap 40, auto click 827..907, gap 4, farm 911..991, 13 px to the bar edge. The skill slots keep 150 px: shifting the bar 36 px left is enough, nothing shrinks. The rail ends at y 609 and the bar starts at y 624, so the two round buttons sit under the rail, not beside it.
+
+**Why the round button no longer covers the monster**: the earlier worry assumed the round button and its open card would both stay on screen. With D1 the button lives inside the bar (y 630..742, below the monster's 565 and the enemy line's content 570..622). Only the window, while open, floats over the right edge of the fight (x 663..903, y about 466..638): it covers part of the monster placeholder, the enemy chips and the weak chip until it closes, as in the mock-up. It never reaches the rail (x 907).
+
+**Phone (390 x 844 viewport)**: the game is the same 1024 x 768 scene scaled to fit, factor 390 / 1024 = 0.381, letterboxed vertically. The bar keeps the same order; the round button is 56 x 0.381 = 21 CSS px wide (its badge 8 px, the window 91 x about 66 CSS px), all inside the scene. That is under the 44 px touch target, like every other control of the scaled scene today (the rail buttons are 29 CSS px); a phone layout is out of scope. The `A` key needs a keyboard; on a touch phone the window opens by tapping the button.
 
 ---
 
@@ -299,15 +342,17 @@ No scene coordinate changes. Box sizes that change (Phaser centres each DOM elem
 | `02-menu-login` | Main menu, login form, focus in the username field |
 | `03-menu-welcome` | Main menu after login (`Welcome back, yan!`) |
 | `04-path-choice` | Path choice after `Sign up` |
-| `05-battle-boss` | Chapter 2 miniboss, FIRE, defenses 10/20/30, 60 s limit, 2 s in: plaque, tag, wallet, timer ring, HP frame, chips, `Fraco: Água`, rail, leader card, skills, auto click card, farm button |
+| `05-battle-boss` | Chapter 2 miniboss, FIRE, defenses 10/20/30, 60 s limit, 2 s in: plaque, tag, wallet, timer ring, HP frame, chips, `Fraco: Água`, rail, leader card, skills, round auto click button (on, green) with `A` and `500 ms`, farm button; nothing on the left of the monster but the wheel |
 | `06-battle-combo` | Five clicks with COMBO 10: combo chip and a damage number |
 | `07-battle-light` | LIGHT phase monster: no weak chip |
 | `08-battle-locked` | 1-star leader: two locked skills |
 | `09-skill-tooltip` | Pointer over skill slot 1 |
 | `10-notice` | `Carta: Lyra Folhaveloz` notice |
 | `11-pause` | Escape |
-| `12-reset-dialog` | `Resetar conta` dialog |
+| `12-reset-dialog` | `Resetar conta` dialog (opened from the auto click window) |
 | `13-farm-on` | Farm button drawn checked |
+| `14-auto-click-window` | Auto click window opened with `A`, switch focused (focus ring visible), reset button shown |
+| `15-auto-click-off` | Auto click switched off, window closed: bronze ring, no glow |
 | `20-heroes` | Heróis catalog (stars 3, 4, 7, 2, 6) |
 | `21-hero-detail` | Kael 5★ detail |
 | `22-bag` | Mochila |
@@ -323,7 +368,7 @@ No scene coordinate changes. Box sizes that change (Phaser centres each DOM elem
 
 ---
 
-## Gemini Prompts (for `PROMPTS_ASSETS_UI.md`, task T25)
+## Gemini Prompts (for `PROMPTS_ASSETS_UI.md`, task T27)
 
 Appended as section `## 5. Texturas da interface`, before `## Checklist de arquivos`:
 
@@ -383,13 +428,16 @@ The `Checklist de arquivos` table of that file gains two rows: `ui-parchment.jpg
 | Concern | Location (file:line) | Impact | Mitigation |
 | --- | --- | --- | --- |
 | Tests pin old colours of the HP bar and damage numbers | `game/src/adapters/phaser/ClickerGame.test.js:194-196, 1862, 1870, 2956-2957, 3559, 3563, 3573, 3719` | The gate fails after T8 | T8 lists every line and its new literal; the test names stay |
-| Menu test mocks `ellipse` as `{}` | `game/src/adapters/phaser/MainMenu.test.js:36` | `setStrokeStyle` would throw | T17 changes the mock to return `{ setStrokeStyle }` |
-| Re-mapping shared tokens shifts rules nobody restyles explicitly | `style.css` (about 300 uses of `--color-*`) | A forgotten corner keeps an odd mix | Re-mapped values stay in the same family (cream to parchment, terracotta to ember); the ui-artist reviews 25 screens on two viewports (T28); findings become tasks |
+| Menu test mocks `ellipse` as `{}` | `game/src/adapters/phaser/MainMenu.test.js:36` | `setStrokeStyle` would throw | T19 changes the mock to return `{ setStrokeStyle }` |
+| Re-mapping shared tokens shifts rules nobody restyles explicitly | `style.css` (about 300 uses of `--color-*`) | A forgotten corner keeps an odd mix | Re-mapped values stay in the same family (cream to parchment, terracotta to ember); the ui-artist reviews 27 screens on two viewports (T30); findings become tasks |
 | The enemy line and `unified-damage` (AD-021, proposed) both edit `showEnemyStats` | `ClickerGame.js:685` | Merge conflict, or a `data-stat` for a tag that no longer exists | Whichever lands second adapts: with one defense the stat tags become `data-stat="defense"` (shield `rgb(176, 122, 58)`) and `crit`; noted here for that feature |
 | `:has()` and CSS `mask` need a recent Chromium | `style.css:1165` (already uses `:has`) | Older browsers miss the icons | Already required by the game; icons are decoration, the text stays |
 | Cutout blends purple effects close to the key | `art/tools/cutout_hero.py:13` (`KEEP, DROP = 40, 110`) | Some violet glows lose saturation | Trial sheet of 5 skills looked clean; the ui-artist reviews all 15 in `21-hero-detail` and catalog shots |
-| `PROMPTS_ASSETS_UI.md` may hold the owner's uncommitted edits | repository root | T25 could commit the owner's work | T25 stops and reports if `git status` shows the file modified before it starts |
+| `PROMPTS_ASSETS_UI.md` may hold the owner's uncommitted edits | repository root | T27 could commit the owner's work | T27 stops and reports if `git status` shows the file modified before it starts |
 | Labels of the rail at 76 px | `.hero-hud button` | `Equipamento` could overflow | Spec edge case; the e2e checks `scrollWidth <= clientWidth` for all seven |
+| The old card's e2e flows click controls that are now inside a closed window | `game/e2e/autoClick.spec.js:53-57, 71-72`; `game/e2e/accountReset.spec.js:31-32, 54, 61` | Those tests fail once T14 lands | T15 (test-engineer) opens the window first with a new helper and swaps the `auto-click-toggle` visibility check for `auto-click-button`; T15 runs right after T14, in the same phase |
+| The scene test stand-in does not attach DOM nodes to `document` and keeps one handler per `events.once` name | `game/src/adapters/phaser/ClickerGame.test.js:160-185` | Focus tests see no `document.activeElement`; a second `once('shutdown')` would replace the first | T14's focus tests append the auto click node to `document.body`; the scene removes its document listener inside the existing shutdown handler, not in a second one |
+| The window re-renders its children on every state change | `ClickerGame.js:251-259` (`showAutoClick`) | A keyboard user loses focus when the switch or the upgrade answers | `showAutoClick` restores focus to the control with the same `data-testid` (UIR-19 AC 15) |
 
 ---
 
@@ -404,6 +452,8 @@ The `Checklist de arquivos` table of that file gains two rows: `ui-parchment.jpg
 | Thumbnails stay JPEG with a dark background | Flatten onto `#1c120c` | No reference to update anywhere; 36 MB become 1 MB |
 | Textures behind tokens set to `none` | Turned on by one line each | No 404 before the art exists; Q4 |
 | No new motion | No `transition` or `animation` in the new rules | Nothing to switch off for `prefers-reduced-motion` |
+| Auto click window | One Phaser DOM element holds the button, its label and the window; the window is absolutely positioned above the button (like `.skill-tooltip.is-above`) and toggled with `hidden` | The box stays 80 x 112 so Phaser keeps it in place; no second scene element to keep in sync |
+| Auto click key | Phaser `keydown-A` in the battle scene, ignored for repeats, text fields, pause, reset dialog, hero screens and while locked | `A` is free (keys in use: 1, 2, 3, Q, W, E, Esc); the main menu's text fields live in another scene |
 
 > **Proposed project decision (append to `.specs/STATE.md` as AD-022 when the owner approves):**
 > **Decision**: The game's look is the Grove theme of spec `ui-redesign`: the palette and recipe tokens of `game/public/style.css :root` (parchment panels, dark wood frames, ember primary and wood secondary buttons, chips), Cinzel 700 for headings and numbers, Figtree for body text. New UI reads the recipe tokens; painted textures are switched on through `--texture-parchment` and `--texture-wood`.

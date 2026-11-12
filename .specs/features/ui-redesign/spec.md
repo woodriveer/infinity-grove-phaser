@@ -4,15 +4,20 @@ Reference: `.specs/features/ui-redesign/reference.jpg` (the owner's Gemini mock-
 
 ## Open Questions for the Owner
 
-Each question has a recommended default. The tasks are written with the default; a different answer changes the tasks named in the question before any task runs.
+Each question has a recommended default. The tasks are written with the default; a different answer changes the tasks named in the question before any task runs. Q1 is decided (below); Q2 to Q5 are open.
 
 | # | Question | Recommended default | Tasks it changes |
 | --- | --- | --- | --- |
-| Q1 | The mock-up draws the auto click twice: a panel on the left and a round glowing button (key A) with a popover in the bottom bar. Where does it live? | Keep one place: the parchment card on the left, where it is today, restyled like the mock-up's left panel (switch, interval, crystals, upgrade, reset). The round button in the bar would sit on top of the monster and the enemy line in a 1024 x 768 scene, and its key A does not exist. | T14 (a round button needs a second HUD element, a split of `renderAutoClick` and new positions) |
-| Q2 | The mock-up's HUD is in Portuguese (`Tempo Restante: 37s`, `DEF FÍS`, `Modo Farmar`), while today's HUD says `Time: 37`, `Physical def 0%`, `Farm boss`, `Stage 1/10  Phase 1/5`, `Paused`, `Login` (debt TD-001). Translate them now? | No. The redesign changes no existing text; the translation stays TD-001, a task of its own, because about 40 tests pin those strings. | T6, T7, T9, T14, T15, T16 and the e2e suites that read the texts |
-| Q3 | The mock-up has no element wheel. Keep it? | Keep it, restyled as a parchment card in the same place. The new `Fraco: <elemento>` chip shows the counter of the current enemy; the wheel still explains the whole table. | T24 |
-| Q4 | Painted parchment and wood textures cannot be drawn by the agents. Ship with CSS only? | Yes. The panels are drawn with CSS gradients, borders and shadows now. `PROMPTS_ASSETS_UI.md` gets two Gemini prompts (`ui-parchment.jpg`, `ui-wood.jpg`); when you add the files, one line per file in `style.css` turns them on. No file is requested before then. | T25 |
-| Q5 | The mock-up's right menu has `Renascer` instead of `Rever chefes`. Change the menu? | No. The rail keeps its seven buttons, `Rever chefes` included; the account reset stays the `Resetar conta (+N cristais)` button of the auto click card, as in the mock-up's left panel. | T12 |
+| Q2 | The mock-up's HUD is in Portuguese (`Tempo Restante: 37s`, `DEF FÍS`, `Modo Farmar`), while today's HUD says `Time: 37`, `Physical def 0%`, `Farm boss`, `Stage 1/10  Phase 1/5`, `Paused`, `Login` (debt TD-001). Translate them now? | No. The redesign changes no existing text; the translation stays TD-001, a task of its own, because about 40 tests pin those strings. | T6, T7, T9, T16, T17, T18 and the e2e suites that read the texts |
+| Q3 | The mock-up has no element wheel. Keep it? | Keep it, restyled as a parchment card in the same place. The new `Fraco: <elemento>` chip shows the counter of the current enemy; the wheel still explains the whole table. | T26 |
+| Q4 | Painted parchment and wood textures cannot be drawn by the agents. Ship with CSS only? | Yes. The panels are drawn with CSS gradients, borders and shadows now. `PROMPTS_ASSETS_UI.md` gets two Gemini prompts (`ui-parchment.jpg`, `ui-wood.jpg`); when you add the files, one line per file in `style.css` turns them on. No file is requested before then. | T27 |
+| Q5 | Account reset button: inside the auto click window (current plan) or a `Renascer` entry in the right menu as in the mock-up? | Inside the auto click window, as the last control under the upgrade (nothing the player can do today disappears). The rail keeps its seven buttons, `Rever chefes` included. | T12, T14, T16 |
+
+### Decided
+
+| # | Decision | Owner's words | Notes |
+| --- | --- | --- | --- |
+| D1 (was Q1) | The auto click card on the left of the battle screen is removed. The auto click becomes a round button at the right end of the battle bar, beside the round farm button, as in the mock-up: a glowing green ring while the auto click is on, the interval (e.g. `500 ms`) under it, and the key badge `A`. Activating the button or pressing `A` opens a window above it (a popover, as in the mock-up) with everything the old card had: the `Auto clique` switch, the interval, the crystals, the upgrade and, while the reset pays crystals, the reset button (Q5). Escape, a second `A`, the button again or a press outside closes it. | "eu prefiro o auto clique com o botão redondo, e a opção do atalho para abrir a nova janela e remover a janela antiga do lado esquerdo." (2026-11-12) | Not included: a key `F` and its badge on the farm button (not asked for). The interval label reuses today's format `500 ms` (with a space). Requirement UIR-19. |
 
 ---
 
@@ -32,13 +37,12 @@ The game looks like a flat mobile app: cream pills with large rounded corners ov
 | Feature | Reason |
 | --- | --- |
 | Monster art (the mock-up's fire treant) | The monster is a placeholder rectangle today and enemy design per chapter is still open (AD-006, AD-008). Wiring art per enemy is new data; it is its own feature. |
-| A round auto click button in the bar with a popover, key `A` | Q1 default. No key `A` or `F` exists; adding keys is new behaviour. |
-| Key badges `A` and `F` on the auto click and farm buttons | No such keys exist (same reason). |
+| A key `F` and its badge on the farm button | Not asked for (decision D1); the farm button keeps working by click only. |
 | `Nível 5` / `Nível 10` under a locked skill | A skill unlocks with stars, not levels (`characters`, AD-020); the text would be wrong. The lock mark stays. |
-| `Renascer` button on the rail | Q5 default. |
+| `Renascer` button on the rail | Q5 default (open). |
 | Translating the English HUD and menu texts | Q2 default; debt TD-001. |
 | New labels from the mock-up (`Vida do Chefe`, `Tempo Restante`) | They are text the game does not have; Q2 keeps text unchanged. |
-| Larger HP bar or moving HUD elements | The bar keeps 240 x 16 px and every HUD element keeps its scene coordinates; about 20 unit tests pin the bar width and the positions keep the layout checked by earlier reviews. |
+| Larger HP bar, or moving HUD elements other than the bottom bar's | The bar keeps 240 x 16 px (about 20 unit tests pin it). Only the skill bar, the farm button and the auto click move, to make room for the auto click button in the bar (D1, design § Layout). |
 | Painted frame art (9-slice borders) | Q4 default: frames are CSS. Only two tileable textures get prompts. |
 | A phone-specific layout | The game is one 1024 x 768 scene scaled to the screen (today on phone too); the redesign applies to that scene and is reviewed at the phone viewport. |
 | New animations | The redesign adds no animation or transition (UIR-03). |
@@ -54,14 +58,16 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --- | --- | --- | --- |
 | Scope of the redesign | Every screen: login and path choice, preloader, battle HUD, every hero screen (Heróis, detail, Mochila, bulk sell, Fusão, Líder, Equipamento with tiles and tooltip, Talentos, Rever chefes), pause, reset dialog, auto click, farm switch, notices, element wheel, skill tooltip; desktop and phone viewports | Orchestrator assumption 1; one theme for the whole game | n (owner confirms at approval) |
-| Kind of change | Visual only: no backend change, no new rule, no change to what a control does; layout changes only where the data already exists (timer ring, enemy chips, weak element chip, round farm button) | Orchestrator assumption 2 | n |
+| Kind of change | Visual only: no backend change, no new game rule; layout changes only where the data already exists (timer ring, enemy chips, weak element chip, round farm button). The one behaviour change is D1: the auto click controls move into a window opened by a round button or the key `A` | Orchestrator assumption 2; D1 is the owner's decision | n (D1: y) |
 | How the look is built | CSS tokens and recipes in `game/public/style.css`, the Cinzel web font and the existing assets; Phaser colours for the HP bar, damage numbers, menu oval and preloader bar; painted textures only through prompts (Q4) | Orchestrator assumption 3; ships without new art | n |
 | Tests and accessibility | Every existing test id, class name and text stays; contrast and focus are not reduced; no new animation | Orchestrator assumption 4 | n |
-| Auto click placement | Q1 default: the card stays on the left | Q1 | n |
+| Auto click placement | D1: round button at scene (867, 686) in the battle bar, window above it; the left card is removed | Owner decision 2026-11-12 | y |
+| Press outside the open auto click window | It closes the window and still does what it does today (a press on the canvas hits the monster); focus stays where the press put it | The window is not modal; the fight must not lose a click the player meant for it | n |
+| `A` while a hero screen, the pause menu or the reset dialog is open | Does nothing | Those cover the battle bar; the window would open behind them | n |
 | Existing English text | Q2 default: unchanged | Q2 | n |
 | Element wheel | Q3 default: kept and restyled | Q3 | n |
 | Painted textures | Q4 default: CSS now, art later through the `--texture-*` tokens | Q4 | n |
-| Rail buttons | Q5 default: seven buttons, `Rever chefes` kept | Q5 | n |
+| Rail buttons and reset button | Q5 default: seven buttons, `Rever chefes` kept; the reset button lives in the auto click window | Q5 | n |
 | Magenta skill thumbnails | Decided by the owner (in scope): the 15 skill images are re-cut with the existing `art/tools/cutout_hero.py` onto the dark background `#1c120c`, keeping their names and `.jpg` format, 512 px tall | Same file names mean no change to the backend seed, `dom.js` or any test fixture; JPEG keeps the files small (the 2.3 to 2.8 MB sources become about 60 KB) | y (owner, via orchestrator) |
 | Fonts | Cinzel 700 for headings, plaques, buttons and HUD numbers; Figtree stays the body font; Caprasimo is dropped | The mock-up's headings are a classical serif in small caps; its body text is a sans | n |
 | Damage number colours | Normal `#ffd35c` (gold), critical `#ff8a1f` (orange), both with a `#2a1408` outline | The mock-up's `15.7` is gold-orange with a dark outline; critical stays bigger (48 px) and warmer | n |
@@ -69,7 +75,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 | New text | `Fraco: <elemento>` is the only new player text, in Portuguese (AD-007), with the labels of `ELEMENT_LABELS` (`Fogo`, `Água`, `Natureza`) | AD-007 | n |
 | Reference rendering for numbers in tests | Colours are asserted as the computed `rgb(...)` strings of `design.md`; the contrast ratios are computed from those values (WCAG 2.x relative luminance) | L-013: exact markers, not adjectives | y |
 
-**Open questions:** none unresolved - Q1 to Q5 at the top carry a recommended default, logged above with Confirmed? n until the owner approves.
+**Open questions:** none unresolved - Q2 to Q5 at the top carry a recommended default, logged above with Confirmed? n until the owner approves; Q1 is decided (D1).
 
 ---
 
@@ -118,7 +124,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 4. WHILE the combo is shown, the combo (`combo-hud`) SHALL render as an ember chip: background-color `rgb(138, 53, 16)`, a 2 px solid border `rgb(224, 180, 90)`, text `rgb(244, 230, 200)`, Cinzel 700 20 px.  <!-- UIR-04 -->
 5. WHEN a stage message shows (e.g. `Chapter complete!`) THEN it SHALL render in Cinzel 700 52 px, fill `rgb(255, 211, 92)` with a 10 px stroke `rgb(42, 20, 8)`.  <!-- UIR-04 -->
 6. WHEN a notice shows (`card-notice`, e.g. `Carta: Lyra Folhaveloz`) THEN it SHALL render as a dark frame plaque: background-color `rgb(43, 29, 20)`, a 2 px solid border `rgb(176, 122, 58)`, text `rgb(243, 213, 138)`, Cinzel 700 22 px.  <!-- UIR-04 -->
-7. Every HUD element SHALL keep the scene coordinates it has today (`ClickerGame.js` and `HeroUi.js` position constants unchanged).  <!-- UIR-04 -->
+7. Every HUD element SHALL keep the scene coordinates it has today, except the three of the battle bar that make room for the auto click button: the skill bar moves from x 586 to x 550, the farm button from x 918 to x 951, and the auto click from (366, 200) to (867, 686).  <!-- UIR-04 -->
 8. The monster health bar SHALL keep 240 x 16 px and its position, with the back colour `0x2a1410` and the fill colour `0xc0392b`.  <!-- UIR-05 -->
 9. The box over the bar (`.hud-monster-hp`) SHALL draw a frame of a 2 px ring `rgb(28, 18, 12)` inside a 2 px ring `rgb(176, 122, 58)` and a gloss gradient, and SHALL stay click-through.  <!-- UIR-05 -->
 10. The HP text (`monster-hp`, e.g. `HP 1000/1000`) SHALL keep its text and render in Figtree 800 12 px, colour `rgb(255, 244, 220)` with a 3 px stroke `rgb(28, 18, 12)`.  <!-- UIR-05 -->
@@ -140,13 +146,48 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 26. The key badge (`skill-key-<slot>`) SHALL be 20 x 20 px with background `rgb(28, 18, 12)`, a 1 px border `rgb(224, 180, 90)` and the letter in Cinzel 700 12 px `rgb(243, 213, 138)`.  <!-- UIR-10 -->
 27. WHILE a skill is locked, its lock mark SHALL be a 32 px circle with background `rgba(28, 18, 12, 0.85)` and the lock drawn in `rgb(224, 180, 90)`.  <!-- UIR-10 -->
 28. The skill level badges and the star tiers SHALL keep the colours of AD-020 (`#7a3fa0`; `#d9a521` with `#201e1d`).  <!-- UIR-10 -->
-29. The auto click card (`auto-click`) SHALL render as a parchment panel with border-radius `10px`, its switch track `rgb(61, 42, 28)` with a 1 px border `rgb(176, 122, 58)` that turns `rgb(63, 143, 58)` when on, and its upgrade and reset buttons in the primary recipe.  <!-- UIR-11 -->
+29. The auto click window (`auto-click-popover`) SHALL render as a parchment panel 240 px wide with border-radius `10px` and a tail pointing at the button, its switch track `rgb(61, 42, 28)` with a 1 px border `rgb(176, 122, 58)` that turns `rgb(63, 143, 58)` when on, and its upgrade and reset buttons in the primary recipe.  <!-- UIR-11 -->
 30. The farm switch (`.farm-toggle input`) SHALL render as a 56 px round button with a skull icon `rgb(224, 180, 90)`, background-color `rgb(43, 29, 20)` and a 3 px solid ring `rgb(176, 122, 58)`, with its label `Farm boss` under it in Figtree 700 12 px `rgb(42, 26, 16)`.  <!-- UIR-11 -->
 31. WHILE the farm switch is on, its ring SHALL be `rgb(232, 116, 42)` with an outer glow `0 0 12px 2px rgba(232, 116, 42, 0.75)`.  <!-- UIR-11 -->
 32. The dim layer behind the pause menu, the reset dialog and the hero screens SHALL be `rgba(28, 18, 12, 0.62)`.  <!-- UIR-12 -->
 33. The pause card and the reset card SHALL be parchment panels 420 px wide with border-radius `12px`; the title `Paused` SHALL be Cinzel 700 40 px `rgb(42, 26, 16)`.  <!-- UIR-12 -->
 
-**Independent Test**: Start a chapter 2 boss fight against a FIRE boss (`npm run ui:shots -- uiRedesign`, shot `05-battle-boss`): plaque, tag, scroll, timer pill with its ring, framed HP bar, dark enemy chips with icons and `Fraco: Água`, framed rail, dark leader card, framed skills, parchment auto click card and round farm button.
+**Independent Test**: Start a chapter 2 boss fight against a FIRE boss (`npm run ui:shots -- uiRedesign`, shot `05-battle-boss`): plaque, tag, scroll, timer pill with its ring, framed HP bar, dark enemy chips with icons and `Fraco: Água`, framed rail, dark leader card, framed skills, round auto click button with its `A` badge and `500 ms` under it, and the round farm button; no card on the left.
+
+---
+
+### P1: Round auto click button and its window ⭐ MVP
+
+**User Story**: As a player, I want the auto click as a round button in the bar that opens its settings on demand, with a key, so that the left side of the fight stays clear and I reach the settings fast.
+
+**Why P1**: Owner decision D1.
+
+**Acceptance Criteria** (UIR-19):
+
+1. WHILE the auto click is unlocked (campaign at chapter 2 or later, or at least one account reset), the battle bar SHALL show the round button `auto-click-button` centred at scene (867, 686): a 56 px circle with background-color `rgb(43, 29, 20)`, a 3 px ring and a pointer icon in `rgb(243, 213, 138)`.  <!-- UIR-19 -->
+2. The button SHALL carry the key badge `auto-click-key` reading `A` (20 x 20 px, the look of the skill key badges) on its top left, and under it the label `auto-click-rate` with the current interval in today's format (`500 ms` at level 0, `250 ms` at level 1).  <!-- UIR-19 -->
+3. WHILE the auto click is locked, the button, its label and its window SHALL not render, and no auto click element SHALL render anywhere else (the old card at (366, 200) is gone).  <!-- UIR-19 -->
+4. WHILE the auto click is on, the button ring SHALL be `rgb(95, 211, 90)` with an outer glow `0 0 14px 4px rgba(95, 211, 90, 0.75)`.  <!-- UIR-19 -->
+5. WHILE the auto click is off, the button ring SHALL be `rgb(176, 122, 58)` with no green glow.  <!-- UIR-19 -->
+6. WHEN the player activates the closed button (click, Enter or Space) THEN the window `auto-click-popover` SHALL open above the button, the button's `aria-expanded` SHALL become `true` and focus SHALL move to the switch `auto-click-toggle`.  <!-- UIR-19 -->
+7. The window SHALL hold, in this order, the switch `Auto clique`, the interval (`auto-click-interval`), the crystals (`auto-click-crystals`), the upgrade (`auto-click-upgrade`) and, while a reset pays crystals, the button `reset-account` (`Resetar conta (+N cristais)`), each with its text and behaviour of today.  <!-- UIR-19 -->
+8. WHEN the player presses `A` with the window closed THEN the window SHALL open as in criterion 6.  <!-- UIR-19 -->
+9. WHEN the player presses `A`, presses Escape or activates the button with the window open THEN the window SHALL close, `aria-expanded` SHALL become `false` and focus SHALL return to the button.  <!-- UIR-19 -->
+10. WHEN Escape closes the window THEN the pause menu SHALL not open (a second Escape opens it as today).  <!-- UIR-19 -->
+11. WHEN a pointer press lands outside the button and its window THEN the window SHALL close and the press SHALL act as it does today (a press on the canvas hits the monster).  <!-- UIR-19 -->
+12. IF the `A` key event comes from a text field (an `input` other than checkbox, radio or button, a `textarea`, a `select` or a `contenteditable` element) THEN the key SHALL do nothing.  <!-- UIR-19 -->
+13. IF the `A` key event is a repeat of a held key THEN it SHALL do nothing.  <!-- UIR-19 -->
+14. WHILE the pause menu, the reset dialog or a hero screen is open, or the auto click is locked, `A` SHALL do nothing.  <!-- UIR-19 -->
+15. WHEN the window re-renders while it holds focus (switch turned, upgrade answered, crystals loaded) THEN focus SHALL stay on the control with the same `data-testid`.  <!-- UIR-19 -->
+16. WHEN the reset button of the window opens the reset dialog THEN the window SHALL close.  <!-- UIR-19 -->
+17. WHEN the auto click becomes locked with the window open THEN the window SHALL close.  <!-- UIR-19 -->
+18. The button SHALL carry `aria-label="Auto clique"`, `aria-haspopup="dialog"` and `aria-controls="auto-click-popover"`; the window SHALL carry `id="auto-click-popover"`, `role="dialog"` and `aria-label="Auto clique"`.  <!-- UIR-19 -->
+19. A click on the button or inside the window SHALL not hit the monster.  <!-- UIR-19 -->
+20. The key `A` SHALL be bound to nothing else in the battle scene (keys in use: 1, 2, 3, Q, W, E, Esc).  <!-- UIR-19 -->
+21. The boxes of the skill bar (x 313..787), the auto click (x 827..907) and the farm button (x 911..991) SHALL not overlap each other, the leader card (x 34..274), the hero rail (x from 907, y up to 609) or the bar's edges (x 20..1004, y 624..748); the open window SHALL stay inside the scene and left of the rail.  <!-- UIR-19 -->
+22. WHILE the scene is scaled to a 390 px wide phone viewport, the button, its badge, its label and its open window SHALL keep the same layout scaled by 390/1024 and stay inside the scene.  <!-- UIR-19 -->
+
+**Independent Test**: In chapter 2, the bar shows two round buttons at its right end; press `A`: the window opens above the auto click button with the switch focused; Escape closes it and the focus is back on the button; the left of the fight is empty.
 
 ---
 
@@ -263,6 +304,8 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 - WHEN a hero screen opens over a running fight THEN the dim layer SHALL be the only change behind it (the fight keeps running, spec background-fight).  <!-- UIR-12 -->
 - WHEN a label is the longest one of the rail (`Equipamento`) THEN its text SHALL fit inside the 76 px button (scrollWidth not greater than clientWidth).  <!-- UIR-09 -->
 - WHILE the player's system asks for reduced motion, the existing EPIC and LEGENDARY tile effects and the map pulse SHALL stay off as today, and no new animation SHALL exist to turn off.  <!-- UIR-03 -->
+- WHEN the auto click window opens on the phone viewport THEN it SHALL stay inside the scaled scene (left edge at scene x 663 or more, top at scene y 400 or more).  <!-- UIR-19 -->
+- WHEN the reset button shows in the window (chapter 2 or later) THEN the window SHALL grow upward to hold it and still end 10 px above the button.  <!-- UIR-19 -->
 - IF the skill art of a source has purple effects close to the chroma key THEN the cutout SHALL blend them toward the dark background (accepted; checked in the ui-artist review).  <!-- UIR-16 -->
 
 ---
@@ -289,8 +332,9 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 | UIR-16 | P1: Skill thumbnails without magenta | Tasks | In Tasks |
 | UIR-17 | P3: Painted textures | Tasks | In Tasks |
 | UIR-18 | P1: Review screenshots | Tasks | In Tasks |
+| UIR-19 | P1: Round auto click button and its window | Tasks | In Tasks |
 
-**Coverage:** 18 total, 18 mapped to tasks, 0 unmapped.
+**Coverage:** 19 total, 19 mapped to tasks, 0 unmapped.
 
 ---
 

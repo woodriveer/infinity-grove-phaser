@@ -11,7 +11,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 **Spec**: `.specs/features/ui-redesign/spec.md`
 **Design**: `.specs/features/ui-redesign/design.md`
 **Reference image**: `.specs/features/ui-redesign/reference.jpg` (look at it before any CSS task)
-**Status**: Draft for the owner's approval (written with the defaults of Q1 to Q5 of the spec)
+**Status**: Draft for the owner's approval (Q1 decided as D1 on 2026-11-12: round auto click button, its window and the key `A`, tasks T13 to T16; written with the defaults of the open Q2 to Q5)
 
 Rules for every task:
 
@@ -34,9 +34,9 @@ Rules for every task:
 | --- | --- | --- | --- | --- |
 | Game domain (`elements.js`) | unit | Every element and the unknown element of `weaknessOf` | `game/src/domain/**/*.test.js` | `cd game && npm test` |
 | Game scenes (`ClickerGame.js`, `MainMenu.js`, `Preloader.js`) | unit (jsdom) | Every new constant, attribute and property of the spec, with the exact spec value | `game/src/adapters/phaser/*.test.js` | `cd game && npm test` |
-| Game CSS and `index.html` | none | Build gate; the computed values are asserted by the e2e of T26 and reviewed by T28 | `game/public/style.css`, `game/index.html` | `cd game && npm test && npm run build` |
+| Game CSS and `index.html` | none | Build gate; the computed values are asserted by the e2e of T28 and reviewed by T30 | `game/public/style.css`, `game/index.html` | `cd game && npm test && npm run build` |
 | Art tool (`art/tools/cutout_hero.py`) and the 15 images | none (no Python test harness) | An output check command in the gate of T4 and T5 asserts both modes of the tool and every file | `art/tools/`, `game/public/assets/heroes/` | the command in each task's Gate |
-| e2e | e2e (Playwright, fake backend) | Every acceptance criterion of UIR-01 to UIR-16 that the browser can observe, and every spec edge case | `game/e2e/uiRedesign.spec.js` | `cd game && npx playwright test e2e/uiRedesign.spec.js` |
+| e2e | e2e (Playwright, fake backend) | Every acceptance criterion of UIR-01 to UIR-16 and UIR-19 that the browser can observe, and every spec edge case | `game/e2e/uiRedesign.spec.js` | `cd game && npx playwright test e2e/uiRedesign.spec.js` |
 | Review screenshots | none | Every file of design § Review Screenshots on both projects | `game/ui-review/uiRedesign.shots.js` | `cd game && npm run ui:shots -- uiRedesign` |
 
 ## Gate Check Commands
@@ -51,7 +51,7 @@ Rules for every task:
 
 ## Execution Plan
 
-Phases run in order; tasks inside a phase run in order. Every task of Phases 1 to 7 is `game-dev`; Phase 8 is `test-engineer`; Phase 9 is `ui-artist`.
+Phases run in order; tasks inside a phase run in order. Every task of Phases 1 to 7 is `game-dev` except T15 (`test-engineer`); Phase 8 is `test-engineer`; Phase 9 is `ui-artist`.
 
 ### Phase 1: Foundation
 
@@ -74,37 +74,37 @@ T5 → T6 → T7 → T8 → T9 → T10 → T11
 ### Phase 4: Battle controls and overlays
 
 ```
-T11 → T12 → T13 → T14 → T15
+T11 → T12 → T13 → T14 → T15 → T16 → T17
 ```
 
 ### Phase 5: Main menu and preloader
 
 ```
-T15 → T16 → T17 → T18
+T17 → T18 → T19 → T20
 ```
 
 ### Phase 6: Hero screens
 
 ```
-T18 → T19 → T20 → T21 → T22 → T23 → T24
+T20 → T21 → T22 → T23 → T24 → T25 → T26
 ```
 
 ### Phase 7: Art prompts
 
 ```
-T24 → T25
+T26 → T27
 ```
 
 ### Phase 8: Browser tests and screenshots
 
 ```
-T25 → T26 → T27
+T27 → T28 → T29
 ```
 
 ### Phase 9: Visual review
 
 ```
-T27 → T28
+T29 → T30
 ```
 
 ---
@@ -132,7 +132,7 @@ The two `preconnect` links and the `/style.css` link stay.
 
 1. Replace the `href` of that link.
 
-**Tests**: none - static HTML; T26 asserts that Cinzel loads and Caprasimo is never requested.
+**Tests**: none - static HTML; T28 asserts that Cinzel loads and Caprasimo is never requested.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
@@ -238,7 +238,7 @@ The two `preconnect` links and the `/style.css` link stay.
 3. Append the new tokens.
 4. Edit `body` and `:focus-visible`.
 
-**Tests**: none - CSS; T26 asserts the letterbox, the tokens through computed colours, the texture tokens and the focus ring.
+**Tests**: none - CSS; T28 asserts the letterbox, the tokens through computed colours, the texture tokens and the focus ring.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
@@ -413,7 +413,7 @@ The old `.tag-element` rule is gone on purpose: the element chip gets its dot in
 
 1. Replace the section.
 
-**Tests**: none - CSS; T26 asserts the button, chip and coin values.
+**Tests**: none - CSS; T28 asserts the button, chip and coin values.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
@@ -530,7 +530,7 @@ for name in kael_dimensional_cut kael_charge kael_screen lyra_double_shot lyra_f
 2. Run the gate.
 3. Stage the 15 files by path.
 
-**Tests**: none - binary assets; the gate checks every file, and T26 checks them in the browser on every screen.
+**Tests**: none - binary assets; the gate checks every file, and T28 checks them in the browser on every screen.
 **Gate**: from the repository root:
 
 ```bash
@@ -589,7 +589,7 @@ Write `background` before `background-color` in each rule (the shorthand resets 
 
 1. Edit the five rules.
 
-**Tests**: none - CSS; T26 asserts every value of UIR-04 AC 1 to 6.
+**Tests**: none - CSS; T28 asserts every value of UIR-04 AC 1 to 6.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
@@ -1023,7 +1023,7 @@ CSS: `.hud-enemy` - set `height: 80px;` `flex-direction: column;` `gap: 4px;` (w
 
 1. Edit the comment and the seven rules.
 
-**Tests**: none - CSS; T26 asserts sizes, colours, badges and that no label overflows.
+**Tests**: none - CSS; T28 asserts sizes, colours, badges and that no label overflows.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
@@ -1036,15 +1036,27 @@ CSS: `.hud-enemy` - set `height: 80px;` `flex-direction: column;` `gap: 4px;` (w
 ### T13: Parchment battle bar, dark leader card and framed skills [ ]
 
 **Owner**: game-dev
-**What**: The bottom bar, the leader card, the skill frames, key badges and lock marks of UIR-10.
+**What**: The bottom bar, the leader card, the skill frames, key badges and lock marks of UIR-10, and the new layout of the bar that makes room for the round auto click button of T14 (skill bar to x 550, farm button to x 951, farm box 80 x 112; UIR-04 AC 7, UIR-19 AC 21).
 **Where**: `game/public/style.css`
-**Read first**: `style.css:392-399` (`.battle-bar`), `:484-488` (`.leader-host`, the second rule with that selector), `:826-965` (leader card and skill bar), `:1606-1622` (`.skill-key`); `reference.jpg` bottom row
+**Also changes**: `game/src/adapters/phaser/HeroUi.js` (`SKILL_BAR`), `game/src/adapters/phaser/ClickerGame.js` (`FARM_TOGGLE`), `game/src/adapters/phaser/HeroUi.test.js`, `game/src/adapters/phaser/ClickerGame.test.js`
+**Read first**: `style.css:392-399` (`.battle-bar`), `:462-465` (`.hud-farm`), `:484-488` (`.leader-host`, the second rule with that selector), `:826-965` (leader card and skill bar), `:1606-1622` (`.skill-key`); `HeroUi.js:15-20`; `ClickerGame.js:71`; `HeroUi.test.js:32-75` (`createUi`, the `scene.add.dom` stand-in); design § Layout (Battle bar, left to right); `reference.jpg` bottom row
 **Depends on**: T12
-**Requirement**: UIR-10
+**Requirement**: UIR-10, UIR-04, UIR-19
 
-**Contract**:
+**Contract** - positions:
+
+```js
+// HeroUi.js: the skills sit 36 px further left so the round auto click and farm buttons fit at the right end of the bar (spec ui-redesign D1)
+const SKILL_BAR = { x: 550, y: 686 };
+// ClickerGame.js: the round farm button at the right end of the bar, right of the auto click button
+const FARM_TOGGLE = { x: 951, y: 686 };
+```
+
+**Contract** - CSS:
 
 | Rule | Set | Remove |
+| --- | --- | --- |
+| `.hud-farm` | `width: 80px;` `height: 112px;` | - |
 | --- | --- | --- |
 | `.battle-bar` | `background: var(--panel-bg);` `background-color: var(--parchment-200);` `border: var(--panel-border);` `box-shadow: var(--panel-shadow);` (width 984px, height 124px, `border-radius: var(--radius-lg)` stay) | - |
 | `.leader-host` (the rule at line 484 only, not the group at line 402) | `width: 240px;` `height: 104px;` | - |
@@ -1063,31 +1075,280 @@ The AD-020 rules `.skill-level-badge` and `.skill-level-badge[data-level="3"]` d
 
 **Steps**:
 
-1. Edit the twelve rules.
+1. Change the two position constants (and the comment above each).
+2. Edit the thirteen rules.
+3. Add the test cases.
 
-**Tests**: none - CSS; T26 asserts every value of UIR-10.
-**Gate**: build - `cd game && npm test && npm run build`
+**Tests**: unit (the positions; the CSS values are asserted by T28)
+**Test cases**:
+
+- `HeroUi.test.js` - `places the skill bar at 550, 686, left of the round buttons`: `createUi()` (return its `scene` if it does not yet); the `scene.add.dom` call whose result node holds `.skill-bar-host` was made with `(550, 686)`.
+- `ClickerGame.test.js` - `places the round farm button at 951, 686`: `createScene()`; the element of `ctx.doms` whose node holds `.farm-toggle` has `x` 951 and `y` 686.
+
+**Gate**: quick - `cd game && npm test`, then build - `cd game && npm run build`
 **Done when**:
 
-- [ ] The build passes; `git diff game/public/style.css` touches no `.skill-level-badge` rule.
+- [ ] The 2 cases pass with the whole Vitest suite; the build passes; `git diff game/public/style.css` touches no `.skill-level-badge` rule.
 
 **Commit**: `style(game): draw the battle bar, leader card and skills in the grove look`
 
 ---
 
-### T14: Parchment auto click card and round farm button [ ]
+### T14: Round auto click button, its window and the key A [ ]
 
 **Owner**: game-dev
-**What**: The auto click card, its switch and buttons, and the farm switch as a round button (UIR-11; Q1 default: the card stays where it is).
-**Where**: `game/public/style.css`
-**Read first**: `style.css:462-472` (`.hud-farm`, `.hud-auto-click`), `:606-693` (switches, `.auto-click`, `.auto-click-upgrade`, `.reset-account`); `ClickerGame.js:79` (`FARM_TOGGLE_HTML`); `game/src/adapters/phaser/views/autoClickView.js`; design § Icons (skull)
+**What**: The auto click card on the left is replaced by a round button in the battle bar that opens a window with the old card's controls, by click or by the key `A` (decision D1; UIR-19).
+**Where**: `game/src/adapters/phaser/ClickerGame.js`
+**Also changes**: `game/src/adapters/phaser/ClickerGame.test.js`
+**Read first**: `ClickerGame.js:16` (imports of the views), `:73-76` (`AUTO_CLICK_HUD`, `AUTO_CLICK_HUD_HTML`), `:183-189` (end of `create`, the `shutdown` handler), `:206-260` (`createControls`, `createAutoClickHud`, `showAutoClick`), `:280-292` (`openResetDialog`), `:420-430` (`escape`); `game/src/adapters/phaser/views/autoClickView.js`; `ClickerGame.test.js:160-186` (stand-in: `ctx.doms`, `ctx.handlers`), `:3412` (`press`), `:3755-3860` (auto click tests, helpers `autoClickElement`, `toggle`, `atChapter`); design § Auto click button and window
 **Depends on**: T13
-**Requirement**: UIR-11
+**Requirement**: UIR-19
+
+**Contract**:
+
+```js
+import { autoClickIntervalText, renderAutoClick } from './views/autoClickView';
+// ...
+//  The auto click (spec ui-redesign D1, UIR-19): a round button at the right end of the battle bar with its key A and its interval under it, and the
+//  window it opens above it with the switch, the interval, the crystals, the upgrade and the account reset. The box keeps Phaser's placement fixed.
+const AUTO_CLICK_HUD = { x: 867, y: 686 };
+const AUTO_CLICK_HUD_HTML = '<div class="hud-box hud-auto-click"><div class="auto-click" data-testid="auto-click">'
+    + '<div class="auto-click-popover" id="auto-click-popover" role="dialog" aria-label="Auto clique" data-testid="auto-click-popover" hidden></div>'
+    + '<button type="button" class="auto-click-button" data-testid="auto-click-button" data-on="false" aria-label="Auto clique" aria-haspopup="dialog"'
+    + ' aria-expanded="false" aria-controls="auto-click-popover"><span class="auto-click-key" data-testid="auto-click-key" aria-hidden="true">A</span></button>'
+    + '<span class="auto-click-rate" data-testid="auto-click-rate"></span>'
+    + '</div></div>';
+
+//  A key typed into a text field is text, not a shortcut
+const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [contenteditable="true"], input:not([type="checkbox"]):not([type="radio"]):not([type="button"])'));
+```
+
+`createAutoClickHud()` becomes:
+
+```js
+    //  The round auto click button and its window are clickable HTML, hidden until the auto click is open; they read their state in the background
+    createAutoClickHud ()
+    {
+        this.autoClickElement = this.add.dom(AUTO_CLICK_HUD.x, AUTO_CLICK_HUD.y).createFromHTML(AUTO_CLICK_HUD_HTML);
+        this.autoClickBox = this.autoClickElement.node.querySelector('.auto-click');
+        this.autoClickWindow = this.autoClickBox.querySelector('.auto-click-popover');
+        this.autoClickButton = this.autoClickBox.querySelector('.auto-click-button');
+        this.autoClickRate = this.autoClickBox.querySelector('.auto-click-rate');
+        this.autoClickBox.addEventListener('change', (event) => this.switchAutoClick(event.target.checked));
+        this.autoClickBox.addEventListener('click', (event) => event.target.closest('.auto-click-upgrade') && this.upgradeAutoClick());
+        this.autoClickBox.addEventListener('click', (event) => event.target.closest('.reset-account') && this.openResetDialog());
+        this.autoClickButton.addEventListener('click', () => this.toggleAutoClickWindow());
+        //  A press anywhere outside the button and its window closes the window and still does what it does (a press on the canvas hits)
+        this.onPressOutsideAutoClick = (event) => !this.autoClickBox.contains(event.target) && this.closeAutoClickWindow({ returnFocus: false });
+        document.addEventListener('pointerdown', this.onPressOutsideAutoClick, true);
+        this.input.keyboard.on('keydown-A', (event) => this.autoClickKey(event));
+        this.showAutoClick();
+        this.loadAutoClick();
+    }
+```
+
+`showAutoClick()` becomes:
+
+```js
+    showAutoClick ()
+    {
+        const reward = this.resetReward;
+        //  The window is drawn again on every change; a keyboard user keeps the control that had focus
+        const focused = this.autoClickWindow.contains(document.activeElement) ? document.activeElement.getAttribute('data-testid') : null;
+
+        this.autoClickElement.setVisible(this.autoClickOpen);
+        this.autoClickWindow.replaceChildren(...renderAutoClick({
+            enabled: this.autoClickEnabled, intervalMs: this.autoClick.intervalMs(), state: this.autoClick.state(), busy: this.upgradingAutoClick
+        }), ...(reward === null ? [] : [ renderResetButton(reward) ]));
+        this.autoClickButton.setAttribute('data-on', String(this.autoClickEnabled));
+        this.autoClickRate.textContent = autoClickIntervalText(this.autoClick.intervalMs());
+
+        if (!this.autoClickOpen)
+        {
+            this.closeAutoClickWindow({ returnFocus: false });
+        }
+        else if (focused)
+        {
+            this.autoClickWindow.querySelector(`[data-testid="${focused}"]`)?.focus();
+        }
+    }
+```
+
+New methods, after `showAutoClick`:
+
+```js
+    get autoClickWindowOpen ()
+    {
+        return !this.autoClickWindow.hidden;
+    }
+
+    //  The window opens with the focus on its switch, so the keyboard can use it at once
+    openAutoClickWindow ()
+    {
+        if (!this.autoClickOpen)
+        {
+            return;
+        }
+
+        this.autoClickWindow.hidden = false;
+        this.autoClickButton.setAttribute('aria-expanded', 'true');
+        this.autoClickWindow.querySelector('[data-testid="auto-click-toggle"]')?.focus();
+    }
+
+    closeAutoClickWindow ({ returnFocus = true } = {})
+    {
+        if (!this.autoClickWindowOpen)
+        {
+            return;
+        }
+
+        this.autoClickWindow.hidden = true;
+        this.autoClickButton.setAttribute('aria-expanded', 'false');
+
+        if (returnFocus)
+        {
+            this.autoClickButton.focus();
+        }
+    }
+
+    toggleAutoClickWindow ()
+    {
+        this.autoClickWindowOpen ? this.closeAutoClickWindow() : this.openAutoClickWindow();
+    }
+
+    //  The A key opens or closes the window; not while typing, not for the repeats of a held key, and not while a dialog, the pause menu or a
+    //  hero screen covers the battle bar
+    autoClickKey (event)
+    {
+        if (event?.repeat || isTextField(event?.target) || this.paused || !this.resetDialog.hidden || this.heroUi.isOpen || !this.autoClickOpen)
+        {
+            return;
+        }
+
+        this.toggleAutoClickWindow();
+    }
+```
+
+Other edits:
+
+- `escape()`: as its first statement, `if (this.autoClickWindowOpen) { this.closeAutoClickWindow(); return; }` (with the house brace style), and the comment becomes `//  Esc closes the auto click window first, then an open hero screen; otherwise it opens or closes the pause menu`.
+- `openResetDialog()`: right after the `if (this.resetReward === null) { return; }` block, add `this.closeAutoClickWindow({ returnFocus: false });`.
+- The `shutdown` line of `create()` becomes:
+
+```js
+        this.events.once('shutdown', () =>
+        {
+            this.syncOnExit();
+            document.removeEventListener('pointerdown', this.onPressOutsideAutoClick, true);
+        });
+```
+
+`renderAutoClick`, `renderResetButton`, `switchAutoClick`, `upgradeAutoClick` and every text do not change. `FARM_TOGGLE` and `SKILL_BAR` were moved by T13.
+
+**Steps**:
+
+1. Imports, constants, `isTextField`.
+2. `createAutoClickHud`, `showAutoClick`, the five new members.
+3. `escape`, `openResetDialog`, the `shutdown` handler.
+4. Add the test cases in the `describe` of the auto click tests (line ~3755). Helpers: `const button = (ctx) => ctx.hud('[data-testid="auto-click-button"]'); const popover = (ctx) => ctx.hud('[data-testid="auto-click-popover"]'); const attach = (ctx) => document.body.append(autoClickElement(ctx).node);` (focus needs the node in the document; remove it at the end of the test).
+
+**Tests**: unit
+**Test cases** (`ClickerGame.test.js`; `atChapter(2)` unless said otherwise):
+
+- `places the round auto click button at 867, 686 with the key A and the interval under it` (UIR-19 AC 1, 2): `autoClickElement(ctx)` has `x` 867, `y` 686; `ctx.hud('[data-testid="auto-click-key"]').textContent` is `'A'`; `ctx.hud('[data-testid="auto-click-rate"]').textContent` is `'500 ms'`.
+- `writes 250 ms under the button at level 1` (AC 2): `autoClick: { ...AUTO_CLICK_LEVEL_0, level: 1, intervalMs: 250, next: { level: 2, intervalMs: 150, price: 25 } }`; rate `'250 ms'`.
+- `marks the button on while the auto click runs and off when switched off` (AC 4, 5): `button(ctx).getAttribute('data-on')` is `'true'`; set `toggle(ctx).checked = false` and dispatch a bubbling `change`; `'false'`.
+- `keeps the window closed until the button is pressed` (AC 6): `popover(ctx).hidden` is `true`, `button(ctx).getAttribute('aria-expanded')` is `'false'`.
+- `opens the window on a click with the focus on the switch` (AC 6): `attach(ctx)`; `button(ctx).click()`; `popover(ctx).hidden` `false`, `aria-expanded` `'true'`, `document.activeElement` is `toggle(ctx)`.
+- `holds the switch, interval, crystals and upgrade in the window, and the reset from chapter 2` (AC 7): `atChapter(3)`; `[...popover(ctx).children].map((child) => child.getAttribute('data-testid') ?? child.querySelector('[data-testid]')?.getAttribute('data-testid'))` equals `[ 'auto-click-toggle', 'auto-click-interval', 'auto-click-crystals', 'auto-click-upgrade', 'reset-account' ]`; `reset-account` text `'Resetar conta (+3 cristais)'`.
+- `opens and closes the window with A, the focus back on the button` (AC 8, 9): `attach(ctx)`; `press(ctx, 'A', { repeat: false, target: document.body })`; open, focus on the switch; press again; closed, `aria-expanded` `'false'`, `document.activeElement` is `button(ctx)`.
+- `closes the window when the button is pressed again` (AC 9): two `button(ctx).click()`; closed, focus on the button.
+- `closes the window with Escape and does not pause` (AC 9, 10): open; `ctx.handlers['keydown-ESC']()`; closed; `ctx.scene.paused` is `false`; a second `ctx.handlers['keydown-ESC']()` sets `ctx.scene.paused` to `true`.
+- `closes the window on a press outside, without moving the focus to the button` (AC 11): `attach(ctx)`; open; `document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }))`; closed; `document.activeElement` is not `button(ctx)`.
+- `keeps the window open on a press inside it` (AC 11): open; `toggle(ctx).dispatchEvent(new Event('pointerdown', { bubbles: true }))`; still open.
+- `ignores A typed into a text field` (AC 12): `const field = document.createElement('input'); field.type = 'text';` `press(ctx, 'A', { repeat: false, target: field })`; closed.
+- `ignores the repeats of a held A` (AC 13): `press(ctx, 'A', { repeat: true, target: document.body })`; closed.
+- `ignores A while the pause menu is open` (AC 14): `ctx.handlers['keydown-ESC']()` (pauses); `press(ctx, 'A', ...)`; closed.
+- `ignores A while a hero screen is open` (AC 14): `ctx.scene.heroUi.show('heroes')`; `press(ctx, 'A', ...)`; closed.
+- `ignores A while the auto click is locked` (AC 14, 3): `atChapter(1)` with `resets: 0`; `autoClickElement(ctx).visible` is `false`; `press(ctx, 'A', ...)`; closed.
+- `keeps the focus on the switch when the window is drawn again` (AC 15): `attach(ctx)`; open (focus on the switch); `ctx.scene.showAutoClick()`; `document.activeElement` is the new `toggle(ctx)`.
+- `closes the window when its reset button opens the reset dialog` (AC 16): `atChapter(3)`; open; `ctx.hud('[data-testid="reset-account"]').click()`; window closed; `ctx.hud('[data-testid="reset-dialog"]').hidden` is `false`.
+- `labels the button and the window for assistive tech` (AC 18): button `aria-label` `'Auto clique'`, `aria-haspopup` `'dialog'`, `aria-controls` `'auto-click-popover'`; window `id` `'auto-click-popover'`, `role` `'dialog'`, `aria-label` `'Auto clique'`.
+- `binds A to nothing but the auto click window` (AC 20): the keys registered on `scene.input.keyboard.on` are exactly `keydown-ESC`, `keydown-ONE`, `keydown-TWO`, `keydown-THREE`, `keydown-Q`, `keydown-W`, `keydown-E`, `keydown-A` (read `scene.input.keyboard.on.mock.calls.map(([ name ]) => name)`, sorted).
+- `removes the outside-press listener when the scene shuts down`: `vi.spyOn(document, 'removeEventListener')`; `ctx.eventHandlers.shutdown()`; it was called with `('pointerdown', ctx.scene.onPressOutsideAutoClick, true)`.
+
+Every existing auto click test (`toggle`, `interval`, `crystals`, `upgradeButton`, `visible`) and account reset test keeps passing unchanged: they query by test id, which the window still holds.
+
+**Gate**: quick - `cd game && npm test`
+**Done when**:
+
+- [ ] The 21 new cases and every existing `ClickerGame.test.js` case pass.
+- [ ] `grep -n "366, y: 200" game/src/adapters/phaser/ClickerGame.js` prints nothing.
+
+**Commit**: `feat(game): open the auto click from a round button or the A key`
+
+---
+
+### T15: Open the auto click window in the existing browser tests [ ]
+
+**Owner**: test-engineer
+**What**: The two e2e suites that used the old card open the auto click window before touching its controls, so they test the same behaviour through the new button (UIR-19 AC 7; regression of `auto-click` and `account-reset`).
+**Where**: `game/e2e/autoClick.spec.js`
+**Also changes**: `game/e2e/accountReset.spec.js`
+**Read first**: `game/e2e/autoClick.spec.js:1-90`; `game/e2e/accountReset.spec.js:1-70`; T14 (test ids)
+**Depends on**: T14
+**Requirement**: UIR-19
+
+**Contract**: in each file, a helper after `health`:
+
+```js
+//  The auto click controls live in the window of the round button (spec ui-redesign D1)
+const openAutoClick = async (page) => {
+    await page.getByTestId('auto-click-button').click();
+    await expect(page.getByTestId('auto-click-popover')).toBeVisible();
+};
+```
+
+| File:line | Change |
+| --- | --- |
+| `autoClick.spec.js:51` (test `shows 500 ms, Cristais: 0 and a disabled ...`) | after `await startGame(page, 2);` add `await openAutoClick(page);` |
+| `autoClick.spec.js:61` (test `unchecking Auto clique stops it, without the click hitting the monster`) | add `await openAutoClick(page);` right before `await page.getByTestId('auto-click-toggle').click();` (after the hit counter is installed, so the button's click is counted too and must stay 0) |
+| `autoClick.spec.js:83` (test `in chapter 1 there is no Auto clique switch ...`) | add the line `await expect(page.getByTestId('auto-click-button')).toBeHidden();` before the existing `toBeHidden` |
+| `accountReset.spec.js:31` (test `in chapter 3 the button offers 3 crystals ...`) | add `await openAutoClick(page);` before the first `expect` |
+| `accountReset.spec.js:54` (test `Resetar brings chapter 1, ...`) | add `await openAutoClick(page);` before `await page.getByTestId('reset-account').click();` |
+| `accountReset.spec.js:61` | `auto-click-toggle` `toBeVisible()` becomes `auto-click-button` `toBeVisible()` (the reset dialog closed the window) |
+
+No other line changes; test names stay.
+
+**Steps**:
+
+1. Add the helper to both files.
+2. Apply the six changes.
+3. Run the gate.
+
+**Tests**: e2e (regression)
+**Gate**: full - `cd game && npx playwright test e2e/autoClick.spec.js e2e/accountReset.spec.js`, then `cd game && npm test && npx playwright test`
+**Done when**:
+
+- [ ] Both suites pass with every test name unchanged; the whole Playwright suite passes.
+
+**Commit**: `test(game): open the auto click window in the auto click and reset tests`
+
+---
+
+### T16: Round auto click and farm buttons, the auto click window [ ]
+
+**Owner**: game-dev
+**What**: The CSS of the round auto click button, its key badge, rate label and window, the switch inside it, and the round farm button (UIR-11, UIR-19 AC 1, 2, 4, 5, 21, 22).
+**Where**: `game/public/style.css`
+**Read first**: `style.css:467-472` (`.hud-auto-click`), `:606-693` (switches, `.auto-click`, `.auto-click-upgrade`, `.reset-account`); `ClickerGame.js` `AUTO_CLICK_HUD_HTML` (T14) and `FARM_TOGGLE_HTML`; design § Auto click button and window, § Layout; `reference.jpg` bottom right
+**Depends on**: T15
+**Requirement**: UIR-11, UIR-19
 
 **Contract**: replace the five rules from `.farm-toggle,` `.auto-click-toggle {` up to `.farm-toggle input:checked::after,` `.auto-click-toggle input:checked::after { ... }` (style.css:606-653) with:
 
 ```css
-/* The auto click switch: a wood track with a parchment knob, green when on (spec ui-redesign UIR-11) */
+/* The auto click switch, inside the auto click window: a wood track with a parchment knob, green when on (spec ui-redesign UIR-11) */
 .auto-click-toggle {
     display: flex;
     align-items: center;
@@ -1134,7 +1395,7 @@ The AD-020 rules `.skill-level-badge` and `.skill-level-badge[data-level="3"]` d
     left: 18px;
 }
 
-/* The farm switch: a round wood button with a skull, its label under it; an ember ring and glow while on */
+/* The two round buttons of the bar share the look: a dark wood disc with a bronze ring, the label under it (spec ui-redesign D1) */
 .farm-toggle {
     display: flex;
     flex-direction: column;
@@ -1146,62 +1407,161 @@ The AD-020 rules `.skill-level-badge` and `.skill-level-badge[data-level="3"]` d
     cursor: pointer;
 }
 
-.farm-toggle input {
+.farm-toggle input,
+.auto-click-button {
     appearance: none;
+    position: relative;
     flex: none;
     width: 56px;
     height: 56px;
     margin: 0;
+    padding: 0;
     border-radius: 50%;
-    background:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e0b45a' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z'/%3E%3Ccircle cx='15' cy='12' r='1'/%3E%3Ccircle cx='9' cy='12' r='1'/%3E%3C/svg%3E") center / 30px 30px no-repeat,
-        var(--frame-bg);
     background-color: var(--wood-800);
     border: 3px solid var(--bronze-500);
     box-shadow: var(--frame-shadow);
     cursor: pointer;
 }
 
+.farm-toggle input {
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e0b45a' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z'/%3E%3Ccircle cx='15' cy='12' r='1'/%3E%3Ccircle cx='9' cy='12' r='1'/%3E%3C/svg%3E") center / 30px 30px no-repeat,
+        var(--frame-bg);
+    background-color: var(--wood-800);
+}
+
 .farm-toggle input:checked {
     border-color: var(--ember-500);
     box-shadow: 0 0 12px 2px rgb(232 116 42 / 0.75), var(--frame-shadow);
 }
+
+/* The auto click: the button, its key and its interval in a column; the window floats above the button */
+.auto-click {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 80px;
+}
+
+.auto-click-button {
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f3d58a' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4.1 12 6'/%3E%3Cpath d='m5.1 8-2.9-.8'/%3E%3Cpath d='m6 12-1.9 2'/%3E%3Cpath d='M7.2 2.2 8 5.1'/%3E%3Cpath d='M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z'/%3E%3C/svg%3E") center / 28px 28px no-repeat,
+        var(--frame-bg);
+    background-color: var(--wood-800);
+}
+
+/* On: a green ring and glow, as in the mock-up */
+.auto-click-button[data-on="true"] {
+    border-color: #5fd35a;
+    box-shadow: 0 0 14px 4px rgb(95 211 90 / 0.75), var(--frame-shadow);
+}
+
+.auto-click-button:hover {
+    filter: brightness(1.15);
+}
+
+.auto-click-button:active {
+    filter: brightness(0.9);
+}
+
+/* The key that opens the window, like the skill keys */
+.auto-click-key {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold-200);
+    border-radius: 6px;
+    background: var(--wood-900);
+    border: 1px solid var(--gold-400);
+    pointer-events: none;
+}
+
+.auto-click-rate {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-900);
+    white-space: pre;
+}
+
+/* The window: parchment above the button, 4 px inside the right edge of the box (left of the hero rail), a tail pointing at the button */
+.auto-click-popover {
+    position: absolute;
+    right: 4px;
+    bottom: calc(100% + 10px);
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    width: 240px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-900);
+    border-radius: 10px;
+    background: var(--panel-bg);
+    background-color: var(--parchment-200);
+    border: var(--panel-border);
+    box-shadow: var(--panel-shadow);
+}
+
+.auto-click-popover::after {
+    content: '';
+    position: absolute;
+    right: 28px;
+    bottom: -11px;
+    width: 16px;
+    height: 16px;
+    background: var(--parchment-300);
+    border-right: 3px solid var(--wood-600);
+    border-bottom: 3px solid var(--wood-600);
+    transform: rotate(45deg);
+}
 ```
+
+The window is out of the flow (`position: absolute`), so the button is the top of `.auto-click`: `bottom: calc(100% + 10px)` puts the window's bottom edge 10 px above the button. Use exactly these values; T28 asserts the boxes.
 
 Other rules:
 
 | Rule | Set | Remove |
 | --- | --- | --- |
-| `.hud-farm` | `width: 120px;` `height: 112px;` | - |
-| `.auto-click` | `color: var(--ink-900);` `border-radius: 10px;` `background: var(--panel-bg);` `background-color: var(--parchment-200);` `border: var(--panel-border);` `box-shadow: var(--panel-shadow);` | - |
+| `.hud-auto-click` | `width: 80px;` `height: 112px;` `align-items: center;` `justify-content: center;` | - |
+| the old `.auto-click` rule (the one with `flex-wrap: wrap`, from before T16) | delete the whole rule (the new `.auto-click` above replaces it) | - |
 | `.auto-click-upgrade` | `padding: 6px 12px;` `color: var(--parchment-100);` `background: var(--btn-primary-bg);` `background-color: var(--ember-700);` `border: 2px solid var(--gold-400);` `box-shadow: var(--btn-shadow);` | - |
 | `.auto-click-upgrade:disabled` | - | `background` (the shared `button:disabled` opacity 0.45 dims it) |
 | `.reset-account` | `padding: 6px 12px;` `color: var(--parchment-100);` `background: var(--btn-primary-bg);` `background-color: var(--ember-700);` `border: 2px solid var(--gold-400);` `box-shadow: var(--btn-shadow);` | - |
 
-`FARM_TOGGLE` (918, 686) and `AUTO_CLICK_HUD` (366, 200) in `ClickerGame.js` do not change.
-
 **Steps**:
 
-1. Replace the switch rules.
-2. Edit the other five rules.
+1. Replace the switch rules with the block.
+2. Delete the old `.auto-click` rule; edit `.hud-auto-click`, `.auto-click-upgrade`, `.auto-click-upgrade:disabled`, `.reset-account`.
 
-**Tests**: none - CSS; T26 asserts UIR-11.
+**Tests**: none - CSS; T28 asserts UIR-11 and the layout of UIR-19.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The build passes; `ClickerGame.js` is unchanged.
+- [ ] The build passes; `grep -c "flex-wrap: wrap" game/public/style.css` is one less than before this task (the old card rule is gone) and `grep -c "auto-click-popover" game/public/style.css` prints `2`.
 
-**Commit**: `style(game): draw the auto click card and a round farm button`
+**Commit**: `style(game): draw the round auto click and farm buttons and the auto click window`
 
 ---
 
-### T15: Dim layer, pause card and reset card [ ]
+### T17: Dim layer, pause card and reset card [ ]
 
 **Owner**: game-dev
 **What**: The overlays of UIR-12.
 **Where**: `game/public/style.css`
 **Read first**: `style.css:695-754` (`.reset-question` to `.pause-question`)
-**Depends on**: T14
+**Depends on**: T16
 **Requirement**: UIR-12
 
 **Contract**:
@@ -1217,7 +1577,7 @@ Other rules:
 
 1. Edit the four rules.
 
-**Tests**: none - CSS; T26 asserts UIR-12.
+**Tests**: none - CSS; T28 asserts UIR-12.
 **Gate**: build, then full (phase gate) - `cd game && npm test && npm run build && npx playwright test`
 **Done when**:
 
@@ -1227,13 +1587,13 @@ Other rules:
 
 ---
 
-### T16: Main menu fields, buttons and path choice [ ]
+### T18: Main menu fields, buttons and path choice [ ]
 
 **Owner**: game-dev
 **What**: The DOM of the main menu in the Grove recipes (UIR-15 AC 2, 3).
 **Where**: `game/public/style.css` (section `/* ══ 01 · Main menu`)
 **Read first**: `style.css:217-389`; `MainMenu.js:20-64` (the HTML)
-**Depends on**: T15
+**Depends on**: T17
 **Requirement**: UIR-15
 
 **Contract**:
@@ -1257,7 +1617,7 @@ Other rules:
 
 1. Edit the twelve rules.
 
-**Tests**: none - CSS; T26 asserts UIR-15 AC 2 and 3.
+**Tests**: none - CSS; T28 asserts UIR-15 AC 2 and 3.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
@@ -1267,14 +1627,14 @@ Other rules:
 
 ---
 
-### T17: Parchment menu oval with a wood rim [ ]
+### T19: Parchment menu oval with a wood rim [ ]
 
 **Owner**: game-dev
 **What**: The Phaser oval of the main menu is parchment with a 6 px dark wood rim (UIR-15 AC 1).
 **Where**: `game/src/adapters/phaser/MainMenu.js`
 **Also changes**: `game/src/adapters/phaser/MainMenu.test.js`
 **Read first**: `MainMenu.js:7-9`, `:70-80`; `MainMenu.test.js:1-80` (Phaser stand-in, `createScene`, the first test)
-**Depends on**: T16
+**Depends on**: T18
 **Requirement**: UIR-15
 
 **Contract**:
@@ -1312,14 +1672,14 @@ Test stand-in (`MainMenu.test.js:36`): `ellipse: vi.fn(() => { const shape = {};
 
 ---
 
-### T18: Gold and ember loading bar [ ]
+### T20: Gold and ember loading bar [ ]
 
 **Owner**: game-dev
 **What**: The preloader bar has a 2 px gold outline and an ember fill (UIR-15 AC 4).
 **Where**: `game/src/adapters/phaser/Preloader.js`
 **Also changes**: `game/src/adapters/phaser/Preloader.test.js` (new)
 **Read first**: `Preloader.js:14-31`; `MainMenu.test.js:1-12` (how a scene test mocks `phaser`)
-**Depends on**: T17
+**Depends on**: T19
 **Requirement**: UIR-15
 
 **Contract**:
@@ -1385,13 +1745,13 @@ const createScene = () => {
 
 ---
 
-### T19: Parchment hero window [ ]
+### T21: Parchment hero window [ ]
 
 **Owner**: game-dev
 **What**: The shell of every hero screen: window, title, error line, empty state (UIR-13 AC 1 to 4).
 **Where**: `game/public/style.css` (section `/* ══ Hero screens`)
 **Read first**: `style.css:978-1031`
-**Depends on**: T18
+**Depends on**: T20
 **Requirement**: UIR-13
 
 **Contract**: replace the section comment with `/* ══ Hero screens: one parchment window over the dimmed fight ══ */` and:
@@ -1407,7 +1767,7 @@ const createScene = () => {
 
 1. Edit the comment and the four rules.
 
-**Tests**: none - CSS; T26 asserts UIR-13 AC 1 to 3.
+**Tests**: none - CSS; T28 asserts UIR-13 AC 1 to 3.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
@@ -1417,13 +1777,13 @@ const createScene = () => {
 
 ---
 
-### T20: Catalog, detail, skill rows, farm list, fusion and leader [ ]
+### T22: Catalog, detail, skill rows, farm list, fusion and leader [ ]
 
 **Owner**: game-dev
 **What**: The inset cards and dark portraits of UIR-13 AC 4 to 6.
 **Where**: `game/public/style.css`
 **Read first**: `style.css:1033-1318`; `game/src/adapters/phaser/views/catalogView.js` (classes used)
-**Depends on**: T19
+**Depends on**: T21
 **Requirement**: UIR-13
 
 **Contract**:
@@ -1454,7 +1814,7 @@ The AD-020 rules (`.hero-stars.is-ascended`, `.hero-stars.is-exalted`, `.skill-l
 
 1. Edit the seventeen rules.
 
-**Tests**: none - CSS; T26 asserts the inset recipe, portraits and AD-020 colours; `heroAscension.spec.js` keeps asserting the star colours.
+**Tests**: none - CSS; T28 asserts the inset recipe, portraits and AD-020 colours; `heroAscension.spec.js` keeps asserting the star colours.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
@@ -1464,13 +1824,13 @@ The AD-020 rules (`.hero-stars.is-ascended`, `.hero-stars.is-exalted`, `.skill-l
 
 ---
 
-### T21: Equipment, piece tiles, tooltip and bulk sale [ ]
+### T23: Equipment, piece tiles, tooltip and bulk sale [ ]
 
 **Owner**: game-dev
 **What**: The Equipamento screen of UIR-13 AC 4 and UIR-14 AC 7, 8.
 **Where**: `game/public/style.css`
 **Read first**: `style.css:1319-1437`, `:1768-1810`, `:1990-2016`, `:2038-2070`, `:2152-2162`
-**Depends on**: T20
+**Depends on**: T22
 **Requirement**: UIR-14
 
 **Contract**:
@@ -1501,7 +1861,7 @@ The rarity rules (`.piece-tile.rarity-*`, the EPIC and LEGENDARY effects, `@keyf
 
 1. Edit the seventeen rules.
 
-**Tests**: none - CSS; T26 asserts the tile and tooltip values; `dragEquip.spec.js`, `bulkSell.spec.js` and `equipmentUi.spec.js` guard the behaviour.
+**Tests**: none - CSS; T28 asserts the tile and tooltip values; `dragEquip.spec.js`, `bulkSell.spec.js` and `equipmentUi.spec.js` guard the behaviour.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
@@ -1511,13 +1871,13 @@ The rarity rules (`.piece-tile.rarity-*`, the EPIC and LEGENDARY effects, `@keyf
 
 ---
 
-### T22: Talent columns and cards [ ]
+### T24: Talent columns and cards [ ]
 
 **Owner**: game-dev
 **What**: The Talentos screen of UIR-13 AC 4 and UIR-14 AC 9.
 **Where**: `game/public/style.css` (section `/* ══ Talentos`)
 **Read first**: `style.css:1624-1741`
-**Depends on**: T21
+**Depends on**: T23
 **Requirement**: UIR-14
 
 **Contract**:
@@ -1536,7 +1896,7 @@ The four `--branch` colours, `.talent-upgrade` and `.talent-reset` do not change
 
 1. Edit the five rules.
 
-**Tests**: none - CSS; T26 asserts the talent card background; `talents.spec.js` guards the behaviour.
+**Tests**: none - CSS; T28 asserts the talent card background; `talents.spec.js` guards the behaviour.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
@@ -1546,13 +1906,13 @@ The four `--branch` colours, `.talent-upgrade` and `.talent-reset` do not change
 
 ---
 
-### T23: Framed chapter map [ ]
+### T25: Framed chapter map [ ]
 
 **Owner**: game-dev
 **What**: The `Rever chefes` map gets a wood ring and a bronze ring without changing its size (UIR-14 AC 10).
 **Where**: `game/public/style.css` (section `/* ══ Rever chefes`)
 **Read first**: `style.css:2259-2290`; `game/e2e/bossMap.spec.js:78-100` (the map keeps 880 x 495)
-**Depends on**: T22
+**Depends on**: T24
 **Requirement**: UIR-14
 
 **Contract**:
@@ -1568,7 +1928,7 @@ Rings are shadows, not a border, so the map keeps its 880 x 495 layout box and t
 
 1. Edit the two rules.
 
-**Tests**: none - CSS; `bossMap.spec.js` guards the size; T26 asserts the rings.
+**Tests**: none - CSS; `bossMap.spec.js` guards the size; T28 asserts the rings.
 **Gate**: build - `cd game && npm test && npm run build`, then `cd game && npx playwright test e2e/bossMap.spec.js`
 **Done when**:
 
@@ -1578,13 +1938,13 @@ Rings are shadows, not a border, so the map keeps its 880 x 495 layout box and t
 
 ---
 
-### T24: Element wheel and skill tooltip on parchment [ ]
+### T26: Element wheel and skill tooltip on parchment [ ]
 
 **Owner**: game-dev
 **What**: The element wheel card and the skill tooltip in the Grove recipes (UIR-14 AC 8, 11; Q3 default: the wheel stays).
 **Where**: `game/public/style.css`
 **Read first**: `style.css:1438-1605`
-**Depends on**: T23
+**Depends on**: T25
 **Requirement**: UIR-14
 
 **Contract**:
@@ -1604,7 +1964,7 @@ The wheel gets rings as shadows, not a border, so the arrows that `elementWheel.
 
 1. Edit the six rules.
 
-**Tests**: none - CSS; T26 asserts the wheel and tooltip values.
+**Tests**: none - CSS; T28 asserts the wheel and tooltip values.
 **Gate**: build, then full (phase gate) - `cd game && npm test && npm run build && npx playwright test`
 **Done when**:
 
@@ -1614,13 +1974,13 @@ The wheel gets rings as shadows, not a border, so the arrows that `elementWheel.
 
 ---
 
-### T25: Gemini prompts for the parchment and wood textures [ ]
+### T27: Gemini prompts for the parchment and wood textures [ ]
 
 **Owner**: game-dev
 **What**: `PROMPTS_ASSETS_UI.md` gains section 5 with the two texture prompts and their activation lines (UIR-17).
 **Where**: `PROMPTS_ASSETS_UI.md`
 **Read first**: `PROMPTS_ASSETS_UI.md:1-20`, `:300-325`; design § Gemini Prompts (the exact text)
-**Depends on**: T24
+**Depends on**: T26
 **Requirement**: UIR-17
 
 **Contract**:
@@ -1645,14 +2005,14 @@ The wheel gets rings as shadows, not a border, so the arrows that `elementWheel.
 
 ---
 
-### T26: e2e of the Grove theme [ ]
+### T28: e2e of the Grove theme [ ]
 
 **Owner**: test-engineer
-**What**: Browser tests of every acceptance criterion of UIR-01 to UIR-16 the browser can observe, the spec edge cases included.
+**What**: Browser tests of every acceptance criterion of UIR-01 to UIR-16 and UIR-19 the browser can observe, the spec edge cases included.
 **Where**: `game/e2e/uiRedesign.spec.js` (new)
 **Read first**: `game/e2e/heroAscension.spec.js:1-60` (`startAs`, `colorOf`, imports from `./support/coverage`); `game/e2e/autoClick.spec.js:1-30` (chapter 2 start); `game/e2e/clickPower.spec.js:1-60` (clicking the monster, COMBO talent); `game/e2e/talents.spec.js:60-70` (`talentPoints`); `game/e2e/bossMap.spec.js:1-60` (opening the map); `game/ui-review/bulkSell.shots.js:1-20` (equipment pieces); spec (all); design § Palette, § Contrast
-**Depends on**: T25
-**Requirement**: UIR-01, UIR-02, UIR-03, UIR-04, UIR-05, UIR-06, UIR-07, UIR-08, UIR-09, UIR-10, UIR-11, UIR-12, UIR-13, UIR-14, UIR-15, UIR-16
+**Depends on**: T27
+**Requirement**: UIR-01, UIR-02, UIR-03, UIR-04, UIR-05, UIR-06, UIR-07, UIR-08, UIR-09, UIR-10, UIR-11, UIR-12, UIR-13, UIR-14, UIR-15, UIR-16, UIR-19
 
 **Contract**: one `test.describe('Grove theme')`. Import `test` and `expect` from `./support/coverage`. Helpers:
 
@@ -1694,11 +2054,11 @@ Foundation (UIR-01 to UIR-03):
 - `draws Fechar as a wood pill` (UIR-02 AC 7): open Heróis; `hero-close`: `background-color` `rgb(43, 29, 20)`, `border-top-width` `2px`, `border-top-color` `rgb(176, 122, 58)`, `color` `rgb(244, 230, 200)`, `border-top-left-radius` `999px`.
 - `draws Fundir as an ember pill` (UIR-02 AC 8): copies `{ 'kael:1': 3 }`; open Fusão; `fusion-button-kael-1`: `background-color` `rgb(168, 67, 26)`, `border-top-color` `rgb(224, 180, 90)`, `color` `rgb(244, 230, 200)`.
 - `brightens a hovered button and darkens a pressed one` (UIR-02 AC 9, 10): hover `hero-close`: `filter` `brightness(1.15)`; `page.mouse.down()`: `brightness(0.9)`; `page.mouse.up()` after.
-- `keeps a disabled button at opacity 0.45` (UIR-02 AC 11): `progress: { chapter: 2 }`; `auto-click-upgrade` is disabled and its `opacity` is `0.45`.
+- `keeps a disabled button at opacity 0.45` (UIR-02 AC 11): `progress: { chapter: 2 }`; click `auto-click-button`; `auto-click-upgrade` is disabled and its `opacity` is `0.45`.
 - `draws metallic coins` (UIR-02 AC 12): `.wallet .coin-gold` `::before` `background-image` contains `rgb(255, 241, 176)`, `width` `20px`; `.coin-silver` contains `rgb(201, 204, 209)`; `.coin-copper` contains `rgb(184, 101, 45)`.
 - `rings the focused control in ember` (UIR-03 AC 13): press `Tab` up to 40 times until `document.activeElement` is a rail button (`data-testid` starts with `hud-`); its `outline-style` `solid`, `outline-width` `3px`, `outline-color` `rgb(204, 78, 26)`, `outline-offset` `2px`.
 - `meets 4.5:1 on the eight contrast pairs of the design` (UIR-03 AC 14): for rows 1 to 8 of design § Contrast, read the text `color` and the background's `background-color` and assert `ratio >= 4.5`; also assert the exact colours of each row (e.g. row 1: `rgb(42, 26, 16)` on `rgb(234, 214, 173)`). Row 7 is `.skill-row.is-locked` (its own `color` on its own `background-color`, `rgb(87, 75, 62)` on `rgb(234, 214, 173)`).
-- `adds no animation or transition to buttons, rail and timer` (UIR-03 AC 15): `hero-close`, `hud-heroes` and, in a miniboss fight, `.boss-timer`: `animation-name` `none`, `transition-duration` `0s`.
+- `adds no animation or transition to buttons, rail and timer` (UIR-03 AC 15): `hero-close`, `hud-heroes`, `auto-click-button` (chapter 2) and, in a miniboss fight, `.boss-timer`: `animation-name` `none`, `transition-duration` `0s`.
 
 Battle HUD (UIR-04 to UIR-12):
 
@@ -1720,7 +2080,25 @@ Battle HUD (UIR-04 to UIR-12):
 - `draws the battle bar, leader card and skill frames` (UIR-10 AC 23 to 26): `.battle-bar` `offsetWidth` 984, `offsetHeight` 124, `background-color` `rgb(234, 214, 173)`, radius `12px`; `leader-card` `offsetWidth` 240, `offsetHeight` 104, `background-color` `rgb(43, 29, 20)`, `border-top-color` `rgb(176, 122, 58)`; `.leader-face` `box-shadow` contains `rgb(224, 180, 90) 0px 0px 0px 3px`; `.leader-name` `font-size` `17px`, `color` `rgb(243, 213, 138)`; `.leader-bonus` `color` `rgb(244, 230, 200)`; `skill-slot-1 img`: `offsetWidth` 150, `offsetHeight` 62, `border-top-width` `2px`, `border-top-color` `rgb(176, 122, 58)`, radius `8px`, `background-color` `rgb(28, 18, 12)`, `box-shadow` contains `rgb(224, 180, 90) 0px 0px 0px 2px`; `skill-key-1`: `offsetWidth` 20, `background-color` `rgb(28, 18, 12)`, `border-top-color` `rgb(224, 180, 90)`, `color` `rgb(243, 213, 138)`.
 - `draws the lock mark of a locked skill in gold on dark` (UIR-10 AC 27): copies `{ 'kael:1': 1 }`; `skill-slot-2 .skill-lock-mark`: `background-color` `rgba(28, 18, 12, 0.85)`, `color` `rgb(224, 180, 90)`.
 - `shows the dark frame behind a skill image that fails to load` (edge case UIR-10): `page.route('**/assets/heroes/kael_charge.jpg', (route) => route.abort())`; `skill-slot-2 img` `background-color` `rgb(28, 18, 12)`.
-- `draws the auto click card on parchment with a green switch when on` (UIR-11 AC 29): `progress: { chapter: 2 }`; `auto-click` `background-color` `rgb(234, 214, 173)`, radius `10px`; `auto-click-toggle` unchecked `background-color` `rgb(61, 42, 28)`; after `check()` `rgb(63, 143, 58)`; `auto-click-upgrade` `background-color` `rgb(168, 67, 26)`.
+- `draws the auto click window on parchment with a green switch when on` (UIR-11 AC 29): `progress: { chapter: 2 }`; click `auto-click-button`; `auto-click-popover` `background-color` `rgb(234, 214, 173)`, radius `10px`, `offsetWidth` 240; `auto-click-toggle` checked `background-color` `rgb(63, 143, 58)`; after `uncheck()` `rgb(61, 42, 28)`; `auto-click-upgrade` `background-color` `rgb(168, 67, 26)`.
+
+Round auto click button and its window (UIR-19; `progress: { chapter: 2 }` unless said otherwise):
+
+- `shows the round auto click button in the bar with A and 500 ms, and nothing left of the monster` (AC 1 to 3): `auto-click-button` `offsetWidth` 56, `offsetHeight` 56, `background-color` `rgb(43, 29, 20)`, `background-image` contains `data:image/svg+xml`; `auto-click-key` text `A`, `offsetWidth` 20; `auto-click-rate` text `500 ms`; the button's bounding box lies inside the box of `.battle-bar`; no element with a test id starting `auto-click` has a bounding box whose right edge is left of the monster centre (scene x 670, converted with the canvas box: `canvasBox.x + 670 * canvasBox.width / 1024`) while the window is closed.
+- `shows no auto click button in chapter 1` (AC 3): `progress: { chapter: 1 }`; `auto-click-button` hidden; `auto-click-popover` hidden.
+- `rings the button green while the auto click is on and bronze when it is off` (AC 4, 5): on: `border-top-color` `rgb(95, 211, 90)`, `box-shadow` contains `rgba(95, 211, 90, 0.75) 0px 0px 14px 4px`; open the window, `uncheck()` the switch, close it with Escape: `border-top-color` `rgb(176, 122, 58)` and `box-shadow` does not contain `95, 211, 90`.
+- `opens the window on a click with the focus on the switch` (AC 6, 18): click `auto-click-button`; `auto-click-popover` visible; button `aria-expanded` `true`; `auto-click-toggle` is focused (`toBeFocused()`); window `role` `dialog`, `aria-label` `Auto clique`.
+- `opens the window with Enter on the focused button` (AC 6): `auto-click-button` `.focus()`; `page.keyboard.press('Enter')`; window visible.
+- `holds the old card's controls in order, the reset from chapter 2` (AC 7): `progress: { chapter: 3 }`; open; inside `auto-click-popover`: `auto-click-toggle` checked, `auto-click-interval` `500 ms`, `auto-click-crystals` `Cristais: 0`, `auto-click-upgrade` `Melhorar: 250 ms (10 cristais)`, `reset-account` `Resetar conta (+3 cristais)`, in this DOM order.
+- `opens and closes the window with A, the focus back on the button` (AC 8, 9): `page.keyboard.press('a')`; visible and switch focused; press `a` again; hidden, `aria-expanded` `false`, `auto-click-button` focused.
+- `closes the window with Escape without pausing` (AC 9, 10): open; `Escape`; window hidden, `.pause-menu` hidden, button focused; `Escape` again; `.pause-menu` visible.
+- `closes the window on a click on the monster, and the click still hits` (AC 11): `const before = await health(page)` (as in `autoClick.spec.js`, with the switch turned off first so only the click hits); open; click the canvas at the monster centre; window hidden; `expect.poll(() => health(page))` below `before`.
+- `does not hit the monster when the button or the window is clicked` (AC 19): install the hit counter of `autoClick.spec.js:61-68`; click `auto-click-button`, then `auto-click-toggle`, then `auto-click-button`; the counter is 0.
+- `ignores A while a hero screen is open` (AC 14): click `hud-heroes`; press `a`; `auto-click-popover` hidden; close the hero screen; press `a`; visible.
+- `ignores A typed into a text field` (AC 12): `page.evaluate` appends `<input type="text" data-testid="probe-field">` to `document.body`; focus it; press `a`; the window stays hidden and the field's value is `a`; remove the field.
+- `closes the window when its reset button opens the dialog` (AC 16): `progress: { chapter: 3 }`; open; click `reset-account`; `reset-dialog` visible and `auto-click-popover` hidden.
+- `keeps the bar's boxes apart and the window left of the rail` (AC 21): bounding boxes of `.skill-bar-host`, `.hud-auto-click`, `.hud-farm` and `leader-card` do not intersect each other; none intersects `.hero-hud`; each lies inside `.battle-bar`; with the window open (chapter 3, reset shown), the box of `auto-click-popover` lies inside the canvas box and its right edge is left of the left edge of `.hero-hud`.
+- `test.describe('on a 390 x 844 phone')` with `test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })` - `keeps the round button and its window inside the scaled scene` (AC 22, edge case): `progress: { chapter: 3 }`; tap `auto-click-button`; the boxes of the button, `auto-click-key`, `auto-click-rate` and `auto-click-popover` lie inside the canvas box; the button's width divided by the canvas width equals `56 / 1024` within 0.002.
 - `draws the farm switch as a round skull button with an ember ring when on` (UIR-11 AC 30, 31): `.farm-toggle input` `offsetWidth` 56, `offsetHeight` 56, `background-color` `rgb(43, 29, 20)`, `border-top-width` `3px`, `border-top-color` `rgb(176, 122, 58)`, `background-image` contains `data:image/svg+xml`; `.farm-toggle` `font-size` `12px`, `color` `rgb(42, 26, 16)`, text contains `Farm boss`; then `node.checked = true` by `evaluate` (no event): `border-top-color` `rgb(232, 116, 42)`, `box-shadow` contains `rgba(232, 116, 42, 0.75) 0px 0px 12px 2px`.
 - `dims the fight and draws the pause card on parchment` (UIR-12): press `Escape`; `.pause-menu` `background-color` `rgba(28, 18, 12, 0.62)`; `.pause-card` `background-color` `rgb(234, 214, 173)`, `offsetWidth` 420, radius `12px`; `.pause-title` `font-size` `40px`, `color` `rgb(42, 26, 16)`, `font-family` starts with `Cinzel`. Then `Escape`/`1. Continue`, open Heróis: `.hero-panel` `background-color` `rgba(28, 18, 12, 0.62)`.
 
@@ -1756,13 +2134,13 @@ Skill thumbnails (UIR-16):
 
 ---
 
-### T27: Review screenshots of the Grove theme [ ]
+### T29: Review screenshots of the Grove theme [ ]
 
 **Owner**: test-engineer
 **What**: `npm run ui:shots -- uiRedesign` writes every screenshot of design § Review Screenshots for desktop and phone (UIR-18).
 **Where**: `game/ui-review/uiRedesign.shots.js` (new)
 **Read first**: `game/ui-review.config.js`; `game/ui-review/support/shots.js`; `game/ui-review/heroAscension.shots.js` (whole file: `watch`, `report`, `startAs`); `game/ui-review/bulkSell.shots.js:1-80` (equipment, bulk sale); design § Review Screenshots
-**Depends on**: T26
+**Depends on**: T28
 **Requirement**: UIR-18
 
 **Contract**: one `test()` per group, each starting with `const problems = watch(page)` and ending with `report(testInfo, '<group>', problems)` (copy both helpers from `heroAscension.shots.js`). Use `shot(page, testInfo, '<NN>-<name>')` with the exact names of the design table; move the mouse to `(0, 0)` before every shot that is not a hover state.
@@ -1770,7 +2148,7 @@ Skill thumbnails (UIR-16):
 | Test | Setup | Shots |
 | --- | --- | --- |
 | `menu and preloader` | `mockBackend` with `users: { yan: 'secret123' }`; before `page.goto('/')`, hold `**/assets/heroes/vex_sprite.png` with a route that awaits a promise; click the canvas; shot `01-preloader` once the Preloader scene is active; release the route | `01-preloader`, `02-menu-login` (focus the username field with Tab), `03-menu-welcome` (after login), `04-path-choice` (on a fresh page: `Sign up` with user `novo` / `secret123`) |
-| `battle` | `chapter(bare('FIRE', 10, 20, 30))`, `progress: { yan: { chapter: 2, stage: 1, encounter: 'MINIBOSS', phase: 1 } }`, `talents: { yan: { COMBO: 10 } }`, copies `{ 'kael:3': 1 }`; wait 2 s in the fight | `05-battle-boss`; five canvas clicks on the monster then `06-battle-combo`; hover `skill-slot-1` then `09-skill-tooltip`; `heroUi.showNotice('Carta: Lyra Folhaveloz')` then `10-notice`; `Escape` then `11-pause`; `1. Continue`; click `reset-account` then `12-reset-dialog`; `Cancelar`; set `.farm-toggle input` `checked = true` by `evaluate` then `13-farm-on` |
+| `battle` | `chapter(bare('FIRE', 10, 20, 30))`, `progress: { yan: { chapter: 3, stage: 1, encounter: 'MINIBOSS', phase: 1 } }` (chapter 3, so the window shows the reset button), `talents: { yan: { COMBO: 10 } }`, copies `{ 'kael:3': 1 }`; wait 2 s in the fight | `05-battle-boss`; five canvas clicks on the monster then `06-battle-combo`; hover `skill-slot-1` then `09-skill-tooltip`; `heroUi.showNotice('Carta: Lyra Folhaveloz')` then `10-notice`; `Escape` then `11-pause`; `1. Continue`; press `a` (window opens, switch focused) then `14-auto-click-window`; click `reset-account` then `12-reset-dialog`; `Cancelar`; set `.farm-toggle input` `checked = true` by `evaluate` then `13-farm-on`; press `a`, `uncheck()` `auto-click-toggle`, press `Escape`, then `15-auto-click-off` |
 | `light enemy and locked skills` | `chapter(bare('LIGHT'))`, copies `{ 'kael:1': 1 }` | `07-battle-light`, `08-battle-locked` |
 | `hero screens` | copies `{ 'kael:5': 1, 'kael:1': 3, 'lyra:4': 1, 'orina:7': 1, 'seraphine:2': 1, 'vex:6': 1 }`, equipment of `bulkSell.shots.js` (`WORN` and `BAG`), `talentPoints: { yan: 3 }` | `20-heroes`; Kael card `21-hero-detail`; Mochila `22-bag`; a bag entry `23-bag-detail`; Fusão `24-fusion`; Líder `26-leader`; Equipamento `27-equipment`; hover `equip-piece-b1` `28-piece-tooltip`; `bulk-sell-start` and three tiles `29-bulk-sell`; Talentos `30-talents`; Rever chefes `31-boss-map` |
 | `fusion error` | copies `{ 'kael:4': 3 }`; open Fusão; route `**/api/heroes/*/fuse` to status 500; click `fusion-button-kael-4` | `25-fusion-error` |
@@ -1779,27 +2157,27 @@ Skill thumbnails (UIR-16):
 
 1. Write the file.
 2. Run `cd game && npm run ui:shots -- uiRedesign`.
-3. Check that `.specs/features/ui-redesign/ui-review/` holds 50 files (25 names x 2 projects).
+3. Check that `.specs/features/ui-redesign/ui-review/` holds 54 files (27 names x 2 projects).
 
 **Tests**: none - screenshots for the review, not a test of the game; never part of the e2e suite.
-**Gate**: `cd game && npm run ui:shots -- uiRedesign` passes and `ls .specs/features/ui-redesign/ui-review/*.png | wc -l` prints `50`.
+**Gate**: `cd game && npm run ui:shots -- uiRedesign` passes and `ls .specs/features/ui-redesign/ui-review/*.png | wc -l` prints `54`.
 **Done when**:
 
 - [ ] The gate passes; every `CONSOLE-REPORT` line reads `clean` (any other line goes into the commit message body).
-- [ ] The commit holds the script and the 50 screenshots.
+- [ ] The commit holds the script and the 54 screenshots.
 
 **Commit**: `test(game): screenshot the grove theme for the ui review`
 
 ---
 
-### T28: Visual review of the Grove theme [ ]
+### T30: Visual review of the Grove theme [ ]
 
 **Owner**: ui-artist
 **What**: Review every restyled screen against `reference.jpg` and the design, on desktop and phone, and write the findings (UIR-01 to UIR-18).
 **Where**: `.specs/features/ui-redesign/ui-review.html` (new; the template is under **Read first**)
-**Read first**: `.claude/templates/ui-review.html` (the report template); `.specs/features/ui-redesign/reference.jpg`; spec (all); design § Palette, § Contrast, § Recipes, § Screen Map, § Layout; the 50 screenshots of T27
-**Depends on**: T27
-**Requirement**: UIR-01, UIR-02, UIR-03, UIR-04, UIR-05, UIR-06, UIR-07, UIR-08, UIR-09, UIR-10, UIR-11, UIR-12, UIR-13, UIR-14, UIR-15, UIR-16, UIR-17, UIR-18
+**Read first**: `.claude/templates/ui-review.html` (the report template); `.specs/features/ui-redesign/reference.jpg`; spec (all); design § Palette, § Contrast, § Recipes, § Screen Map, § Layout, § Auto click button and window; the 54 screenshots of T29
+**Depends on**: T29
+**Requirement**: UIR-01, UIR-02, UIR-03, UIR-04, UIR-05, UIR-06, UIR-07, UIR-08, UIR-09, UIR-10, UIR-11, UIR-12, UIR-13, UIR-14, UIR-15, UIR-16, UIR-17, UIR-18, UIR-19
 
 **Steps**:
 
@@ -1807,13 +2185,14 @@ Skill thumbnails (UIR-16):
 2. Check the 15 skill thumbnails (shots `21`, `23`, `05`, `09`): no magenta, no purple effect lost to the cutout.
 3. Audit contrast rows 9 to 16 of design § Contrast and any text the table does not list (talent upgrade buttons on their branch colours included).
 4. Check the phone shots: nothing cut off, nothing overlapping.
-5. Write `ui-review.html` with a verdict (OK or CHANGES) and one numbered finding per problem (screen, selector, what is wrong, the exact fix). The orchestrator turns each finding into a new task appended to this file.
+5. Check the auto click against the mock-up's round button and popover (shots `05`, `14`, `15`, `12`): green glow on, bronze off, `A` badge readable, the window's tail pointing at the button, the window clear of the hero rail, the focus ring visible on the switch in `14`.
+6. Write `ui-review.html` with a verdict (OK or CHANGES) and one numbered finding per problem (screen, selector, what is wrong, the exact fix). The orchestrator turns each finding into a new task appended to this file.
 
 **Tests**: none - a visual review produces no code.
 **Gate**: `test -s .specs/features/ui-redesign/ui-review.html`
 **Done when**:
 
-- [ ] `ui-review.html` exists with a verdict and covers the four steps.
+- [ ] `ui-review.html` exists with a verdict and covers steps 1 to 5.
 
 **Commit**: `docs(ui-redesign): add the ui review`
 
@@ -1827,15 +2206,15 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 
 Phase 1:  T1 → T2 → T3
 Phase 2:  T4 → T5
 Phase 3:  T6 → T7 → T8 → T9 → T10 → T11
-Phase 4:  T12 → T13 → T14 → T15
-Phase 5:  T16 → T17 → T18
-Phase 6:  T19 → T20 → T21 → T22 → T23 → T24
-Phase 7:  T25
-Phase 8:  T26 → T27
-Phase 9:  T28
+Phase 4:  T12 → T13 → T14 → T15 → T16 → T17
+Phase 5:  T18 → T19 → T20
+Phase 6:  T21 → T22 → T23 → T24 → T25 → T26
+Phase 7:  T27
+Phase 8:  T28 → T29
+Phase 9:  T30
 ```
 
-Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`); batch 2 = Phase 3 (T6 to T11, `game-dev`); batch 3 = Phases 4 and 5 (T12 to T18, `game-dev`); batch 4 = Phases 6 and 7 (T19 to T25, `game-dev`); batch 5 = Phase 8 (T26, T27, `test-engineer`); then T28 (`ui-artist`). A fresh `test-engineer` that wrote none of these tasks runs as the Verifier afterwards.
+Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`); batch 2 = Phase 3 (T6 to T11, `game-dev`); batch 3 = Phase 4 (T12 to T17, `game-dev`, except T15 which goes to `test-engineer` between T14 and T16); batch 4 = Phase 5 (T18 to T20, `game-dev`); batch 5 = Phases 6 and 7 (T21 to T27, `game-dev`); batch 6 = Phase 8 (T28, T29, `test-engineer`); then T30 (`ui-artist`). A fresh `test-engineer` that wrote none of these tasks runs as the Verifier afterwards.
 
 ---
 
@@ -1855,22 +2234,24 @@ Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`);
 | T10 | 1 pure function | ✅ Granular |
 | T11 | 1 HUD element, 1 method | ✅ Cohesive |
 | T12 | 1 stylesheet block | ✅ Granular |
-| T13 | 1 stylesheet block | ✅ Granular |
-| T14 | 1 stylesheet block | ✅ Granular |
-| T15 | 4 rules | ✅ Granular |
-| T16 | 1 stylesheet section | ✅ Granular |
-| T17 | 1 constant and 1 call | ✅ Granular |
-| T18 | 2 calls and 1 new test file | ✅ Granular |
-| T19 | 4 rules | ✅ Granular |
-| T20 | 1 stylesheet section | ✅ Granular |
-| T21 | 1 screen's rules | ✅ Granular |
-| T22 | 5 rules | ✅ Granular |
-| T23 | 2 rules | ✅ Granular |
-| T24 | 6 rules | ✅ Granular |
-| T25 | 1 document section | ✅ Granular |
-| T26 | 1 e2e file | ✅ Granular |
-| T27 | 1 shots file | ✅ Granular |
-| T28 | 1 review file | ✅ Granular |
+| T13 | 1 stylesheet block and 2 position constants | ✅ Cohesive (the bar's layout) |
+| T14 | 1 HUD element of 1 scene: markup, 5 methods, 3 hooks | ✅ Cohesive (one control) |
+| T15 | 2 e2e files, 6 edits | ✅ Cohesive (one regression) |
+| T16 | 1 stylesheet block | ✅ Granular |
+| T17 | 4 rules | ✅ Granular |
+| T18 | 1 stylesheet section | ✅ Granular |
+| T19 | 1 constant and 1 call | ✅ Granular |
+| T20 | 2 calls and 1 new test file | ✅ Granular |
+| T21 | 4 rules | ✅ Granular |
+| T22 | 1 stylesheet section | ✅ Granular |
+| T23 | 1 screen's rules | ✅ Granular |
+| T24 | 5 rules | ✅ Granular |
+| T25 | 2 rules | ✅ Granular |
+| T26 | 6 rules | ✅ Granular |
+| T27 | 1 document section | ✅ Granular |
+| T28 | 1 e2e file | ✅ Granular |
+| T29 | 1 shots file | ✅ Granular |
+| T30 | 1 review file | ✅ Granular |
 
 ## Diagram-Definition Cross-Check
 
@@ -1904,14 +2285,16 @@ Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`);
 | T26 | T25 | T25 → T26 | ✅ Match |
 | T27 | T26 | T26 → T27 | ✅ Match |
 | T28 | T27 | T27 → T28 | ✅ Match |
+| T29 | T28 | T28 → T29 | ✅ Match |
+| T30 | T29 | T29 → T30 | ✅ Match |
 
 ## Test Co-location Validation
 
 | Task | Code Layer Created/Modified | Matrix Requires | Task Says | Status |
 | --- | --- | --- | --- | --- |
-| T1 | Game HTML | none | none | ✅ OK (checked by T26) |
-| T2 | Game CSS | none | none | ✅ OK (checked by T26) |
-| T3 | Game CSS | none | none | ✅ OK (checked by T26) |
+| T1 | Game HTML | none | none | ✅ OK (checked by T28) |
+| T2 | Game CSS | none | none | ✅ OK (checked by T28) |
+| T3 | Game CSS | none | none | ✅ OK (checked by T28) |
 | T4 | Art tool | none (output check in Gate) | none + output check | ✅ OK |
 | T5 | Assets | none (output check in Gate) | none + output check + 3 e2e suites | ✅ OK |
 | T6 | Game CSS | none | none | ✅ OK |
@@ -1921,19 +2304,21 @@ Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`);
 | T10 | Game domain | unit | unit | ✅ OK |
 | T11 | Game scene + CSS | unit (jsdom) | unit | ✅ OK |
 | T12 | Game CSS | none | none | ✅ OK |
-| T13 | Game CSS | none | none | ✅ OK |
-| T14 | Game CSS | none | none | ✅ OK |
-| T15 | Game CSS | none | none | ✅ OK |
-| T16 | Game CSS | none | none | ✅ OK |
-| T17 | Game scene | unit (jsdom) | unit | ✅ OK |
-| T18 | Game scene | unit (jsdom) | unit | ✅ OK |
-| T19 | Game CSS | none | none | ✅ OK |
-| T20 | Game CSS | none | none | ✅ OK |
+| T13 | Game CSS + scene and HeroUi constants | unit (jsdom) | unit | ✅ OK |
+| T14 | Game scene | unit (jsdom) | unit | ✅ OK |
+| T15 | e2e | e2e | e2e (regression) | ✅ OK |
+| T16 | Game CSS | none | none | ✅ OK (checked by T28) |
+| T17 | Game CSS | none | none | ✅ OK |
+| T18 | Game CSS | none | none | ✅ OK |
+| T19 | Game scene | unit (jsdom) | unit | ✅ OK |
+| T20 | Game scene | unit (jsdom) | unit | ✅ OK |
 | T21 | Game CSS | none | none | ✅ OK |
 | T22 | Game CSS | none | none | ✅ OK |
-| T23 | Game CSS | none | none + `bossMap.spec.js` | ✅ OK |
+| T23 | Game CSS | none | none | ✅ OK |
 | T24 | Game CSS | none | none | ✅ OK |
-| T25 | Documentation | none | none | ✅ OK |
-| T26 | e2e | e2e | e2e | ✅ OK |
-| T27 | Review screenshots | none | none | ✅ OK |
-| T28 | Review document | none | none | ✅ OK |
+| T25 | Game CSS | none | none + `bossMap.spec.js` | ✅ OK |
+| T26 | Game CSS | none | none | ✅ OK |
+| T27 | Documentation | none | none | ✅ OK |
+| T28 | e2e | e2e | e2e | ✅ OK |
+| T29 | Review screenshots | none | none | ✅ OK |
+| T30 | Review document | none | none | ✅ OK |
