@@ -35,6 +35,7 @@ With the prices 10/25/50/100 (185 crystals in total), the auto click reaches 50 
 | --- | --- | --- | --- |
 | What the reset clears | The campaign (`progress` back to chapter 1, stage 1, first phase, not completed), every `player_talents` row and every `talent_point_awards` row of the player, including `legacy` | User choice "Progresso da campanha, Talentos e pontos" | y |
 | What the reset keeps | Coins (`wallets`, `wallet_drop_queues`), equipment, cards and heroes, crystals, the auto click level, the starting element | User choice; crystals and the auto click level are the point of the reset | y |
+| Chapter bosses already beaten | The reset keeps `clearedChapters`: a chapter boss beaten before the reset gives no guaranteed card in the new run, only the normal roll | Decision 2026-11-12: the guaranteed card unlocks the next chapter's hero, which a player who resets already owns; clearing it would hand out free cards on every reset and speed up ascension | y |
 | Reward | `min(chapter, 5)` crystals: chapter 2 pays 2, chapter 5 pays 5, a completed campaign pays 5 | User: "no capitulo 2, ganha 2 cristais, no capitulo 5 ganha 5"; completed = 5 by user choice | y |
 | When the reset is open | WHILE the campaign chapter is 2 or later, or the campaign is completed | User: "a partir do capitulo 2" | y |
 | Auto click after a reset | The auto click is unlocked WHILE chapter ≥ 2, the campaign is completed, or the player has reset at least once. The backend stores a reset count per player | User choice "Libera após 1º reset" | y |
