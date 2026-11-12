@@ -1,3 +1,4 @@
+import { leaderBonusText } from '../../../domain/heroes/leaderBonus';
 import { skillLevelOf } from '../../../domain/skills/skillLevel';
 import { art, el, sprite } from './dom';
 import { attachSkillTooltip } from './skillTooltip';
@@ -109,7 +110,7 @@ export const renderLeaderCard = (leader) =>
     face.append(sprite(leader.id, ''));
     crown.innerHTML = CROWN_ICON;
     portrait.append(face, crown);
-    text.append(el('span', 'leader-name', leader.name), el('span', 'leader-bonus', `Líder · ${leader.leaderBonus}`));
+    text.append(el('span', 'leader-name', leader.name), el('span', 'leader-bonus', `Líder · ${leaderBonusText(leader)}`));
     card.append(portrait, text);
 
     return card;

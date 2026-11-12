@@ -1,4 +1,5 @@
 import { ELEMENT_LABELS, starsClass } from '../../../domain/heroes/heroes';
+import { leaderBonusText } from '../../../domain/heroes/leaderBonus';
 import { starPowerText } from '../../../domain/heroes/starBonus';
 import { skillLevelOf, skillLevelText } from '../../../domain/skills/skillLevel';
 import { art, el, sprite, starsText } from './dom';
@@ -79,7 +80,7 @@ export const renderHeroDetail = (hero) =>
         el('div', 'hero-element', `Elemento: ${ELEMENT_LABELS[hero.element]}`),
         el('div', starsClassName(hero), hero.owned ? `Estrelas: ${starsText(hero.stars)}` : 'Não obtido'),
         ...(power ? [ el('div', 'hero-star-power', power, { testid: 'hero-star-power' }) ] : []),
-        el('div', 'hero-bonus', `Bônus de líder: ${hero.leaderBonus}`)
+        el('div', 'hero-bonus', `Bônus de líder: ${leaderBonusText(hero)}`)
     );
     detail.append(sprite(hero.id, hero.name, 'hero-detail-portrait'), text, renderSkillList(hero));
 

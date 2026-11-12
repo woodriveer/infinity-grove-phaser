@@ -1,5 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
-import { clickHits } from './leaderBonus';
+import { clickHits, leaderBonusText } from './leaderBonus';
+
+describe('leaderBonusText', () => {
+    it('shows the bonus of Lyra as it is and marks the others as coming soon', () => {
+        expect(leaderBonusText({ id: 'lyra', leaderBonus: 'Clique duplo.' })).toBe('Clique duplo.');
+        [ 'kael', 'orina', 'seraphine', 'vex' ].forEach((id) => expect(leaderBonusText({ id, leaderBonus: 'X.' })).toBe('X. (em breve)'));
+    });
+});
 
 describe('clickHits', () => {
     it('is a double click for Lyra on a roll below 30', () => {

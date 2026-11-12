@@ -86,7 +86,7 @@ describe('renderHeroDetail', () => {
         expect(detail.querySelector('.hero-class').textContent).toBe('Classe: Guerreiro');
         expect(detail.querySelector('.hero-element').textContent).toBe('Elemento: Fogo');
         expect(detail.querySelector('.hero-stars').textContent).toBe('Estrelas: 1★');
-        expect(detail.querySelector('.hero-bonus').textContent).toBe('Bônus de líder: Bonus kael');
+        expect(detail.querySelector('.hero-bonus').textContent).toBe('Bônus de líder: Bonus kael (em breve)');
         expect(detail.querySelectorAll('.skill-row')).toHaveLength(3);
     });
 

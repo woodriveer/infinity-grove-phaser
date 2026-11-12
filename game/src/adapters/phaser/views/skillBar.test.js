@@ -197,7 +197,7 @@ describe('renderLeaderCard', () => {
 
         expect(card.querySelector('img').getAttribute('src')).toBe('assets/heroes/kael_sprite.png');
         expect(card.querySelector('.leader-name').textContent).toBe('Kael Raizférrea');
-        expect(card.querySelector('.leader-bonus').textContent).toBe('Líder · +25% contra chefes');
+        expect(card.querySelector('.leader-bonus').textContent).toBe('Líder · +25% contra chefes (em breve)');
     });
 
     it('is empty without a leader', () => {
