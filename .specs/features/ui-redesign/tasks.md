@@ -11,7 +11,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 **Spec**: `.specs/features/ui-redesign/spec.md`
 **Design**: `.specs/features/ui-redesign/design.md`
 **Reference image**: `.specs/features/ui-redesign/reference.jpg` (look at it before any CSS task)
-**Status**: Draft for the owner's approval (Q1 decided as D1 on 2026-11-12: round auto click button, its window and the key `A`, tasks T13 to T16; written with the defaults of the open Q2 to Q5)
+**Status**: Approved by the owner on 2026-11-12, defaults of Q2 to Q5 accepted (Q1 decided as D1 on 2026-11-12: round auto click button, its window and the key `A`, tasks T13 to T16; written with the defaults of the open Q2 to Q5)
 
 Rules for every task:
 

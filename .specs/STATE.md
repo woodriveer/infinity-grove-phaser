@@ -170,6 +170,14 @@
 - **Date**: 2026-10-31
 - **Status**: proposed (owner decisions 1 to 3 of 2026-10-31; awaiting approval of the spec and the answers to Q1 and Q2). Supersedes the PHYSICAL / MAGICAL damage types and the two defenses of `elements` and `hero-skills`, the `MAGICAL_BREAK` talent of `talents` and AD-017 (10 talents per grade becomes 9), the "physical" / "magical" wording of the `hero-ascension` Skill Levels table, and "a damage type beside PHYSICAL and MAGICAL" of AD-018 (`hero-team`, not built, is revised when it is picked up; spec Q2)
 
+### AD-022
+- **Decision**: The game's look is the Grove theme of spec `ui-redesign`: the palette and recipe tokens of `game/public/style.css :root` (parchment panels, dark wood frames, ember primary and wood secondary buttons, chips), Cinzel 700 for headings and numbers, Figtree for body text. New UI reads the recipe tokens; painted textures are switched on through `--texture-parchment` and `--texture-wood`.
+- **Reason**: Owner request of 2026-11-12 ("redesenhasse todo o jogo no estilo da imagem").
+- **Trade-off**: Contrast is held by the token values; a new colour must be checked against the parchment and wood bases. The Organic look (Caprasimo, cream pills) is retired.
+- **Scope**: `game/public/style.css`, `game/index.html`, the Phaser colour constants of `ClickerGame.js`, `MainMenu.js`, `Preloader.js`.
+- **Date**: 2026-11-12
+- **Status**: active (owner approval of spec `ui-redesign` on 2026-11-12)
+
 ## Handoff
 
 - **Feature**: five features from the owner's batch of 2026-10-21, all game side except two backend pieces: `combat-hud`, `click-power`, `talents`, `equipment-ui`, `boss-map` (`.specs/features/*`)

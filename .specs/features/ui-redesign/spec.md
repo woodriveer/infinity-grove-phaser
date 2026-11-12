@@ -4,7 +4,7 @@ Reference: `.specs/features/ui-redesign/reference.jpg` (the owner's Gemini mock-
 
 ## Open Questions for the Owner
 
-Each question has a recommended default. The tasks are written with the default; a different answer changes the tasks named in the question before any task runs. Q1 is decided (below); Q2 to Q5 are open.
+Each question has a recommended default. The tasks are written with the default; a different answer changes the tasks named in the question before any task runs. Q1 is decided (below). The owner accepted the recommended defaults of Q2 to Q5 on 2026-11-12 ("2. segue recomendação, 3. manter, 4. concordo, 5. ok"), so no question is open.
 
 | # | Question | Recommended default | Tasks it changes |
 | --- | --- | --- | --- |
@@ -39,7 +39,7 @@ The game looks like a flat mobile app: cream pills with large rounded corners ov
 | Monster art (the mock-up's fire treant) | The monster is a placeholder rectangle today and enemy design per chapter is still open (AD-006, AD-008). Wiring art per enemy is new data; it is its own feature. |
 | A key `F` and its badge on the farm button | Not asked for (decision D1); the farm button keeps working by click only. |
 | `Nível 5` / `Nível 10` under a locked skill | A skill unlocks with stars, not levels (`characters`, AD-020); the text would be wrong. The lock mark stays. |
-| `Renascer` button on the rail | Q5 default (open). |
+| `Renascer` button on the rail | Q5 default, accepted by the owner. |
 | Translating the English HUD and menu texts | Q2 default; debt TD-001. |
 | New labels from the mock-up (`Vida do Chefe`, `Tempo Restante`) | They are text the game does not have; Q2 keeps text unchanged. |
 | Larger HP bar, or moving HUD elements other than the bottom bar's | The bar keeps 240 x 16 px (about 20 unit tests pin it). Only the skill bar, the farm button and the auto click move, to make room for the auto click button in the bar (D1, design § Layout). |
@@ -59,23 +59,23 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 | --- | --- | --- | --- |
 | Scope of the redesign | Every screen: login and path choice, preloader, battle HUD, every hero screen (Heróis, detail, Mochila, bulk sell, Fusão, Líder, Equipamento with tiles and tooltip, Talentos, Rever chefes), pause, reset dialog, auto click, farm switch, notices, element wheel, skill tooltip; desktop and phone viewports | Orchestrator assumption 1; one theme for the whole game | n (owner confirms at approval) |
 | Kind of change | Visual only: no backend change, no new game rule; layout changes only where the data already exists (timer ring, enemy chips, weak element chip, round farm button). The one behaviour change is D1: the auto click controls move into a window opened by a round button or the key `A` | Orchestrator assumption 2; D1 is the owner's decision | n (D1: y) |
-| How the look is built | CSS tokens and recipes in `game/public/style.css`, the Cinzel web font and the existing assets; Phaser colours for the HP bar, damage numbers, menu oval and preloader bar; painted textures only through prompts (Q4) | Orchestrator assumption 3; ships without new art | n |
-| Tests and accessibility | Every existing test id, class name and text stays; contrast and focus are not reduced; no new animation | Orchestrator assumption 4 | n |
+| How the look is built | CSS tokens and recipes in `game/public/style.css`, the Cinzel web font and the existing assets; Phaser colours for the HP bar, damage numbers, menu oval and preloader bar; painted textures only through prompts (Q4) | Orchestrator assumption 3; ships without new art | y |
+| Tests and accessibility | Every existing test id, class name and text stays; contrast and focus are not reduced; no new animation | Orchestrator assumption 4 | y |
 | Auto click placement | D1: round button at scene (867, 686) in the battle bar, window above it; the left card is removed | Owner decision 2026-11-12 | y |
-| Press outside the open auto click window | It closes the window and still does what it does today (a press on the canvas hits the monster); focus stays where the press put it | The window is not modal; the fight must not lose a click the player meant for it | n |
-| `A` while a hero screen, the pause menu or the reset dialog is open | Does nothing | Those cover the battle bar; the window would open behind them | n |
-| Existing English text | Q2 default: unchanged | Q2 | n |
-| Element wheel | Q3 default: kept and restyled | Q3 | n |
-| Painted textures | Q4 default: CSS now, art later through the `--texture-*` tokens | Q4 | n |
-| Rail buttons and reset button | Q5 default: seven buttons, `Rever chefes` kept; the reset button lives in the auto click window | Q5 | n |
+| Press outside the open auto click window | It closes the window and still does what it does today (a press on the canvas hits the monster); focus stays where the press put it | The window is not modal; the fight must not lose a click the player meant for it | y |
+| `A` while a hero screen, the pause menu or the reset dialog is open | Does nothing | Those cover the battle bar; the window would open behind them | y |
+| Existing English text | Q2 default: unchanged | Q2 | y |
+| Element wheel | Q3 default: kept and restyled | Q3 | y |
+| Painted textures | Q4 default: CSS now, art later through the `--texture-*` tokens | Q4 | y |
+| Rail buttons and reset button | Q5 default: seven buttons, `Rever chefes` kept; the reset button lives in the auto click window | Q5 | y |
 | Magenta skill thumbnails | Decided by the owner (in scope): the 15 skill images are re-cut with the existing `art/tools/cutout_hero.py` onto the dark background `#1c120c`, keeping their names and `.jpg` format, 512 px tall | Same file names mean no change to the backend seed, `dom.js` or any test fixture; JPEG keeps the files small (the 2.3 to 2.8 MB sources become about 60 KB) | y (owner, via orchestrator) |
-| Fonts | Cinzel 700 for headings, plaques, buttons and HUD numbers; Figtree stays the body font; Caprasimo is dropped | The mock-up's headings are a classical serif in small caps; its body text is a sans | n |
-| Damage number colours | Normal `#ffd35c` (gold), critical `#ff8a1f` (orange), both with a `#2a1408` outline | The mock-up's `15.7` is gold-orange with a dark outline; critical stays bigger (48 px) and warmer | n |
-| Weak element chip | `Fraco: <elemento>` names the element that hits the enemy for double (FIRE is weak to WATER, WATER to NATURE, NATURE to FIRE); LIGHT and DARKNESS enemies show no chip | Derived from the element table of `game/src/domain/combat/elements.js`; LIGHT and DARKNESS take at most 1x from any element, so they have no weakness | n |
-| New text | `Fraco: <elemento>` is the only new player text, in Portuguese (AD-007), with the labels of `ELEMENT_LABELS` (`Fogo`, `Água`, `Natureza`) | AD-007 | n |
+| Fonts | Cinzel 700 for headings, plaques, buttons and HUD numbers; Figtree stays the body font; Caprasimo is dropped | The mock-up's headings are a classical serif in small caps; its body text is a sans | y |
+| Damage number colours | Normal `#ffd35c` (gold), critical `#ff8a1f` (orange), both with a `#2a1408` outline | The mock-up's `15.7` is gold-orange with a dark outline; critical stays bigger (48 px) and warmer | y |
+| Weak element chip | `Fraco: <elemento>` names the element that hits the enemy for double (FIRE is weak to WATER, WATER to NATURE, NATURE to FIRE); LIGHT and DARKNESS enemies show no chip | Derived from the element table of `game/src/domain/combat/elements.js`; LIGHT and DARKNESS take at most 1x from any element, so they have no weakness | y |
+| New text | `Fraco: <elemento>` is the only new player text, in Portuguese (AD-007), with the labels of `ELEMENT_LABELS` (`Fogo`, `Água`, `Natureza`) | AD-007 | y |
 | Reference rendering for numbers in tests | Colours are asserted as the computed `rgb(...)` strings of `design.md`; the contrast ratios are computed from those values (WCAG 2.x relative luminance) | L-013: exact markers, not adjectives | y |
 
-**Open questions:** none unresolved - Q2 to Q5 at the top carry a recommended default, logged above with Confirmed? n until the owner approves; Q1 is decided (D1).
+**Open questions:** none - Q1 is decided (D1) and the owner accepted the defaults of Q2 to Q5 and approved the spec on 2026-11-12.
 
 ---
 
