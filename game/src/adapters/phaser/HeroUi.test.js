@@ -365,6 +365,13 @@ describe('HeroUi Rever chefes', () => {
 });
 
 describe('HeroUi skill bar', () => {
+    it('places the skill bar at 550, 686, left of the round buttons', () => {
+        const { scene, root } = createUi();
+        const index = root.findIndex((node) => node.querySelector('.skill-bar-host'));
+
+        expect(scene.add.dom.mock.calls[index]).toEqual([ 550, 686 ]);
+    });
+
     it('is empty until the heroes load and then shows the three slots of the leader', async () => {
         const ctx = createUi();
 

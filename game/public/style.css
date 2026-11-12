@@ -448,8 +448,10 @@ button:disabled {
     width: 984px;
     height: 124px;
     border-radius: var(--radius-lg);
-    background: var(--color-bg);
-    box-shadow: var(--shadow-lg);
+    background: var(--panel-bg);
+    box-shadow: var(--panel-shadow);
+    background-color: var(--parchment-200);
+    border: var(--panel-border);
 }
 
 /* Phaser centres a DOM element on the size it had when it was added, so the ones whose content changes get a fixed box */
@@ -544,8 +546,8 @@ button:disabled {
 }
 
 .hud-farm {
-    width: 160px;
-    height: 48px;
+    width: 80px;
+    height: 112px;
 }
 
 .hud-auto-click {
@@ -566,8 +568,8 @@ button:disabled {
 }
 
 .leader-host {
-    width: 230px;
-    height: 84px;
+    width: 240px;
+    height: 104px;
     justify-content: flex-start;
 }
 
@@ -997,7 +999,14 @@ button:disabled {
     display: flex;
     align-items: center;
     gap: 12px;
-    width: 230px;
+    width: 240px;
+    height: 104px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--frame-bg);
+    background-color: var(--wood-800);
+    border: var(--frame-border);
+    box-shadow: var(--frame-shadow);
 }
 
 .leader-card:empty {
@@ -1016,7 +1025,8 @@ button:disabled {
     height: 72px;
     overflow: hidden;
     border-radius: 50%;
-    background: var(--color-accent-200);
+    background: radial-gradient(circle at 50% 45%, var(--wood-600), var(--wood-900));
+    box-shadow: 0 0 0 3px var(--gold-400);
 }
 
 .leader-face img {
@@ -1036,9 +1046,9 @@ button:disabled {
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    color: var(--color-bg);
-    background: var(--color-accent);
-    box-shadow: 0 0 0 3px var(--color-bg);
+    color: var(--parchment-100);
+    background: var(--ember-700);
+    box-shadow: 0 0 0 2px var(--gold-400);
 }
 
 .leader-text {
@@ -1055,12 +1065,14 @@ button:disabled {
     font-size: 17px;
     white-space: nowrap;
     text-overflow: ellipsis;
+    font-weight: 700;
+    color: var(--gold-200);
 }
 
 .leader-bonus {
     font-size: 12px;
     font-weight: 600;
-    color: var(--color-neutral-700);
+    color: var(--parchment-100);
 }
 
 .skill-bar {
@@ -1084,11 +1096,13 @@ button:disabled {
     width: 100%;
     height: 62px;
     object-fit: cover;
-    border-radius: var(--radius-md);
+    border-radius: 8px;
+    border: 2px solid var(--bronze-500);
+    background: var(--wood-900);
 }
 
 .skill-slot:not(.is-locked) img {
-    box-shadow: 0 0 0 3px var(--color-accent);
+    box-shadow: 0 0 0 2px var(--gold-400);
 }
 
 .skill-slot:not(.is-locked) {
@@ -1105,7 +1119,7 @@ button:disabled {
 
 .skill-slot-cooldown {
     font-size: 11px;
-    color: var(--color-accent-700);
+    color: var(--ember-800);
 }
 
 .skill-slot.is-locked {
@@ -1129,8 +1143,9 @@ button:disabled {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    color: var(--color-neutral-700);
-    background: var(--color-bg);
+    color: var(--gold-400);
+    background: rgb(28 18 12 / 0.85);
+    box-shadow: 0 0 0 1px var(--bronze-500);
 }
 
 .card-notice {
@@ -1786,11 +1801,13 @@ button:disabled {
     height: 20px;
     font-family: var(--font-heading);
     font-size: 12px;
-    color: var(--color-bg);
+    color: var(--gold-200);
     border-radius: 6px;
-    background: var(--color-neutral-900);
-    opacity: 0.85;
+    background: var(--wood-900);
+    opacity: 1;
     pointer-events: none;
+    font-weight: 700;
+    border: 1px solid var(--gold-400);
 }
 
 /* ══ Talentos: the points line and four columns of cards ══ */

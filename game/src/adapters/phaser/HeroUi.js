@@ -16,7 +16,8 @@ const HUD = { x: 956, y: 370 };
 const PANEL = { x: 512, y: 384 };
 //  The leader and the skill bar share the cream battle bar along the bottom
 const LEADER = { x: 154, y: 686 };
-const SKILL_BAR = { x: 586, y: 686 };
+//  The skills sit 36 px further left so the round auto click and farm buttons fit at the right end of the bar (spec ui-redesign D1)
+const SKILL_BAR = { x: 550, y: 686 };
 const NOTICE = { x: 512, y: 120 };
 const NOTICE_MS = 3000;
 

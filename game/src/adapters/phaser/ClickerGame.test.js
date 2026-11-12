@@ -204,6 +204,13 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
 };
 
 describe('ClickerGame scene', () => {
+    it('places the round farm button at 951, 686', async () => {
+        const ctx = await createScene();
+        const element = ctx.doms.find((dom) => dom.node.querySelector('.farm-toggle'));
+
+        expect([ element.x, element.y ]).toEqual([ 951, 686 ]);
+    });
+
     it('shows the leader hero and one monster, and no coins yet', async () => {
         const { scene, rectangles, byColor, images } = await createScene();
 

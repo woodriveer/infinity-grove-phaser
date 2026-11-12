@@ -71,7 +71,8 @@ const BOSS_TIMER_HTML = '<div class="hud-box hud-timer"><div class="boss-timer">
 const ENEMY_STATS_HTML = '<div class="hud-box hud-enemy"><div class="weak-chip" data-testid="weak-chip"></div><div class="enemy-stats"></div></div>';
 const EFFECTS_HTML = '<div class="hud-box hud-effects"><div class="effect-tags"></div></div>';
 const STAGE_MESSAGE_HTML = '<div class="hud-box hud-message"><div class="stage-message"></div></div>';
-const FARM_TOGGLE = { x: 918, y: 686 };
+//  The round farm button at the right end of the bar, right of the auto click button
+const FARM_TOGGLE = { x: 951, y: 686 };
 const PAUSE_MENU = { x: 512, y: 384 };
 //  Right of the element wheel, above the leader's head: the auto click switch, its interval, the crystals and the next upgrade
 //  (spec auto-click)

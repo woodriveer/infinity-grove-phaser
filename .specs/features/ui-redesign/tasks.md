@@ -1033,7 +1033,7 @@ CSS: `.hud-enemy` - set `height: 80px;` `flex-direction: column;` `gap: 4px;` (w
 
 ---
 
-### T13: Parchment battle bar, dark leader card and framed skills [ ]
+### T13: Parchment battle bar, dark leader card and framed skills [x]
 
 **Owner**: game-dev
 **What**: The bottom bar, the leader card, the skill frames, key badges and lock marks of UIR-10, and the new layout of the bar that makes room for the round auto click button of T14 (skill bar to x 550, farm button to x 951, farm box 80 x 112; UIR-04 AC 7, UIR-19 AC 21).
