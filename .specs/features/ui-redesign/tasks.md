@@ -250,7 +250,7 @@ The two `preconnect` links and the `/style.css` link stay.
 
 ---
 
-### T3: Wood and ember buttons, chips and metallic coins [ ]
+### T3: Wood and ember buttons, chips and metallic coins [x]
 
 **Owner**: game-dev
 **What**: The shared button groups, tags and coin discs in the Grove recipes (UIR-02 AC 7 to 12).
