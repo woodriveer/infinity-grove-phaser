@@ -509,7 +509,28 @@ button:disabled {
 
 .hud-enemy {
     width: 460px;
-    height: 48px;
+    height: 80px;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* "Fraco: Água": the element that hits the enemy for double, above the enemy chips (spec ui-redesign UIR-08) */
+.weak-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: pre;
+    color: var(--parchment-100);
+    border-radius: 999px;
+    background: var(--chip-bg);
+    border: 1px solid var(--bronze-500);
+}
+
+.weak-chip:empty {
+    display: none;
 }
 
 .hud-effects {

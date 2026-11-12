@@ -911,7 +911,7 @@ export const weaknessOf = (defender) =>
 
 ---
 
-### T11: Weak element chip above the enemy line [ ]
+### T11: Weak element chip above the enemy line [x]
 
 **Owner**: game-dev
 **What**: The HUD shows `Fraco: <elemento>` above the enemy chips and clears it with them (UIR-08).

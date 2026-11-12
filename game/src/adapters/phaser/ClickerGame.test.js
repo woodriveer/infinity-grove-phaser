@@ -1862,6 +1862,7 @@ describe('ClickerGame elements', () => {
         definition: { ...definition, boss, stages: definition.stages.map((stage) => ({ ...stage, monster, miniboss })) }
     });
     const enemyText = (ctx) => ctx.hud('.enemy-stats').textContent;
+    const weak = (ctx) => ctx.hud('.weak-chip');
     const killAll = (ctx) => {
         while (ctx.scene.monster && !ctx.scene.monster.dead)
         {
@@ -2036,6 +2037,72 @@ describe('ClickerGame elements', () => {
         const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1, true) });
 
         expect(enemyText(ctx)).toBe('');
+    });
+
+    it('shows Fraco: Água for a FIRE monster', async () => {
+        const ctx = await createScene({ start: withStats(stats('FIRE')) });
+
+        expect(weak(ctx).textContent).toBe('Fraco: Água');
+        expect(weak(ctx).getAttribute('data-element')).toBe('WATER');
+    });
+
+    it('shows Fraco: Natureza for a WATER monster', async () => {
+        const ctx = await createScene({ start: withStats(stats('WATER')) });
+
+        expect(weak(ctx).textContent).toBe('Fraco: Natureza');
+        expect(weak(ctx).getAttribute('data-element')).toBe('NATURE');
+    });
+
+    it('shows Fraco: Fogo for a NATURE monster', async () => {
+        const ctx = await createScene({ start: withStats(stats('NATURE')) });
+
+        expect(weak(ctx).textContent).toBe('Fraco: Fogo');
+        expect(weak(ctx).getAttribute('data-element')).toBe('FIRE');
+    });
+
+    it('shows no weak element for a LIGHT miniboss', async () => {
+        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT', 1, 2, 3)), encounter: 'MINIBOSS' } });
+
+        expect(weak(ctx).textContent).toBe('');
+    });
+
+    it('shows no weak element for a DARKNESS chapter boss', async () => {
+        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
+
+        expect(weak(ctx).textContent).toBe('');
+    });
+
+    it('empties the weak element chip when the monster dies', async () => {
+        const ctx = await createScene({ start: withStats(stats('NATURE')) });
+
+        killAll(ctx);
+        expect(weak(ctx).textContent).toBe('');
+
+        fade(ctx).onComplete();
+        ctx.timers.at(-1).callback();
+        expect(weak(ctx).textContent).toBe('Fraco: Fogo');
+    });
+
+    it('empties the weak element chip when the boss runs out of time', async () => {
+        const ctx = await createScene({ start: { ...withStats(stats('NATURE')), encounter: 'MINIBOSS' } });
+
+        ctx.scene.update(0, 30000);
+
+        expect(weak(ctx).textContent).toBe('');
+    });
+
+    it('empties the weak element chip when the chapter is complete', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1, true) });
+
+        expect(weak(ctx).textContent).toBe('');
+    });
+
+    it('keeps the weak element chip in the click-through enemy element', async () => {
+        const ctx = await createScene();
+        const element = ctx.doms.find((d) => d.node.querySelector('.enemy-stats'));
+
+        expect(element.node.querySelector('.weak-chip')).not.toBeNull();
+        expect(element.pointerEvents).toBe('none');
     });
 
     it('lets clicks through the attribute text', async () => {

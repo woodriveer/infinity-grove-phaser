@@ -5,10 +5,12 @@ import { AutoClicker, autoClickUnlocked } from '../../domain/combat/autoClick';
 import { resetReward } from '../../domain/campaign/accountReset';
 import { Combo, comboText } from '../../domain/combat/combo';
 import { formatDamage } from '../../domain/combat/damage';
+import { weaknessOf } from '../../domain/combat/elements';
 import { leaderAttacker } from '../../domain/combat/leaderAttacker';
 import { bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/equipment';
 import { healthText, Monster } from '../../domain/combat/monster';
 import { clickHits } from '../../domain/heroes/leaderBonus';
+import { ELEMENT_LABELS } from '../../domain/heroes/heroes';
 import { SkillCombat } from '../../domain/skills/skillCombat';
 import { monsterAfterBreak, talentComboCap, talentTimeBonusMs } from '../../domain/talents/talents';
 import { HeroUi } from './HeroUi';
@@ -65,7 +67,8 @@ const CHAPTER_HUD_HTML = '<div class="hud-box hud-chapter"><div class="chapter-h
 const MONSTER_HP_HTML = `<div class="hud-box hud-monster-hp"><div class="monster-hp" data-testid="monster-hp"></div></div>`;
 const STAGE_HUD_HTML = '<div class="hud-box hud-stage"><div class="stage-hud"></div></div>';
 const BOSS_TIMER_HTML = '<div class="hud-box hud-timer"><div class="boss-timer"></div></div>';
-const ENEMY_STATS_HTML = '<div class="hud-box hud-enemy"><div class="enemy-stats"></div></div>';
+//  The weak element chip sits above the enemy line in the same click-through box (spec ui-redesign UIR-08)
+const ENEMY_STATS_HTML = '<div class="hud-box hud-enemy"><div class="weak-chip" data-testid="weak-chip"></div><div class="enemy-stats"></div></div>';
 const EFFECTS_HTML = '<div class="hud-box hud-effects"><div class="effect-tags"></div></div>';
 const STAGE_MESSAGE_HTML = '<div class="hud-box hud-message"><div class="stage-message"></div></div>';
 const FARM_TOGGLE = { x: 918, y: 686 };
@@ -178,6 +181,7 @@ export class ClickerGame extends Scene
         this.createHtml(ELEMENT_WHEEL, ELEMENT_WHEEL_HTML, '.hud-wheel').append(renderElementWheel());
         this.bossTimer = this.createHtml(BOSS_TIMER, BOSS_TIMER_HTML, '.boss-timer');
         this.enemyStats = this.createHtml(ENEMY_STATS, ENEMY_STATS_HTML, '.enemy-stats');
+        this.weakChip = this.enemyStats.parentElement.querySelector('.weak-chip');
         this.effectTags = this.createHtml(EFFECTS, EFFECTS_HTML, '.effect-tags');
         this.stageMessage = this.createHtml(STAGE_MESSAGE, STAGE_MESSAGE_HTML, '.stage-message');
         this.createControls();
@@ -693,12 +697,24 @@ export class ClickerGame extends Scene
         ];
 
         this.enemyStats.replaceChildren(...tags.flatMap((tag, index) => (index ? [ el('span', 'gap', '  '), tag ] : [ tag ])));
+
+        const weak = weaknessOf(element);
+
+        this.weakChip.textContent = weak ? `Fraco: ${ELEMENT_LABELS[weak]}` : '';
+        this.weakChip.setAttribute('data-element', weak ?? '');
+    }
+
+    //  The enemy line and its weak element chip go together
+    clearEnemyStats ()
+    {
+        this.enemyStats.textContent = '';
+        this.weakChip.textContent = '';
     }
 
     completeChapter ()
     {
         this.monster = null;
-        this.enemyStats.textContent = '';
+        this.clearEnemyStats();
         this.monsterParts.forEach((part) => part.setAlpha(0));
         this.stageHud.textContent = '';
         this.monsterHp.textContent = '';
@@ -854,7 +870,7 @@ export class ClickerGame extends Scene
     {
         this.hideCountdown();
         this.monster = null;
-        this.enemyStats.textContent = '';
+        this.clearEnemyStats();
         this.monsterParts.forEach((part) => part.setAlpha(0));
 
         //  A farmed boss that survives its time limit just comes back; nothing is reported and the campaign does not move
@@ -1027,7 +1043,7 @@ export class ClickerGame extends Scene
 
         if (this.monster.dead)
         {
-            this.enemyStats.textContent = '';
+            this.clearEnemyStats();
 
             //  A farm fight drops no coins: kills are only reported for the campaign
             if (!this.farmBoss)
