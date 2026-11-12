@@ -998,7 +998,7 @@ CSS: `.hud-enemy` - set `height: 80px;` `flex-direction: column;` `gap: 4px;` (w
 
 ---
 
-### T12: Hero rail of framed squares [ ]
+### T12: Hero rail of framed squares [x]
 
 **Owner**: game-dev
 **What**: The rail as a parchment strip with seven 76 x 60 framed buttons and ember badges (UIR-09).

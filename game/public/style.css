@@ -915,15 +915,17 @@ button:disabled {
     color: var(--color-neutral-800);
 }
 
-/* The hero buttons: a cream rail on the right edge */
+/* The hero buttons: framed wood squares on a parchment strip at the right edge (spec ui-redesign UIR-09) */
 .hero-hud {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 6px;
     padding: 8px;
-    border-radius: var(--radius-lg);
-    background: var(--color-bg);
-    box-shadow: var(--shadow-lg);
+    border-radius: 10px;
+    background: var(--panel-bg);
+    box-shadow: var(--panel-shadow);
+    background-color: var(--parchment-200);
+    border: var(--panel-border);
 }
 
 .hero-hud button {
@@ -932,53 +934,58 @@ button:disabled {
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    width: 80px;
-    padding: 10px 0;
+    width: 76px;
+    height: 60px;
+    padding: 4px 0;
     font-family: var(--font-body);
     font-size: 11px;
     font-weight: 700;
     line-height: 1.15;
-    color: var(--color-text);
-    background: transparent;
-    border: none;
-    border-radius: 20px;
+    color: var(--parchment-100);
+    background: var(--frame-bg);
+    border: var(--frame-border);
+    border-radius: 6px;
     cursor: pointer;
+    justify-content: center;
+    background-color: var(--wood-800);
+    box-shadow: var(--frame-shadow);
 }
 
 .hero-hud button:hover {
-    background: color-mix(in srgb, var(--color-text) 7%, transparent);
+    filter: brightness(1.15);
 }
 
 .hero-hud button:active {
-    background: color-mix(in srgb, var(--color-text) 14%, transparent);
+    filter: brightness(0.9);
 }
 
 .hero-hud svg {
     display: block;
+    color: var(--gold-400);
 }
 
 .hud-badge {
     position: absolute;
-    top: 6px;
-    right: 16px;
+    top: 4px;
+    right: 6px;
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: var(--color-accent);
-    box-shadow: 0 0 0 2px var(--color-bg);
+    background: var(--ember-500);
+    box-shadow: 0 0 0 2px var(--wood-900);
 }
 
 /* The talents dot carries the count of unspent points */
 [data-testid="talents-badge"] {
     top: 2px;
-    right: 10px;
+    right: 2px;
     width: auto;
     min-width: 16px;
     height: 16px;
     padding: 0 3px;
     box-sizing: border-box;
     border-radius: 8px;
-    color: #fff;
+    color: var(--ink-900);
     font-size: 11px;
     font-weight: 700;
     line-height: 16px;
