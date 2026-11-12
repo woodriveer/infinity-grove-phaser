@@ -1,20 +1,20 @@
-/* Infinity Grove: the Organic look of the "Infinity Grove UI" design. Cream rounded panels float over the forest,
-   Caprasimo for numbers and titles, terracotta for actions and sage for progress. */
+/* Infinity Grove: the Grove look of spec ui-redesign. Parchment panels and dark wood frames with bronze rings over the forest,
+   Cinzel for headings and numbers, Figtree for text, ember for actions. Panels and frames read the recipe tokens of :root. */
 
 :root {
-    --color-bg: #f5ead8;
-    --color-surface: #ebddc5;
-    --color-text: #201e1d;
-    --color-accent: #c67139;
-    --color-divider: color-mix(in srgb, #201e1d 16%, transparent);
+    --color-bg: #f4e6c8;
+    --color-surface: #e6d0a2;
+    --color-text: #2a1a10;
+    --color-accent: #a8431a;
+    --color-divider: color-mix(in srgb, #2a1a10 22%, transparent);
 
     --color-neutral-100: #f9f4ed;
     --color-neutral-200: #eee7db;
     --color-neutral-300: #dcd3c4;
     --color-neutral-400: #c0b6a5;
     --color-neutral-500: #a19786;
-    --color-neutral-600: #82796a;
-    --color-neutral-700: #645c50;
+    --color-neutral-600: #5f5244;
+    --color-neutral-700: #574b3e;
     --color-neutral-800: #474238;
     --color-neutral-900: #2e2b25;
 
@@ -32,18 +32,62 @@
     --color-accent-2-400: #aebf92;
     --color-accent-2-500: #8fa073;
     --color-accent-2-600: #728157;
-    --color-accent-2-700: #56633f;
+    --color-accent-2-700: #4a5636;
     --color-accent-2-800: #3d472b;
     --color-accent-2-900: #272e1b;
 
-    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-heading: "Cinzel", Georgia, serif;
     --font-body: "Figtree", system-ui, sans-serif;
 
-    --radius-md: 16px;
-    --radius-lg: 28px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
 
-    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
-    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 22%, transparent);
+    --shadow-md: 0 3px 10px rgb(0 0 0 / 0.35);
+    --shadow-lg: 0 10px 28px rgb(0 0 0 / 0.5);
+
+    /* ══ Grove palette (spec ui-redesign) ══ */
+    --wood-900: #1c120c;
+    --wood-800: #2b1d14;
+    --wood-700: #3d2a1c;
+    --wood-600: #5a3d26;
+    --bronze-500: #b07a3a;
+    --gold-400: #e0b45a;
+    --gold-200: #f3d58a;
+    --parchment-100: #f4e6c8;
+    --parchment-200: #ead6ad;
+    --parchment-300: #e6d0a2;
+    --ink-900: #2a1a10;
+    --ink-600: #6b4a2b;
+    --ember-500: #e8742a;
+    --ember-700: #a8431a;
+    --ember-800: #8a3510;
+    --color-focus: #cc4e1a;
+
+    /* ══ Grove theme recipes: a rule applies one by writing its declarations (design.md § Recipes) ══ */
+    /* Painted textures: none until the art exists; one line turns each on (PROMPTS_ASSETS_UI.md, section 5) */
+    --texture-parchment: none;
+    --texture-wood: none;
+
+    /* Parchment panel: windows, plaques, rail, bars, cards that float */
+    --panel-bg: var(--texture-parchment), radial-gradient(ellipse at 50% 40%, var(--parchment-100) 0%, var(--parchment-200) 62%, var(--parchment-300) 100%);
+    --panel-border: 3px solid var(--wood-600);
+    --panel-shadow: 0 0 0 2px var(--bronze-500), inset 0 0 22px rgb(138 90 43 / 0.45), 0 10px 28px rgb(0 0 0 / 0.55);
+
+    /* Dark wood frame: leader card, rail buttons, timer, notice, tiles */
+    --frame-bg: var(--texture-wood), linear-gradient(180deg, var(--wood-700) 0%, var(--wood-800) 55%, var(--wood-900) 100%);
+    --frame-border: 2px solid var(--bronze-500);
+    --frame-shadow: inset 0 0 0 1px rgb(243 213 138 / 0.25), 0 0 0 2px var(--wood-900), 0 8px 20px rgb(0 0 0 / 0.5);
+
+    /* Buttons: wood (secondary) and ember (primary) pills */
+    --btn-bg: linear-gradient(180deg, var(--wood-600) 0%, var(--wood-800) 100%);
+    --btn-primary-bg: linear-gradient(180deg, var(--ember-700) 0%, #7a2e0c 100%);
+    --btn-shadow: inset 0 1px 0 rgb(243 213 138 / 0.35), 0 2px 0 var(--wood-900), 0 4px 10px rgb(0 0 0 / 0.4);
+
+    /* Chip: enemy tags, effect tags, weak element */
+    --chip-bg: rgb(28 18 12 / 0.85);
+
+    /* Inset card inside a parchment panel */
+    --inset-border: 1px solid rgb(90 61 38 / 0.45);
 }
 
 *, *::before, *::after {
@@ -54,7 +98,7 @@ body {
     margin: 0;
     padding: 0;
     color: var(--color-text);
-    background-color: var(--color-accent-2-900);
+    background-color: var(--wood-900);
     font-family: var(--font-body);
 }
 
@@ -76,7 +120,7 @@ body {
 }
 
 :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 3px solid var(--color-focus);
     outline-offset: 2px;
 }
 

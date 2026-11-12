@@ -143,7 +143,7 @@ The two `preconnect` links and the `/style.css` link stay.
 
 ---
 
-### T2: Grove tokens, letterbox and focus ring [ ]
+### T2: Grove tokens, letterbox and focus ring [x]
 
 **Owner**: game-dev
 **What**: The palette, re-mapped tokens, recipe tokens, letterbox colour and focus ring of the design (UIR-01 AC 2 to 6, UIR-03 AC 13).
