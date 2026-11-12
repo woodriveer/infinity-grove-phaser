@@ -192,8 +192,8 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
     const click = (pointer = { x: 100, y: 100 }) => handlers.pointerdown(pointer);
     const byColor = (color) => rectangles.filter((r) => r.color === color);
     const monster = byColor(0xf5ead8)[0];
-    const fill = byColor(0xc67139)[0];
-    const back = byColor(0xdcd3c4)[0];
+    const fill = byColor(0xc0392b)[0];
+    const back = byColor(0x2a1410)[0];
 
     const walletText = () => doms.map((d) => d.node.querySelector('.wallet')).find(Boolean);
     const control = (selector) => doms.map((d) => d.node.querySelector(selector)).find(Boolean);
@@ -286,6 +286,17 @@ describe('ClickerGame scene', () => {
 });
 
 describe('ClickerGame health bar', () => {
+    it('draws the bar back 0x2a1410 and the fill 0xc0392b', async () => {
+        const { byColor } = await createScene();
+
+        const back = byColor(0x2a1410);
+        const fill = byColor(0xc0392b);
+
+        expect(back).toHaveLength(1);
+        expect(fill).toHaveLength(1);
+        expect([ back[0].width, back[0].height, fill[0].width, fill[0].height ]).toEqual([ 240, 16, 240, 16 ]);
+    });
+
     it('is centred above the monster and 240 px wide at full health', async () => {
         const { monster, fill, back } = await createScene();
 
@@ -1909,7 +1920,7 @@ describe('ClickerGame elements', () => {
         expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 0.5);
     });
 
-    it('doubles the damage on a critical click and draws that number bigger and peach', async () => {
+    it('doubles the damage on a critical click and draws that number bigger and orange', async () => {
         const ctx = await createScene({ start: withStats(stats('FIRE')) });
         ctx.dice.value = 0;
 
@@ -1917,15 +1928,32 @@ describe('ClickerGame elements', () => {
 
         expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 2);
         expect(ctx.texts[0].text).toBe('2');
-        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ color: '#ffc6a5', fontSize: 48 }));
+        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ color: '#ff8a1f', fontSize: 48 }));
     });
 
-    it('draws a normal click cream and 32 px', async () => {
+    it('draws damage numbers in Cinzel 700 with a dark outline', async () => {
         const ctx = await createScene({ start: withStats(stats('FIRE')) });
 
         ctx.click();
 
-        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ color: '#f5ead8', fontSize: 32 }));
+        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ fontFamily: 'Cinzel', fontStyle: '700', stroke: '#2a1408', strokeThickness: 8 }));
+    });
+
+    it('draws a critical number in Cinzel 700 with the same outline', async () => {
+        const ctx = await createScene({ start: withStats(stats('FIRE')) });
+        ctx.dice.value = 0;
+
+        ctx.click();
+
+        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ fontFamily: 'Cinzel', fontStyle: '700', stroke: '#2a1408', strokeThickness: 8, color: '#ff8a1f', fontSize: 48 }));
+    });
+
+    it('draws a normal click gold and 32 px', async () => {
+        const ctx = await createScene({ start: withStats(stats('FIRE')) });
+
+        ctx.click();
+
+        expect(ctx.texts[0].style).toEqual(expect.objectContaining({ color: '#ffd35c', fontSize: 32 }));
     });
 
     it('never crits a monster with critical resistance 100', async () => {
@@ -3011,8 +3039,8 @@ describe('ClickerGame Lyra double click', () => {
         definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000, ...extra })) }
     });
     const leaderOf = (id, stars = 0) => ({ leaderId: id, heroes: [ heroEntry(id, { [stars]: 1 }, stars), heroEntry('kael', { 0: 1 }, 0) ] });
-    const critical = { color: '#ffc6a5', fontSize: 48 };
-    const normal = { color: '#f5ead8', fontSize: 32 };
+    const critical = { color: '#ff8a1f', fontSize: 48 };
+    const normal = { color: '#ffd35c', fontSize: 32 };
 
     it('deals two critical hits of 2 on a roll below 30', async () => {
         const ctx = await createScene({ start: big(), heroes: leaderOf('lyra') });
@@ -3614,11 +3642,11 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         const ctx = await createScene({ start: big(), heroes: leaderOf('kael', 3) });
 
         key(ctx, 'ONE');
-        expect(ctx.texts.at(-1)).toMatchObject({ text: '21', style: expect.objectContaining({ color: '#f5ead8', fontSize: 32 }) });
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '21', style: expect.objectContaining({ color: '#ffd35c', fontSize: 32 }) });
 
         ctx.dice.value = 0;
         key(ctx, 'TWO');
-        expect(ctx.texts.at(-1)).toMatchObject({ text: '14', style: expect.objectContaining({ color: '#ffc6a5', fontSize: 48 }) });
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '14', style: expect.objectContaining({ color: '#ff8a1f', fontSize: 48 }) });
     });
 
     it('never shows a tick as critical, whatever the roll', async () => {
@@ -3628,7 +3656,7 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         key(ctx, 'TWO');
         ctx.scene.update(0, 1000);
 
-        expect(ctx.texts.at(-1)).toMatchObject({ text: '2.4', style: expect.objectContaining({ color: '#f5ead8', fontSize: 32 }) });
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '2.4', style: expect.objectContaining({ color: '#ffd35c', fontSize: 32 }) });
     });
 
     it('freezes the effects, the ticks and the aimed shot while the fight is paused', async () => {
@@ -3774,7 +3802,7 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         key(ctx, 'TWO');
         ctx.scene.update(0, 2000);
 
-        expect(ctx.texts.at(-1)).toMatchObject({ text: '105', style: expect.objectContaining({ color: '#ffc6a5', fontSize: 48 }) });
+        expect(ctx.texts.at(-1)).toMatchObject({ text: '105', style: expect.objectContaining({ color: '#ff8a1f', fontSize: 48 }) });
     });
 
     it('runs the aimed shot down only while the fight is not paused: after a pause the 2 s are still left', async () => {

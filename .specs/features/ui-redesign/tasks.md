@@ -686,7 +686,7 @@ CSS: replace the rule `.boss-timer` and add `.boss-timer::before` right after it
 
 ---
 
-### T8: HP bar frame and gold damage numbers [ ]
+### T8: HP bar frame and gold damage numbers [x]
 
 **Owner**: game-dev
 **What**: The health bar colours, its frame, the HP text and the damage numbers of UIR-05.

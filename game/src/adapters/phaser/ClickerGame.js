@@ -22,7 +22,7 @@ import { renderEffectTags, updateEffectTags } from './views/skillEffects';
 const CHARACTER = { x: 230, y: 612, height: 320 };
 //  The monster is a translucent cream placeholder until its art arrives
 const MONSTER = { x: 670, y: 440, width: 220, height: 250, color: 0xf5ead8, fillAlpha: 0.35 };
-const HEALTH_BAR = { width: 240, height: 16, gap: 18, backColor: 0xdcd3c4, fillColor: 0xc67139 };
+const HEALTH_BAR = { width: 240, height: 16, gap: 18, backColor: 0x2a1410, fillColor: 0xc0392b };
 const DAMAGE_TEXT = { rise: 40, duration: 800 };
 const DEATH = { fadeDuration: 500, respawnDelay: 1000 };
 const LOGO = { x: 82, y: 44, width: 136 };
@@ -55,9 +55,9 @@ const ENEMY_STATS = { x: 670, y: 596 };
 const EFFECTS = { x: 512, y: 96 };
 //  Phaser key names of the skill keys and the slot each one uses: 1, 2, 3 and Q, W, E
 const SKILL_KEYS = [ [ 'ONE', 1 ], [ 'TWO', 2 ], [ 'THREE', 3 ], [ 'Q', 1 ], [ 'W', 2 ], [ 'E', 3 ] ];
-const DAMAGE_FONT = { fontFamily: 'Caprasimo', stroke: '#2e2b25', strokeThickness: 8 };
-const CRITICAL_TEXT = { color: '#ffc6a5', fontSize: 48 };
-const NORMAL_TEXT = { color: '#f5ead8', fontSize: 32 };
+const DAMAGE_FONT = { fontFamily: 'Cinzel', fontStyle: '700', stroke: '#2a1408', strokeThickness: 8 };
+const CRITICAL_TEXT = { color: '#ff8a1f', fontSize: 48 };
+const NORMAL_TEXT = { color: '#ffd35c', fontSize: 32 };
 const STAGE_MESSAGE = { x: 512, y: 384 };
 const BATTLE_BAR = { x: 512, y: 686 };
 const BATTLE_BAR_HTML = '<div class="battle-bar"></div>';
@@ -1244,7 +1244,7 @@ export class ClickerGame extends Scene
         return onMonster ? pointer.x : MONSTER.x;
     }
 
-    //  A critical hit is bigger and peach
+    //  A critical hit is bigger and orange, a normal one gold
     showDamage (damage, x, critical = false)
     {
         const textStyle = { ...DAMAGE_FONT, ...(critical ? CRITICAL_TEXT : NORMAL_TEXT) };
