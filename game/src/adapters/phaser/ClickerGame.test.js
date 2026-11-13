@@ -4133,6 +4133,19 @@ describe('ClickerGame auto click', () => {
         expect(ctx.hud('[data-testid="reset-dialog"]').hidden).toBe(false);
     });
 
+    it('closes the open window when the auto click becomes locked', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        attach(ctx);
+        button(ctx).click();
+        expect(popover(ctx).hidden).toBe(false);
+        vi.spyOn(ctx.scene, 'autoClickOpen', 'get').mockReturnValue(false);
+
+        ctx.scene.showAutoClick();
+
+        expect(popover(ctx).hidden).toBe(true);
+        expect(button(ctx).getAttribute('aria-expanded')).toBe('false');
+    });
+
     it('labels the button and the window for assistive tech', async () => {
         const ctx = await createScene({ start: atChapter(2) });
 
