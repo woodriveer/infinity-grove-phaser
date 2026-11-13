@@ -802,6 +802,27 @@ test.describe('Grove theme', () => {
         });
     }
 
+    //  UIR-08 AC6: the chip is centred on the enemy line within 1 scene px, its bottom at or above the line's top, inside the .hud-enemy
+    for (const element of [ 'FIRE', 'WATER', 'NATURE' ])
+    {
+        test(`centres the weak chip of the ${element} enemy over the enemy line within 1 scene px`, async ({ page }) => {
+            await startAs(page, { monster: bare(element) });
+            const canvas = await canvasBox(page);
+            const toScene = (box) => ({
+                x: ((box.x - canvas.x) * 1024) / canvas.width,
+                y: ((box.y - canvas.y) * 768) / canvas.height,
+                width: (box.width * 1024) / canvas.width,
+                height: (box.height * 768) / canvas.height
+            });
+            const chip = toScene(await page.getByTestId('weak-chip').boundingBox());
+            const line = toScene(await page.locator('.enemy-stats').boundingBox());
+
+            expect(Math.abs(chip.x + chip.width / 2 - (line.x + line.width / 2))).toBeLessThanOrEqual(1);
+            expect(chip.y + chip.height).toBeLessThanOrEqual(line.y);
+            expect(await page.locator('.hud-enemy [data-testid="weak-chip"]').count()).toBe(1);
+        });
+    }
+
     test('keeps the weak chip and the enemy line clear of the bar and the rail', async ({ page }) => {
         await startAs(page, { monster: bare('FIRE') });
         const chip = await page.getByTestId('weak-chip').boundingBox();
