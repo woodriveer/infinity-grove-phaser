@@ -1340,6 +1340,58 @@ test.describe('Grove theme', () => {
         expect(await page.locator('.reset-card').evaluate((node) => node.offsetWidth)).toBe(420);
     });
 
+    test('draws every inner card on the inset recipe', async ({ page }) => {
+        const INSET = { 'background-color': 'rgb(230, 208, 162)', 'border-top-width': '1px', 'border-top-style': 'solid', 'border-top-color': 'rgba(90, 61, 38, 0.45)', 'border-top-left-radius': '8px' };
+        await startAs(page, { copies: { 'kael:1': 3, 'lyra:3': 1, 'orina:3': 1 }, equipment: [ piece('r1', 'RING', 'COMMON') ], talentPoints: 1, progress: { chapter: 2 } });
+
+        //  Heroes: a hero card, then a skill row and the portrait of the hero detail
+        await openScreen(page, 'heroes');
+        await expectStyle(page.getByTestId('hero-card-kael'), INSET);
+        await page.getByTestId('hero-card-kael').click();
+        await expectStyle(page.locator('.skill-row').first(), INSET);
+        //  UIR-13 AC5: the portrait of the detail sits on the dark vignette
+        expect(await page.locator('.hero-detail-portrait').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('rgb(28, 18, 12)');
+        await page.getByTestId('hero-back').click();
+        await page.getByTestId('hero-close').click();
+
+        //  Fusion: a fusion row
+        await page.getByTestId('hud-fusion').click();
+        await expectStyle(page.locator('.fusion-row').first(), INSET);
+        await page.getByTestId('hero-close').click();
+
+        //  Líder: a leader row that is not the current one
+        await openScreen(page, 'leader');
+        await expectStyle(page.locator('.leader-entry:not(.is-current)').first(), INSET);
+        await page.getByTestId('hero-close').click();
+
+        //  Talents: a talent column
+        await openScreen(page, 'talents');
+        await expectStyle(page.locator('.talent-column').first(), INSET);
+        await page.getByTestId('hero-close').click();
+
+        //  Equipment: a hero block, then the bulk sale bar
+        await openScreen(page, 'equipment');
+        await expectStyle(page.locator('.equip-hero').first(), INSET);
+        await expectStyle(page.getByTestId('leader-stats'), INSET);
+        await page.getByTestId('bulk-sell-start').click();
+        await expectStyle(page.getByTestId('bulk-sell-bar'), INSET);
+        await page.getByTestId('hero-close').click();
+    });
+
+    test('draws the empty lines of the fusion and the equipment on the inset recipe', async ({ page }) => {
+        const INSET = { 'background-color': 'rgb(230, 208, 162)', 'border-top-width': '1px', 'border-top-style': 'solid', 'border-top-color': 'rgba(90, 61, 38, 0.45)', 'border-top-left-radius': '8px' };
+        await startAs(page, { copies: { 'kael:3': 1 }, equipment: [] });
+
+        //  One copy of each hero waits for no fusion, and no piece is in the bag
+        await page.getByTestId('hud-fusion').click();
+        await expectStyle(page.getByTestId('fusion-empty'), INSET);
+        await page.getByTestId('hero-close').click();
+
+        await openScreen(page, 'equipment');
+        await expectStyle(page.getByTestId('equipment-empty'), INSET);
+        await page.getByTestId('hero-close').click();
+    });
+
     test('draws the hero window, title and inset cards', async ({ page }) => {
         await startAs(page, { copies: { 'kael:5': 1 } });
         await openScreen(page, 'heroes');
@@ -1352,7 +1404,7 @@ test.describe('Grove theme', () => {
             'border-top-color': 'rgb(90, 61, 38)',
             'border-top-left-radius': '12px'
         });
-        await expectStyle(page.locator('.hero-title'), { 'font-size': '30px', color: 'rgb(42, 26, 16)' });
+        await expectStyle(page.locator('.hero-title'), { 'font-size': '30px', 'font-weight': '700', color: 'rgb(42, 26, 16)' });
         await expectStyle(page.getByTestId('hero-card-kael'), {
             'background-color': 'rgb(230, 208, 162)',
             'border-top-width': '1px',
@@ -1361,6 +1413,7 @@ test.describe('Grove theme', () => {
         });
         expect(await page.getByTestId('hero-card-kael').locator('img').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('radial-gradient');
         expect(await page.getByTestId('hero-card-kael').locator('img').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('rgb(90, 61, 38)');
+        expect(await page.getByTestId('hero-card-kael').locator('img').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('rgb(28, 18, 12)');
     });
 
     test('keeps the five hero cards the same size with every name inside its card', async ({ page }) => {
