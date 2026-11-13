@@ -180,11 +180,12 @@
 
 ## Handoff
 
-- **Feature**: five features from the owner's batch of 2026-10-21, all game side except two backend pieces: `combat-hud`, `click-power`, `talents`, `equipment-ui`, `boss-map` (`.specs/features/*`)
-- **Phase / Task**: code of the five features done and pushed; Verifier PASS for `combat-hud` and `click-power`; `talents`, `equipment-ui` and `boss-map` were with the Verifier when this was written (see each `validation.md`)
-- **Completed**: chapter pill, HP text, element wheel, skill tooltip, keys Q W E, red dot on Equipamento; star bonus, combo, Lyra's double critical click (backend seed + V2 migration); talent tree (backend `V3`, endpoints, Talentos screen, effects in combat); leader attribute panel, icon bag with rarity frames and tooltip, transfer of a set; chapter map in Rever chefes
-- **In-progress** (file:line): none
-- **Next step**: the owner generates the art of `PROMPTS_ASSETS_UI.md` into `game/public/assets/ui/` (13 files) and sends the map so the 11 positions of `mapLayout.js` are recalibrated; deploy (`./publish.sh`) is pending and needs the local reset `docker compose down -v` in `backend/` (Flyway V1 to V3 on a fresh database); then the other four leader bonuses, account level / prestige
-- **Blockers**: the owner's uncommitted `application.yaml` rates (cards 0.07/0.80, equipment miniboss 0.5) fail `EquipmentDropFlowIT` and `FarmControllerIT`; backend gates ran with `APP_EQUIPMENT_MINIBOSSRATE=0.25 APP_CARDS_MINIBOSSRATEPERSTAGE=0.02 APP_CARDS_CHAPTERBOSSRATE=0.30`
-- **Uncommitted files**: `backend/src/main/resources/application.yaml` (owner rate edits), `.idea/`, `game/public/assets/coin-*.png`, `game/src/scenes/` (owner work, never stage them; add files by path)
+- **Feature**: `ui-redesign` (Grove theme, AD-022), `.specs/features/ui-redesign/`
+- **Phase / Task**: Execute, paused by the owner on 2026-11-13 between T19 and T20 (Phase 5). T1 to T19 done and pushed (last commit `92a3613`); T20 to T30 pending
+- **Completed**: Phases 1 to 4 with their phase gates (foundation, skill thumbnails without magenta, battle HUD, round auto click button with its window and the key `A`, pause and reset cards); T18 and T19 of Phase 5 (main menu)
+- **In-progress** (file:line): none. T20 (`Preloader.js`, new `Preloader.test.js`) was written, passed its unit gate and was reverted at the pause; redo it from the task
+- **Next step**: `game-dev` runs T20 with the Phase 5 gate, then T21 to T27; `test-engineer` T28 and T29; `ui-artist` T30; then a fresh `test-engineer` as Verifier, `product-owner` acceptance, `gitops` (deploy check, `report.html`, changelog, tag)
+- **Blockers**: none
+- **Notes for the resume**: (1) phase gate is `cd game && npm test && npm run build && npx playwright test --workers=2`; a failing e2e test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both (seen so far: `dragEquip.spec.js:550` and `:604`, `talents.spec.js:148` and `:111`, `auth.spec.js:113`, `clickPower.spec.js:41`). (2) Line numbers quoted in `tasks.md` have drifted: locate edits by selector or content. (3) Finding for T30: the leader's name is cut ("Kael Raizfé…") in the dark leader card of the battle bar. (4) The screenshot of the main menu after T19 was not taken
+- **Uncommitted files**: owner's, never stage them: `CLAUDE.md`, `GEMINI.md`, `graphify-out/`, `.agents/`, `.claude/skills/impeccable/`, `.claude/skills/reversa-*/`
 - **Branch**: main
