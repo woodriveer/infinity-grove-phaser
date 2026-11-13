@@ -551,10 +551,10 @@ button:disabled {
 }
 
 .hud-auto-click {
-    width: 260px;
-    height: 160px;
-    align-items: flex-start;
-    justify-content: flex-start;
+    width: 80px;
+    height: 112px;
+    align-items: center;
+    justify-content: center;
 }
 
 .hud-notice {
@@ -767,20 +767,20 @@ button:disabled {
     font-weight: 700;
 }
 
-.farm-toggle,
+/* The auto click switch, inside the auto click window: a wood track with a parchment knob, green when on (spec ui-redesign UIR-11) */
 .auto-click-toggle {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 16px 10px 10px;
+    padding: 6px 12px 6px 6px;
     font-size: 14px;
     font-weight: 700;
     border-radius: 999px;
-    background: var(--color-surface);
+    background: var(--parchment-300);
+    border: var(--inset-border);
     cursor: pointer;
 }
 
-.farm-toggle input,
 .auto-click-toggle input {
     appearance: none;
     position: relative;
@@ -789,71 +789,190 @@ button:disabled {
     height: 24px;
     margin: 0;
     border-radius: 999px;
-    background: var(--color-neutral-400);
+    background: var(--wood-700);
+    border: 1px solid var(--bronze-500);
     cursor: pointer;
 }
 
-.farm-toggle input::after,
 .auto-click-toggle input::after {
     content: '';
     position: absolute;
-    left: 3px;
-    top: 3px;
+    left: 2px;
+    top: 2px;
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: var(--color-bg);
+    background: var(--parchment-100);
     transition: left 120ms;
 }
 
-.farm-toggle input:checked,
 .auto-click-toggle input:checked {
-    background: var(--color-accent-2-600);
+    background: #3f8f3a;
 }
 
-.farm-toggle input:checked::after,
 .auto-click-toggle input:checked::after {
-    left: 19px;
+    left: 18px;
 }
 
-/* The auto click box (spec auto-click): the switch, then the interval and the crystals, then the upgrade */
-.auto-click {
+/* The two round buttons of the bar share the look: a dark wood disc with a bronze ring, the label under it (spec ui-redesign D1) */
+.farm-toggle {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: center;
-    gap: 6px 10px;
-    padding: 10px 12px;
-    font-size: 13px;
+    gap: 4px;
+    font-size: 12px;
     font-weight: 700;
-    border-radius: 20px;
-    background: var(--color-bg);
-    box-shadow: var(--shadow-lg);
-}
-
-.auto-click-upgrade {
-    padding: 6px 10px;
-    font: inherit;
-    border: none;
-    border-radius: 999px;
-    background: var(--color-accent-2-600);
-    color: var(--color-bg);
+    color: var(--ink-900);
     cursor: pointer;
 }
 
+.farm-toggle input,
+.auto-click-button {
+    appearance: none;
+    position: relative;
+    flex: none;
+    width: 56px;
+    height: 56px;
+    margin: 0;
+    padding: 0;
+    border-radius: 50%;
+    background-color: var(--wood-800);
+    border: 3px solid var(--bronze-500);
+    box-shadow: var(--frame-shadow);
+    cursor: pointer;
+}
+
+.farm-toggle input {
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e0b45a' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z'/%3E%3Ccircle cx='15' cy='12' r='1'/%3E%3Ccircle cx='9' cy='12' r='1'/%3E%3C/svg%3E") center / 30px 30px no-repeat,
+        var(--frame-bg);
+    background-color: var(--wood-800);
+}
+
+.farm-toggle input:checked {
+    border-color: var(--ember-500);
+    box-shadow: 0 0 12px 2px rgb(232 116 42 / 0.75), var(--frame-shadow);
+}
+
+/* The auto click: the button, its key and its interval in a column; the window floats above the button */
+.auto-click {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 80px;
+}
+
+.auto-click-button {
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f3d58a' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4.1 12 6'/%3E%3Cpath d='m5.1 8-2.9-.8'/%3E%3Cpath d='m6 12-1.9 2'/%3E%3Cpath d='M7.2 2.2 8 5.1'/%3E%3Cpath d='M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z'/%3E%3C/svg%3E") center / 28px 28px no-repeat,
+        var(--frame-bg);
+    background-color: var(--wood-800);
+}
+
+/* On: a green ring and glow, as in the mock-up */
+.auto-click-button[data-on="true"] {
+    border-color: #5fd35a;
+    box-shadow: 0 0 14px 4px rgb(95 211 90 / 0.75), var(--frame-shadow);
+}
+
+.auto-click-button:hover {
+    filter: brightness(1.15);
+}
+
+.auto-click-button:active {
+    filter: brightness(0.9);
+}
+
+/* The key that opens the window, like the skill keys */
+.auto-click-key {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold-200);
+    border-radius: 6px;
+    background: var(--wood-900);
+    border: 1px solid var(--gold-400);
+    pointer-events: none;
+}
+
+.auto-click-rate {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-900);
+    white-space: pre;
+}
+
+/* The window: parchment above the button, 4 px inside the right edge of the box (left of the hero rail), a tail pointing at the button */
+.auto-click-popover {
+    position: absolute;
+    right: 4px;
+    bottom: calc(100% + 10px);
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    width: 240px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-900);
+    border-radius: 10px;
+    background: var(--panel-bg);
+    background-color: var(--parchment-200);
+    border: var(--panel-border);
+    box-shadow: var(--panel-shadow);
+}
+
+.auto-click-popover::after {
+    content: '';
+    position: absolute;
+    right: 28px;
+    bottom: -11px;
+    width: 16px;
+    height: 16px;
+    background: var(--parchment-300);
+    border-right: 3px solid var(--wood-600);
+    border-bottom: 3px solid var(--wood-600);
+    transform: rotate(45deg);
+}
+
+.auto-click-upgrade {
+    padding: 6px 12px;
+    font: inherit;
+    border: 2px solid var(--gold-400);
+    border-radius: 999px;
+    background: var(--btn-primary-bg);
+    color: var(--parchment-100);
+    cursor: pointer;
+    background-color: var(--ember-700);
+    box-shadow: var(--btn-shadow);
+}
+
 .auto-click-upgrade:disabled {
-    background: var(--color-neutral-400);
     cursor: not-allowed;
 }
 
 /* The account reset (spec account-reset): the button under the crystals and the line of a failed request in its dialog */
 .reset-account {
-    padding: 6px 10px;
+    padding: 6px 12px;
     font: inherit;
-    border: none;
+    border: 2px solid var(--gold-400);
     border-radius: 999px;
-    background: var(--color-accent);
-    color: var(--color-bg);
+    background: var(--btn-primary-bg);
+    color: var(--parchment-100);
     cursor: pointer;
+    background-color: var(--ember-700);
+    box-shadow: var(--btn-shadow);
 }
 
 .reset-question {

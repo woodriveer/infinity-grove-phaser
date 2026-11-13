@@ -1336,7 +1336,7 @@ No other line changes; test names stay.
 
 ---
 
-### T16: Round auto click and farm buttons, the auto click window [ ]
+### T16: Round auto click and farm buttons, the auto click window [x]
 
 **Owner**: game-dev
 **What**: The CSS of the round auto click button, its key badge, rate label and window, the switch inside it, and the round farm button (UIR-11, UIR-19 AC 1, 2, 4, 5, 21, 22).
