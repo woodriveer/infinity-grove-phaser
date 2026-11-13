@@ -1514,6 +1514,7 @@ test.describe('Grove theme', () => {
         await expectStyle(page.locator('.skill-row').first(), INSET);
         //  UIR-13 AC5: the portrait of the detail sits on the dark vignette
         expect(await page.locator('.hero-detail-portrait').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('rgb(28, 18, 12)');
+        expect(await page.locator('.hero-detail-portrait').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('circle at 50% 45%');
         await page.getByTestId('hero-back').click();
         await page.getByTestId('hero-close').click();
 
@@ -1576,6 +1577,8 @@ test.describe('Grove theme', () => {
             'border-top-left-radius': '8px'
         });
         expect(await page.getByTestId('hero-card-kael').locator('img').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('radial-gradient');
+        //  UIR-13 AC5: the portrait sits on the vignette centred at 50% 45%
+        expect(await page.getByTestId('hero-card-kael').locator('img').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('circle at 50% 45%');
         expect(await page.getByTestId('hero-card-kael').locator('img').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('rgb(90, 61, 38)');
         expect(await page.getByTestId('hero-card-kael').locator('img').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('rgb(28, 18, 12)');
     });
@@ -1598,7 +1601,8 @@ test.describe('Grove theme', () => {
             const content = { x: box.x + 9 * scale, y: box.y, width: box.width - 18 * scale, height: box.height };
 
             sizes.push(await card.evaluate((node) => [ node.offsetWidth, node.querySelector('img').offsetHeight ]));
-            await expectStyle(card.locator('.hero-name'), { 'font-size': '15px' });
+            //  UIR-13 AC13: the hero name of each card is Cinzel 700 15 px
+            await expectStyle(card.locator('.hero-name'), { 'font-family': expect.stringMatching(/^"?Cinzel/), 'font-weight': '700', 'font-size': '15px' });
             expect(inside(await card.locator('.hero-name').boundingBox(), content)).toBe(true);
         }
 
@@ -1633,11 +1637,13 @@ test.describe('Grove theme', () => {
         for (const [ hero, background ] of [ [ 'kael', 'rgb(244, 230, 200)' ], [ 'lyra', 'rgb(230, 208, 162)' ] ])
         {
             const row = page.getByTestId(`leader-entry-${hero}`);
-            const { color, 'font-size': size } = await css(row.locator('.leader-name'), [ 'color', 'font-size' ]);
+            const { color, 'font-size': size, 'font-family': family } = await css(row.locator('.leader-name'), [ 'color', 'font-size', 'font-family' ]);
             const { 'background-color': back } = await css(row, [ 'background-color' ]);
 
             expect(color).toBe('rgb(42, 26, 16)');
             expect(size).toBe('18px');
+            //  UIR-13 AC12: the hero name of each row is written in Cinzel
+            expect(family).toMatch(/^"?Cinzel/);
             expect(back).toBe(background);
             expect(ratio(color, back)).toBeGreaterThanOrEqual(4.5);
         }
