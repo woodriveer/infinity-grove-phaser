@@ -1672,7 +1672,7 @@ Test stand-in (`MainMenu.test.js:36`): `ellipse: vi.fn(() => { const shape = {};
 
 ---
 
-### T20: Gold and ember loading bar [ ]
+### T20: Gold and ember loading bar [x]
 
 **Owner**: game-dev
 **What**: The preloader bar has a 2 px gold outline and an ember fill (UIR-15 AC 4).
@@ -1739,7 +1739,7 @@ const createScene = () => {
 **Gate**: quick - `cd game && npm test`, then full (phase gate) - `cd game && npx playwright test`
 **Done when**:
 
-- [ ] The 3 cases pass; every Vitest and Playwright suite passes.
+- [x] The 3 cases pass; every Vitest and Playwright suite passes.
 
 **Commit**: `style(game): draw the loading bar in gold and ember`
 
