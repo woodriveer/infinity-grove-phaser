@@ -468,6 +468,19 @@ test.describe('Grove theme', () => {
         expect(Number(await timerLeft(page))).toBeGreaterThan(0.9);
     });
 
+    test('fills the ring with the share of the time left in ember', async ({ page }) => {
+        await startAs(page, { progress: MINIBOSS });
+        const timer = page.locator('.boss-timer');
+        //  The pause menu stops the countdown, so the share set here is the one the ring draws
+        await page.keyboard.press('Escape');
+
+        await timer.evaluate((node) => node.style.setProperty('--timer-left', '0.750'));
+        expect((await css(timer, [ 'background-image' ], '::before'))['background-image']).toContain('conic-gradient(rgb(232, 116, 42) 270deg');
+
+        await timer.evaluate((node) => node.style.setProperty('--timer-left', '1.000'));
+        expect((await css(timer, [ 'background-image' ], '::before'))['background-image']).toContain('conic-gradient(rgb(232, 116, 42) 360deg');
+    });
+
     test('empties the ring to 0.000 at expiry and never shows a negative value', async ({ page }) => {
         await startAs(page, { progress: MINIBOSS, limit: 1500 });
         //  The expiry writes 0.000 and removes the property in the same task, so a frame sampler would miss it:
