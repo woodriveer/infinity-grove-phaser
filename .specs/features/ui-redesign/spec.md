@@ -251,7 +251,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 3. WHEN an encounter of element NATURE spawns THEN the chip SHALL read `Fraco: Fogo`.  <!-- UIR-08 -->
 4. WHEN an encounter of element LIGHT or DARKNESS spawns THEN the chip SHALL be empty and not render.  <!-- UIR-08 -->
 5. WHEN the enemy line is cleared (the monster dies, the boss times out, the chapter is complete) THEN the chip SHALL be emptied in the same call.  <!-- UIR-08 -->
-6. The chip SHALL sit centred above the enemy line, inside the same click-through HUD element, carry `data-element` of the element it names, and render as a dark chip with that element's dot.  <!-- UIR-08 -->
+6. WHEN the chip shows (FIRE, WATER or NATURE encounter) THEN its horizontal centre SHALL be within 1 scene px of the horizontal centre of the enemy line (`.enemy-stats`) and its bottom edge at or above that line's top edge, inside the same click-through HUD element (`.hud-enemy`), and it SHALL carry `data-element` of the element it names and render as a dark chip with that element's dot.  <!-- UIR-08 -->
 7. The chip's box SHALL not overlap the battle bar or the hero rail.  <!-- UIR-08 -->
 
 **Independent Test**: Start against a FIRE monster: `Fraco: Água` with a blue dot above the enemy chips; against a LIGHT monster: no chip.
