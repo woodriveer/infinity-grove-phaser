@@ -1906,7 +1906,7 @@ The four `--branch` colours, `.talent-upgrade` and `.talent-reset` do not change
 
 ---
 
-### T25: Framed chapter map [ ]
+### T25: Framed chapter map [x]
 
 **Owner**: game-dev
 **What**: The `Rever chefes` map gets a wood ring and a bronze ring without changing its size (UIR-14 AC 10).
@@ -1932,7 +1932,7 @@ Rings are shadows, not a border, so the map keeps its 880 x 495 layout box and t
 **Gate**: build - `cd game && npm test && npm run build`, then `cd game && npx playwright test e2e/bossMap.spec.js`
 **Done when**:
 
-- [ ] The build passes and `bossMap.spec.js` passes unchanged.
+- [x] The build passes and `bossMap.spec.js` passes unchanged.
 
 **Commit**: `style(game): frame the chapter map`
 
