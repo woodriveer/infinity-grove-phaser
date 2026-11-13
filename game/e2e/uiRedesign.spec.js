@@ -410,7 +410,7 @@ test.describe('Grove theme', () => {
         await expectStyle(page.getByTestId('piece-sell'), WOOD_PILL);
         await expect(page.getByTestId('piece-refine')).toBeEnabled();
         await expectStyle(page.getByTestId('piece-refine'), EMBER_PILL);
-        //  UIR-02 AC9: the hover brightens them
+        //  UIR-02 AC9: the hover brightens them. AC10 (press) is not asserted on the three: the hover rule of style.css:1757 overrides the press rule of :196
         await expectHoverShade(page.locator('[data-testid^="piece-equip-"]').first());
         await expectHoverShade(page.getByTestId('piece-sell'));
         await expectHoverShade(page.getByTestId('piece-refine'));
@@ -430,6 +430,7 @@ test.describe('Grove theme', () => {
         await page.getByTestId('equip-piece-c1').click();
         await page.getByTestId('bulk-sell-submit').click();
 
+        //  UIR-02 AC9: the hover brightens it. AC10 (press) is not asserted: the hover rule of style.css:2520 overrides the press rule of :197
         await expectStyle(page.getByTestId('bulk-sell-confirm-yes'), EMBER_PILL);
         await expectHoverShade(page.getByTestId('bulk-sell-confirm-yes'));
     });
@@ -445,6 +446,17 @@ test.describe('Grove theme', () => {
         await page.mouse.down();
         await expect.poll(async () => (await css(close, [ 'filter' ])).filter).toBe('brightness(0.9)');
         await page.mouse.up();
+    });
+
+    //  UIR-02 AC9 and AC10 for the two buttons of the auto click window, each on its own: the shared rule of the buttons may drop one
+    test('brightens and darkens the upgrade and the reset buttons of the window, one at a time', async ({ page }) => {
+        await startAs(page, { progress: { chapter: 3 }, autoClick: { crystals: 10 } });
+        await openAutoClick(page);
+
+        await expect(page.getByTestId('auto-click-upgrade')).toBeEnabled();
+        await expect(page.getByTestId('reset-account')).toBeEnabled();
+        await expectShades(page, page.getByTestId('auto-click-upgrade'));
+        await expectShades(page, page.getByTestId('reset-account'));
     });
 
     test('keeps a disabled button at opacity 0.45', async ({ page }) => {
