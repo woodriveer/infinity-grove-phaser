@@ -125,7 +125,7 @@ const openScreen = async (page, screen) => {
 
 //  The button recipes of UIR-02: secondary (wood) and primary (ember)
 const WOOD_PILL = { 'background-color': 'rgb(43, 29, 20)', 'border-top-width': '2px', 'border-top-style': 'solid', 'border-top-color': 'rgb(176, 122, 58)', color: 'rgb(244, 230, 200)', 'border-top-left-radius': '999px' };
-const EMBER_PILL = { 'background-color': 'rgb(168, 67, 26)', 'border-top-width': '2px', 'border-top-color': 'rgb(224, 180, 90)', color: 'rgb(244, 230, 200)' };
+const EMBER_PILL = { 'background-color': 'rgb(168, 67, 26)', 'border-top-width': '2px', 'border-top-style': 'solid', 'border-top-color': 'rgb(224, 180, 90)', color: 'rgb(244, 230, 200)' };
 
 //  UIR-02 AC9 and AC10: the hover brightens an enabled button and the press darkens it. The release is made off the button,
 //  so the press itself clicks nothing (some buttons spend crystals, copper or log out)
@@ -265,6 +265,7 @@ test.describe('Grove theme', () => {
         await expectStyle(page.getByTestId('hero-close'), {
             'background-color': 'rgb(43, 29, 20)',
             'border-top-width': '2px',
+            'border-top-style': 'solid',
             'border-top-color': 'rgb(176, 122, 58)',
             color: 'rgb(244, 230, 200)',
             'border-top-left-radius': '999px'
@@ -277,6 +278,8 @@ test.describe('Grove theme', () => {
 
         await expectStyle(page.getByTestId('fusion-button-kael-1'), {
             'background-color': 'rgb(168, 67, 26)',
+            'border-top-width': '2px',
+            'border-top-style': 'solid',
             'border-top-color': 'rgb(224, 180, 90)',
             color: 'rgb(244, 230, 200)'
         });
@@ -289,6 +292,7 @@ test.describe('Grove theme', () => {
         await expectStyle(menu.loginButton, {
             'background-color': 'rgb(168, 67, 26)',
             'border-top-width': '2px',
+            'border-top-style': 'solid',
             'border-top-color': 'rgb(224, 180, 90)',
             color: 'rgb(244, 230, 200)'
         });
@@ -588,6 +592,7 @@ test.describe('Grove theme', () => {
         const plaque = {
             'background-color': 'rgb(234, 214, 173)',
             'border-top-width': '3px',
+            'border-top-style': 'solid',
             'border-top-color': 'rgb(90, 61, 38)',
             'border-top-left-radius': '6px',
             'font-family': expect.stringMatching(/^"?Cinzel/),
@@ -959,6 +964,7 @@ test.describe('Grove theme', () => {
         expect(await art.evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 150, 62 ]);
         await expectStyle(art, {
             'border-top-width': '2px',
+            'border-top-style': 'solid',
             'border-top-color': 'rgb(176, 122, 58)',
             'border-top-left-radius': '8px',
             'background-color': 'rgb(28, 18, 12)'
@@ -1495,6 +1501,7 @@ test.describe('Grove theme', () => {
         await expectStyle(window_, {
             'background-color': 'rgb(234, 214, 173)',
             'border-top-width': '3px',
+            'border-top-style': 'solid',
             'border-top-color': 'rgb(90, 61, 38)',
             'border-top-left-radius': '12px'
         });
@@ -1583,6 +1590,7 @@ test.describe('Grove theme', () => {
         await expectStyle(page.locator('.piece-tooltip'), {
             'background-color': 'rgb(234, 214, 173)',
             'border-top-width': '2px',
+            'border-top-style': 'solid',
             'border-top-color': 'rgb(90, 61, 38)',
             'border-top-left-radius': '8px'
         });
@@ -1595,6 +1603,7 @@ test.describe('Grove theme', () => {
         await expectStyle(page.locator('.skill-tooltip'), {
             'background-color': 'rgb(234, 214, 173)',
             'border-top-width': '2px',
+            'border-top-style': 'solid',
             'border-top-color': 'rgb(90, 61, 38)',
             'border-top-left-radius': '8px'
         });
@@ -1714,6 +1723,7 @@ test.describe('Grove theme', () => {
         await expectStyle(menu.username, {
             'background-color': 'rgb(244, 230, 200)',
             'border-top-width': '2px',
+            'border-top-style': 'solid',
             'border-top-color': 'rgb(90, 61, 38)',
             color: 'rgb(42, 26, 16)'
         });
