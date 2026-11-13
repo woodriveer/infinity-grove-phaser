@@ -1744,6 +1744,69 @@ test.describe('Grove theme', () => {
         expect((await css(page.getByTestId('talent-CRIT_CHANCE'), [ 'box-shadow' ]))['box-shadow']).toContain('rgb(201, 154, 31) 4px 0px 0px 0px inset');
     });
 
+    //  UIR-04 AC7: the battle HUD keeps its place on the scene. The anchors are the ones the redesign keeps when a plaque grows:
+    //  the centre of the chapter tag, the boss timer, the combo and the enemy line, the centre line of the plaques, the left of the
+    //  stage plaque and the right of the wallet. The values are the baseline's (5d98b6f) in a 1024 x 768 scene, same battle state.
+    //  The enemy line's vertical centre is not asserted: it moved from 596 to 609 with the weak chip (see the report)
+    test('keeps the battle HUD on the scene anchors of the baseline', async ({ page }) => {
+        const menu = await startAs(page, { progress: MINIBOSS, talents: { COMBO: 10 } });
+
+        for (let i = 0; i < 3; i++) { await menu.canvas.click(); }
+        await expect(page.getByTestId('combo-hud')).toBeVisible();
+        await expect(page.locator('.boss-timer')).toBeVisible();
+
+        //  One read of every box: the combo hides after a short while, so the boxes are taken in the same synchronous step
+        const { canvas, boxes } = await page.evaluate(() => {
+            const rect = (node) => {
+                const r = node?.getBoundingClientRect();
+
+                return r && { x: r.x, y: r.y, width: r.width, height: r.height };
+            };
+
+            return {
+                canvas: rect(document.querySelector('#game-container canvas')),
+                boxes: {
+                    stage: rect(document.querySelector('.stage-hud')),
+                    wallet: rect(document.querySelector('.wallet')),
+                    chapter: rect(document.querySelector('[data-testid="chapter-hud"]')),
+                    combo: rect(document.querySelector('[data-testid="combo-hud"]')),
+                    timer: rect(document.querySelector('.boss-timer')),
+                    enemy: rect(document.querySelector('.enemy-stats'))
+                }
+            };
+        });
+        const scene = (box) => {
+            expect(box).not.toBeNull();
+
+            return {
+                left: ((box.x - canvas.x) * 1024) / canvas.width,
+                right: ((box.x + box.width - canvas.x) * 1024) / canvas.width,
+                centreX: ((box.x + box.width / 2 - canvas.x) * 1024) / canvas.width,
+                centreY: ((box.y + box.height / 2 - canvas.y) * 768) / canvas.height
+            };
+        };
+        const near = (value, expected) => Math.abs(value - expected) <= 1;
+
+        const stage = scene(boxes.stage);
+        const wallet = scene(boxes.wallet);
+        const chapter = scene(boxes.chapter);
+        const combo = scene(boxes.combo);
+        const timer = scene(boxes.timer);
+        const enemy = scene(boxes.enemy);
+
+        expect(near(stage.left, 156)).toBe(true);
+        expect(near(stage.centreY, 44)).toBe(true);
+        expect(near(wallet.right, 1004)).toBe(true);
+        expect(near(wallet.centreY, 44)).toBe(true);
+        expect(near(chapter.centreX, 82)).toBe(true);
+        expect(near(chapter.centreY, 96)).toBe(true);
+        expect(near(combo.centreX, 670)).toBe(true);
+        expect(near(combo.centreY, 150)).toBe(true);
+        expect(near(timer.centreX, 512)).toBe(true);
+        expect(near(timer.centreY, 44)).toBe(true);
+        expect(near(enemy.centreX, 670)).toBe(true);
+    });
+
     //  UIR-14 AC9: each card keeps its branch colour on its left edge (an inset bar of 4 px). The colours are the baseline's (5d98b6f, style.css:1647-1650)
     test('draws the left bar of a talent card in the colour of its branch', async ({ page }) => {
         await startAs(page, {});
