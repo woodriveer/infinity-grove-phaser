@@ -2005,7 +2005,7 @@ The wheel gets rings as shadows, not a border, so the arrows that `elementWheel.
 
 ---
 
-### T28: e2e of the Grove theme [ ]
+### T28: e2e of the Grove theme [x]
 
 **Owner**: test-engineer
 **What**: Browser tests of every acceptance criterion of UIR-01 to UIR-16 and UIR-19 the browser can observe, the spec edge cases included.
@@ -2128,7 +2128,7 @@ Skill thumbnails (UIR-16):
 **Gate**: full - `cd game && npx playwright test e2e/uiRedesign.spec.js` twice in a row, then `cd game && npm test && npx playwright test`
 **Done when**:
 
-- [ ] Every scenario above passes twice in a row, and the whole Vitest and Playwright suites pass.
+- [x] Every scenario above passes twice in a row, and the whole Vitest and Playwright suites pass.
 
 **Commit**: `test(game): cover the grove theme in the browser`
 
