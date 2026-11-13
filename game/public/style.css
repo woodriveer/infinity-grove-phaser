@@ -275,7 +275,7 @@ button:disabled {
     margin: 0;
     font-size: 17px;
     line-height: 1.5;
-    color: var(--color-neutral-800);
+    color: var(--ink-600);
     pointer-events: none;
 }
 
@@ -288,23 +288,23 @@ button:disabled {
 
 .auth-form input {
     width: 100%;
-    padding: 13px 20px;
+    padding: 12px 20px;
     font-family: var(--font-body);
     font-size: 17px;
-    color: var(--color-text);
+    color: var(--ink-900);
     caret-color: var(--color-accent);
-    background: var(--color-surface);
-    border: 1px solid var(--color-divider);
+    background: var(--parchment-100);
+    border: 2px solid var(--wood-600);
     border-radius: 999px;
 }
 
 .auth-form input:hover {
-    border-color: color-mix(in srgb, var(--color-text) 45%, transparent);
+    border-color: var(--bronze-500);
 }
 
 .auth-form input:focus-visible {
-    border-color: var(--color-accent);
-    outline-offset: 0;
+    border-color: var(--color-focus);
+    outline-offset: 2px;
 }
 
 .auth-form input::placeholder {
@@ -333,11 +333,11 @@ button:disabled {
     font-size: 15px;
     font-weight: 700;
     line-height: 1.4;
-    color: var(--color-accent-2-700);
+    color: var(--color-accent-2-800);
 }
 
 .auth-message.error {
-    color: var(--color-accent-700);
+    color: var(--ember-800);
 }
 
 .welcome {
@@ -356,6 +356,8 @@ button:disabled {
     font-family: var(--font-heading);
     font-size: 34px;
     line-height: 1.1;
+    font-weight: 700;
+    color: var(--ink-900);
 }
 
 /* Looks like the Continue button of the design; the whole canvas takes the click */
@@ -367,10 +369,13 @@ button:disabled {
     padding: 16px 26px;
     font-family: var(--font-heading);
     font-size: 22px;
-    color: var(--color-bg);
-    background: var(--color-accent);
+    color: var(--parchment-100);
+    background: var(--btn-primary-bg);
     border-radius: 999px;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--btn-shadow);
+    font-weight: 700;
+    background-color: var(--ember-700);
+    border: 2px solid var(--gold-400);
 }
 
 .welcome-start svg {
@@ -390,15 +395,17 @@ button:disabled {
     gap: 18px;
     width: 640px;
     padding: 30px 32px 28px;
-    border-radius: 36px;
-    background: var(--color-bg);
-    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-lg);
+    background: var(--panel-bg);
+    box-shadow: var(--panel-shadow);
+    background-color: var(--parchment-200);
+    border: var(--panel-border);
 }
 
 .path-title {
     margin: 0;
     font-family: var(--font-heading);
-    font-weight: 400;
+    font-weight: 700;
     font-size: 36px;
     line-height: 1.1;
 }
@@ -418,16 +425,17 @@ button:disabled {
     padding: 16px 10px 14px;
     font-family: var(--font-heading);
     font-size: 16px;
-    color: var(--color-text);
-    border: none;
-    border-radius: var(--radius-lg);
-    background: var(--color-surface);
+    color: var(--ink-900);
+    border: var(--inset-border);
+    border-radius: var(--radius-md);
+    background: var(--parchment-300);
     cursor: pointer;
+    font-weight: 700;
 }
 
 .path-option:hover:not(:disabled) {
-    background: var(--color-accent-200);
-    box-shadow: inset 0 0 0 2px var(--color-accent);
+    background: var(--parchment-100);
+    box-shadow: inset 0 0 0 2px var(--bronze-500);
 }
 
 .path-option img {

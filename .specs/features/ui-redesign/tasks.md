@@ -1587,7 +1587,7 @@ Other rules:
 
 ---
 
-### T18: Main menu fields, buttons and path choice [ ]
+### T18: Main menu fields, buttons and path choice [x]
 
 **Owner**: game-dev
 **What**: The DOM of the main menu in the Grove recipes (UIR-15 AC 2, 3).
