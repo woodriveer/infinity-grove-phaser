@@ -217,6 +217,27 @@ test.describe('Grove theme', () => {
         expect(background).toContain('ui-parchment.jpg');
     });
 
+    test('draws the wood texture as the top layer of a dark wood frame once its token is set', async ({ page }) => {
+        await startAs(page, {});
+        await page.addStyleTag({ content: ':root { --texture-wood: url("assets/ui-wood.jpg"); }' });
+
+        const background = await page.locator('.leader-card').evaluate((node) => getComputedStyle(node).backgroundImage);
+
+        expect(background.startsWith('url(')).toBe(true);
+        expect(background).toContain('ui-wood.jpg');
+        expect(background.indexOf('ui-wood.jpg')).toBeLessThan(background.indexOf('linear-gradient'));
+    });
+
+    test('draws the parchment texture on a second parchment panel, not only the hero window', async ({ page }) => {
+        await startAs(page, {});
+        await page.addStyleTag({ content: ':root { --texture-parchment: url("assets/ui-parchment.jpg"); }' });
+
+        const background = await page.locator('.battle-bar').evaluate((node) => getComputedStyle(node).backgroundImage);
+
+        expect(background.startsWith('url(')).toBe(true);
+        expect(background).toContain('ui-parchment.jpg');
+    });
+
     test('draws Fechar as a wood pill', async ({ page }) => {
         await startAs(page, {});
         await openScreen(page, 'heroes');
