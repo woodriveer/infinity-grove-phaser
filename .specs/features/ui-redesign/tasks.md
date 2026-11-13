@@ -1627,7 +1627,7 @@ Other rules:
 
 ---
 
-### T19: Parchment menu oval with a wood rim [ ]
+### T19: Parchment menu oval with a wood rim [x]
 
 **Owner**: game-dev
 **What**: The Phaser oval of the main menu is parchment with a 6 px dark wood rim (UIR-15 AC 1).

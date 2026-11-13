@@ -33,7 +33,7 @@ const createScene = (data = {}) => {
             image.setOrigin = () => image;
             return image;
         }),
-        ellipse: vi.fn(() => ({})),
+        ellipse: vi.fn(() => { const shape = {}; shape.setStrokeStyle = vi.fn(() => shape); return shape; }),
         text: vi.fn(() => ({})),
         dom: vi.fn(() => ({
             createFromHTML: (html) => {
@@ -432,5 +432,34 @@ describe('MainMenu logo', () => {
 
         const [ , y ] = scene.add.image.mock.calls.find(([ , , key ]) => key === 'logo');
         expect(y).toBeLessThan(0);
+    });
+});
+
+describe('MainMenu oval', () => {
+    it('draws the menu oval in parchment at 170, 380, 700 x 1040', async () => {
+        const { scene } = createScene({ highscore: 0 });
+
+        await open(scene);
+
+        expect(scene.add.ellipse.mock.calls[1]).toEqual([ 170, 380, 700, 1040, 0xead6ad ]);
+    });
+
+    it('gives the menu oval a 6 px dark wood rim', async () => {
+        const { scene } = createScene({ highscore: 0 });
+
+        await open(scene);
+
+        const oval = scene.add.ellipse.mock.results[1].value;
+
+        expect(oval.setStrokeStyle).toHaveBeenCalledTimes(1);
+        expect(oval.setStrokeStyle).toHaveBeenCalledWith(6, 0x5a3d26);
+    });
+
+    it('keeps the soft shadow under the oval', async () => {
+        const { scene } = createScene({ highscore: 0 });
+
+        await open(scene);
+
+        expect(scene.add.ellipse.mock.calls[0]).toEqual([ 176, 392, 700, 1040, 0x2e2b25, 0.22 ]);
     });
 });

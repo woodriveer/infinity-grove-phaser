@@ -4,9 +4,9 @@ import { STARTING_CHOICES } from '../../domain/heroes/heroes';
 const CHOOSE_PATH_TEXT = 'Escolha seu caminho';
 const TAGLINE_TEXT = 'Defenda a Grande Árvore das hordas do Submundo.';
 
-//  Everything the player reads or clicks sits in a cream oval on the left; x is the centre of that column
+//  Everything the player reads or clicks sits in a parchment oval with a dark wood rim on the left; x is the centre of that column
 const COLUMN_X = 216;
-const OVAL = { x: 170, y: 380, width: 700, height: 1040, color: 0xf5ead8, shadow: 0x2e2b25 };
+const OVAL = { x: 170, y: 380, width: 700, height: 1040, color: 0xead6ad, rim: 0x5a3d26, rimWidth: 6, shadow: 0x2e2b25 };
 
 //  The five heroes stand on the right, back to front; x is the centre of the feet, y the ground line
 const LINEUP = [
@@ -76,7 +76,7 @@ export class MainMenu extends Scene
 
         //  The oval drops a soft shadow on the forest
         this.add.ellipse(OVAL.x + 6, OVAL.y + 12, OVAL.width, OVAL.height, OVAL.shadow, 0.22);
-        this.add.ellipse(OVAL.x, OVAL.y, OVAL.width, OVAL.height, OVAL.color);
+        this.add.ellipse(OVAL.x, OVAL.y, OVAL.width, OVAL.height, OVAL.color).setStrokeStyle(OVAL.rimWidth, OVAL.rim);
 
         //  Scaled to 400 px wide; start above the canvas, rest at y = 150
         const logo = this.add.image(COLUMN_X, -150, 'logo');
