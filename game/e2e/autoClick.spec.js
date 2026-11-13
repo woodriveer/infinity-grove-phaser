@@ -26,6 +26,12 @@ const startGame = async (page, chapter) => {
 
 const health = (page) => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').monster?.health);
 
+//  The auto click controls live in the window of the round button (spec ui-redesign D1)
+const openAutoClick = async (page) => {
+    await page.getByTestId('auto-click-button').click();
+    await expect(page.getByTestId('auto-click-popover')).toBeVisible();
+};
+
 test.describe('Auto click', () => {
     test('in chapter 2 the monster loses health with no click', async ({ page }) => {
         await startGame(page, 2);
@@ -49,6 +55,7 @@ test.describe('Auto click', () => {
 
     test('shows 500 ms, Cristais: 0 and a disabled Melhorar: 250 ms (10 cristais)', async ({ page }) => {
         await startGame(page, 2);
+        await openAutoClick(page);
 
         await expect(page.getByTestId('auto-click-toggle')).toBeChecked();
         await expect(page.getByTestId('auto-click-interval')).toHaveText('500 ms');
@@ -68,6 +75,7 @@ test.describe('Auto click', () => {
             scene.hitMonster = (pointer) => { window.__pointerHits += 1; hit(pointer); };
         });
 
+        await openAutoClick(page);
         await page.getByTestId('auto-click-toggle').click();
         await expect(page.getByTestId('auto-click-toggle')).not.toBeChecked();
         expect(await page.evaluate(() => window.__pointerHits)).toBe(0);
@@ -80,6 +88,7 @@ test.describe('Auto click', () => {
     test('in chapter 1 there is no Auto clique switch and no hit without a click', async ({ page }) => {
         await startGame(page, 1);
 
+        await expect(page.getByTestId('auto-click-button')).toBeHidden();
         await expect(page.getByTestId('auto-click-toggle')).toBeHidden();
         await page.waitForTimeout(1500);
 

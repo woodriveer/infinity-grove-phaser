@@ -1289,7 +1289,7 @@ Every existing auto click test (`toggle`, `interval`, `crystals`, `upgradeButton
 
 ---
 
-### T15: Open the auto click window in the existing browser tests [ ]
+### T15: Open the auto click window in the existing browser tests [x]
 
 **Owner**: test-engineer
 **What**: The two e2e suites that used the old card open the auto click window before touching its controls, so they test the same behaviour through the new button (UIR-19 AC 7; regression of `auto-click` and `account-reset`).

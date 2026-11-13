@@ -24,9 +24,16 @@ const startGame = async (page, chapter) => {
 
 const health = (page) => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').monster?.health);
 
+//  The auto click controls live in the window of the round button (spec ui-redesign D1)
+const openAutoClick = async (page) => {
+    await page.getByTestId('auto-click-button').click();
+    await expect(page.getByTestId('auto-click-popover')).toBeVisible();
+};
+
 test.describe('Account reset', () => {
     test('in chapter 3 the button offers 3 crystals and Cancelar keeps the chapter', async ({ page }) => {
         await startGame(page, 3);
+        await openAutoClick(page);
 
         await expect(page.getByTestId('reset-account')).toHaveText('Resetar conta (+3 cristais)');
         await page.getByTestId('reset-account').click();
@@ -51,6 +58,7 @@ test.describe('Account reset', () => {
             scene.hitMonster = (pointer) => { window.__pointerHits += 1; hit(pointer); };
         });
 
+        await openAutoClick(page);
         await page.getByTestId('reset-account').click();
         await page.getByTestId('reset-confirm').click();
 
@@ -58,7 +66,7 @@ test.describe('Account reset', () => {
         await expect(page.getByTestId('auto-click-crystals')).toHaveText('Cristais: 3');
         await expect(page.getByTestId('card-notice')).toHaveText('+3 cristais');
         await expect(page.getByTestId('reset-dialog')).toBeHidden();
-        await expect(page.getByTestId('auto-click-toggle')).toBeVisible();
+        await expect(page.getByTestId('auto-click-button')).toBeVisible();
         await expect(page.getByTestId('reset-account')).toHaveCount(0);
         expect(await page.evaluate(() => window.__pointerHits)).toBe(0);
 
