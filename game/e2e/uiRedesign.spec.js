@@ -797,7 +797,8 @@ test.describe('Grove theme', () => {
 
         await expect(page.locator('.enemy-stats')).toHaveText('Nature  Physical def 10%  Magical def 20%  Crit res 30%');
         await expectStyle(page.locator('.enemy-stats'), { 'background-color': 'rgba(0, 0, 0, 0)' });
-        await expectStyle(page.locator('.tag-element'), { 'background-color': 'rgba(28, 18, 12, 0.85)', 'border-top-color': 'rgb(176, 122, 58)' });
+        //  UIR-07 AC18: a dark chip with a 1 px solid bronze border
+        await expectStyle(page.locator('.tag-element'), { 'background-color': 'rgba(28, 18, 12, 0.85)', 'border-top-width': '1px', 'border-top-style': 'solid', 'border-top-color': 'rgb(176, 122, 58)' });
         expect(await page.locator('.tag-element').getAttribute('data-element')).toBe('NATURE');
         expect((await css(page.locator('.tag-element'), [ 'background-color' ], '::before'))['background-color']).toBe('rgb(79, 154, 60)');
         expect((await css(page.locator('.tag-element'), [ 'width' ], '::before')).width).toBe('10px');
@@ -805,11 +806,16 @@ test.describe('Grove theme', () => {
         expect((await css(page.locator('[data-stat="physical"]'), [ 'width' ], '::before')).width).toBe('12px');
         expect((await css(page.locator('[data-stat="magical"]'), [ 'background-color' ], '::before'))['background-color']).toBe('rgb(63, 143, 209)');
         expect((await css(page.locator('[data-stat="crit"]'), [ 'background-color' ], '::before'))['background-color']).toBe('rgb(214, 69, 65)');
+        //  UIR-07 AC17: the magical and the crit icons are 12 px too
+        expect((await css(page.locator('[data-stat="magical"]'), [ 'width' ], '::before')).width).toBe('12px');
+        expect((await css(page.locator('[data-stat="crit"]'), [ 'width' ], '::before')).width).toBe('12px');
 
         for (const tag of await page.locator('.enemy-stats .tag').all())
         {
             await expectStyle(tag, {
                 'background-color': 'rgba(28, 18, 12, 0.85)',
+                'border-top-width': '1px',
+                'border-top-style': 'solid',
                 'border-top-color': 'rgb(176, 122, 58)',
                 color: 'rgb(244, 230, 200)'
             });
@@ -873,6 +879,14 @@ test.describe('Grove theme', () => {
             expect(Math.abs(chip.x + chip.width / 2 - (line.x + line.width / 2))).toBeLessThanOrEqual(1);
             expect(chip.y + chip.height).toBeLessThanOrEqual(line.y);
             expect(await page.locator('.hud-enemy [data-testid="weak-chip"]').count()).toBe(1);
+            //  UIR-08 AC6: the chip renders as a dark chip, the recipe of UIR-07 AC18
+            await expectStyle(page.getByTestId('weak-chip'), {
+                'background-color': 'rgba(28, 18, 12, 0.85)',
+                'border-top-width': '1px',
+                'border-top-style': 'solid',
+                'border-top-color': 'rgb(176, 122, 58)',
+                color: 'rgb(244, 230, 200)'
+            });
         });
     }
 
