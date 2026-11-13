@@ -524,7 +524,11 @@ test.describe('Grove theme', () => {
         await startAs(page, { progress: { chapter: 2, ...MINIBOSS } });
         const quiet = { 'animation-name': 'none', 'transition-duration': '0s' };
 
-        await expectStyle(page.getByTestId('hud-heroes'), quiet);
+        //  UIR-03 AC15: every rail button is restyled, so every rail button is still
+        for (const id of [ 'hud-heroes', 'hud-bag', 'hud-fusion', 'hud-leader', 'hud-equipment', 'hud-talents', 'hud-farm' ])
+        {
+            await expectStyle(page.getByTestId(id), quiet);
+        }
         await expectStyle(page.getByTestId('auto-click-button'), quiet);
         await expectStyle(page.locator('.boss-timer'), quiet);
         await openScreen(page, 'heroes');
@@ -548,6 +552,8 @@ test.describe('Grove theme', () => {
         await expectStyle(page.getByTestId('chapter-hud'), {
             'background-color': 'rgb(234, 214, 173)',
             'border-top-width': '2px',
+            'border-top-style': 'solid',
+            'border-top-color': 'rgb(90, 61, 38)',
             'border-top-left-radius': '4px',
             'font-size': '16px',
             'font-family': expect.stringMatching(/^"?Cinzel/),
@@ -563,8 +569,12 @@ test.describe('Grove theme', () => {
 
         await expectStyle(page.getByTestId('combo-hud'), {
             'background-color': 'rgb(138, 53, 16)',
+            'border-top-width': '2px',
+            'border-top-style': 'solid',
             'border-top-color': 'rgb(224, 180, 90)',
             color: 'rgb(244, 230, 200)',
+            'font-family': expect.stringMatching(/^"?Cinzel/),
+            'font-weight': '700',
             'font-size': '20px'
         });
     });
@@ -581,6 +591,8 @@ test.describe('Grove theme', () => {
             color: 'rgb(255, 211, 92)',
             '-webkit-text-stroke-color': 'rgb(42, 20, 8)',
             '-webkit-text-stroke-width': '10px',
+            'font-family': expect.stringMatching(/^"?Cinzel/),
+            'font-weight': '700',
             'font-size': '52px'
         });
     });
@@ -592,7 +604,12 @@ test.describe('Grove theme', () => {
         await expect(page.getByTestId('card-notice')).toHaveText('Carta: Lyra Folhaveloz');
         await expectStyle(page.getByTestId('card-notice'), {
             'background-color': 'rgb(43, 29, 20)',
+            'border-top-width': '2px',
+            'border-top-style': 'solid',
+            'border-top-color': 'rgb(176, 122, 58)',
             color: 'rgb(243, 213, 138)',
+            'font-family': expect.stringMatching(/^"?Cinzel/),
+            'font-weight': '700',
             'font-size': '22px'
         });
     });
@@ -603,16 +620,25 @@ test.describe('Grove theme', () => {
         expect(await page.evaluate(() => {
             const scene = window.__PHASER_GAME__.scene.getScene('ClickerGame');
 
-            return { fill: scene.healthFill.fillColor, back: scene.monsterParts[1].fillColor, width: scene.healthFill.width, height: scene.healthFill.height };
-        })).toEqual({ fill: 0xc0392b, back: 0x2a1410, width: 240, height: 16 });
+            return { fill: scene.healthFill.fillColor, back: scene.monsterParts[1].fillColor, width: scene.healthFill.width, height: scene.healthFill.height, x: scene.healthFill.x, y: scene.healthFill.y };
+        })).toEqual({ fill: 0xc0392b, back: 0x2a1410, width: 240, height: 16, x: 550, y: 281 });
 
-        const shadow = (await css(page.locator('.hud-monster-hp'), [ 'box-shadow', 'pointer-events' ]));
+        const shadow = (await css(page.locator('.hud-monster-hp'), [ 'box-shadow', 'pointer-events', 'background-image' ]));
 
         expect(shadow['box-shadow']).toContain('rgb(28, 18, 12) 0px 0px 0px 2px');
         expect(shadow['box-shadow']).toContain('rgb(176, 122, 58) 0px 0px 0px 4px');
         expect(shadow['pointer-events']).toBe('none');
+        //  UIR-05 AC9: the gloss is a gradient over the frame
+        expect(shadow['background-image']).toContain('linear-gradient');
         await expect(page.getByTestId('monster-hp')).toHaveText('HP 1000/1000');
-        await expectStyle(page.getByTestId('monster-hp'), { 'font-weight': '800', color: 'rgb(255, 244, 220)' });
+        await expectStyle(page.getByTestId('monster-hp'), {
+            'font-weight': '800',
+            'font-size': '12px',
+            'font-family': expect.stringMatching(/Figtree/),
+            color: 'rgb(255, 244, 220)',
+            '-webkit-text-stroke-width': '3px',
+            '-webkit-text-stroke-color': 'rgb(28, 18, 12)'
+        });
     });
 
     test('draws a normal damage number in gold Cinzel', async ({ page }) => {
@@ -636,7 +662,16 @@ test.describe('Grove theme', () => {
         const timer = page.locator('.boss-timer');
 
         await expect(timer).toHaveText(/^Time: \d+$/);
-        await expectStyle(timer, { 'background-color': 'rgb(43, 29, 20)', color: 'rgb(243, 213, 138)', 'font-size': '20px' });
+        await expectStyle(timer, {
+            'background-color': 'rgb(43, 29, 20)',
+            'border-top-width': '2px',
+            'border-top-style': 'solid',
+            'border-top-color': 'rgb(176, 122, 58)',
+            color: 'rgb(243, 213, 138)',
+            'font-family': expect.stringMatching(/^"?Cinzel/),
+            'font-weight': '700',
+            'font-size': '20px'
+        });
         await expectStyle(timer, { width: '32px' }, '::before');
 
         const first = Number(await timerLeft(page));
@@ -701,6 +736,7 @@ test.describe('Grove theme', () => {
 
         await expect(page.locator('.boss-timer')).toHaveText('');
         expect(await timerLeft(page)).toBe('');
+        await expectStyle(page.locator('.boss-timer'), { display: 'none' });
     });
 
     test('draws the enemy chips with a dot and three icons, text unchanged', async ({ page }) => {
