@@ -1938,7 +1938,7 @@ Rings are shadows, not a border, so the map keeps its 880 x 495 layout box and t
 
 ---
 
-### T26: Element wheel and skill tooltip on parchment [ ]
+### T26: Element wheel and skill tooltip on parchment [x]
 
 **Owner**: game-dev
 **What**: The element wheel card and the skill tooltip in the Grove recipes (UIR-14 AC 8, 11; Q3 default: the wheel stays).
