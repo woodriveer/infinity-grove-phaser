@@ -90,7 +90,7 @@ const enterGame = async (page, menu) => {
 };
 
 //  Logs in as yan with Kael (or another leader) and waits for the fight at 1000 health
-const startAs = async (page, { monster = bare('FIRE'), copies = { 'kael:3': 1 }, leader = 'kael', progress = {}, talents, talentPoints, equipment, autoClick, limit, random, setup } = {}) => {
+const startAs = async (page, { monster = bare('FIRE'), copies = { 'kael:3': 1 }, leader = 'kael', progress = {}, talents, talentPoints, equipment, wallet, autoClick, limit, random, setup } = {}) => {
     const backend = await mockBackend(page, {
         users: { yan: 'secret123' },
         definition: chapter(monster, limit),
@@ -99,6 +99,7 @@ const startAs = async (page, { monster = bare('FIRE'), copies = { 'kael:3': 1 },
         ...(talents && { talents: { yan: talents } }),
         ...(talentPoints !== undefined && { talentPoints: { yan: talentPoints } }),
         ...(equipment && { equipment: { yan: equipment } }),
+        ...(wallet !== undefined && { wallets: { yan: wallet } }),
         ...(autoClick && { autoClick: { yan: autoClick } })
     });
 
@@ -120,6 +121,25 @@ const openMenu = async (page) => {
 const openScreen = async (page, screen) => {
     await page.getByTestId(`hud-${screen}`).click();
     await expect(page.locator('.hero-window')).toBeVisible();
+};
+
+//  The button recipes of UIR-02: secondary (wood) and primary (ember)
+const WOOD_PILL = { 'background-color': 'rgb(43, 29, 20)', 'border-top-width': '2px', 'border-top-style': 'solid', 'border-top-color': 'rgb(176, 122, 58)', color: 'rgb(244, 230, 200)', 'border-top-left-radius': '999px' };
+const EMBER_PILL = { 'background-color': 'rgb(168, 67, 26)', 'border-top-width': '2px', 'border-top-color': 'rgb(224, 180, 90)', color: 'rgb(244, 230, 200)' };
+
+//  UIR-02 AC9 and AC10: the hover brightens an enabled button and the press darkens it. The release is made off the button,
+//  so the press itself clicks nothing (some buttons spend crystals, copper or log out)
+const expectHoverShade = async (button) => {
+    await button.hover();
+    await expect.poll(async () => (await css(button, [ 'filter' ])).filter).toBe('brightness(1.15)');
+};
+
+const expectShades = async (page, button) => {
+    await expectHoverShade(button);
+    await page.mouse.down();
+    await expect.poll(async () => (await css(button, [ 'filter' ])).filter).toBe('brightness(0.9)');
+    await page.mouse.move(0, 0);
+    await page.mouse.up();
 };
 
 const lastText = (page) => page.evaluate(() => {
@@ -260,6 +280,7 @@ test.describe('Grove theme', () => {
             'border-top-color': 'rgb(224, 180, 90)',
             color: 'rgb(244, 230, 200)'
         });
+        await expectShades(page, page.getByTestId('fusion-button-kael-1'));
     });
 
     test('draws Login as an ember pill', async ({ page }) => {
@@ -271,6 +292,110 @@ test.describe('Grove theme', () => {
             'border-top-color': 'rgb(224, 180, 90)',
             color: 'rgb(244, 230, 200)'
         });
+    });
+
+    test('draws the secondary and primary buttons of the Sign up and login screen', async ({ page }) => {
+        const menu = await openMenu(page);
+
+        await expectStyle(menu.signupButton, WOOD_PILL);
+        await expectShades(page, menu.signupButton);
+        await expectShades(page, menu.loginButton);
+    });
+
+    test('draws Logout as a wood pill and Click to Start as an ember pill on the welcome', async ({ page }) => {
+        await mockBackend(page, { users: { yan: 'secret123' } });
+        const menu = await openMainMenu(page);
+        await fillCredentials(menu, 'yan', 'secret123');
+        await menu.loginButton.click();
+        await expect(menu.message).toHaveText('Welcome back, yan!');
+
+        await page.reload();
+        const welcome = await openMainMenu(page, { state: 'welcome' });
+
+        await expectStyle(welcome.logoutButton, WOOD_PILL);
+        await expectShades(page, welcome.logoutButton);
+        //  The start line is no button: the welcome block takes no pointer (the canvas takes the click), so it has no hover or press
+        await expectStyle(page.locator('.welcome-start'), EMBER_PILL);
+    });
+
+    test('draws Voltar as a wood pill', async ({ page }) => {
+        await startAs(page, {});
+        await openScreen(page, 'heroes');
+        await page.getByTestId('hero-card-kael').click();
+
+        await expect(page.getByTestId('hero-back')).toContainText('Voltar');
+        await expectStyle(page.getByTestId('hero-back'), WOOD_PILL);
+        await expectShades(page, page.getByTestId('hero-back'));
+    });
+
+    test('draws the leave and confirm buttons of the pause menu as wood pills', async ({ page }) => {
+        await startAs(page, { progress: MINIBOSS });
+        await page.keyboard.press('Escape');
+
+        await expectStyle(page.locator('.pause-leave'), WOOD_PILL);
+        await expectShades(page, page.locator('.pause-leave'));
+        await page.locator('.pause-leave').click();
+
+        await expect(page.locator('.pause-confirm-yes')).toBeVisible();
+        await expectStyle(page.locator('.pause-confirm-yes'), WOOD_PILL);
+        await expectShades(page, page.locator('.pause-confirm-yes'));
+    });
+
+    test('draws the continue and stay buttons of the pause menu as ember pills', async ({ page }) => {
+        await startAs(page, { progress: MINIBOSS });
+        await page.keyboard.press('Escape');
+
+        await expectStyle(page.locator('.pause-continue'), EMBER_PILL);
+        await expectShades(page, page.locator('.pause-continue'));
+        await page.locator('.pause-leave').click();
+
+        await expect(page.locator('.pause-confirm-no')).toBeVisible();
+        await expectStyle(page.locator('.pause-confirm-no'), EMBER_PILL);
+        await expectShades(page, page.locator('.pause-confirm-no'));
+    });
+
+    test('draws the reset button of the dialog as a wood pill and Cancelar as an ember pill', async ({ page }) => {
+        await startAs(page, { progress: { chapter: 3 } });
+        await openAutoClick(page);
+        await page.getByTestId('reset-account').click();
+
+        await expectStyle(page.getByTestId('reset-confirm'), WOOD_PILL);
+        await expectShades(page, page.getByTestId('reset-confirm'));
+        await expectStyle(page.getByTestId('reset-cancel'), EMBER_PILL);
+        await expectShades(page, page.getByTestId('reset-cancel'));
+    });
+
+    test('draws the equip and sell buttons of a piece as wood pills and Refinar as an ember pill', async ({ page }) => {
+        await startAs(page, { equipment: [ piece('r1', 'RING', 'COMMON') ], wallet: 600 });
+        await page.getByTestId('hud-equipment').click();
+        await page.getByTestId('equip-piece-r1').click();
+
+        await expectStyle(page.locator('[data-testid^="piece-equip-"]').first(), WOOD_PILL);
+        await expectStyle(page.getByTestId('piece-sell'), WOOD_PILL);
+        await expect(page.getByTestId('piece-refine')).toBeEnabled();
+        await expectStyle(page.getByTestId('piece-refine'), EMBER_PILL);
+        //  UIR-02 AC9: the hover brightens them
+        await expectHoverShade(page.locator('[data-testid^="piece-equip-"]').first());
+        await expectHoverShade(page.getByTestId('piece-sell'));
+        await expectHoverShade(page.getByTestId('piece-refine'));
+    });
+
+    test('draws the bag button to the fusion and the bulk sale confirmation as ember pills', async ({ page }) => {
+        await startAs(page, { copies: { 'kael:3': 3 }, equipment: [ piece('c1', 'RING', 'COMMON') ] });
+        await page.getByTestId('hud-bag').click();
+        await page.getByTestId('bag-entry-kael-3').click();
+
+        await expectStyle(page.getByTestId('bag-go-fusion'), EMBER_PILL);
+        await expectShades(page, page.getByTestId('bag-go-fusion'));
+
+        await page.getByTestId('hero-close').click();
+        await page.getByTestId('hud-equipment').click();
+        await page.getByTestId('bulk-sell-start').click();
+        await page.getByTestId('equip-piece-c1').click();
+        await page.getByTestId('bulk-sell-submit').click();
+
+        await expectStyle(page.getByTestId('bulk-sell-confirm-yes'), EMBER_PILL);
+        await expectHoverShade(page.getByTestId('bulk-sell-confirm-yes'));
     });
 
     test('brightens a hovered button and darkens a pressed one', async ({ page }) => {
@@ -301,6 +426,22 @@ test.describe('Grove theme', () => {
         expect((await css(page.locator('.wallet .coin-gold'), [ 'background-image' ], '::before'))['background-image']).toContain('rgb(255, 241, 176)');
         expect((await css(page.locator('.wallet .coin-silver'), [ 'background-image' ], '::before'))['background-image']).toContain('rgb(201, 204, 209)');
         expect((await css(page.locator('.wallet .coin-copper'), [ 'background-image' ], '::before'))['background-image']).toContain('rgb(184, 101, 45)');
+
+        //  UIR-02 AC12: every coin is 20 px and runs through three metallic stops
+        await expectStyle(page.locator('.wallet .coin-silver'), { width: '20px' }, '::before');
+        await expectStyle(page.locator('.wallet .coin-copper'), { width: '20px' }, '::before');
+        const stops = [
+            [ 'coin-gold', [ 'rgb(255, 241, 176)', 'rgb(224, 180, 90)', 'rgb(138, 90, 18)' ] ],
+            [ 'coin-silver', [ 'rgb(255, 255, 255)', 'rgb(201, 204, 209)', 'rgb(111, 116, 123)' ] ],
+            [ 'coin-copper', [ 'rgb(246, 192, 143)', 'rgb(184, 101, 45)', 'rgb(94, 44, 16)' ] ]
+        ];
+
+        for (const [ coin, colours ] of stops)
+        {
+            const background = (await css(page.locator(`.wallet .${coin}`), [ 'background-image' ], '::before'))['background-image'];
+
+            for (const colour of colours) { expect(background).toContain(colour); }
+        }
     });
 
     test('rings the focused control in ember', async ({ page }) => {
