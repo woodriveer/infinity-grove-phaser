@@ -1277,6 +1277,31 @@ test.describe('Grove theme', () => {
         }
     });
 
+    test('keeps the leader card, the bar and the rail at their scene boxes', async ({ page }) => {
+        await startAs(page, { progress: { chapter: 2 } });
+        const canvas = await canvasBox(page);
+        const sceneY = (box) => ({ from: ((box.y - canvas.y) * 768) / canvas.height, to: ((box.y + box.height - canvas.y) * 768) / canvas.height });
+
+        //  UIR-04 AC7 keeps these boxes; the x and y ranges are the ones UIR-19 AC21 names
+        for (const [ selector, from, to ] of [ [ '.leader-card', 34, 274 ], [ '.battle-bar', 20, 1004 ] ])
+        {
+            const span = sceneSpan(canvas, await page.locator(selector).boundingBox());
+
+            expect(Math.abs(span.from - from)).toBeLessThanOrEqual(1);
+            expect(Math.abs(span.to - to)).toBeLessThanOrEqual(1);
+        }
+        const bar = sceneY(await page.locator('.battle-bar').boundingBox());
+
+        expect(Math.abs(bar.from - 624)).toBeLessThanOrEqual(1);
+        expect(Math.abs(bar.to - 748)).toBeLessThanOrEqual(1);
+
+        //  The rail starts at x 907 and ends at y 609
+        const rail = await page.locator('.hero-hud').boundingBox();
+
+        expect(Math.abs(sceneSpan(canvas, rail).from - 907)).toBeLessThanOrEqual(1);
+        expect(Math.abs(sceneY(rail).to - 609)).toBeLessThanOrEqual(1);
+    });
+
     test('draws the farm switch as a round skull button with an ember ring when on', async ({ page }) => {
         await startAs(page, {});
         const farm = page.locator('.farm-toggle input');
