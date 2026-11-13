@@ -2349,7 +2349,7 @@ The existing case `draws the battle bar, leader card and skill frames` keeps pas
 
 ---
 
-### T33: Keep the skill art and its text inside the skill tooltip [ ]
+### T33: Keep the skill art and its text inside the skill tooltip [x]
 
 **Owner**: game-dev
 **What**: The skill tooltip shows a 112 x 64 art and the whole skill text inside its parchment box (review finding 2, blocker; spec UIR-14 AC 14).
@@ -2424,8 +2424,8 @@ It comes after `.skill-row.is-locked` in the file with the same specificity (0,2
 **Gate**: build - `cd game && npm test && npm run build`, then `cd game && npx playwright test e2e/uiRedesign.spec.js e2e/combatHud.spec.js`
 **Done when**:
 
-- [ ] `grep -c "^\.skill-slot[^{>]* img {" game/public/style.css` prints `0` and `grep -c "^\.skill-slot[^{]* > img {" game/public/style.css` prints `5`.
-- [ ] The new case passes; every case of `uiRedesign.spec.js` and `combatHud.spec.js` passes; `npm test` and the build pass.
+- [x] `grep -c "^\.skill-slot[^{>]* img {" game/public/style.css` prints `0` and `grep -c "^\.skill-slot[^{]* > img {" game/public/style.css` prints `5`.
+- [x] The new case passes; every case of `uiRedesign.spec.js` and `combatHud.spec.js` passes; `npm test` and the build pass.
 
 **Commit**: `fix(game): keep the skill art and text inside the skill tooltip`
 

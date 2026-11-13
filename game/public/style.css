@@ -1220,7 +1220,7 @@ button:disabled {
     line-height: 1.2;
 }
 
-.skill-slot img {
+.skill-slot > img {
     display: block;
     width: 100%;
     height: 62px;
@@ -1230,7 +1230,7 @@ button:disabled {
     background: var(--wood-900);
 }
 
-.skill-slot:not(.is-locked) img {
+.skill-slot:not(.is-locked) > img {
     box-shadow: 0 0 0 2px var(--gold-400);
 }
 
@@ -1238,11 +1238,11 @@ button:disabled {
     cursor: pointer;
 }
 
-.skill-slot.is-cooling img {
+.skill-slot.is-cooling > img {
     filter: grayscale(0.7) brightness(0.8);
 }
 
-.skill-slot.is-casting img {
+.skill-slot.is-casting > img {
     box-shadow: 0 0 0 3px var(--color-accent-2-800);
 }
 
@@ -1255,7 +1255,7 @@ button:disabled {
     color: var(--color-neutral-600);
 }
 
-.skill-slot.is-locked img {
+.skill-slot.is-locked > img {
     filter: grayscale(1) brightness(0.8);
 }
 
@@ -1940,6 +1940,13 @@ button:disabled {
 
 .skill-tooltip.is-below {
     top: calc(100% + 10px);
+}
+
+/* The skill row of the hero screens, flat inside the tooltip: the tooltip is already the parchment card */
+.skill-tooltip .skill-row {
+    padding: 0;
+    border: 0;
+    background: none;
 }
 
 /* The key that uses the skill, on the corner of its art */

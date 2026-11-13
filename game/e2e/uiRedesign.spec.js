@@ -1152,6 +1152,30 @@ test.describe('Grove theme', () => {
         });
     });
 
+    test('keeps the skill art and its text inside the skill tooltip, locked or not', async ({ page }) => {
+        //  Kael 1 star: slot 1 unlocked, slot 2 locked
+        await startAs(page, { copies: { 'kael:1': 1 } });
+
+        for (const [ slot, filter ] of [ [ 1, 'none' ], [ 2, 'grayscale(1)' ] ])
+        {
+            await page.getByTestId(`skill-slot-${slot}`).hover();
+
+            const tooltip = page.getByTestId('skill-tooltip');
+            const art = tooltip.locator('.skill-art');
+
+            await expect(tooltip).toBeVisible();
+            expect(await art.evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 112, 64 ]);
+            await expectStyle(art, { filter, 'box-shadow': 'none' });
+            await expectStyle(tooltip.locator('.skill-row'), { 'background-color': 'rgba(0, 0, 0, 0)', 'border-top-width': '0px', 'padding-left': '0px' });
+            expect(inside(await tooltip.locator('.skill-row > div').boundingBox(), await tooltip.boundingBox())).toBe(true);
+            await page.mouse.move(0, 0);
+            await expect(tooltip).toHaveCount(0);
+        }
+
+        //  The bar's own art keeps its frame
+        expect(await page.getByTestId('skill-slot-1').locator('img').evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 150, 62 ]);
+    });
+
     test('draws talent cards on light parchment', async ({ page }) => {
         await startAs(page, {});
         await openScreen(page, 'talents');
