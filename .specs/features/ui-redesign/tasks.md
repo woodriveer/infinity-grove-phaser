@@ -1745,7 +1745,7 @@ const createScene = () => {
 
 ---
 
-### T21: Parchment hero window [ ]
+### T21: Parchment hero window [x]
 
 **Owner**: game-dev
 **What**: The shell of every hero screen: window, title, error line, empty state (UIR-13 AC 1 to 4).
@@ -1771,7 +1771,7 @@ const createScene = () => {
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The build passes.
+- [x] The build passes.
 
 **Commit**: `style(game): draw the hero screens on a parchment window`
 
