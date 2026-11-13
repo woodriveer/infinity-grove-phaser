@@ -323,7 +323,7 @@ test.describe('Grove theme', () => {
         });
     });
 
-    test('meets 4.5:1 on the eight contrast pairs of the design', async ({ page }) => {
+    test('meets 4.5:1 on the contrast pairs of the design (rows 1 to 8, 13 and 14)', async ({ page }) => {
         //  A 1-star Kael: skill 1 is unlocked (the cooldown of row 5) and skills 2 and 3 are locked (row 7)
         const { backend } = await startAs(page, { copies: { 'kael:1': 3 }, progress: MINIBOSS });
         const rows = [];
@@ -347,6 +347,9 @@ test.describe('Grove theme', () => {
         await openScreen(page, 'heroes');
         await check(page.locator('.hero-title'), page.locator('.hero-window'), 'rgb(42, 26, 16)', 'rgb(234, 214, 173)');
         await check(page.getByTestId('hero-card-kael').locator('.hero-meta'), page.getByTestId('hero-card-kael'), 'rgb(74, 86, 54)', 'rgb(230, 208, 162)');
+        //  Row 14: a hero with 1 to 3 stars carries no tier class, so the stars take the plain accent ink
+        await expect(page.getByTestId('hero-card-kael').locator('.hero-stars')).toHaveAttribute('class', 'hero-stars');
+        await check(page.getByTestId('hero-card-kael').locator('.hero-stars'), page.getByTestId('hero-card-kael'), 'rgb(140, 73, 26)', 'rgb(230, 208, 162)');
         await page.getByTestId('hero-card-kael').click();
         await check(page.locator('.skill-row.is-locked').first(), page.locator('.skill-row.is-locked').first(), 'rgb(87, 75, 62)', 'rgb(234, 214, 173)');
         await page.getByTestId('hero-back').click();
@@ -359,7 +362,21 @@ test.describe('Grove theme', () => {
         await page.getByTestId('fusion-button-kael-1').click();
         await check(page.locator('.hero-error'), page.locator('.hero-error'), 'rgb(244, 230, 200)', 'rgb(138, 53, 16)');
 
-        expect(rows).toHaveLength(8);
+        //  Talents: row 13, the effect line on its light card
+        await page.getByTestId('hero-close').click();
+        await openScreen(page, 'talents');
+        const talentCard = page.locator('.talent-card').first();
+        await check(talentCard.locator('.talent-effect').first(), talentCard, 'rgb(87, 75, 62)', 'rgb(244, 230, 200)');
+
+        expect(rows).toHaveLength(10);
+    });
+
+    test('meets 4.5:1 on the menu tagline over the parchment oval', async ({ page }) => {
+        await openMenu(page);
+
+        await expectStyle(page.locator('.menu-tagline'), { color: 'rgb(107, 74, 43)' });
+        //  The oval is drawn on the canvas, so its colour is pinned by value: the 0xead6ad fill of UIR-15 (rgb 234, 214, 173)
+        expect(ratio('rgb(107, 74, 43)', 'rgb(234, 214, 173)')).toBeGreaterThanOrEqual(4.5);
     });
 
     test('adds no animation or transition to buttons, rail and timer', async ({ page }) => {
