@@ -1088,6 +1088,32 @@ test.describe('Grove theme', () => {
         expect(await page.getByTestId('hero-card-kael').locator('img').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('rgb(90, 61, 38)');
     });
 
+    test('keeps the five hero cards the same size with every name inside its card', async ({ page }) => {
+        const heroes = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
+
+        await startAs(page, { copies: Object.fromEntries(heroes.map((hero) => [ `${hero}:3`, 1 ])) });
+        await openScreen(page, 'heroes');
+
+        const sizes = [];
+
+        for (const hero of heroes)
+        {
+            const card = page.getByTestId(`hero-card-${hero}`);
+            const box = await card.boundingBox();
+            //  Screen pixels per CSS pixel (the scene is scaled to the viewport)
+            const scale = box.width / await card.evaluate((node) => node.offsetWidth);
+            //  The card's content box: 1 px border + 8 px padding on each side
+            const content = { x: box.x + 9 * scale, y: box.y, width: box.width - 18 * scale, height: box.height };
+
+            sizes.push(await card.evaluate((node) => [ node.offsetWidth, node.querySelector('img').offsetHeight ]));
+            await expectStyle(card.locator('.hero-name'), { 'font-size': '15px' });
+            expect(inside(await card.locator('.hero-name').boundingBox(), content)).toBe(true);
+        }
+
+        expect(new Set(sizes.map(([ width ]) => width)).size).toBe(1);
+        expect(new Set(sizes.map(([ , height ]) => height)).size).toBe(1);
+    });
+
     test('draws the error line in ember', async ({ page }) => {
         const { backend } = await startAs(page, { copies: { 'kael:4': 3 } });
         await openScreen(page, 'fusion');

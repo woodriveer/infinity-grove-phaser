@@ -1353,7 +1353,7 @@ button:disabled {
 
 .hero-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 12px;
 }
 
@@ -1391,7 +1391,7 @@ button:disabled {
 .hero-card .hero-name {
     padding: 0 6px;
     font-family: var(--font-heading);
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
 }
 

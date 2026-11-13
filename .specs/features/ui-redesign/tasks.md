@@ -2613,7 +2613,7 @@ The ember bar and the progress handler do not change (the bar stays the second r
 
 ---
 
-### T36: Five hero cards of the same size [ ]
+### T36: Five hero cards of the same size [x]
 
 **Owner**: game-dev
 **What**: The `Heróis` cards share one column width, so Vex's portrait is no longer taller and every name stays inside its card (review finding 9; spec UIR-13 AC 13).
@@ -2675,8 +2675,8 @@ The ember bar and the progress handler do not change (the bar stays the second r
 **Gate**: build, then full (phase gate) - `cd game && npm test && npm run build && npx playwright test --workers=2`
 **Done when**:
 
-- [ ] The new case passes.
-- [ ] Phase gate: every Vitest suite, the build and every Playwright suite pass (`heroes.spec.js` and `heroAscension.spec.js` read the hero cards).
+- [x] The new case passes.
+- [x] Phase gate: every Vitest suite, the build and every Playwright suite pass (`heroes.spec.js` and `heroAscension.spec.js` read the hero cards).
 
 **Commit**: `fix(game): keep the five hero cards the same size`
 
