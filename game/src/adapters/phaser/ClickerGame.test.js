@@ -4076,6 +4076,42 @@ describe('ClickerGame auto click', () => {
         expect(popover(ctx).hidden).toBe(true);
     });
 
+    it('ignores A typed into a textarea', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        press(ctx, 'A', { repeat: false, target: document.createElement('textarea') });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('ignores A while a select has the focus', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        press(ctx, 'A', { repeat: false, target: document.createElement('select') });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('ignores A typed into a contenteditable element', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        const editor = document.createElement('div');
+        editor.setAttribute('contenteditable', 'true');
+
+        press(ctx, 'A', { repeat: false, target: editor });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('still opens the window for A on a checkbox, which is not a text field', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        const box = document.createElement('input');
+        box.type = 'checkbox';
+
+        press(ctx, 'A', { repeat: false, target: box });
+
+        expect(popover(ctx).hidden).toBe(false);
+    });
+
     it('ignores the repeats of a held A', async () => {
         const ctx = await createScene({ start: atChapter(2) });
 
