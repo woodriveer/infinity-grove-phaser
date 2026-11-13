@@ -2682,7 +2682,7 @@ The ember bar and the progress handler do not change (the bar stays the second r
 
 ---
 
-### T37: Settled review shots and the states nobody judged [ ]
+### T37: Settled review shots and the states nobody judged [x]
 
 **Owner**: test-engineer
 **What**: Every review shot waits for its images (review finding 8), and six new shots show the selected fusion row, a disabled equipment button and the detail of the four heroes the review could not check (UIR-18; review "Sugestões" 4 and 6, and the partial check of step 2 of T30).
@@ -2765,9 +2765,9 @@ const settleImages = async (page) => {
 **Gate**: `cd game && npm run ui:shots -- uiRedesign` passes and `ls .specs/features/ui-redesign/ui-review/*.png | wc -l` prints `66` (33 names x 2 projects).
 **Done when**:
 
-- [ ] The gate passes; every `CONSOLE-REPORT` line reads `clean` except the known noise the T30 review lists (GPU stall in the menu and preloader; HTTP 500 of `fusion error`); any other line goes into the commit message body.
-- [ ] In `30-talents-desktop.png` and `31-boss-map-desktop.png` the icons and the map art are drawn (open both files and look).
-- [ ] The commit holds the script, `design.md` and the 66 screenshots.
+- [x] The gate passes; every `CONSOLE-REPORT` line reads `clean` except the known noise the T30 review lists (GPU stall in the menu and preloader; HTTP 500 of `fusion error`); any other line goes into the commit message body.
+- [x] In `30-talents-desktop.png` and `31-boss-map-desktop.png` the icons and the map art are drawn (open both files and look).
+- [x] The commit holds the script, `design.md` and the 66 screenshots.
 
 **Commit**: `test(game): settle images and add six review shots`
 

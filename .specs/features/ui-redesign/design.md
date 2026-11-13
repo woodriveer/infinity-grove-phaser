@@ -365,6 +365,14 @@ Three scene coordinates change, all in the battle bar, to make room for the roun
 | `29-bulk-sell` | Bulk sale bar with three tiles selected |
 | `30-talents` | Talentos with points |
 | `31-boss-map` | Rever chefes |
+| `32-fusion-selected` | Fusão opened from a bag entry with `Ir para a fusão`: the Kael 1★ row selected (`.fusion-row.is-selected`) |
+| `33-equip-disabled` | Bag piece b1 opened in Equipamento with an empty wallet: `Refinar` disabled (`.equip-button:disabled`) |
+| `34-hero-detail-lyra` | Lyra 4★ detail and her three skill thumbnails |
+| `35-hero-detail-orina` | Orina 7★ detail and her three skill thumbnails |
+| `36-hero-detail-seraphine` | Seraphine 2★ detail and her three skill thumbnails |
+| `37-hero-detail-vex` | Vex 6★ detail and his three skill thumbnails |
+
+Every shot but 01-preloader waits until the page's images have loaded (settleImages).
 
 ---
 

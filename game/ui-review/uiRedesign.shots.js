@@ -76,6 +76,12 @@ const tabTo = async (page, locator) => {
     }
 };
 
+//  Starts every lazy image and waits until each image of the page has loaded or failed, so no shot catches a half-loaded screen (review finding 8)
+const settleImages = async (page) => {
+    await page.evaluate(() => document.querySelectorAll('img[loading="lazy"]').forEach((img) => { img.loading = 'eager'; }));
+    await page.waitForFunction(() => [ ...document.images ].every((img) => img.complete));
+};
+
 test('menu and preloader', async ({ page }, testInfo) => {
     const problems = watch(page);
     let release;
@@ -103,12 +109,14 @@ test('menu and preloader', async ({ page }, testInfo) => {
     await expect(menu.username).toBeVisible({ timeout: 15_000 });
     await page.waitForFunction(() => window.__PHASER_GAME__.scene.getScene('MainMenu').input.enabled);
     await tabTo(page, menu.username);
+    await settleImages(page);
     await shot(page, testInfo, '02-menu-login');
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
     await expect(menu.message).toHaveText('Welcome back, yan!');
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '03-menu-welcome');
 
     //  The path choice needs no session: without it the menu shows the form again
@@ -119,6 +127,7 @@ test('menu and preloader', async ({ page }, testInfo) => {
     await signup.signupButton.click();
     await expect(page.locator('.path-choice')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '04-path-choice');
 
     report(testInfo, 'menu and preloader', problems);
@@ -135,24 +144,29 @@ test('battle', async ({ page }, testInfo) => {
     });
     await page.waitForTimeout(2000);
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '05-battle-boss');
 
     const canvas = page.locator('#game-container canvas');
 
     for (let i = 0; i < 5; i++) { await canvas.click(); }
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '06-battle-combo');
 
     await page.getByTestId('skill-slot-1').hover();
+    await settleImages(page);
     await shot(page, testInfo, '09-skill-tooltip');
 
     await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').heroUi.showNotice('Carta: Lyra Folhaveloz'));
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '10-notice');
 
     await page.keyboard.press('Escape');
     await expect(page.locator('.pause-menu')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '11-pause');
 
     await page.getByRole('button', { name: '1. Continue' }).click();
@@ -160,16 +174,19 @@ test('battle', async ({ page }, testInfo) => {
     await expect(page.getByTestId('auto-click-popover')).toBeVisible();
     await expect(page.getByTestId('auto-click-toggle')).toBeFocused();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '14-auto-click-window');
 
     await page.getByTestId('reset-account').click();
     await expect(page.getByTestId('reset-dialog')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '12-reset-dialog');
     await page.getByRole('button', { name: 'Cancelar' }).click();
 
     await page.locator('.farm-toggle input').evaluate((node) => { node.checked = true; });
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '13-farm-on');
 
     await page.keyboard.press('a');
@@ -178,6 +195,7 @@ test('battle', async ({ page }, testInfo) => {
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('auto-click-popover')).toBeHidden();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '15-auto-click-off');
 
     report(testInfo, 'battle', problems);
@@ -189,9 +207,11 @@ test('light enemy and locked skills', async ({ page }, testInfo) => {
     await startAs(page, { monster: bare('LIGHT'), copies: { 'kael:1': 1 } });
     await page.waitForTimeout(1000);
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '07-battle-light');
 
     await expect(page.getByTestId('skill-slot-2')).toBeVisible();
+    await settleImages(page);
     await shot(page, testInfo, '08-battle-locked');
 
     report(testInfo, 'light enemy and locked skills', problems);
@@ -209,46 +229,68 @@ test('hero screens', async ({ page }, testInfo) => {
     await page.getByTestId('hud-heroes').click();
     await expect(page.getByTestId('hero-card-kael')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '20-heroes');
 
     await page.getByTestId('hero-card-kael').click();
     await expect(page.getByTestId('hero-detail')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '21-hero-detail');
 
     await page.getByTestId('hero-back').click();
+    for (const [ hero, name ] of [ [ 'lyra', '34-hero-detail-lyra' ], [ 'orina', '35-hero-detail-orina' ], [ 'seraphine', '36-hero-detail-seraphine' ], [ 'vex', '37-hero-detail-vex' ] ])
+    {
+        await page.getByTestId(`hero-card-${hero}`).click();
+        await expect(page.getByTestId('hero-detail')).toBeVisible();
+        await page.mouse.move(0, 0);
+        await settleImages(page);
+        await shot(page, testInfo, name);
+        await page.getByTestId('hero-back').click();
+    }
     await page.getByTestId('hero-close').click();
 
     await page.getByTestId('hud-bag').click();
     await expect(page.getByTestId('bag-entry-kael-1')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '22-bag');
 
     await page.getByTestId('bag-entry-kael-1').click();
     await expect(page.getByTestId('bag-entry-detail')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '23-bag-detail');
+    await page.getByTestId('bag-go-fusion').click();
+    await expect(page.getByTestId('fusion-row-kael-1')).toHaveClass(/is-selected/);
+    await page.mouse.move(0, 0);
+    await settleImages(page);
+    await shot(page, testInfo, '32-fusion-selected');
 
     await page.getByTestId('hero-close').click();
     await page.getByTestId('hud-fusion').click();
     await expect(page.getByTestId('fusion-button-kael-1')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '24-fusion');
 
     await page.getByTestId('hero-close').click();
     await page.getByTestId('hud-leader').click();
     await expect(page.getByTestId('leader-entry-lyra')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '26-leader');
 
     await page.getByTestId('hero-close').click();
     await page.getByTestId('hud-equipment').click();
     await expect(page.getByTestId('equip-piece-b1')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '27-equipment');
 
     await page.getByTestId('equip-piece-b1').hover();
     await expect(page.getByTestId('piece-tooltip')).toBeVisible();
+    await settleImages(page);
     await shot(page, testInfo, '28-piece-tooltip');
 
     await page.mouse.move(0, 0);
@@ -258,19 +300,27 @@ test('hero screens', async ({ page }, testInfo) => {
     await page.getByTestId('equip-piece-b5').click();
     await page.getByTestId('equip-piece-b8').click();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '29-bulk-sell');
     await page.getByTestId('bulk-sell-cancel').click();
+    await page.getByTestId('equip-piece-b1').click();
+    await expect(page.getByTestId('piece-refine')).toBeDisabled();
+    await page.mouse.move(0, 0);
+    await settleImages(page);
+    await shot(page, testInfo, '33-equip-disabled');
     await page.getByTestId('hero-close').click();
 
     await page.getByTestId('hud-talents').click();
     await expect(page.locator('.talent-card').first()).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '30-talents');
 
     await page.getByTestId('hero-close').click();
     await page.getByTestId('hud-farm').click();
     await expect(page.getByTestId('farm-map')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '31-boss-map');
 
     report(testInfo, 'hero screens', problems);
@@ -287,6 +337,7 @@ test('fusion error', async ({ page }, testInfo) => {
     await page.getByTestId('fusion-button-kael-4').click();
     await expect(page.locator('.hero-error')).toBeVisible();
     await page.mouse.move(0, 0);
+    await settleImages(page);
     await shot(page, testInfo, '25-fusion-error');
 
     report(testInfo, 'fusion error', problems);
