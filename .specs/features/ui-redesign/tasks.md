@@ -11,7 +11,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 **Spec**: `.specs/features/ui-redesign/spec.md`
 **Design**: `.specs/features/ui-redesign/design.md`
 **Reference image**: `.specs/features/ui-redesign/reference.jpg` (look at it before any CSS task)
-**Status**: Approved by the owner on 2026-11-12, defaults of Q2 to Q5 accepted (Q1 decided as D1 on 2026-11-12: round auto click button, its window and the key `A`, tasks T13 to T16; written with the defaults of the open Q2 to Q5)
+**Status**: Approved by the owner on 2026-11-12, defaults of Q2 to Q5 accepted (Q1 decided as D1 on 2026-11-12: round auto click button, its window and the key `A`, tasks T13 to T16; written with the defaults of the open Q2 to Q5). T1 to T30 done. Phase 10 (T31 to T38, fixes of the T30 review) added on 2026-11-13, waiting for the owner's approval
 
 Rules for every task:
 
@@ -51,7 +51,7 @@ Rules for every task:
 
 ## Execution Plan
 
-Phases run in order; tasks inside a phase run in order. Every task of Phases 1 to 7 is `game-dev` except T15 (`test-engineer`); Phase 8 is `test-engineer`; Phase 9 is `ui-artist`.
+Phases run in order; tasks inside a phase run in order. Every task of Phases 1 to 7 is `game-dev` except T15 (`test-engineer`); Phase 8 is `test-engineer`; Phase 9 is `ui-artist`. Phase 10 fixes the findings of the T30 review: T31 to T36 `game-dev`, T37 `test-engineer`, T38 `ui-artist`.
 
 ### Phase 1: Foundation
 
@@ -105,6 +105,12 @@ T27 → T28 → T29
 
 ```
 T29 → T30
+```
+
+### Phase 10: Review fixes
+
+```
+T30 → T31 → T32 → T33 → T34 → T35 → T36 → T37 → T38
 ```
 
 ---
@@ -2198,10 +2204,619 @@ Skill thumbnails (UIR-16):
 
 ---
 
+### Review fixes: notes for Phase 10
+
+The T30 review (`.specs/features/ui-redesign/ui-review.html`, verdict "MUDANÇAS PEDIDAS") found 9 problems. T31 to T36 fix findings 1 to 5 and 9, T37 fixes finding 8 and adds the shots of the states nobody judged, T38 reviews again. Findings 6 and 7 are deferred (end of this phase). The ACs these tasks implement were added to `spec.md` with these tasks: UIR-10 AC 24 (amended), UIR-13 AC 12 and 13, UIR-14 AC 14 and 15, UIR-15 AC 5.
+
+Rules added for this phase:
+
+- **Line numbers drift.** Every `path:line` below is a hint from HEAD `39a58c8`; find the rule or line by its selector or its exact text, never by the number.
+- The new e2e cases go into `game/e2e/uiRedesign.spec.js`, inside `test.describe('Grove theme', ...)`, right after the test the task names. They use the helpers already at the top of that file (`startAs`, `openScreen`, `css`, `expectStyle`, `ratio`, `inside`); add no helper unless the task gives its code.
+- The phase gate (`cd game && npm test && npm run build && npx playwright test --workers=2`) runs on T36, the last task that changes game code; T37 and T38 change no game code.
+- Measurements quoted below come from Chromium with the real `style.css` and the Google Fonts Cinzel 700 and Figtree, the same browser as the e2e suite. If a size assertion fails by 2 px or less, STOP and report the measured value; do not change the values of the contract.
+
+---
+
+### T31: Scope the battle leader name so the Líder rows keep their ink [ ]
+
+**Owner**: game-dev
+**What**: The names of the `Líder` screen rows read `rgb(42, 26, 16)` again (review finding 1, blocker; spec UIR-13 AC 12).
+**Where**: `game/public/style.css` (the rule `.leader-name`, in the block that starts with the comment `/* The leader on the left of the battle bar */`)
+**Also changes**: `game/e2e/uiRedesign.spec.js`
+**Read first**: `style.css:1185-1207` (`.leader-text`, `.leader-name`, `.leader-bonus`); `style.css:1568-1636` (`.leader-entry` shares the row rule with `.bag-entry`, `.fusion-row`, `.farm-entry`); `game/src/adapters/phaser/views/leaderView.js:13`; `game/src/adapters/phaser/views/skillBar.js:108-113`
+**Depends on**: T30
+**Requirement**: UIR-13
+
+**Root cause** (found by the PO, not a guess): the class `leader-name` is used twice. `skillBar.js:113` puts it on the name of the battle bar's leader card; `leaderView.js:13` puts it on the name `<span>` inside every `.leader-entry` row. The battle card rule `.leader-name` is unscoped, so it reaches the rows: it sets `color: var(--gold-200)` (`#f3d58a`, 1.06:1 on `#e6d0a2`, 1.16:1 on `#f4e6c8`), plus `font-size: 17px`, `white-space: nowrap` and `text-overflow: ellipsis`, on the span itself, which beats the colour the span would inherit from `.leader-entry` (`color: var(--color-text)`). It hits the current row too (shot `26-leader`: `Kael Raizférrea 5★` is gold as well). The rule existed before the redesign without a colour (`92abd66`), so the clash was invisible until T13 (`03fe846`) added `color: var(--gold-200)`.
+
+**Contract**: in `game/public/style.css`, change only the selector line of that rule: `.leader-name {` becomes `.leader-card .leader-name {`. It is the only rule whose selector is `.leader-name`; its declarations stay as they are (T32 changes them). Nothing else in the file changes: the rows then inherit `font-family: var(--font-heading)`, `font-size: 18px` and `color: var(--color-text)` (`#2a1a10`) from `.leader-entry`. Do not add a rule for `.leader-entry .leader-name`.
+
+**Steps**:
+
+1. Edit the selector.
+2. Add the e2e case below right after the test `keeps the AD-020 star colours on the inset cards`.
+
+**Tests**: e2e
+**Test cases** (`uiRedesign.spec.js`):
+
+- `draws the Líder rows in dark ink, the current one too` (UIR-13 AC 12):
+
+```js
+    test('draws the Líder rows in dark ink, the current one too', async ({ page }) => {
+        await startAs(page, { copies: { 'kael:5': 1, 'lyra:4': 1 } });
+        await openScreen(page, 'leader');
+
+        //  Kael leads, so his row is the current one (parchment-100); Lyra's row is an inset card (parchment-300)
+        for (const [ hero, background ] of [ [ 'kael', 'rgb(244, 230, 200)' ], [ 'lyra', 'rgb(230, 208, 162)' ] ])
+        {
+            const row = page.getByTestId(`leader-entry-${hero}`);
+            const { color, 'font-size': size } = await css(row.locator('.leader-name'), [ 'color', 'font-size' ]);
+            const { 'background-color': back } = await css(row, [ 'background-color' ]);
+
+            expect(color).toBe('rgb(42, 26, 16)');
+            expect(size).toBe('18px');
+            expect(back).toBe(background);
+            expect(ratio(color, back)).toBeGreaterThanOrEqual(4.5);
+        }
+    });
+```
+
+The existing case `draws the battle bar, leader card and skill frames` keeps passing unchanged (`.leader-name` there matches only the battle card, since no hero screen is open).
+
+**Gate**: build - `cd game && npm test && npm run build`, then `cd game && npx playwright test e2e/uiRedesign.spec.js e2e/heroes.spec.js`
+**Done when**:
+
+- [ ] `grep -c "^\.leader-name {" game/public/style.css` prints `0` and `grep -c "^\.leader-card \.leader-name {" game/public/style.css` prints `1`.
+- [ ] The new case passes; every case of `uiRedesign.spec.js` and `heroes.spec.js` passes; `npm test` and the build pass.
+
+**Commit**: `fix(game): scope the leader name rule to the battle card`
+
+---
+
+### T32: Show the whole leader name in the battle card [ ]
+
+**Owner**: game-dev
+**What**: The leader card name wraps to two lines at 15 px instead of being cut with `…` (review finding 3; spec UIR-10 AC 24, amended).
+**Where**: `game/public/style.css` (the rule `.leader-card .leader-name` of T31)
+**Also changes**: `game/e2e/uiRedesign.spec.js`
+**Read first**: `style.css:1128-1207` (`.leader-card` 240 x 104, padding `10px 12px`, border 2 px; `.leader-portrait` 72 px; gap 12 px; `.leader-text`); `game/e2e/uiRedesign.spec.js:619-628`; `game/e2e/heroes.spec.js:147-166` (picking a leader while the `Líder` screen stays open)
+**Depends on**: T31
+**Requirement**: UIR-10
+
+**Decision and measurements**: the text column of the card is 128 px wide (240 - 2 x 2 border - 2 x 12 padding - 72 portrait - 12 gap). Measured widths of the longest word of each name in Cinzel 700: at 17 px `Brumaestrela` 129 px and `Sombraespinho` 144 px (do not fit even on their own line); at 16 px `Sombraespinho` 135 px (does not fit); at 15 px every word fits, the widest being `Sombraespinho` at 127 px. So the name drops to 15 px and wraps; the card keeps 240 x 104. With the 15 px name the whole text block (name 33 px in two lines, 2 px gap, bonus up to 58 px for Vex) stays inside the card (6 px from its top and bottom edges for Vex).
+
+**Contract**: replace the rule `.leader-card .leader-name` with:
+
+```css
+.leader-card .leader-name {
+    font-family: var(--font-heading);
+    font-size: 15px;
+    line-height: 1.1;
+    font-weight: 700;
+    color: var(--gold-200);
+}
+```
+
+(`overflow: hidden`, `white-space: nowrap` and `text-overflow: ellipsis` are removed; the name wraps at the space.)
+
+**Steps**:
+
+1. Replace the rule.
+2. In the existing case `draws the battle bar, leader card and skill frames`, replace the line `await expectStyle(page.locator('.leader-name'), { 'font-size': '17px', color: 'rgb(243, 213, 138)' });` with `await expectStyle(page.locator('.leader-card .leader-name'), { 'font-size': '15px', color: 'rgb(243, 213, 138)' });` (the spec value changed; the test keeps its name).
+3. Add the e2e case below right after `draws the battle bar, leader card and skill frames`.
+
+**Tests**: e2e
+**Test cases** (`uiRedesign.spec.js`):
+
+- `shows the whole leader name in the battle card for each of the five heroes` (UIR-10 AC 24):
+
+```js
+    test('shows the whole leader name in the battle card for each of the five heroes', async ({ page }) => {
+        const names = { kael: 'Kael Raizférrea', lyra: 'Lyra Folhaveloz', orina: 'Orina Brumaestrela', seraphine: 'Seraphine Aurora', vex: 'Vex Sombraespinho' };
+
+        await startAs(page, { copies: Object.fromEntries(Object.keys(names).map((hero) => [ `${hero}:3`, 1 ])) });
+        await openScreen(page, 'leader');
+
+        for (const [ hero, name ] of Object.entries(names))
+        {
+            //  The Líder screen stays open after a pick; Kael is already the leader, so his click changes nothing
+            await page.getByTestId(`leader-entry-${hero}`).click();
+            await expect(page.getByTestId(`leader-entry-${hero}`)).toHaveClass(/is-current/);
+
+            const label = page.locator('.leader-card .leader-name');
+
+            await expect(label).toHaveText(name);
+            await expectStyle(label, { 'font-size': '15px', 'white-space': 'normal', 'text-overflow': 'clip' });
+
+            const fit = await label.evaluate((node) => ({ scroll: node.scrollWidth, client: node.clientWidth, height: node.offsetHeight }));
+
+            expect(fit.scroll).toBeLessThanOrEqual(fit.client);
+            //  Two lines of 15 px x 1.1 at most
+            expect(fit.height).toBeLessThanOrEqual(34);
+            expect(inside(await page.locator('.leader-card .leader-text').boundingBox(), await page.getByTestId('leader-card').boundingBox())).toBe(true);
+            expect(await page.getByTestId('leader-card').evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 240, 104 ]);
+        }
+    });
+```
+
+**Gate**: build - `cd game && npm test && npm run build`, then `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [ ] The new case passes for all five heroes and the edited case passes with `15px`.
+- [ ] Every case of `uiRedesign.spec.js` passes; `npm test` and the build pass.
+
+**Commit**: `fix(game): wrap the leader name of the battle card at 15 px`
+
+---
+
+### T33: Keep the skill art and its text inside the skill tooltip [ ]
+
+**Owner**: game-dev
+**What**: The skill tooltip shows a 112 x 64 art and the whole skill text inside its parchment box (review finding 2, blocker; spec UIR-14 AC 14).
+**Where**: `game/public/style.css` (the five slot `img` rules after `.skill-bar`, and one new rule after the tooltip's `is-below` rule)
+**Also changes**: `game/e2e/uiRedesign.spec.js`
+**Read first**: `style.css:1214-1266` (`.skill-slot` and its five `img` rules); `style.css:1495-1527` (`.skill-row`, `.skill-row.is-locked`, `.skill-row.is-locked .skill-art`, `.skill-art`); `style.css:1918-1945` (`.skill-tooltip`); `game/src/adapters/phaser/views/skillTooltip.js` (the tooltip is a child of the slot); `game/src/adapters/phaser/views/skillBar.js:28-33` (the slot's own art is its direct child `img`); `game/src/adapters/phaser/views/catalogView.js:11-36` (`renderSkillRow`: `div.skill-row` > `img.skill-art` + text `div`)
+**Depends on**: T32
+**Requirement**: UIR-14
+
+**Root cause** (checked against the markup and the CSS of T22 and T26): `attachSkillTooltip` appends the tooltip inside the `.skill-slot`, so the tooltip's `img.skill-art` is also a descendant `img` of the slot. `.skill-slot img` (specificity 0,1,1) beats `.skill-art` (0,1,0): the tooltip art gets `width: 100%` and `height: 62px`; with `flex: none` from `.skill-art` it takes the whole 312 px row and pushes the text `div` out to the right of the 340 px tooltip. `.skill-slot:not(.is-locked) img` also gives it the gold ring of the bar. The bug predates the redesign (the rule `.skill-slot img` came with `0bd9f4f`); T22 and T26 only restyled it. Scoping the five slot rules to the slot's own art (`> img`) fixes the cause; the review's suggested `.skill-tooltip .skill-art { width: 112px; height: 64px }` would only patch it.
+
+**Contract**:
+
+| Rule (selector today, exactly) | New selector | Declarations |
+| --- | --- | --- |
+| `.skill-slot img` | `.skill-slot > img` | unchanged |
+| `.skill-slot:not(.is-locked) img` | `.skill-slot:not(.is-locked) > img` | unchanged |
+| `.skill-slot.is-cooling img` | `.skill-slot.is-cooling > img` | unchanged |
+| `.skill-slot.is-casting img` | `.skill-slot.is-casting > img` | unchanged |
+| `.skill-slot.is-locked img` | `.skill-slot.is-locked > img` | unchanged |
+
+And add this rule right after the rule `.skill-tooltip.is-below`:
+
+```css
+/* The skill row of the hero screens, flat inside the tooltip: the tooltip is already the parchment card */
+.skill-tooltip .skill-row {
+    padding: 0;
+    border: 0;
+    background: none;
+}
+```
+
+It comes after `.skill-row.is-locked` in the file with the same specificity (0,2,0), so it wins for a locked skill too. The tooltip box, its 340 px width and its colours (T26) do not change.
+
+**Steps**:
+
+1. Edit the five selectors.
+2. Add the rule.
+3. Add the e2e case below right after the test `draws the skill tooltip on parchment`.
+
+**Tests**: e2e
+**Test cases** (`uiRedesign.spec.js`):
+
+- `keeps the skill art and its text inside the skill tooltip, locked or not` (UIR-14 AC 14):
+
+```js
+    test('keeps the skill art and its text inside the skill tooltip, locked or not', async ({ page }) => {
+        //  Kael 1 star: slot 1 unlocked, slot 2 locked
+        await startAs(page, { copies: { 'kael:1': 1 } });
+
+        for (const [ slot, filter ] of [ [ 1, 'none' ], [ 2, 'grayscale(1)' ] ])
+        {
+            await page.getByTestId(`skill-slot-${slot}`).hover();
+
+            const tooltip = page.getByTestId('skill-tooltip');
+            const art = tooltip.locator('.skill-art');
+
+            await expect(tooltip).toBeVisible();
+            expect(await art.evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 112, 64 ]);
+            await expectStyle(art, { filter, 'box-shadow': 'none' });
+            await expectStyle(tooltip.locator('.skill-row'), { 'background-color': 'rgba(0, 0, 0, 0)', 'border-top-width': '0px', 'padding-left': '0px' });
+            expect(inside(await tooltip.locator('.skill-row > div').boundingBox(), await tooltip.boundingBox())).toBe(true);
+            await page.mouse.move(0, 0);
+            await expect(tooltip).toHaveCount(0);
+        }
+
+        //  The bar's own art keeps its frame
+        expect(await page.getByTestId('skill-slot-1').locator('img').evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 150, 62 ]);
+    });
+```
+
+**Gate**: build - `cd game && npm test && npm run build`, then `cd game && npx playwright test e2e/uiRedesign.spec.js e2e/combatHud.spec.js`
+**Done when**:
+
+- [ ] `grep -c "^\.skill-slot[^{>]* img {" game/public/style.css` prints `0` and `grep -c "^\.skill-slot[^{]* > img {" game/public/style.css` prints `5`.
+- [ ] The new case passes; every case of `uiRedesign.spec.js` and `combatHud.spec.js` passes; `npm test` and the build pass.
+
+**Commit**: `fix(game): keep the skill art and text inside the skill tooltip`
+
+---
+
+### T34: Dark branch ink for the talent buttons, titles and max marks [ ]
+
+**Owner**: game-dev
+**What**: The `Melhorar` buttons, the branch titles and `Nível máximo` use a dark ink of each branch that reaches 4.5:1 (review finding 4; spec UIR-14 AC 15).
+**Where**: `game/public/style.css` (section `/* ══ Talentos`)
+**Also changes**: `game/e2e/uiRedesign.spec.js`
+**Read first**: `style.css:1967-2068` (`.talent-column[data-branch=...]`, `.talent-branch-title`, `.talent-card`, `.talent-max`, `.talent-upgrade`); `game/src/adapters/phaser/views/talentsView.js:14-81` (test ids `talent-branch-<BRANCH>`, `talent-upgrade-<id>`, `talent-max-<id>`; cards are inside their column, so they inherit its custom properties); `game/e2e/support/fakeBackend.js:176-182` (`CLICK_DAMAGE` is a POWER talent)
+**Depends on**: T33
+**Requirement**: UIR-14
+
+**Decision and contrast** (WCAG 2.x, computed by the PO): the button text is `var(--color-bg)` = `#f4e6c8` = `rgb(244, 230, 200)`. Today the buttons are filled with `--branch`: TIME `#3b9aa6` 2.67:1, BREAK `#c4492f` 3.92:1, POWER `#c99a1f` 2.09:1, COMBO `#8a5bd6` 3.74:1, all below 4.5:1 (the review's estimates were 3.4, 4.2, 2.3 and "passes"; its suggested gold `#8a6a0f` reaches only 4.10:1). The same colours fail as title text on the column `#e6d0a2` (1.71:1 to 3.20:1). Each branch gets a second token, `--branch-ink`: the same hue darkened until it reaches 4.8:1 on `#e6d0a2`. `--branch` stays for the card's left bar and the icon tint (UIR-14 AC 9).
+
+| Branch | `--branch` (kept) | `--branch-ink` (new) | Button: ink vs `#f4e6c8` | Title: ink vs column `#e6d0a2` |
+| --- | --- | --- | --- | --- |
+| TIME | `#3b9aa6` | `#245d64` = `rgb(36, 93, 100)` | 6.02:1 | 4.92:1 |
+| BREAK | `#c4492f` | `#953724` = `rgb(149, 55, 36)` | 5.96:1 | 4.88:1 |
+| POWER | `#c99a1f` | `#6c5311` = `rgb(108, 83, 17)` | 5.90:1 | 4.82:1 |
+| COMBO | `#8a5bd6` | `#6a31c5` = `rgb(106, 49, 197)` | 5.95:1 | 4.87:1 |
+
+`Nível máximo` sits on the card `#f4e6c8`: same ratios as the button column.
+
+**Contract**: replace the four one-line rules `.talent-column[data-branch="..."] { --branch: ...; }` with these five lines (comment first):
+
+```css
+/* --branch marks the column (card bar, icon tint); --branch-ink is the same hue dark enough for text and buttons (4.5:1, spec UIR-14 AC 15) */
+.talent-column[data-branch="TIME"] { --branch: #3b9aa6; --branch-ink: #245d64; }
+.talent-column[data-branch="BREAK"] { --branch: #c4492f; --branch-ink: #953724; }
+.talent-column[data-branch="POWER"] { --branch: #c99a1f; --branch-ink: #6c5311; }
+.talent-column[data-branch="COMBO"] { --branch: #8a5bd6; --branch-ink: #6a31c5; }
+```
+
+| Rule | Set | Remove |
+| --- | --- | --- |
+| `.talent-branch-title` | `color: var(--branch-ink);` | - |
+| `.talent-max` | `color: var(--branch-ink);` | - |
+| `.talent-upgrade` | `background: var(--branch-ink);` | - |
+
+`.talent-card` (its `inset 4px 0 0 var(--branch)` bar), `.icon-fallback`, `.talent-upgrade:disabled` and `.talent-reset` do not change.
+
+**Steps**:
+
+1. Replace the four branch lines.
+2. Edit the three rules.
+3. Add the e2e case below right after the test `draws talent cards on light parchment`.
+
+**Tests**: e2e
+**Test cases** (`uiRedesign.spec.js`):
+
+- `draws the talent buttons, titles and max marks in the dark branch ink` (UIR-14 AC 15):
+
+```js
+    test('draws the talent buttons, titles and max marks in the dark branch ink', async ({ page }) => {
+        const inks = { TIME: 'rgb(36, 93, 100)', BREAK: 'rgb(149, 55, 36)', POWER: 'rgb(108, 83, 17)', COMBO: 'rgb(106, 49, 197)' };
+
+        //  CLICK_DAMAGE at its maximum shows `Nível máximo`; 10 points enable the other buttons
+        await startAs(page, { talents: { CLICK_DAMAGE: 10 }, talentPoints: 10 });
+        await openScreen(page, 'talents');
+
+        for (const [ branch, ink ] of Object.entries(inks))
+        {
+            const column = page.getByTestId(`talent-branch-${branch}`);
+            const button = column.locator('.talent-upgrade').first();
+            const { 'background-color': columnBack } = await css(column, [ 'background-color' ]);
+
+            await expect(button).toBeEnabled();
+            await expectStyle(button, { 'background-color': ink, color: 'rgb(244, 230, 200)' });
+            expect(ratio(ink, 'rgb(244, 230, 200)')).toBeGreaterThanOrEqual(4.5);
+            await expectStyle(column.locator('.talent-branch-title'), { color: ink });
+            expect(columnBack).toBe('rgb(230, 208, 162)');
+            expect(ratio(ink, columnBack)).toBeGreaterThanOrEqual(4.5);
+        }
+
+        await expectStyle(page.getByTestId('talent-max-CLICK_DAMAGE'), { color: inks.POWER });
+        //  The card bar keeps the bright branch colour
+        expect((await css(page.getByTestId('talent-CRIT_CHANCE'), [ 'box-shadow' ]))['box-shadow']).toContain('rgb(201, 154, 31) 4px 0px 0px 0px inset');
+    });
+```
+
+**Gate**: build - `cd game && npm test && npm run build`, then `cd game && npx playwright test e2e/uiRedesign.spec.js e2e/talents.spec.js`
+**Done when**:
+
+- [ ] `grep -c -- "--branch-ink" game/public/style.css` prints `8` (4 definitions, 1 in the comment, 3 uses).
+- [ ] The new case passes; every case of `uiRedesign.spec.js` and `talents.spec.js` passes; `npm test` and the build pass.
+
+**Commit**: `fix(game): draw the talent buttons and titles in a dark branch ink`
+
+---
+
+### T35: Boot and preloader screens on dark wood [ ]
+
+**Owner**: game-dev
+**What**: The first two screens drop the template's sky: dark game background, no sky image, a wood track under the bar (review finding 5; spec UIR-15 AC 5).
+**Where**: `game/src/adapters/phaser/Preloader.js`
+**Also changes**: `game/src/adapters/phaser/Preloader.test.js`, `game/src/adapters/phaser/Boot.js`, `game/src/main.js`, `game/public/assets/preloader.png` (deleted), `game/e2e/uiRedesign.spec.js`
+**Read first**: `Preloader.js:14-31`; `Preloader.test.js` (whole: the stand-in records `color`, `add.image` is a `vi.fn()`); `Boot.js` (whole); `main.js:11-20`; `game/e2e/uiRedesign.spec.js:1171-1191` (how the Preloader is held on screen)
+**Depends on**: T34
+**Requirement**: UIR-15
+
+**Root cause** (where the cyan comes from): two places, both left from the Phaser template. (1) `Boot.js` loads `assets/preloader.png`, a 1024 x 768 blue-to-cyan gradient, and `Preloader.init` draws it full screen at (512, 384) under the bar. (2) `main.js` sets the game `backgroundColor: '#028af8'` (bright blue), the only thing drawn on the Boot screen while it waits for the first click. Neither the CSS nor `index.html` adds blue; the page around the canvas is already `#1c120c` (T2). `git grep` finds no other user of `preloader.png` or the texture key `preloader`.
+
+**Contract**:
+
+1. `game/src/main.js`: the line `    backgroundColor: '#028af8',` becomes `    backgroundColor: '#1c120c',`.
+2. `game/src/adapters/phaser/Boot.js`: delete the whole `preload ()` method (from the line `    preload ()` to its closing `    }` and the empty line after it); `constructor` and `create` stay unchanged.
+3. `game/src/adapters/phaser/Preloader.js`, in `init()`: replace these five lines
+
+```js
+        //  We loaded this image in our Boot Scene, so we can display it here
+        this.add.image(512, 384, 'preloader');
+
+        //  The outline of the bar: a thin gold rim (spec ui-redesign)
+        this.add.rectangle(512, 384, 468, 32).setStrokeStyle(2, 0xe0b45a);
+```
+
+with
+
+```js
+        //  The track of the bar: dark wood inside a thin gold rim, on the dark game background (spec ui-redesign)
+        this.add.rectangle(512, 384, 468, 32, 0x2b1d14).setStrokeStyle(2, 0xe0b45a);
+```
+
+The ember bar and the progress handler do not change (the bar stays the second rectangle, drawn over the track).
+4. `git rm game/public/assets/preloader.png`.
+
+**Steps**:
+
+1. Edit `main.js`.
+2. Edit `Boot.js`.
+3. Edit `Preloader.js`.
+4. Delete the image with `git rm`.
+5. Add the two unit cases to `Preloader.test.js`, inside `describe('Preloader')`, after `grows the bar to 464 px at full progress`.
+6. Add the e2e case right after the test `draws the preloader bar with a gold outline and an ember fill`.
+
+**Tests**: unit + e2e
+**Test cases**:
+
+`Preloader.test.js` (use `createScene()` of the file):
+
+- `fills the track of the loading bar in dark wood`: `scene.init()`; `rectangles[0].color` is `0x2b1d14`; `rectangles[0].setStrokeStyle` was called with `(2, 0xe0b45a)`.
+- `draws no image behind the loading bar`: `scene.init()`; `expect(scene.add.image).not.toHaveBeenCalled()`.
+
+`uiRedesign.spec.js`:
+
+```js
+    test('draws the boot and preloader screens on dark wood with no sky image', async ({ page }) => {
+        let release;
+        const held = new Promise((resolve) => { release = resolve; });
+        const requests = [];
+
+        page.on('request', (request) => requests.push(request.url()));
+        await page.route('**/assets/heroes/vex_sprite.png', async (route) => { await held; await route.continue(); });
+        await mockBackend(page, { users: { yan: 'secret123' } });
+        await page.goto('/');
+        await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
+
+        //  The Boot screen shows only the game background until the first click
+        expect(await page.evaluate(() => window.__PHASER_GAME__.config.backgroundColor.color)).toBe(0x1c120c);
+
+        await page.locator('#game-container canvas').click();
+        await expect.poll(() => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('Preloader').children.list.length)).toBeGreaterThan(0);
+
+        const children = await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('Preloader').children.list
+            .map((child) => ({ type: child.type, x: child.x, y: child.y, width: child.width, height: child.height, fillColor: child.fillColor, isFilled: child.isFilled })));
+
+        release();
+
+        expect(children.map((child) => child.type)).not.toContain('Image');
+        expect(children).toContainEqual(expect.objectContaining({ type: 'Rectangle', x: 512, y: 384, width: 468, height: 32, fillColor: 0x2b1d14, isFilled: true }));
+        expect(requests.filter((url) => url.includes('preloader.png'))).toEqual([]);
+    });
+```
+
+**Gate**: quick - `cd game && npm test`, then build - `cd game && npm run build`, then `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [ ] `git grep -n -e "preloader.png" -e "028af8" -- game/src game/public` prints nothing and `game/public/assets/preloader.png` no longer exists.
+- [ ] The 2 new unit cases and the 3 existing `Preloader.test.js` cases pass; the new e2e case and the existing preloader e2e case pass; `npm test` and the build pass.
+
+**Commit**: `style(game): draw the boot and preloader screens on dark wood`
+
+---
+
+### T36: Five hero cards of the same size [ ]
+
+**Owner**: game-dev
+**What**: The `Heróis` cards share one column width, so Vex's portrait is no longer taller and every name stays inside its card (review finding 9; spec UIR-13 AC 13).
+**Where**: `game/public/style.css` (rules `.hero-grid` and `.hero-card .hero-name`)
+**Also changes**: `game/e2e/uiRedesign.spec.js`
+**Read first**: `style.css:1356-1398` (`.hero-grid`, `.hero-card`, `.hero-card img`, `.hero-card .hero-name`); `game/src/adapters/phaser/views/catalogView.js:55-62` (`span.hero-name`)
+**Depends on**: T35
+**Requirement**: UIR-13
+
+**Root cause and measurements**: `.hero-grid` uses `repeat(5, 1fr)`, and `1fr` never shrinks a column below its content's min-content width. In Cinzel 700 at 16 px the word `Sombraespinho` is 135 px; with the name's 2 x 6 px padding and the card's 2 x 8 px padding and 2 x 1 px border, Vex's card needs 165 px while the five equal columns of the 862 px window content (920 - 2 x 3 border - 2 x 26 padding, 4 gaps of 12) are 162.8 px. So Vex's column grows, and its `img` (width 100%, `aspect-ratio: 3 / 4`) grows about 4 px taller. `minmax(0, 1fr)` makes the five columns equal; at 15 px `Sombraespinho` is 127 px, which fits the 132.8 px left for the name inside the card.
+
+**Contract**:
+
+| Rule | Set | Remove |
+| --- | --- | --- |
+| `.hero-grid` (the only rule with this selector) | `grid-template-columns: repeat(5, minmax(0, 1fr));` | - |
+| `.hero-card .hero-name` | `font-size: 15px;` | - |
+
+`.hero-detail-text .hero-name` and `.equip-detail .hero-name` do not change.
+
+**Steps**:
+
+1. Edit the two rules.
+2. Add the e2e case below right after the test `draws the hero window, title and inset cards`.
+
+**Tests**: e2e
+**Test cases** (`uiRedesign.spec.js`):
+
+- `keeps the five hero cards the same size with every name inside its card` (UIR-13 AC 13):
+
+```js
+    test('keeps the five hero cards the same size with every name inside its card', async ({ page }) => {
+        const heroes = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
+
+        await startAs(page, { copies: Object.fromEntries(heroes.map((hero) => [ `${hero}:3`, 1 ])) });
+        await openScreen(page, 'heroes');
+
+        const sizes = [];
+
+        for (const hero of heroes)
+        {
+            const card = page.getByTestId(`hero-card-${hero}`);
+            const box = await card.boundingBox();
+            //  Screen pixels per CSS pixel (the scene is scaled to the viewport)
+            const scale = box.width / await card.evaluate((node) => node.offsetWidth);
+            //  The card's content box: 1 px border + 8 px padding on each side
+            const content = { x: box.x + 9 * scale, y: box.y, width: box.width - 18 * scale, height: box.height };
+
+            sizes.push(await card.evaluate((node) => [ node.offsetWidth, node.querySelector('img').offsetHeight ]));
+            await expectStyle(card.locator('.hero-name'), { 'font-size': '15px' });
+            expect(inside(await card.locator('.hero-name').boundingBox(), content)).toBe(true);
+        }
+
+        expect(new Set(sizes.map(([ width ]) => width)).size).toBe(1);
+        expect(new Set(sizes.map(([ , height ]) => height)).size).toBe(1);
+    });
+```
+
+**Gate**: build, then full (phase gate) - `cd game && npm test && npm run build && npx playwright test --workers=2`
+**Done when**:
+
+- [ ] The new case passes.
+- [ ] Phase gate: every Vitest suite, the build and every Playwright suite pass (`heroes.spec.js` and `heroAscension.spec.js` read the hero cards).
+
+**Commit**: `fix(game): keep the five hero cards the same size`
+
+---
+
+### T37: Settled review shots and the states nobody judged [ ]
+
+**Owner**: test-engineer
+**What**: Every review shot waits for its images (review finding 8), and six new shots show the selected fusion row, a disabled equipment button and the detail of the four heroes the review could not check (UIR-18; review "Sugestões" 4 and 6, and the partial check of step 2 of T30).
+**Where**: `game/ui-review/uiRedesign.shots.js`
+**Also changes**: `.specs/features/ui-redesign/design.md` (§ Review Screenshots table), the PNG files of `.specs/features/ui-redesign/ui-review/`
+**Read first**: `game/ui-review/uiRedesign.shots.js` (whole; `tabTo` ends near line 77, the `hero screens` test runs from line 200); `game/ui-review/support/shots.js`; `game/src/adapters/phaser/views/dom.js:27-30` (every art `img` is `loading="lazy"`); `game/src/adapters/phaser/views/bagView.js:35-46` (`bag-go-fusion`); `game/src/adapters/phaser/views/fusionView.js:20-21` (`is-selected`); `game/src/adapters/phaser/views/equipmentView.js:268-275` (`piece-refine` is disabled while the wallet is below the cost; the fake wallet starts at 0)
+**Depends on**: T36
+**Requirement**: UIR-18
+
+**Cause of finding 8**: the art images are `loading="lazy"` and the shots fire as soon as the screen's first element is visible, so the talent icons and the chapter map (`assets/boss-map.jpg`) were still loading: the "test art" of `31-boss-map` is the CSS gradient behind the map image, not a different file. A lazy image that is clipped by a scrolled window never starts loading, so waiting for `complete` alone could hang; switching the lazy images to eager first starts them all. A broken image counts as `complete`, so a missing icon never blocks the wait.
+
+**Contract**:
+
+1. Add this helper right after `tabTo`:
+
+```js
+//  Starts every lazy image and waits until each image of the page has loaded or failed, so no shot catches a half-loaded screen (review finding 8)
+const settleImages = async (page) => {
+    await page.evaluate(() => document.querySelectorAll('img[loading="lazy"]').forEach((img) => { img.loading = 'eager'; }));
+    await page.waitForFunction(() => [ ...document.images ].every((img) => img.complete));
+};
+```
+
+2. Insert `await settleImages(page);` on its own line right before every `await shot(page, testInfo, '...')` call of the file except `01-preloader` (hover shots included: the helper does not move the pointer).
+3. In the test `hero screens`:
+   - after the line `await page.getByTestId('hero-back').click();` that follows `21-hero-detail`, and before `await page.getByTestId('hero-close').click();`, add one block per hero, in this order: `lyra` `34-hero-detail-lyra`, `orina` `35-hero-detail-orina`, `seraphine` `36-hero-detail-seraphine`, `vex` `37-hero-detail-vex`:
+
+```js
+    for (const [ hero, name ] of [ [ 'lyra', '34-hero-detail-lyra' ], [ 'orina', '35-hero-detail-orina' ], [ 'seraphine', '36-hero-detail-seraphine' ], [ 'vex', '37-hero-detail-vex' ] ])
+    {
+        await page.getByTestId(`hero-card-${hero}`).click();
+        await expect(page.getByTestId('hero-detail')).toBeVisible();
+        await page.mouse.move(0, 0);
+        await settleImages(page);
+        await shot(page, testInfo, name);
+        await page.getByTestId('hero-back').click();
+    }
+```
+
+   - after the shot `23-bag-detail` and before the following `await page.getByTestId('hero-close').click();`, add:
+
+```js
+    await page.getByTestId('bag-go-fusion').click();
+    await expect(page.getByTestId('fusion-row-kael-1')).toHaveClass(/is-selected/);
+    await page.mouse.move(0, 0);
+    await settleImages(page);
+    await shot(page, testInfo, '32-fusion-selected');
+```
+
+   - after `await page.getByTestId('bulk-sell-cancel').click();` and before the following `await page.getByTestId('hero-close').click();`, add:
+
+```js
+    await page.getByTestId('equip-piece-b1').click();
+    await expect(page.getByTestId('piece-refine')).toBeDisabled();
+    await page.mouse.move(0, 0);
+    await settleImages(page);
+    await shot(page, testInfo, '33-equip-disabled');
+```
+
+4. In `design.md` § Review Screenshots, append six rows to the table after `31-boss-map`, and add the sentence `Every shot but 01-preloader waits until the page's images have loaded (settleImages).` under the table:
+
+```
+| `32-fusion-selected` | Fusão opened from a bag entry with `Ir para a fusão`: the Kael 1★ row selected (`.fusion-row.is-selected`) |
+| `33-equip-disabled` | Bag piece b1 opened in Equipamento with an empty wallet: `Refinar` disabled (`.equip-button:disabled`) |
+| `34-hero-detail-lyra` | Lyra 4★ detail and her three skill thumbnails |
+| `35-hero-detail-orina` | Orina 7★ detail and her three skill thumbnails |
+| `36-hero-detail-seraphine` | Seraphine 2★ detail and her three skill thumbnails |
+| `37-hero-detail-vex` | Vex 6★ detail and his three skill thumbnails |
+```
+
+**Steps**:
+
+1. Add the helper.
+2. Insert the `settleImages` calls.
+3. Add the three blocks of shots.
+4. Edit the design table.
+5. Run `cd game && npm run ui:shots -- uiRedesign` (it rewrites all shots on the fixed game of T31 to T36).
+
+**Tests**: none - screenshots for the review, not a test of the game; never part of the e2e suite.
+**Gate**: `cd game && npm run ui:shots -- uiRedesign` passes and `ls .specs/features/ui-redesign/ui-review/*.png | wc -l` prints `66` (33 names x 2 projects).
+**Done when**:
+
+- [ ] The gate passes; every `CONSOLE-REPORT` line reads `clean` except the known noise the T30 review lists (GPU stall in the menu and preloader; HTTP 500 of `fusion error`); any other line goes into the commit message body.
+- [ ] In `30-talents-desktop.png` and `31-boss-map-desktop.png` the icons and the map art are drawn (open both files and look).
+- [ ] The commit holds the script, `design.md` and the 66 screenshots.
+
+**Commit**: `test(game): settle images and add six review shots`
+
+---
+
+### T38: Re-review of the Grove theme after the fixes [ ]
+
+**Owner**: ui-artist
+**What**: Check the fixes of T31 to T37 on desktop and phone and update the review with a new verdict (UIR-01 to UIR-19).
+**Where**: `.specs/features/ui-redesign/ui-review.html`
+**Read first**: the current `ui-review.html` (findings 1 to 9); spec UIR-10 AC 24, UIR-13 AC 12 and 13, UIR-14 AC 14 and 15, UIR-15 AC 5; T31 to T37 above; § Deferred review findings below
+**Depends on**: T37
+**Requirement**: UIR-01, UIR-02, UIR-03, UIR-04, UIR-05, UIR-06, UIR-07, UIR-08, UIR-09, UIR-10, UIR-11, UIR-12, UIR-13, UIR-14, UIR-15, UIR-16, UIR-17, UIR-18, UIR-19
+
+**Steps**:
+
+1. Run `cd game && npm run ui:shots -- uiRedesign` again on the current `main` and use those 66 files.
+2. For each finding of the old review, write its new state, with the shot that proves it: #1 leader rows (`26-leader`), #2 skill tooltip (`09-skill-tooltip`), #3 leader name (`05-battle-boss`, `08-battle-locked`), #4 talent buttons and titles (`30-talents`), #5 preloader (`01-preloader`), #8 loaded images (`30-talents`, `31-boss-map`), #9 hero cards (`20-heroes`). State is `corrigido` or a new numbered finding with the exact fix.
+3. List #6 and #7 as `adiado` with the reason of § Deferred review findings.
+4. Judge the states nobody judged: `.fusion-row.is-selected` (`32-fusion-selected`), the disabled `.equip-button` (`33-equip-disabled`), and the skill thumbnails of Lyra, Orina, Seraphine and Vex (`34` to `37`): no magenta, no purple effect lost to the cutout (UIR-16 edge case).
+5. Check that the fixes broke nothing on the shots around them (the battle bar of `05`, the tooltip over the effect tags is not in a shot: say so).
+6. Write the verdict: OK, or CHANGES with numbered findings (screen, selector, what is wrong, the exact fix). The orchestrator turns new findings into tasks appended to this file.
+
+**Tests**: none - a visual review produces no code.
+**Gate**: `test -s .specs/features/ui-redesign/ui-review.html && grep -q "32-fusion-selected" .specs/features/ui-redesign/ui-review.html && grep -q "33-equip-disabled" .specs/features/ui-redesign/ui-review.html && grep -q "37-hero-detail-vex" .specs/features/ui-redesign/ui-review.html` exits 0.
+**Done when**:
+
+- [ ] `ui-review.html` has a new verdict, the state of findings 1 to 9, and covers steps 2 to 5.
+- [ ] The commit holds `ui-review.html` and any shot that step 1 changed.
+
+**Commit**: `docs(ui-redesign): re-review the grove theme after the fixes`
+
+---
+
+### Deferred review findings
+
+Decided by the PO on 2026-11-13; not tasks of this feature.
+
+| Finding | Decision | Reason |
+| --- | --- | --- |
+| #6 Logo top left fades into the forest (battle) | Deferred | The logo is outside this spec (no UIR covers it) and is the same Phaser image as the main menu's; a readable version needs a light logo variant or a glow FX, which is new art or a scene change, not a CSS fix. Owner decides in a later art pass. |
+| #7 Card notice covers half of the combo chip (`10-notice`) | Deferred | Moving a HUD element other than the bottom bar's is Out of Scope in the spec; the overlap lasts the 3 s of the notice. Fixing it means moving `NOTICE` (`HeroUi.js`, y 120) or `COMBO_HUD` (`ClickerGame.js`, y 150), an owner decision. |
+
+---
+
 ## Phase Execution Map
 
 ```
-Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9
+Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9 → Phase 10
 
 Phase 1:  T1 → T2 → T3
 Phase 2:  T4 → T5
@@ -2212,9 +2827,10 @@ Phase 6:  T21 → T22 → T23 → T24 → T25 → T26
 Phase 7:  T27
 Phase 8:  T28 → T29
 Phase 9:  T30
+Phase 10: T31 → T32 → T33 → T34 → T35 → T36 → T37 → T38
 ```
 
-Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`); batch 2 = Phase 3 (T6 to T11, `game-dev`); batch 3 = Phase 4 (T12 to T17, `game-dev`, except T15 which goes to `test-engineer` between T14 and T16); batch 4 = Phase 5 (T18 to T20, `game-dev`); batch 5 = Phases 6 and 7 (T21 to T27, `game-dev`); batch 6 = Phase 8 (T28, T29, `test-engineer`); then T30 (`ui-artist`). A fresh `test-engineer` that wrote none of these tasks runs as the Verifier afterwards.
+Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`); batch 2 = Phase 3 (T6 to T11, `game-dev`); batch 3 = Phase 4 (T12 to T17, `game-dev`, except T15 which goes to `test-engineer` between T14 and T16); batch 4 = Phase 5 (T18 to T20, `game-dev`); batch 5 = Phases 6 and 7 (T21 to T27, `game-dev`); batch 6 = Phase 8 (T28, T29, `test-engineer`); then T30 (`ui-artist`). Batch 7 = Phase 10: T31 to T36 (`game-dev`, one worker, in order), then T37 (`test-engineer`), then T38 (`ui-artist`). A fresh `test-engineer` that wrote none of these tasks runs as the Verifier after T38.
 
 ---
 
@@ -2252,6 +2868,14 @@ Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`);
 | T28 | 1 e2e file | ✅ Granular |
 | T29 | 1 shots file | ✅ Granular |
 | T30 | 1 review file | ✅ Granular |
+| T31 | 1 selector and 1 e2e case | ✅ Granular |
+| T32 | 1 rule, 1 edited and 1 new e2e case | ✅ Granular |
+| T33 | 5 selectors and 1 rule of one control, 1 e2e case | ✅ Cohesive (one root cause) |
+| T34 | 4 token lines and 3 rules of 1 section, 1 e2e case | ✅ Cohesive (one colour set) |
+| T35 | 2 scenes, 1 config value, 1 asset, their tests | ✅ Cohesive (the first two screens) |
+| T36 | 2 declarations, 1 e2e case | ✅ Granular |
+| T37 | 1 shots file and its design table | ✅ Granular |
+| T38 | 1 review file | ✅ Granular |
 
 ## Diagram-Definition Cross-Check
 
@@ -2287,6 +2911,14 @@ Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`);
 | T28 | T27 | T27 → T28 | ✅ Match |
 | T29 | T28 | T28 → T29 | ✅ Match |
 | T30 | T29 | T29 → T30 | ✅ Match |
+| T31 | T30 | T30 → T31 | ✅ Match |
+| T32 | T31 | T31 → T32 | ✅ Match |
+| T33 | T32 | T32 → T33 | ✅ Match |
+| T34 | T33 | T33 → T34 | ✅ Match |
+| T35 | T34 | T34 → T35 | ✅ Match |
+| T36 | T35 | T35 → T36 | ✅ Match |
+| T37 | T36 | T36 → T37 | ✅ Match |
+| T38 | T37 | T37 → T38 | ✅ Match |
 
 ## Test Co-location Validation
 
@@ -2322,3 +2954,11 @@ Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`);
 | T28 | e2e | e2e | e2e | ✅ OK |
 | T29 | Review screenshots | none | none | ✅ OK |
 | T30 | Review document | none | none | ✅ OK |
+| T31 | Game CSS (player-visible fix) | e2e (phase rule: every observable fix) | e2e | ✅ OK |
+| T32 | Game CSS (player-visible fix) | e2e | e2e | ✅ OK |
+| T33 | Game CSS (player-visible fix) | e2e | e2e | ✅ OK |
+| T34 | Game CSS (player-visible fix) | e2e | e2e | ✅ OK |
+| T35 | Game scenes + config | unit (jsdom) + e2e | unit + e2e | ✅ OK |
+| T36 | Game CSS (player-visible fix) | e2e | e2e | ✅ OK |
+| T37 | Review screenshots | none | none | ✅ OK |
+| T38 | Review document | none | none | ✅ OK |

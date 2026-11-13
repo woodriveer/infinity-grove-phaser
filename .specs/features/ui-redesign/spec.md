@@ -73,6 +73,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 | Damage number colours | Normal `#ffd35c` (gold), critical `#ff8a1f` (orange), both with a `#2a1408` outline | The mock-up's `15.7` is gold-orange with a dark outline; critical stays bigger (48 px) and warmer | y |
 | Weak element chip | `Fraco: <elemento>` names the element that hits the enemy for double (FIRE is weak to WATER, WATER to NATURE, NATURE to FIRE); LIGHT and DARKNESS enemies show no chip | Derived from the element table of `game/src/domain/combat/elements.js`; LIGHT and DARKNESS take at most 1x from any element, so they have no weakness | y |
 | New text | `Fraco: <elemento>` is the only new player text, in Portuguese (AD-007), with the labels of `ELEMENT_LABELS` (`Fogo`, `Água`, `Natureza`) | AD-007 | y |
+| Fixes of the ui review (2026-11-13, tasks T31 to T38) | Leader card name at 15 px in up to two lines; a dark ink per talent branch for the `Melhorar` buttons, branch titles and `Nível máximo`; Boot and Preloader on `#1c120c` with a wood track; hero cards in equal columns with 15 px names. Findings 6 (logo glow) and 7 (notice over the combo chip) deferred | 17 px does not fit `Sombraespinho` (144 px in a 128 px column, measured in Chromium); the four branch colours fail 4.5:1 as button fill and as title text (1.71:1 to 3.92:1); the logo is outside this spec and moving the notice is out of scope (Out of Scope, HUD positions) | n (owner confirms with the fix tasks) |
 | Reference rendering for numbers in tests | Colours are asserted as the computed `rgb(...)` strings of `design.md`; the contrast ratios are computed from those values (WCAG 2.x relative luminance) | L-013: exact markers, not adjectives | y |
 
 **Open questions:** none - Q1 is decided (D1) and the owner accepted the defaults of Q2 to Q5 and approved the spec on 2026-11-12.
@@ -141,7 +142,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 21. Each rail button SHALL be a 76 x 60 px framed square: background-color `rgb(43, 29, 20)`, a 2 px solid border `rgb(176, 122, 58)`, border-radius `6px`, icon colour `rgb(224, 180, 90)`, label Figtree 700 11 px `rgb(244, 230, 200)`, 6 px apart, with no label wider than its button.  <!-- UIR-09 -->
 22. The rail badges SHALL be ember dots: background-color `rgb(232, 116, 42)` with a 2 px ring `rgb(28, 18, 12)`; the talents count SHALL be written in `rgb(42, 26, 16)`.  <!-- UIR-09 -->
 23. The battle bar SHALL be a parchment panel 984 x 124 px with border-radius `12px`.  <!-- UIR-10 -->
-24. The leader card (`leader-card`) SHALL be a 240 x 104 px dark frame card (background-color `rgb(43, 29, 20)`, 2 px border `rgb(176, 122, 58)`): the 72 px portrait inside a 3 px ring `rgb(224, 180, 90)`, the name in Cinzel 700 17 px `rgb(243, 213, 138)`, the bonus in Figtree 600 12 px `rgb(244, 230, 200)`.  <!-- UIR-10 -->
+24. The leader card (`leader-card`) SHALL be a 240 x 104 px dark frame card (background-color `rgb(43, 29, 20)`, 2 px border `rgb(176, 122, 58)`): the 72 px portrait inside a 3 px ring `rgb(224, 180, 90)`, the name in Cinzel 700 15 px `rgb(243, 213, 138)` with line-height 1.1, wrapping to at most two lines and never cut (its scrollWidth not greater than its clientWidth for each of the five heroes), the bonus in Figtree 600 12 px `rgb(244, 230, 200)`. (Amended 2026-11-13, review finding 3: at 17 px `Sombraespinho` needs 144 px of the 128 px text column.)  <!-- UIR-10 -->
 25. Each skill art in the bar SHALL sit in a 150 x 62 px frame with a 2 px solid border `rgb(176, 122, 58)`, border-radius `8px` and background `rgb(28, 18, 12)`; an unlocked skill SHALL add a 2 px ring `rgb(224, 180, 90)` around it.  <!-- UIR-10 -->
 26. The key badge (`skill-key-<slot>`) SHALL be 20 x 20 px with background `rgb(28, 18, 12)`, a 1 px border `rgb(224, 180, 90)` and the letter in Cinzel 700 12 px `rgb(243, 213, 138)`.  <!-- UIR-10 -->
 27. WHILE a skill is locked, its lock mark SHALL be a 32 px circle with background `rgba(28, 18, 12, 0.85)` and the lock drawn in `rgb(224, 180, 90)`.  <!-- UIR-10 -->
@@ -228,6 +229,10 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 9. The talent cards SHALL keep their branch colours and render on `rgb(244, 230, 200)` with the branch bar on their left edge.  <!-- UIR-14 -->
 10. The chapter map of `Rever chefes` (`.farm-map`) SHALL be framed by a 3 px ring `rgb(90, 61, 38)` and an outer 2 px ring `rgb(176, 122, 58)`, drawn as box-shadows so the map keeps its 880 x 495 layout box.  <!-- UIR-14 -->
 11. The element wheel SHALL be a parchment panel with border-radius `10px` and its title in Cinzel 700.  <!-- UIR-14 -->
+12. The rows of the `Líder` screen (`.leader-entry`, the current one included) SHALL write the hero name (`.leader-name`) in Cinzel 18 px `rgb(42, 26, 16)`: 13.56:1 on the current row `rgb(244, 230, 200)`, 11.09:1 on the other rows `rgb(230, 208, 162)`.  <!-- UIR-13 -->
+13. The five hero cards of `Heróis` SHALL have the same width and the same portrait height, and each hero name (`.hero-card .hero-name`, Cinzel 700 15 px) SHALL lie inside its card's content box.  <!-- UIR-13 -->
+14. WHEN the pointer is over a skill slot THEN the skill tooltip SHALL show the skill art at 112 x 64 px and the whole skill text inside the tooltip box, on the tooltip's own parchment (the skill row inside it has no background, border or padding).  <!-- UIR-14 -->
+15. Each talent branch SHALL have a dark ink: TIME `rgb(36, 93, 100)`, BREAK `rgb(149, 55, 36)`, POWER `rgb(108, 83, 17)`, COMBO `rgb(106, 49, 197)`. The `Melhorar` buttons SHALL be filled with that ink under text `rgb(244, 230, 200)` (5.90:1 to 6.02:1), and the branch titles and `Nível máximo` SHALL be written in it (at least 4.82:1 on `rgb(230, 208, 162)`); the card's left bar keeps the branch colour of AC 9.  <!-- UIR-14 -->
 
 **Independent Test**: Open each rail screen in turn (shots `20` to `31` of `ui:shots`): parchment window, Cinzel title, inset cards, dark tiles with their rarity frames, parchment tooltips.
 
@@ -265,6 +270,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 2. The login fields SHALL have background-color `rgb(244, 230, 200)`, a 2 px solid border `rgb(90, 61, 38)` and text `rgb(42, 26, 16)`; WHEN a field has keyboard focus THEN its border SHALL be `rgb(204, 78, 26)`.  <!-- UIR-15 -->
 3. The path choice panel (`.path-choice`) SHALL be a parchment panel and each hero option an inset card.  <!-- UIR-15 -->
 4. The preloader bar SHALL have a 2 px outline `0xe0b45a` and a fill `0xe8742a`, at the same position and size as today.  <!-- UIR-15 -->
+5. The Boot and Preloader screens SHALL draw on the game background `#1c120c` with no image behind the bar (the sky gradient `assets/preloader.png` is neither loaded nor drawn), and the bar's track SHALL be filled `0x2b1d14` inside its gold outline.  <!-- UIR-15 -->
 
 **Independent Test**: Reload the page: gold-outlined ember loading bar; menu: parchment oval with a wood rim, Cinzel title, ember `Login`, wood `Sign up`.
 
