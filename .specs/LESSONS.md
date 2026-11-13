@@ -456,6 +456,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md UIR-02 AC7 to AC10: only Fechar, Login and Fundir asserted of the named button lists (css-recipes)
 - last seen: 2026-11-13T18:12:56Z
 
+### L-075 - Assert the border style keyword with the width and colour of every bordered recipe element, because a dashed border passes a colour-only check
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `css-recipes` · harmful: 0
+- features: ui-redesign
+- evidence: validation.md round 2 N10 and N11 (game/public/style.css:214, :73) (css-recipes)
+- last seen: 2026-11-13T21:30:58Z
+
+### L-076 - Test a text-entry guard against every HTML form of the element the spec names, such as an empty or plaintext-only contenteditable, not only the attribute value the spec example uses
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `game-input` · harmful: 0
+- features: ui-redesign
+- evidence: validation.md round 2 G1 (game/src/adapters/phaser/ClickerGame.js:87) (game-input)
+- last seen: 2026-11-13T21:30:58Z
+
+### L-077 - Before a hover or press criterion names an element, check that the element takes a pointer, because a non-interactive text line cannot meet it
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: ui-redesign
+- evidence: validation.md round 2 gap 6 (game/src/adapters/phaser/MainMenu.js:57) (spec)
+- last seen: 2026-11-13T21:30:58Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

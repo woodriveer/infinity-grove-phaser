@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 75,
+  "next_id": 78,
   "lessons": [
     {
       "id": "L-001",
@@ -1340,6 +1340,60 @@
       ],
       "created": "2026-11-13T18:12:56Z",
       "last_seen": "2026-11-13T18:12:56Z"
+    },
+    {
+      "id": "L-075",
+      "key": "surviving_mutant::assert the border style keyword with the width and colour of every bordered recipe element because a dashed border passes a colour only check",
+      "text": "Assert the border style keyword with the width and colour of every bordered recipe element, because a dashed border passes a colour-only check",
+      "signal": "surviving_mutant",
+      "scope": "css-recipes",
+      "status": "candidate",
+      "features": [
+        "ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md round 2 N10 and N11 (game/public/style.css:214, :73) (css-recipes)"
+      ],
+      "created": "2026-11-13T21:30:58Z",
+      "last_seen": "2026-11-13T21:30:58Z"
+    },
+    {
+      "id": "L-076",
+      "key": "ac_gap::test a text entry guard against every html form of the element the spec names such as an empty or plaintext only contenteditable not only the attribute value the spec example uses",
+      "text": "Test a text-entry guard against every HTML form of the element the spec names, such as an empty or plaintext-only contenteditable, not only the attribute value the spec example uses",
+      "signal": "ac_gap",
+      "scope": "game-input",
+      "status": "candidate",
+      "features": [
+        "ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md round 2 G1 (game/src/adapters/phaser/ClickerGame.js:87) (game-input)"
+      ],
+      "created": "2026-11-13T21:30:58Z",
+      "last_seen": "2026-11-13T21:30:58Z"
+    },
+    {
+      "id": "L-077",
+      "key": "spec_precision_gap::before a hover or press criterion names an element check that the element takes a pointer because a non interactive text line cannot meet it",
+      "text": "Before a hover or press criterion names an element, check that the element takes a pointer, because a non-interactive text line cannot meet it",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md round 2 gap 6 (game/src/adapters/phaser/MainMenu.js:57) (spec)"
+      ],
+      "created": "2026-11-13T21:30:58Z",
+      "last_seen": "2026-11-13T21:30:58Z"
     }
   ]
 }
