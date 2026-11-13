@@ -4146,6 +4146,19 @@ describe('ClickerGame auto click', () => {
         expect(button(ctx).getAttribute('aria-expanded')).toBe('false');
     });
 
+    it('ignores A while the reset dialog is open', async () => {
+        const ctx = await createScene({ start: atChapter(3) });
+        attach(ctx);
+        button(ctx).click();
+        ctx.hud('[data-testid="reset-account"]').click();
+        expect(ctx.hud('[data-testid="reset-dialog"]').hidden).toBe(false);
+
+        press(ctx, 'A', { repeat: false, target: document.body });
+
+        expect(popover(ctx).hidden).toBe(true);
+        expect(button(ctx).getAttribute('aria-expanded')).toBe('false');
+    });
+
     it('labels the button and the window for assistive tech', async () => {
         const ctx = await createScene({ start: atChapter(2) });
 
