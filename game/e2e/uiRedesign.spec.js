@@ -126,6 +126,8 @@ const openScreen = async (page, screen) => {
 //  The button recipes of UIR-02: secondary (wood) and primary (ember)
 const WOOD_PILL = { 'background-color': 'rgb(43, 29, 20)', 'border-top-width': '2px', 'border-top-style': 'solid', 'border-top-color': 'rgb(176, 122, 58)', color: 'rgb(244, 230, 200)', 'border-top-left-radius': '999px' };
 const EMBER_PILL = { 'background-color': 'rgb(168, 67, 26)', 'border-top-width': '2px', 'border-top-style': 'solid', 'border-top-color': 'rgb(224, 180, 90)', color: 'rgb(244, 230, 200)' };
+//  UIR-03 AC15: the restyled buttons, the rail and the boss timer have no animation and no transition
+const QUIET = { 'animation-name': 'none', 'transition-duration': '0s' };
 
 //  UIR-02 AC9 and AC10: the hover brightens an enabled button and the press darkens it. The release is made off the button,
 //  so the press itself clicks nothing (some buttons spend crystals, copper or log out)
@@ -270,6 +272,7 @@ test.describe('Grove theme', () => {
             color: 'rgb(244, 230, 200)',
             'border-top-left-radius': '999px'
         });
+        await expectStyle(page.getByTestId('hero-close'), QUIET);
     });
 
     test('draws Fundir as an ember pill', async ({ page }) => {
@@ -284,11 +287,13 @@ test.describe('Grove theme', () => {
             color: 'rgb(244, 230, 200)'
         });
         await expectShades(page, page.getByTestId('fusion-button-kael-1'));
+        await expectStyle(page.getByTestId('fusion-button-kael-1'), QUIET);
     });
 
     test('draws Login as an ember pill', async ({ page }) => {
         const menu = await openMenu(page);
 
+        await expectStyle(menu.loginButton, QUIET);
         await expectStyle(menu.loginButton, {
             'background-color': 'rgb(168, 67, 26)',
             'border-top-width': '2px',
@@ -302,6 +307,8 @@ test.describe('Grove theme', () => {
         const menu = await openMenu(page);
 
         await expectStyle(menu.signupButton, WOOD_PILL);
+        await expectStyle(menu.signupButton, QUIET);
+        await expectStyle(menu.loginButton, QUIET);
         await expectShades(page, menu.signupButton);
         await expectShades(page, menu.loginButton);
     });
@@ -317,6 +324,7 @@ test.describe('Grove theme', () => {
         const welcome = await openMainMenu(page, { state: 'welcome' });
 
         await expectStyle(welcome.logoutButton, WOOD_PILL);
+        await expectStyle(welcome.logoutButton, QUIET);
         await expectShades(page, welcome.logoutButton);
     });
 
@@ -334,6 +342,7 @@ test.describe('Grove theme', () => {
         const start = page.locator('.welcome-start');
 
         expect(await start.evaluate((node) => node.tagName)).toBe('P');
+        await expectStyle(start, QUIET);
         await expectStyle(start, {
             'font-family': expect.stringMatching(/^"?Cinzel/),
             'font-weight': '700',
@@ -365,6 +374,7 @@ test.describe('Grove theme', () => {
 
         await expect(page.getByTestId('hero-back')).toContainText('Voltar');
         await expectStyle(page.getByTestId('hero-back'), WOOD_PILL);
+        await expectStyle(page.getByTestId('hero-back'), QUIET);
         await expectShades(page, page.getByTestId('hero-back'));
     });
 
@@ -373,11 +383,13 @@ test.describe('Grove theme', () => {
         await page.keyboard.press('Escape');
 
         await expectStyle(page.locator('.pause-leave'), WOOD_PILL);
+        await expectStyle(page.locator('.pause-leave'), QUIET);
         await expectShades(page, page.locator('.pause-leave'));
         await page.locator('.pause-leave').click();
 
         await expect(page.locator('.pause-confirm-yes')).toBeVisible();
         await expectStyle(page.locator('.pause-confirm-yes'), WOOD_PILL);
+        await expectStyle(page.locator('.pause-confirm-yes'), QUIET);
         await expectShades(page, page.locator('.pause-confirm-yes'));
     });
 
@@ -386,11 +398,13 @@ test.describe('Grove theme', () => {
         await page.keyboard.press('Escape');
 
         await expectStyle(page.locator('.pause-continue'), EMBER_PILL);
+        await expectStyle(page.locator('.pause-continue'), QUIET);
         await expectShades(page, page.locator('.pause-continue'));
         await page.locator('.pause-leave').click();
 
         await expect(page.locator('.pause-confirm-no')).toBeVisible();
         await expectStyle(page.locator('.pause-confirm-no'), EMBER_PILL);
+        await expectStyle(page.locator('.pause-confirm-no'), QUIET);
         await expectShades(page, page.locator('.pause-confirm-no'));
     });
 
@@ -400,8 +414,10 @@ test.describe('Grove theme', () => {
         await page.getByTestId('reset-account').click();
 
         await expectStyle(page.getByTestId('reset-confirm'), WOOD_PILL);
+        await expectStyle(page.getByTestId('reset-confirm'), QUIET);
         await expectShades(page, page.getByTestId('reset-confirm'));
         await expectStyle(page.getByTestId('reset-cancel'), EMBER_PILL);
+        await expectStyle(page.getByTestId('reset-cancel'), QUIET);
         await expectShades(page, page.getByTestId('reset-cancel'));
     });
 
@@ -411,9 +427,12 @@ test.describe('Grove theme', () => {
         await page.getByTestId('equip-piece-r1').click();
 
         await expectStyle(page.locator('[data-testid^="piece-equip-"]').first(), WOOD_PILL);
+        await expectStyle(page.locator('[data-testid^="piece-equip-"]').first(), QUIET);
         await expectStyle(page.getByTestId('piece-sell'), WOOD_PILL);
+        await expectStyle(page.getByTestId('piece-sell'), QUIET);
         await expect(page.getByTestId('piece-refine')).toBeEnabled();
         await expectStyle(page.getByTestId('piece-refine'), EMBER_PILL);
+        await expectStyle(page.getByTestId('piece-refine'), QUIET);
         //  UIR-02 AC9: the hover brightens them. AC10 (press) is not asserted on the three: the hover rule of style.css:1757 overrides the press rule of :196
         await expectHoverShade(page.locator('[data-testid^="piece-equip-"]').first());
         await expectHoverShade(page.getByTestId('piece-sell'));
@@ -426,6 +445,7 @@ test.describe('Grove theme', () => {
         await page.getByTestId('bag-entry-kael-3').click();
 
         await expectStyle(page.getByTestId('bag-go-fusion'), EMBER_PILL);
+        await expectStyle(page.getByTestId('bag-go-fusion'), QUIET);
         await expectShades(page, page.getByTestId('bag-go-fusion'));
 
         await page.getByTestId('hero-close').click();
@@ -436,6 +456,7 @@ test.describe('Grove theme', () => {
 
         //  UIR-02 AC9: the hover brightens it. AC10 (press) is not asserted: the hover rule of style.css:2520 overrides the press rule of :197
         await expectStyle(page.getByTestId('bulk-sell-confirm-yes'), EMBER_PILL);
+        await expectStyle(page.getByTestId('bulk-sell-confirm-yes'), QUIET);
         await expectHoverShade(page.getByTestId('bulk-sell-confirm-yes'));
     });
 
@@ -461,6 +482,8 @@ test.describe('Grove theme', () => {
         await expect(page.getByTestId('reset-account')).toBeEnabled();
         await expectShades(page, page.getByTestId('auto-click-upgrade'));
         await expectShades(page, page.getByTestId('reset-account'));
+        await expectStyle(page.getByTestId('auto-click-upgrade'), QUIET);
+        await expectStyle(page.getByTestId('reset-account'), QUIET);
     });
 
     test('keeps a disabled button at opacity 0.45', async ({ page }) => {
@@ -492,6 +515,7 @@ test.describe('Grove theme', () => {
         {
             const background = (await css(page.locator(`.wallet .${coin}`), [ 'background-image' ], '::before'))['background-image'];
 
+            expect(background).toMatch(/^radial-gradient\(/);
             for (const colour of colours) { expect(background).toContain(colour); }
         }
     });
@@ -1178,6 +1202,7 @@ test.describe('Grove theme', () => {
         await expect(page.getByTestId('reset-account')).toHaveText('Resetar conta (+3 cristais)');
         //  UIR-11 AC29: the reset button of the window is in the primary recipe
         await expectStyle(page.getByTestId('reset-account'), { 'background-color': 'rgb(168, 67, 26)', 'border-top-color': 'rgb(224, 180, 90)', color: 'rgb(244, 230, 200)' });
+        await expectStyle(page.getByTestId('reset-account'), QUIET);
     });
 
     test('opens and closes the window with A, the focus back on the button', async ({ page }) => {
