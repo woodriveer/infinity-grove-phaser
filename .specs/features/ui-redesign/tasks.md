@@ -2134,7 +2134,7 @@ Skill thumbnails (UIR-16):
 
 ---
 
-### T29: Review screenshots of the Grove theme [ ]
+### T29: Review screenshots of the Grove theme [x]
 
 **Owner**: test-engineer
 **What**: `npm run ui:shots -- uiRedesign` writes every screenshot of design § Review Screenshots for desktop and phone (UIR-18).
@@ -2163,8 +2163,8 @@ Skill thumbnails (UIR-16):
 **Gate**: `cd game && npm run ui:shots -- uiRedesign` passes and `ls .specs/features/ui-redesign/ui-review/*.png | wc -l` prints `54`.
 **Done when**:
 
-- [ ] The gate passes; every `CONSOLE-REPORT` line reads `clean` (any other line goes into the commit message body).
-- [ ] The commit holds the script and the 54 screenshots.
+- [x] The gate passes; every `CONSOLE-REPORT` line reads `clean` (any other line goes into the commit message body).
+- [x] The commit holds the script and the 54 screenshots.
 
 **Commit**: `test(game): screenshot the grove theme for the ui review`
 
