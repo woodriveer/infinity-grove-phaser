@@ -1692,7 +1692,16 @@ test.describe('Grove theme', () => {
             await expect(tooltip).toBeVisible();
             expect(await art.evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 112, 64 ]);
             await expectStyle(art, { filter, 'box-shadow': 'none' });
-            await expectStyle(tooltip.locator('.skill-row'), { 'background-color': 'rgba(0, 0, 0, 0)', 'border-top-width': '0px', 'padding-left': '0px' });
+            //  UIR-14 AC14: the skill row inside the tooltip has no background, no border and no padding
+            await expectStyle(tooltip.locator('.skill-row'), {
+                'background-color': 'rgba(0, 0, 0, 0)',
+                'border-top-width': '0px',
+                'border-top-style': 'none',
+                'padding-top': '0px',
+                'padding-right': '0px',
+                'padding-bottom': '0px',
+                'padding-left': '0px'
+            });
             expect(inside(await tooltip.locator('.skill-row > div').boundingBox(), await tooltip.boundingBox())).toBe(true);
             await page.mouse.move(0, 0);
             await expect(tooltip).toHaveCount(0);
@@ -1733,6 +1742,39 @@ test.describe('Grove theme', () => {
         await expectStyle(page.getByTestId('talent-max-CLICK_DAMAGE'), { color: inks.POWER });
         //  The card bar keeps the bright branch colour
         expect((await css(page.getByTestId('talent-CRIT_CHANCE'), [ 'box-shadow' ]))['box-shadow']).toContain('rgb(201, 154, 31) 4px 0px 0px 0px inset');
+    });
+
+    //  UIR-14 AC9: each card keeps its branch colour on its left edge (an inset bar of 4 px). The colours are the baseline's (5d98b6f, style.css:1647-1650)
+    test('draws the left bar of a talent card in the colour of its branch', async ({ page }) => {
+        await startAs(page, {});
+        await openScreen(page, 'talents');
+        const bars = { TIME: 'rgb(59, 154, 166)', BREAK: 'rgb(196, 73, 47)', POWER: 'rgb(201, 154, 31)', COMBO: 'rgb(138, 91, 214)' };
+
+        for (const [ branch, colour ] of Object.entries(bars))
+        {
+            const card = page.getByTestId(`talent-branch-${branch}`).locator('.talent-card').first();
+
+            expect(await card.evaluate((node) => getComputedStyle(node).boxShadow)).toContain(`${colour} 4px 0px 0px 0px inset`);
+        }
+    });
+
+    //  UIR-14 AC15: the max marks of TIME, BREAK and COMBO are written in their dark ink, at least 4.82:1 on the branch parchment
+    test('writes Nível máximo of TIME, BREAK and COMBO in their dark ink', async ({ page }) => {
+        const marks = { TIME: [ 'MINIBOSS_TIME', 'rgb(36, 93, 100)' ], BREAK: [ 'PHYSICAL_BREAK', 'rgb(149, 55, 36)' ], COMBO: [ 'COMBO', 'rgb(106, 49, 197)' ] };
+
+        await startAs(page, { talents: { MINIBOSS_TIME: 10, PHYSICAL_BREAK: 10, COMBO: 10 }, talentPoints: 10 });
+        await openScreen(page, 'talents');
+
+        for (const [ branch, [ talent, ink ] ] of Object.entries(marks))
+        {
+            const mark = page.getByTestId(`talent-max-${talent}`);
+            const back = await page.getByTestId(`talent-branch-${branch}`).evaluate((node) => getComputedStyle(node).backgroundColor);
+
+            await expect(mark).toHaveText('Nível máximo');
+            await expectStyle(mark, { color: ink });
+            expect(back).toBe('rgb(230, 208, 162)');
+            expect(ratio(ink, back)).toBeGreaterThanOrEqual(4.82);
+        }
     });
 
     test('frames the chapter map with a wood and a bronze ring', async ({ page }) => {
