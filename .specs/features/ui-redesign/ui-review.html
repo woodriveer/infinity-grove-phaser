@@ -1,0 +1,427 @@
+<!doctype html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Redesign da UI (tema Grove)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Redesign da UI (tema Grove)</h1>
+                <div class="meta">
+                    <code>.specs/features/ui-redesign</code> · commits <code>até ebe6500</code> · 2026-11-13 · local (capturas Playwright, 54 imagens)
+                </div>
+            </div>
+            <span class="chip verdict changes">MUDANÇAS PEDIDAS</span>
+        </div>
+        <p style="margin-top:16px">O tema Grove está bem aplicado e próximo da referência na maior parte das telas: pergaminho com aros de madeira e bronze, Cinzel nos títulos, botões em pílula e o botão redondo de auto clique. Dois defeitos bloqueiam a aprovação: o texto das linhas de líder some sobre o pergaminho e o tooltip de habilidade quebra o layout. Há também achados médios de contraste, de nome cortado e do preloader. Console sem erros além do ruído conhecido (GPU stall no menu e no preloader, HTTP 500 do cenário de erro de fusão).</p>
+        <div class="stats">
+            <div class="stat"><div class="n">27</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">54</div><div class="l">capturas (desktop + celular)</div></div>
+            <div class="stat"><div class="n">2</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">7</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Pergaminho e madeira com aros de bronze, títulos em Cinzel, botões em pílula (madeira secundária, ember primário) em todas as telas <code>UIR-01, UIR-02</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Chips da carteira, trilho de heróis emoldurado, barra de batalha, cartão do líder escuro, molduras das habilidades e crachás de tecla conforme a referência <code>UIR-04, UIR-09, UIR-10</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Botão redondo de auto clique: anel verde ligado, bronze desligado, crachá A legível, cauda da janela apontando o botão, janela livre do trilho (cerca de 5 px de folga), foco laranja visível no interruptor <code>UIR-19</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Pausa, reset e telas de herói sobre a camada escura <code>UIR-12</code></span></li>
+            <li class="no"><span class="mark">✗</span><span>Preloader fora do tema Grove (céu ciano) <code>UIR-01</code> — achado #5</span></li>
+            <li class="no"><span class="mark">✗</span><span>Texto das linhas de líder ilegível; tooltip de habilidade quebrado; nome do líder cortado; contraste dos botões de talento <code>UIR-03, UIR-10, UIR-12</code> — achados #1 a #4</span></li>
+            <li class="no"><span class="mark">✗</span><span>Miniaturas de habilidade sem magenta nem efeito roxo perdido: confirmado nas três habilidades do Kael (capturas 05, 09, 21, 23). As habilidades dos outros heróis não aparecem nas capturas e não foram conferidas <code>passo 2 da T30</code> — verificação parcial</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>Preloader</h3>
+            <div class="shots">
+                <figure><a href="ui-review/01-preloader-desktop.png" target="_blank"><img src="ui-review/01-preloader-desktop.png" alt="Carregando" loading="lazy"></a><figcaption><span class="t">Carregando</span><span class="d">Barra ember sobre o céu azul/ciano do carregamento.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #5</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/01-preloader-phone.png" target="_blank"><img src="ui-review/01-preloader-phone.png" alt="Carregando" loading="lazy"></a><figcaption><span class="t">Carregando</span><span class="d">Barra ember sobre o céu azul/ciano do carregamento.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #5</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Menu principal</h3>
+            <div class="shots">
+                <figure><a href="ui-review/02-menu-login-desktop.png" target="_blank"><img src="ui-review/02-menu-login-desktop.png" alt="Login" loading="lazy"></a><figcaption><span class="t">Login</span><span class="d">Oval de pergaminho com aro de madeira, campos, Login (primário) e Sign up (secundário). Foco laranja visível no campo.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/03-menu-welcome-desktop.png" target="_blank"><img src="ui-review/03-menu-welcome-desktop.png" alt="Boas-vindas" loading="lazy"></a><figcaption><span class="t">Boas-vindas</span><span class="d">Click to Start! em ember com borda dourada, Logout em madeira.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/02-menu-login-phone.png" target="_blank"><img src="ui-review/02-menu-login-phone.png" alt="Login" loading="lazy"></a><figcaption><span class="t">Login</span><span class="d">Oval de pergaminho com aro de madeira, campos, Login (primário) e Sign up (secundário). Foco laranja visível no campo.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/03-menu-welcome-phone.png" target="_blank"><img src="ui-review/03-menu-welcome-phone.png" alt="Boas-vindas" loading="lazy"></a><figcaption><span class="t">Boas-vindas</span><span class="d">Click to Start! em ember com borda dourada, Logout em madeira.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Escolha de caminho</h3>
+            <div class="shots">
+                <figure><a href="ui-review/04-path-choice-desktop.png" target="_blank"><img src="ui-review/04-path-choice-desktop.png" alt="Escolha seu caminho" loading="lazy"></a><figcaption><span class="t">Escolha seu caminho</span><span class="d">Cartão de pergaminho com título Cinzel e botão Voltar em madeira.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/04-path-choice-phone.png" target="_blank"><img src="ui-review/04-path-choice-phone.png" alt="Escolha seu caminho" loading="lazy"></a><figcaption><span class="t">Escolha seu caminho</span><span class="d">Cartão de pergaminho com título Cinzel e botão Voltar em madeira.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Batalha (HUD)</h3>
+            <div class="shots">
+                <figure><a href="ui-review/05-battle-boss-desktop.png" target="_blank"><img src="ui-review/05-battle-boss-desktop.png" alt="Miniboss, auto clique ligado" loading="lazy"></a><figcaption><span class="t">Miniboss, auto clique ligado</span><span class="d">Placas de pergaminho, trilho de madeira, barra de batalha, botão redondo com anel verde. Nome do líder cortado.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #3</span></span></figcaption></figure>
+                <figure><a href="ui-review/06-battle-combo-desktop.png" target="_blank"><img src="ui-review/06-battle-combo-desktop.png" alt="Combo" loading="lazy"></a><figcaption><span class="t">Combo</span><span class="d">Chip de combo em ember.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/07-battle-light-desktop.png" target="_blank"><img src="ui-review/07-battle-light-desktop.png" alt="Fase normal, elemento Luz" loading="lazy"></a><figcaption><span class="t">Fase normal, elemento Luz</span><span class="d">Tags escuras com ponto de elemento.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/08-battle-locked-desktop.png" target="_blank"><img src="ui-review/08-battle-locked-desktop.png" alt="Auto clique bloqueado" loading="lazy"></a><figcaption><span class="t">Auto clique bloqueado</span><span class="d">Sem botão de auto clique; botão Farm boss sozinho.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/10-notice-desktop.png" target="_blank"><img src="ui-review/10-notice-desktop.png" alt="Aviso de carta" loading="lazy"></a><figcaption><span class="t">Aviso de carta</span><span class="d">Placa escura Carta: Lyra Folhaveloz cobrindo o combo.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #7</span></span></figcaption></figure>
+                <figure><a href="ui-review/13-farm-on-desktop.png" target="_blank"><img src="ui-review/13-farm-on-desktop.png" alt="Farm boss ligado" loading="lazy"></a><figcaption><span class="t">Farm boss ligado</span><span class="d">Anel ember com brilho no botão Farm boss.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/05-battle-boss-phone.png" target="_blank"><img src="ui-review/05-battle-boss-phone.png" alt="Miniboss, auto clique ligado" loading="lazy"></a><figcaption><span class="t">Miniboss, auto clique ligado</span><span class="d">Placas de pergaminho, trilho de madeira, barra de batalha, botão redondo com anel verde. Nome do líder cortado.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #3</span></span></figcaption></figure>
+                <figure><a href="ui-review/06-battle-combo-phone.png" target="_blank"><img src="ui-review/06-battle-combo-phone.png" alt="Combo" loading="lazy"></a><figcaption><span class="t">Combo</span><span class="d">Chip de combo em ember.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/07-battle-light-phone.png" target="_blank"><img src="ui-review/07-battle-light-phone.png" alt="Fase normal, elemento Luz" loading="lazy"></a><figcaption><span class="t">Fase normal, elemento Luz</span><span class="d">Tags escuras com ponto de elemento.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/08-battle-locked-phone.png" target="_blank"><img src="ui-review/08-battle-locked-phone.png" alt="Auto clique bloqueado" loading="lazy"></a><figcaption><span class="t">Auto clique bloqueado</span><span class="d">Sem botão de auto clique; botão Farm boss sozinho.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/10-notice-phone.png" target="_blank"><img src="ui-review/10-notice-phone.png" alt="Aviso de carta" loading="lazy"></a><figcaption><span class="t">Aviso de carta</span><span class="d">Placa escura Carta: Lyra Folhaveloz cobrindo o combo.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #7</span></span></figcaption></figure>
+                <figure><a href="ui-review/13-farm-on-phone.png" target="_blank"><img src="ui-review/13-farm-on-phone.png" alt="Farm boss ligado" loading="lazy"></a><figcaption><span class="t">Farm boss ligado</span><span class="d">Anel ember com brilho no botão Farm boss.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Tooltip de habilidade</h3>
+            <div class="shots">
+                <figure><a href="ui-review/09-skill-tooltip-desktop.png" target="_blank"><img src="ui-review/09-skill-tooltip-desktop.png" alt="Tooltip sobre o espaço Q" loading="lazy"></a><figcaption><span class="t">Tooltip sobre o espaço Q</span><span class="d">Painel de pergaminho com a arte esticada e o texto fora do painel.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-alta">achado #2</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/09-skill-tooltip-phone.png" target="_blank"><img src="ui-review/09-skill-tooltip-phone.png" alt="Tooltip sobre o espaço Q" loading="lazy"></a><figcaption><span class="t">Tooltip sobre o espaço Q</span><span class="d">Painel de pergaminho com a arte esticada e o texto fora do painel.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-alta">achado #2</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Auto clique</h3>
+            <div class="shots">
+                <figure><a href="ui-review/14-auto-click-window-desktop.png" target="_blank"><img src="ui-review/14-auto-click-window-desktop.png" alt="Janela aberta" loading="lazy"></a><figcaption><span class="t">Janela aberta</span><span class="d">Janela de pergaminho com cauda para o botão, interruptor com foco, melhorar desabilitado e reset em primário.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/15-auto-click-off-desktop.png" target="_blank"><img src="ui-review/15-auto-click-off-desktop.png" alt="Desligado" loading="lazy"></a><figcaption><span class="t">Desligado</span><span class="d">Anel de bronze, sem brilho verde.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/14-auto-click-window-phone.png" target="_blank"><img src="ui-review/14-auto-click-window-phone.png" alt="Janela aberta" loading="lazy"></a><figcaption><span class="t">Janela aberta</span><span class="d">Janela de pergaminho com cauda para o botão, interruptor com foco, melhorar desabilitado e reset em primário.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/15-auto-click-off-phone.png" target="_blank"><img src="ui-review/15-auto-click-off-phone.png" alt="Desligado" loading="lazy"></a><figcaption><span class="t">Desligado</span><span class="d">Anel de bronze, sem brilho verde.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Pausa e reset</h3>
+            <div class="shots">
+                <figure><a href="ui-review/11-pause-desktop.png" target="_blank"><img src="ui-review/11-pause-desktop.png" alt="Menu de pausa" loading="lazy"></a><figcaption><span class="t">Menu de pausa</span><span class="d">Cartão de pergaminho; Continue em ember, Leave fight em madeira.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/12-reset-dialog-desktop.png" target="_blank"><img src="ui-review/12-reset-dialog-desktop.png" alt="Diálogo de reset" loading="lazy"></a><figcaption><span class="t">Diálogo de reset</span><span class="d">Resetar em madeira, Cancelar em ember.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/11-pause-phone.png" target="_blank"><img src="ui-review/11-pause-phone.png" alt="Menu de pausa" loading="lazy"></a><figcaption><span class="t">Menu de pausa</span><span class="d">Cartão de pergaminho; Continue em ember, Leave fight em madeira.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/12-reset-dialog-phone.png" target="_blank"><img src="ui-review/12-reset-dialog-phone.png" alt="Diálogo de reset" loading="lazy"></a><figcaption><span class="t">Diálogo de reset</span><span class="d">Resetar em madeira, Cancelar em ember.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Heróis</h3>
+            <div class="shots">
+                <figure><a href="ui-review/20-heroes-desktop.png" target="_blank"><img src="ui-review/20-heroes-desktop.png" alt="Lista de heróis" loading="lazy"></a><figcaption><span class="t">Lista de heróis</span><span class="d">Cartões de pergaminho com retrato em madeira.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #9</span></span></figcaption></figure>
+                <figure><a href="ui-review/21-hero-detail-desktop.png" target="_blank"><img src="ui-review/21-hero-detail-desktop.png" alt="Detalhe do herói" loading="lazy"></a><figcaption><span class="t">Detalhe do herói</span><span class="d">Tarja escura do bônus de líder, linhas de habilidade em pergaminho.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/20-heroes-phone.png" target="_blank"><img src="ui-review/20-heroes-phone.png" alt="Lista de heróis" loading="lazy"></a><figcaption><span class="t">Lista de heróis</span><span class="d">Cartões de pergaminho com retrato em madeira.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #9</span></span></figcaption></figure>
+                <figure><a href="ui-review/21-hero-detail-phone.png" target="_blank"><img src="ui-review/21-hero-detail-phone.png" alt="Detalhe do herói" loading="lazy"></a><figcaption><span class="t">Detalhe do herói</span><span class="d">Tarja escura do bônus de líder, linhas de habilidade em pergaminho.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Mochila</h3>
+            <div class="shots">
+                <figure><a href="ui-review/22-bag-desktop.png" target="_blank"><img src="ui-review/22-bag-desktop.png" alt="Lista da mochila" loading="lazy"></a><figcaption><span class="t">Lista da mochila</span><span class="d">Linhas de pergaminho com pílula de cópias em madeira.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/23-bag-detail-desktop.png" target="_blank"><img src="ui-review/23-bag-detail-desktop.png" alt="Detalhe da carta" loading="lazy"></a><figcaption><span class="t">Detalhe da carta</span><span class="d">Ir para a fusão em ember; habilidades.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/22-bag-phone.png" target="_blank"><img src="ui-review/22-bag-phone.png" alt="Lista da mochila" loading="lazy"></a><figcaption><span class="t">Lista da mochila</span><span class="d">Linhas de pergaminho com pílula de cópias em madeira.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/23-bag-detail-phone.png" target="_blank"><img src="ui-review/23-bag-detail-phone.png" alt="Detalhe da carta" loading="lazy"></a><figcaption><span class="t">Detalhe da carta</span><span class="d">Ir para a fusão em ember; habilidades.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Fusão</h3>
+            <div class="shots">
+                <figure><a href="ui-review/24-fusion-desktop.png" target="_blank"><img src="ui-review/24-fusion-desktop.png" alt="Lista de fusão" loading="lazy"></a><figcaption><span class="t">Lista de fusão</span><span class="d">Linha com contador e Fundir em ember.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/25-fusion-error-desktop.png" target="_blank"><img src="ui-review/25-fusion-error-desktop.png" alt="Erro de fusão" loading="lazy"></a><figcaption><span class="t">Erro de fusão</span><span class="d">Faixa ember com a mensagem em Português.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/24-fusion-phone.png" target="_blank"><img src="ui-review/24-fusion-phone.png" alt="Lista de fusão" loading="lazy"></a><figcaption><span class="t">Lista de fusão</span><span class="d">Linha com contador e Fundir em ember.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/25-fusion-error-phone.png" target="_blank"><img src="ui-review/25-fusion-error-phone.png" alt="Erro de fusão" loading="lazy"></a><figcaption><span class="t">Erro de fusão</span><span class="d">Faixa ember com a mensagem em Português.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Líder</h3>
+            <div class="shots">
+                <figure><a href="ui-review/26-leader-desktop.png" target="_blank"><img src="ui-review/26-leader-desktop.png" alt="Escolher líder" loading="lazy"></a><figcaption><span class="t">Escolher líder</span><span class="d">Texto das linhas quase invisível sobre o pergaminho.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-alta">achado #1</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/26-leader-phone.png" target="_blank"><img src="ui-review/26-leader-phone.png" alt="Escolher líder" loading="lazy"></a><figcaption><span class="t">Escolher líder</span><span class="d">Texto das linhas quase invisível sobre o pergaminho.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-alta">achado #1</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Equipamento</h3>
+            <div class="shots">
+                <figure><a href="ui-review/27-equipment-desktop.png" target="_blank"><img src="ui-review/27-equipment-desktop.png" alt="Lista de equipamento" loading="lazy"></a><figcaption><span class="t">Lista de equipamento</span><span class="d">Atributos, slots vazios em tracejado, Transferir conjunto em madeira.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/28-piece-tooltip-desktop.png" target="_blank"><img src="ui-review/28-piece-tooltip-desktop.png" alt="Tooltip de peça" loading="lazy"></a><figcaption><span class="t">Tooltip de peça</span><span class="d">Tooltip de pergaminho legível.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/29-bulk-sell-desktop.png" target="_blank"><img src="ui-review/29-bulk-sell-desktop.png" alt="Venda em massa" loading="lazy"></a><figcaption><span class="t">Venda em massa</span><span class="d">Barra de seleção com Vender selecionadas (ember) e Cancelar (madeira).</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/27-equipment-phone.png" target="_blank"><img src="ui-review/27-equipment-phone.png" alt="Lista de equipamento" loading="lazy"></a><figcaption><span class="t">Lista de equipamento</span><span class="d">Atributos, slots vazios em tracejado, Transferir conjunto em madeira.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/28-piece-tooltip-phone.png" target="_blank"><img src="ui-review/28-piece-tooltip-phone.png" alt="Tooltip de peça" loading="lazy"></a><figcaption><span class="t">Tooltip de peça</span><span class="d">Tooltip de pergaminho legível.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+                <figure><a href="ui-review/29-bulk-sell-phone.png" target="_blank"><img src="ui-review/29-bulk-sell-phone.png" alt="Venda em massa" loading="lazy"></a><figcaption><span class="t">Venda em massa</span><span class="d">Barra de seleção com Vender selecionadas (ember) e Cancelar (madeira).</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Talentos</h3>
+            <div class="shots">
+                <figure><a href="ui-review/30-talents-desktop.png" target="_blank"><img src="ui-review/30-talents-desktop.png" alt="Árvore de talentos" loading="lazy"></a><figcaption><span class="t">Árvore de talentos</span><span class="d">Botões Melhorar nas cores dos ramos; miniaturas ainda carregando na captura.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #4</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/30-talents-phone.png" target="_blank"><img src="ui-review/30-talents-phone.png" alt="Árvore de talentos" loading="lazy"></a><figcaption><span class="t">Árvore de talentos</span><span class="d">Botões Melhorar nas cores dos ramos; miniaturas ainda carregando na captura.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #4</span></span></figcaption></figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Rever chefes</h3>
+            <div class="shots">
+                <figure><a href="ui-review/31-boss-map-desktop.png" target="_blank"><img src="ui-review/31-boss-map-desktop.png" alt="Mapa de chefes" loading="lazy"></a><figcaption><span class="t">Mapa de chefes</span><span class="d">Mapa com aro de madeira e bronze (arte de teste).</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure><a href="ui-review/31-boss-map-phone.png" target="_blank"><img src="ui-review/31-boss-map-phone.png" alt="Mapa de chefes" loading="lazy"></a><figcaption><span class="t">Mapa de chefes</span><span class="d">Mapa com aro de madeira e bronze (arte de teste).</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-alta">#1 · Alta</span><strong>Linhas da lista de líder com texto quase invisível</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Líder (desktop e celular)</dd>
+                    <dt>O que está errado</dt><dd>O nome de cada herói (exceto o líder atual) aparece em dourado claro sobre o pergaminho, contraste perto de 1,3:1; só o título e o botão Fechar leem bem. É o creme claro do visual antigo que sobrou. Viola UIR-03 (todo par texto/fundo com pelo menos 4,5:1). A causa não foi localizada: a regra de .leader-entry declara color: var(--color-text), então outra regra ou o estado do botão a sobrescreve; conferir a cor calculada.</dd>
+                    <dt>Como deveria ficar</dt><dd>Texto das linhas em <code>rgb(42, 26, 16)</code> (var(--color-text)), igual às linhas da mochila e da fusão. Se for estado desabilitado, usar opacidade, não cor clara. Verificar a cor calculada de <code>[data-testid^="leader-entry"]</code> e dos filhos.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (.leader-entry, a partir da linha 1570)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/26-leader-desktop.png" target="_blank"><img src="ui-review/26-leader-desktop.png" alt="Captura do achado #1"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-alta">#2 · Alta</span><strong>Tooltip de habilidade quebrado: o texto sai do painel</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Tooltip de habilidade (desktop e celular)</dd>
+                    <dt>O que está errado</dt><dd>O .skill-tooltip (340 px) contém um .skill-row em flex; a arte ocupa quase toda a largura e o bloco de texto (nome, tipo, efeito, recarga, Liberada, Nível) fica fora do painel, direto sobre a floresta, ilegível e sobreposto às tags do inimigo. Quebra a leitura exigida por UIR-03 e o tooltip da spec dos heróis.</dd>
+                    <dt>Como deveria ficar</dt><dd>Dentro do painel: arte de 112 x 64 px à esquerda e o texto ao lado, tudo sobre pergaminho com texto <code>rgb(42, 26, 16)</code>. Provável correção: <code>.skill-tooltip .skill-art { width: 112px; height: 64px; }</code>, <code>.skill-tooltip .skill-row &gt; div { flex: 1; min-width: 0; }</code> e <code>.skill-tooltip .skill-row { background: none; border: 0; padding: 0; }</code> (o painel já é de pergaminho).</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (.skill-tooltip, linha 1920; .skill-row, linha 1495)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/09-skill-tooltip-desktop.png" target="_blank"><img src="ui-review/09-skill-tooltip-desktop.png" alt="Captura do achado #2"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#3 · Média</span><strong>Nome do líder cortado na barra de batalha</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Barra de batalha (desktop e celular)</dd>
+                    <dt>O que está errado</dt><dd>O nome aparece como “Kael Raizfé...” no cartão escuro do líder (Cinzel 17 px, cerca de 150 px úteis). O mesmo corte atinge “Lyra Folhaveloz”, “Orina Brumaestrela” e “Seraphine Aurora”, quase todos os heróis. UIR-10 fixa o nome em Cinzel 700 17 px, mas o cartão não deveria esconder o nome.</dd>
+                    <dt>Como deveria ficar</dt><dd>Mostrar o nome inteiro em até duas linhas: <code>white-space: normal; line-height: 1.1; text-overflow: clip;</code> na regra do nome do cartão do líder (manter 17 px e o cartão 240 x 104; o bônus pode usar 2 linhas). Se não couber, 15 px com <code>letter-spacing: 0</code>.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (regra do nome em .leader-card) e o teste que fixa o tamanho, se houver</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/05-battle-boss-desktop.png" target="_blank"><img src="ui-review/05-battle-boss-desktop.png" alt="Captura do achado #3"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#4 · Média</span><strong>Botões Melhorar dos talentos com contraste baixo</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (desktop)</dd>
+                    <dt>O que está errado</dt><dd>Texto claro sobre os botões nas cores dos ramos: dourado (Poder do clique) em torno de 2,3:1, azul-petróleo (Tempo) em torno de 3,4:1 e vermelho-terra (Quebra de defesa) perto de 4,2:1 (estimativa pelas cores vistas). O passo 3 da T30 pede auditar esses botões; abaixo de 4,5:1 viola UIR-03. Texto de 12 px em negrito não conta como texto grande.</dd>
+                    <dt>Como deveria ficar</dt><dd>Escurecer os fundos até 4,5:1 com texto <code>rgb(244, 230, 200)</code> (dourado <code>#8a6a0f</code>, petróleo <code>#2a6f7e</code>, vermelho <code>#a8431a</code>; o roxo já passa) ou usar texto <code>rgb(42, 26, 16)</code> sobre o dourado. Manter o ramo identificável pela borda esquerda e pelo título.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (botões de upgrade de talento por ramo)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/30-talents-desktop.png" target="_blank"><img src="ui-review/30-talents-desktop.png" alt="Captura do achado #4"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#5 · Média</span><strong>Preloader ainda no céu azul/ciano, fora da paleta Grove</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Preloader (desktop e celular)</dd>
+                    <dt>O que está errado</dt><dd>A tela de carregamento é um degradê azul-ciano vivo com a barra ember. É o único lugar sem madeira, pergaminho ou floresta; a tela é breve, mas é a primeira impressão. A spec não cobre o fundo do Preloader, por isso é pedido de acabamento.</dd>
+                    <dt>Como deveria ficar</dt><dd>Fundo <code>#1c120c</code> (igual ao fundo da página) ou a floresta escurecida; trilho da barra em <code>#2b1d14</code> com borda <code>#b07a3a</code>.</dd>
+                    <dt>Arquivo</dt><dd><code>game/src/scenes (Preloader)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/01-preloader-desktop.png" target="_blank"><img src="ui-review/01-preloader-desktop.png" alt="Captura do achado #5"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#6 · Baixa</span><strong>Logo no canto superior esquerdo quase invisível no combate</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Batalha (desktop)</dd>
+                    <dt>O que está errado</dt><dd>O logo escuro Infinity Grove some sobre a floresta; na referência ele é legível. Não é pedido pela spec.</dd>
+                    <dt>Como deveria ficar</dt><dd>Dar ao logo um brilho claro (<code>filter: drop-shadow(0 0 6px rgba(244,230,200,.8))</code>) ou usar uma versão clara.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (logo do HUD)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/05-battle-boss-desktop.png" target="_blank"><img src="ui-review/05-battle-boss-desktop.png" alt="Captura do achado #6"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#7 · Baixa</span><strong>Aviso de carta cobre o chip de combo</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Batalha, aviso (desktop)</dd>
+                    <dt>O que está errado</dt><dd>A placa “Carta: ...” (y 85-140) cobre a metade superior do chip de combo (y 122-160) enquanto o aviso dura, e o texto do combo fica cortado. É passageiro.</dd>
+                    <dt>Como deveria ficar</dt><dd>Subir o aviso uns 20 px ou descer o combo.</dd>
+                    <dt>Arquivo</dt><dd><code>game/src (coordenada do card-notice)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/10-notice-desktop.png" target="_blank"><img src="ui-review/10-notice-desktop.png" alt="Captura do achado #7"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#8 · Baixa</span><strong>Capturas de talentos e do mapa pegas durante o carregamento de imagens</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos e Rever chefes (desktop e celular)</dd>
+                    <dt>O que está errado</dt><dd>Na captura de desktop as miniaturas dos talentos aparecem quebradas ou minúsculas; na de celular algumas já carregaram. O mapa de chefes usa uma arte de teste (degradê verde e roxo). É problema da captura, não do jogo, e impede a conferência das miniaturas.</dd>
+                    <dt>Como deveria ficar</dt><dd>No arquivo de capturas, esperar as imagens (<code>await page.waitForFunction(() =&gt; [...document.images].every(i =&gt; i.complete))</code>) antes de <code>shot()</code>, e usar a arte real no mapa.</dd>
+                    <dt>Arquivo</dt><dd><code>game/ui-review/uiRedesign.shots.js</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/30-talents-desktop.png" target="_blank"><img src="ui-review/30-talents-desktop.png" alt="Captura do achado #8"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#9 · Baixa</span><strong>Retrato do Vex mais alto que os outros na lista de heróis</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Heróis (desktop)</dd>
+                    <dt>O que está errado</dt><dd>O retrato do Vex termina cerca de 4 px abaixo dos outros quatro e o nome “Sombraespinho” ocupa a largura toda, deixando o cartão desalinhado na base.</dd>
+                    <dt>Como deveria ficar</dt><dd>Fixar a altura do retrato em todos os cartões (por exemplo <code>height: 180px; object-fit: contain;</code> na imagem do cartão de herói).</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (cartão de herói)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/20-heroes-desktop.png" target="_blank"><img src="ui-review/20-heroes-desktop.png" alt="Captura do achado #9"></a>
+        </article>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>Julgamentos pedidos pelos desenvolvedores. (1) O nome cortado é o achado #3. (2) O menu principal em oval de pergaminho com aro de madeira ficou bonito e legível; não percebi elipse de sombra escura atrás dele. (3) Os contadores .bag-copies, .fusion-copies e .farm-wins em pílula de madeira com texto creme leem bem. (4) As linhas empilhadas da mochila e da fusão têm bom ritmo e o anel de bronze no hover é coerente; o anel dourado da linha atual do líder aparece, mas o texto dela é o achado #1; o estado .fusion-row.is-selected não aparece em nenhuma captura, então não foi avaliado.</span></li>
+            <li><span class="mark">✦</span><span>(5) Vender selecionadas (ember com borda dourada) e Cancelar (madeira) se distinguem bem; a barra fixa de seleção continua alinhada e legível no desktop e no celular. (6) O estado desabilitado de .equip-button não aparece nas capturas (só o botão ativo Transferir conjunto); pedir ao test-engineer uma captura dele. (7) O mapa de chefes com aros de madeira e bronze combina com o resto.</span></li>
+            <li><span class="mark">✦</span><span>(9) Texturas ui-parchment.jpg e ui-wood.jpg (2048 x 2048, 3,0 MB e 2,8 MB). Contraste baixo o bastante para texto: desvio padrão 6 e 9 em 255, luminância média 227 e 32, perto de parchment-200 e wood-800. A de madeira é boa: tábuas horizontais discretas, combinaria nos painéis e no trilho. A de pergaminho é manchada e suave, mas não é perfeitamente contínua: ao ladrilhar aparecem emendas de claridade nas bordas e faixas claras e escuras repetidas. O pedido era 512 x 512 e os arquivos têm 16 vezes mais pixels e cerca de 5,8 MB juntos, o que pesa no carregamento. Ainda não ligar: gerar de novo a 512 x 512 contínuo, comprimir para menos de 200 KB cada e só então trocar <code>--texture-parchment</code> e <code>--texture-wood</code>.</span></li>
+            <li><span class="mark">✦</span><span>No celular (390 px de largura) o jogo é a mesma cena de 960 x 540 reduzida a cerca de 40%: os rótulos de 11 px do trilho viram uns 4,5 px. Não há quebra nem sobreposição, mas o texto pequeno fica difícil de ler; se o celular em pé for alvo, pedir um layout próprio em outra feature.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <ul class="checks">
+            <li class="no"><span class="mark">✗</span><span><code>GPU stall due to ReadPixels</code> — ruído conhecido do Chrome headless no menu e no preloader, não é achado.</span></li>
+            <li class="no"><span class="mark">✗</span><span><code>HTTP 500</code> — provocado de propósito pelo cenário de erro de fusão, não é achado.</span></li>
+        </ul>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-13</footer>
+</main>
+</body>
+</html>

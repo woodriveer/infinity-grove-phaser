@@ -2170,7 +2170,7 @@ Skill thumbnails (UIR-16):
 
 ---
 
-### T30: Visual review of the Grove theme [ ]
+### T30: Visual review of the Grove theme [x]
 
 **Owner**: ui-artist
 **What**: Review every restyled screen against `reference.jpg` and the design, on desktop and phone, and write the findings (UIR-01 to UIR-18).
@@ -2192,7 +2192,7 @@ Skill thumbnails (UIR-16):
 **Gate**: `test -s .specs/features/ui-redesign/ui-review.html`
 **Done when**:
 
-- [ ] `ui-review.html` exists with a verdict and covers steps 1 to 5.
+- [x] `ui-review.html` exists with a verdict and covers steps 1 to 5.
 
 **Commit**: `docs(ui-redesign): add the ui review`
 
