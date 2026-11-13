@@ -2273,7 +2273,7 @@ The existing case `draws the battle bar, leader card and skill frames` keeps pas
 
 ---
 
-### T32: Show the whole leader name in the battle card [ ]
+### T32: Show the whole leader name in the battle card [x]
 
 **Owner**: game-dev
 **What**: The leader card name wraps to two lines at 15 px instead of being cut with `…` (review finding 3; spec UIR-10 AC 24, amended).
@@ -2342,8 +2342,8 @@ The existing case `draws the battle bar, leader card and skill frames` keeps pas
 **Gate**: build - `cd game && npm test && npm run build`, then `cd game && npx playwright test e2e/uiRedesign.spec.js`
 **Done when**:
 
-- [ ] The new case passes for all five heroes and the edited case passes with `15px`.
-- [ ] Every case of `uiRedesign.spec.js` passes; `npm test` and the build pass.
+- [x] The new case passes for all five heroes and the edited case passes with `15px`.
+- [x] Every case of `uiRedesign.spec.js` passes; `npm test` and the build pass.
 
 **Commit**: `fix(game): wrap the leader name of the battle card at 15 px`
 

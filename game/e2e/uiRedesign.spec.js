@@ -633,7 +633,7 @@ test.describe('Grove theme', () => {
         expect(await page.getByTestId('leader-card').evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 240, 104 ]);
         await expectStyle(page.getByTestId('leader-card'), { 'background-color': 'rgb(43, 29, 20)', 'border-top-color': 'rgb(176, 122, 58)' });
         expect(await page.locator('.leader-face').evaluate((node) => getComputedStyle(node).boxShadow)).toContain('rgb(224, 180, 90) 0px 0px 0px 3px');
-        await expectStyle(page.locator('.leader-name'), { 'font-size': '17px', color: 'rgb(243, 213, 138)' });
+        await expectStyle(page.locator('.leader-card .leader-name'), { 'font-size': '15px', color: 'rgb(243, 213, 138)' });
         await expectStyle(page.locator('.leader-bonus'), { color: 'rgb(244, 230, 200)' });
 
         const art = page.getByTestId('skill-slot-1').locator('img');
@@ -652,6 +652,33 @@ test.describe('Grove theme', () => {
             'border-top-color': 'rgb(224, 180, 90)',
             color: 'rgb(243, 213, 138)'
         });
+    });
+
+    test('shows the whole leader name in the battle card for each of the five heroes', async ({ page }) => {
+        const names = { kael: 'Kael Raizférrea', lyra: 'Lyra Folhaveloz', orina: 'Orina Brumaestrela', seraphine: 'Seraphine Aurora', vex: 'Vex Sombraespinho' };
+
+        await startAs(page, { copies: Object.fromEntries(Object.keys(names).map((hero) => [ `${hero}:3`, 1 ])) });
+        await openScreen(page, 'leader');
+
+        for (const [ hero, name ] of Object.entries(names))
+        {
+            //  The Líder screen stays open after a pick; Kael is already the leader, so his click changes nothing
+            await page.getByTestId(`leader-entry-${hero}`).click();
+            await expect(page.getByTestId(`leader-entry-${hero}`)).toHaveClass(/is-current/);
+
+            const label = page.locator('.leader-card .leader-name');
+
+            await expect(label).toHaveText(name);
+            await expectStyle(label, { 'font-size': '15px', 'white-space': 'normal', 'text-overflow': 'clip' });
+
+            const fit = await label.evaluate((node) => ({ scroll: node.scrollWidth, client: node.clientWidth, height: node.offsetHeight }));
+
+            expect(fit.scroll).toBeLessThanOrEqual(fit.client);
+            //  Two lines of 15 px x 1.1 at most
+            expect(fit.height).toBeLessThanOrEqual(34);
+            expect(inside(await page.locator('.leader-card .leader-text').boundingBox(), await page.getByTestId('leader-card').boundingBox())).toBe(true);
+            expect(await page.getByTestId('leader-card').evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 240, 104 ]);
+        }
     });
 
     test('draws the lock mark of a locked skill in gold on dark', async ({ page }) => {

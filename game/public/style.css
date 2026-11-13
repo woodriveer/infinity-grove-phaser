@@ -1191,11 +1191,9 @@ button:disabled {
 }
 
 .leader-card .leader-name {
-    overflow: hidden;
     font-family: var(--font-heading);
-    font-size: 17px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    font-size: 15px;
+    line-height: 1.1;
     font-weight: 700;
     color: var(--gold-200);
 }
