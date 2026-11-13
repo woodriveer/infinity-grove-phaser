@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 67,
+  "next_id": 75,
   "lessons": [
     {
       "id": "L-001",
@@ -1196,6 +1196,150 @@
       ],
       "created": "2026-11-02T04:41:31Z",
       "last_seen": "2026-11-02T04:41:31Z"
+    },
+    {
+      "id": "L-067",
+      "key": "surviving_mutant::assert the colour and the share of every css gradient that encodes a value through computed style not only the rule that declares it",
+      "text": "Assert the colour and the share of every CSS gradient that encodes a value, through computed style, not only the rule that declares it",
+      "signal": "surviving_mutant",
+      "scope": "css",
+      "status": "candidate",
+      "features": [
+        "ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md sensor M01-M02: game/public/style.css:680 timer ring colour and share (css)"
+      ],
+      "created": "2026-11-13T18:12:54Z",
+      "last_seen": "2026-11-13T18:12:54Z"
+    },
+    {
+      "id": "L-068",
+      "key": "surviving_mutant::assert every token driven background layer of a shared recipe one case per token not only the first token that the tests happen to set",
+      "text": "Assert every token-driven background layer of a shared recipe, one case per token, not only the first token that the tests happen to set",
+      "signal": "surviving_mutant",
+      "scope": "css-tokens",
+      "status": "candidate",
+      "features": [
+        "ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md sensor M03: game/public/style.css:77 wood texture layer of the frame recipe (css-tokens)"
+      ],
+      "created": "2026-11-13T18:12:55Z",
+      "last_seen": "2026-11-13T18:12:55Z"
+    },
+    {
+      "id": "L-069",
+      "key": "surviving_mutant::test a keyboard shortcut against every blocking overlay its handler checks one case per overlay not only the most common one",
+      "text": "Test a keyboard shortcut against every blocking overlay its handler checks, one case per overlay, not only the most common one",
+      "signal": "surviving_mutant",
+      "scope": "game-input",
+      "status": "candidate",
+      "features": [
+        "ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md sensor M14: game/src/adapters/phaser/ClickerGame.js:341 reset dialog guard of the shortcut (game-input)"
+      ],
+      "created": "2026-11-13T18:12:55Z",
+      "last_seen": "2026-11-13T18:12:55Z"
+    },
+    {
+      "id": "L-070",
+      "key": "surviving_mutant::cover every element type that a text entry guard names with its own test case not only the input element",
+      "text": "Cover every element type that a text-entry guard names with its own test case, not only the input element",
+      "signal": "surviving_mutant",
+      "scope": "game-input",
+      "status": "candidate",
+      "features": [
+        "ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md sensor M15: game/src/adapters/phaser/ClickerGame.js:87 isTextField selector list (game-input)"
+      ],
+      "created": "2026-11-13T18:12:55Z",
+      "last_seen": "2026-11-13T18:12:55Z"
+    },
+    {
+      "id": "L-071",
+      "key": "surviving_mutant::test that an open panel closes when its enabling state changes while it is open not only that it stays closed when the state starts off",
+      "text": "Test that an open panel closes when its enabling state changes while it is open, not only that it stays closed when the state starts off",
+      "signal": "surviving_mutant",
+      "scope": "game-ui",
+      "status": "candidate",
+      "features": [
+        "ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md sensor M16: game/src/adapters/phaser/ClickerGame.js:288 close-on-lock branch; UIR-19 AC17 (game-ui)"
+      ],
+      "created": "2026-11-13T18:12:55Z",
+      "last_seen": "2026-11-13T18:12:55Z"
+    },
+    {
+      "id": "L-072",
+      "key": "ac_gap::assert every row of a contrast table against the rendered colours of its own selector not a sample of the rows",
+      "text": "Assert every row of a contrast table against the rendered colours of its own selector, not a sample of the rows",
+      "signal": "ac_gap",
+      "scope": "css-contrast",
+      "status": "candidate",
+      "features": [
+        "ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md UIR-03 AC14: design.md Contrast rows 10, 13 and 14 have no colour pin (css-contrast)"
+      ],
+      "created": "2026-11-13T18:12:55Z",
+      "last_seen": "2026-11-13T18:12:55Z"
+    },
+    {
+      "id": "L-073",
+      "key": "spec_precision_gap::test a centred element as the distance between its centre and the container centre with a stated pixel tolerance never as an overlap check",
+      "text": "Test a centred element as the distance between its centre and the container centre with a stated pixel tolerance, never as an overlap check",
+      "signal": "spec_precision_gap",
+      "scope": "geometry",
+      "status": "candidate",
+      "features": [
+        "ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md UIR-08 AC6: centred chip criterion has no tolerance and no test (geometry)"
+      ],
+      "created": "2026-11-13T18:12:56Z",
+      "last_seen": "2026-11-13T18:12:56Z"
+    },
+    {
+      "id": "L-074",
+      "key": "ac_gap::assert each control a criterion names in a list not one representative because a shared rule does not prove the per control overrides",
+      "text": "Assert each control a criterion names in a list, not one representative, because a shared rule does not prove the per-control overrides",
+      "signal": "ac_gap",
+      "scope": "css-recipes",
+      "status": "candidate",
+      "features": [
+        "ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md UIR-02 AC7 to AC10: only Fechar, Login and Fundir asserted of the named button lists (css-recipes)"
+      ],
+      "created": "2026-11-13T18:12:56Z",
+      "last_seen": "2026-11-13T18:12:56Z"
     }
   ]
 }

@@ -408,6 +408,54 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: game/src/adapters/phaser/HeroUi.js:469 (sensor F8b, round 3) (game-views)
 - last seen: 2026-11-02T04:41:31Z
 
+### L-067 - Assert the colour and the share of every CSS gradient that encodes a value, through computed style, not only the rule that declares it
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `css` · harmful: 0
+- features: ui-redesign
+- evidence: validation.md sensor M01-M02: game/public/style.css:680 timer ring colour and share (css)
+- last seen: 2026-11-13T18:12:54Z
+
+### L-068 - Assert every token-driven background layer of a shared recipe, one case per token, not only the first token that the tests happen to set
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `css-tokens` · harmful: 0
+- features: ui-redesign
+- evidence: validation.md sensor M03: game/public/style.css:77 wood texture layer of the frame recipe (css-tokens)
+- last seen: 2026-11-13T18:12:55Z
+
+### L-069 - Test a keyboard shortcut against every blocking overlay its handler checks, one case per overlay, not only the most common one
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game-input` · harmful: 0
+- features: ui-redesign
+- evidence: validation.md sensor M14: game/src/adapters/phaser/ClickerGame.js:341 reset dialog guard of the shortcut (game-input)
+- last seen: 2026-11-13T18:12:55Z
+
+### L-070 - Cover every element type that a text-entry guard names with its own test case, not only the input element
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game-input` · harmful: 0
+- features: ui-redesign
+- evidence: validation.md sensor M15: game/src/adapters/phaser/ClickerGame.js:87 isTextField selector list (game-input)
+- last seen: 2026-11-13T18:12:55Z
+
+### L-071 - Test that an open panel closes when its enabling state changes while it is open, not only that it stays closed when the state starts off
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game-ui` · harmful: 0
+- features: ui-redesign
+- evidence: validation.md sensor M16: game/src/adapters/phaser/ClickerGame.js:288 close-on-lock branch; UIR-19 AC17 (game-ui)
+- last seen: 2026-11-13T18:12:55Z
+
+### L-072 - Assert every row of a contrast table against the rendered colours of its own selector, not a sample of the rows
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `css-contrast` · harmful: 0
+- features: ui-redesign
+- evidence: validation.md UIR-03 AC14: design.md Contrast rows 10, 13 and 14 have no colour pin (css-contrast)
+- last seen: 2026-11-13T18:12:55Z
+
+### L-073 - Test a centred element as the distance between its centre and the container centre with a stated pixel tolerance, never as an overlap check
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `geometry` · harmful: 0
+- features: ui-redesign
+- evidence: validation.md UIR-08 AC6: centred chip criterion has no tolerance and no test (geometry)
+- last seen: 2026-11-13T18:12:56Z
+
+### L-074 - Assert each control a criterion names in a list, not one representative, because a shared rule does not prove the per-control overrides
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `css-recipes` · harmful: 0
+- features: ui-redesign
+- evidence: validation.md UIR-02 AC7 to AC10: only Fechar, Login and Fundir asserted of the named button lists (css-recipes)
+- last seen: 2026-11-13T18:12:56Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
