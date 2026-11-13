@@ -1190,7 +1190,7 @@ button:disabled {
     line-height: 1.2;
 }
 
-.leader-name {
+.leader-card .leader-name {
     overflow: hidden;
     font-family: var(--font-heading);
     font-size: 17px;

@@ -1080,6 +1080,24 @@ test.describe('Grove theme', () => {
         await expectStyle(page.getByTestId('hero-card-orina').locator('.hero-stars'), { 'background-color': 'rgb(217, 165, 33)', color: 'rgb(32, 30, 29)' });
     });
 
+    test('draws the Líder rows in dark ink, the current one too', async ({ page }) => {
+        await startAs(page, { copies: { 'kael:5': 1, 'lyra:4': 1 } });
+        await openScreen(page, 'leader');
+
+        //  Kael leads, so his row is the current one (parchment-100); Lyra's row is an inset card (parchment-300)
+        for (const [ hero, background ] of [ [ 'kael', 'rgb(244, 230, 200)' ], [ 'lyra', 'rgb(230, 208, 162)' ] ])
+        {
+            const row = page.getByTestId(`leader-entry-${hero}`);
+            const { color, 'font-size': size } = await css(row.locator('.leader-name'), [ 'color', 'font-size' ]);
+            const { 'background-color': back } = await css(row, [ 'background-color' ]);
+
+            expect(color).toBe('rgb(42, 26, 16)');
+            expect(size).toBe('18px');
+            expect(back).toBe(background);
+            expect(ratio(color, back)).toBeGreaterThanOrEqual(4.5);
+        }
+    });
+
     test('draws dark piece tiles and a parchment piece tooltip', async ({ page }) => {
         await startAs(page, { equipment: [ piece('b1', 'ARMOR', 'COMMON') ] });
         await openScreen(page, 'equipment');

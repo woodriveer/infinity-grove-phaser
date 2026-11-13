@@ -2217,7 +2217,7 @@ Rules added for this phase:
 
 ---
 
-### T31: Scope the battle leader name so the Líder rows keep their ink [ ]
+### T31: Scope the battle leader name so the Líder rows keep their ink [x]
 
 **Owner**: game-dev
 **What**: The names of the `Líder` screen rows read `rgb(42, 26, 16)` again (review finding 1, blocker; spec UIR-13 AC 12).
@@ -2266,8 +2266,8 @@ The existing case `draws the battle bar, leader card and skill frames` keeps pas
 **Gate**: build - `cd game && npm test && npm run build`, then `cd game && npx playwright test e2e/uiRedesign.spec.js e2e/heroes.spec.js`
 **Done when**:
 
-- [ ] `grep -c "^\.leader-name {" game/public/style.css` prints `0` and `grep -c "^\.leader-card \.leader-name {" game/public/style.css` prints `1`.
-- [ ] The new case passes; every case of `uiRedesign.spec.js` and `heroes.spec.js` passes; `npm test` and the build pass.
+- [x] `grep -c "^\.leader-name {" game/public/style.css` prints `0` and `grep -c "^\.leader-card \.leader-name {" game/public/style.css` prints `1`.
+- [x] The new case passes; every case of `uiRedesign.spec.js` and `heroes.spec.js` passes; `npm test` and the build pass.
 
 **Commit**: `fix(game): scope the leader name rule to the battle card`
 
