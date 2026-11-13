@@ -186,6 +186,15 @@ test.describe('Grove theme', () => {
     test('requests no texture file while the texture tokens are none', async ({ page }) => {
         const urls = [];
 
+        //  The textures are switched on in style.css: serve it with both tokens back at none
+        await page.route('**/style.css', async (route) => {
+            const response = await route.fetch();
+            const css = (await response.text()).replace(/--texture-(parchment|wood): url\([^)]*\);/g, '--texture-$1: none;');
+
+            expect(css).toContain('--texture-parchment: none;');
+            expect(css).toContain('--texture-wood: none;');
+            await route.fulfill({ response, body: css });
+        });
         page.on('request', (request) => urls.push(request.url()));
         await startAs(page, {});
         await openScreen(page, 'heroes');

@@ -64,9 +64,9 @@
     --color-focus: #cc4e1a;
 
     /* ══ Grove theme recipes: a rule applies one by writing its declarations (design.md § Recipes) ══ */
-    /* Painted textures: none until the art exists; one line turns each on (PROMPTS_ASSETS_UI.md, section 5) */
-    --texture-parchment: none;
-    --texture-wood: none;
+    /* Painted textures: 512 px tiles over the CSS gradients; none turns one off (PROMPTS_ASSETS_UI.md, section 5) */
+    --texture-parchment: url("assets/ui-parchment.jpg");
+    --texture-wood: url("assets/ui-wood.jpg");
 
     /* Parchment panel: windows, plaques, rail, bars, cards that float */
     --panel-bg: var(--texture-parchment), radial-gradient(ellipse at 50% 40%, var(--parchment-100) 0%, var(--parchment-200) 62%, var(--parchment-300) 100%);
