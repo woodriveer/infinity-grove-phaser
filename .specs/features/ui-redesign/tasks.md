@@ -1824,7 +1824,7 @@ The AD-020 rules (`.hero-stars.is-ascended`, `.hero-stars.is-exalted`, `.skill-l
 
 ---
 
-### T23: Equipment, piece tiles, tooltip and bulk sale [ ]
+### T23: Equipment, piece tiles, tooltip and bulk sale [x]
 
 **Owner**: game-dev
 **What**: The Equipamento screen of UIR-13 AC 4 and UIR-14 AC 7, 8.
@@ -1865,7 +1865,7 @@ The rarity rules (`.piece-tile.rarity-*`, the EPIC and LEGENDARY effects, `@keyf
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The build passes; `git diff game/public/style.css` touches no `rarity`, `is-dragging`, `drag-ghost`, `is-selected` or `is-locked` rule.
+- [x] The build passes; `git diff game/public/style.css` touches no `rarity`, `is-dragging`, `drag-ghost`, `is-selected` or `is-locked` rule.
 
 **Commit**: `style(game): draw the equipment screen in the grove look`
 
