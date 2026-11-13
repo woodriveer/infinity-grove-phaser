@@ -826,7 +826,9 @@ test.describe('Grove theme', () => {
         await expectStyle(page.locator('.hero-hud'), {
             'background-color': 'rgb(234, 214, 173)',
             'border-top-width': '3px',
-            'border-top-left-radius': '10px'
+            'border-top-color': 'rgb(90, 61, 38)',
+            'border-top-left-radius': '10px',
+            'column-gap': '6px'
         });
         expect(await page.locator('.hero-hud [data-testid^="hud-"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.testid))).toEqual(rail.map(([ id ]) => id));
 
@@ -838,9 +840,14 @@ test.describe('Grove theme', () => {
             expect(await button.evaluate((node) => [ node.offsetWidth, node.offsetHeight, node.scrollWidth <= node.clientWidth ])).toEqual([ 76, 60, true ]);
             await expectStyle(button, {
                 'background-color': 'rgb(43, 29, 20)',
+                'border-top-width': '2px',
+                'border-top-style': 'solid',
                 'border-top-color': 'rgb(176, 122, 58)',
                 'border-top-left-radius': '6px',
-                color: 'rgb(244, 230, 200)'
+                color: 'rgb(244, 230, 200)',
+                'font-family': expect.stringMatching(/Figtree/),
+                'font-weight': '700',
+                'font-size': '11px'
             });
             await expectStyle(button.locator('svg').first(), { color: 'rgb(224, 180, 90)' });
         }
@@ -851,6 +858,8 @@ test.describe('Grove theme', () => {
 
         await expect(page.getByTestId('talents-badge')).toBeVisible();
         await expectStyle(page.getByTestId('talents-badge'), { 'background-color': 'rgb(232, 116, 42)', color: 'rgb(42, 26, 16)' });
+        //  UIR-09 AC22: the 2 px ring of the dot is the dark wood
+        expect(await page.getByTestId('talents-badge').evaluate((node) => getComputedStyle(node).boxShadow)).toContain('rgb(28, 18, 12) 0px 0px 0px 2px');
     });
 
     test('draws the battle bar, leader card and skill frames', async ({ page }) => {
@@ -859,10 +868,22 @@ test.describe('Grove theme', () => {
         expect(await page.locator('.battle-bar').evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 984, 124 ]);
         await expectStyle(page.locator('.battle-bar'), { 'background-color': 'rgb(234, 214, 173)', 'border-top-left-radius': '12px' });
         expect(await page.getByTestId('leader-card').evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 240, 104 ]);
-        await expectStyle(page.getByTestId('leader-card'), { 'background-color': 'rgb(43, 29, 20)', 'border-top-color': 'rgb(176, 122, 58)' });
+        await expectStyle(page.getByTestId('leader-card'), { 'background-color': 'rgb(43, 29, 20)', 'border-top-width': '2px', 'border-top-color': 'rgb(176, 122, 58)' });
+        expect(await page.locator('.leader-face').evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 72, 72 ]);
         expect(await page.locator('.leader-face').evaluate((node) => getComputedStyle(node).boxShadow)).toContain('rgb(224, 180, 90) 0px 0px 0px 3px');
-        await expectStyle(page.locator('.leader-card .leader-name'), { 'font-size': '15px', color: 'rgb(243, 213, 138)' });
-        await expectStyle(page.locator('.leader-bonus'), { color: 'rgb(244, 230, 200)' });
+        await expectStyle(page.locator('.leader-card .leader-name'), {
+            'font-size': '15px',
+            'font-family': expect.stringMatching(/^"?Cinzel/),
+            'font-weight': '700',
+            'line-height': '16.5px',
+            color: 'rgb(243, 213, 138)'
+        });
+        await expectStyle(page.locator('.leader-bonus'), {
+            'font-family': expect.stringMatching(/Figtree/),
+            'font-weight': '600',
+            'font-size': '12px',
+            color: 'rgb(244, 230, 200)'
+        });
 
         const art = page.getByTestId('skill-slot-1').locator('img');
 
@@ -874,10 +895,14 @@ test.describe('Grove theme', () => {
             'background-color': 'rgb(28, 18, 12)'
         });
         expect(await art.evaluate((node) => getComputedStyle(node).boxShadow)).toContain('rgb(224, 180, 90) 0px 0px 0px 2px');
-        expect(await page.getByTestId('skill-key-1').evaluate((node) => node.offsetWidth)).toBe(20);
+        expect(await page.getByTestId('skill-key-1').evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 20, 20 ]);
         await expectStyle(page.getByTestId('skill-key-1'), {
             'background-color': 'rgb(28, 18, 12)',
+            'border-top-width': '1px',
             'border-top-color': 'rgb(224, 180, 90)',
+            'font-family': expect.stringMatching(/^"?Cinzel/),
+            'font-weight': '700',
+            'font-size': '12px',
             color: 'rgb(243, 213, 138)'
         });
     });
@@ -912,8 +937,12 @@ test.describe('Grove theme', () => {
     test('draws the lock mark of a locked skill in gold on dark', async ({ page }) => {
         await startAs(page, { copies: { 'kael:1': 1 } });
 
-        await expectStyle(page.getByTestId('skill-slot-2').locator('.skill-lock-mark'), {
+        const lock = page.getByTestId('skill-slot-2').locator('.skill-lock-mark');
+
+        expect(await lock.evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 32, 32 ]);
+        await expectStyle(lock, {
             'background-color': 'rgba(28, 18, 12, 0.85)',
+            'border-top-left-radius': '50%',
             color: 'rgb(224, 180, 90)'
         });
     });
