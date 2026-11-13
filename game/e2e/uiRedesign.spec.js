@@ -302,7 +302,7 @@ test.describe('Grove theme', () => {
         await expectShades(page, menu.loginButton);
     });
 
-    test('draws Logout as a wood pill and Click to Start as an ember pill on the welcome', async ({ page }) => {
+    test('draws Logout as a wood pill on the welcome', async ({ page }) => {
         await mockBackend(page, { users: { yan: 'secret123' } });
         const menu = await openMainMenu(page);
         await fillCredentials(menu, 'yan', 'secret123');
@@ -314,8 +314,44 @@ test.describe('Grove theme', () => {
 
         await expectStyle(welcome.logoutButton, WOOD_PILL);
         await expectShades(page, welcome.logoutButton);
-        //  The start line is no button: the welcome block takes no pointer (the canvas takes the click), so it has no hover or press
-        await expectStyle(page.locator('.welcome-start'), EMBER_PILL);
+    });
+
+    //  UIR-15 AC6: the start line is a prompt, not a button. The welcome block takes no pointer (the canvas takes the click),
+    //  so the hover and the press are forced on the node: no rule may shade it
+    test('draws Click to Start as an ember prompt with no hover or press shade', async ({ page }) => {
+        await mockBackend(page, { users: { yan: 'secret123' } });
+        const menu = await openMainMenu(page);
+        await fillCredentials(menu, 'yan', 'secret123');
+        await menu.loginButton.click();
+        await expect(menu.message).toHaveText('Welcome back, yan!');
+
+        await page.reload();
+        await openMainMenu(page, { state: 'welcome' });
+        const start = page.locator('.welcome-start');
+
+        expect(await start.evaluate((node) => node.tagName)).toBe('P');
+        await expectStyle(start, {
+            'font-family': expect.stringMatching(/^"?Cinzel/),
+            'font-weight': '700',
+            'font-size': '22px',
+            width: '320px',
+            color: 'rgb(244, 230, 200)',
+            'background-color': 'rgb(168, 67, 26)',
+            'border-top-width': '2px',
+            'border-top-style': 'solid',
+            'border-top-color': 'rgb(224, 180, 90)',
+            'border-radius': '999px',
+            filter: 'none'
+        });
+
+        const cdp = await page.context().newCDPSession(page);
+        await cdp.send('DOM.enable');
+        await cdp.send('CSS.enable');
+        const { root } = await cdp.send('DOM.getDocument');
+        const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: '.welcome-start' });
+        await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: [ 'hover', 'active' ] });
+        await expectStyle(start, { filter: 'none' });
+        await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: [] });
     });
 
     test('draws Voltar as a wood pill', async ({ page }) => {
