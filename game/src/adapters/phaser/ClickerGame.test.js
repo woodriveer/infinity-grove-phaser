@@ -4112,6 +4112,68 @@ describe('ClickerGame auto click', () => {
         expect(popover(ctx).hidden).toBe(false);
     });
 
+    it('ignores A typed in an element with a bare contenteditable attribute', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        const editor = document.createElement('div');
+        editor.setAttribute('contenteditable', '');
+
+        press(ctx, 'A', { repeat: false, target: editor });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('ignores A typed in a plaintext-only contenteditable element', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        const editor = document.createElement('div');
+        editor.setAttribute('contenteditable', 'plaintext-only');
+
+        press(ctx, 'A', { repeat: false, target: editor });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('ignores A typed in a child of a contenteditable element', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        const editor = document.createElement('div');
+        const child = document.createElement('span');
+        editor.setAttribute('contenteditable', '');
+        editor.append(child);
+
+        press(ctx, 'A', { repeat: false, target: child });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('opens the window with A pressed on an element with contenteditable="false"', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        const plain = document.createElement('div');
+        plain.setAttribute('contenteditable', 'false');
+
+        press(ctx, 'A', { repeat: false, target: plain });
+
+        expect(popover(ctx).hidden).toBe(false);
+    });
+
+    it('opens the window with A pressed on a radio input', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+
+        press(ctx, 'A', { repeat: false, target: radio });
+
+        expect(popover(ctx).hidden).toBe(false);
+    });
+
+    it('opens the window with A pressed on a button input', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        const buttonInput = document.createElement('input');
+        buttonInput.type = 'button';
+
+        press(ctx, 'A', { repeat: false, target: buttonInput });
+
+        expect(popover(ctx).hidden).toBe(false);
+    });
+
     it('ignores the repeats of a held A', async () => {
         const ctx = await createScene({ start: atChapter(2) });
 

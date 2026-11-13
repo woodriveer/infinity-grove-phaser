@@ -84,7 +84,7 @@ const AUTO_CLICK_HUD_HTML = '<div class="hud-box hud-auto-click"><div class="aut
     + '<span class="auto-click-rate" data-testid="auto-click-rate"></span>'
     + '</div></div>';
 //  A key typed into a text field is text, not a shortcut
-const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [contenteditable="true"], input:not([type="checkbox"]):not([type="radio"]):not([type="button"])'));
+const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [contenteditable]:not([contenteditable="false"]), input:not([type="checkbox"]):not([type="radio"]):not([type="button"])'));
 //  The confirmation of the account reset (spec account-reset) covers the screen like the pause menu
 const RESET_DIALOG_HTML = '<div class="reset-dialog" data-testid="reset-dialog" hidden><div class="reset-card"></div></div>';
 const FARM_TOGGLE_HTML = '<div class="hud-box hud-farm"><label class="farm-toggle"><input type="checkbox"> Farm boss</label></div>';
