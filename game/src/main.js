@@ -16,7 +16,7 @@ const config = {
     dom: {
         createContainer: true
     },
-    backgroundColor: '#028af8',
+    backgroundColor: '#1c120c',
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH

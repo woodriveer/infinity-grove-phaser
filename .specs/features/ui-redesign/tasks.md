@@ -2519,7 +2519,7 @@ It comes after `.skill-row.is-locked` in the file with the same specificity (0,2
 
 ---
 
-### T35: Boot and preloader screens on dark wood [ ]
+### T35: Boot and preloader screens on dark wood [x]
 
 **Owner**: game-dev
 **What**: The first two screens drop the template's sky: dark game background, no sky image, a wood track under the bar (review finding 5; spec UIR-15 AC 5).
@@ -2606,8 +2606,8 @@ The ember bar and the progress handler do not change (the bar stays the second r
 **Gate**: quick - `cd game && npm test`, then build - `cd game && npm run build`, then `cd game && npx playwright test e2e/uiRedesign.spec.js`
 **Done when**:
 
-- [ ] `git grep -n -e "preloader.png" -e "028af8" -- game/src game/public` prints nothing and `game/public/assets/preloader.png` no longer exists.
-- [ ] The 2 new unit cases and the 3 existing `Preloader.test.js` cases pass; the new e2e case and the existing preloader e2e case pass; `npm test` and the build pass.
+- [x] `git grep -n -e "preloader.png" -e "028af8" -- game/src game/public` prints nothing and `game/public/assets/preloader.png` no longer exists.
+- [x] The 2 new unit cases and the 3 existing `Preloader.test.js` cases pass; the new e2e case and the existing preloader e2e case pass; `npm test` and the build pass.
 
 **Commit**: `style(game): draw the boot and preloader screens on dark wood`
 

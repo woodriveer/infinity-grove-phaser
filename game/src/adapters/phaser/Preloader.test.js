@@ -52,4 +52,21 @@ describe('Preloader', () => {
 
         expect(rectangles[1].width).toBe(464);
     });
+
+    it('fills the track of the loading bar in dark wood', () => {
+        const { scene, rectangles } = createScene();
+
+        scene.init();
+
+        expect(rectangles[0].color).toBe(0x2b1d14);
+        expect(rectangles[0].setStrokeStyle).toHaveBeenCalledWith(2, 0xe0b45a);
+    });
+
+    it('draws no image behind the loading bar', () => {
+        const { scene } = createScene();
+
+        scene.init();
+
+        expect(scene.add.image).not.toHaveBeenCalled();
+    });
 });

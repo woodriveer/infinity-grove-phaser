@@ -13,11 +13,8 @@ export class Preloader extends Scene
 
     init ()
     {
-        //  We loaded this image in our Boot Scene, so we can display it here
-        this.add.image(512, 384, 'preloader');
-
-        //  The outline of the bar: a thin gold rim (spec ui-redesign)
-        this.add.rectangle(512, 384, 468, 32).setStrokeStyle(2, 0xe0b45a);
+        //  The track of the bar: dark wood inside a thin gold rim, on the dark game background (spec ui-redesign)
+        this.add.rectangle(512, 384, 468, 32, 0x2b1d14).setStrokeStyle(2, 0xe0b45a);
 
         //  The bar itself, in ember; it grows from the left with the progress
         const bar = this.add.rectangle(512-230, 384, 4, 28, 0xe8742a);

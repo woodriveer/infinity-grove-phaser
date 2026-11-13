@@ -1294,6 +1294,33 @@ test.describe('Grove theme', () => {
         expect(rectangles).toContainEqual(expect.objectContaining({ fillColor: 0xe8742a }));
     });
 
+    test('draws the boot and preloader screens on dark wood with no sky image', async ({ page }) => {
+        let release;
+        const held = new Promise((resolve) => { release = resolve; });
+        const requests = [];
+
+        page.on('request', (request) => requests.push(request.url()));
+        await page.route('**/assets/heroes/vex_sprite.png', async (route) => { await held; await route.continue(); });
+        await mockBackend(page, { users: { yan: 'secret123' } });
+        await page.goto('/');
+        await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
+
+        //  The Boot screen shows only the game background until the first click
+        expect(await page.evaluate(() => window.__PHASER_GAME__.config.backgroundColor.color)).toBe(0x1c120c);
+
+        await page.locator('#game-container canvas').click();
+        await expect.poll(() => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('Preloader').children.list.length)).toBeGreaterThan(0);
+
+        const children = await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('Preloader').children.list
+            .map((child) => ({ type: child.type, x: child.x, y: child.y, width: child.width, height: child.height, fillColor: child.fillColor, isFilled: child.isFilled })));
+
+        release();
+
+        expect(children.map((child) => child.type)).not.toContain('Image');
+        expect(children).toContainEqual(expect.objectContaining({ type: 'Rectangle', x: 512, y: 384, width: 468, height: 32, fillColor: 0x2b1d14, isFilled: true }));
+        expect(requests.filter((url) => url.includes('preloader.png'))).toEqual([]);
+    });
+
     test('shows no magenta in the skill bar', async ({ page }) => {
         await startAs(page, { copies: { 'kael:3': 1 } });
 
