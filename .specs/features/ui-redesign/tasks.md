@@ -1974,7 +1974,7 @@ The wheel gets rings as shadows, not a border, so the arrows that `elementWheel.
 
 ---
 
-### T27: Gemini prompts for the parchment and wood textures [ ]
+### T27: Gemini prompts for the parchment and wood textures [x]
 
 **Owner**: game-dev
 **What**: `PROMPTS_ASSETS_UI.md` gains section 5 with the two texture prompts and their activation lines (UIR-17).
@@ -1999,7 +1999,7 @@ The wheel gets rings as shadows, not a border, so the arrows that `elementWheel.
 **Gate**: `grep -c "ui-parchment.jpg" PROMPTS_ASSETS_UI.md` prints at least `3` and `grep -c "## 5. Texturas da interface" PROMPTS_ASSETS_UI.md` prints `1`.
 **Done when**:
 
-- [ ] The gate passes; `git diff --stat` lists only `PROMPTS_ASSETS_UI.md` and this file.
+- [x] The gate passes; `git diff --stat` lists only `PROMPTS_ASSETS_UI.md` and this file.
 
 **Commit**: `docs(game): add the prompts of the parchment and wood textures`
 

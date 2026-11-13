@@ -2,7 +2,7 @@
 
 Prompts para gerar, no Gemini, os assets da **interface**: o mapa do menu "Rever chefes", os ícones das 4 peças de equipamento e os ícones da árvore de talentos. Os personagens e as habilidades continuam em `PROMPTS_ASSETS.md`.
 
-Total: **1 mapa + 4 ícones de equipamento + 10 ícones de talento + 20 ícones dos graus 2 e 3 = 35 imagens.**
+Total: **1 mapa + 4 ícones de equipamento + 10 ícones de talento + 20 ícones dos graus 2 e 3 + 2 texturas = 37 imagens.**
 
 ## Como usar
 
@@ -302,6 +302,41 @@ Enquanto o arquivo de um grau não existir, o jogo mostra o ícone do grau 1 (e,
 
 ---
 
+## 5. Texturas da interface
+
+Duas texturas **repetíveis** (as bordas se encaixam) para os painéis de pergaminho e as molduras de madeira. Sem fundo magenta: são imagens inteiras, em **JPG** (qualidade 85 ou mais), **512×512 px**.
+
+Enquanto o arquivo não existir, o jogo desenha o pergaminho e a madeira com gradientes de CSS. Depois de salvar o arquivo em `game/public/assets/`, troque **uma linha** em `game/public/style.css`, no bloco `:root`:
+
+| Arquivo | Linha de hoje | Linha nova |
+|---|---|---|
+| `ui-parchment.jpg` | `--texture-parchment: none;` | `--texture-parchment: url("assets/ui-parchment.jpg");` |
+| `ui-wood.jpg` | `--texture-wood: none;` | `--texture-wood: url("assets/ui-wood.jpg");` |
+
+### 5.1 Pergaminho — `ui-parchment.jpg`
+
+```
+Seamless tileable texture, 512x512, flat top-down scan of aged fantasy
+parchment paper. Warm cream and light tan (#f4e6c8 to #e6d0a2), soft fibers,
+faint stains and mottling, very low contrast so dark text stays readable on it.
+Even lighting, no vignette, no burnt edges, no folds, no shadows, no objects.
+No text, no letters, no symbols, no frame, no border, no watermark.
+The left edge must continue the right edge and the top edge the bottom edge.
+```
+
+### 5.2 Madeira escura — `ui-wood.jpg`
+
+```
+Seamless tileable texture, 512x512, flat top-down view of dark stained oak
+planks for a fantasy RPG interface. Deep brown (#3d2a1c to #1c120c), visible
+grain running horizontally, subtle warm highlights, low contrast so light text
+stays readable on it. Even lighting, no vignette, no nails, no metal, no
+objects. No text, no letters, no symbols, no frame, no border, no watermark.
+The left edge must continue the right edge and the top edge the bottom edge.
+```
+
+---
+
 ## Checklist de arquivos
 
 Todos em `game/public/assets/`:
@@ -315,6 +350,7 @@ Todos em `game/public/assets/`:
 | `talent-click-damage.png`, `talent-crit-chance.png`, `talent-crit-damage.png` | PNG 1:1 | transparente |
 | `talent-click-flat-damage.png`, `talent-combo.png` | PNG 1:1 | transparente |
 | `talent-<nome>-g2.png` e `talent-<nome>-g3.png` dos 10 talentos (seção 4) | PNG 1:1 | transparente |
+| `ui-parchment.jpg`, `ui-wood.jpg` | JPG 1:1, 512×512, repetível | textura inteira (seção 5) |
 
 ## Coisas que NÃO precisam de asset (feitas em CSS no jogo)
 
