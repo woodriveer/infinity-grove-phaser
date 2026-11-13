@@ -963,8 +963,14 @@ test.describe('Grove theme', () => {
         expect(await page.getByTestId('auto-click-popover').evaluate((node) => node.offsetWidth)).toBe(240);
         await expectStyle(page.getByTestId('auto-click-toggle'), { 'background-color': 'rgb(63, 143, 58)' });
         await page.getByTestId('auto-click-toggle').uncheck();
-        await expectStyle(page.getByTestId('auto-click-toggle'), { 'background-color': 'rgb(61, 42, 28)' });
+        await expectStyle(page.getByTestId('auto-click-toggle'), { 'background-color': 'rgb(61, 42, 28)', 'border-top-width': '1px', 'border-top-color': 'rgb(176, 122, 58)' });
         await expectStyle(page.getByTestId('auto-click-upgrade'), { 'background-color': 'rgb(168, 67, 26)' });
+        //  UIR-11 AC29: the tail is a rotated square on the bottom edge of the window, pointing at the button
+        expect(await page.getByTestId('auto-click-popover').evaluate((node) => {
+            const tail = getComputedStyle(node, '::after');
+
+            return [ tail.content, tail.transform !== 'none' ];
+        })).toEqual([ '""', true ]);
     });
 
     test('shows the round auto click button in the bar with A and 500 ms, and nothing left of the monster', async ({ page }) => {
@@ -973,10 +979,18 @@ test.describe('Grove theme', () => {
         const canvas = await canvasBox(page);
 
         expect(await button.evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 56, 56 ]);
-        await expectStyle(button, { 'background-color': 'rgb(43, 29, 20)' });
+        await expectStyle(button, { 'background-color': 'rgb(43, 29, 20)', 'border-top-width': '3px' });
         expect(await button.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('data:image/svg+xml');
+        //  UIR-19 AC1: the pointer icon is drawn in rgb(243, 213, 138), #f3d58a
+        expect(await button.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('%23f3d58a');
         await expect(page.getByTestId('auto-click-key')).toHaveText('A');
         expect(await page.getByTestId('auto-click-key').evaluate((node) => node.offsetWidth)).toBe(20);
+        //  UIR-19 AC2: the key badge sits on the top left of the button
+        const badgeBox = await page.getByTestId('auto-click-key').boundingBox();
+        const buttonBox = await button.boundingBox();
+
+        expect(badgeBox.x + badgeBox.width / 2).toBeLessThan(buttonBox.x + buttonBox.width / 2);
+        expect(badgeBox.y + badgeBox.height / 2).toBeLessThan(buttonBox.y + buttonBox.height / 2);
         await expect(page.getByTestId('auto-click-rate')).toHaveText('500 ms');
 
         const box = await button.boundingBox();
@@ -1073,6 +1087,8 @@ test.describe('Grove theme', () => {
         await expect(page.getByTestId('auto-click-crystals')).toHaveText('Cristais: 0');
         await expect(page.getByTestId('auto-click-upgrade')).toHaveText('Melhorar: 250 ms (10 cristais)');
         await expect(page.getByTestId('reset-account')).toHaveText('Resetar conta (+3 cristais)');
+        //  UIR-11 AC29: the reset button of the window is in the primary recipe
+        await expectStyle(page.getByTestId('reset-account'), { 'background-color': 'rgb(168, 67, 26)', 'border-top-color': 'rgb(224, 180, 90)', color: 'rgb(244, 230, 200)' });
     });
 
     test('opens and closes the window with A, the focus back on the button', async ({ page }) => {
@@ -1266,9 +1282,11 @@ test.describe('Grove theme', () => {
         const farm = page.locator('.farm-toggle input');
 
         expect(await farm.evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 56, 56 ]);
-        await expectStyle(farm, { 'background-color': 'rgb(43, 29, 20)', 'border-top-width': '3px', 'border-top-color': 'rgb(176, 122, 58)' });
+        await expectStyle(farm, { 'background-color': 'rgb(43, 29, 20)', 'border-top-width': '3px', 'border-top-style': 'solid', 'border-top-color': 'rgb(176, 122, 58)' });
         expect(await farm.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('data:image/svg+xml');
-        await expectStyle(page.locator('.farm-toggle'), { 'font-size': '12px', color: 'rgb(42, 26, 16)' });
+        //  UIR-11 AC30: the skull is drawn in rgb(224, 180, 90), #e0b45a
+        expect(await farm.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('%23e0b45a');
+        await expectStyle(page.locator('.farm-toggle'), { 'font-size': '12px', 'font-family': expect.stringMatching(/Figtree/), 'font-weight': '700', color: 'rgb(42, 26, 16)' });
         await expect(page.locator('.farm-toggle')).toContainText('Farm boss');
 
         await farm.evaluate((node) => { node.checked = true; });
@@ -1303,7 +1321,7 @@ test.describe('Grove theme', () => {
         await expectStyle(page.locator('.pause-menu'), { 'background-color': 'rgba(28, 18, 12, 0.62)' });
         await expectStyle(page.locator('.pause-card'), { 'background-color': 'rgb(234, 214, 173)', 'border-top-left-radius': '12px' });
         expect(await page.locator('.pause-card').evaluate((node) => node.offsetWidth)).toBe(420);
-        await expectStyle(page.locator('.pause-title'), { 'font-size': '40px', color: 'rgb(42, 26, 16)' });
+        await expectStyle(page.locator('.pause-title'), { 'font-size': '40px', 'font-weight': '700', color: 'rgb(42, 26, 16)' });
         expect((await css(page.locator('.pause-title'), [ 'font-family' ]))['font-family']).toMatch(/^"?Cinzel/);
 
         await page.getByRole('button', { name: '1. Continue' }).click();
@@ -1501,6 +1519,13 @@ test.describe('Grove theme', () => {
 
         expect(shadow).toContain('rgb(90, 61, 38) 0px 0px 0px 3px');
         expect(shadow).toContain('rgb(176, 122, 58) 0px 0px 0px 5px');
+        //  UIR-14 AC10: the rings are drawn as shadows, so the map keeps its 880 x 495 layout box. The parent limit (max-width 100%)
+        //  shrinks the map in this layout, so the limit is lifted here to measure the box the rule declares
+        expect(await page.getByTestId('farm-map').evaluate((node) => {
+            node.style.maxWidth = 'none';
+
+            return [ node.offsetWidth, node.offsetHeight ];
+        })).toEqual([ 880, 495 ]);
     });
 
     test('draws the element wheel on parchment', async ({ page }) => {
