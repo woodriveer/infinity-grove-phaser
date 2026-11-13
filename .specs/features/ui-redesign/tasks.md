@@ -2773,7 +2773,7 @@ const settleImages = async (page) => {
 
 ---
 
-### T38: Re-review of the Grove theme after the fixes [ ]
+### T38: Re-review of the Grove theme after the fixes [x]
 
 **Owner**: ui-artist
 **What**: Check the fixes of T31 to T37 on desktop and phone and update the review with a new verdict (UIR-01 to UIR-19).
@@ -2795,8 +2795,8 @@ const settleImages = async (page) => {
 **Gate**: `test -s .specs/features/ui-redesign/ui-review.html && grep -q "32-fusion-selected" .specs/features/ui-redesign/ui-review.html && grep -q "33-equip-disabled" .specs/features/ui-redesign/ui-review.html && grep -q "37-hero-detail-vex" .specs/features/ui-redesign/ui-review.html` exits 0.
 **Done when**:
 
-- [ ] `ui-review.html` has a new verdict, the state of findings 1 to 9, and covers steps 2 to 5.
-- [ ] The commit holds `ui-review.html` and any shot that step 1 changed.
+- [x] `ui-review.html` has a new verdict, the state of findings 1 to 9, and covers steps 2 to 5.
+- [x] The commit holds `ui-review.html` and any shot that step 1 changed.
 
 **Commit**: `docs(ui-redesign): re-review the grove theme after the fixes`
 
