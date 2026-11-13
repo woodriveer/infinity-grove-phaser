@@ -1581,6 +1581,20 @@ test.describe('Grove theme', () => {
         })).toEqual([ 880, 495 ]);
     });
 
+    test('pulses the current map node unless the player prefers reduced motion', async ({ page }) => {
+        await startAs(page, { progress: { stage: 1, encounter: 'PHASE', phase: 3 } });
+        await page.getByTestId('hud-farm').click();
+        await expect(page.getByTestId('farm-map')).toBeVisible();
+        const current = page.locator('.farm-map .map-node[data-state="current"]');
+
+        await expect(current).toHaveCount(1);
+        await page.emulateMedia({ reducedMotion: 'no-preference' });
+        await expectStyle(current, { 'animation-name': 'map-current' });
+
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await expectStyle(current, { 'animation-name': 'none' });
+    });
+
     test('draws the element wheel on parchment', async ({ page }) => {
         await startAs(page, {});
 
