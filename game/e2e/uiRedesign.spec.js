@@ -482,8 +482,32 @@ test.describe('Grove theme', () => {
         await expect(page.getByTestId('reset-account')).toBeEnabled();
         await expectShades(page, page.getByTestId('auto-click-upgrade'));
         await expectShades(page, page.getByTestId('reset-account'));
+        //  UIR-11 AC29: the upgrade is in the primary recipe, as the reset button is
+        await expectStyle(page.getByTestId('auto-click-upgrade'), { 'background-color': 'rgb(168, 67, 26)', 'border-top-color': 'rgb(224, 180, 90)', color: 'rgb(244, 230, 200)' });
         await expectStyle(page.getByTestId('auto-click-upgrade'), QUIET);
         await expectStyle(page.getByTestId('reset-account'), QUIET);
+    });
+
+    //  UIR-11 AC29: the tail of the window points at the button. Its centre lies over the button's horizontal span and the window stands above the button
+    test('points the tail of the window at the auto click button', async ({ page }) => {
+        await startAs(page, { progress: { chapter: 2 } });
+        await openAutoClick(page);
+
+        const popover = page.getByTestId('auto-click-popover');
+        const box = await popover.boundingBox();
+        const button = await page.getByTestId('auto-click-button').boundingBox();
+        //  The tail is the ::after of the window: its right offset and width are CSS pixels, measured from the padding box
+        const tail = await popover.evaluate((node) => {
+            const after = getComputedStyle(node, '::after');
+
+            return { right: parseFloat(after.right), width: parseFloat(after.width), border: parseFloat(getComputedStyle(node).borderRightWidth), layout: node.offsetWidth };
+        });
+        const scale = box.width / tail.layout;
+        const centre = box.x + box.width - (tail.border + tail.right + tail.width / 2) * scale;
+
+        expect(centre).toBeGreaterThanOrEqual(button.x);
+        expect(centre).toBeLessThanOrEqual(button.x + button.width);
+        expect(box.y + box.height).toBeLessThanOrEqual(button.y);
     });
 
     test('keeps a disabled button at opacity 0.45', async ({ page }) => {
@@ -1897,5 +1921,22 @@ test.describe('Round auto click button on a 390 x 844 phone', () => {
         expect(Math.abs(button.width / canvas.width - 56 / 1024)).toBeLessThanOrEqual(0.002);
         expect((popover.x - canvas.x) * 1024 / canvas.width).toBeGreaterThanOrEqual(663);
         expect((popover.y - canvas.y) * 768 / canvas.height).toBeGreaterThanOrEqual(400);
+
+        //  UIR-19 AC22: the badge, the label and the window are scaled with the button, by the same 390/1024 of the scene
+        expect(canvas.width).toBeCloseTo(390, 0);
+        for (const testid of [ 'auto-click-key', 'auto-click-rate', 'auto-click-popover' ])
+        {
+            const element = page.getByTestId(testid);
+            const box = await element.boundingBox();
+            //  The unscaled border-box width in CSS pixels, fractions kept (offsetWidth rounds them away)
+            const layoutWidth = await element.evaluate((node) => {
+                const style = getComputedStyle(node);
+                const frame = style.boxSizing === 'border-box' ? 0 : [ style.paddingLeft, style.paddingRight, style.borderLeftWidth, style.borderRightWidth ].reduce((sum, v) => sum + parseFloat(v), 0);
+
+                return parseFloat(style.width) + frame;
+            });
+
+            expect(Math.abs(box.width / layoutWidth - 390 / 1024)).toBeLessThanOrEqual(0.002);
+        }
     });
 });
