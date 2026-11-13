@@ -1555,7 +1555,7 @@ Other rules:
 
 ---
 
-### T17: Dim layer, pause card and reset card [ ]
+### T17: Dim layer, pause card and reset card [x]
 
 **Owner**: game-dev
 **What**: The overlays of UIR-12.

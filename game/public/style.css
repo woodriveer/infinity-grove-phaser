@@ -983,7 +983,7 @@ button:disabled {
 .reset-error {
     font-size: 14px;
     font-weight: 700;
-    color: var(--color-accent-700);
+    color: var(--ember-800);
 }
 
 .pause-menu,
@@ -995,7 +995,7 @@ button:disabled {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
+    background: rgb(28 18 12 / 0.62);
 }
 
 .pause-card,
@@ -1006,15 +1006,19 @@ button:disabled {
     gap: 22px;
     width: 420px;
     padding: 30px 32px 32px;
-    border-radius: 36px;
-    background: var(--color-bg);
-    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-lg);
+    background: var(--panel-bg);
+    box-shadow: var(--panel-shadow);
+    background-color: var(--parchment-200);
+    border: var(--panel-border);
 }
 
 .pause-title {
     font-family: var(--font-heading);
-    font-size: 44px;
+    font-size: 40px;
     line-height: 1;
+    font-weight: 700;
+    color: var(--ink-900);
 }
 
 .pause-options,
