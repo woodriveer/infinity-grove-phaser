@@ -1871,7 +1871,7 @@ The rarity rules (`.piece-tile.rarity-*`, the EPIC and LEGENDARY effects, `@keyf
 
 ---
 
-### T24: Talent columns and cards [ ]
+### T24: Talent columns and cards [x]
 
 **Owner**: game-dev
 **What**: The Talentos screen of UIR-13 AC 4 and UIR-14 AC 9.
@@ -1900,7 +1900,7 @@ The four `--branch` colours, `.talent-upgrade` and `.talent-reset` do not change
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The build passes.
+- [x] The build passes.
 
 **Commit**: `style(game): draw the talent tree in the grove look`
 

@@ -1972,6 +1972,7 @@ button:disabled {
     grid-column: 1 / -1;
     font-family: var(--font-heading);
     font-size: 18px;
+    font-weight: 700;
 }
 
 .talent-column {
@@ -1980,7 +1981,8 @@ button:disabled {
     gap: 10px;
     padding: 12px;
     border-radius: var(--radius-md);
-    background: var(--color-surface);
+    background: var(--parchment-300);
+    border: var(--inset-border);
 }
 
 .talent-column[data-branch="TIME"] { --branch: #3b9aa6; }
@@ -1992,15 +1994,16 @@ button:disabled {
     font-family: var(--font-heading);
     font-size: 18px;
     color: var(--branch);
+    font-weight: 700;
 }
 
 .talent-card {
     display: flex;
     gap: 10px;
     padding: 10px;
-    border-radius: 14px;
-    background: var(--color-bg);
-    box-shadow: inset 4px 0 0 var(--branch);
+    border-radius: 6px;
+    background: var(--parchment-100);
+    box-shadow: inset 4px 0 0 var(--branch), 0 1px 0 rgb(90 61 38 / 0.25);
 }
 
 .talent-text {
@@ -2030,6 +2033,7 @@ button:disabled {
     font-family: var(--font-heading);
     font-size: 14px;
     border-top: 1px solid rgba(0, 0, 0, 0.15);
+    font-weight: 700;
 }
 
 .talent-locked {
