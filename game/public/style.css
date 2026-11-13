@@ -1368,14 +1368,14 @@ button:disabled {
     font-family: var(--font-body);
     text-align: left;
     color: var(--color-text);
-    border: none;
-    border-radius: 24px;
-    background: var(--color-surface);
+    border: var(--inset-border);
+    border-radius: var(--radius-md);
+    background: var(--parchment-300);
     cursor: pointer;
 }
 
 .hero-card:hover {
-    box-shadow: inset 0 0 0 2px var(--color-accent);
+    box-shadow: inset 0 0 0 2px var(--bronze-500);
 }
 
 .hero-card img {
@@ -1386,14 +1386,15 @@ button:disabled {
     padding: 10px 6px 4px;
     object-fit: contain;
     object-position: bottom;
-    border-radius: 18px;
-    background: var(--color-accent-200);
+    border-radius: 6px;
+    background: radial-gradient(circle at 50% 45%, #5a3d26, #1c120c);
 }
 
 .hero-card .hero-name {
     padding: 0 6px;
     font-family: var(--font-heading);
     font-size: 16px;
+    font-weight: 700;
 }
 
 .hero-card .hero-meta,
@@ -1413,7 +1414,7 @@ button:disabled {
 
 .hero-card.is-grey img {
     filter: grayscale(1);
-    background: var(--color-neutral-300);
+    background: radial-gradient(circle at 50% 45%, #5a3d26, #1c120c);
 }
 
 .hero-stars {
@@ -1436,8 +1437,9 @@ button:disabled {
     padding: 40px 16px 24px;
     object-fit: contain;
     object-position: bottom;
-    border-radius: var(--radius-lg);
-    background: radial-gradient(circle at 50% 52%, var(--color-accent-300) 0 58%, var(--color-accent-200) 58.5%);
+    border-radius: var(--radius-md);
+    background: radial-gradient(circle at 50% 45%, #5a3d26, #1c120c);
+    border: 2px solid var(--bronze-500);
 }
 
 .hero-detail-text {
@@ -1452,7 +1454,7 @@ button:disabled {
 
 .hero-detail-text .hero-name {
     font-family: var(--font-heading);
-    font-weight: 400;
+    font-weight: 700;
     font-size: 32px;
     line-height: 1.1;
     color: var(--color-text);
@@ -1467,9 +1469,10 @@ button:disabled {
     margin-top: 6px;
     padding: 12px 16px;
     font-size: 14px;
-    color: var(--color-accent-2-900);
-    border-radius: 20px;
-    background: var(--color-accent-2-200);
+    color: var(--parchment-100);
+    border: 1px solid var(--bronze-500);
+    border-radius: var(--radius-md);
+    background: var(--wood-800);
 }
 
 .bag-fuse {
@@ -1494,8 +1497,9 @@ button:disabled {
     align-items: center;
     gap: 14px;
     padding: 8px 16px 8px 8px;
-    border-radius: 20px;
-    background: var(--color-surface);
+    border: var(--inset-border);
+    border-radius: var(--radius-md);
+    background: var(--parchment-300);
 }
 
 .skill-row p {
@@ -1504,7 +1508,7 @@ button:disabled {
 
 .skill-row.is-locked {
     color: var(--color-neutral-700);
-    background: var(--color-neutral-200);
+    background: var(--parchment-200);
 }
 
 .skill-row.is-locked .skill-art {
@@ -1517,7 +1521,9 @@ button:disabled {
     width: 112px;
     height: 64px;
     object-fit: cover;
-    border-radius: 14px;
+    border-radius: 6px;
+    border: 2px solid var(--bronze-500);
+    background: var(--wood-900);
 }
 
 .skill-name {
@@ -1536,8 +1542,8 @@ button:disabled {
 .skill-state {
     padding: 2px 8px;
     border-radius: 999px;
-    color: var(--color-accent-800);
-    background: var(--color-accent-100);
+    color: var(--parchment-100);
+    background: var(--wood-800);
 }
 
 .skill-row.is-locked .skill-state {
@@ -1572,9 +1578,9 @@ button:disabled {
     font-family: var(--font-heading);
     font-size: 18px;
     color: var(--color-text);
-    border: none;
-    border-radius: 999px;
-    background: var(--color-surface);
+    border: var(--inset-border);
+    border-radius: var(--radius-md);
+    background: var(--parchment-300);
 }
 
 .bag-entry,
@@ -1586,7 +1592,7 @@ button:disabled {
 .bag-entry:hover,
 .leader-entry:hover:not(.is-current),
 .farm-entry:hover:not(:disabled) {
-    box-shadow: inset 0 0 0 2px var(--color-accent);
+    box-shadow: inset 0 0 0 2px var(--bronze-500);
 }
 
 .bag-copies,
@@ -1603,8 +1609,8 @@ button:disabled {
 .farm-wins {
     padding: 6px 14px;
     border-radius: 999px;
-    color: var(--color-accent-2-800);
-    background: var(--color-accent-2-100);
+    color: var(--parchment-100);
+    background: var(--wood-800);
 }
 
 .fusion-row .fusion-name {
@@ -1613,8 +1619,8 @@ button:disabled {
 
 .fusion-row.is-selected,
 .leader-entry.is-current {
-    box-shadow: inset 0 0 0 2px var(--color-accent);
-    background: var(--color-accent-100);
+    box-shadow: inset 0 0 0 2px var(--gold-400);
+    background: var(--parchment-100);
 }
 
 .fusion-button {
@@ -1634,9 +1640,11 @@ button:disabled {
     padding: 14px 20px;
     font-family: var(--font-heading);
     font-size: 20px;
-    color: var(--color-accent-2-900);
-    border-radius: var(--radius-lg);
-    background: var(--color-accent-2-200);
+    color: var(--gold-200);
+    border-radius: var(--radius-md);
+    background: var(--wood-800);
+    font-weight: 700;
+    border: var(--frame-border);
 }
 
 /* ══ Equipment screen: the slots of every hero, the bag and one piece with its actions ══ */

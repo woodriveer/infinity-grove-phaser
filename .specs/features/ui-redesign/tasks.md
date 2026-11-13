@@ -1777,7 +1777,7 @@ const createScene = () => {
 
 ---
 
-### T22: Catalog, detail, skill rows, farm list, fusion and leader [ ]
+### T22: Catalog, detail, skill rows, farm list, fusion and leader [x]
 
 **Owner**: game-dev
 **What**: The inset cards and dark portraits of UIR-13 AC 4 to 6.
@@ -1818,7 +1818,7 @@ The AD-020 rules (`.hero-stars.is-ascended`, `.hero-stars.is-exalted`, `.skill-l
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The build passes; `git diff game/public/style.css` touches no AD-020 rule.
+- [x] The build passes; `git diff game/public/style.css` touches no AD-020 rule.
 
 **Commit**: `style(game): draw the hero, fusion and leader cards in the grove look`
 
