@@ -1183,6 +1183,32 @@ test.describe('Grove theme', () => {
         await expectStyle(page.locator('.talent-card').first(), { 'background-color': 'rgb(244, 230, 200)' });
     });
 
+    test('draws the talent buttons, titles and max marks in the dark branch ink', async ({ page }) => {
+        const inks = { TIME: 'rgb(36, 93, 100)', BREAK: 'rgb(149, 55, 36)', POWER: 'rgb(108, 83, 17)', COMBO: 'rgb(106, 49, 197)' };
+
+        //  CLICK_DAMAGE at its maximum shows `Nível máximo`; 10 points enable the other buttons
+        await startAs(page, { talents: { CLICK_DAMAGE: 10 }, talentPoints: 10 });
+        await openScreen(page, 'talents');
+
+        for (const [ branch, ink ] of Object.entries(inks))
+        {
+            const column = page.getByTestId(`talent-branch-${branch}`);
+            const button = column.locator('.talent-upgrade').first();
+            const { 'background-color': columnBack } = await css(column, [ 'background-color' ]);
+
+            await expect(button).toBeEnabled();
+            await expectStyle(button, { 'background-color': ink, color: 'rgb(244, 230, 200)' });
+            expect(ratio(ink, 'rgb(244, 230, 200)')).toBeGreaterThanOrEqual(4.5);
+            await expectStyle(column.locator('.talent-branch-title'), { color: ink });
+            expect(columnBack).toBe('rgb(230, 208, 162)');
+            expect(ratio(ink, columnBack)).toBeGreaterThanOrEqual(4.5);
+        }
+
+        await expectStyle(page.getByTestId('talent-max-CLICK_DAMAGE'), { color: inks.POWER });
+        //  The card bar keeps the bright branch colour
+        expect((await css(page.getByTestId('talent-CRIT_CHANCE'), [ 'box-shadow' ]))['box-shadow']).toContain('rgb(201, 154, 31) 4px 0px 0px 0px inset');
+    });
+
     test('frames the chapter map with a wood and a bronze ring', async ({ page }) => {
         await startAs(page, { progress: { stage: 4, encounter: 'PHASE', phase: 2 } });
         await page.getByTestId('hud-farm').click();

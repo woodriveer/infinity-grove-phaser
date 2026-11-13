@@ -1994,15 +1994,16 @@ button:disabled {
     border: var(--inset-border);
 }
 
-.talent-column[data-branch="TIME"] { --branch: #3b9aa6; }
-.talent-column[data-branch="BREAK"] { --branch: #c4492f; }
-.talent-column[data-branch="POWER"] { --branch: #c99a1f; }
-.talent-column[data-branch="COMBO"] { --branch: #8a5bd6; }
+/* --branch marks the column (card bar, icon tint); --branch-ink is the same hue dark enough for text and buttons (4.5:1, spec UIR-14 AC 15) */
+.talent-column[data-branch="TIME"] { --branch: #3b9aa6; --branch-ink: #245d64; }
+.talent-column[data-branch="BREAK"] { --branch: #c4492f; --branch-ink: #953724; }
+.talent-column[data-branch="POWER"] { --branch: #c99a1f; --branch-ink: #6c5311; }
+.talent-column[data-branch="COMBO"] { --branch: #8a5bd6; --branch-ink: #6a31c5; }
 
 .talent-branch-title {
     font-family: var(--font-heading);
     font-size: 18px;
-    color: var(--branch);
+    color: var(--branch-ink);
     font-weight: 700;
 }
 
@@ -2034,7 +2035,7 @@ button:disabled {
 
 .talent-max {
     font-weight: 800;
-    color: var(--branch);
+    color: var(--branch-ink);
 }
 
 .talent-grade-title {
@@ -2063,7 +2064,7 @@ button:disabled {
     color: var(--color-bg);
     border: none;
     border-radius: 999px;
-    background: var(--branch);
+    background: var(--branch-ink);
     cursor: pointer;
 }
 

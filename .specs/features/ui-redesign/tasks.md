@@ -2431,7 +2431,7 @@ It comes after `.skill-row.is-locked` in the file with the same specificity (0,2
 
 ---
 
-### T34: Dark branch ink for the talent buttons, titles and max marks [ ]
+### T34: Dark branch ink for the talent buttons, titles and max marks [x]
 
 **Owner**: game-dev
 **What**: The `Melhorar` buttons, the branch titles and `Nível máximo` use a dark ink of each branch that reaches 4.5:1 (review finding 4; spec UIR-14 AC 15).
@@ -2512,8 +2512,8 @@ It comes after `.skill-row.is-locked` in the file with the same specificity (0,2
 **Gate**: build - `cd game && npm test && npm run build`, then `cd game && npx playwright test e2e/uiRedesign.spec.js e2e/talents.spec.js`
 **Done when**:
 
-- [ ] `grep -c -- "--branch-ink" game/public/style.css` prints `8` (4 definitions, 1 in the comment, 3 uses).
-- [ ] The new case passes; every case of `uiRedesign.spec.js` and `talents.spec.js` passes; `npm test` and the build pass.
+- [x] `grep -c -- "--branch-ink" game/public/style.css` prints `8` (4 definitions, 1 in the comment, 3 uses).
+- [x] The new case passes; every case of `uiRedesign.spec.js` and `talents.spec.js` passes; `npm test` and the build pass.
 
 **Commit**: `fix(game): draw the talent buttons and titles in a dark branch ink`
 
