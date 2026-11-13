@@ -97,7 +97,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 5. WHILE a `--texture-*` token is `none` the panels and frames SHALL draw only their CSS gradients and the page SHALL request no `ui-parchment.jpg` or `ui-wood.jpg`.  <!-- UIR-01 -->
 6. WHERE `--texture-parchment` or `--texture-wood` is set to `url("assets/ui-parchment.jpg")` or `url("assets/ui-wood.jpg")`, every parchment panel or wood frame SHALL draw that image as its top background layer.  <!-- UIR-01 -->
 7. The secondary button (`Fechar`, `Voltar`, `Sign up`, `Logout`, `2. Leave fight`, `Yes, leave`, `Resetar` of the reset dialog, the equipment action buttons other than `Refinar`) SHALL have computed background-color `rgb(43, 29, 20)`, a 2 px solid border `rgb(176, 122, 58)`, text colour `rgb(244, 230, 200)` and border-radius `999px`.  <!-- UIR-02 -->
-8. The primary button (`Login`, `1. Continue`, `No, stay`, `Cancelar` of the reset dialog, `Fundir`, the bag's go-to-fusion button, `Refinar`, the bulk sale confirmation, `Click to Start!`) SHALL have computed background-color `rgb(168, 67, 26)`, a 2 px solid border `rgb(224, 180, 90)` and text colour `rgb(244, 230, 200)`.  <!-- UIR-02 -->
+8. The primary button (`Login`, `1. Continue`, `No, stay`, `Cancelar` of the reset dialog, `Fundir`, the bag's go-to-fusion button, `Refinar`, the bulk sale confirmation) SHALL have computed background-color `rgb(168, 67, 26)`, a 2 px solid border `rgb(224, 180, 90)` and text colour `rgb(244, 230, 200)`.  <!-- UIR-02 -->
 9. WHEN the pointer is over an enabled primary or secondary button THEN the button SHALL render with `filter: brightness(1.15)`.  <!-- UIR-02 -->
 10. WHEN an enabled primary or secondary button is pressed THEN it SHALL render with `filter: brightness(0.9)`.  <!-- UIR-02 -->
 11. IF a button is disabled THEN it SHALL keep opacity `0.45`, as today.  <!-- UIR-02 -->
@@ -271,6 +271,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 3. The path choice panel (`.path-choice`) SHALL be a parchment panel and each hero option an inset card.  <!-- UIR-15 -->
 4. The preloader bar SHALL have a 2 px outline `0xe0b45a` and a fill `0xe8742a`, at the same position and size as today.  <!-- UIR-15 -->
 5. The Boot and Preloader screens SHALL draw on the game background `#1c120c` with no image behind the bar (the sky gradient `assets/preloader.png` is neither loaded nor drawn), and the bar's track SHALL be filled `0x2b1d14` inside its gold outline.  <!-- UIR-15 -->
+6. WHILE the welcome screen is shown, the start prompt `Click to Start!` (`.welcome-start`, a `<p>` and not a button: a click anywhere on the canvas starts the game) SHALL be drawn as an ember pill with no hover or press shade: computed font-family starting with `Cinzel`, font-weight `700`, font-size `22px`, width `320px`, text colour `rgb(244, 230, 200)`, background-color `rgb(168, 67, 26)`, a 2 px solid border `rgb(224, 180, 90)`, border-radius `999px` and filter `none`.  <!-- UIR-15 -->
 
 **Independent Test**: Reload the page: gold-outlined ember loading bar; menu: parchment oval with a wood rim, Cinzel title, ember `Login`, wood `Sign up`.
 
