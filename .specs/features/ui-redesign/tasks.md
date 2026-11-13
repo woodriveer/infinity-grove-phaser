@@ -1968,7 +1968,7 @@ The wheel gets rings as shadows, not a border, so the arrows that `elementWheel.
 **Gate**: build, then full (phase gate) - `cd game && npm test && npm run build && npx playwright test`
 **Done when**:
 
-- [ ] The build and every Vitest and Playwright suite pass unchanged.
+- [x] The build and every Vitest and Playwright suite pass unchanged.
 
 **Commit**: `style(game): draw the element wheel and skill tooltip on parchment`
 
