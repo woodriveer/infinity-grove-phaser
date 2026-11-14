@@ -3,6 +3,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.config
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.adapter.repository.ChapterRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.DropRuleRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaDropRuleRepository
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.DropRule
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +22,9 @@ class ChapterSeederIT : IntegrationTestBase() {
     @Autowired
     private lateinit var dropRules: DropRuleRepository
 
+    @Autowired
+    private lateinit var jpaDropRules: JpaDropRuleRepository
+
     private fun seedRules() = dropRules.findAll().rules.filter { it.id in 1..15 }
 
     // other integration tests play against the seeded chapter 1, so every test leaves it seeded again
@@ -28,8 +32,16 @@ class ChapterSeederIT : IntegrationTestBase() {
     fun restoreSeed() {
         jpaStageRepository.deleteAll(jpaStageRepository.findAllByChapterOrderByNumber(1))
         jpaChapterRepository.deleteById(1)
+        removeChapter(6)
+        removeChapter(7)
         dropRules.save(ChapterDefinition.dropRules(1)[1])
         seeder.seed()
+    }
+
+    /** Removes chapter [number] with its stages, if it is stored. */
+    private fun removeChapter(number: Int) {
+        jpaStageRepository.deleteAll(jpaStageRepository.findAllByChapterOrderByNumber(number))
+        if (jpaChapterRepository.existsById(number)) jpaChapterRepository.deleteById(number)
     }
 
     @Test
@@ -100,5 +112,29 @@ class ChapterSeederIT : IntegrationTestBase() {
 
         assertEquals(before, dropRules.findAll().rules)
         assertEquals(DropRule(2, 7, 8, 1500), dropRules.findAll().ruleFor(2))
+    }
+
+    @Test
+    fun `a missing chapter from 6 to 15 is seeded on start with its stages and drop rules`() {
+        removeChapter(6)
+        (16..18).forEach { jpaDropRules.deleteById(it) }
+
+        seeder.seed()
+
+        assertEquals(ChapterDefinition.of(6), repository.findByNumber(6))
+        assertEquals(10, jpaStageRepository.findAllByChapterOrderByNumber(6).size)
+        assertEquals(DropRule(16, 64, 192, 1500), dropRules.findAll().ruleFor(16))
+        assertEquals(DropRule(17, 256, 640, 1500), dropRules.findAll().ruleFor(17))
+        assertEquals(DropRule(18, 960, 2240, 1500), dropRules.findAll().ruleFor(18))
+    }
+
+    @Test
+    fun `a chapter from 6 to 15 stored by hand is left unchanged on start`() {
+        val handMade = ChapterDefinition.of(7).copy(bossHealth = 1_234L)
+        repository.save(handMade)
+
+        seeder.seed()
+
+        assertEquals(handMade, repository.findByNumber(7))
     }
 }
