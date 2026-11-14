@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Capítulos da campanha</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+<div class="brand">Infinity Grove · Revisão de UI</div>
+<section class="panel"><div class="head"><div><h1>Capítulos da campanha</h1>
+<div class="meta"><code>.specs/features/campaign-chapters</code> · commits <code>91e3111..HEAD</code> · 2026-11-14 · local (npm run dev, fake backend)</div></div>
+<span class="chip verdict ok">APROVADO</span></div>
+<p style="margin-top:16px">O HP abreviado cabe e fica centralizado na barra do menor ao maior valor (999, 1K, 3B, 1.5B/3B). O número de dano abreviado (500M, 5K) é legível. "Capítulo 12" e "Capítulo 15" cabem na placa e no título do mapa, e "Resetar conta (+15 cristais)" cabe no botão. Há um achado de severidade baixa e nenhum bloqueio.</p>
+<div class="stats"><div class="stat"><div class="n">7</div><div class="l">telas e estados verificados</div></div><div class="stat"><div class="n">14</div><div class="l">capturas (desktop + celular)</div></div><div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div><div class="stat"><div class="n">1</div><div class="l">achados médios e baixos</div></div></div></section>
+<section class="panel"><h2>Fidelidade à spec</h2><ul class="checks">
+<li class="yes"><span class="mark">✓</span><span>HP e dano abreviam a partir de 1 000 com K, M, B, T (999 sem sufixo, 1K, 500M, 1.5B, 3B) <code>CHAP-07</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Número do capítulo de dois dígitos na placa do HUD e no título do mapa <code>CHAP-06</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Botão de reset mostra +15 cristais com a campanha completa <code>CHAP-03</code></span></li>
+</ul></section>
+<section class="panel"><h2>Capturas</h2>
+<div class="screen"><h3>Barra de HP: menor valor</h3><div class="shots">
+<figure><a href="ui-review/01-hp-999-desktop.png" target="_blank"><img src="ui-review/01-hp-999-desktop.png" alt="HP 999/999" loading="lazy"></a><figcaption><span class="t">HP 999/999</span><span class="d">Capítulo 1, chefe com 999 de vida; sem sufixo.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div><div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/01-hp-999-phone.png" target="_blank"><img src="ui-review/01-hp-999-phone.png" alt="HP 999/999" loading="lazy"></a><figcaption><span class="t">HP 999/999</span><span class="d">Capítulo 1, chefe com 999 de vida; sem sufixo.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Barra de HP: 1K</h3><div class="shots">
+<figure><a href="ui-review/02-hp-1k-desktop.png" target="_blank"><img src="ui-review/02-hp-1k-desktop.png" alt="HP 1K/1K" loading="lazy"></a><figcaption><span class="t">HP 1K/1K</span><span class="d">Primeiro valor abreviado.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div><div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/02-hp-1k-phone.png" target="_blank"><img src="ui-review/02-hp-1k-phone.png" alt="HP 1K/1K" loading="lazy"></a><figcaption><span class="t">HP 1K/1K</span><span class="d">Primeiro valor abreviado.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Capítulo 15 com HP de 3B</h3><div class="shots">
+<figure><a href="ui-review/03-hp-3b-chapter-15-desktop.png" target="_blank"><img src="ui-review/03-hp-3b-chapter-15-desktop.png" alt="HP 3B/3B, Capítulo 15" loading="lazy"></a><figcaption><span class="t">HP 3B/3B, Capítulo 15</span><span class="d">Placa de dois dígitos e HP no valor mais longo.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div><div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/03-hp-3b-chapter-15-phone.png" target="_blank"><img src="ui-review/03-hp-3b-chapter-15-phone.png" alt="HP 3B/3B, Capítulo 15" loading="lazy"></a><figcaption><span class="t">HP 3B/3B, Capítulo 15</span><span class="d">Placa de dois dígitos e HP no valor mais longo.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Dano e HP parcial</h3><div class="shots">
+<figure><a href="ui-review/04-hp-1-5b-damage-number-desktop.png" target="_blank"><img src="ui-review/04-hp-1-5b-damage-number-desktop.png" alt="HP 1.5B/3B e dano 500M" loading="lazy"></a><figcaption><span class="t">HP 1.5B/3B e dano 500M</span><span class="d">Desktop: um clique. Celular: o auto clique já bateu duas vezes (HP 1B/3B, dois números empilhados).</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div><div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/04-hp-1-5b-damage-number-phone.png" target="_blank"><img src="ui-review/04-hp-1-5b-damage-number-phone.png" alt="HP 1.5B/3B e dano 500M" loading="lazy"></a><figcaption><span class="t">HP 1.5B/3B e dano 500M</span><span class="d">Desktop: um clique. Celular: o auto clique já bateu duas vezes (HP 1B/3B, dois números empilhados).</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #1</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Dano 5K no Capítulo 12</h3><div class="shots">
+<figure><a href="ui-review/05-damage-5k-chapter-12-desktop.png" target="_blank"><img src="ui-review/05-damage-5k-chapter-12-desktop.png" alt="Dano 5K, HP 5K/10K" loading="lazy"></a><figcaption><span class="t">Dano 5K, HP 5K/10K</span><span class="d">Capítulo 12 na placa.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div><div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/05-damage-5k-chapter-12-phone.png" target="_blank"><img src="ui-review/05-damage-5k-chapter-12-phone.png" alt="Dano 5K, HP 5K/10K" loading="lazy"></a><figcaption><span class="t">Dano 5K, HP 5K/10K</span><span class="d">Capítulo 12 na placa.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Mapa do capítulo 15</h3><div class="shots">
+<figure><a href="ui-review/06-map-chapter-15-desktop.png" target="_blank"><img src="ui-review/06-map-chapter-15-desktop.png" alt="Caminho do Capítulo 15" loading="lazy"></a><figcaption><span class="t">Caminho do Capítulo 15</span><span class="d">Título do mapa com dois dígitos.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div><div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/06-map-chapter-15-phone.png" target="_blank"><img src="ui-review/06-map-chapter-15-phone.png" alt="Caminho do Capítulo 15" loading="lazy"></a><figcaption><span class="t">Caminho do Capítulo 15</span><span class="d">Título do mapa com dois dígitos.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Reset com +15 cristais</h3><div class="shots">
+<figure><a href="ui-review/07-reset-label-15-desktop.png" target="_blank"><img src="ui-review/07-reset-label-15-desktop.png" alt="Resetar conta (+15 cristais)" loading="lazy"></a><figcaption><span class="t">Resetar conta (+15 cristais)</span><span class="d">Janela do auto clique com a campanha completa.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div><div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/07-reset-label-15-phone.png" target="_blank"><img src="ui-review/07-reset-label-15-phone.png" alt="Resetar conta (+15 cristais)" loading="lazy"></a><figcaption><span class="t">Resetar conta (+15 cristais)</span><span class="d">Janela do auto clique com a campanha completa.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+</section>
+<section class="panel"><h2>Achados</h2>
+<article class="finding"><div><div class="top"><span class="chip sev-baixa">#1 · Baixa</span><strong>Números de dano abreviados se sobrepõem no auto clique</strong></div><dl>
+<dt>Tela</dt><dd>Combate, auto clique ativo (celular)</dd>
+<dt>O que está errado</dt><dd>Dois danos seguidos (500M) aparecem empilhados e quase ilegíveis por um instante. É efeito do auto clique a 500 ms, não do formato; o texto abreviado em si é nítido.</dd>
+<dt>Como deveria ficar</dt><dd>Cada número flutuante sobe com um pequeno deslocamento horizontal ou vertical para não se sobrepor.</dd>
+<dt>Arquivo</dt><dd><code>game/src/adapters/phaser/ClickerGame.js</code> (animação do dano flutuante)</dd></dl></div>
+<a href="ui-review/04-hp-1-5b-damage-number-phone.png" target="_blank"><img src="ui-review/04-hp-1-5b-damage-number-phone.png" alt="Captura do achado #1"></a></article>
+</section>
+<section class="panel"><h2>Sugestões</h2><ul class="checks">
+<li><span class="mark">✦</span><span>No celular a tela é paisagem reduzida (letterbox), então o texto "HP 1.5B/3B" fica pequeno; segue o padrão do projeto, mas vale considerar fonte maior na barra.</span></li>
+<li><span class="mark">✦</span><span>Textos em inglês já existentes e fora desta feature: "Chapter Boss", "Chapter complete!", "Stage 4/10 Phase 2/5" (AD-007).</span></li>
+</ul></section>
+<section class="panel"><h2>Console e recursos</h2><p class="empty">Não foi aberto o console do Chrome; os scripts do Playwright rodaram sem erros e sem falha de carregamento visível. Rota stubada: nenhuma (o fake backend com <code>lastChapter: 15</code> bastou).</p></section>
+<footer>Revisão do ui-artist · 2026-11-14</footer>
+</main></body></html>
