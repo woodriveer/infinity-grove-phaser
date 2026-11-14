@@ -330,25 +330,54 @@ class ChapterTest {
             ChapterTableRow(15, 262_144, 524_288_000, 10_485_760, 19_922_944, 99_614_720, 50, 80, 70, 70, 70),
         )
 
+    /** Chapters 1 to 5 as the release before this feature (commit `91e3111`) seeded them; the Chapter Table row of chapter 5. */
+    private val firstFiveChapters =
+        listOf(
+            ChapterTableRow(1, 1, 2_000, 40, 76, 380, 0, 30, 30, 20, 30),
+            ChapterTableRow(2, 4, 8_000, 160, 304, 1_520, 5, 35, 35, 25, 35),
+            ChapterTableRow(3, 16, 32_000, 640, 1_216, 6_080, 10, 40, 40, 30, 40),
+            ChapterTableRow(4, 64, 128_000, 2_560, 4_864, 24_320, 15, 45, 45, 35, 45),
+            ChapterTableRow(5, 256, 512_000, 10_240, 19_456, 97_280, 20, 50, 50, 40, 50),
+        )
+
+    private fun assertChapterTableRow(row: ChapterTableRow) {
+        val c = row.chapter
+        val chapter = ChapterDefinition.of(c)
+        val miniboss = chapter.stage(10).miniboss
+
+        assertEquals(row.factor, ChapterDefinition.healthFactor(c), "chapter $c factor")
+        assertEquals(row.bonus, ChapterDefinition.defenseBonus(c), "chapter $c bonus")
+        assertEquals(row.bossHealth, chapter.bossHealth, "chapter $c boss health")
+        assertEquals(row.phaseHealthStage1, chapter.stage(1).monsterHealth, "chapter $c phase health stage 1")
+        assertEquals(row.phaseHealthStage10, chapter.stage(10).monsterHealth, "chapter $c phase health stage 10")
+        assertEquals(row.minibossHealthStage10, chapter.stage(10).minibossHealth, "chapter $c miniboss health stage 10")
+        assertEquals(row.bossDefenses, chapter.boss.physicalDefense, "chapter $c boss physical defense")
+        assertEquals(row.bossDefenses, chapter.boss.magicalDefense, "chapter $c boss magical defense")
+        assertEquals(row.bossCritResistance, chapter.boss.critResistance, "chapter $c boss crit resistance")
+        assertEquals(row.minibossDefensesStage10, miniboss.physicalDefense, "chapter $c miniboss physical defense stage 10")
+        assertEquals(row.minibossDefensesStage10, miniboss.magicalDefense, "chapter $c miniboss magical defense stage 10")
+        assertEquals(row.minibossCritResistanceStage10, miniboss.critResistance, "chapter $c miniboss crit resistance stage 10")
+    }
+
     @Test
     fun `every row of the chapter table holds for chapters 6 to 15`() {
-        chapterTable.forEach { row ->
-            val c = row.chapter
-            val chapter = ChapterDefinition.of(c)
-            val miniboss = chapter.stage(10).miniboss
+        chapterTable.forEach { assertChapterTableRow(it) }
+    }
 
-            assertEquals(row.factor, ChapterDefinition.healthFactor(c), "chapter $c factor")
-            assertEquals(row.bonus, ChapterDefinition.defenseBonus(c), "chapter $c bonus")
-            assertEquals(row.bossHealth, chapter.bossHealth, "chapter $c boss health")
-            assertEquals(row.phaseHealthStage1, chapter.stage(1).monsterHealth, "chapter $c phase health stage 1")
-            assertEquals(row.phaseHealthStage10, chapter.stage(10).monsterHealth, "chapter $c phase health stage 10")
-            assertEquals(row.minibossHealthStage10, chapter.stage(10).minibossHealth, "chapter $c miniboss health stage 10")
-            assertEquals(row.bossDefenses, chapter.boss.physicalDefense, "chapter $c boss physical defense")
-            assertEquals(row.bossDefenses, chapter.boss.magicalDefense, "chapter $c boss magical defense")
-            assertEquals(row.bossCritResistance, chapter.boss.critResistance, "chapter $c boss crit resistance")
-            assertEquals(row.minibossDefensesStage10, miniboss.physicalDefense, "chapter $c miniboss physical defense stage 10")
-            assertEquals(row.minibossDefensesStage10, miniboss.magicalDefense, "chapter $c miniboss magical defense stage 10")
-            assertEquals(row.minibossCritResistanceStage10, miniboss.critResistance, "chapter $c miniboss crit resistance stage 10")
+    @Test
+    fun `chapters 1 to 5 keep every column of the chapter table`() {
+        firstFiveChapters.forEach { assertChapterTableRow(it) }
+    }
+
+    @Test
+    fun `chapters 1 to 5 keep the 60 and 30 second limits`() {
+        (1..5).forEach { c ->
+            val chapter = ChapterDefinition.of(c)
+
+            assertEquals(60_000L, chapter.bossTimeLimitMs, "chapter $c boss")
+            chapter.stages.forEach { stage ->
+                assertEquals(30_000L, stage.minibossTimeLimitMs, "chapter $c stage ${stage.number}")
+            }
         }
     }
 }
