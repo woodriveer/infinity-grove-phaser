@@ -4613,6 +4613,24 @@ describe('ClickerGame account reset', () => {
         expect(cancel(ctx).textContent).toBe('Cancelar');
     });
 
+    it('says the chapter 12 reward in the dialog', async () => {
+        const ctx = await createScene({ start: atChapter(12) });
+
+        resetButton(ctx).click();
+
+        expect(question(ctx)).toBe('Resetar a conta? Você volta ao capítulo 1 e perde todos os talentos e pontos de talento. '
+            + 'Moedas, equipamentos, cartas, cristais e o auto clique são mantidos. Você ganha 12 cristais.');
+    });
+
+    it('says 15 crystals in the dialog of a completed campaign', async () => {
+        const ctx = await createScene({ start: atChapter(15, true) });
+
+        resetButton(ctx).click();
+
+        expect(question(ctx)).toBe('Resetar a conta? Você volta ao capítulo 1 e perde todos os talentos e pontos de talento. '
+            + 'Moedas, equipamentos, cartas, cristais e o auto clique são mantidos. Você ganha 15 cristais.');
+    });
+
     it('measures the dialog again when it opens so it stays centred', async () => {
         const ctx = await createScene({ start: atChapter(4) });
 
