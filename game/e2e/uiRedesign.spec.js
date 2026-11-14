@@ -730,7 +730,7 @@ test.describe('Grove theme', () => {
         expect(shadow['pointer-events']).toBe('none');
         //  UIR-05 AC9: the gloss is a gradient over the frame
         expect(shadow['background-image']).toContain('linear-gradient');
-        await expect(page.getByTestId('monster-hp')).toHaveText('HP 1000/1000');
+        await expect(page.getByTestId('monster-hp')).toHaveText('HP 1K/1K');
         await expectStyle(page.getByTestId('monster-hp'), {
             'font-weight': '800',
             'font-size': '12px',
