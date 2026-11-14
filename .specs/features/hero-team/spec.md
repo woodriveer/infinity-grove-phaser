@@ -298,6 +298,7 @@ Rows `Q1` to `Q13` carry the owner's answers of 2026-10-30. Rows `Q26` and later
 17. WHILE the campaign chapter is below 5 and the campaign is not completed, the panel SHALL show `A equipe luta a partir do capítulo 5.`  <!-- state-driven -->
 18. IF a save or leader request fails THEN the game SHALL show `Não foi possível salvar a equipe.`, and IF a purchase fails THEN `Não foi possível comprar a vaga.`, keep the panel open and reload the heroes from the backend.  <!-- unwanted-behavior -->
 19. WHEN the first win of the chapter 5, 6, 7 or 8 boss is answered THEN the game SHALL show the matching slot as buyable the next time Equipe opens, and show the `Equipe` button after the chapter 5 win without a reload.  <!-- event-driven -->
+20. WHEN the game shows `Dano: <n>/s` or `Dano da equipe: <n>/s` THEN it SHALL write `<n>` with `formatShort` (`game/src/domain/combat/numberFormat.js`, the Number Format of `campaign-chapters`): 999 reads `999`, 12 500 reads `12.5K`.  <!-- event-driven -->
 
 **Independent Test**: In the browser against the fake backend with the chapter 5 boss won and 1 ouro, open Equipe: `Líder` holds the leader, `Aliado 1` shows the coin and `1`, `Aliado 2` to `Aliado 4` show `Chefe do capítulo 6` to `8`. Buy slot 1 and read `Vaga de aliado comprada!` and `vazio`; click Lyra and read her in `Aliado 1`.
 
@@ -376,7 +377,7 @@ Rows `Q1` to `Q13` carry the owner's answers of 2026-10-30. Rows `Q26` and later
 | TEAM-06 | P1: Allies fight - AC 2 to 8 (formula and sources) | - | Pending |
 | TEAM-07 | P1: Allies fight - AC 1, 9, 11, 12, 13 (rhythm, kill, gates) | - | Pending |
 | TEAM-08 | P1: Allies fight - AC 10 (damage number) | - | Pending |
-| TEAM-09 | P1: Equipe screen - AC 1 to 6, 11 to 19 (screen, team editing) | - | Pending |
+| TEAM-09 | P1: Equipe screen - AC 1 to 6, 11 to 20 (screen, team editing, number format) | - | Pending |
 | TEAM-10 | P1: Equipe screen - AC 7 to 10 (purchase dialog and feedback) | - | Pending |
 | TEAM-11 | P2: Ally passives - AC 1 to 12 | - | Pending |
 | TEAM-12 | P2: Allies on the field - AC 1 to 7 | - | Pending |

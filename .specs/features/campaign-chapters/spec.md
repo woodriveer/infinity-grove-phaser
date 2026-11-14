@@ -81,6 +81,8 @@ Chapter 5 is shown for reference and does not change.
 
 The curve was not balance-tested. Capping critical resistance at 70 keeps critical hits possible on every boss.
 
+The defense cap of 80 binds no chapter from 1 to 15: boss defenses reach exactly 80 at chapter 15 (30 + 50) and miniboss defenses at most 70. The cap only takes effect if the campaign grows past chapter 15, so no test is owed for a capped defense in this feature. The critical resistance cap of 70 does bind (bosses from chapter 12).
+
 ## Coin Drops
 
 Owner decision Q45 (2026-10-31): keep the slot prices of `hero-team` and raise the drops so a normal first run can afford them. The owner delegated the numbers. Targets: about 1 ouro (10 000 cobre) earned when slot 1 opens (chapter 5 boss), about 10 ouro (100 000 cobre) earned when slot 4 opens (chapter 8 boss), and no shortcut through the refine costs.
@@ -124,7 +126,7 @@ Owner decision (Q18). Details are the default of Q42.
 - First the existing rounding runs: damage to one decimal (`formatDamage`), current health up to 0.1 (`healthText`). A rounded value below 1 000 shows as today.
 - A rounded value from 1 000: divide by the largest unit the value reaches, K = 1 000, M = 1 000 000, B = 1 000 000 000 or T = 1 000 000 000 000. Round to one decimal (half up), drop a trailing `.0`, and append the letter. If the rounding reaches 1000 of a unit, the next unit is used.
 - Examples: 999 → `999`; 999.96 damage rounds to 1 000 → `1K`; 1 000 → `1K`; 1 500 → `1.5K`; 5 000 → `5K`; 50 000 → `50K`; 999 949 → `999.9K`; 999 950 → `1M`; 1 050 000 → `1.1M`; 16 384 000 → `16.4M`; 20 000 000 → `20M`; 2 500 000 000 → `2.5B`; 6 000 000 000 → `6B`; 1 000 000 000 000 → `1T`.
-- Where: every damage number (click, skill, tick, ally), both numbers of the HP text, and the team damage texts of `hero-team` (`Dano: <n>/s`, `Dano da equipe: <n>/s`). The current health of the HP text is first rounded up to 0.1 as today, then formatted.
+- Where: every damage number (click, skill, tick, ally) and both numbers of the HP text. The team damage texts (`Dano: <n>/s`, `Dano da equipe: <n>/s`) do not exist yet: `hero-team` creates them and requires this format for them (its Equipe screen AC 20). The current health of the HP text is first rounded up to 0.1 as today, then formatted.
 
 ---
 
@@ -142,7 +144,7 @@ Rows `Q14` to `Q19` carry the owner's answers of 2026-10-30; `Q26`, `Q42` and `Q
 | **Q18** Big numbers | Number Format: K, M, B (and T) from 1 000, on damage numbers and the HP text | Owner answer (K included) | y |
 | **Q19** Rewards of chapters 6 to 15 | Talent points 2 per miniboss and 5 per chapter boss on first clears, the full equipment rarity table, the chapter boss farm limit of 10 a day; coin drops follow Coin Drops (Q45) | Owner answer 2026-10-31 (Q43); the coin part is superseded by Q45 | y |
 | **Q26** Order | This feature runs first (see `hero-team` Feature Split) | Owner answer 2026-10-31 | y |
-| **Q42** Number format details | One decimal, half up, no trailing `.0`; units K, M, B, T; a rounding that reaches 1000 moves up a unit; values below 1 000 unchanged; also used for the team damage texts; coins excluded | Owner answer 2026-10-31 | y |
+| **Q42** Number format details | One decimal, half up, no trailing `.0`; units K, M, B, T; a rounding that reaches 1000 moves up a unit; values below 1 000 unchanged; also used for the team damage texts, which `hero-team` owns and specifies; coins excluded | Owner answer 2026-10-31; the team texts moved to `hero-team` (validation gap 4) because they ship there | y |
 | **Q45** Coin drops | Coin Drops section: factor `2^(c-1)` up to chapter 8, then `128 + 32(c-8)`; ranges `2m-6m`, `8m-20m`, `30m-70m`; a data migration moves rules of chapters 1 to 5 that still hold the old seeded range | Owner answer 2026-10-31: keep the slot prices, raise the drops; numbers delegated to the PO and checked against the targets and the refine costs | y |
 | **Q44** Ceiling of the game's numbers | Accept 9 007 199 254 740 991 as the new ceiling (JavaScript doubles, no `BigInt` in the game) | Owner answer 2026-10-31 | y |
 | Existing completed players | A player stored as completed at chapter 5 lands in chapter 6 stage 1 phase 1 on the next progress load (existing `withNextChapterOpen`) and from then on farms chapter 6 bosses only (AD-008) | Code fact | n |
@@ -261,7 +263,7 @@ Rows `Q14` to `Q19` carry the owner's answers of 2026-10-30; `Q26`, `Q42` and `Q
 
 **Acceptance Criteria**:
 
-1. WHEN the game shows a damage number, an HP text value or a team damage value of 1 000 or more THEN it SHALL format it by the Number Format rule.  <!-- event-driven -->
+1. WHEN the game shows a damage number or an HP text value of 1 000 or more THEN it SHALL format it by the Number Format rule.  <!-- event-driven -->
 2. WHEN the value is below 1 000 THEN the game SHALL show it exactly as today.  <!-- event-driven -->
 3. WHEN the values 999, 1 000, 1 500, 50 000, 999 949, 999 950, 1 050 000, 16 384 000, 2 500 000 000 and 1 000 000 000 000 are formatted THEN the game SHALL show `999`, `1K`, `1.5K`, `50K`, `999.9K`, `1M`, `1.1M`, `16.4M`, `2.5B` and `1T`.  <!-- event-driven -->
 4. WHEN the chapter 1 boss appears THEN the HP text SHALL read `HP 2K/2K`, and WHEN the chapter 10 boss appears THEN `HP 16.4M/16.4M`.  <!-- event-driven -->
