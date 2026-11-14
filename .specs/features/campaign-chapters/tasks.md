@@ -511,7 +511,7 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 
 ---
 
-### T11: Fake backend knows chapters past 1 [ ]
+### T11: Fake backend knows chapters past 1 [x]
 
 **Owner**: test-engineer
 **What**: The fake backend accepts reports from the stored chapter, opens the next chapter after a chapter boss below `lastChapter`, and pays the reset up to 15. Every existing e2e keeps its behaviour.
@@ -538,7 +538,7 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 **Gate**: full - `cd game && npx playwright test`
 **Done when**:
 
-- [ ] The whole Playwright suite passes with no spec file changed.
+- [x] The whole Playwright suite passes with no spec file changed.
 
 **Commit**: `test(game): let the fake backend open chapters past the first`
 

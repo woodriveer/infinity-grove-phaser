@@ -45,12 +45,14 @@ const seededDefinition = () => ({
 
 const startOfCampaign = () => ({ stage: 1, encounter: 'PHASE', phase: 1, completed: false });
 
-//  The position after an outcome, or null when the outcome does not apply (a conflict)
-const afterOutcome = (progress, outcome, definition) => {
+//  The position after an outcome, or null when the outcome does not apply (a conflict). A cleared chapter boss opens the next chapter
+//  up to lastChapter (Progress.kt), then completes the campaign
+const afterOutcome = (progress, outcome, definition, lastChapter) => {
     if (progress.completed) { return null; }
 
     const stage = definition.stages.find((candidate) => candidate.number === progress.stage);
     const lastStage = definition.stages.length;
+    const chapter = progress.chapter ?? 1;
 
     if (outcome === 'FAILED') {
         return progress.encounter === 'PHASE' ? null : { ...progress, encounter: 'PHASE', phase: stage.phasesPerStage };
@@ -64,6 +66,10 @@ const afterOutcome = (progress, outcome, definition) => {
         return progress.stage < lastStage
             ? { ...progress, stage: progress.stage + 1, encounter: 'PHASE', phase: 1 }
             : { ...progress, encounter: 'CHAPTER_BOSS', phase: 1 };
+    }
+
+    if (chapter < lastChapter) {
+        return { ...progress, chapter: chapter + 1, stage: 1, encounter: 'PHASE', phase: 1, completed: false };
     }
 
     return { ...progress, completed: true };
@@ -215,12 +221,13 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  equipment {name: [raw pieces]} (starting bags, default empty), equipmentDrops (the pieces the next won bosses drop, one each, in order) and
 //  talents {name: {TALENT_ID: level}} (starting levels, default 0; an upgrade takes one talent point like the backend) and
 //  talentPoints {name: n} (points available at the start, on top of the ones the starting levels cost; first clears pay more) and
-//  autoClick {name: { level, crystals }} (default level 0 and 0 crystals; the upgrade follows AutoClickController).
+//  autoClick {name: { level, crystals }} (default level 0 and 0 crystals; the upgrade follows AutoClickController) and
+//  lastChapter (the last chapter a cleared chapter boss opens, default 1: the boss of that chapter completes the campaign).
 //  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens.
 export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
     cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = [],
-    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}
+    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -373,7 +380,7 @@ export async function mockBackend (page, {
     };
 
     //  Account reset contract (AccountResetController): from chapter 2 the campaign goes back to its start, the talents and their points
-    //  are wiped, and the chapter left (up to 5) is paid in crystals; the crystals and the auto click level stay
+    //  are wiped, and the chapter left (up to 15) is paid in crystals; the crystals and the auto click level stay
     const handleAccountReset = (route, method, path, body, now) => {
         const username = authenticated(route, now);
 
@@ -394,7 +401,7 @@ export async function mockBackend (page, {
         }
         if (chapter < 2 && !progress.completed) { return route.fulfill(problem(409, 'Locked', 'RESET_LOCKED')); }
 
-        const reward = progress.completed ? 5 : Math.min(chapter, 5);
+        const reward = progress.completed ? 15 : Math.min(chapter, 15);
         const state = autoClickOf(username);
 
         state.crystals += reward;
@@ -730,8 +737,8 @@ export async function mockBackend (page, {
 
             if (!valid) { return route.fulfill(problem(400, 'Outcome is invalid', 'PROGRESS_INVALID_OUTCOME')); }
 
-            const reportedFromStored = body.chapter === 1 && body.stage === progress.stage && body.encounter === progress.encounter && body.phase === progress.phase;
-            const next = reportedFromStored ? afterOutcome(progress, body.outcome, definition) : null;
+            const reportedFromStored = body.chapter === (progress.chapter ?? 1) && body.stage === progress.stage && body.encounter === progress.encounter && body.phase === progress.phase;
+            const next = reportedFromStored ? afterOutcome(progress, body.outcome, definition, lastChapter) : null;
 
             if (!next) {
                 const conflict = problem(409, 'Reported position does not match the stored progress', 'PROGRESS_CONFLICT');
