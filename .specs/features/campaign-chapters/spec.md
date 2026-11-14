@@ -212,7 +212,7 @@ Rows `Q14` to `Q19` carry the owner's answers of 2026-10-30; `Q26`, `Q42` and `Q
 2. WHEN a chapter boss health of 3 000 000 000 is stored THEN `GET /progress` SHALL answer `bossHealth` 3000000000 as a JSON integer.  <!-- event-driven -->
 3. WHEN the game receives a health of 3 000 000 000 THEN it SHALL spawn the monster with exactly that health and show `HP 3B/3B`.  <!-- event-driven -->
 4. WHEN the expand migration runs THEN every existing health value SHALL be copied unchanged to the 64-bit storage.  <!-- event-driven -->
-5. WHILE the expand migration has run and the previous backend version still serves requests or starts again for a rollback, the previous backend SHALL start, answer progress and accept outcome reports (AD-016).  <!-- state-driven -->
+5. WHILE the expand migration has run and the backend version deployed before the current one still serves requests or starts again for a rollback, that backend version SHALL start, answer progress and accept outcome reports (AD-016). From the contract migration on, that version is the one that no longer maps the legacy columns: compatibility with the pre-feature backend ends there by design.  <!-- state-driven -->
 6. IF a health value is below 1 THEN the backend SHALL refuse to save that definition.  <!-- unwanted-behavior -->
 
 **Independent Test**: A backend integration test stores a chapter boss of 3 000 000 000 and reads it back from `GET /progress`; a migration test starts the previous backend's schema check against the migrated database.

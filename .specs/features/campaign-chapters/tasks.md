@@ -18,7 +18,7 @@ Rules for every task:
 - One task = one commit with the message under **Commit**, checked with `python3 .claude/skills/tlc-spec-driven/scripts/check_commit.py --message "<msg>"`, ending with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Add files by path only, never `git add -A`: the working tree holds the owner's uncommitted files (`PROMPTS_ASSETS_UI.md`, `game/src/...`, `art/`, `game/public/assets/...`).
 - Mark the task `[x]` in this file in the same commit.
 - Push right after the commit (`CLAUDE.md`). Every pushed commit can go live through the watcher, so a task never leaves the backend in a state that seeds wrong data (design, Risks).
-- A test that pins an old value superseded by AD-019 is updated to the new value and renamed after the behaviour (L-054). Never delete or weaken a test to make a gate pass; the only removals allowed are the ones T14 names.
+- A test that pins an old value superseded by AD-019 is updated to the new value and renamed after the behaviour (L-054). Never delete or weaken a test to make a gate pass; the only removals allowed are the ones listed under **Removals allowed** in T14 (T13 allows none).
 
 ---
 
@@ -78,6 +78,8 @@ T11 → T12
 ### Phase 5: Contract (deferred until the deploys of Phase 1 to 4 are live)
 
 Start only when `./publish.sh` runs and the precondition of each task holds. If it cannot be met, stop and report the contract as pending; the feature works without it.
+
+T13 and T14 stay two commits and two deploys. The release before T13 maps and writes the legacy columns, so it must stop being the rollback target (T13 is `active.commit` and `previous` is null) before V10 drops them. Pushed together, the watcher would deploy only T14 and keep the release before T13 as the rollback target on a schema without its columns.
 
 ```
 T13 → T14
@@ -588,8 +590,8 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 **Owner**: kotlin-backend-dev
 **What**: Step B of the expand/contract. The entities no longer map `boss_health`, `monster_health` and `miniboss_health`, so the next step can drop them while this backend stays the rollback target (CHAP-08 AC 5).
 **Where**: `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ChapterEntities.kt`
-**Also changes**: `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ChapterRepositoryIT.kt`
-**Read first**: design, Backend persistence - health expand/contract; `ChapterEntities.kt`
+**Also changes** (under `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`): `adapter/repository/ChapterRepositoryIT.kt`, `adapter/repository/HealthHitPointsMigrationIT.kt`, `adapter/web/ProgressControllerIT.kt`, `adapter/repository/MonsterHealthMigrationIT.kt`, `adapter/repository/PreviousBackendCompatibilityIT.kt`
+**Read first**: design, Backend persistence - health expand/contract; `ChapterEntities.kt`; `adapter/config/ChapterSeeder.kt:29-34`; the five test files above
 **Depends on**: T10, T12
 **Requirement**: CHAP-08
 
@@ -598,21 +600,54 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 1. `./publish.sh` is running.
 2. `node -e "const s=JSON.parse(require('fs').readFileSync('.deploy-state','utf8')); console.log(s.active.commit, s.previous)"` prints an `active.commit` for which `git merge-base --is-ancestor <T10 commit> <active.commit>` exits 0, and `previous` is `null` (the 5-minute rollback window of that deploy has closed).
 
-**Contract**: remove `bossHealth: Int?` from `ChapterEntity`, `monsterHealth: Int?` and `minibossHealth: Int?` from `StageEntity`, and `legacyHealth`. Nothing else changes.
+**Contract**: remove `bossHealth: Int?` from `ChapterEntity`, `monsterHealth: Int?` and `minibossHealth: Int?` from `StageEntity`, and `legacyHealth`. No other production file changes.
+
+**Why tests change** (all paths under `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`): `ChapterSeeder` (`adapter/config/ChapterSeeder.kt:29-34`) inserts chapters through the entity, so after this task every fresh database, which is every test database, holds null in `boss_health`, `monster_health` and `miniboss_health`. Production keeps its values, because its rows exist and the seeder never overwrites. A test that copies a legacy column into a hit point column now writes null there and breaks every later test that loads that chapter; a test that reads the seeded legacy value reads null.
+
+**"Previous backend" from this task on**: the rollback target of the T13 deploy is the release before T13, the active slot at `e57f60c` (backend code of T2 to T10). It maps the legacy columns as nullable `Int?` next to `*_hit_points` and writes both, so it reads a row whose legacy columns are null. The pre-feature release (`91e3111`) maps them as `Int`: it still finds them with their types (schema check and Flyway validation unchanged until V10), and production rows keep its values, but it cannot read a row seeded after T13. It stopped being a rollback target when the 5-minute window of the T10 deploy closed (precondition 2). Its compatibility ends by design at V10 (T14), as CHAP-08 AC 5 states.
+
+**Removals allowed**: none. No test case is removed and no assertion is dropped: the restores take the saved hit points instead of the legacy column, and a read of a seeded legacy value becomes a read of the same number from the hit point column.
 
 **Steps**:
 
 1. Check the precondition.
-2. Remove the fields, the helper and their uses.
-3. In `ChapterRepositoryIT`, the test `a seeded chapter holds the same value in the legacy and the hit point columns` becomes `a chapter saved now leaves the legacy health columns null`: save chapter 99 with boss health 3000, `select boss_health` is null and `boss_hit_points` is 3000.
+2. `ChapterEntities.kt`: remove the fields, the helper and their uses.
+3. `ChapterRepositoryIT`: the test `a seeded chapter holds the same value in the legacy and the hit point columns` becomes `a chapter saved now leaves the legacy health columns null`: save `ChapterDefinition(99, 3000L, 61_000, listOf(StageDefinition(1, 1, 1, 1, 1000)))`, `select boss_health from chapters where number = 99` is null and `boss_hit_points` is `3000L`; in `finally` delete the stages of chapter 99 and chapter 99.
+4. `HealthHitPointsMigrationIT`, case `the expand migration copies every legacy health into the hit points`: the test writes its own legacy values before the backfill, on chapters 1 to 15 only (rows other tests insert hold null legacy values, and nulling their hit points would leave them null). Replace its two first statements with these four, in this order, then `migrate()`:
+   ```kotlin
+   jdbc.update("update chapters set boss_health = boss_hit_points where number between 1 and 15")
+   jdbc.update("update stages set monster_health = monster_hit_points, miniboss_health = miniboss_hit_points where chapter between 1 and 15")
+   jdbc.update("update chapters set boss_hit_points = null where number between 1 and 15")
+   jdbc.update("update stages set monster_hit_points = null, miniboss_hit_points = null where chapter between 1 and 15")
+   ```
+   The three `is distinct from` counts get `and number between 1 and 15` (chapters) and `and chapter between 1 and 15` (stages) and still expect 0; `boss_hit_points` of chapter 5 still expects `512_000L`. After the assertions, put the database back as T13 seeds it: `update chapters set boss_health = null where number between 1 and 15` and `update stages set monster_health = null, miniboss_health = null where chapter between 1 and 15`.
+5. `HealthHitPointsMigrationIT`, case `a hit point below 1 is refused and 3000000000 is stored`: first line `val saved = jdbc.queryForObject("select boss_hit_points from chapters where number = 1", Long::class.java)`; the last line (`:80`) becomes `jdbc.update("update chapters set boss_hit_points = ? where number = 1", saved)`. Assertions unchanged.
+6. `ProgressControllerIT`, case `GET progress answers a boss health above the 32-bit limit as a JSON integer` (`:98`): read `saved` the same way before the `update ... 3000000000`; the `finally` line (`:106`) becomes `jdbc.update("update chapters set boss_hit_points = ? where number = 1", saved)`. Assertion unchanged.
+7. `MonsterHealthMigrationIT`, case `a new database seeds the grown health`: it reads what the seeder writes, now only the hit point columns. Replace its three assertions with inline queries: `select monster_hit_points from stages where chapter = 1 and number = 1` is `40L`, `... chapter = 4 and number = 10` is `4864L` (`76 * 64`), `select boss_hit_points from chapters where number = 5` is `512_000L`. The helpers `stage`, `boss`, `setOld`, `restore` and the two V4 re-run cases stay as they are: they write the legacy values they read.
+8. `PreviousBackendCompatibilityIT`:
+   - Class KDoc becomes: `AD-016: the backend deployed before the current one must keep starting and serving on this database. The schema check and Flyway's validation replay the release before 64-bit health (commit 91e3111), whose columns stay until V10. The read and write paths replay the release before T13 (commit e57f60c, the rollback target), which maps the legacy integer health columns as nullable next to the hit points: a database seeded after T13 holds null in the legacy columns, which 91e3111 cannot read. Booting a previous image itself is not executed here.`
+   - `the previous entities pass the schema check of the migrated database` (`:59`): unchanged.
+   - `the previous backend reads the legacy integer health of chapters 1 to 15` (`:101`) becomes `the previous backend reads the health of chapters 1 to 15 from the hit point columns`: the same two queries on `boss_hit_points`, `monster_hit_points`, `miniboss_hit_points` with `rs.getLong`; the null count `select count(*) from stages where monster_hit_points is null or miniboss_hit_points is null` expects 0; keys `(1..15).toList()`; values `2_000L`, `512_000L`, `16_384_000L`, `524_288_000L` for chapters 1, 5, 10, 15; stage 10 pairs `19_456L to 97_280L`, `622_592L to 3_112_960L`, `19_922_944L to 99_614_720L` for chapters 5, 10, 15.
+   - `the previous backend reads the drop rules of chapters 1 to 15 in its shape` (`:131`): unchanged.
+   - `the previous backend writes the legacy health and the drop rule columns` (`:148`) becomes `the previous backend writes the health and the drop rule columns`: before `rolledBack`, `val legacyBefore = jdbc.queryForObject("select boss_health from chapters where number = 1", Int::class.java)`. Inside, `jdbc.update("update chapters set boss_hit_points = ?, boss_health = ? where number = ?", 3_000L, 3_000, 1)` returns 1, `boss_hit_points` of chapter 1 is `3_000L` and `boss_health` is `3_000`; the drop rule update and its read stay. After the rollback, `boss_hit_points` of chapter 1 is `2_000L`, `boss_health` equals `legacyBefore` (null on a test database), `min_copper` of rule 5 is 16.
+   - `the previous release starts on the migrated schema and its validation ignores V8 and V9` (`:170`): unchanged (still V1 to V7, two `FUTURE_SUCCESS`).
 
 **Tests**: integration
-**Test cases**: the renamed `ChapterRepositoryIT` case above; `a chapter boss of 3000000000 health round-trips and leaves the legacy column null` passes unchanged.
+**Test cases**:
+
+- `ChapterRepositoryIT`: `a chapter saved now leaves the legacy health columns null` (step 3); `a chapter boss of 3000000000 health round-trips and leaves the legacy column null` passes unchanged.
+- `HealthHitPointsMigrationIT`: `the expand migration copies every legacy health into the hit points` (step 4: 0, 0, 0, `512_000L`); `a hit point below 1 is refused and 3000000000 is stored` (step 5: `DataIntegrityViolationException` for 0, `3_000_000_000L` read back).
+- `ProgressControllerIT`: `GET progress answers a boss health above the 32-bit limit as a JSON integer` (`3_000_000_000L`).
+- `MonsterHealthMigrationIT`: `a new database seeds the grown health` (`40L`, `4864L`, `512_000L`).
+- `PreviousBackendCompatibilityIT`: the five cases of step 8 with the values there.
+
 **Gate**: full - `cd backend && ./gradlew test`
 **Done when**:
 
-- [ ] The backend suite passes and `SchemaValidationIT` passes.
-- [ ] The commit is pushed alone, and T14 waits for it to be deployed.
+- [ ] The backend suite passes, including `SchemaValidationIT`, `HealthHitPointsMigrationIT`, `PreviousBackendCompatibilityIT`, `ProgressControllerIT`, `AccountResetControllerIT`, `CardsFlowIT`, `EquipmentDropFlowIT`, `FarmControllerIT` and `MonsterHealthMigrationIT`.
+- [ ] `grep -rnE "_hit_points = (boss|monster|miniboss)_health" backend/src/test` prints nothing.
+- [ ] The commit touches exactly `ChapterEntities.kt`, the five test files named above and this file.
+- [ ] The commit is pushed alone, and T14 waits for it to be deployed: V10 drops columns that the release before T13 still maps and writes, so V10 must never run while that release is the rollback target.
 
 **Commit**: `refactor(backend): stop mapping the legacy health columns`
 
@@ -623,8 +658,8 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 **Owner**: kotlin-backend-dev
 **What**: Step C. Drop the three `integer` health columns and make the hit point columns `not null` (CHAP-08 AC 1).
 **Where**: `backend/src/main/resources/db/migration/V10__health_legacy_columns_drop.sql` (new)
-**Also changes**: `adapter/repository/HealthHitPointsMigrationIT.kt`, `adapter/repository/MonsterHealthMigrationIT.kt`, `adapter/repository/SchemaConstraintsIT.kt` (lines 48, 52, 203), `adapter/repository/ChapterRepositoryIT.kt` (raw inserts at 150-155)
-**Read first**: design, Backend persistence - health expand/contract
+**Also changes** (under `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/`): `HealthHitPointsMigrationIT.kt`, `MonsterHealthMigrationIT.kt`, `SchemaConstraintsIT.kt` (lines 48, 52, 203, 207, 211), `ChapterRepositoryIT.kt` (the two legacy cases at `:92-115` and the raw inserts at `:174-189`, line numbers as T13 leaves the file), `PreviousBackendCompatibilityIT.kt`
+**Read first**: design, Backend persistence - health expand/contract; the five test files above as T13 leaves them
 **Depends on**: T13
 **Requirement**: CHAP-08
 
@@ -642,21 +677,56 @@ alter table stages alter column monster_hit_points set not null;
 alter table stages alter column miniboss_hit_points set not null;
 ```
 
+**"Previous backend" from this task on**: the rollback target of the T14 deploy is the T13 commit. Its entities are the entities of this task (T14 changes no Kotlin in `src/main`), so `SchemaValidationIT` is its schema check, and its migrations are V1 to V9. Compatibility with the pre-feature release (`91e3111`) ends here by design (CHAP-08 AC 5): V10 drops the columns its entities map. CHAP-09 AC 7 still holds, because the drop rule tables and columns are unchanged and the T13 release reads them in the same shape.
+
+**Removals allowed** (the only ones in this feature; each removes an assertion whose subject V10 drops or a replay of the pre-feature release):
+
+- `HealthHitPointsMigrationIT`: `migrate()`, `restore()` (`@AfterTest`), the cases `the expand migration copies every legacy health into the hit points` and `the legacy health columns stay integer and accept null` (V8 and these cases name the dropped columns; V8's backfill was verified by T1 and T13 before the drop).
+- `MonsterHealthMigrationIT`: `migrate()`, `restore()` (`@AfterTest`), `setOld`, `stage`, `boss`, the cases `a database seeded with the linear health gets the grown one` and `a health tuned in the database survives` (V4 updates the dropped columns).
+- `ChapterRepositoryIT`: the `assertNull(... boss_health ...)` line of `a chapter boss of 3000000000 health round-trips and leaves the legacy column null`, and the whole case `a chapter saved now leaves the legacy health columns null` (replaced by `the legacy health columns are gone`).
+- `PreviousBackendCompatibilityIT`: the `boss_health`, `monster_health`, `miniboss_health` entries of the schema case (replaced by the hit point entries), the `boss_health` write, reads and `legacyBefore` of the write case, and the second `FUTURE_SUCCESS` of the Flyway case (V8 and V9 now belong to the previous release).
+- `SchemaConstraintsIT` and `ChapterRepositoryIT` raw inserts: the legacy column names (renamed, or dropped where the hit point column is already listed) and their duplicate values.
+
 **Steps**:
 
 1. Check the precondition.
 2. Write the migration.
-3. `HealthHitPointsMigrationIT`: remove `migrate()`, its `@AfterTest` and the cases that re-run V8 (V8 names columns that no longer exist). Keep `the expand migration adds bigint hit point columns` renamed to `the hit point columns are bigint and not null` (`is_nullable = 'NO'`). Add `the legacy health columns are gone` (no `information_schema.columns` row for the three names).
-4. `MonsterHealthMigrationIT`: keep `a new database seeds the grown health` reading `monster_hit_points` and `boss_hit_points`; remove the cases and the `@AfterTest` that re-run V4, because V4 updates columns that no longer exist. Its behaviour was verified in its own feature; say so in the class comment.
-5. `SchemaConstraintsIT` and `ChapterRepositoryIT`: in the raw inserts, replace `boss_health`, `monster_health` and `miniboss_health` with the hit point columns.
+3. `HealthHitPointsMigrationIT`:
+   - Remove what **Removals allowed** lists, and the `ClassPathResource` and `AfterTest` imports.
+   - `the expand migration adds bigint hit point columns` becomes `the hit point columns are bigint and not null`: for `chapters.boss_hit_points`, `stages.monster_hit_points`, `stages.miniboss_hit_points`, `data_type` is `"bigint"` and `is_nullable` is `"NO"`.
+   - Add `the legacy health columns are gone`: `select count(*) from information_schema.columns where table_schema = 'public' and column_name in ('boss_health', 'monster_health', 'miniboss_health')` is 0.
+   - `a hit point below 1 is refused and 3000000000 is stored`: unchanged (T13 restore).
+   - Class KDoc: `` `V8__health_hit_points_expand.sql` and `V10__health_legacy_columns_drop.sql`: the hit points are 64-bit, not null and at least 1. The backfill of V8 was verified before V10 dropped its source columns (tasks T1 and T13). ``
+4. `MonsterHealthMigrationIT`: remove what **Removals allowed** lists, and the `ClassPathResource` and `AfterTest` imports. Keep `a new database seeds the grown health` as T13 left it (`40L`, `4864L`, `512_000L` from the hit point columns). Class KDoc: `` `V4__monster_health_growth.sql` updated the legacy integer health columns, which V10 drops; its re-runs were verified in their own feature and until T14. A new database still seeds the grown health. ``
+5. `SchemaConstraintsIT`: in the inserts at lines 48, 52, 203, 207 and 211, rename `boss_health` to `boss_hit_points`, `monster_health` to `monster_hit_points`, `miniboss_health` to `miniboss_hit_points`; the values stay (300, 10, 50). Reason: V10 makes the hit point columns `not null`, so an insert without them fails with `23502` before the foreign key check the cases expect (`23503`).
+6. `ChapterRepositoryIT`:
+   - `a chapter boss of 3000000000 health round-trips and leaves the legacy column null` becomes `a chapter boss of 3000000000 health round-trips in the hit point column`: remove the `boss_health` line; `findByNumber(number)!!.bossHealth` and `select boss_hit_points` stay `3_000_000_000L`.
+   - Remove `a chapter saved now leaves the legacy health columns null`.
+   - `rows written by SQL read the enemies and drop rules they point at`: the chapter insert becomes `"insert into chapters (number, boss_hit_points, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) values (?, 5, 1000, ?, 3)"`; the stage insert becomes `"insert into stages (id, chapter, number, phases_per_stage, monster_hit_points, miniboss_hit_points, miniboss_time_limit_ms, monster_enemy_id, miniboss_enemy_id, monster_drop_rule_id, miniboss_drop_rule_id) values (?, ?, 1, 1, 1, 1, 1000, ?, ?, 1, 2)"`, split over lines as today. Arguments and assertions unchanged.
+7. `PreviousBackendCompatibilityIT`:
+   - Class KDoc becomes: `AD-016: the release before V10 (the T13 commit) must keep starting and serving on the database after V10. Its entities are the current ones (SchemaValidationIT); these checks replay its column types, its read and write paths and Flyway's validation of its own migrations V1 to V9. Compatibility with the release before 64-bit health (commit 91e3111) ended by design at V10, which drops the legacy integer health columns it maps. Booting the previous image itself is not executed here.`
+   - `the previous entities pass the schema check of the migrated database`: replace `"boss_health" to "integer"` by `"boss_hit_points" to "bigint"`, `"monster_health" to "integer"` by `"monster_hit_points" to "bigint"`, `"miniboss_health" to "integer"` by `"miniboss_hit_points" to "bigint"`. Every other entry stays.
+   - `the previous backend reads the health of chapters 1 to 15 from the hit point columns`: unchanged.
+   - `the previous backend reads the drop rules of chapters 1 to 15 in its shape`: unchanged.
+   - `the previous backend writes the health and the drop rule columns` becomes `the previous backend writes the hit points and the drop rule columns`: the update is `jdbc.update("update chapters set boss_hit_points = ? where number = ?", 3_000L, 1)` and returns 1, `boss_hit_points` of chapter 1 reads `3_000L` inside and `2_000L` after the rollback; the drop rule asserts stay (1 row, 20 inside, 16 after).
+   - `the previous release starts on the migrated schema and its validation ignores V8 and V9` becomes `the previous release starts on the migrated schema and its validation ignores V10`: `PREVIOUS_LAST_VERSION = 9`, so the copy holds 9 files, `migrationsExecuted` is 0, and the states of versions above 9 are `listOf(MigrationState.FUTURE_SUCCESS)`. The KDoc of `previousMigrations` becomes `The migrations of the previous release: the files of V1 to V9, which are unchanged since the T13 commit.`
 
 **Tests**: integration
-**Test cases**: `the hit point columns are bigint and not null`; `the legacy health columns are gone`; `a new database seeds the grown health` (chapter 1 stage 1 monster 40, chapter 4 stage 10 monster 4864, chapter 5 boss 512000).
+**Test cases**:
+
+- `HealthHitPointsMigrationIT`: `the hit point columns are bigint and not null` (`bigint`/`NO` for the three); `the legacy health columns are gone` (0); `a hit point below 1 is refused and 3000000000 is stored` (unchanged).
+- `MonsterHealthMigrationIT`: `a new database seeds the grown health` (chapter 1 stage 1 monster `40L`, chapter 4 stage 10 monster `4864L`, chapter 5 boss `512_000L`).
+- `ChapterRepositoryIT`: `a chapter boss of 3000000000 health round-trips in the hit point column` (`3_000_000_000L` twice); `rows written by SQL read the enemies and drop rules they point at` (unchanged assertions).
+- `SchemaConstraintsIT`: every case passes with its current expected SQL state.
+- `PreviousBackendCompatibilityIT`: the five cases of step 7 with the values there.
+
 **Gate**: full - `cd backend && ./gradlew test`
 **Done when**:
 
 - [ ] The backend suite passes, `SchemaValidationIT` included.
 - [ ] `cd backend && ./gradlew build` passes.
+- [ ] `grep -rnE "(boss|monster|miniboss)_health([^_]|$)" backend/src/main/kotlin backend/src/test` prints only the query line of `the legacy health columns are gone`.
+- [ ] The commit is pushed alone, after the T13 deploy is `active.commit` with `previous` null.
 
 **Commit**: `feat(backend): drop the legacy 32-bit health columns`
 
@@ -699,7 +769,7 @@ T12 → T13
 | T10 | 1 constant and 1 function; tests across the readers of the constant | ⚠️ Cohesive, one concept |
 | T11 | 1 fake backend option | ✅ Granular |
 | T12 | 1 e2e file | ✅ Granular |
-| T13 | 1 mapping removal | ✅ Granular |
+| T13 | 1 mapping removal + the test restores and reads it forces | ⚠️ Cohesive, one concept |
 | T14 | 1 migration + test adjustments it forces | ✅ Granular |
 
 ## Diagram-Definition Cross-Check
