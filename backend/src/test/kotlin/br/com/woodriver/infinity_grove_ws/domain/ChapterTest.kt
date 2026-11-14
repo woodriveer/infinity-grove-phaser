@@ -365,6 +365,35 @@ class ChapterTest {
     }
 
     @Test
+    fun `every stage of chapters 6 to 15 follows the spec formulas`() {
+        val elements = listOf(Element.FIRE, Element.WATER, Element.NATURE, Element.LIGHT, Element.DARKNESS)
+        (6..15).forEach { c ->
+            // Spec Chapter Table: health factor 256 x 2^(c-5), defense bonus 20 + 3 x (c-5)
+            val factor = 256L * (1L shl (c - 5))
+            val bonus = 20 + 3 * (c - 5)
+            val chapter = ChapterDefinition.of(c)
+
+            assertEquals(10, chapter.stageCount, "chapter $c stage count")
+            (1..10).forEach { n ->
+                val stage = chapter.stage(n)
+                val label = "chapter $c stage $n"
+                // phase monster health (40 + 4(n-1)) x factor, miniboss health 5 times it
+                val phaseHealth = (40L + 4L * (n - 1)) * factor
+                assertEquals(phaseHealth, stage.monsterHealth, "$label phase monster health")
+                assertEquals(5L * phaseHealth, stage.minibossHealth, "$label miniboss health")
+                // miniboss defenses min(10 + n + bonus, 80), critical resistance min(10 + 2n + bonus, 70)
+                assertEquals(minOf(10 + n + bonus, 80), stage.miniboss.physicalDefense, "$label miniboss physical defense")
+                assertEquals(minOf(10 + n + bonus, 80), stage.miniboss.magicalDefense, "$label miniboss magical defense")
+                assertEquals(minOf(10 + 2 * n + bonus, 70), stage.miniboss.critResistance, "$label miniboss crit resistance")
+                // elements cycle by stage number and shift by one per chapter (campaign-chapters Q16 keeps the rotating formula)
+                val element = elements[(n - 1 + c - 1) % elements.size]
+                assertEquals(element, stage.monster.element, "$label phase monster element")
+                assertEquals(element, stage.miniboss.element, "$label miniboss element")
+            }
+        }
+    }
+
+    @Test
     fun `chapters 1 to 5 keep every column of the chapter table`() {
         firstFiveChapters.forEach { assertChapterTableRow(it) }
     }
