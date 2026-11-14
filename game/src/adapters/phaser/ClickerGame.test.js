@@ -424,22 +424,22 @@ describe('ClickerGame HP text after skills', () => {
     });
     const hp = (ctx) => ctx.hud('.monster-hp').textContent;
 
-    it('follows a skill hit that does not kill: Corte Dimensional of a 1 star Kael reads HP 983.5/1000 and moves the bar', async () => {
+    it('follows a skill hit that does not kill: Corte Dimensional of a 1 star Kael reads HP 983.5/1K and moves the bar', async () => {
         const ctx = await createScene({ start: big(), heroes: { leaderId: 'kael', heroes: [ heroEntry('kael', { 1: 1 }, 1) ] } });
 
         ctx.scene.useSkill(1);
 
-        expect(hp(ctx)).toBe('HP 983.5/1000');
+        expect(hp(ctx)).toBe('HP 983.5/1K');
         expect(ctx.fill.width).toBeCloseTo(240 * 983.5 / 1000, 10);
     });
 
-    it('follows a damage tick that does not kill: Tempestade Arcana of a 2 star Orina reads HP 997.6/1000 and moves the bar', async () => {
+    it('follows a damage tick that does not kill: Tempestade Arcana of a 2 star Orina reads HP 997.6/1K and moves the bar', async () => {
         const ctx = await createScene({ start: big(), heroes: { leaderId: 'orina', heroes: [ heroEntry('orina', { 2: 1 }, 2) ] } });
 
         ctx.scene.useSkill(2);
         ctx.scene.update(0, 1000);
 
-        expect(hp(ctx)).toBe('HP 997.6/1000');
+        expect(hp(ctx)).toBe('HP 997.6/1K');
         expect(ctx.fill.width).toBeCloseTo(240 * 997.6 / 1000, 10);
     });
 
@@ -447,7 +447,7 @@ describe('ClickerGame HP text after skills', () => {
         const ctx = await createScene({ start: { ...big(), chapter: 3 }, heroes: new Error('down') });
 
         expect(ctx.hud('.chapter-hud').textContent).toBe('Capítulo 3');
-        expect(hp(ctx)).toBe('HP 1000/1000');
+        expect(hp(ctx)).toBe('HP 1K/1K');
     });
 });
 

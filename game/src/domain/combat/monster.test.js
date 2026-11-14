@@ -169,4 +169,48 @@ describe('healthText', () => {
 
         expect(healthText(monster)).toBe('HP 0/10');
     });
+
+    it('abbreviates a full 2000 health boss to HP 2K/2K', () => {
+        expect(healthText(new Monster(2000))).toBe('HP 2K/2K');
+    });
+
+    it('abbreviates a 16 384 000 health boss to HP 16.4M/16.4M', () => {
+        expect(healthText(new Monster(16_384_000))).toBe('HP 16.4M/16.4M');
+    });
+
+    it('abbreviates a 3 000 000 000 health boss to HP 3B/3B', () => {
+        expect(healthText(new Monster(3_000_000_000))).toBe('HP 3B/3B');
+    });
+
+    it('reads 1.5K of 2K after 500 damage', () => {
+        const monster = new Monster(2000);
+
+        monster.hit(500);
+
+        expect(healthText(monster)).toBe('HP 1.5K/2K');
+    });
+
+    it('reads 1K of 2K when 999.95 is left, rounded up to 1000 first', () => {
+        const monster = new Monster(2000);
+
+        monster.hit(1000.05);
+
+        expect(healthText(monster)).toBe('HP 1K/2K');
+    });
+
+    it('reads 999.9 of 2K when 999.9 is left', () => {
+        const monster = new Monster(2000);
+
+        monster.hit(1000.1);
+
+        expect(healthText(monster)).toBe('HP 999.9/2K');
+    });
+
+    it('reads 2K of 2K when 1999.95 is left, rounded up to 2000 first', () => {
+        const monster = new Monster(2000);
+
+        monster.hit(0.05);
+
+        expect(healthText(monster)).toBe('HP 2K/2K');
+    });
 });

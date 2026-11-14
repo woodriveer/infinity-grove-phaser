@@ -165,6 +165,12 @@ describe('Campaign encounter', () => {
         });
     });
 
+    it('a chapter boss of 3000000000 health spawns with that health', () => {
+        const huge = { ...definition, bossHealth: 3_000_000_000 };
+
+        expect(Campaign.fromProgress({ chapter: 1, stage: 3, encounter: CHAPTER_BOSS, phase: 1, completed: false, definition: huge }).encounter().health).toBe(3000000000);
+    });
+
     it('there is no encounter once the campaign is completed', () => {
         expect(at(3, CHAPTER_BOSS, 1, true).encounter()).toBeNull();
     });

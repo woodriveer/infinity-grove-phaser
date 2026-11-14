@@ -87,7 +87,7 @@ T13 → T14
 
 ## Task Breakdown
 
-### T1: Expand migration for 64-bit health [ ]
+### T1: Expand migration for 64-bit health [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Add nullable `bigint` hit point columns next to the three `integer` health columns, copy the values, and make the legacy columns nullable, in a migration that can run twice (CHAP-08 AC 1, 4, 5, 6).
@@ -138,8 +138,8 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 **Gate**: full - `cd backend && ./gradlew test --tests '*HealthHitPointsMigrationIT' --tests '*SchemaValidationIT' --tests '*SchemaConstraintsIT'`
 **Done when**:
 
-- [ ] The four test cases pass and `SchemaValidationIT` and `SchemaConstraintsIT` pass unchanged.
-- [ ] No Kotlin file changed.
+- [x] The four test cases pass and `SchemaValidationIT` and `SchemaConstraintsIT` pass unchanged.
+- [x] No Kotlin file changed.
 
 **Commit**: `feat(backend): add 64-bit hit point columns beside the health columns`
 
@@ -261,7 +261,7 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 
 ---
 
-### T5: HP text uses the short format [ ]
+### T5: HP text uses the short format [x]
 
 **Owner**: game-dev
 **What**: `healthText` rounds the current health up to 0.1 as today, then abbreviates both numbers from 1 000. The tests prove that a 3 000 000 000 health boss passes through the campaign (CHAP-07 AC 1, 2, 4; CHAP-08 AC 3).
@@ -289,7 +289,7 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The new cases pass and the three updated `ClickerGame.test.js` expectations pass.
+- [x] The new cases pass and the three updated `ClickerGame.test.js` expectations pass.
 
 **Commit**: `feat(game): abbreviate the HP text from 1000`
 
