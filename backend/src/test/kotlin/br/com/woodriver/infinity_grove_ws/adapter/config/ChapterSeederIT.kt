@@ -64,9 +64,23 @@ class ChapterSeederIT : IntegrationTestBase() {
     @Test
     fun `application start stores the 15 seed drop rules with the spec values`() {
         val expected =
-            (1..5).flatMap { c ->
-                listOf(DropRule(3 * c - 2, c, 5 * c, 1500), DropRule(3 * c - 1, 5 * c, 15 * c, 1500), DropRule(3 * c, 20 * c, 50 * c, 1500))
-            }
+            listOf(
+                DropRule(1, 2, 6, 1500),
+                DropRule(2, 8, 20, 1500),
+                DropRule(3, 30, 70, 1500),
+                DropRule(4, 4, 12, 1500),
+                DropRule(5, 16, 40, 1500),
+                DropRule(6, 60, 140, 1500),
+                DropRule(7, 8, 24, 1500),
+                DropRule(8, 32, 80, 1500),
+                DropRule(9, 120, 280, 1500),
+                DropRule(10, 16, 48, 1500),
+                DropRule(11, 64, 160, 1500),
+                DropRule(12, 240, 560, 1500),
+                DropRule(13, 32, 96, 1500),
+                DropRule(14, 128, 320, 1500),
+                DropRule(15, 480, 1120, 1500),
+            )
 
         assertEquals(expected, seedRules())
     }

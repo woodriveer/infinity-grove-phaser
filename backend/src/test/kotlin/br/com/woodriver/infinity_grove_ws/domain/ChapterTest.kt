@@ -216,27 +216,51 @@ class ChapterTest {
     }
 
     @Test
-    fun `chapter 1 seeds a monster rule of 1 to 5, a miniboss rule of 5 to 15 and a boss rule of 20 to 50 copper`() {
+    fun `the coin factor doubles to chapter 8 and then grows by 32`() {
         assertEquals(
-            listOf(DropRule(1, 1, 5, 1500), DropRule(2, 5, 15, 1500), DropRule(3, 20, 50, 1500)),
+            listOf(1, 2, 4, 8, 16, 32, 64, 128, 160, 192, 224, 256, 288, 320, 352),
+            (1..15).map { ChapterDefinition.coinFactor(it) },
+        )
+    }
+
+    @Test
+    fun `chapter 1 seeds 2 to 6, 8 to 20 and 30 to 70 copper`() {
+        assertEquals(
+            listOf(DropRule(1, 2, 6, 1500), DropRule(2, 8, 20, 1500), DropRule(3, 30, 70, 1500)),
             ChapterDefinition.dropRules(1),
         )
     }
 
     @Test
-    fun `chapter 5 seeds its rules as ids 13 to 15 with five times the chapter 1 ranges`() {
+    fun `chapter 5 seeds sixteen times the chapter 1 ranges`() {
         assertEquals(
-            listOf(DropRule(13, 5, 25, 1500), DropRule(14, 25, 75, 1500), DropRule(15, 100, 250, 1500)),
+            listOf(DropRule(13, 32, 96, 1500), DropRule(14, 128, 320, 1500), DropRule(15, 480, 1120, 1500)),
             ChapterDefinition.dropRules(5),
         )
     }
 
     @Test
-    fun `the 15 seed rules of chapters 1 to 5 have distinct ids`() {
-        val ids = (1..5).flatMap { c -> ChapterDefinition.dropRules(c).map { it.id } }
+    fun `chapter 8 seeds 128 times the chapter 1 ranges`() {
+        assertEquals(
+            listOf(DropRule(22, 256, 768, 1500), DropRule(23, 1024, 2560, 1500), DropRule(24, 3840, 8960, 1500)),
+            ChapterDefinition.dropRules(8),
+        )
+    }
 
-        assertEquals(15, ids.size)
-        assertEquals((1..15).toSet(), ids.toSet())
+    @Test
+    fun `chapter 15 seeds 352 times the chapter 1 ranges`() {
+        assertEquals(
+            listOf(DropRule(43, 704, 2112, 1500), DropRule(44, 2816, 7040, 1500), DropRule(45, 10560, 24640, 1500)),
+            ChapterDefinition.dropRules(15),
+        )
+    }
+
+    @Test
+    fun `the 45 seed rules of chapters 1 to 15 have distinct ids`() {
+        val ids = (1..15).flatMap { c -> ChapterDefinition.dropRules(c).map { it.id } }
+
+        assertEquals(45, ids.size)
+        assertEquals((1..45).toSet(), ids.toSet())
     }
 
     @Test

@@ -88,24 +88,33 @@ data class ChapterDefinition(
         private const val MAX_SEEDED_DEFENSE = 80
         private const val MAX_SEEDED_CRIT_RESISTANCE = 70
         private const val RULES_PER_CHAPTER = 3
-        private const val MONSTER_MIN_COPPER = 1
-        private const val MONSTER_MAX_COPPER = 5
-        private const val MINIBOSS_MIN_COPPER = 5
-        private const val MINIBOSS_MAX_COPPER = 15
-        private const val BOSS_MIN_COPPER = 20
-        private const val BOSS_MAX_COPPER = 50
+        private val MONSTER_COPPER = 2..6
+        private val MINIBOSS_COPPER = 8..20
+        private val BOSS_COPPER = 30..70
+        private const val LAST_DOUBLED_COIN_CHAPTER = 8
+        private const val COIN_FACTOR_STEP = 32
         private const val KILL_INTERVAL_MS = 1500L
 
         /**
          * The three drop rules seeded for chapter [number]: the phase monster (id 3c-2), the miniboss (3c-1) and the chapter boss
-         * (3c), each range growing with the chapter. Tunable in the database afterwards.
+         * (3c). Each range is the chapter's copper range times [coinFactor] (AD-019). Tunable in the database afterwards.
          */
-        fun dropRules(number: Int): List<DropRule> =
-            listOf(
-                DropRule(monsterRuleId(number), MONSTER_MIN_COPPER * number, MONSTER_MAX_COPPER * number, KILL_INTERVAL_MS),
-                DropRule(minibossRuleId(number), MINIBOSS_MIN_COPPER * number, MINIBOSS_MAX_COPPER * number, KILL_INTERVAL_MS),
-                DropRule(bossRuleId(number), BOSS_MIN_COPPER * number, BOSS_MAX_COPPER * number, KILL_INTERVAL_MS),
+        fun dropRules(number: Int): List<DropRule> {
+            val factor = coinFactor(number)
+            return listOf(
+                DropRule(monsterRuleId(number), MONSTER_COPPER.first * factor, MONSTER_COPPER.last * factor, KILL_INTERVAL_MS),
+                DropRule(minibossRuleId(number), MINIBOSS_COPPER.first * factor, MINIBOSS_COPPER.last * factor, KILL_INTERVAL_MS),
+                DropRule(bossRuleId(number), BOSS_COPPER.first * factor, BOSS_COPPER.last * factor, KILL_INTERVAL_MS),
             )
+        }
+
+        /** The copper factor of chapter [number]: it doubles up to chapter 8, then grows by 32 each chapter (AD-019). */
+        fun coinFactor(number: Int): Int =
+            if (number <= LAST_DOUBLED_COIN_CHAPTER) {
+                1 shl (number - 1)
+            } else {
+                coinFactor(LAST_DOUBLED_COIN_CHAPTER) + COIN_FACTOR_STEP * (number - LAST_DOUBLED_COIN_CHAPTER)
+            }
 
         private fun bossRuleId(number: Int) = RULES_PER_CHAPTER * number
 

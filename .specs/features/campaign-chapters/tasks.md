@@ -372,7 +372,7 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 
 ---
 
-### T8: Coin drop formula [ ]
+### T8: Coin drop formula [x]
 
 **Owner**: kotlin-backend-dev
 **What**: `ChapterDefinition.dropRules(c)` uses the coin factor of Coin Drops (CHAP-09 AC 1 to 4).
@@ -407,7 +407,7 @@ Rows for the seeder test (chapters 1 to 5): 1 `(2,6)`, 2 `(8,20)`, 3 `(30,70)`, 
 **Gate**: full - `cd backend && ./gradlew test --tests '*ChapterTest' --tests '*ChapterSeederIT' --tests '*DropRuleRepositoryIT'`
 **Done when**:
 
-- [ ] The listed cases and the updated seeder test pass.
+- [x] The listed cases and the updated seeder test pass.
 
 **Commit**: `feat(backend): raise the coin drops with a per-chapter coin factor`
 
