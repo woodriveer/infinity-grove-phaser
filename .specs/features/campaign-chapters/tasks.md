@@ -227,7 +227,7 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 
 ---
 
-### T4: Damage numbers use the short format [ ]
+### T4: Damage numbers use the short format [x]
 
 **Owner**: game-dev
 **What**: `formatDamage` rounds as today, then abbreviates from 1 000 (CHAP-07 AC 1, 2, 5).
@@ -255,7 +255,7 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 4 new cases and the existing `formatDamage` cases pass.
+- [x] The 4 new cases and the existing `formatDamage` cases pass.
 
 **Commit**: `feat(game): abbreviate damage numbers from 1000`
 

@@ -101,6 +101,22 @@ describe('formatDamage', () => {
         expect(formatDamage(0.04)).toBe('0');
         expect(formatDamage(0.0450000001)).toBe('0');
     });
+
+    it('abbreviates 5000 to 5K', () => {
+        expect(formatDamage(5000)).toBe('5K');
+    });
+
+    it('rounds to 1000 first, so 999.96 reads 1K', () => {
+        expect(formatDamage(999.96)).toBe('1K');
+    });
+
+    it('keeps 999.94 at one decimal below 1000', () => {
+        expect(formatDamage(999.94)).toBe('999.9');
+    });
+
+    it('abbreviates 1234567 to 1.2M', () => {
+        expect(formatDamage(1234567)).toBe('1.2M');
+    });
 });
 
 describe('armor pierce', () => {

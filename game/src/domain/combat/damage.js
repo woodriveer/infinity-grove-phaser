@@ -1,4 +1,5 @@
 import { elementMultiplier, FIRE } from './elements';
+import { formatShort } from './numberFormat';
 
 export const PHYSICAL = 'PHYSICAL';
 export const MAGICAL = 'MAGICAL';
@@ -27,5 +28,10 @@ export const calculateDamage = ({ attacker = PLAYER, defender, random, boss = fa
     return { damage, critical };
 };
 
-//  The damage number on screen: at most one decimal, no trailing zero
-export const formatDamage = (damage) => String(Math.round(damage * 10) / 10);
+//  The damage number on screen: at most one decimal, no trailing zero; from 1 000 the short format (spec campaign-chapters)
+export const formatDamage = (damage) =>
+{
+    const rounded = Math.round(damage * 10) / 10;
+
+    return rounded >= 1000 ? formatShort(rounded) : String(rounded);
+};
