@@ -52,10 +52,12 @@ class FarmServiceTest {
     private val equipment = InMemoryEquipmentRepository()
     private var equipmentChance = SequenceChanceRoller(0.5)
     private val heroes = InMemoryHeroRepository(*HeroSeed.heroes().toTypedArray())
-    private val service get() =
+    private val service get() = farmWith(ChapterDefinition.first())
+
+    private fun farmWith(vararg chapters: ChapterDefinition) =
         FarmService(
             progresses,
-            InMemoryChapterRepository(ChapterDefinition.first()),
+            InMemoryChapterRepository(*chapters),
             users,
             playerCards,
             CardRewards(heroes, chance, rates, clock),
@@ -122,6 +124,16 @@ class FarmServiceTest {
         val bosses = service.state("yan").bosses
         assertEquals(11, bosses.size)
         assertEquals(chapterBoss, bosses.last())
+    }
+
+    @Test
+    fun `a player in chapter 6 farms the minibosses of chapter 6 that were passed`() {
+        player(Progress("yan", ProgressPosition(6, 4, Encounter.PHASE, 1)))
+
+        val bosses = farmWith(ChapterDefinition.of(5), ChapterDefinition.of(6)).state("yan").bosses
+
+        assertEquals(listOf(1, 2, 3), bosses.map { it.stage })
+        assertEquals(List(3) { Encounter.MINIBOSS }, bosses.map { it.kind })
     }
 
     @Test
