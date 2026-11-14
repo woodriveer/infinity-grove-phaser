@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/campaign-chapters/spec.md`
 **Design**: `.specs/features/campaign-chapters/design.md`
-**Status**: Draft
+**Status**: Approved (owner, 2026-11-14; the campaign keeps 15 chapters)
 
 Rules for every task:
 
@@ -190,7 +190,7 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 
 ---
 
-### T3: Short number formatter [ ]
+### T3: Short number formatter [x]
 
 **Owner**: game-dev
 **What**: A pure `formatShort` that abbreviates values of 1 000 or more with K, M, B, T (CHAP-07 AC 1, 3).
@@ -220,8 +220,8 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 16 cases pass.
-- [ ] The architecture test of the game (imports point inward) passes.
+- [x] The 16 cases pass.
+- [x] The architecture test of the game (imports point inward) passes.
 
 **Commit**: `feat(game): add the short number format`
 
