@@ -544,7 +544,7 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 
 ---
 
-### T12: e2e of the player-visible changes [ ]
+### T12: e2e of the player-visible changes [x]
 
 **Owner**: test-engineer
 **What**: One Playwright file that proves, on the real page, chapter 6 after the chapter 5 boss, completion at 15, the reset label past 5, and `K` on the HP text and a damage number (CHAP-03, CHAP-06 AC 3, CHAP-07 AC 4, 5).
@@ -577,7 +577,7 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 **Gate**: full - `cd game && npx playwright test e2e/campaignChapters.spec.js`
 **Done when**:
 
-- [ ] The 6 tests pass three runs in a row (`--repeat-each=3`).
+- [x] The 6 tests pass three runs in a row (`--repeat-each=3`).
 
 **Commit**: `test(game): cover chapters past 5 and the short number format end to end`
 
