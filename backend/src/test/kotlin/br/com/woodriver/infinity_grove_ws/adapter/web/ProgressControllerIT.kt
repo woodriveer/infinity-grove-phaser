@@ -218,6 +218,12 @@ class ProgressControllerIT : IntegrationTestBase() {
             .body("stage", equalTo(1))
             .body("encounter", equalTo("PHASE"))
             .body("completed", equalTo(false))
+            .body("definition.bossHealth", equalTo(1_024_000))
+            .body("definition.bossTimeLimitMs", equalTo(60_000))
+            .body("definition.bossDropRuleId", equalTo(18))
+            .body("definition.boss.physicalDefense", equalTo(53))
+            .body("definition.stages.size()", equalTo(10))
+            .body("definition.stages[0].monsterHealth", equalTo(20_480))
         assertEquals(6, jpaProgressRepository.findById("yan").get().chapter)
     }
 
@@ -233,6 +239,7 @@ class ProgressControllerIT : IntegrationTestBase() {
             .body("stage", equalTo(1))
             .body("encounter", equalTo("PHASE"))
             .body("phase", equalTo(1))
+            .body("completed", equalTo(false))
             .body("definition.bossHealth", equalTo(1_024_000))
     }
 
