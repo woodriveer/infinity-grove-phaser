@@ -413,7 +413,7 @@ Rows for the seeder test (chapters 1 to 5): 1 `(2,6)`, 2 `(8,20)`, 3 `(30,70)`, 
 
 ---
 
-### T9: Data migration of the coin drops of chapters 1 to 5 [ ]
+### T9: Data migration of the coin drops of chapters 1 to 5 [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Move every drop rule of chapters 1 to 5 that still holds its old seeded range to the new range; leave tuned rules alone (CHAP-09 AC 5, 6, 7).
@@ -462,7 +462,7 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 **Gate**: full - `cd backend && ./gradlew test --tests '*CoinDropMigrationIT' --tests '*SchemaValidationIT'`
 **Done when**:
 
-- [ ] The four cases pass.
+- [x] The four cases pass.
 
 **Commit**: `feat(backend): move the seeded coin drops of chapters 1 to 5 to the new ranges`
 
