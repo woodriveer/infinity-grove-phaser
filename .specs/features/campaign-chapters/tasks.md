@@ -653,7 +653,7 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 
 ---
 
-### T14: Contract migration drops the legacy health columns [ ]
+### T14: Contract migration drops the legacy health columns [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Step C. Drop the three `integer` health columns and make the hit point columns `not null` (CHAP-08 AC 1).
@@ -723,9 +723,9 @@ alter table stages alter column miniboss_hit_points set not null;
 **Gate**: full - `cd backend && ./gradlew test`
 **Done when**:
 
-- [ ] The backend suite passes, `SchemaValidationIT` included.
-- [ ] `cd backend && ./gradlew build` passes.
-- [ ] `grep -rnE "(boss|monster|miniboss)_health([^_]|$)" backend/src/main/kotlin backend/src/test` prints only the query line of `the legacy health columns are gone`.
+- [x] The backend suite passes, `SchemaValidationIT` included.
+- [x] `cd backend && ./gradlew build` passes.
+- [x] `grep -rnE "(boss|monster|miniboss)_health([^_]|$)" backend/src/main/kotlin backend/src/test` prints only the query line of `the legacy health columns are gone`.
 - [ ] The commit is pushed alone, after the T13 deploy is `active.commit` with `previous` null.
 
 **Commit**: `feat(backend): drop the legacy 32-bit health columns`

@@ -16,11 +16,10 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * AD-016: the backend deployed before the current one must keep starting and serving on this database. The schema check and Flyway's
- * validation replay the release before 64-bit health (commit `91e3111`), whose columns stay until V10. The read and write paths replay
- * the release before T13 (commit `e57f60c`, the rollback target), which maps the legacy integer health columns as nullable next to the
- * hit points: a database seeded after T13 holds null in the legacy columns, which `91e3111` cannot read. Booting a previous image itself
- * is not executed here.
+ * AD-016: the release before V10 (the T13 commit) must keep starting and serving on the database after V10. Its entities are the
+ * current ones (SchemaValidationIT); these checks replay its column types, its read and write paths and Flyway's validation of its own
+ * migrations V1 to V9. Compatibility with the release before 64-bit health (commit `91e3111`) ended by design at V10, which drops the
+ * legacy integer health columns it maps. Booting the previous image itself is not executed here.
  */
 class PreviousBackendCompatibilityIT : IntegrationTestBase() {
     @Autowired
@@ -64,7 +63,7 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
                 "chapters" to
                     mapOf(
                         "number" to "integer",
-                        "boss_health" to "integer",
+                        "boss_hit_points" to "bigint",
                         "boss_time_limit_ms" to "bigint",
                         "boss_enemy_id" to "bigint",
                         "boss_drop_rule_id" to "integer",
@@ -75,8 +74,8 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
                         "chapter" to "integer",
                         "number" to "integer",
                         "phases_per_stage" to "integer",
-                        "monster_health" to "integer",
-                        "miniboss_health" to "integer",
+                        "monster_hit_points" to "bigint",
+                        "miniboss_hit_points" to "bigint",
                         "miniboss_time_limit_ms" to "bigint",
                         "monster_enemy_id" to "bigint",
                         "miniboss_enemy_id" to "bigint",
@@ -147,12 +146,10 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `the previous backend writes the health and the drop rule columns`() {
-        val legacyBefore = jdbc.queryForObject("select boss_health from chapters where number = 1", Int::class.java)
+    fun `the previous backend writes the hit points and the drop rule columns`() {
         rolledBack {
-            assertEquals(1, jdbc.update("update chapters set boss_hit_points = ?, boss_health = ? where number = ?", 3_000L, 3_000, 1))
+            assertEquals(1, jdbc.update("update chapters set boss_hit_points = ? where number = ?", 3_000L, 1))
             assertEquals(3_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 1", Long::class.java))
-            assertEquals(3_000, jdbc.queryForObject("select boss_health from chapters where number = 1", Int::class.java))
             assertEquals(
                 1,
                 jdbc.update(
@@ -167,12 +164,11 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
         }
 
         assertEquals(2_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 1", Long::class.java))
-        assertEquals(legacyBefore, jdbc.queryForObject("select boss_health from chapters where number = 1", Int::class.java))
         assertEquals(16, jdbc.queryForObject("select min_copper from drop_rules where id = 5", Int::class.java))
     }
 
     @Test
-    fun `the previous release starts on the migrated schema and its validation ignores V8 and V9`() {
+    fun `the previous release starts on the migrated schema and its validation ignores V10`() {
         Flyway
             .configure()
             .dataSource(dataSource)
@@ -197,7 +193,7 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
             previous.validate()
             assertEquals(0, previous.migrate().migrationsExecuted)
             assertEquals(
-                listOf(MigrationState.FUTURE_SUCCESS, MigrationState.FUTURE_SUCCESS),
+                listOf(MigrationState.FUTURE_SUCCESS),
                 previous
                     .info()
                     .all()
@@ -209,7 +205,7 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
         }
     }
 
-    /** The migrations of the previous release: the files of `V1` to `V7`, which are unchanged since commit `91e3111`. */
+    /** The migrations of the previous release: the files of `V1` to `V9`, which are unchanged since the T13 commit. */
     private fun previousMigrations(): Path {
         val dir = Files.createTempDirectory("previous-release-migrations")
         PathMatchingResourcePatternResolver()
@@ -223,6 +219,6 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
 
     private companion object {
         const val PREVIOUS_SCHEMA = "previous_backend_check"
-        const val PREVIOUS_LAST_VERSION = 7
+        const val PREVIOUS_LAST_VERSION = 9
     }
 }

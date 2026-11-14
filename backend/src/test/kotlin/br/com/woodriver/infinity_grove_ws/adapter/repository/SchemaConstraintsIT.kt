@@ -45,11 +45,11 @@ class SchemaConstraintsIT : IntegrationTestBase() {
     ) = jdbc.queryForObject("select count(*) from $table where username = ?", Int::class.java, username)
 
     private val stageInsert =
-        "insert into stages (id, chapter, number, phases_per_stage, monster_health, miniboss_health, miniboss_time_limit_ms, " +
+        "insert into stages (id, chapter, number, phases_per_stage, monster_hit_points, miniboss_hit_points, miniboss_time_limit_ms, " +
             "monster_enemy_id, miniboss_enemy_id, monster_drop_rule_id, miniboss_drop_rule_id) values ('1/99', ?, 99, 5, 10, 50, 30000, ?, ?, ?, ?)"
 
     private val chapterInsert =
-        "insert into chapters (number, boss_health, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) values (99, 300, 60000, ?, ?)"
+        "insert into chapters (number, boss_hit_points, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) values (99, 300, 60000, ?, ?)"
 
     @Test
     fun `flyway applied V1 and recorded it in its history`() {
@@ -200,15 +200,15 @@ class SchemaConstraintsIT : IntegrationTestBase() {
         }
         val probe = Probe(probeEnemy(11), probeEnemy(12), probeEnemy(13))
         jdbc.update(
-            "insert into chapters (number, boss_health, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) values (99, 300, 60000, ?, 901)",
+            "insert into chapters (number, boss_hit_points, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) values (99, 300, 60000, ?, 901)",
             probe.bossEnemy,
         )
         jdbc.update(
-            "insert into chapters (number, boss_health, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) values (98, 300, 60000, ?, 3)",
+            "insert into chapters (number, boss_hit_points, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) values (98, 300, 60000, ?, 3)",
             enemy,
         )
         jdbc.update(
-            "insert into stages (id, chapter, number, phases_per_stage, monster_health, miniboss_health, miniboss_time_limit_ms, " +
+            "insert into stages (id, chapter, number, phases_per_stage, monster_hit_points, miniboss_hit_points, miniboss_time_limit_ms, " +
                 "monster_enemy_id, miniboss_enemy_id, monster_drop_rule_id, miniboss_drop_rule_id) " +
                 "values ('98/1', 98, 1, 5, 10, 50, 30000, ?, ?, 902, 903)",
             probe.monsterEnemy,

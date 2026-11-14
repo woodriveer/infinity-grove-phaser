@@ -90,28 +90,14 @@ class ChapterRepositoryIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `a chapter boss of 3000000000 health round-trips and leaves the legacy column null`() {
+    fun `a chapter boss of 3000000000 health round-trips in the hit point column`() {
         repository.save(chapter(bossHealth = 3_000_000_000L))
 
         assertEquals(3_000_000_000L, repository.findByNumber(number)!!.bossHealth)
-        assertNull(jdbc.queryForObject("select boss_health from chapters where number = ?", Int::class.java, number))
         assertEquals(
             3_000_000_000L,
             jdbc.queryForObject("select boss_hit_points from chapters where number = ?", Long::class.java, number),
         )
-    }
-
-    @Test
-    fun `a chapter saved now leaves the legacy health columns null`() {
-        repository.save(ChapterDefinition(99, 3000L, 61_000, listOf(StageDefinition(1, 1, 1, 1, 1000))))
-
-        try {
-            assertNull(jdbc.queryForObject("select boss_health from chapters where number = 99", Int::class.java))
-            assertEquals(3000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 99", Long::class.java))
-        } finally {
-            jpaStageRepository.deleteAll(jpaStageRepository.findAllByChapterOrderByNumber(99))
-            jpaChapterRepository.deleteById(99)
-        }
     }
 
     @Test
@@ -172,16 +158,16 @@ class ChapterRepositoryIT : IntegrationTestBase() {
                 Long::class.java,
             )
         jdbc.update(
-            "insert into chapters (number, boss_health, boss_hit_points, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) " +
-                "values (?, 5, 5, 1000, ?, 3)",
+            "insert into chapters (number, boss_hit_points, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) " +
+                "values (?, 5, 1000, ?, 3)",
             number,
             boss,
         )
         jdbc.update(
-            "insert into stages (id, chapter, number, phases_per_stage, monster_health, monster_hit_points, miniboss_health, " +
-                "miniboss_hit_points, miniboss_time_limit_ms, monster_enemy_id, miniboss_enemy_id, " +
+            "insert into stages (id, chapter, number, phases_per_stage, monster_hit_points, miniboss_hit_points, " +
+                "miniboss_time_limit_ms, monster_enemy_id, miniboss_enemy_id, " +
                 "monster_drop_rule_id, miniboss_drop_rule_id) " +
-                "values (?, ?, 1, 1, 1, 1, 1, 1, 1000, ?, ?, 1, 2)",
+                "values (?, ?, 1, 1, 1, 1, 1000, ?, ?, 1, 2)",
             "$number/1",
             number,
             monster,
