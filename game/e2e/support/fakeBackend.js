@@ -115,7 +115,8 @@ const AUTO_CLICK_PRICES = [ 10, 25, 50, 100 ];
 
 const chapterElements = (start) => [ start, TRIAD_HITS[start], TRIAD_HITS[TRIAD_HITS[start]], 'DARKNESS', 'LIGHT' ];
 const heroOfElement = (element) => HEROES.find((hero) => hero.element === element);
-const heroOfChapter = (start, chapter) => heroOfElement(chapterElements(start)[Math.min(chapter, 5) - 1]);
+//  Chapters 6 to 15 repeat the element order of chapters 1 to 5 (spec campaign-chapters, Q16)
+const heroOfChapter = (start, chapter) => heroOfElement(chapterElements(start)[(chapter - 1) % 5]);
 const utcDay = () => new Date().toISOString().slice(0, 10);
 
 //  A new player holds one blank card of the hero of the starting element, who leads
@@ -537,7 +538,7 @@ export async function mockBackend (page, {
         const first = chapterBoss && !cards.cleared.has(chapter);
         const hero = encounter === 'MINIBOSS'
             ? (nextChance() < MINIBOSS_RATE ? heroOfChapter(cards.start, chapter) : null)
-            : (first || nextChance() < CHAPTER_BOSS_RATE ? heroOfChapter(cards.start, chapter + 1) : null);
+            : (first || nextChance() < CHAPTER_BOSS_RATE ? heroOfChapter(cards.start, Math.min(chapter + 1, 15)) : null);
 
         if (chapterBoss) {
             cards.cleared.add(chapter);

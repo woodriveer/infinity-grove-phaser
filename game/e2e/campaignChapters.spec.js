@@ -94,6 +94,28 @@ test.describe('Campaign chapters', () => {
         expect(await health(page)).toBe(2000);
     });
 
+    test('the chapter 6 boss drops the NATURE hero of chapter 7', async ({ page }) => {
+        const { menu } = await startGame(page, {
+            progress: { chapter: 6, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1 }, lastChapter: 15
+        });
+        const outcome = page.waitForResponse((response) => response.url().endsWith('/progress/outcome'));
+
+        await menu.canvas.click();
+
+        expect((await (await outcome).json()).drop).toMatchObject({ heroId: 'lyra', stars: 0 });
+    });
+
+    test('the chapter 14 boss drops the LIGHT hero of chapter 15', async ({ page }) => {
+        const { menu } = await startGame(page, {
+            progress: { chapter: 14, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1 }, lastChapter: 15
+        });
+        const outcome = page.waitForResponse((response) => response.url().endsWith('/progress/outcome'));
+
+        await menu.canvas.click();
+
+        expect((await (await outcome).json()).drop).toMatchObject({ heroId: 'seraphine', stars: 0 });
+    });
+
     test('a click of 5000 damage shows 5K', async ({ page }) => {
         const { menu } = await startGame(page, {
             progress: { chapter: 1, stage: 1, encounter: 'PHASE', phase: 1 },
