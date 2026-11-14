@@ -1754,20 +1754,12 @@ button:disabled {
     box-shadow: var(--btn-shadow);
 }
 
-.equip-button:hover:not(:disabled) {
-    filter: brightness(1.15);
-}
-
 .equip-button[data-testid="piece-refine"] {
     color: var(--parchment-100);
     background: var(--btn-primary-bg);
     border-color: var(--gold-400);
     box-shadow: var(--btn-shadow);
     background-color: var(--ember-700);
-}
-
-.equip-button[data-testid="piece-refine"]:hover:not(:disabled) {
-    filter: brightness(1.15);
 }
 
 /* ══ Element wheel: the triad fire > nature > water > fire, and the light and darkness pair ══ */
@@ -2372,6 +2364,26 @@ button:disabled {
     color: var(--color-neutral-700);
 }
 
+/* The comparison with the piece the leader wears: gains and losses also differ by the arrow, not by colour alone */
+.piece-tooltip-compare {
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: var(--inset-border);
+    font-weight: 700;
+}
+
+.piece-tooltip-delta {
+    font-weight: 700;
+}
+
+.piece-tooltip-delta.is-gain {
+    color: #2c5e1e;
+}
+
+.piece-tooltip-delta.is-loss {
+    color: var(--ember-800);
+}
+
 /* The transfer of a set and its notice */
 
 .equip-hero-heading {
@@ -2514,11 +2526,6 @@ button:disabled {
     border-color: var(--gold-400);
     box-shadow: var(--btn-shadow);
     background-color: var(--ember-700);
-}
-
-.bulk-sell-submit:hover:not(:disabled),
-.bulk-sell-yes:hover:not(:disabled) {
-    filter: brightness(1.15);
 }
 
 .bulk-sell-question {

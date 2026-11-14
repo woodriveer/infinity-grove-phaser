@@ -1,10 +1,11 @@
-import { pieceLines, pieceTitle } from '../../../domain/equipment/equipment';
+import { compareLines, pieceLines, pieceTitle } from '../../../domain/equipment/equipment';
 import { el } from './dom';
 
 const MARGIN = 8;
 
 //  The tooltip of a piece: its title, the weapon line and one line per affix, and where it is (`Equipado em <nome>` or `Na mochila`). No button.
-export const renderPieceTooltip = (piece, heroes) =>
+//  `compare` = { hero, worn } adds what the player gains (▲) and loses (▼) by equipping the piece on `hero` in place of `worn` (null: empty slot).
+export const renderPieceTooltip = (piece, heroes, compare = null) =>
 {
     const owner = heroes.find((hero) => hero.id === piece.heroId);
     const tooltip = el('div', 'piece-tooltip', '', { testid: 'piece-tooltip' });
@@ -12,6 +13,14 @@ export const renderPieceTooltip = (piece, heroes) =>
     tooltip.append(el('strong', 'piece-tooltip-title', pieceTitle(piece)));
     pieceLines(piece).forEach((line) => tooltip.append(el('div', 'piece-tooltip-line', line)));
     tooltip.append(el('div', 'piece-tooltip-worn', owner ? `Equipado em ${owner.name}` : 'Na mochila'));
+
+    if (compare)
+    {
+        const lines = compareLines(piece, compare.worn);
+
+        tooltip.append(el('div', 'piece-tooltip-compare', lines.length > 0 ? `Ao equipar em ${compare.hero.name}:` : `Igual à peça de ${compare.hero.name}`));
+        lines.forEach(({ text, gain }) => tooltip.append(el('div', `piece-tooltip-delta ${gain ? 'is-gain' : 'is-loss'}`, `${gain ? '▲' : '▼'} ${text}`)));
+    }
 
     return tooltip;
 };
@@ -30,7 +39,7 @@ export const tooltipPlace = ({ tile, host, tooltip, scale }) =>
 
 //  Shows the tooltip of `piece` while the pointer is on `tile` and hides it when it leaves. It lives in the `.hero-panel` (outside the scroll
 //  area of the window, so it is never clipped); a tile that is not in a panel holds it itself.
-export const attachPieceTooltip = (tile, piece, heroes) =>
+export const attachPieceTooltip = (tile, piece, heroes, compare = null) =>
 {
     let tooltip = null;
 
@@ -54,7 +63,7 @@ export const attachPieceTooltip = (tile, piece, heroes) =>
     tile.addEventListener('pointerenter', () =>
     {
         hide();
-        tooltip = renderPieceTooltip(piece, heroes);
+        tooltip = renderPieceTooltip(piece, heroes, compare);
         document.addEventListener('pointermove', guard, true);
 
         const host = tile.closest('.hero-panel');

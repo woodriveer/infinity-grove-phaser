@@ -433,10 +433,10 @@ test.describe('Grove theme', () => {
         await expect(page.getByTestId('piece-refine')).toBeEnabled();
         await expectStyle(page.getByTestId('piece-refine'), EMBER_PILL);
         await expectStyle(page.getByTestId('piece-refine'), QUIET);
-        //  UIR-02 AC9: the hover brightens them. AC10 (press) is not asserted on the three: the hover rule of style.css:1757 overrides the press rule of :196
-        await expectHoverShade(page.locator('[data-testid^="piece-equip-"]').first());
-        await expectHoverShade(page.getByTestId('piece-sell'));
-        await expectHoverShade(page.getByTestId('piece-refine'));
+        //  UIR-02 AC9 and AC10: each one brightens under the pointer and darkens while pressed
+        await expectShades(page, page.locator('[data-testid^="piece-equip-"]').first());
+        await expectShades(page, page.getByTestId('piece-sell'));
+        await expectShades(page, page.getByTestId('piece-refine'));
     });
 
     test('draws the bag button to the fusion and the bulk sale confirmation as ember pills', async ({ page }) => {
@@ -454,10 +454,9 @@ test.describe('Grove theme', () => {
         await page.getByTestId('equip-piece-c1').click();
         await page.getByTestId('bulk-sell-submit').click();
 
-        //  UIR-02 AC9: the hover brightens it. AC10 (press) is not asserted: the hover rule of style.css:2520 overrides the press rule of :197
         await expectStyle(page.getByTestId('bulk-sell-confirm-yes'), EMBER_PILL);
         await expectStyle(page.getByTestId('bulk-sell-confirm-yes'), QUIET);
-        await expectHoverShade(page.getByTestId('bulk-sell-confirm-yes'));
+        await expectShades(page, page.getByTestId('bulk-sell-confirm-yes'));
     });
 
     test('brightens a hovered button and darkens a pressed one', async ({ page }) => {

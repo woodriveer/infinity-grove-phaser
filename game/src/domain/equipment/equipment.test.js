@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { PLAYER } from '../combat/damage';
 import {
-    applyEquipmentDrop, attackerFor, bossTimeBonusMs, describeAffix, describeClickDamage, dropLabel, formatCopper, pieceLines, pieceTitle, walletCopper, wornBy
+    applyEquipmentDrop, attackerFor, bossTimeBonusMs, compareLines, describeAffix, describeClickDamage, dropLabel, formatCopper, pieceLines, pieceTitle, walletCopper, wornBy
 } from './equipment';
 
 const piece = (extra = {}) => ({
@@ -189,5 +189,22 @@ describe('pieceLines', () => {
 
     it('keeps one decimal with a trailing zero on a weapon', () => {
         expect(pieceLines(weapon(3, []))).toEqual([ 'Dano de clique: 3.0' ]);
+    });
+});
+
+describe('compareLines', () => {
+    it('lists what is gained and lost against the worn piece, and nothing for the numbers that are equal', () => {
+        const worn = weapon(3, [ affix('CRIT_CHANCE', 6), affix('BOSS_TIME_SECONDS', 2) ]);
+        const next = weapon(4.2, [ affix('CRIT_CHANCE', 2), affix('BOSS_TIME_SECONDS', 2), affix('CLICK_DAMAGE_PCT', 7) ]);
+
+        expect(compareLines(next, worn)).toEqual([
+            { text: 'Dano de clique +1.2', gain: true },
+            { text: 'Dano de clique +7%', gain: true },
+            { text: 'Chance de crítico −4%', gain: false }
+        ]);
+    });
+
+    it('counts every number as a gain against an empty slot', () => {
+        expect(compareLines(piece({ affixes: [ affix('CRIT_DAMAGE_PCT', 27) ] }))).toEqual([ { text: 'Dano crítico +27%', gain: true } ]);
     });
 });

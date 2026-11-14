@@ -132,6 +132,23 @@ describe('renderEquipment tiles and tooltip', () => {
         expect(screen.querySelector('.piece-tooltip-worn').textContent).toBe('Equipado em Hero kael');
     });
 
+    it('compares a piece with the one the leader wears in that slot, and shows no comparison on the piece of the leader', () => {
+        const worn = weapon({ id: 'w0', heroId: 'kael', clickDamage: 6, affixes: [ { type: 'CRIT_DAMAGE_PCT', value: 20 } ] });
+        const screen = renderEquipment([ worn, weapon() ], heroes, { onSelect: vi.fn(), leaderId: 'kael' });
+
+        enter(tile(screen, 'equip-piece-w1'));
+
+        expect(screen.querySelector('.piece-tooltip-compare').textContent).toBe('Ao equipar em Hero kael:');
+        expect([ ...screen.querySelectorAll('.piece-tooltip-delta') ].map((line) => [ line.textContent, line.classList.contains('is-gain') ])).toEqual([
+            [ '▼ Dano de clique −0.8', false ], [ '▲ Dano crítico +7%', true ], [ '▲ Tempo extra de chefe +2s', true ]
+        ]);
+
+        enter(tile(screen, 'equip-slot-kael-WEAPON'));
+
+        expect(tile(screen, 'equip-slot-kael-WEAPON').querySelector('.piece-tooltip')).not.toBeNull();
+        expect(tile(screen, 'equip-slot-kael-WEAPON').querySelector('.piece-tooltip-compare')).toBeNull();
+    });
+
     it('has no weapon line for a ring: only its affix lines', () => {
         const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn() });
 

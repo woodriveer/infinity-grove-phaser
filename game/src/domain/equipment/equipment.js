@@ -29,6 +29,21 @@ export const pieceLines = (piece) => [
     ...piece.affixes.map(describeAffix)
 ];
 
+//  What changes when `piece` takes the place of `worn` (the piece of the same slot, or nothing): one { text, gain } per number that differs,
+//  the weapon click damage first, then the affixes. "Dano de clique +1.2", "Chance de crítico −4%"
+export const compareLines = (piece, worn = null) =>
+{
+    const delta = (text, unit, now, before) => ({ text, unit, value: Number((now - before).toFixed(1)) });
+
+    return [
+        { ...delta('Dano de clique', '', piece.clickDamage ?? 0, worn?.clickDamage ?? 0), decimals: 1 },
+        ...Object.entries(AFFIXES).map(([ type, { label, unit } ]) => delta(label, unit, sumOf([ piece ], type), worn ? sumOf([ worn ], type) : 0))
+    ].filter(({ value }) => value !== 0).map(({ text, unit, value, decimals }) => ({
+        text: `${text} ${value > 0 ? '+' : '−'}${decimals ? Math.abs(value).toFixed(decimals) : Math.abs(value)}${unit}`,
+        gain: value > 0
+    }));
+};
+
 //  "Raro Arma +3": the title of a piece on the screens
 export const pieceTitle = (piece) => `${RARITY_LABELS[piece.rarity]} ${SLOT_LABELS[piece.slot]} +${piece.refine}`;
 

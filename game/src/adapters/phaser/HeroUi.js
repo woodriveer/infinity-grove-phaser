@@ -365,6 +365,7 @@ export class HeroUi
         {
             this.body.replaceChildren(renderEquipment(this.equipment.pieces(), owned, {
                 stats,
+                leaderId: this.heroes.leaderId(),
                 notice,
                 sellNotice,
                 busy: this.equipBusy,

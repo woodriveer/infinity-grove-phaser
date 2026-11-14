@@ -71,8 +71,9 @@ export const renderEquipmentUnavailable = () => el('p', 'hero-empty', UNAVAILABL
 //  `notice` is a line shown at the top (the result of a transfer); `sellNotice` is the line of the last bulk sale, under it; `busy` disables every button while a request runs.
 //  `onStartSelling()` fires for `Vender várias`. `selection` is null (mode off) or { ids: Set<string>, confirming, onToggle(piece), onRarity(rarity), onSubmit(),
 //  onCancel(), onConfirm(), onDecline() }: a bag click toggles its piece, the worn pieces are locked, the selection bar is shown and the button `Transferir conjunto` is hidden (its place stays).
+//  `leaderId` is the leader: the tooltip of a piece it does not wear compares it with the piece the leader wears in that slot (only the leader fights).
 //  `onDrop(piece, heroId)` fires when a bag or worn piece is dragged onto the block of another owned hero (spec drag-equip); no tile is draggable in selection mode.
-export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, onStartSelling, onDrop, stats = null, notice = null, sellNotice = null, busy = false, selection = null }) =>
+export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, onStartSelling, onDrop, leaderId = null, stats = null, notice = null, sellNotice = null, busy = false, selection = null }) =>
 {
     if (pieces.length === 0)
     {
@@ -125,7 +126,11 @@ export const renderEquipment = (pieces, heroes, { onSelect, onTransfer, onStartS
 
         if (!selection)
         {
-            attachPieceTooltip(tile, piece, heroes);
+            const leader = piece.heroId === leaderId ? null : heroes.find((hero) => hero.id === leaderId);
+
+            attachPieceTooltip(tile, piece, heroes, leader
+                ? { hero: leader, worn: pieces.find((other) => other.heroId === leaderId && other.slot === piece.slot) ?? null }
+                : null);
 
             if (onDrop)
             {
