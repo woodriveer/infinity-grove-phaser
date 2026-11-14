@@ -528,6 +528,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md gap 2 (ClickerGame.test.js:4611) (game)
 - last seen: 2026-11-14T07:27:40Z
 
+### L-087 - Pin every stage of each chapter range the spec keeps unchanged, not only the stages a table lists
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: campaign-chapters
+- evidence: backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterTest.kt:397-399 (mutant F4, Chapter.kt:161) (tests)
+- last seen: 2026-11-14T11:27:17Z
+
+### L-088 - Write the per-stage enemy formula into the acceptance criterion when a rule says keep the existing rotation, so tests pin a spec value
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: campaign-chapters
+- evidence: backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterTest.kt:388-391 (spec)
+- last seen: 2026-11-14T11:27:17Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

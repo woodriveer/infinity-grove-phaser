@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 87,
+  "next_id": 89,
   "lessons": [
     {
       "id": "L-001",
@@ -1556,6 +1556,42 @@
       ],
       "created": "2026-11-14T07:27:40Z",
       "last_seen": "2026-11-14T07:27:40Z"
+    },
+    {
+      "id": "L-087",
+      "key": "surviving_mutant::pin every stage of each chapter range the spec keeps unchanged not only the stages a table lists",
+      "text": "Pin every stage of each chapter range the spec keeps unchanged, not only the stages a table lists",
+      "signal": "surviving_mutant",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "campaign-chapters"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterTest.kt:397-399 (mutant F4, Chapter.kt:161) (tests)"
+      ],
+      "created": "2026-11-14T11:27:17Z",
+      "last_seen": "2026-11-14T11:27:17Z"
+    },
+    {
+      "id": "L-088",
+      "key": "spec_precision_gap::write the per stage enemy formula into the acceptance criterion when a rule says keep the existing rotation so tests pin a spec value",
+      "text": "Write the per-stage enemy formula into the acceptance criterion when a rule says keep the existing rotation, so tests pin a spec value",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "campaign-chapters"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterTest.kt:388-391 (spec)"
+      ],
+      "created": "2026-11-14T11:27:17Z",
+      "last_seen": "2026-11-14T11:27:17Z"
     }
   ]
 }
