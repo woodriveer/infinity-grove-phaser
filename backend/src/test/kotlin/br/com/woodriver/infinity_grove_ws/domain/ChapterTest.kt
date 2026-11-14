@@ -300,4 +300,55 @@ class ChapterTest {
         assertEquals(3_000_000_000L, stage.monsterHealth)
         assertEquals(15_000_000_000L, stage.minibossHealth)
     }
+
+    /** One row of the Chapter Table of the spec, every column. */
+    private data class ChapterTableRow(
+        val chapter: Int,
+        val factor: Long,
+        val bossHealth: Long,
+        val phaseHealthStage1: Long,
+        val phaseHealthStage10: Long,
+        val minibossHealthStage10: Long,
+        val bonus: Int,
+        val bossDefenses: Int,
+        val bossCritResistance: Int,
+        val minibossDefensesStage10: Int,
+        val minibossCritResistanceStage10: Int,
+    )
+
+    private val chapterTable =
+        listOf(
+            ChapterTableRow(6, 512, 1_024_000, 20_480, 38_912, 194_560, 23, 53, 53, 43, 53),
+            ChapterTableRow(7, 1_024, 2_048_000, 40_960, 77_824, 389_120, 26, 56, 56, 46, 56),
+            ChapterTableRow(8, 2_048, 4_096_000, 81_920, 155_648, 778_240, 29, 59, 59, 49, 59),
+            ChapterTableRow(9, 4_096, 8_192_000, 163_840, 311_296, 1_556_480, 32, 62, 62, 52, 62),
+            ChapterTableRow(10, 8_192, 16_384_000, 327_680, 622_592, 3_112_960, 35, 65, 65, 55, 65),
+            ChapterTableRow(11, 16_384, 32_768_000, 655_360, 1_245_184, 6_225_920, 38, 68, 68, 58, 68),
+            ChapterTableRow(12, 32_768, 65_536_000, 1_310_720, 2_490_368, 12_451_840, 41, 71, 70, 61, 70),
+            ChapterTableRow(13, 65_536, 131_072_000, 2_621_440, 4_980_736, 24_903_680, 44, 74, 70, 64, 70),
+            ChapterTableRow(14, 131_072, 262_144_000, 5_242_880, 9_961_472, 49_807_360, 47, 77, 70, 67, 70),
+            ChapterTableRow(15, 262_144, 524_288_000, 10_485_760, 19_922_944, 99_614_720, 50, 80, 70, 70, 70),
+        )
+
+    @Test
+    fun `every row of the chapter table holds for chapters 6 to 15`() {
+        chapterTable.forEach { row ->
+            val c = row.chapter
+            val chapter = ChapterDefinition.of(c)
+            val miniboss = chapter.stage(10).miniboss
+
+            assertEquals(row.factor, ChapterDefinition.healthFactor(c), "chapter $c factor")
+            assertEquals(row.bonus, ChapterDefinition.defenseBonus(c), "chapter $c bonus")
+            assertEquals(row.bossHealth, chapter.bossHealth, "chapter $c boss health")
+            assertEquals(row.phaseHealthStage1, chapter.stage(1).monsterHealth, "chapter $c phase health stage 1")
+            assertEquals(row.phaseHealthStage10, chapter.stage(10).monsterHealth, "chapter $c phase health stage 10")
+            assertEquals(row.minibossHealthStage10, chapter.stage(10).minibossHealth, "chapter $c miniboss health stage 10")
+            assertEquals(row.bossDefenses, chapter.boss.physicalDefense, "chapter $c boss physical defense")
+            assertEquals(row.bossDefenses, chapter.boss.magicalDefense, "chapter $c boss magical defense")
+            assertEquals(row.bossCritResistance, chapter.boss.critResistance, "chapter $c boss crit resistance")
+            assertEquals(row.minibossDefensesStage10, miniboss.physicalDefense, "chapter $c miniboss physical defense stage 10")
+            assertEquals(row.minibossDefensesStage10, miniboss.magicalDefense, "chapter $c miniboss magical defense stage 10")
+            assertEquals(row.minibossCritResistanceStage10, miniboss.critResistance, "chapter $c miniboss crit resistance stage 10")
+        }
+    }
 }
