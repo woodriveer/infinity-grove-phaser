@@ -83,6 +83,10 @@ data class ChapterDefinition(
         private const val BOSS_DEFENSE = 30
         private const val BOSS_CRIT_RESISTANCE = 30
         private const val DEFENSE_PER_CHAPTER = 5
+        private const val DEFENSE_PER_CHAPTER_FROM_6 = 3
+        private const val LAST_QUADRUPLED_CHAPTER = 5
+        private const val MAX_SEEDED_DEFENSE = 80
+        private const val MAX_SEEDED_CRIT_RESISTANCE = 70
         private const val RULES_PER_CHAPTER = 3
         private const val MONSTER_MIN_COPPER = 1
         private const val MONSTER_MAX_COPPER = 5
@@ -109,8 +113,24 @@ data class ChapterDefinition(
 
         private fun monsterRuleId(number: Int) = bossRuleId(number) - 2
 
-        /** How many times the health of chapter 1 the monsters of chapter [number] have: it multiplies by 4 each chapter (1, 4, 16, 64, 256). */
-        fun healthFactor(number: Int): Long = (1 until number).fold(1L) { factor, _ -> factor * HEALTH_GROWTH_PER_CHAPTER }
+        /**
+         * How many times the health of chapter 1 the monsters of chapter [number] have: it multiplies by 4 each chapter up to
+         * chapter 5 (1, 4, 16, 64, 256), then by 2 each chapter (AD-019).
+         */
+        fun healthFactor(number: Int): Long =
+            if (number <= LAST_QUADRUPLED_CHAPTER) {
+                (1 until number).fold(1L) { factor, _ -> factor * HEALTH_GROWTH_PER_CHAPTER }
+            } else {
+                healthFactor(LAST_QUADRUPLED_CHAPTER) shl (number - LAST_QUADRUPLED_CHAPTER)
+            }
+
+        /** The defense added to chapter 1 by chapter [number]: +5 per chapter up to chapter 5, then +3 per chapter (AD-019). */
+        fun defenseBonus(number: Int): Int =
+            if (number <= LAST_QUADRUPLED_CHAPTER) {
+                DEFENSE_PER_CHAPTER * (number - 1)
+            } else {
+                defenseBonus(LAST_QUADRUPLED_CHAPTER) + DEFENSE_PER_CHAPTER_FROM_6 * (number - LAST_QUADRUPLED_CHAPTER)
+            }
 
         /** Chapter 1 as seeded: reachable with 1 damage per click, tunable in the database afterwards. */
         fun first() = of(1)
@@ -120,8 +140,8 @@ data class ChapterDefinition(
          * stage elements shifted by one per chapter. Which enemies belong to which chapter is still open (AD-006).
          */
         fun of(number: Int): ChapterDefinition {
-            require(number in 1..ChapterOrder.MAX_CHAPTER) { "Chapter $number must be between 1 and ${ChapterOrder.MAX_CHAPTER}" }
-            val defenseBonus = DEFENSE_PER_CHAPTER * (number - 1)
+            require(number >= 1) { "Chapter $number must be at least 1" }
+            val defenseBonus = defenseBonus(number)
             val healthFactor = healthFactor(number)
             return ChapterDefinition(
                 number = number,
@@ -132,11 +152,11 @@ data class ChapterDefinition(
                         val monsterHealth = (BASE_MONSTER_HEALTH + MONSTER_HEALTH_PER_STAGE * (n - 1)) * healthFactor
                         // the elements take turns by stage, so every multiplier shows up in the chapter
                         val element = Element.entries[(n - 1 + number - 1) % Element.entries.size]
-                        val defense = minOf(MINIBOSS_BASE_DEFENSE + n + defenseBonus, EnemyStats.MAX_DEFENSE)
+                        val defense = minOf(MINIBOSS_BASE_DEFENSE + n + defenseBonus, MAX_SEEDED_DEFENSE)
                         val critResistance =
                             minOf(
                                 MINIBOSS_BASE_CRIT_RESISTANCE + MINIBOSS_CRIT_RESISTANCE_PER_STAGE * n + defenseBonus,
-                                EnemyStats.MAX_CRIT_RESISTANCE,
+                                MAX_SEEDED_CRIT_RESISTANCE,
                             )
                         StageDefinition(
                             number = n,
@@ -153,9 +173,9 @@ data class ChapterDefinition(
                 boss =
                     EnemyStats(
                         Element.entries[(number + 3) % Element.entries.size],
-                        minOf(BOSS_DEFENSE + defenseBonus, EnemyStats.MAX_DEFENSE),
-                        minOf(BOSS_DEFENSE + defenseBonus, EnemyStats.MAX_DEFENSE),
-                        minOf(BOSS_CRIT_RESISTANCE + defenseBonus, EnemyStats.MAX_CRIT_RESISTANCE),
+                        minOf(BOSS_DEFENSE + defenseBonus, MAX_SEEDED_DEFENSE),
+                        minOf(BOSS_DEFENSE + defenseBonus, MAX_SEEDED_DEFENSE),
+                        minOf(BOSS_CRIT_RESISTANCE + defenseBonus, MAX_SEEDED_CRIT_RESISTANCE),
                     ),
                 bossDropRuleId = bossRuleId(number),
             )

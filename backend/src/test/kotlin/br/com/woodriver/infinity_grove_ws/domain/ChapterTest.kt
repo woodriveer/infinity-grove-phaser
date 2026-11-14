@@ -115,7 +115,7 @@ class ChapterTest {
     @Test
     fun `chapter 1 is the first chapter and later chapters have more health and defense`() {
         assertEquals(ChapterDefinition.first(), ChapterDefinition.of(1))
-        (2..ChapterOrder.MAX_CHAPTER).forEach {
+        (2..15).forEach {
             val chapter = ChapterDefinition.of(it)
             val before = ChapterDefinition.of(it - 1)
 
@@ -127,8 +127,92 @@ class ChapterTest {
     }
 
     @Test
-    fun `a chapter past the last one cannot be built`() {
-        assertFailsWith<IllegalArgumentException> { ChapterDefinition.of(ChapterOrder.MAX_CHAPTER + 1) }
+    fun `chapter 0 cannot be built`() {
+        assertFailsWith<IllegalArgumentException> { ChapterDefinition.of(0) }
+    }
+
+    @Test
+    fun `health doubles each chapter from chapter 6`() {
+        assertEquals(256L, ChapterDefinition.healthFactor(5))
+        assertEquals(512L, ChapterDefinition.healthFactor(6))
+        assertEquals(262_144L, ChapterDefinition.healthFactor(15))
+    }
+
+    @Test
+    fun `chapter 6 has twice the health of chapter 5`() {
+        val chapter = ChapterDefinition.of(6)
+
+        assertEquals(1_024_000L, chapter.bossHealth)
+        assertEquals(20_480L, chapter.stage(1).monsterHealth)
+        assertEquals(38_912L, chapter.stage(10).monsterHealth)
+        assertEquals(194_560L, chapter.stage(10).minibossHealth)
+    }
+
+    @Test
+    fun `chapter 10 follows the chapter table`() {
+        val chapter = ChapterDefinition.of(10)
+        val miniboss = chapter.stage(10).miniboss
+
+        assertEquals(16_384_000L, chapter.bossHealth)
+        assertEquals(3_112_960L, chapter.stage(10).minibossHealth)
+        assertEquals(65, chapter.boss.physicalDefense)
+        assertEquals(65, chapter.boss.magicalDefense)
+        assertEquals(65, chapter.boss.critResistance)
+        assertEquals(55, miniboss.physicalDefense)
+        assertEquals(55, miniboss.magicalDefense)
+        assertEquals(65, miniboss.critResistance)
+    }
+
+    @Test
+    fun `chapter 12 caps the boss critical resistance at 70`() {
+        val boss = ChapterDefinition.of(12).boss
+
+        assertEquals(71, boss.physicalDefense)
+        assertEquals(70, boss.critResistance)
+    }
+
+    @Test
+    fun `chapter 15 follows the chapter table`() {
+        val chapter = ChapterDefinition.of(15)
+        val miniboss = chapter.stage(10).miniboss
+
+        assertEquals(524_288_000L, chapter.bossHealth)
+        assertEquals(80, chapter.boss.physicalDefense)
+        assertEquals(80, chapter.boss.magicalDefense)
+        assertEquals(70, chapter.boss.critResistance)
+        assertEquals(19_922_944L, chapter.stage(10).monsterHealth)
+        assertEquals(99_614_720L, chapter.stage(10).minibossHealth)
+        assertEquals(70, miniboss.physicalDefense)
+        assertEquals(70, miniboss.critResistance)
+    }
+
+    @Test
+    fun `chapters 6 to 15 keep phase monsters defenseless and the 30 and 60 second limits`() {
+        (6..15).forEach { c ->
+            val chapter = ChapterDefinition.of(c)
+
+            chapter.stages.forEach { stage ->
+                assertEquals(0, stage.monster.physicalDefense, "chapter $c stage ${stage.number}")
+                assertEquals(0, stage.monster.magicalDefense, "chapter $c stage ${stage.number}")
+                assertEquals(0, stage.monster.critResistance, "chapter $c stage ${stage.number}")
+                assertEquals(30_000L, stage.minibossTimeLimitMs, "chapter $c stage ${stage.number}")
+            }
+            assertEquals(60_000L, chapter.bossTimeLimitMs, "chapter $c boss")
+        }
+    }
+
+    @Test
+    fun `chapters 1 to 5 keep their numbers`() {
+        val first = ChapterDefinition.of(1)
+        val fifth = ChapterDefinition.of(5)
+
+        assertEquals(2000L, first.bossHealth)
+        assertEquals(40L, first.stage(1).monsterHealth)
+        assertEquals(512_000L, fifth.bossHealth)
+        assertEquals(50, fifth.boss.physicalDefense)
+        assertEquals(50, fifth.boss.critResistance)
+        assertEquals(40, fifth.stage(10).miniboss.physicalDefense)
+        assertEquals(50, fifth.stage(10).miniboss.critResistance)
     }
 
     @Test

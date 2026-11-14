@@ -327,7 +327,7 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 
 ---
 
-### T7: Chapter formula for chapters 6 and later [ ]
+### T7: Chapter formula for chapters 6 and later [x]
 
 **Owner**: kotlin-backend-dev
 **What**: `ChapterDefinition.of(c)` builds any chapter c >= 1: x4 health and +5 defense up to chapter 5, x2 health and +3 defense from chapter 6, caps 80 (defenses) and 70 (critical resistance). Chapters 1 to 5 keep their numbers (CHAP-04).
@@ -366,7 +366,7 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 **Gate**: quick - `cd backend && ./gradlew test --tests '*ChapterTest' --tests '*ProgressTest'`
 **Done when**:
 
-- [ ] The listed cases pass; `ProgressTest` passes unchanged.
+- [x] The listed cases pass; `ProgressTest` passes unchanged.
 
 **Commit**: `feat(backend): define the health and defenses of chapters 6 to 15`
 
