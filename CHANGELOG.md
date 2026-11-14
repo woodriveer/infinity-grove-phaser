@@ -3,6 +3,26 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Não lançado]
+
+A campanha vai até o capítulo 15 (`campaign-chapters`). Ainda sem versão e sem tag: a entrada espera o deploy.
+
+### Adicionado
+
+- Capítulos 6 a 15 na campanha: a vida dos monstros dobra a cada capítulo a partir do 6, e as defesas sobem 3 por capítulo, até o limite de 80. Os capítulos 1 a 5 mantêm os números de antes.
+- Números grandes abreviados na tela: o texto de vida e os números de dano passam a usar K, M, B e T a partir de 1000 (por exemplo `1.5B/3B`).
+- Novas faixas de moedas dos monstros, que sobem a cada capítulo, para que uma primeira jornada normal pague as vagas de aliados (1, 2, 3 e 4 de ouro).
+
+### Alterado
+
+- A vida dos monstros agora é guardada em 64 bits, então os capítulos altos não estouram mais o limite.
+- O botão **Resetar conta** paga cristais pelo capítulo alcançado, sem o limite de 5: até 15 cristais (`Resetar conta (+15 cristais)`).
+- As moedas dos capítulos 1 a 5 foram movidas para as novas faixas.
+
+### Corrigido
+
+- A fazenda de um jogador que já completou o capítulo 5 não falha mais: o próximo capítulo é aberto antes de a fazenda ler o jogador.
+
 ## [0.1.0] - 2026-10-31
 
 Primeira versão marcada. Traz a venda de equipamentos em lote (`bulk-sell`).

@@ -222,3 +222,12 @@ The spec file itself was not edited by the Verifier; the status column above is 
 **Issues found**: gap 1 (chapters 2 to 5 per stage; test-only fix, F4 must die).
 
 **Next steps**: owner decides whether to accept the FAIL or run one test-only fix to close gap 1 (escalation, since round 3 is the last allowed); run the rollback drill before relying on the replay for CHAP-08 AC 5 and CHAP-09 AC 7.
+
+---
+
+## Owner decision (2026-11-14)
+
+The owner accepted the feature `campaign-chapters` with gap 1 left open (per-stage definitions of chapters 2 to 5 not pinned; mutant F4 survives). The Verifier verdict above stays **FAIL**: nothing in this report was changed, and the gap was not fixed. It is a test-only gap with no known production defect.
+
+- **Open follow-up**: close gap 1 with the test-only fix described under "Fix Plans" (extend `ChapterTest.kt:368-394` to chapters 1 to 5 and kill F4). `.specs/STATE.md` has no list for follow-ups (its Handoff block describes a paused feature), so it is recorded here and in `report.html` only.
+- **Deploy**: the owner restarts `./publish.sh` personally. Until then the deploy is pending; the release tag, the GitHub release and the production check wait for it. Tasks T13 and T14 (contract migration) wait for the deploy of T1 to T12 to be live.

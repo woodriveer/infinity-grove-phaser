@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relatório de release - campaign-chapters</title>
+<style>
+body{font:16px/1.5 system-ui,sans-serif;max-width:60rem;margin:2rem auto;padding:0 1rem;color:#222}
+h1,h2{line-height:1.2}table{border-collapse:collapse;width:100%;margin:.5rem 0 1rem}
+th,td{border:1px solid #ccc;padding:.35rem .6rem;text-align:left;vertical-align:top}th{background:#f2f2f2}
+.v{padding:.8rem 1rem;border-left:6px solid #b45309;background:#fff7ed}
+code{background:#f4f4f4;padding:0 .2rem}
+</style>
+</head>
+<body>
+<h1>Relatório de release: campaign-chapters (campanha até o capítulo 15)</h1>
+<p>Gerado em 2026-11-14. Todos os números abaixo vêm de comandos rodados para este relatório, no commit <code>e57f60c</code> (mais este relatório).</p>
+
+<h2>Veredito</h2>
+<div class="v">
+<p><strong>Veredito do Verificador: FAIL</strong> (rodada 3 de 3). <strong>Aceita pelo dono em 2026-11-14 com a lacuna 1 aberta.</strong> Este relatório não apresenta a feature como PASS.</p>
+<p>Lacuna 1 (menor, só de teste): as definições por fase dos capítulos 2 a 5 não estão fixadas em teste (<code>ChapterTest.kt:397-399</code>). O mutante F4 (<code>Chapter.kt:161</code>) sobrevive. Não há defeito de produção conhecido. Acompanhamento: estender o laço de <code>ChapterTest.kt:368-394</code> aos capítulos 1 a 5 e matar F4, sem tocar no código de produção.</p>
+</div>
+
+<h2>Faixa de commits</h2>
+<p><code>91e3111..e57f60c</code>: 32 commits, todos em <code>origin/main</code>. Tarefas T1 a T12 feitas. <strong>T13 e T14 (migração de contração) ficam adiadas</strong> até o deploy de T1 a T12 estar no ar.</p>
+
+<h2>Resumo do Verificador</h2>
+<p>Três rodadas. Sensor (mutação) somado: 23 mutantes, 21 mortos, 2 sobreviventes: F4 (a lacuna 1) e M4 (equivalente, aceito). Na rodada 3: 5 de 6 mutantes mortos (F4 sobreviveu). Critérios de aceite: 36 de 36 com evidência (dois por reprodução do esquema, risco residual); Critérios de sucesso: 4 de 5 (lacuna 1). Detalhes em <code>validation.md</code>.</p>
+
+<h2>Código de produção da faixa</h2>
+<p>Comando: <code>git diff --numstat 91e3111..HEAD</code>, separado por área. Specs, testes e assets não contam.</p>
+<table>
+<tr><th>Área</th><th>Arquivos</th><th>Linhas adicionadas</th><th>Linhas removidas</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>, inclui migrações V8 e V9)</td><td>7</td><td>122</td><td>42</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem <code>*.test.js</code>; nenhum <code>game/public/*.css</code> mudou)</td><td>4</td><td>47</td><td>5</td></tr>
+</table>
+
+<h2>Código de teste da faixa</h2>
+<table>
+<tr><th>Suíte</th><th>Arquivos</th><th>Linhas +</th><th>Linhas -</th><th>Testes adicionados (declarações no diff)</th><th>Total após a rodada</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td>24</td><td>994</td><td>99</td><td>50 (<code>@Test</code>/<code>@ParameterizedTest</code>; 0 removidos)</td><td>935 casos, 0 falhas, 0 erros, 0 ignorados</td></tr>
+<tr><td>Jogo unitário (<code>game/src/**/*.test.js</code>)</td><td>6</td><td>123</td><td>10</td><td>35 declarações <code>it/test</code> adicionadas, 4 removidas (reescritas)</td><td>1576 passaram em 72 arquivos, 0 falhas</td></tr>
+<tr><td>E2E (<code>game/e2e</code>)</td><td>3</td><td>184</td><td>12</td><td>11 (<code>campaignChapters.spec.js</code>)</td><td>300 testes: 271 passaram na rodada completa, 27 falharam sob carga e passaram ao rodar sozinhos, 2 ignorados (<code>fixme</code>)</td></tr>
+</table>
+<p>A contagem de testes adicionados vem de linhas <code>+</code> do diff; casos de teste parametrizados geram mais casos do que declarações.</p>
+
+<h2>Cobertura unitária</h2>
+<table>
+<tr><th>Alvo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Backend inteiro (JaCoCo)</td><td>98,99% (2756/2784)</td><td>93,03% (827/889)</td></tr>
+<tr><td>Jogo inteiro (Vitest, v8)</td><td>97,95% (2586/2640)</td><td>95,18% (1205/1266)</td></tr>
+</table>
+<p>Arquivos que a feature mudou:</p>
+<table>
+<tr><th>Arquivo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td><code>Chapter.kt</code></td><td>100% (103/103)</td><td>94,29% (66/70)</td></tr>
+<tr><td><code>ChapterOrder.kt</code></td><td>100% (8/8)</td><td>100% (8/8)</td></tr>
+<tr><td><code>ChapterEntities.kt</code></td><td>87,76% (86/98)</td><td>75% (3/4)</td></tr>
+<tr><td><code>ProgressController.kt</code></td><td>100% (98/98)</td><td>100% (10/10)</td></tr>
+<tr><td><code>FarmService.kt</code></td><td>100% (36/36)</td><td>83,33% (15/18)</td></tr>
+<tr><td><code>numberFormat.js</code>, <code>damage.js</code>, <code>monster.js</code>, <code>accountReset.js</code> (domain)</td><td>100%</td><td>100%</td></tr>
+</table>
+<p>As migrações SQL V8 e V9 não entram no JaCoCo: são verificadas pelos testes de integração (todas as 15 regras de moeda e a reprodução do código anterior).</p>
+
+<h2>Cobertura e2e</h2>
+<p><code>npm run test:e2e:coverage</code>: <strong>linhas 92,27% (2437/2641)</strong>, ramos 76,65% (778/1015), instruções 92,12%. É um limite inferior: uma página recarregada dentro do teste perde o que já contou, e um teste que falha no meio conta só o que executou (houve 27 falhas sob carga nesta rodada).</p>
+<table>
+<tr><th>Arquivo mudado</th><th>Linhas e2e</th><th>Ramos e2e</th></tr>
+<tr><td><code>domain/campaign/accountReset.js</code></td><td>100%</td><td>100%</td></tr>
+<tr><td><code>domain/combat/damage.js</code></td><td>100%</td><td>76,47%</td></tr>
+<tr><td><code>domain/combat/monster.js</code></td><td>88,23%</td><td>0%</td></tr>
+<tr><td><code>domain/combat/numberFormat.js</code></td><td>83,33%</td><td>66,66%</td></tr>
+</table>
+
+<h2>Cenários e2e da feature (<code>e2e/campaignChapters.spec.js</code>)</h2>
+<table>
+<tr><th>Linha</th><th>Cenário</th><th>Resultado</th></tr>
+<tr><td>51</td><td>vencer o chefe do capítulo 5 abre o capítulo 6</td><td>passou</td></tr>
+<tr><td>64</td><td>vencer o chefe do capítulo 15 completa a campanha</td><td>passou</td></tr>
+<tr><td>77</td><td>campanha completa no 5 abre o capítulo 6 ao carregar</td><td>passou</td></tr>
+<tr><td>87</td><td>o botão de reset paga 12 cristais no capítulo 12</td><td>passou</td></tr>
+<tr><td>94</td><td>campanha completa oferece 15 cristais</td><td>passou</td></tr>
+<tr><td>101</td><td>vida 2000 aparece como 2K</td><td>passou</td></tr>
+<tr><td>108</td><td>chefe de 3 000 000 000 de vida nasce e mostra HP 3B/3B</td><td>passou</td></tr>
+<tr><td>115</td><td>chefe do capítulo 10 mostra HP 16.4M/16.4M</td><td>passou</td></tr>
+<tr><td>123</td><td>chefe do capítulo 6 solta o herói NATURE do capítulo 7</td><td>passou</td></tr>
+<tr><td>134</td><td>chefe do capítulo 14 solta o herói LIGHT do capítulo 15</td><td>passou</td></tr>
+<tr><td>145</td><td>clique de 5000 de dano mostra 5K</td><td>passou</td></tr>
+</table>
+<p>11 de 11 passaram na rodada completa. Nenhum cenário e2e cobre o diálogo de reset (CHAP-06 AC 3); a frase exata é fixada no teste unitário (<code>ClickerGame.test.js:4616-4632</code>).</p>
+
+<h2>Testes que falharam sem culpa da feature</h2>
+<p>Na rodada e2e completa com cobertura (1,4 hora; a máquina estava lenta, cerca de 30 s por teste), <strong>27 testes falharam</strong>. Rodados sozinhos, com <code>--workers=1</code>, <strong>os 27 passaram</strong> (27 passed em 4,7 min). Atribuição: timeouts sob carga, não a feature.</p>
+<ul>
+<li><code>uiRedesign.spec.js</code> (22 testes: 316, 381, 566, 622, 665, 682, 700, 760, 842, 954, 1000, 1112, 1215, 1246, 1281, 1374, 1404, 1417, 1470, 1478, 1505, 1558): nenhum arquivo do tema Grove mudou na faixa; o erro que li (1558) foi um clique em <code>hud-*</code> estourando o tempo; os demais não foram lidos um a um, e todos passaram sozinhos.</li>
+<li><code>session.spec.js:76</code>, <code>skills.spec.js:38</code>, <code>talents.spec.js:148</code> (a mesma sensibilidade a carga que o STATE.md já registra): passaram sozinhos.</li>
+<li><code>dragEquip.spec.js:550</code> e <code>:604</code> (rolagem na borda): falharam na rodada completa e na última do Verificador, mas <strong>passaram sozinhos no HEAD e passaram sozinhos em <code>91e3111</code></strong> (worktree temporário, já removido). Não reproduzem em isolamento em nenhum dos dois pontos; nenhum arquivo de arrastar ou equipamento mudou na faixa. São sensíveis a tempo.</li>
+</ul>
+
+<h2>Revisão de UI</h2>
+<p><code>ui-review.html</code>: aprovada. Um achado de severidade baixa: números de dano abreviados se empilham no celular com o auto clique. Não bloqueia.</p>
+
+<h2>Risco residual</h2>
+<ul>
+<li>A imagem do backend anterior nunca é iniciada em um teste: a compatibilidade (CHAP-08 AC 5, CHAP-09 AC 7) é provada por uma reprodução (<code>PreviousBackendCompatibilityIT.kt</code>). <strong>Recomenda-se um ensaio de rollback</strong> no slot anterior já implantado.</li>
+<li>O ciclo completo de 3 000 000 000 de vida não atravessa o JSON do backend até o jogo em um único cenário (cada trecho é testado).</li>
+<li>Lacuna 1 aberta (ver veredito).</li>
+</ul>
+
+<h2>Deploy</h2>
+<p><strong>PENDENTE, a cargo do dono.</strong> O observador (<code>watcher</code>) em execução está travado (<code>.deploy-state</code> não é escrito desde 2026-11-13 01:21 e <code>handled</code> está muito atrás do HEAD), então nada do backend desta feature está no ar. O dono vai reiniciar <code>./publish.sh</code> pessoalmente. Não foram iniciados nem parados <code>publish.sh</code>, observador, túnel ou contêineres, e o Worker não foi publicado à mão.</p>
+<p>Ficam aguardando o deploy: a validação em produção, a tag <code>vX.Y.Z</code> e o release no GitHub, além de T13 e T14. A entrada do <code>CHANGELOG.md</code> está como "Não lançado". O site só fica no ar enquanto <code>publish.sh</code> roda.</p>
+</body>
+</html>
