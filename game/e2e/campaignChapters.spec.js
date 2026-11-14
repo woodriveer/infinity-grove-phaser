@@ -71,6 +71,17 @@ test.describe('Campaign chapters', () => {
 
         await expect(page.locator('.stage-message')).toHaveText('Chapter complete!', { timeout: 15_000 });
         await expect.poll(() => backend.progresses.get('yan').completed, { timeout: 25_000 }).toBe(true);
+        await expect.poll(() => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').monster ?? null)).toBeNull();
+    });
+
+    test('a campaign completed at chapter 5 opens chapter 6 on the load', async ({ page }) => {
+        const { backend } = await startGame(page, {
+            progress: { chapter: 5, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1, completed: true }, lastChapter: 15
+        });
+
+        await expect(page.getByTestId('chapter-hud')).toHaveText('Capítulo 6');
+        await expect(page.locator('.stage-hud')).toHaveText('Stage 1/10  Phase 1/5');
+        expect(backend.progresses.get('yan')).toMatchObject({ chapter: 6, stage: 1, encounter: 'PHASE', phase: 1, completed: false });
     });
 
     test('the reset button pays 12 crystals at chapter 12', async ({ page }) => {
@@ -92,6 +103,21 @@ test.describe('Campaign chapters', () => {
 
         await expect(page.getByTestId('monster-hp')).toHaveText('HP 2K/2K');
         expect(await health(page)).toBe(2000);
+    });
+
+    test('a boss of 3 000 000 000 health spawns with it and reads HP 3B/3B', async ({ page }) => {
+        await startGame(page, { progress: { chapter: 1, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1 }, definition: chapter(3_000_000_000) });
+
+        await expect(page.getByTestId('monster-hp')).toHaveText('HP 3B/3B');
+        expect(await health(page)).toBe(3_000_000_000);
+    });
+
+    test('the chapter 10 boss reads HP 16.4M/16.4M', async ({ page }) => {
+        await startGame(page, {
+            progress: { chapter: 10, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1 }, definition: chapter(16_384_000), lastChapter: 15
+        });
+
+        await expect(page.getByTestId('monster-hp')).toHaveText('HP 16.4M/16.4M');
     });
 
     test('the chapter 6 boss drops the NATURE hero of chapter 7', async ({ page }) => {

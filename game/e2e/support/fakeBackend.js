@@ -729,7 +729,13 @@ export async function mockBackend (page, {
         const progress = progressOf(username);
 
         if (method === 'GET' && path === '/progress') {
-            return route.fulfill({ json: progressBody(progress) });
+            //  Progress.withNextChapterOpen: a campaign stored as completed below lastChapter opens the next chapter on the load and keeps it
+            const opened = progress.completed && (progress.chapter ?? 1) < lastChapter
+                ? { ...progress, chapter: (progress.chapter ?? 1) + 1, stage: 1, encounter: 'PHASE', phase: 1, completed: false }
+                : progress;
+
+            if (opened !== progress) { progresses.set(username, opened); }
+            return route.fulfill({ json: progressBody(opened) });
         }
 
         if (method === 'POST' && path === '/progress/outcome') {
