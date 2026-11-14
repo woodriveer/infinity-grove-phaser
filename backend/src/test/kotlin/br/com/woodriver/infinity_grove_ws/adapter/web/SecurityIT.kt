@@ -28,7 +28,8 @@ class SecurityIT : IntegrationTestBase() {
         spec: RequestSpecification,
         method: String,
         path: String,
-    ): Response = spec.contentType(ContentType.JSON).body("""{"currentPassword":"password123","password":"newpassword1"}""").request(method, path)
+    ): Response =
+        spec.contentType(ContentType.JSON).body("""{"currentPassword":"password123","password":"newpassword1"}""").request(method, path)
 
     private fun assertUnauthenticated(response: Response) {
         response
