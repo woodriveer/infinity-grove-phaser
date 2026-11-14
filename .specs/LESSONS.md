@@ -474,6 +474,48 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md round 2 gap 6 (game/src/adapters/phaser/MainMenu.js:57) (spec)
 - last seen: 2026-11-13T21:30:58Z
 
+### L-078 - Assert every row that a data migration rewrites, not a sample, because one unasserted row can change by one digit and ship unseen
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `migrations` · harmful: 0
+- features: campaign-chapters
+- evidence: M11 backend/src/main/resources/db/migration/V9__coin_drop_rebalance.sql:29 (validation.md sensor) (migrations)
+- last seen: 2026-11-14T05:51:11Z
+
+### L-079 - Pin each cap with an input past the cap, because a cap the test data never reaches cannot be told apart from no cap
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `domain-rules` · harmful: 0
+- features: campaign-chapters
+- evidence: M4 backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Chapter.kt:185-186 (validation.md sensor) (domain-rules)
+- last seen: 2026-11-14T05:51:11Z
+
+### L-080 - Pin the rollback obligation of an expand migration by running the previous release's start and read path against the migrated database, not only the column types
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `migrations` · harmful: 0
+- features: campaign-chapters
+- evidence: CHAP-08 AC 5 (validation.md gap 1) (migrations)
+- last seen: 2026-11-14T05:51:11Z
+
+### L-081 - Assert every row of a spec table with its own assertion, because sampling a few rows does not meet a criterion that says every number is tested
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `domain-rules` · harmful: 0
+- features: campaign-chapters
+- evidence: CHAP-04 AC 1 and 2 with the Chapter Table success criterion (validation.md gap 3) (domain-rules)
+- last seen: 2026-11-14T05:51:13Z
+
+### L-082 - Write acceptance criteria only over surfaces the feature's own code ships, and move cross-feature surfaces to the owning feature's spec
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: campaign-chapters
+- evidence: CHAP-07 AC 1 team damage texts (validation.md gap 4) (spec)
+- last seen: 2026-11-14T05:51:13Z
+
+### L-083 - Assert every field a criterion names, including nested definition fields, because a response that drops one still passes the status check
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `api` · harmful: 0
+- features: campaign-chapters
+- evidence: CHAP-01 AC 5 backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/ProgressControllerIT.kt:210 (validation.md gap 8) (api)
+- last seen: 2026-11-14T05:51:13Z
+
+### L-084 - Give each player-visible acceptance criterion its own e2e assertion, because a unit test of a formatter does not show the player the value
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `e2e` · harmful: 0
+- features: campaign-chapters
+- evidence: CHAP-08 AC 3 (validation.md gap 5) (e2e)
+- last seen: 2026-11-14T05:51:13Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
