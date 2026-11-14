@@ -4581,10 +4581,16 @@ describe('ClickerGame account reset', () => {
         expect(autoClickElement(ctx).visible).toBe(true);
     });
 
-    it('offers 5 crystals on a completed campaign', async () => {
-        const ctx = await createScene({ start: atChapter(5, true) });
+    it('offers 15 crystals on a completed campaign', async () => {
+        const ctx = await createScene({ start: atChapter(15, true) });
 
-        expect(resetButton(ctx).textContent).toBe('Resetar conta (+5 cristais)');
+        expect(resetButton(ctx).textContent).toBe('Resetar conta (+15 cristais)');
+    });
+
+    it('offers 12 crystals at chapter 12', async () => {
+        const ctx = await createScene({ start: atChapter(12) });
+
+        expect(resetButton(ctx).textContent).toBe('Resetar conta (+12 cristais)');
     });
 
     it('shows no reset button and no box in chapter 1 for a player who never reset', async () => {

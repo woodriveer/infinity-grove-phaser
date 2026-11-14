@@ -12,10 +12,12 @@ describe('resetReward', () => {
         expect(resetReward({ chapter: 2, completed: false })).toBe(2);
         expect(resetReward({ chapter: 4, completed: false })).toBe(4);
         expect(resetReward({ chapter: 5, completed: false })).toBe(5);
+        expect(resetReward({ chapter: 12, completed: false })).toBe(12);
+        expect(resetReward({ chapter: 15, completed: false })).toBe(15);
     });
 
-    it('pays 5 for a completed campaign', () => {
-        expect(resetReward({ chapter: 5, completed: true })).toBe(5);
+    it('pays 15 for a completed campaign', () => {
+        expect(resetReward({ chapter: 15, completed: true })).toBe(15);
     });
 });
 

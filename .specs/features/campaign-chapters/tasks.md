@@ -295,7 +295,7 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 
 ---
 
-### T6: Reset reward grows to chapter 15 in the game [ ]
+### T6: Reset reward grows to chapter 15 in the game [x]
 
 **Owner**: game-dev
 **What**: The reset label pays the chapter shown, up to 15 (CHAP-06 AC 3).
@@ -321,7 +321,7 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The listed cases pass; the test at line 4185 (`+5` at chapter 5, not completed) passes unchanged.
+- [x] The listed cases pass; the test at line 4185 (`+5` at chapter 5, not completed) passes unchanged.
 
 **Commit**: `feat(game): label the reset with the chapter up to 15`
 
