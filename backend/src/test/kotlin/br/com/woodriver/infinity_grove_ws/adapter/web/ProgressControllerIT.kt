@@ -18,6 +18,7 @@ import org.hamcrest.Matchers.hasSize
 import org.hamcrest.Matchers.nullValue
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.jdbc.core.JdbcTemplate
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -29,6 +30,9 @@ import kotlin.test.assertFalse
 class ProgressControllerIT : IntegrationTestBase() {
     @Autowired
     private lateinit var talentRepository: TalentRepository
+
+    @Autowired
+    private lateinit var jdbc: JdbcTemplate
 
     private fun user(name: String = "yan") = jpaUserRepository.save(UserEntity(name, "hash", 1L, 1L))
 
@@ -88,6 +92,19 @@ class ProgressControllerIT : IntegrationTestBase() {
             .body("definition.stages[9].number", equalTo(10))
             .body("definition.stages[9].monsterHealth", equalTo(76))
             .body("definition.stages[9].minibossHealth", equalTo(380))
+    }
+
+    @Test
+    fun `GET progress answers a boss health above the 32-bit limit as a JSON integer`() {
+        user()
+        jdbc.update("update chapters set boss_hit_points = 3000000000 where number = 1")
+        try {
+            val bossHealth = getProgress().jsonPath().getLong("definition.bossHealth")
+
+            assertEquals(3_000_000_000L, bossHealth)
+        } finally {
+            jdbc.update("update chapters set boss_hit_points = boss_health where number = 1")
+        }
     }
 
     @Test

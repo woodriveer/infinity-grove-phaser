@@ -58,7 +58,7 @@ class ChapterSeederIT : IntegrationTestBase() {
 
         seeder.seed()
 
-        assertEquals(1234, repository.findByNumber(1)!!.bossHealth)
+        assertEquals(1234L, repository.findByNumber(1)!!.bossHealth)
     }
 
     @Test

@@ -145,7 +145,7 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 
 ---
 
-### T2: Health is a Long from the database to the API [ ]
+### T2: Health is a Long from the database to the API [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Carry health as `Long` in the domain, map the entities to `*_hit_points`, keep writing the legacy columns while the value fits, and answer `Long` in the progress JSON (CHAP-08 AC 1, 2, 5).
@@ -183,8 +183,8 @@ The new columns stay nullable until V10 (T14), because the entities do not write
 **Gate**: full - `cd backend && ./gradlew test`
 **Done when**:
 
-- [ ] The four test cases pass and the whole backend suite passes.
-- [ ] `SchemaValidationIT` passes (entities validate against V8).
+- [x] The four test cases pass and the whole backend suite passes.
+- [x] `SchemaValidationIT` passes (entities validate against V8).
 
 **Commit**: `feat(backend): carry health as a 64-bit value`
 

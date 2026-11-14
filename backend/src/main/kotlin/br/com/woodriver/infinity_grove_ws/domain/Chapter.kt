@@ -28,8 +28,8 @@ data class EnemyStats(
 data class StageDefinition(
     val number: Int,
     val phasesPerStage: Int,
-    val monsterHealth: Int,
-    val minibossHealth: Int,
+    val monsterHealth: Long,
+    val minibossHealth: Long,
     val minibossTimeLimitMs: Long,
     val monster: EnemyStats = EnemyStats.DEFAULT,
     val miniboss: EnemyStats = EnemyStats.DEFAULT,
@@ -48,7 +48,7 @@ data class StageDefinition(
 /** A chapter: its stages in order, the chapter boss that closes it and the drop rule the boss pays. */
 data class ChapterDefinition(
     val number: Int,
-    val bossHealth: Int,
+    val bossHealth: Long,
     val bossTimeLimitMs: Long,
     val stages: List<StageDefinition>,
     val boss: EnemyStats = EnemyStats.DEFAULT,
@@ -110,7 +110,7 @@ data class ChapterDefinition(
         private fun monsterRuleId(number: Int) = bossRuleId(number) - 2
 
         /** How many times the health of chapter 1 the monsters of chapter [number] have: it multiplies by 4 each chapter (1, 4, 16, 64, 256). */
-        fun healthFactor(number: Int): Int = (1 until number).fold(1) { factor, _ -> factor * HEALTH_GROWTH_PER_CHAPTER }
+        fun healthFactor(number: Int): Long = (1 until number).fold(1L) { factor, _ -> factor * HEALTH_GROWTH_PER_CHAPTER }
 
         /** Chapter 1 as seeded: reachable with 1 damage per click, tunable in the database afterwards. */
         fun first() = of(1)

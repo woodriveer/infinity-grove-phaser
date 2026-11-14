@@ -41,8 +41,8 @@ data class EnemyStatsResponse(
 data class StageResponse(
     val number: Int,
     val phasesPerStage: Int,
-    val monsterHealth: Int,
-    val minibossHealth: Int,
+    val monsterHealth: Long,
+    val minibossHealth: Long,
     val minibossTimeLimitMs: Long,
     val monster: EnemyStatsResponse,
     val miniboss: EnemyStatsResponse,
@@ -66,7 +66,7 @@ data class StageResponse(
 }
 
 data class ChapterResponse(
-    val bossHealth: Int,
+    val bossHealth: Long,
     val bossTimeLimitMs: Long,
     val boss: EnemyStatsResponse,
     val bossDropRuleId: Int,

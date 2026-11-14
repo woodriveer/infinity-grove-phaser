@@ -29,7 +29,7 @@ class ChapterRepositoryIT : IntegrationTestBase() {
     private val number = 90
 
     private fun chapter(
-        bossHealth: Int = 321,
+        bossHealth: Long = 321,
         stages: Int = 3,
     ) = ChapterDefinition(
         number,
@@ -40,8 +40,8 @@ class ChapterRepositoryIT : IntegrationTestBase() {
                 StageDefinition(
                     number = it,
                     phasesPerStage = 4 + it,
-                    monsterHealth = 20 + it,
-                    minibossHealth = 100 + it,
+                    monsterHealth = 20L + it,
+                    minibossHealth = 100L + it,
                     minibossTimeLimitMs = 31_000L + it,
                     monster = EnemyStats(Element.WATER, it, it + 1, it + 2),
                     miniboss = EnemyStats(Element.LIGHT, 20 + it, 30 + it, 40 + it),
@@ -86,7 +86,29 @@ class ChapterRepositoryIT : IntegrationTestBase() {
 
         repository.save(chapter(bossHealth = 999))
 
-        assertEquals(999, repository.findByNumber(number)!!.bossHealth)
+        assertEquals(999L, repository.findByNumber(number)!!.bossHealth)
+    }
+
+    @Test
+    fun `a chapter boss of 3000000000 health round-trips and leaves the legacy column null`() {
+        repository.save(chapter(bossHealth = 3_000_000_000L))
+
+        assertEquals(3_000_000_000L, repository.findByNumber(number)!!.bossHealth)
+        assertNull(jdbc.queryForObject("select boss_health from chapters where number = ?", Int::class.java, number))
+        assertEquals(
+            3_000_000_000L,
+            jdbc.queryForObject("select boss_hit_points from chapters where number = ?", Long::class.java, number),
+        )
+    }
+
+    @Test
+    fun `a seeded chapter holds the same value in the legacy and the hit point columns`() {
+        assertEquals(512_000, jdbc.queryForObject("select boss_health from chapters where number = 5", Int::class.java))
+        assertEquals(512_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 5", Long::class.java))
+        assertEquals(19_456, jdbc.queryForObject("select monster_health from stages where id = '5/10'", Int::class.java))
+        assertEquals(19_456L, jdbc.queryForObject("select monster_hit_points from stages where id = '5/10'", Long::class.java))
+        assertEquals(97_280, jdbc.queryForObject("select miniboss_health from stages where id = '5/10'", Int::class.java))
+        assertEquals(97_280L, jdbc.queryForObject("select miniboss_hit_points from stages where id = '5/10'", Long::class.java))
     }
 
     @Test
@@ -147,14 +169,16 @@ class ChapterRepositoryIT : IntegrationTestBase() {
                 Long::class.java,
             )
         jdbc.update(
-            "insert into chapters (number, boss_health, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) values (?, 5, 1000, ?, 3)",
+            "insert into chapters (number, boss_health, boss_hit_points, boss_time_limit_ms, boss_enemy_id, boss_drop_rule_id) " +
+                "values (?, 5, 5, 1000, ?, 3)",
             number,
             boss,
         )
         jdbc.update(
-            "insert into stages (id, chapter, number, phases_per_stage, monster_health, miniboss_health, miniboss_time_limit_ms, " +
-                "monster_enemy_id, miniboss_enemy_id, monster_drop_rule_id, miniboss_drop_rule_id) " +
-                "values (?, ?, 1, 1, 1, 1, 1000, ?, ?, 1, 2)",
+            "insert into stages (id, chapter, number, phases_per_stage, monster_health, monster_hit_points, miniboss_health, " +
+                "miniboss_hit_points, miniboss_time_limit_ms, monster_enemy_id, miniboss_enemy_id, " +
+                "monster_drop_rule_id, miniboss_drop_rule_id) " +
+                "values (?, ?, 1, 1, 1, 1, 1, 1, 1000, ?, ?, 1, 2)",
             "$number/1",
             number,
             monster,

@@ -9,14 +9,14 @@ class ChapterTest {
     private fun stage(
         number: Int = 1,
         phases: Int = 5,
-        monster: Int = 10,
-        miniboss: Int = 50,
+        monster: Long = 10,
+        miniboss: Long = 50,
         limit: Long = 30_000,
     ) = StageDefinition(number, phases, monster, miniboss, limit)
 
     private fun chapter(
         stages: List<StageDefinition> = listOf(stage(1), stage(2)),
-        bossHealth: Int = 300,
+        bossHealth: Long = 300,
         bossLimit: Long = 60_000,
     ) = ChapterDefinition(1, bossHealth, bossLimit, stages)
 
@@ -93,7 +93,7 @@ class ChapterTest {
 
     @Test
     fun `the seeded phase monster health grows from 40 to 76 in steps of 4`() {
-        assertEquals((40..76 step 4).toList(), ChapterDefinition.first().stages.map { it.monsterHealth })
+        assertEquals((40L..76L step 4L).toList(), ChapterDefinition.first().stages.map { it.monsterHealth })
     }
 
     @Test
@@ -108,7 +108,7 @@ class ChapterTest {
     fun `the seeded chapter boss has 2000 health and a 60 second limit`() {
         val first = ChapterDefinition.first()
 
-        assertEquals(2000, first.bossHealth)
+        assertEquals(2000L, first.bossHealth)
         assertEquals(60_000L, first.bossTimeLimitMs)
     }
 
@@ -179,9 +179,17 @@ class ChapterTest {
 
     @Test
     fun `the health multiplies by 4 each chapter`() {
-        assertEquals(listOf(1, 4, 16, 64, 256), (1..5).map { ChapterDefinition.healthFactor(it) })
-        assertEquals(40 * 16, ChapterDefinition.of(3).stage(1).monsterHealth)
-        assertEquals(76 * 256, ChapterDefinition.of(5).stage(10).monsterHealth)
-        assertEquals(2000 * 64, ChapterDefinition.of(4).bossHealth)
+        assertEquals(listOf(1L, 4L, 16L, 64L, 256L), (1..5).map { ChapterDefinition.healthFactor(it) })
+        assertEquals(40L * 16, ChapterDefinition.of(3).stage(1).monsterHealth)
+        assertEquals(76L * 256, ChapterDefinition.of(5).stage(10).monsterHealth)
+        assertEquals(2000L * 64, ChapterDefinition.of(4).bossHealth)
+    }
+
+    @Test
+    fun `a stage keeps a health above the 32-bit limit`() {
+        val stage = StageDefinition(1, 5, 3_000_000_000L, 15_000_000_000L, 30_000)
+
+        assertEquals(3_000_000_000L, stage.monsterHealth)
+        assertEquals(15_000_000_000L, stage.minibossHealth)
     }
 }
