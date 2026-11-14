@@ -14,41 +14,43 @@ code{background:#f4f4f4;padding:0 .2rem}
 </head>
 <body>
 <h1>Relatório de release: campaign-chapters (campanha até o capítulo 15)</h1>
-<p>Gerado em 2026-11-14. Todos os números abaixo vêm de comandos rodados para este relatório, no commit <code>e57f60c</code> (mais este relatório).</p>
+<p>Gerado em 2026-11-14. Todos os números abaixo vêm de comandos rodados para este relatório, no commit <code>ae88c42</code> (mais este relatório). Versão: <code>v0.2.0</code>.</p>
 
 <h2>Veredito</h2>
 <div class="v">
 <p><strong>Veredito do Verificador: FAIL</strong> (rodada 3 de 3). <strong>Aceita pelo dono em 2026-11-14 com a lacuna 1 aberta.</strong> Este relatório não apresenta a feature como PASS.</p>
+<p><strong>T13 e T14 não foram verificadas de forma independente.</strong> As três rodadas do Verificador cobriram só T1 a T12. T13 e T14 foram feitas pelo desenvolvedor do backend, passam na suíte (931 testes, 0 falhas) e estão no ar, mas nenhum Verificador as leu nem rodou mutantes sobre elas.</p>
 <p>Lacuna 1 (menor, só de teste): as definições por fase dos capítulos 2 a 5 não estão fixadas em teste (<code>ChapterTest.kt:397-399</code>). O mutante F4 (<code>Chapter.kt:161</code>) sobrevive. Não há defeito de produção conhecido. Acompanhamento: estender o laço de <code>ChapterTest.kt:368-394</code> aos capítulos 1 a 5 e matar F4, sem tocar no código de produção.</p>
 </div>
 
 <h2>Faixa de commits</h2>
-<p><code>91e3111..e57f60c</code>: 32 commits, todos em <code>origin/main</code>. Tarefas T1 a T12 feitas. <strong>T13 e T14 (migração de contração) ficam adiadas</strong> até o deploy de T1 a T12 estar no ar.</p>
+<p><code>91e3111..ae88c42</code>: 36 commits (<code>git log --oneline 91e3111..HEAD</code>), todos em <code>origin/main</code>. As 14 tarefas estão <code>[x]</code>. T1 a T12: verificadas (FAIL aceito). T13 (<code>a0c7066</code>, o backend deixa de mapear as colunas de vida antigas) e T14 (<code>ae88c42</code>, a migração V10 apaga essas colunas): feitas, no ar, <strong>sem verificação independente</strong>. O commit <code>70d0a76</code> ajustou antes as definições das tarefas, <code>spec.md:215</code> e <code>design.md</code>.</p>
 
 <h2>Resumo do Verificador</h2>
-<p>Três rodadas. Sensor (mutação) somado: 23 mutantes, 21 mortos, 2 sobreviventes: F4 (a lacuna 1) e M4 (equivalente, aceito). Na rodada 3: 5 de 6 mutantes mortos (F4 sobreviveu). Critérios de aceite: 36 de 36 com evidência (dois por reprodução do esquema, risco residual); Critérios de sucesso: 4 de 5 (lacuna 1). Detalhes em <code>validation.md</code>.</p>
+<p>Três rodadas, cobrindo T1 a T12 apenas. Sensor (mutação) somado: 23 mutantes, 21 mortos, 2 sobreviventes: F4 (a lacuna 1) e M4 (equivalente, aceito). Na rodada 3: 5 de 6 mutantes mortos (F4 sobreviveu). Critérios de aceite: 36 de 36 com evidência (dois por reprodução do esquema, risco residual); Critérios de sucesso: 4 de 5 (lacuna 1). Detalhes em <code>validation.md</code>.</p>
 
 <h2>Código de produção da faixa</h2>
 <p>Comando: <code>git diff --numstat 91e3111..HEAD</code>, separado por área. Specs, testes e assets não contam.</p>
 <table>
 <tr><th>Área</th><th>Arquivos</th><th>Linhas adicionadas</th><th>Linhas removidas</th></tr>
-<tr><td>Backend (<code>backend/src/main</code>, inclui migrações V8 e V9)</td><td>7</td><td>122</td><td>42</td></tr>
+<tr><td>Backend (<code>backend/src/main</code>, inclui migrações V8, V9 e V10)</td><td>8</td><td>115</td><td>42</td></tr>
 <tr><td>Jogo (<code>game/src</code> sem <code>*.test.js</code>; nenhum <code>game/public/*.css</code> mudou)</td><td>4</td><td>47</td><td>5</td></tr>
 </table>
 
 <h2>Código de teste da faixa</h2>
 <table>
 <tr><th>Suíte</th><th>Arquivos</th><th>Linhas +</th><th>Linhas -</th><th>Testes adicionados (declarações no diff)</th><th>Total após a rodada</th></tr>
-<tr><td>Backend (<code>backend/src/test</code>)</td><td>24</td><td>994</td><td>99</td><td>50 (<code>@Test</code>/<code>@ParameterizedTest</code>; 0 removidos)</td><td>935 casos, 0 falhas, 0 erros, 0 ignorados</td></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td>24</td><td>977</td><td>159</td><td>48 declarações <code>@Test</code>/<code>@ParameterizedTest</code> adicionadas e 2 removidas no diff da faixa (T14 removeu 4 testes, 2 deles criados antes na própria faixa)</td><td>931 casos, 0 falhas, 0 erros, 0 ignorados (medido agora)</td></tr>
 <tr><td>Jogo unitário (<code>game/src/**/*.test.js</code>)</td><td>6</td><td>123</td><td>10</td><td>35 declarações <code>it/test</code> adicionadas, 4 removidas (reescritas)</td><td>1576 passaram em 72 arquivos, 0 falhas</td></tr>
 <tr><td>E2E (<code>game/e2e</code>)</td><td>3</td><td>184</td><td>12</td><td>11 (<code>campaignChapters.spec.js</code>)</td><td>300 testes: 271 passaram na rodada completa, 27 falharam sob carga e passaram ao rodar sozinhos, 2 ignorados (<code>fixme</code>)</td></tr>
 </table>
+<p>Os números de backend vêm de <code>git diff --numstat 91e3111..HEAD</code> e de <code>./gradlew cleanTest test jacocoTestReport</code> rodados agora (931 casos; eram 935 antes de T14). Os de jogo e e2e não mudaram desde <code>16e5cd5</code>: <code>git diff --stat 16e5cd5..HEAD -- game</code> está vazio, então as medições de jogo (unitário e e2e) continuam valendo.</p>
 <p>A contagem de testes adicionados vem de linhas <code>+</code> do diff; casos de teste parametrizados geram mais casos do que declarações.</p>
 
 <h2>Cobertura unitária</h2>
 <table>
 <tr><th>Alvo</th><th>Linhas</th><th>Ramos</th></tr>
-<tr><td>Backend inteiro (JaCoCo)</td><td>98,99% (2756/2784)</td><td>93,03% (827/889)</td></tr>
+<tr><td>Backend inteiro (JaCoCo)</td><td>99,10% (2749/2774)</td><td>93,01% (825/887)</td></tr>
 <tr><td>Jogo inteiro (Vitest, v8)</td><td>97,95% (2586/2640)</td><td>95,18% (1205/1266)</td></tr>
 </table>
 <p>Arquivos que a feature mudou:</p>
@@ -56,12 +58,12 @@ code{background:#f4f4f4;padding:0 .2rem}
 <tr><th>Arquivo</th><th>Linhas</th><th>Ramos</th></tr>
 <tr><td><code>Chapter.kt</code></td><td>100% (103/103)</td><td>94,29% (66/70)</td></tr>
 <tr><td><code>ChapterOrder.kt</code></td><td>100% (8/8)</td><td>100% (8/8)</td></tr>
-<tr><td><code>ChapterEntities.kt</code></td><td>87,76% (86/98)</td><td>75% (3/4)</td></tr>
+<tr><td><code>ChapterEntities.kt</code></td><td>89,77% (79/88)</td><td>50% (1/2)</td></tr>
 <tr><td><code>ProgressController.kt</code></td><td>100% (98/98)</td><td>100% (10/10)</td></tr>
 <tr><td><code>FarmService.kt</code></td><td>100% (36/36)</td><td>83,33% (15/18)</td></tr>
 <tr><td><code>numberFormat.js</code>, <code>damage.js</code>, <code>monster.js</code>, <code>accountReset.js</code> (domain)</td><td>100%</td><td>100%</td></tr>
 </table>
-<p>As migrações SQL V8 e V9 não entram no JaCoCo: são verificadas pelos testes de integração (todas as 15 regras de moeda e a reprodução do código anterior).</p>
+<p>As migrações SQL V8, V9 e V10 não entram no JaCoCo: são verificadas pelos testes de integração (todas as 15 regras de moeda e a reprodução do código anterior).</p>
 
 <h2>Cobertura e2e</h2>
 <p><code>npm run test:e2e:coverage</code>: <strong>linhas 92,27% (2437/2641)</strong>, ramos 76,65% (778/1015), instruções 92,12%. É um limite inferior: uma página recarregada dentro do teste perde o que já contou, e um teste que falha no meio conta só o que executou (houve 27 falhas sob carga nesta rodada).</p>
@@ -98,18 +100,49 @@ code{background:#f4f4f4;padding:0 .2rem}
 <li><code>dragEquip.spec.js:550</code> e <code>:604</code> (rolagem na borda): falharam na rodada completa e na última do Verificador, mas <strong>passaram sozinhos no HEAD e passaram sozinhos em <code>91e3111</code></strong> (worktree temporário, já removido). Não reproduzem em isolamento em nenhum dos dois pontos; nenhum arquivo de arrastar ou equipamento mudou na faixa. São sensíveis a tempo.</li>
 </ul>
 
+<h2>Testes removidos por T14 (<code>git show --stat ae88c42</code>)</h2>
+<p>T14 mexeu em 5 arquivos de teste de integração (o commit inteiro, com a migração e <code>tasks.md</code>: +59/-154). Testes removidos, porque dependiam das colunas apagadas:</p>
+<ul>
+<li><code>ChapterRepositoryIT</code>: <em>a chapter saved now leaves the legacy health columns null</em>.</li>
+<li><code>HealthHitPointsMigrationIT</code>: <em>the legacy health columns stay integer and accept null</em> (e os auxiliares <code>migrate()</code> e <code>restore()</code>).</li>
+<li><code>MonsterHealthMigrationIT</code>: <em>a database seeded with the linear health gets the grown one</em> e <em>a health tuned in the database survives</em> (reexecutavam a migração V4 sobre as colunas antigas).</li>
+</ul>
+<p>Reescritos no lugar: <em>the hit point columns are bigint and not null</em> e <em>the legacy health columns are gone</em> (<code>HealthHitPointsMigrationIT</code>), o teste de ida e volta de 3 000 000 000 em <code>ChapterRepositoryIT</code>, e dois de <code>PreviousBackendCompatibilityIT</code> (agora validam contra a V10). Resultado: 935 para 931 casos.</p>
+
 <h2>Revisão de UI</h2>
 <p><code>ui-review.html</code>: aprovada. Um achado de severidade baixa: números de dano abreviados se empilham no celular com o auto clique. Não bloqueia.</p>
 
 <h2>Risco residual</h2>
 <ul>
-<li>A imagem do backend anterior nunca é iniciada em um teste: a compatibilidade (CHAP-08 AC 5, CHAP-09 AC 7) é provada por uma reprodução (<code>PreviousBackendCompatibilityIT.kt</code>). <strong>Recomenda-se um ensaio de rollback</strong> no slot anterior já implantado.</li>
+<li><strong>Depois da V10 não há rollback para um backend mais antigo que T13</strong>: a V10 apagou as colunas de vida de 32 bits, que o backend anterior lê. <code>./deploy.sh --rollback</code> só volta para o slot <code>blue</code> em <code>a0c7066</code> (T13) e, passados 5 minutos, o slot e a imagem antigos são removidos. Voltar além disso exigiria restaurar um backup do banco, que não foi verificado aqui.</li>
+<li>T13 e T14 sem verificação independente (ver veredito).</li>
+<li>A compatibilidade com o backend anterior (CHAP-08 AC 5, CHAP-09 AC 7) foi provada por uma reprodução (<code>PreviousBackendCompatibilityIT.kt</code>), nunca iniciando a imagem antiga; o ensaio de rollback recomendado antes deixou de ser possível além de T13.</li>
 <li>O ciclo completo de 3 000 000 000 de vida não atravessa o JSON do backend até o jogo em um único cenário (cada trecho é testado).</li>
 <li>Lacuna 1 aberta (ver veredito).</li>
 </ul>
 
 <h2>Deploy</h2>
-<p><strong>PENDENTE, a cargo do dono.</strong> O observador (<code>watcher</code>) em execução está travado (<code>.deploy-state</code> não é escrito desde 2026-11-13 01:21 e <code>handled</code> está muito atrás do HEAD), então nada do backend desta feature está no ar. O dono vai reiniciar <code>./publish.sh</code> pessoalmente. Não foram iniciados nem parados <code>publish.sh</code>, observador, túnel ou contêineres, e o Worker não foi publicado à mão.</p>
-<p>Ficam aguardando o deploy: a validação em produção, a tag <code>vX.Y.Z</code> e o release no GitHub, além de T13 e T14. A entrada do <code>CHANGELOG.md</code> está como "Não lançado". O site só fica no ar enquanto <code>publish.sh</code> roda.</p>
+<p><strong>No ar.</strong> Evidência (comandos rodados em 2026-11-14):</p>
+<ul>
+<li><code>.deploy-state</code>: slot ativo <code>green</code> em <code>ae88c4279210c3997ea93df86151e4b68b5063a7</code>; anterior <code>blue</code> em <code>a0c7066</code>; <code>handled</code> = <code>ae88c42</code> = <code>origin/main</code> = <code>HEAD</code>. Não existe <code>.deploy.lock</code>.</li>
+<li><code>docker ps</code>: <code>infinity-grove-backend-green</code>, <code>-postgres</code> (healthy), <code>-proxy</code> e <code>-dozzle</code> em execução.</li>
+<li>Banco de produção (somente leitura, <code>psql</code>): Flyway na versão 10 (<code>health legacy columns drop</code>, sucesso; V9 e V8 também com sucesso); 15 linhas em <code>chapters</code>; colunas com "health" ou "hit" restantes: apenas <code>boss_hit_points</code>, <code>miniboss_hit_points</code> e <code>monster_hit_points</code>, todas <code>bigint</code>. <code>boss_health</code>, <code>monster_health</code> e <code>miniboss_health</code> não existem mais.</li>
+<li>O jogo (inclusive <code>e027ff8</code>) já estava publicado na Worker: <code>game/</code> não mudou desde <code>16e5cd5</code>.</li>
+</ul>
+
+<h2>Validação em produção</h2>
+<p>Feita em <code>https://infinity-grove.yan-tapajos.workers.dev/</code> com Claude in Chrome, usando a sessão já aberta no navegador da conta de teste <code>teste</code> (capítulo 6). Não foi criada conta, não houve reset, não se gastou moeda. Foi dada uma única pancada no monstro, na conta de teste.</p>
+<table>
+<tr><th>Item</th><th>Resultado</th></tr>
+<tr><td>O jogo carrega sem erros no console</td><td>Verificado: só o log do Phaser v3.90.0; nenhuma mensagem de erro. O canvas demorou a pintar com a aba em segundo plano e apareceu após um clique.</td></tr>
+<tr><td>Sessão/login</td><td>Verificado: sessão existente restaurada ("Hello, teste!"); iniciar o jogo chamou <code>/api/wallet</code>, <code>/auto-click</code>, <code>/heroes</code>, <code>/equipment</code>, <code>/talents</code> e <code>/progress</code>, todos 200. Não testei um login novo com senha.</td></tr>
+<tr><td>Texto de HP em formato curto</td><td>Verificado: <code>HP 20.5K/20.5K</code> no capítulo 6 e <code>HP 7.8K/20.5K</code> depois da pancada.</td></tr>
+<tr><td>Número de dano em formato curto</td><td>Verificado: <code>6.4K</code> na pancada de clique.</td></tr>
+<tr><td>Dica de equipamento com comparação (<code>e027ff8</code>)</td><td>Verificado: uma armadura Rara da mochila mostra <code>Ao equipar em Seraphine Aurora:</code> com Dano de clique, Chance de crítico, Dano crítico, Dano em chefes e Tempo extra de chefe.</td></tr>
+<tr><td>API de progresso pela Worker</td><td>Verificado: <code>GET /api/progress</code> 200 e <code>POST /api/progress/outcome</code> 200 na aba autenticada; sem token, <code>curl</code> em <code>/api/progress</code> pela Worker responde 401.</td></tr>
+<tr><td>Slot ativo responde</td><td>Verificado: o proxy local (<code>localhost:8080</code>) e o túnel respondem 401 sem token, e as chamadas autenticadas acima voltaram 200 pelo slot <code>green</code>.</td></tr>
+<tr><td>Capítulos 7 a 15 jogados em produção</td><td>Não verificado: só o capítulo 6 foi visto. O restante é coberto pelos testes (cenários e2e acima).</td></tr>
+</table>
+<p>O site só fica no ar enquanto <code>publish.sh</code> roda.</p>
 </body>
 </html>

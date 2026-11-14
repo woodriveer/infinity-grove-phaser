@@ -3,9 +3,9 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [Não lançado]
+## [0.2.0] - 2026-11-14
 
-A campanha vai até o capítulo 15 (`campaign-chapters`). Ainda sem versão e sem tag: a entrada espera o deploy.
+A campanha vai até o capítulo 15 (`campaign-chapters`). A feature foi aceita pelo dono com uma lacuna de teste em aberto: as definições por fase dos capítulos 2 a 5 não estão fixadas em teste (só teste, sem defeito conhecido). As tarefas T13 e T14 (colunas antigas de vida) não passaram por verificação independente.
 
 ### Adicionado
 
@@ -16,6 +16,7 @@ A campanha vai até o capítulo 15 (`campaign-chapters`). Ainda sem versão e se
 ### Alterado
 
 - A vida dos monstros agora é guardada em 64 bits, então os capítulos altos não estouram mais o limite.
+- As colunas antigas de vida de 32 bits foram apagadas do banco (migração V10): o servidor usa só as colunas de 64 bits. Depois disso não dá mais para voltar a um servidor anterior a esta mudança.
 - O botão **Resetar conta** paga cristais pelo capítulo alcançado, sem o limite de 5: até 15 cristais (`Resetar conta (+15 cristais)`).
 - As moedas dos capítulos 1 a 5 foram movidas para as novas faixas.
 
@@ -46,4 +47,5 @@ Primeira versão marcada. Traz a venda de equipamentos em lote (`bulk-sell`).
 - Os blocos dos heróis não se mexem mais quando o modo de seleção abre.
 - Os contornos das peças marcadas ficam separados uns dos outros no modo de seleção.
 
+[0.2.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.2.0
 [0.1.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.1.0
