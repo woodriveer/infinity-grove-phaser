@@ -52,7 +52,7 @@ class FarmServiceTest {
     private val equipment = InMemoryEquipmentRepository()
     private var equipmentChance = SequenceChanceRoller(0.5)
     private val heroes = InMemoryHeroRepository(*HeroSeed.heroes().toTypedArray())
-    private val service get() = farmWith(ChapterDefinition.first())
+    private val service get() = farmWith(ChapterDefinition.first(), ChapterDefinition.of(15))
 
     private fun farmWith(vararg chapters: ChapterDefinition) =
         FarmService(
@@ -70,13 +70,13 @@ class FarmServiceTest {
             ),
         )
 
-    private val completed = Progress("yan", ProgressPosition(1, 10, Encounter.CHAPTER_BOSS, 1), completed = true)
+    private val completed = Progress("yan", ProgressPosition(15, 10, Encounter.CHAPTER_BOSS, 1), completed = true)
     private val miniboss3 = FarmBoss(Encounter.MINIBOSS, 3)
     private val chapterBoss = FarmBoss(Encounter.CHAPTER_BOSS)
 
     private fun player(
         progress: Progress = completed,
-        bosses: BossRecord = BossRecord(clearedChapters = setOf(1)),
+        bosses: BossRecord = BossRecord(clearedChapters = setOf(15)),
         start: Element = Element.FIRE,
     ) {
         users.save(User("yan", "hash", 1L, 1L))
@@ -138,7 +138,7 @@ class FarmServiceTest {
 
     @Test
     fun `state answers the chapter boss wins left today`() {
-        player(bosses = BossRecord(setOf(1), today, 4, null))
+        player(bosses = BossRecord(setOf(15), today, 4, null))
 
         assertEquals(6, service.state("yan").chapterBossWinsLeft)
     }
@@ -150,8 +150,8 @@ class FarmServiceTest {
 
         val result = service.report("yan", miniboss3, Outcome.CLEARED)
 
-        assertEquals(CardDrop("kael", "Kael Raizférrea", 0), result.drop)
-        assertEquals(2, blank("kael"))
+        assertEquals(CardDrop("seraphine", "Seraphine Aurora", 0), result.drop)
+        assertEquals(1, blank("seraphine"))
     }
 
     @Test
@@ -160,7 +160,7 @@ class FarmServiceTest {
         chance = SequenceChanceRoller(0.06)
 
         assertNull(service.report("yan", miniboss3, Outcome.CLEARED).drop)
-        assertEquals(1, blank("kael"))
+        assertEquals(0, blank("seraphine"))
     }
 
     @Test
@@ -177,9 +177,9 @@ class FarmServiceTest {
 
         val result = service.report("yan", chapterBoss, Outcome.CLEARED)
 
-        assertEquals("lyra", result.drop?.heroId)
+        assertEquals("seraphine", result.drop?.heroId)
         assertEquals(9, result.chapterBossWinsLeft)
-        assertEquals(1, blank("lyra"))
+        assertEquals(1, blank("seraphine"))
         assertEquals(9, service.state("yan").chapterBossWinsLeft)
     }
 
@@ -210,7 +210,7 @@ class FarmServiceTest {
 
     @Test
     fun `a failed farm fight answers 200 style, rolls nothing and leaves the wins and the bag`() {
-        player(bosses = BossRecord(setOf(1), today, 3, null))
+        player(bosses = BossRecord(setOf(15), today, 3, null))
         chance = SequenceChanceRoller(0.0)
         val before = playerCards.cards.getValue("yan")
 
@@ -238,7 +238,7 @@ class FarmServiceTest {
 
     @Test
     fun `the tenth chapter boss win of the day is allowed and the eleventh is refused`() {
-        player(bosses = BossRecord(setOf(1), today, 9, null))
+        player(bosses = BossRecord(setOf(15), today, 9, null))
         chance = SequenceChanceRoller(0.0)
 
         assertEquals(0, service.report("yan", chapterBoss, Outcome.CLEARED).chapterBossWinsLeft)
@@ -253,14 +253,14 @@ class FarmServiceTest {
 
     @Test
     fun `the limit does not stop a miniboss farm`() {
-        player(bosses = BossRecord(setOf(1), today, 10, null))
+        player(bosses = BossRecord(setOf(15), today, 10, null))
 
         assertEquals(0, service.report("yan", miniboss3, Outcome.CLEARED).chapterBossWinsLeft)
     }
 
     @Test
     fun `the chapter boss count starts again on the next UTC day`() {
-        player(bosses = BossRecord(setOf(1), today, 10, null))
+        player(bosses = BossRecord(setOf(15), today, 10, null))
         assertEquals(0, service.state("yan").chapterBossWinsLeft)
 
         clock.millis += 24 * 3_600_000L
@@ -362,7 +362,7 @@ class FarmServiceTest {
 
     @Test
     fun `the refused eleventh chapter boss win drops no piece`() {
-        player(bosses = BossRecord(setOf(1), today, 10, null))
+        player(bosses = BossRecord(setOf(15), today, 10, null))
         equipmentChance = SequenceChanceRoller(0.0)
 
         assertFailsWith<DailyLimitReachedException> { service.report("yan", chapterBoss, Outcome.CLEARED) }

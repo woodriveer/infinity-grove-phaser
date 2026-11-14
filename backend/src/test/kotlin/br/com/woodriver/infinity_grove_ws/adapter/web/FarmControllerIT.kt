@@ -37,9 +37,10 @@ class FarmControllerIT : IntegrationTestBase() {
         stage: Int,
         encounter: String,
         completed: Boolean = false,
-    ) = jpaProgressRepository.save(ProgressEntity("yan", 1, stage, encounter, 1, completed))
+        chapter: Int = 1,
+    ) = jpaProgressRepository.save(ProgressEntity("yan", chapter, stage, encounter, 1, completed))
 
-    private fun finished() = progressAt(10, "CHAPTER_BOSS", completed = true)
+    private fun finished() = progressAt(10, "CHAPTER_BOSS", completed = true, chapter = 15)
 
     private fun win(
         token: String,
@@ -90,12 +91,12 @@ class FarmControllerIT : IntegrationTestBase() {
         win(token, miniboss3)
             .then()
             .statusCode(200)
-            .body("drop.heroId", equalTo("kael"))
-            .body("drop.heroName", equalTo("Kael Raizférrea"))
+            .body("drop.heroId", equalTo("seraphine"))
+            .body("drop.heroName", equalTo("Seraphine Aurora"))
             .body("drop.stars", equalTo(0))
             .body("chapterBossWinsLeft", equalTo(10))
 
-        assertEquals(2, jpaCardCopyRepository.findAllByUsername("yan").single { it.stars == 0 }.copies)
+        assertEquals(1, jpaCardCopyRepository.findAllByUsername("yan").single { it.heroId == "seraphine" && it.stars == 0 }.copies)
     }
 
     @Test
@@ -118,7 +119,7 @@ class FarmControllerIT : IntegrationTestBase() {
         win(token, chapterBoss)
             .then()
             .statusCode(200)
-            .body("drop.heroId", equalTo("lyra"))
+            .body("drop.heroId", equalTo("seraphine"))
             .body("chapterBossWinsLeft", equalTo(9))
         asUser(token).get("/farm").then().body("chapterBossWinsLeft", equalTo(9))
     }
@@ -217,7 +218,7 @@ class FarmControllerIT : IntegrationTestBase() {
             .then()
             .statusCode(200)
             .body("equipmentDrop.sold", equalTo(false))
-            .body("equipmentDrop.piece.rarity", equalTo("UNCOMMON"))
+            .body("equipmentDrop.piece.rarity", equalTo("RARE"))
             .body("equipmentDrop.piece.slot", equalTo("RING"))
 
         assertEquals(1, jpaPieceRepository.count())
