@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 85,
+  "next_id": 87,
   "lessons": [
     {
       "id": "L-001",
@@ -1520,6 +1520,42 @@
       ],
       "created": "2026-11-14T05:51:13Z",
       "last_seen": "2026-11-14T05:51:13Z"
+    },
+    {
+      "id": "L-085",
+      "key": "surviving_mutant::pin every stage of a per stage formula with its own assertion not only the first and last stage",
+      "text": "Pin every stage of a per-stage formula with its own assertion, not only the first and last stage",
+      "signal": "surviving_mutant",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "campaign-chapters"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md sensor N7 and N8 (ChapterTest.kt:305-365) (tests)"
+      ],
+      "created": "2026-11-14T07:27:40Z",
+      "last_seen": "2026-11-14T07:27:40Z"
+    },
+    {
+      "id": "L-086",
+      "key": "ac_gap::assert a spec text in every state the spec names not only in the first state that shows it",
+      "text": "Assert a spec text in every state the spec names, not only in the first state that shows it",
+      "signal": "ac_gap",
+      "scope": "game",
+      "status": "candidate",
+      "features": [
+        "campaign-chapters"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md gap 2 (ClickerGame.test.js:4611) (game)"
+      ],
+      "created": "2026-11-14T07:27:40Z",
+      "last_seen": "2026-11-14T07:27:40Z"
     }
   ]
 }

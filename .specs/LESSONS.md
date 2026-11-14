@@ -516,6 +516,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: CHAP-08 AC 3 (validation.md gap 5) (e2e)
 - last seen: 2026-11-14T05:51:13Z
 
+### L-085 - Pin every stage of a per-stage formula with its own assertion, not only the first and last stage
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: campaign-chapters
+- evidence: validation.md sensor N7 and N8 (ChapterTest.kt:305-365) (tests)
+- last seen: 2026-11-14T07:27:40Z
+
+### L-086 - Assert a spec text in every state the spec names, not only in the first state that shows it
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: campaign-chapters
+- evidence: validation.md gap 2 (ClickerGame.test.js:4611) (game)
+- last seen: 2026-11-14T07:27:40Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
