@@ -127,6 +127,25 @@ class FarmServiceTest {
     }
 
     @Test
+    fun `a player completed at chapter 5 farms chapter 6 bosses only and has none beaten yet`() {
+        player(Progress("yan", ProgressPosition(5, 10, Encounter.CHAPTER_BOSS, 1), completed = true))
+
+        assertEquals(emptyList(), farmWith(ChapterDefinition.of(5), ChapterDefinition.of(6)).state("yan").bosses)
+    }
+
+    @Test
+    fun `a player completed at chapter 5 cannot report a chapter 5 boss win as a farm win once chapter 6 is open`() {
+        player(Progress("yan", ProgressPosition(5, 10, Encounter.CHAPTER_BOSS, 1), completed = true))
+
+        assertFailsWith<BossNotAvailableException> {
+            farmWith(ChapterDefinition.of(5), ChapterDefinition.of(6)).report("yan", chapterBoss, Outcome.CLEARED)
+        }
+        assertFailsWith<BossNotAvailableException> {
+            farmWith(ChapterDefinition.of(5), ChapterDefinition.of(6)).report("yan", FarmBoss(Encounter.MINIBOSS, 3), Outcome.CLEARED)
+        }
+    }
+
+    @Test
     fun `a player in chapter 6 farms the minibosses of chapter 6 that were passed`() {
         player(Progress("yan", ProgressPosition(6, 4, Encounter.PHASE, 1)))
 

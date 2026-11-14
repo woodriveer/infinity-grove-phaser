@@ -65,13 +65,13 @@ class FarmService(
 
     private fun winsLeft(cards: PlayerCards) = cards.bosses.winsLeft(rewards.today(), rewards.rates().chapterBossDailyLimit)
 
-    /** Returns the locked progress; a player who never reported anything is at the start of the campaign. */
+    /** Returns the locked progress with the next chapter open, as [ProgressService] does; a player who never reported starts the campaign. */
     private fun loadProgress(username: String): Progress {
         if (!userRepository.existsByUsername(username)) {
             logger.warn("Farm request rejected, user not found username={}", username)
             throw UserNotFoundException(username)
         }
-        return progressRepository.findForUpdate(username) ?: Progress.start(username)
+        return progressRepository.findForUpdate(username)?.withNextChapterOpen() ?: Progress.start(username)
     }
 
     private fun loadCards(username: String): PlayerCards =
