@@ -102,13 +102,16 @@ class ChapterRepositoryIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `a seeded chapter holds the same value in the legacy and the hit point columns`() {
-        assertEquals(512_000, jdbc.queryForObject("select boss_health from chapters where number = 5", Int::class.java))
-        assertEquals(512_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 5", Long::class.java))
-        assertEquals(19_456, jdbc.queryForObject("select monster_health from stages where id = '5/10'", Int::class.java))
-        assertEquals(19_456L, jdbc.queryForObject("select monster_hit_points from stages where id = '5/10'", Long::class.java))
-        assertEquals(97_280, jdbc.queryForObject("select miniboss_health from stages where id = '5/10'", Int::class.java))
-        assertEquals(97_280L, jdbc.queryForObject("select miniboss_hit_points from stages where id = '5/10'", Long::class.java))
+    fun `a chapter saved now leaves the legacy health columns null`() {
+        repository.save(ChapterDefinition(99, 3000L, 61_000, listOf(StageDefinition(1, 1, 1, 1, 1000))))
+
+        try {
+            assertNull(jdbc.queryForObject("select boss_health from chapters where number = 99", Int::class.java))
+            assertEquals(3000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 99", Long::class.java))
+        } finally {
+            jpaStageRepository.deleteAll(jpaStageRepository.findAllByChapterOrderByNumber(99))
+            jpaChapterRepository.deleteById(99)
+        }
     }
 
     @Test

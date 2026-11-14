@@ -44,11 +44,6 @@ class EnemyEntity(
 /** Looks up an enemy the stage or chapter points at; a dangling id fails the load. */
 private fun Map<Long, EnemyStats>.enemy(id: Long) = this[id] ?: throw IllegalStateException("Enemy $id does not exist")
 
-/**
- * The legacy 32-bit health column, kept while the previous backend still reads it (AD-016): the value when it fits, null otherwise.
- */
-internal fun legacyHealth(value: Long): Int? = if (value <= Int.MAX_VALUE) value.toInt() else null
-
 @Entity
 @Table(name = "chapters")
 class ChapterEntity(
@@ -57,8 +52,6 @@ class ChapterEntity(
     var number: Int,
     @Column(nullable = false)
     var bossHitPoints: Long,
-    @Column
-    var bossHealth: Int?,
     @Column(nullable = false)
     var bossTimeLimitMs: Long,
     @Column(nullable = false)
@@ -81,7 +74,6 @@ class ChapterEntity(
         ) = ChapterEntity(
             number = chapter.number,
             bossHitPoints = chapter.bossHealth,
-            bossHealth = legacyHealth(chapter.bossHealth),
             bossTimeLimitMs = chapter.bossTimeLimitMs,
             bossEnemyId = bossEnemyId,
             bossDropRuleId = chapter.bossDropRuleId,
@@ -110,10 +102,6 @@ class StageEntity(
     var monsterHitPoints: Long,
     @Column(nullable = false)
     var minibossHitPoints: Long,
-    @Column
-    var monsterHealth: Int?,
-    @Column
-    var minibossHealth: Int?,
     @Column(nullable = false)
     var minibossTimeLimitMs: Long,
     @Column(nullable = false)
@@ -156,8 +144,6 @@ class StageEntity(
             phasesPerStage = stage.phasesPerStage,
             monsterHitPoints = stage.monsterHealth,
             minibossHitPoints = stage.minibossHealth,
-            monsterHealth = legacyHealth(stage.monsterHealth),
-            minibossHealth = legacyHealth(stage.minibossHealth),
             minibossTimeLimitMs = stage.minibossTimeLimitMs,
             monsterEnemyId = monsterEnemyId,
             minibossEnemyId = minibossEnemyId,

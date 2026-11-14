@@ -39,24 +39,40 @@ class HealthHitPointsMigrationIT : IntegrationTestBase() {
 
     @Test
     fun `the expand migration copies every legacy health into the hit points`() {
-        jdbc.update("update chapters set boss_hit_points = null")
-        jdbc.update("update stages set monster_hit_points = null, miniboss_hit_points = null")
+        jdbc.update("update chapters set boss_health = boss_hit_points where number between 1 and 15")
+        jdbc.update(
+            "update stages set monster_health = monster_hit_points, miniboss_health = miniboss_hit_points where chapter between 1 and 15",
+        )
+        jdbc.update("update chapters set boss_hit_points = null where number between 1 and 15")
+        jdbc.update("update stages set monster_hit_points = null, miniboss_hit_points = null where chapter between 1 and 15")
 
         migrate()
 
         assertEquals(
             0,
-            jdbc.queryForObject("select count(*) from chapters where boss_hit_points is distinct from boss_health", Int::class.java),
+            jdbc.queryForObject(
+                "select count(*) from chapters where number between 1 and 15 and boss_hit_points is distinct from boss_health",
+                Int::class.java,
+            ),
         )
         assertEquals(
             0,
-            jdbc.queryForObject("select count(*) from stages where monster_hit_points is distinct from monster_health", Int::class.java),
+            jdbc.queryForObject(
+                "select count(*) from stages where chapter between 1 and 15 and monster_hit_points is distinct from monster_health",
+                Int::class.java,
+            ),
         )
         assertEquals(
             0,
-            jdbc.queryForObject("select count(*) from stages where miniboss_hit_points is distinct from miniboss_health", Int::class.java),
+            jdbc.queryForObject(
+                "select count(*) from stages where chapter between 1 and 15 and miniboss_hit_points is distinct from miniboss_health",
+                Int::class.java,
+            ),
         )
         assertEquals(512_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 5", Long::class.java))
+
+        jdbc.update("update chapters set boss_health = null where number between 1 and 15")
+        jdbc.update("update stages set monster_health = null, miniboss_health = null where chapter between 1 and 15")
     }
 
     @Test
@@ -70,6 +86,7 @@ class HealthHitPointsMigrationIT : IntegrationTestBase() {
 
     @Test
     fun `a hit point below 1 is refused and 3000000000 is stored`() {
+        val saved = jdbc.queryForObject("select boss_hit_points from chapters where number = 1", Long::class.java)
         assertFailsWith<DataIntegrityViolationException> {
             jdbc.update("update chapters set boss_hit_points = 0 where number = 1")
         }
@@ -77,6 +94,6 @@ class HealthHitPointsMigrationIT : IntegrationTestBase() {
         jdbc.update("update chapters set boss_hit_points = 3000000000 where number = 1")
 
         assertEquals(3_000_000_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 1", Long::class.java))
-        jdbc.update("update chapters set boss_hit_points = boss_health where number = 1")
+        jdbc.update("update chapters set boss_hit_points = ? where number = 1", saved)
     }
 }

@@ -45,9 +45,9 @@ class MonsterHealthMigrationIT : IntegrationTestBase() {
 
     @Test
     fun `a new database seeds the grown health`() {
-        assertEquals(40, stage(1, 1)["monster_health"])
-        assertEquals(76 * 64, stage(4, 10)["monster_health"])
-        assertEquals(2000 * 256, boss(5))
+        assertEquals(40L, jdbc.queryForObject("select monster_hit_points from stages where chapter = 1 and number = 1", Long::class.java))
+        assertEquals(4864L, jdbc.queryForObject("select monster_hit_points from stages where chapter = 4 and number = 10", Long::class.java))
+        assertEquals(512_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 5", Long::class.java))
     }
 
     @Test

@@ -16,10 +16,11 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * AD-016: the release before 64-bit health (commit `91e3111`) must keep starting and serving on the database after V8 and V9.
- * Its entities map the legacy `integer` health columns and the drop rule columns, so these checks replay what it runs at start
- * (the column types of `ddl-auto: validate`, Flyway's validation of its own migrations) and on its read and write paths, against the
- * migrated database. Booting the previous image itself is not executed here.
+ * AD-016: the backend deployed before the current one must keep starting and serving on this database. The schema check and Flyway's
+ * validation replay the release before 64-bit health (commit `91e3111`), whose columns stay until V10. The read and write paths replay
+ * the release before T13 (commit `e57f60c`, the rollback target), which maps the legacy integer health columns as nullable next to the
+ * hit points: a database seeded after T13 holds null in the legacy columns, which `91e3111` cannot read. Booting a previous image itself
+ * is not executed here.
  */
 class PreviousBackendCompatibilityIT : IntegrationTestBase() {
     @Autowired
@@ -99,33 +100,33 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `the previous backend reads the legacy integer health of chapters 1 to 15`() {
+    fun `the previous backend reads the health of chapters 1 to 15 from the hit point columns`() {
         val bossHealth =
             jdbc
-                .query("select number, boss_health from chapters order by number") { rs, _ ->
-                    rs.getInt("number") to rs.getInt("boss_health")
+                .query("select number, boss_hit_points from chapters order by number") { rs, _ ->
+                    rs.getInt("number") to rs.getLong("boss_hit_points")
                 }.toMap()
         val stageHealth =
             jdbc
-                .query("select chapter, monster_health, miniboss_health from stages where number = 10 order by chapter") { rs, _ ->
-                    rs.getInt("chapter") to (rs.getInt("monster_health") to rs.getInt("miniboss_health"))
+                .query("select chapter, monster_hit_points, miniboss_hit_points from stages where number = 10 order by chapter") { rs, _ ->
+                    rs.getInt("chapter") to (rs.getLong("monster_hit_points") to rs.getLong("miniboss_hit_points"))
                 }.toMap()
 
         assertEquals((1..15).toList(), bossHealth.keys.toList())
-        assertEquals(2_000, bossHealth[1])
-        assertEquals(512_000, bossHealth[5])
-        assertEquals(16_384_000, bossHealth[10])
-        assertEquals(524_288_000, bossHealth[15])
+        assertEquals(2_000L, bossHealth[1])
+        assertEquals(512_000L, bossHealth[5])
+        assertEquals(16_384_000L, bossHealth[10])
+        assertEquals(524_288_000L, bossHealth[15])
         assertEquals(
             0,
             jdbc.queryForObject(
-                "select count(*) from stages where monster_health is null or miniboss_health is null",
+                "select count(*) from stages where monster_hit_points is null or miniboss_hit_points is null",
                 Int::class.java,
             ),
         )
-        assertEquals(19_456 to 97_280, stageHealth[5])
-        assertEquals(622_592 to 3_112_960, stageHealth[10])
-        assertEquals(19_922_944 to 99_614_720, stageHealth[15])
+        assertEquals(19_456L to 97_280L, stageHealth[5])
+        assertEquals(622_592L to 3_112_960L, stageHealth[10])
+        assertEquals(19_922_944L to 99_614_720L, stageHealth[15])
     }
 
     @Test
@@ -146,9 +147,11 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `the previous backend writes the legacy health and the drop rule columns`() {
+    fun `the previous backend writes the health and the drop rule columns`() {
+        val legacyBefore = jdbc.queryForObject("select boss_health from chapters where number = 1", Int::class.java)
         rolledBack {
-            assertEquals(1, jdbc.update("update chapters set boss_health = ? where number = ?", 3_000, 1))
+            assertEquals(1, jdbc.update("update chapters set boss_hit_points = ?, boss_health = ? where number = ?", 3_000L, 3_000, 1))
+            assertEquals(3_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 1", Long::class.java))
             assertEquals(3_000, jdbc.queryForObject("select boss_health from chapters where number = 1", Int::class.java))
             assertEquals(
                 1,
@@ -163,7 +166,8 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
             assertEquals(20, jdbc.queryForObject("select min_copper from drop_rules where id = 5", Int::class.java))
         }
 
-        assertEquals(2_000, jdbc.queryForObject("select boss_health from chapters where number = 1", Int::class.java))
+        assertEquals(2_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 1", Long::class.java))
+        assertEquals(legacyBefore, jdbc.queryForObject("select boss_health from chapters where number = 1", Int::class.java))
         assertEquals(16, jdbc.queryForObject("select min_copper from drop_rules where id = 5", Int::class.java))
     }
 

@@ -97,13 +97,14 @@ class ProgressControllerIT : IntegrationTestBase() {
     @Test
     fun `GET progress answers a boss health above the 32-bit limit as a JSON integer`() {
         user()
+        val saved = jdbc.queryForObject("select boss_hit_points from chapters where number = 1", Long::class.java)
         jdbc.update("update chapters set boss_hit_points = 3000000000 where number = 1")
         try {
             val bossHealth = getProgress().jsonPath().getLong("definition.bossHealth")
 
             assertEquals(3_000_000_000L, bossHealth)
         } finally {
-            jdbc.update("update chapters set boss_hit_points = boss_health where number = 1")
+            jdbc.update("update chapters set boss_hit_points = ? where number = 1", saved)
         }
     }
 

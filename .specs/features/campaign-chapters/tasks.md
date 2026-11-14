@@ -585,7 +585,7 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 
 ---
 
-### T13: Stop mapping the legacy health columns [ ]
+### T13: Stop mapping the legacy health columns [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Step B of the expand/contract. The entities no longer map `boss_health`, `monster_health` and `miniboss_health`, so the next step can drop them while this backend stays the rollback target (CHAP-08 AC 5).
@@ -644,9 +644,9 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 **Gate**: full - `cd backend && ./gradlew test`
 **Done when**:
 
-- [ ] The backend suite passes, including `SchemaValidationIT`, `HealthHitPointsMigrationIT`, `PreviousBackendCompatibilityIT`, `ProgressControllerIT`, `AccountResetControllerIT`, `CardsFlowIT`, `EquipmentDropFlowIT`, `FarmControllerIT` and `MonsterHealthMigrationIT`.
-- [ ] `grep -rnE "_hit_points = (boss|monster|miniboss)_health" backend/src/test` prints nothing.
-- [ ] The commit touches exactly `ChapterEntities.kt`, the five test files named above and this file.
+- [x] The backend suite passes, including `SchemaValidationIT`, `HealthHitPointsMigrationIT`, `PreviousBackendCompatibilityIT`, `ProgressControllerIT`, `AccountResetControllerIT`, `CardsFlowIT`, `EquipmentDropFlowIT`, `FarmControllerIT` and `MonsterHealthMigrationIT`.
+- [x] `grep -rnE "_hit_points = (boss|monster|miniboss)_health" backend/src/test` prints nothing.
+- [x] The commit touches exactly `ChapterEntities.kt`, the five test files named above and this file.
 - [ ] The commit is pushed alone, and T14 waits for it to be deployed: V10 drops columns that the release before T13 still maps and writes, so V10 must never run while that release is the rollback target.
 
 **Commit**: `refactor(backend): stop mapping the legacy health columns`
