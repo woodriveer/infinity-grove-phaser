@@ -168,10 +168,17 @@ class AccountResetControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `a completed campaign pays 5`() {
-        atChapter(5, completed = true)
+    fun `a completed campaign pays the last chapter, 15`() {
+        atChapter(15, completed = true)
 
-        reset(5).statusCode(200).body("reward", equalTo(5)).body("crystals", equalTo(5))
+        reset(15).statusCode(200).body("reward", equalTo(15)).body("crystals", equalTo(15))
+    }
+
+    @Test
+    fun `a reset at chapter 10 pays 10 crystals`() {
+        atChapter(10)
+
+        reset(10).statusCode(200).body("reward", equalTo(10)).body("crystals", equalTo(10))
     }
 
     @Test

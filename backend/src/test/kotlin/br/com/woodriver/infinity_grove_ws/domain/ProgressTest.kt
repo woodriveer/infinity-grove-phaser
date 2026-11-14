@@ -145,7 +145,7 @@ class ProgressTest {
     }
 
     @Test
-    fun `each seeded chapter takes 61 clears and the fifth one completes the progress`() {
+    fun `each seeded chapter takes 61 clears and the fifteenth one completes the progress`() {
         var progress = Progress.start("yan")
         var clears = 0
 
@@ -154,8 +154,35 @@ class ProgressTest {
             clears++
         }
 
-        assertEquals(61 * ChapterOrder.MAX_CHAPTER, clears)
-        assertEquals(ProgressPosition(ChapterOrder.MAX_CHAPTER, 10, Encounter.CHAPTER_BOSS, 1), progress.position)
+        assertEquals(61 * 15, clears)
+        assertEquals(ProgressPosition(15, 10, Encounter.CHAPTER_BOSS, 1), progress.position)
+    }
+
+    @Test
+    fun `the chapter 5 boss opens chapter 6`() {
+        val fifth = Progress("yan", ProgressPosition(5, 10, Encounter.CHAPTER_BOSS, 1))
+
+        val next = fifth.report(fifth.position, Outcome.CLEARED, ChapterDefinition.of(5))
+
+        assertFalse(next.completed)
+        assertEquals(ProgressPosition(6, 1, Encounter.PHASE, 1), next.position)
+    }
+
+    @Test
+    fun `the chapter 15 boss completes the campaign`() {
+        val last = Progress("yan", ProgressPosition(15, 10, Encounter.CHAPTER_BOSS, 1))
+
+        val done = last.report(last.position, Outcome.CLEARED, ChapterDefinition.of(15))
+
+        assertTrue(done.completed)
+        assertEquals(last.position, done.position)
+    }
+
+    @Test
+    fun `a progress completed at chapter 5 opens chapter 6`() {
+        val fifth = Progress("yan", ProgressPosition(5, 10, Encounter.CHAPTER_BOSS, 1), completed = true)
+
+        assertEquals(Progress("yan", ProgressPosition(6, 1, Encounter.PHASE, 1)), fifth.withNextChapterOpen())
     }
 
     @Test

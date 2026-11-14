@@ -26,8 +26,14 @@ class AccountResetTest {
     }
 
     @Test
-    fun `a completed campaign pays 5`() {
-        assertEquals(5, AccountReset.reward(at(5, completed = true)))
+    fun `a completed campaign pays the last chapter, 15`() {
+        assertEquals(15, AccountReset.reward(at(15, completed = true)))
+    }
+
+    @Test
+    fun `chapter 10 pays 10 and chapter 15 pays 15`() {
+        assertEquals(10, AccountReset.reward(at(10)))
+        assertEquals(15, AccountReset.reward(at(15)))
     }
 
     @Test

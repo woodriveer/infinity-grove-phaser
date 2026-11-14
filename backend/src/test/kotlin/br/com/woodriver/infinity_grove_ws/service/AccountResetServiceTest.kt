@@ -24,7 +24,7 @@ import kotlin.test.assertTrue
 class AccountResetServiceTest {
     private val users = InMemoryUserRepository()
     private val progress = InMemoryProgressRepository()
-    private val chapters = InMemoryChapterRepository(*(1..5).map { ChapterDefinition.of(it) }.toTypedArray())
+    private val chapters = InMemoryChapterRepository(*(1..15).map { ChapterDefinition.of(it) }.toTypedArray())
     private val talents = InMemoryTalentRepository()
     private val crystals = InMemoryCrystalRepository()
     private val resets = InMemoryResetRepository()
@@ -95,10 +95,10 @@ class AccountResetServiceTest {
     }
 
     @Test
-    fun `a completed campaign pays 5`() {
-        player(chapter = 5, completed = true)
+    fun `a completed campaign pays the last chapter, 15`() {
+        player(chapter = 15, completed = true)
 
-        assertEquals(5, service.reset("yan", 5).reward)
+        assertEquals(15, service.reset("yan", 15).reward)
     }
 
     @Test

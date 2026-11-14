@@ -17,12 +17,12 @@ class EnemyRepositoryIT : IntegrationTestBase() {
     @Autowired
     private lateinit var jdbc: JdbcTemplate
 
-    // the seeded enemies are shared with other integration tests; no seed reaches a physical defense of 80, so these rows are ours
+    // the seeded enemies are shared with other integration tests; no seed reaches a physical defense of 81 (the chapter 15 boss has 80), so these rows are ours
     private val stats = EnemyStats(Element.WATER, 81, 82, 97)
 
     @AfterTest
     fun removeTestEnemies() {
-        jdbc.update("delete from enemies where physical_defense >= 80")
+        jdbc.update("delete from enemies where physical_defense >= 81")
     }
 
     private fun rowsWith(stats: EnemyStats) =

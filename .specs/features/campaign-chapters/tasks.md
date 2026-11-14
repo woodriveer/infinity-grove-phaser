@@ -468,7 +468,7 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 
 ---
 
-### T10: The campaign runs to chapter 15 [ ]
+### T10: The campaign runs to chapter 15 [x]
 
 **Owner**: kotlin-backend-dev
 **What**: `ChapterOrder.MAX_CHAPTER = 15` and the chapter element repeats every 5 chapters. The seeder then creates chapters 6 to 15, the chapter 5 boss opens chapter 6, the chapter 15 boss completes, and the reset pays up to 15 (CHAP-01, CHAP-02, CHAP-05, CHAP-06 AC 1, 2).
@@ -504,8 +504,8 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 **Gate**: full - `cd backend && ./gradlew test`
 **Done when**:
 
-- [ ] Every listed case passes and the whole backend suite passes.
-- [ ] `cd backend && ./gradlew build` passes (ktlint).
+- [x] Every listed case passes and the whole backend suite passes.
+- [x] `cd backend && ./gradlew build` passes (ktlint).
 
 **Commit**: `feat(backend): run the campaign to chapter 15`
 

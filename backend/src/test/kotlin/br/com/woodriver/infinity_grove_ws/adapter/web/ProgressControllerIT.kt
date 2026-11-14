@@ -207,6 +207,36 @@ class ProgressControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `a progress stored as completed in chapter 5 opens chapter 6 on GET`() {
+        user()
+        jpaProgressRepository.save(ProgressEntity("yan", 5, 10, "CHAPTER_BOSS", 1, true))
+
+        getProgress()
+            .then()
+            .statusCode(200)
+            .body("chapter", equalTo(6))
+            .body("stage", equalTo(1))
+            .body("encounter", equalTo("PHASE"))
+            .body("completed", equalTo(false))
+        assertEquals(6, jpaProgressRepository.findById("yan").get().chapter)
+    }
+
+    @Test
+    fun `clearing the chapter 5 boss answers chapter 6 with boss health 1024000`() {
+        user()
+        jpaProgressRepository.save(ProgressEntity("yan", 5, 10, "CHAPTER_BOSS", 1, false))
+
+        report(body(10, "CHAPTER_BOSS", 1, "CLEARED", chapter = 5))
+            .then()
+            .statusCode(200)
+            .body("chapter", equalTo(6))
+            .body("stage", equalTo(1))
+            .body("encounter", equalTo("PHASE"))
+            .body("phase", equalTo(1))
+            .body("definition.bossHealth", equalTo(1_024_000))
+    }
+
+    @Test
     fun `clearing the last phase of a stage moves to its miniboss and clearing that moves to the next stage`() {
         user()
         store(4, "PHASE", 5)
@@ -291,10 +321,10 @@ class ProgressControllerIT : IntegrationTestBase() {
     @Test
     fun `every report on the completed last chapter is 409 and the progress stays completed`() {
         user()
-        jpaProgressRepository.save(ProgressEntity("yan", 5, 10, "CHAPTER_BOSS", 1, true))
+        jpaProgressRepository.save(ProgressEntity("yan", 15, 10, "CHAPTER_BOSS", 1, true))
 
         listOf("CLEARED", "FAILED").forEach { outcome ->
-            report(body(10, "CHAPTER_BOSS", 1, outcome, chapter = 5))
+            report(body(10, "CHAPTER_BOSS", 1, outcome, chapter = 15))
                 .then()
                 .statusCode(409)
                 .body("code", equalTo("PROGRESS_CONFLICT"))

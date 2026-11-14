@@ -124,7 +124,7 @@ class SchemaConstraintsIT : IntegrationTestBase() {
         )
         assertRejected(
             "23503",
-            "insert into progress (username, chapter, stage, encounter, phase, completed) values ('yan', 6, 1, 'PHASE', 1, false)",
+            "insert into progress (username, chapter, stage, encounter, phase, completed) values ('yan', 16, 1, 'PHASE', 1, false)",
         )
     }
 

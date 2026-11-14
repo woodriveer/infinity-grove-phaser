@@ -41,9 +41,25 @@ class ChapterOrderTest {
     }
 
     @Test
-    fun `a chapter outside 1 to 5 is rejected`() {
+    fun `chapters 6 to 15 repeat the five-chapter order`() {
+        assertEquals(FIRE, ChapterOrder.element(FIRE, 6))
+        assertEquals(NATURE, ChapterOrder.element(FIRE, 7))
+        assertEquals(WATER, ChapterOrder.element(FIRE, 8))
+        assertEquals(DARKNESS, ChapterOrder.element(FIRE, 9))
+        assertEquals(LIGHT, ChapterOrder.element(FIRE, 10))
+        assertEquals(FIRE, ChapterOrder.element(FIRE, 11))
+        assertEquals(LIGHT, ChapterOrder.element(FIRE, 15))
+    }
+
+    @Test
+    fun `a chapter outside 1 to 15 is rejected`() {
         assertFailsWith<IllegalArgumentException> { ChapterOrder.element(FIRE, 0) }
-        assertFailsWith<IllegalArgumentException> { ChapterOrder.element(FIRE, 6) }
+        assertFailsWith<IllegalArgumentException> { ChapterOrder.element(FIRE, 16) }
+    }
+
+    @Test
+    fun `the chapter of an element stays its first chapter`() {
+        assertEquals(2, ChapterOrder.chapterOf(FIRE, NATURE))
     }
 
     @Test

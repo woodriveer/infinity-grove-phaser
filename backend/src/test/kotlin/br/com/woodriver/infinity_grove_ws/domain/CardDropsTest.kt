@@ -85,10 +85,30 @@ class CardDropsTest {
     }
 
     @Test
-    fun `the last chapter boss drops the hero of chapter five`() {
-        assertEquals("seraphine", drop(Encounter.CHAPTER_BOSS, 0.0, chapter = 5, first = true))
-        assertEquals("seraphine", drop(Encounter.CHAPTER_BOSS, 0.05, chapter = 5))
-        assertNull(drop(Encounter.CHAPTER_BOSS, 0.30, chapter = 5))
+    fun `the last chapter boss drops the hero of chapter 15`() {
+        assertEquals("seraphine", drop(Encounter.CHAPTER_BOSS, 0.0, chapter = 15, first = true))
+        assertEquals("seraphine", drop(Encounter.CHAPTER_BOSS, 0.05, chapter = 15))
+        assertNull(drop(Encounter.CHAPTER_BOSS, 0.30, chapter = 15))
+    }
+
+    @Test
+    fun `the first chapter 6 boss win drops the NATURE hero of chapter 7`() {
+        assertEquals("lyra", drop(Encounter.CHAPTER_BOSS, 0.0, chapter = 6, first = true))
+    }
+
+    @Test
+    fun `a chapter 11 miniboss drop is the FIRE hero`() {
+        assertEquals("kael", drop(Encounter.MINIBOSS, 0.0, chapter = 11))
+    }
+
+    @Test
+    fun `the chapter 14 boss drops the LIGHT hero of chapter 15`() {
+        assertEquals("seraphine", drop(Encounter.CHAPTER_BOSS, 0.0, chapter = 14, first = true))
+    }
+
+    @Test
+    fun `the chapter 15 boss drops the LIGHT hero of chapter 15`() {
+        assertEquals("seraphine", drop(Encounter.CHAPTER_BOSS, 0.0, chapter = 15, first = true))
     }
 
     @Test

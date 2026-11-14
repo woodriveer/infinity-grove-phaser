@@ -30,15 +30,16 @@ class WalletControllerIT : IntegrationTestBase() {
 
     private fun drops(response: Response): List<Int> = response.path("drops.1")
 
-    private val seedRuleIds = (1..15).map(Int::toString)
+    private val seedRuleIds = (1..45).map(Int::toString)
 
-    /** The seed range of drop rule [id]: chapter c owns 3c-2 (c..5c), 3c-1 (5c..15c) and 3c (20c..50c). */
+    /** The seed range of drop rule [id]: chapter c owns 3c-2 (2m..6m), 3c-1 (8m..20m) and 3c (30m..70m), m the coin factor of the chapter. */
     private fun seedRange(id: Int): IntRange {
         val chapter = (id + 2) / 3
+        val m = if (chapter <= 8) 1 shl (chapter - 1) else 128 + 32 * (chapter - 8)
         return when (id - 3 * (chapter - 1)) {
-            1 -> chapter..5 * chapter
-            2 -> 5 * chapter..15 * chapter
-            else -> 20 * chapter..50 * chapter
+            1 -> 2 * m..6 * m
+            2 -> 8 * m..20 * m
+            else -> 30 * m..70 * m
         }
     }
 
@@ -55,7 +56,7 @@ class WalletControllerIT : IntegrationTestBase() {
             .body("wallet.silver", equalTo(0))
             .body("wallet.copper", equalTo(0))
             .body("drops.keySet()", containsInAnyOrder(*seedRuleIds.toTypedArray()))
-        (1..15).forEach { id ->
+        (1..45).forEach { id ->
             val queue: List<Int> = response.path("drops.$id")
             assertEquals(20, queue.size, "rule $id")
             assertTrue(queue.all { it in seedRange(id) }, "rule $id queue $queue is inside ${seedRange(id)}")
@@ -79,7 +80,7 @@ class WalletControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `POST sync credits kills of the miniboss rule 2 from its 5 to 15 copper queue`() {
+    fun `POST sync credits kills of the miniboss rule 2 from its 8 to 20 copper queue`() {
         user()
         val before: List<Int> = getWallet().path("drops.2")
 
@@ -90,7 +91,7 @@ class WalletControllerIT : IntegrationTestBase() {
             .statusCode(200)
             .body("accepted.2", equalTo(2))
             .body("wallet.copper", equalTo(before.take(2).sum()))
-        assertTrue(before.take(2).all { it in 5..15 }, "credited values ${before.take(2)} are inside 5..15")
+        assertTrue(before.take(2).all { it in seedRange(2) }, "credited values ${before.take(2)} are inside ${seedRange(2)}")
         assertEquals(before.drop(2), response.path<List<Int>>("drops.2").take(18))
     }
 

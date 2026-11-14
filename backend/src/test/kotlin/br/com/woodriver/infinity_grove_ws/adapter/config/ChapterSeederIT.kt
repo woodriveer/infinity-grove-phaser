@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ChapterSeederIT : IntegrationTestBase() {
     @Autowired
@@ -47,8 +48,13 @@ class ChapterSeederIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `application start seeds all five chapters`() {
-        (1..5).forEach { assertEquals(ChapterDefinition.of(it), repository.findByNumber(it)) }
+    fun `application start seeds chapters 1 to 15`() {
+        (1..15).forEach { assertEquals(ChapterDefinition.of(it), repository.findByNumber(it)) }
+        assertEquals(524_288_000L, repository.findByNumber(15)!!.bossHealth)
+        assertEquals(3_112_960L, repository.findByNumber(10)!!.stage(10).minibossHealth)
+        val rules = dropRules.findAll()
+        assertTrue((1..45).all { rules.ruleFor(it) != null })
+        assertEquals(DropRule(45, 10_560, 24_640, 1500), rules.ruleFor(45))
     }
 
     @Test

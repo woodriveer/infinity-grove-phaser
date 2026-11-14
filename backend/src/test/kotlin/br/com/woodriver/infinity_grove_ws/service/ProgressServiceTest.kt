@@ -46,7 +46,7 @@ class ProgressServiceTest {
     private val users = InMemoryUserRepository()
     private val progresses = InMemoryProgressRepository()
     private val chapter = ChapterDefinition.first()
-    private val chapters = InMemoryChapterRepository(*(1..5).map(ChapterDefinition::of).toTypedArray())
+    private val chapters = InMemoryChapterRepository(*(1..15).map(ChapterDefinition::of).toTypedArray())
     private val heroes = InMemoryHeroRepository(*HeroSeed.heroes().toTypedArray())
     private val playerCards = InMemoryPlayerCardsRepository()
     private val talents = InMemoryTalentRepository()
@@ -113,7 +113,7 @@ class ProgressServiceTest {
     @Test
     fun `get fails when the stored chapter does not exist`() {
         existingUser()
-        progresses.save(Progress("yan", ProgressPosition(6, 1, Encounter.PHASE, 1)))
+        progresses.save(Progress("yan", ProgressPosition(16, 1, Encounter.PHASE, 1)))
 
         assertFailsWith<ChapterNotFoundException> { service.get("yan") }
     }
@@ -406,7 +406,7 @@ class ProgressServiceTest {
     @Test
     fun `the progress of the last chapter stays completed`() {
         existingUser()
-        val last = Progress("yan", ProgressPosition(5, 10, Encounter.CHAPTER_BOSS, 1), completed = true)
+        val last = Progress("yan", ProgressPosition(15, 10, Encounter.CHAPTER_BOSS, 1), completed = true)
         progresses.save(last)
 
         assertEquals(last, service.get("yan").progress)

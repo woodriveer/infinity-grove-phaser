@@ -33,12 +33,13 @@ class MonsterHealthMigrationIT : IntegrationTestBase() {
         number,
     )
 
+    // chapters 6 to 15 hold the health of their own formula (AD-019); this restores the chapters 1 to 5 the migration covers
     @AfterTest
     fun restore() {
         migrate()
-        jdbc.update("update chapters set boss_health = 2000 * power(4, number - 1)::integer")
+        jdbc.update("update chapters set boss_health = 2000 * power(4, number - 1)::integer where number <= 5")
         jdbc.update(
-            "update stages set monster_health = (40 + 4 * (number - 1)) * power(4, chapter - 1)::integer, miniboss_health = (40 + 4 * (number - 1)) * power(4, chapter - 1)::integer * 5",
+            "update stages set monster_health = (40 + 4 * (number - 1)) * power(4, chapter - 1)::integer, miniboss_health = (40 + 4 * (number - 1)) * power(4, chapter - 1)::integer * 5 where chapter <= 5",
         )
     }
 
