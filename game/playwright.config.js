@@ -1,6 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
 
-const port = 5174;
+//  The main checkout serves on 5174. A git worktree (agents run in parallel, AD-003 workflow in CLAUDE.md)
+//  gets its own port from its path, so its tests never reuse the dev server of another checkout.
+//  E2E_PORT overrides both.
+const portOf = (dir) =>
+{
+    if (!/[\\/]\.claude[\\/]worktrees[\\/]/.test(dir)) return 5174;
+    let hash = 0;
+    for (const char of dir) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+    return 5200 + (hash % 700);
+};
+const port = Number(process.env.E2E_PORT) || portOf(fileURLToPath(new URL('.', import.meta.url)));
 
 export default defineConfig({
     testDir: './e2e',

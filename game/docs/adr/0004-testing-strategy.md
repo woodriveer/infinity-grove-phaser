@@ -13,7 +13,7 @@ The game has an API layer, scenes rendered on a canvas, and a backend that is de
   - `src/api/*`: `ApiError` mapping, env `config`, the axios client (fake adapter, so interceptors and defaults still run) and `userApi` (client mocked).
   - Scenes: Phaser is mocked (`vi.mock('phaser')`) with a minimal scene stand-in; DOM forms are real jsdom elements. Test scene logic, not rendering.
 - **End-to-end tests: Playwright** (`npm run test:e2e`, config in `playwright.config.js`, specs in `e2e/`, helpers in `e2e/support/`). Chromium only for now.
-  - The real game runs on a Vite dev server (port 5174, started by Playwright, reused locally).
+  - The real game runs on a Vite dev server (port 5174 in the main checkout, a port derived from the path in a `.claude/worktrees/` worktree, `E2E_PORT` overrides; started by Playwright, reused locally).
   - The backend is faked with `page.route` (`e2e/support/fakeBackend.js`), mirroring the real status codes and ProblemDetail bodies (`USER_ALREADY_EXISTS` 409, `LOGIN_INVALID_PASSWORD` 401, ...). Tests are deterministic, need no database and run in parallel.
   - Anything a player must read or press (form, status messages, greeting) is rendered as real HTML through Phaser DOM elements, so tests use ordinary Playwright locators (`getByRole('alert')`, `getByRole('button')`, `toBeVisible`, `toHaveText`). Canvas-drawn text cannot be located; new player-facing text that tests must verify should follow the same approach.
   - State with no DOM representation (registry user, active scene) is read through `window.__PHASER_GAME__`, exposed by `src/main.js` in dev builds only (`import.meta.env.DEV`, absent from production builds).
