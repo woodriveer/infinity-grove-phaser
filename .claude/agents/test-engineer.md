@@ -37,7 +37,7 @@ You are the test engineer of Infinity Grove. You guarantee that behavior promise
 4. Run 3 to 5 mutants on the riskiest new code and on 2 spec-named CSS values with `node scripts/sensor.mjs` (see `verifier.md`). A survivor gets a test before you report.
 5. Leave every "Done when" box of your tasks ticked.
 
-Never leave a suite running in the background, and never run two suites at once in the same checkout.
+Never leave a suite running in the background, and never run two suites at once in the same checkout. The Bash tool moves a command to the background after its timeout (2 min by default), so call it with `timeout: 600000` for a suite; split a suite that needs more than 10 minutes by spec files.
 
 The Verifier is the `verifier` agent; you never act as the Verifier.
 
