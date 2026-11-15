@@ -79,8 +79,7 @@ test.describe('Hero ascension', () => {
         await expect(page.locator('.skill-level-badge')).toHaveCount(0);
     });
 
-    // waits for T9
-    test.fixme('a 4-star Kael\'s Corte Dimensional deals 31.875 (level 2 x 1.25 x the 1.7 click damage)', async ({ page }) => {
+    test('a 4-star Kael\'s Corte Dimensional deals 31.875 (level 2 x 1.25 x the 1.7 click damage)', async ({ page }) => {
         await startAs(page, { copies: { 'kael:4': 1 } });
 
         await page.keyboard.press('1');
@@ -88,8 +87,7 @@ test.describe('Hero ascension', () => {
         await expect.poll(() => health(page)).toBeCloseTo(968.125, 5);
     });
 
-    // waits for T9
-    test.fixme('a 9-star Kael\'s Corte Dimensional deals 72 (level 3 x 1.5 x the 3.2 click damage)', async ({ page }) => {
+    test('a 9-star Kael\'s Corte Dimensional deals 72 (level 3 x 1.5 x the 3.2 click damage)', async ({ page }) => {
         await startAs(page, { copies: { 'kael:9': 1 } });
 
         await page.keyboard.press('1');
