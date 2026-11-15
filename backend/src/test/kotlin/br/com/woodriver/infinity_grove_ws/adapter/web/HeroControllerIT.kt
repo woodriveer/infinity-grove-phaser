@@ -154,6 +154,15 @@ class HeroControllerIT : IntegrationTestBase() {
         listOf("{}", """{"stars":-1}""", """{"stars":9}""", """{"stars":10}""", """{"stars":"0"}""").forEach { body ->
             fuse(token, "kael", body).then().statusCode(400).body("code", equalTo("INVALID_FUSION"))
         }
+
+        //  Nothing changed: the bag read over HTTP (kael is heroes[0]) and in the table keep the 5 nine-star copies
+        asUser(token)
+            .get("/heroes")
+            .then()
+            .statusCode(200)
+            .body("heroes[0].id", equalTo("kael"))
+            .body("heroes[0].copies.9", equalTo(5))
+        assertEquals(5, jpaCardCopyRepository.findAllByUsername("yan").single { it.stars == 9 }.copies)
     }
 
     @Test
