@@ -35,7 +35,10 @@ The main session is the orchestrator; the agents live in `.claude/agents/`. For 
 1. `product-owner` (Opus, high) writes spec, design and fully detailed tasks with `tlc-spec-driven`; the user approves them.
 2. Each task goes to its owner: `kotlin-backend-dev` (Haiku, high) for `backend/`, `game-dev` (Haiku, high) for `game/`, `test-engineer` (Haiku, high) for test tasks.
 3. `ui-artist` reviews every change the player can see and writes `ui-review.html` from `.claude/templates/ui-review.html`, with Playwright screenshots of every changed screen (`npm run ui:shots` in `game/`); findings become tasks.
-4. A fresh `test-engineer` runs as the Verifier (it must not have authored the feature in that context).
+4. The `verifier` agent (Opus) runs as the Verifier; it must not have authored the feature. The `test-engineer` runs its author check first (`.claude/agents/test-engineer.md`). Re-verification rounds are scoped to the gaps and fixes; the full suites run in round 1 and in the final PASS round (`.claude/agents/verifier.md`). Mutants run with `node scripts/sensor.mjs`.
+   - Coverage percentages are measured once, by `gitops` for `report.html`; the Verifier does not run coverage commands.
+   - No agent leaves a test suite running in the background or runs two suites at once in the same checkout.
+   - Work of different features that touches different files (for example test-only fixes) runs in parallel, each agent in its own worktree (`isolation: "worktree"`); each rebases on `origin/main` before it pushes (`git pull --rebase origin main && git push origin HEAD:main`).
 5. `product-owner` accepts or rejects against the spec.
 6. `gitops` pushes, makes sure the deploy is live, checks production, writes `report.html`, updates `CHANGELOG.md` and cuts the release tag.
 
