@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 89,
+  "next_id": 92,
   "lessons": [
     {
       "id": "L-001",
@@ -1592,6 +1592,60 @@
       ],
       "created": "2026-11-14T11:27:17Z",
       "last_seen": "2026-11-14T11:27:17Z"
+    },
+    {
+      "id": "L-089",
+      "key": "surviving_mutant::pin the computed font weight of each styled tier in the browser test not only its class and colour",
+      "text": "Pin the computed font weight of each styled tier in the browser test, not only its class and colour",
+      "signal": "surviving_mutant",
+      "scope": "css",
+      "status": "candidate",
+      "features": [
+        "hero-ascension"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M9 game/public/style.css:2802 (css)"
+      ],
+      "created": "2026-11-15T16:44:34Z",
+      "last_seen": "2026-11-15T16:44:34Z"
+    },
+    {
+      "id": "L-090",
+      "key": "surviving_mutant::assert the computed background of every styled variant each level and tier in the browser test not only one variant",
+      "text": "Assert the computed background of every styled variant (each level and tier) in the browser test, not only one variant",
+      "signal": "surviving_mutant",
+      "scope": "css",
+      "status": "candidate",
+      "features": [
+        "hero-ascension"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M10 game/public/style.css:2819 (css)"
+      ],
+      "created": "2026-11-15T16:44:38Z",
+      "last_seen": "2026-11-15T16:44:38Z"
+    },
+    {
+      "id": "L-091",
+      "key": "spec_precision_gap::assert the damage the spec names as the monster health change not only the rounded display text",
+      "text": "Assert the damage the spec names as the monster health change, not only the rounded display text",
+      "signal": "spec_precision_gap",
+      "scope": "game",
+      "status": "candidate",
+      "features": [
+        "hero-ascension"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/src/adapters/phaser/ClickerGame.test.js:4849 (game)"
+      ],
+      "created": "2026-11-15T16:44:44Z",
+      "last_seen": "2026-11-15T16:44:44Z"
     }
   ]
 }

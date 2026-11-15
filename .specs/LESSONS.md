@@ -540,6 +540,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterTest.kt:388-391 (spec)
 - last seen: 2026-11-14T11:27:17Z
 
+### L-089 - Pin the computed font weight of each styled tier in the browser test, not only its class and colour
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `css` · harmful: 0
+- features: hero-ascension
+- evidence: validation.md M9 game/public/style.css:2802 (css)
+- last seen: 2026-11-15T16:44:34Z
+
+### L-090 - Assert the computed background of every styled variant (each level and tier) in the browser test, not only one variant
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `css` · harmful: 0
+- features: hero-ascension
+- evidence: validation.md M10 game/public/style.css:2819 (css)
+- last seen: 2026-11-15T16:44:38Z
+
+### L-091 - Assert the damage the spec names as the monster health change, not only the rounded display text
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: hero-ascension
+- evidence: game/src/adapters/phaser/ClickerGame.test.js:4849 (game)
+- last seen: 2026-11-15T16:44:44Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
