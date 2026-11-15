@@ -381,7 +381,11 @@ class ChapterTest {
     }
 
     /** Every stage of chapter [c] against the spec formulas, for the chapter's health [factor] and defense [bonus]. */
-    private fun assertStageFormulas(c: Int, factor: Long, bonus: Int) {
+    private fun assertStageFormulas(
+        c: Int,
+        factor: Long,
+        bonus: Int,
+    ) {
         val elements = listOf(Element.FIRE, Element.WATER, Element.NATURE, Element.LIGHT, Element.DARKNESS)
         val chapter = ChapterDefinition.of(c)
 
