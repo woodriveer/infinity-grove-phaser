@@ -171,6 +171,42 @@ test.describe('Drag to equip', () => {
         expect(equipCalls(calls)).toHaveLength(0);
     });
 
+    test('a ring lights the RING slot of the hero, not the AMULET slot', async ({ page }) => {
+        const calls = await startGame(page);
+        await openEquipment(page);
+
+        await drag(page, page.getByTestId('equip-piece-u1'), page.getByTestId('equip-hero-kael'), { release: false });
+
+        await expect(page.getByTestId('equip-hero-kael')).toHaveClass(/is-drop-target/);
+        await expect(page.getByTestId('equip-slot-kael-RING')).toHaveClass(/is-drop-slot/);
+        await expect(page.getByTestId('equip-slot-kael-AMULET')).not.toHaveClass(/is-drop-slot/);
+
+        await page.mouse.up();
+
+        await expect(page.getByTestId('equip-slot-kael-RING')).toHaveAttribute('aria-label', 'Incomum Anel +0');
+        await settle(page);
+        expect(equipCalls(calls)).toHaveLength(1);
+        expect(equipCalls(calls)[0].body).toEqual({ heroId: 'kael' });
+    });
+
+    test('a weapon lights the WEAPON slot of the hero, not the AMULET slot', async ({ page }) => {
+        const calls = await startGame(page);
+        await openEquipment(page);
+
+        await drag(page, page.getByTestId('equip-slot-kael-WEAPON'), page.getByTestId('equip-hero-lyra'), { release: false });
+
+        await expect(page.getByTestId('equip-hero-lyra')).toHaveClass(/is-drop-target/);
+        await expect(page.getByTestId('equip-slot-lyra-WEAPON')).toHaveClass(/is-drop-slot/);
+        await expect(page.getByTestId('equip-slot-lyra-AMULET')).not.toHaveClass(/is-drop-slot/);
+
+        await page.mouse.up();
+
+        await expect(page.getByTestId('equip-slot-lyra-WEAPON')).toHaveAttribute('aria-label', 'Raro Arma +0');
+        await settle(page);
+        expect(equipCalls(calls)).toHaveLength(1);
+        expect(equipCalls(calls)[0].body).toEqual({ heroId: 'lyra' });
+    });
+
     test('the ghost follows the pointer, up and left of it', async ({ page }) => {
         await startGame(page);
         await openEquipment(page);

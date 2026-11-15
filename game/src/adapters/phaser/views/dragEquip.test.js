@@ -127,6 +127,16 @@ describe('attachDragToEquip', () => {
         expect(kael.classList.contains('is-drop-target')).toBe(false);
     });
 
+    it('lights the slot of the piece\'s own kind: a ring lights the RING slot, not the AMULET one', () => {
+        document.body.innerHTML = '';
+        setup({ ...amulet(), id: 'r1', slot: 'RING' });
+        under = lyra.querySelector('.equip-hero-name');
+        startDrag();
+
+        expect(document.querySelector('[data-testid="equip-slot-lyra-RING"]').classList.contains('is-drop-slot')).toBe(true);
+        expect(document.querySelector('[data-testid="equip-slot-lyra-AMULET"]').classList.contains('is-drop-slot')).toBe(false);
+    });
+
     it('moves the light to the next hero', () => {
         under = lyra.querySelector('.equip-hero-name');
         startDrag();
