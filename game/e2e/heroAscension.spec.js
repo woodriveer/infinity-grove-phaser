@@ -13,13 +13,14 @@ const chapter = (monster) => ({
 });
 
 //  Logs in as yan, whose bag is `copies` and whose leader is Kael; resolves with the menu and the fake backend
-const startAs = async (page, { copies }) => {
+//  `random` is the roll of every click (critical when below the crit chance): 0.99 never crits a 4 or 9 star Kael
+const startAs = async (page, { copies, random = 0.99 }) => {
     const backend = await mockBackend(page, {
         users: { yan: 'secret123' },
         definition: chapter(bare('FIRE')),
         cards: { yan: { leader: 'kael', copies } }
     });
-    const menu = await openMainMenu(page);
+    const menu = await openMainMenu(page, { random });
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
@@ -101,6 +102,56 @@ test.describe('Hero ascension', () => {
         await menu.canvas.click();
 
         await expect.poll(() => health(page)).toBeCloseTo(996.8, 5);
+    });
+
+    test('a 4-star Kael crits on a roll of 0.44 for 4.675 (ASC-06 AC3)', async ({ page }) => {
+        const menu = await startAs(page, { copies: { 'kael:4': 1 }, random: 0.44 });
+
+        await menu.canvas.click();
+
+        await expect.poll(() => health(page)).toBeCloseTo(1000 - 4.675, 5);
+    });
+
+    test('a 4-star Kael does not crit on a roll of 0.45 and hits for 1.7 (ASC-06 AC3)', async ({ page }) => {
+        const menu = await startAs(page, { copies: { 'kael:4': 1 }, random: 0.45 });
+
+        await menu.canvas.click();
+
+        await expect.poll(() => health(page)).toBeCloseTo(1000 - 1.7, 5);
+    });
+
+    test('a 9-star Kael crits on a roll of 0.69 for 12.8 (ASC-06 AC4)', async ({ page }) => {
+        const menu = await startAs(page, { copies: { 'kael:9': 1 }, random: 0.69 });
+
+        await menu.canvas.click();
+
+        await expect.poll(() => health(page)).toBeCloseTo(1000 - 12.8, 5);
+    });
+
+    test('a 9-star Kael does not crit on a roll of 0.70 and hits for 3.2 (ASC-06 AC4)', async ({ page }) => {
+        const menu = await startAs(page, { copies: { 'kael:9': 1 }, random: 0.7 });
+
+        await menu.canvas.click();
+
+        await expect.poll(() => health(page)).toBeCloseTo(1000 - 3.2, 5);
+    });
+
+    test('a 3-star Kael clicks for 1.7 after fusing to 4 stars, without a reload (ASC-06 AC6)', async ({ page }) => {
+        const menu = await startAs(page, { copies: { 'kael:3': 3 } });
+
+        await menu.canvas.click();
+        await expect.poll(() => health(page)).toBeCloseTo(1000 - 1.4, 5);
+
+        await page.getByTestId('hud-fusion').click();
+        await page.evaluate(() => { window.__ascensionMarker = 'kept'; });
+        await page.getByTestId('fusion-button-kael-3').click();
+        await expect(page.getByTestId('fusion-result')).toHaveText('Nova carta: Kael Raizférrea 4★ · Corte Dimensional no nível 2');
+        await page.getByTestId('hero-close').click();
+
+        await menu.canvas.click();
+
+        await expect.poll(() => health(page)).toBeCloseTo(1000 - 1.4 - 1.7, 5);
+        expect(await page.evaluate(() => window.__ascensionMarker)).toBe('kept');
     });
 
     test('the attribute panel of a 4-star leader reads 1.7, 45% and x2.75', async ({ page }) => {
@@ -202,6 +253,16 @@ test.describe('Hero ascension', () => {
         await expect(page.getByTestId('fusion-row-kael-3')).toHaveClass(/is-selected/);
     });
 
+    test('a 0-star fusion answers the card without a skill (ASC-07 AC3)', async ({ page }) => {
+        await startAs(page, { copies: { 'kael:0': 3 } });
+        await page.getByTestId('hud-fusion').click();
+
+        await expect(page.getByTestId('fusion-row-kael-0').locator('.fusion-name')).toHaveText('Kael Raizférrea 0★ → 1★');
+        await page.getByTestId('fusion-button-kael-0').click();
+
+        await expect(page.getByTestId('fusion-result')).toHaveText('Nova carta: Kael Raizférrea 1★');
+    });
+
     test('a failed 4-star fusion shows the error and keeps the row', async ({ page }) => {
         const { backend } = await startAs(page, { copies: { 'kael:4': 3 } });
         await page.getByTestId('hud-fusion').click();
@@ -214,6 +275,21 @@ test.describe('Hero ascension', () => {
         await expect(page.locator('.hero-error')).toHaveText('Não foi possível fundir as cartas.');
         await expect(page.getByTestId('fusion-row-kael-4').locator('.fusion-copies')).toHaveText('3/3');
         await expect(page.getByTestId('fusion-result')).toHaveCount(0);
+    });
+
+    test('a 0-star hero and a hero not owned show no star power', async ({ page }) => {
+        await startAs(page, { copies: { 'kael:0': 1 } });
+        await page.getByTestId('hud-heroes').click();
+
+        await page.getByTestId('hero-card-kael').click();
+        await expect(page.getByTestId('skill-row-1')).toBeVisible();
+        await expect(page.getByTestId('hero-star-power')).toHaveCount(0);
+
+        await page.getByTestId('hero-close').click();
+        await page.getByTestId('hud-heroes').click();
+        await page.getByTestId('hero-card-lyra').click();
+        await expect(page.locator('.hero-panel')).toContainText('Não obtido');
+        await expect(page.getByTestId('hero-star-power')).toHaveCount(0);
     });
 
     test('the level badge sits on the top right corner of the slot art', async ({ page }) => {
