@@ -9,9 +9,9 @@ Path shorthands used below: `BT` = `backend/src/test/kotlin/br/com/woodriver/inf
 
 ---
 
-## Validation: campaign-chapters - FAIL
+## Validation: campaign-chapters - PASS
 
-**Verdict (current, round 4)**: FAIL - 1 gap (Minor): the boss element of chapters 2 to 5 is not pinned (mutant F8 survives). Round 3 gap 1 is closed (F4 killed). See `## Round 4` at the end of this file. The text below is the round 3 report, unchanged.
+**Verdict (current, round 5)**: PASS. Round 4 gap 1 (boss element of chapters 2 to 5, mutant F8) is closed by `BT domain/ChapterTest.kt:413-427`, and the field sweep of chapters 1 to 5 found no other unpinned field. See `## Round 5` at the end of this file. The text below is the round 3 report, unchanged; `## Round 4` is unchanged too.
 
 **Round 3 verdict**: FAIL - 1 gap (Minor), ranked below. The round 2 gaps are closed. The gap left is the chapters 1 to 5 success criterion: the new sensor mutant F4 changes stage 5 of chapters 2 to 5 and survives the whole backend suite. Round 3 is the last round allowed, so this FAIL escalates to the user.
 
@@ -28,6 +28,7 @@ Path shorthands used below: `BT` = `backend/src/test/kotlin/br/com/woodriver/inf
 - Round 2 at `b4e6985`: FAIL, 2 gaps (CHAP-04 AC 1 and 2 per stage for chapters 6 to 15; CHAP-06 AC 3 dialog above chapter 4), sensor 16 of 19 killed.
 - Round 3 at `37949f2`: FAIL, 1 gap (chapters 1 to 5 per stage, F4 survives). Both round 2 gaps are closed: `BT domain/ChapterTest.kt:368-394` (every stage 1 to 10 of chapters 6 to 15; mutants N7, N8, F1, F2 killed) and `GS adapters/phaser/ClickerGame.test.js:4616-4632` (dialog at chapter 12 and completed; mutant F3 killed).
 - Round 4 at `46edd83` (see `## Round 4` at the end): FAIL, 1 gap (boss element of chapters 2 to 5; mutant F8 survives). Round 3 gap 1 is closed: F4 killed by `BT domain/ChapterTest.kt:394`, and F5, F6, F7 and F9 killed too.
+- Round 5 at `b59c135` (see `## Round 5` at the end): PASS. Round 4 gap 1 is closed: F8 killed by `BT domain/ChapterTest.kt:425`. The field sweep (5 mutants, 5 killed) found no other unpinned field of chapters 1 to 5, and the release dump of chapters 1 to 5 is identical to `91e3111`.
 
 ---
 
@@ -314,3 +315,105 @@ Control, unmutated: 932 tests, 931 passed, 1 failed, `BT adapter/web/WalletFlowI
 **Issues found**: gap 1 of this round (boss element of chapters 2 to 5). It needs a test-only fix: the literals above, in `ChapterTest.kt:408-410`, then rerun F8.
 
 **Next steps** (owner decides): (a) one test-only fix to pin the boss element of chapters 1 to 5, then re-verify, or accept the gap as round 3 was accepted; (b) a spec edit that states the boss element rule (Q16 or a Chapter Table column) before chapters 6 to 15 can be pinned; (c) the rollback drill for the V10 deploy (round 3); (d) a loop run of `WalletFlowIT` (R3).
+
+---
+
+## Round 5
+
+**Date**: 2026-11-15
+**Verdict**: PASS. Round 4 gap 1 (boss element of chapters 2 to 5, mutant F8) is closed. The sweep of every field of the chapters 1 to 5 definition found no unpinned field. Two fields are pinned only at database level (residual R-a, not a gap).
+**Diff range**: `46edd83..b59c135` on `main`. Commits: `23ad9f3` (round 4 report, this file) and `b59c135` (test only: `BT domain/ChapterTest.kt`, 17 insertions, 0 deletions). No production or game file changed since round 4: `git diff --stat 46edd83..HEAD -- backend/src/main game` is empty. Since round 3 (`37949f2..HEAD`), `game` is empty too, and `domain/Chapter.kt` and `domain/ChapterOrder.kt` are unchanged.
+**Verifier**: fresh instance, round 5 (author ≠ verifier). graphify is not on PATH on this machine, so the source was read directly.
+
+Path shorthands as before: `BT` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`, `BM` = `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/`.
+
+### 1. The new test against the release
+
+Test: `BT domain/ChapterTest.kt:413-427` (`chapters 1 to 5 keep the boss elements of the release`), assertion `:425`.
+
+- **Literals against the release code.** At `91e3111`, `BM domain/Chapter.kt:3` is `enum class Element { FIRE, WATER, NATURE, LIGHT, DARKNESS }` and `:155` is `Element.entries[(number + 3) % Element.entries.size]`. Index by chapter: 1 gives 4 (DARKNESS), 2 gives 0 (FIRE), 3 gives 1 (WATER), 4 gives 2 (NATURE), 5 gives 3 (LIGHT). The literals at `:418-422` match each row.
+- **Independent run of the release.** A throwaway test in a `git worktree` at `91e3111` printed `ChapterDefinition.of(c)` for chapters 1 to 5, every field. The same print at `b59c135` is identical line for line. Its boss elements are DARKNESS, FIRE, WATER, NATURE and LIGHT. Both worktrees were removed; the real tree was not touched.
+- **Anchor.** Success Criterion `spec.md:309` ("Chapters 1 to 5 answer the same definitions as before the release"). The test name and the comment at `:414-415` name the release commit `91e3111` and `Chapter.kt:155`, the same referent the criterion names. Anchored. Spec-precision note 2 below explains why the release code is the only written source for this value.
+
+### 2. Sweep of the chapters 1 to 5 definition
+
+Method: the release print is the reference for every field. A field counts as pinned when an assertion at HEAD would fail for a change of that field in chapters 1 to 5. Every row was checked, and the mutants in section 3 test the rows with no unit-level pin.
+
+| Field (chapters 1 to 5) | Pinning test `file:line` | Mutant |
+| --- | --- | --- |
+| Chapter number | `ChapterTest.kt:89` (chapter 1), `:122` (chapters 2 to 5, loop `:118-122`) | none needed |
+| Boss health | `ChapterTest.kt:350` (table loop `:409`), `:209`, `:211` | none needed |
+| Boss time limit 60 000 ms | `ChapterTest.kt:434` (`:430-439`) | none needed |
+| Boss physical, magical defense | `ChapterTest.kt:354`, `:355` (table loop `:409`) | none needed |
+| Boss critical resistance | `ChapterTest.kt:356` (table loop `:409`) | none needed |
+| Boss element | `ChapterTest.kt:425` (new, `:413-427`) | F8 killed |
+| Boss drop rule id `3c` | `ChapterTest.kt:275` (`:266-277`) | none needed |
+| Stage count and numbering 1 to 10 | `ChapterTest.kt:388` (stage count), `:389-390` (`chapter.stage(n)`) | none needed |
+| Stage phase monster health | `ChapterTest.kt:393-394` (`:376-381`) | none needed |
+| Stage miniboss health (5 times phase) | `ChapterTest.kt:395` | none needed |
+| Stage miniboss time limit 30 000 ms | `ChapterTest.kt:436` (every stage, `:430-439`) | none needed |
+| Stage phases per stage (5) | Chapter 1: `ChapterTest.kt:91`. Chapters 2 to 5: indirect, `ProgressTest.kt:157` (`61 * 15` clears over chapters 1 to 15) | P3 killed by `ProgressTest.kt:148` |
+| Phase monster element | `ChapterTest.kt:402` | none needed |
+| Phase monster physical, magical defense and critical resistance (0) | No unit pin for chapters 1 to 5 (`ChapterTest.kt:190-202` starts at chapter 6). Indirect: `ChapterRepositoryIT.kt:195-216`, which requires the 50 seeded stages of chapters 1 to 5 to share 5 distinct monster tuples, all zero (`:209`, `:213`) | P1, P2, P4 killed by `ChapterRepositoryIT.kt:209` (residual R-a) |
+| Miniboss element | `ChapterTest.kt:403` | none needed |
+| Miniboss physical, magical defense (every stage) | `ChapterTest.kt:397`, `:398` (`:376-381`) | none needed |
+| Miniboss critical resistance (every stage) | `ChapterTest.kt:399` | none needed |
+| Phase monster and miniboss drop rule ids | `ChapterTest.kt:272`, `:273` | none needed |
+
+Result: every field of chapters 1 to 5 has an assertion. Two groups are pinned indirectly and were proven by mutants: the phases per stage of chapters 2 to 5 (P3) and the phase monster defenses and critical resistance of chapters 1 to 5 (P1, P2, P4).
+
+### 3. Discrimination sensor
+
+Isolated `git worktree` at `b59c135` under the session scratch directory (`r5-head`). One anchored line changed per mutant in the worktree copy. The domain package ran first (328 tests). If nothing failed, `ChapterRepositoryIT` ran next, and the full suite only if that also passed. Each mutant was reverted with `git checkout --` in the worktree, and `git status --porcelain` of the worktree was empty before and after every mutant. The worktree was then removed.
+
+Control, unmutated: domain 328 tests, 0 failed.
+
+| Mutation | File:line | Description | Result |
+| --- | --- | --- | --- |
+| F8 | `BM domain/Chapter.kt:184` | Boss element of chapter 2 shifted by one (FIRE to WATER), round 4 survivor | Killed: `ChapterTest.kt:425` ("chapters 1 to 5 keep the boss elements of the release") |
+| P1 | `BM domain/Chapter.kt:176` | Phase monster magical defense of stage 4 of chapter 2 set to 1 | Killed: `ChapterRepositoryIT.kt:209` (domain 328 pass) |
+| P2 | `BM domain/Chapter.kt:176` | Phase monster critical resistance of stage 7 of chapter 4 set to 1 | Killed: `ChapterRepositoryIT.kt:209` (domain 328 pass) |
+| P3 | `BM domain/Chapter.kt:172` | Phases per stage of chapter 2 set to 4 | Killed: `ProgressTest.kt:157` (`61 * 15`, test `:148`) |
+| P4 | `BM domain/Chapter.kt:176` | Phase monster physical defense of stage 10 of chapter 5 set to 1 | Killed: `ChapterRepositoryIT.kt:209` (domain 328 pass) |
+
+**Sensor depth**: expanded (manual, behavior-level, one anchored line per mutant, weakest fields chosen from the sweep: phases per stage and the phase monster stats). No mutation tool configured.
+**Result**: 5 of 5 killed this round. F8 is the round 4 survivor, now killed. Across the campaign: 32 distinct mutations, 31 killed, 1 survived (M4, equivalent, round 2).
+**Isolation**: `git status --porcelain` of the real tree is empty and `git diff -- backend/src/main` is empty after the sensor.
+
+### 4. Gate
+
+- **Backend**: `cd backend && ./gradlew cleanTest test jacocoTestReport` on `b59c135`, real tree. BUILD SUCCESSFUL in 3m 22s. JUnit XML: 84 suites, 933 tests, 933 passed, 0 failed, 0 errors, 0 skipped (round 4: 932; the +1 is `ChapterTest.kt:413`). JaCoCo `build/reports/jacoco/test/jacocoTestReport.xml`: lines 99.10% (2749/2774), branches 93.01% (825/887). The change from round 3 (98.99%, 93.03%) comes from the legacy health columns removed by T13 and T14 (`a0c7066`, `ae88c42`), not from this round.
+- **Game unit and e2e**: not re-run. No `game` file changed since `37949f2` (`git diff --stat 37949f2..HEAD -- game` is empty), so the round 3 figures are carried, not re-measured. Game unit: 72 files, 1576 passed, 0 failed; `npm run test:coverage` lines 97.95% (2586/2640), branches 95.18% (1205/1266). E2E full suite with coverage: 291 passed, 7 failed, 2 skipped; line coverage 92.27% (2437/2641). The 7 failures are explained in round 3 (5 timeouts under load that pass in isolation, 2 `dragEquip` edge-scroll scenarios outside this feature).
+- **Completion gate**: `python .claude/skills/tlc-spec-driven/scripts/validate_state.py campaign-chapters`, run from the repository root on this file, exit code 0 (0 errors).
+
+### 5. Spec-precision notes (not blocking)
+
+1. Stage element rotation (round 3 note 1) is unchanged.
+2. **Boss element rule.** The spec never writes it: the Chapter Table has no element column, and Q16 says only "enemy elements keep the rotating formula". The release code (`91e3111` `Chapter.kt:155`) is the only written source, so the test cites it. The boss elements of chapters 6 to 15 have no spec anchor and no test (carried from round 4).
+3. **"Same definitions" and the drop rules.** `spec.md:309` read literally would conflict with CHAP-09 AC 5, which moves the drop ranges of chapters 1 to 5 by design. The Verifier reads "definitions" as the `ChapterDefinition` values (the Chapter Table and the stage and boss attributes). Drop rule ranges are outside `ChapterDefinition` and are pinned by `ChapterTest.kt:226-240` and `CoinDropMigrationIT`. The release print confirms the drop rule ranges differ, as CHAP-09 requires. A spec wording that says so would close the reading.
+
+### 6. Residuals (not gaps)
+
+- **R-a. Phase monster stats of chapters 1 to 5 are pinned at database level only** (`ChapterRepositoryIT.kt:195-216`). Chapters 6 to 15 are pinned at unit level (`ChapterTest.kt:190-202`). The gate runs the IT, so the criterion is covered. Optional, test-only hardening: extend the loop of `ChapterTest.kt:191` to `(1..15)`.
+- **R-b. `WalletFlowIT` intermittent failure (round 4 R3).** It did not recur: the real-tree gate passed 933 of 933 and the control passed 328 of 328. The loop run remains open.
+- **R-c. Rollback drill for the V10 deploy (round 3 recommendation) is still open.**
+- **R-d. Lesson not recorded.** The round 4 survivor F8 has no entry in `.specs/LESSONS.md` (L-087 covers the round 3 survivor F4 only). This round's commit is limited to `validation.md`, so `lessons.py add` was not run. Proposed lesson for the orchestrator: "Pin every field of each unchanged row, not only the columns a table lists, because a table column does not name the element, the phase count or the monster stats." Grounded in the round 4 sensor (F8, `Chapter.kt:184`).
+
+### 7. Requirement traceability (for the orchestrator to apply; the spec was not edited)
+
+| Requirement | Round 4 | Round 5 |
+| --- | --- | --- |
+| CHAP-04 | Verified (AC 1 to 5); Success Criterion open: boss element of chapters 2 to 5 (gap 1) | Verified (AC 1 to 5); Success Criterion "chapters 1 to 5 same definitions" closed by `ChapterTest.kt:413-427`, `:350` and the release print |
+
+### Summary
+
+**Overall**: PASS (round 5). Round 4 gap 1 is closed. Five of five Success Criteria match, with the spec-precision notes above.
+**Spec-anchored check**: 36 of 36 ACs as in round 3 and 4; Success Criteria 5 of 5.
+**Sensor**: 5 of 5 killed this round (F8, P1 to P4); 31 of 32 across the campaign (M4 equivalent).
+**Gate**: backend 933 passed, 0 failed, 0 skipped; JaCoCo lines 99.10%, branches 93.01%. Game and e2e carried from round 3 (no game change).
+
+**What works**: the chapters 1 to 5 definition is identical to the release in every field, and each field has an assertion that a mutant of it fails.
+
+**Issues found**: none blocking. Residuals R-a to R-d and spec-precision notes 2 and 3.
+
+**Next steps**: the product owner accepts or rejects. Orchestrator: apply the traceability in section 7, record the lesson in R-d if wanted, and run the deploy and report steps for this feature (gitops).
