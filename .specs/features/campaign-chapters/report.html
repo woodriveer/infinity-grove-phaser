@@ -14,19 +14,32 @@ code{background:#f4f4f4;padding:0 .2rem}
 </head>
 <body>
 <h1>Relatório de release: campaign-chapters (campanha até o capítulo 15)</h1>
-<p>Gerado em 2026-11-14. Todos os números abaixo vêm de comandos rodados para este relatório, no commit <code>ae88c42</code> (mais este relatório). Versão: <code>v0.2.0</code>.</p>
+<p>Gerado em 2026-11-14 e atualizado em 2026-11-15 (fechamento da lacuna 1). Os números vêm de comandos rodados para este relatório ou citados de <code>validation.md</code> (rodada 5) com a fonte indicada. Os de jogo e e2e continuam os do commit <code>ae88c42</code>. Versão: <code>v0.2.0</code> (a tag não mudou: as mudanças depois dela são só de teste e de documentação).</p>
 
 <h2>Veredito</h2>
-<div class="v">
-<p><strong>Veredito do Verificador: FAIL</strong> (rodada 3 de 3). <strong>Aceita pelo dono em 2026-11-14 com a lacuna 1 aberta.</strong> Este relatório não apresenta a feature como PASS.</p>
-<p><strong>T13 e T14 não foram verificadas de forma independente.</strong> As três rodadas do Verificador cobriram só T1 a T12. T13 e T14 foram feitas pelo desenvolvedor do backend, passam na suíte (931 testes, 0 falhas) e estão no ar, mas nenhum Verificador as leu nem rodou mutantes sobre elas.</p>
-<p>Lacuna 1 (menor, só de teste): as definições por fase dos capítulos 2 a 5 não estão fixadas em teste (<code>ChapterTest.kt:397-399</code>). O mutante F4 (<code>Chapter.kt:161</code>) sobrevive. Não há defeito de produção conhecido. Acompanhamento: estender o laço de <code>ChapterTest.kt:368-394</code> aos capítulos 1 a 5 e matar F4, sem tocar no código de produção.</p>
+<div class="v" style="border-left-color:#15803d;background:#f0fdf4">
+<p><strong>Veredito do Verificador: PASS (rodada 5).</strong> Histórico: a feature foi lançada com FAIL na rodada 3 e aceita pelo dono em 2026-11-14 com a lacuna 1 aberta; as rodadas 4 (FAIL, o mutante F8 sobreviveu) e 5 (PASS) fecharam a lacuna com dois commits só de teste. Detalhes em <code>validation.md</code> (seção Rodada 5).</p>
+<p><strong>Lacuna 1: fechada.</strong> As definições dos capítulos 1 a 5 agora estão fixadas em teste: <code>46edd83</code> fixa todas as fases dos capítulos 1 a 5 (mata F4) e <code>b59c135</code> fixa o elemento do chefe (mata F8). Nenhum código de produção mudou nesses dois commits.</p>
+<p><strong>T13 e T14</strong> (<code>a0c7066</code>, <code>ae88c42</code>): a suíte completa do backend foi rodada pelo Verificador nas rodadas 4 e 5 (933 de 933 na rodada 5, segundo <code>validation.md</code>). O resíduo R-c (ensaio de rollback da V10) continua aberto.</p>
 </div>
 
 <h2>Faixa de commits</h2>
 <p><code>91e3111..ae88c42</code>: 36 commits (<code>git log --oneline 91e3111..HEAD</code>), todos em <code>origin/main</code>. As 14 tarefas estão <code>[x]</code>. T1 a T12: verificadas (FAIL aceito). T13 (<code>a0c7066</code>, o backend deixa de mapear as colunas de vida antigas) e T14 (<code>ae88c42</code>, a migração V10 apaga essas colunas): feitas, no ar, <strong>sem verificação independente</strong>. O commit <code>70d0a76</code> ajustou antes as definições das tarefas, <code>spec.md:215</code> e <code>design.md</code>.</p>
 
+<h2>Acompanhamento depois do release: <code>37949f2..aea3272</code></h2>
+<p>Comando: <code>git diff --numstat 37949f2..aea3272 -- backend game</code>. Commits: <code>a0c7066</code> e <code>ae88c42</code> (T13 e T14, contrato do backend, já contados na faixa principal e no ar antes), <code>46edd83</code> e <code>b59c135</code> (só teste), <code>23ad9f3</code> e <code>aea3272</code> (rodadas 4 e 5 do Verificador, só documentação). O commit <code>56488c4</code> (arquivos do Reversa) está na faixa, mas não toca <code>backend</code> nem <code>game</code>.</p>
+<table>
+<tr><th>Parte</th><th>Arquivos</th><th>Linhas +</th><th>Linhas -</th></tr>
+<tr><td>Produção, backend (<code>backend/src/main</code>: <code>ChapterEntities.kt</code> e a migração V10; vêm de <code>a0c7066</code> e <code>ae88c42</code>)</td><td>2</td><td>7</td><td>14</td></tr>
+<tr><td>Produção, jogo</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>Teste, backend (<code>backend/src/test</code>; inclui os testes de T13 e T14)</td><td>7</td><td>121</td><td>170</td></tr>
+<tr><td>Teste, só <code>46edd83</code> e <code>b59c135</code> (<code>ChapterTest.kt</code>)</td><td>1</td><td>49</td><td>21</td></tr>
+<tr><td>Teste de jogo unitário e e2e</td><td>0</td><td>0</td><td>0</td></tr>
+</table>
+<p>Os dois commits só de teste adicionaram 2 testes (<code>every stage of chapters 1 to 5 follows the release formulas</code> e <code>chapters 1 to 5 keep the boss elements of the release</code>); a suíte foi de 931 para 933 casos. Faixa principal remedida com <code>git diff --numstat 91e3111..aea3272</code>: teste de backend 24 arquivos, +1005 / -159; produção de backend 8 arquivos, +115 / -42; produção de jogo 4 arquivos, +47 / -5 (a produção é igual à da tabela abaixo).</p>
+
 <h2>Resumo do Verificador</h2>
+<p><strong>Rodada 5 (PASS), fonte <code>validation.md</code>:</strong> sensor 5 de 5 mortos na rodada (F8, P1 a P4) e 31 de 32 na campanha (M4 equivalente, aceito); 933 de 933 testes de backend passaram; JaCoCo linhas 99,10% (2749/2774), ramos 93,01% (825/887). Nenhum arquivo de jogo mudou desde <code>37949f2</code>, então os números de jogo vêm da rodada 3 e não foram remedidos. O texto a seguir é o resumo original das rodadas 1 a 3.</p>
 <p>Três rodadas, cobrindo T1 a T12 apenas. Sensor (mutação) somado: 23 mutantes, 21 mortos, 2 sobreviventes: F4 (a lacuna 1) e M4 (equivalente, aceito). Na rodada 3: 5 de 6 mutantes mortos (F4 sobreviveu). Critérios de aceite: 36 de 36 com evidência (dois por reprodução do esquema, risco residual); Critérios de sucesso: 4 de 5 (lacuna 1). Detalhes em <code>validation.md</code>.</p>
 
 <h2>Código de produção da faixa</h2>
@@ -40,7 +53,7 @@ code{background:#f4f4f4;padding:0 .2rem}
 <h2>Código de teste da faixa</h2>
 <table>
 <tr><th>Suíte</th><th>Arquivos</th><th>Linhas +</th><th>Linhas -</th><th>Testes adicionados (declarações no diff)</th><th>Total após a rodada</th></tr>
-<tr><td>Backend (<code>backend/src/test</code>)</td><td>24</td><td>977</td><td>159</td><td>48 declarações <code>@Test</code>/<code>@ParameterizedTest</code> adicionadas e 2 removidas no diff da faixa (T14 removeu 4 testes, 2 deles criados antes na própria faixa)</td><td>931 casos, 0 falhas, 0 erros, 0 ignorados (medido agora)</td></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td>24</td><td>1005</td><td>159</td><td>48 declarações <code>@Test</code>/<code>@ParameterizedTest</code> adicionadas e 2 removidas no diff da faixa (T14 removeu 4 testes, 2 deles criados antes na própria faixa)</td><td>933 casos, 0 falhas, 0 erros, 0 ignorados (rodada 5, <code>validation.md</code>; eram 931 em <code>ae88c42</code>)</td></tr>
 <tr><td>Jogo unitário (<code>game/src/**/*.test.js</code>)</td><td>6</td><td>123</td><td>10</td><td>35 declarações <code>it/test</code> adicionadas, 4 removidas (reescritas)</td><td>1576 passaram em 72 arquivos, 0 falhas</td></tr>
 <tr><td>E2E (<code>game/e2e</code>)</td><td>3</td><td>184</td><td>12</td><td>11 (<code>campaignChapters.spec.js</code>)</td><td>300 testes: 271 passaram na rodada completa, 27 falharam sob carga e passaram ao rodar sozinhos, 2 ignorados (<code>fixme</code>)</td></tr>
 </table>
@@ -50,7 +63,7 @@ code{background:#f4f4f4;padding:0 .2rem}
 <h2>Cobertura unitária</h2>
 <table>
 <tr><th>Alvo</th><th>Linhas</th><th>Ramos</th></tr>
-<tr><td>Backend inteiro (JaCoCo)</td><td>99,10% (2749/2774)</td><td>93,01% (825/887)</td></tr>
+<tr><td>Backend inteiro (JaCoCo, rodada 5; igual à medição anterior)</td><td>99,10% (2749/2774)</td><td>93,01% (825/887)</td></tr>
 <tr><td>Jogo inteiro (Vitest, v8)</td><td>97,95% (2586/2640)</td><td>95,18% (1205/1266)</td></tr>
 </table>
 <p>Arquivos que a feature mudou:</p>
@@ -100,6 +113,8 @@ code{background:#f4f4f4;padding:0 .2rem}
 <li><code>dragEquip.spec.js:550</code> e <code>:604</code> (rolagem na borda): falharam na rodada completa e na última do Verificador, mas <strong>passaram sozinhos no HEAD e passaram sozinhos em <code>91e3111</code></strong> (worktree temporário, já removido). Não reproduzem em isolamento em nenhum dos dois pontos; nenhum arquivo de arrastar ou equipamento mudou na faixa. São sensíveis a tempo.</li>
 </ul>
 
+<p>Falha de backend sem culpa da feature: <code>WalletFlowIT.kt:51</code> falhou 1 vez em 8 execuções na rodada 4 e passou no gate da rodada 5 (933 de 933). A feature não mexe na carteira.</p>
+
 <h2>Testes removidos por T14 (<code>git show --stat ae88c42</code>)</h2>
 <p>T14 mexeu em 5 arquivos de teste de integração (o commit inteiro, com a migração e <code>tasks.md</code>: +59/-154). Testes removidos, porque dependiam das colunas apagadas:</p>
 <ul>
@@ -118,11 +133,13 @@ code{background:#f4f4f4;padding:0 .2rem}
 <li>T13 e T14 sem verificação independente (ver veredito).</li>
 <li>A compatibilidade com o backend anterior (CHAP-08 AC 5, CHAP-09 AC 7) foi provada por uma reprodução (<code>PreviousBackendCompatibilityIT.kt</code>), nunca iniciando a imagem antiga; o ensaio de rollback recomendado antes deixou de ser possível além de T13.</li>
 <li>O ciclo completo de 3 000 000 000 de vida não atravessa o JSON do backend até o jogo em um único cenário (cada trecho é testado).</li>
-<li>Lacuna 1 aberta (ver veredito).</li>
+<li>Lacuna 1: fechada (ver veredito).</li>
+<li><code>WalletFlowIT.kt:51</code> é intermitente: falhou 1 vez em 8 execuções na rodada 4 e não repetiu no gate da rodada 5. Fica registrada como falha de teste que não é da feature; o acompanhamento é uma execução em laço.</li>
+<li>R-c: o ensaio de rollback da V10 continua aberto.</li>
 </ul>
 
 <h2>Deploy</h2>
-<p><strong>No ar.</strong> Evidência (comandos rodados em 2026-11-14):</p>
+<p><strong>No ar.</strong> Atualização de 2026-11-15: <code>.deploy-state</code> mostra o slot <code>blue</code> ativo em <code>b59c135</code> (o último commit que mexe em backend; contém T13 e T14) e <code>handled</code> = <code>aea3272</code> = <code>origin/main</code>. <code>publish.sh</code> e <code>deploy/watcher.mjs</code> estão rodando, o contêiner <code>infinity-grove-backend-blue</code> está de pé e a Worker responde 200. Os commits novos são só de teste e documentação. Evidência original (comandos rodados em 2026-11-14):</p>
 <ul>
 <li><code>.deploy-state</code>: slot ativo <code>green</code> em <code>ae88c4279210c3997ea93df86151e4b68b5063a7</code>; anterior <code>blue</code> em <code>a0c7066</code>; <code>handled</code> = <code>ae88c42</code> = <code>origin/main</code> = <code>HEAD</code>. Não existe <code>.deploy.lock</code>.</li>
 <li><code>docker ps</code>: <code>infinity-grove-backend-green</code>, <code>-postgres</code> (healthy), <code>-proxy</code> e <code>-dozzle</code> em execução.</li>

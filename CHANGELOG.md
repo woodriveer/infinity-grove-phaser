@@ -5,7 +5,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [0.2.0] - 2026-11-14
 
-A campanha vai até o capítulo 15 (`campaign-chapters`). A feature foi aceita pelo dono com uma lacuna de teste em aberto: as definições por fase dos capítulos 2 a 5 não estão fixadas em teste (só teste, sem defeito conhecido). As tarefas T13 e T14 (colunas antigas de vida) não passaram por verificação independente.
+A campanha vai até o capítulo 15 (`campaign-chapters`). A feature foi aceita pelo dono com uma lacuna de teste em aberto, depois fechada sem nova versão (ver "Alterado"): as definições dos capítulos 1 a 5 agora estão fixadas em teste.
 
 ### Adicionado
 
@@ -19,6 +19,7 @@ A campanha vai até o capítulo 15 (`campaign-chapters`). A feature foi aceita p
 - As colunas antigas de vida de 32 bits foram apagadas do banco (migração V10): o servidor usa só as colunas de 64 bits. Depois disso não dá mais para voltar a um servidor anterior a esta mudança.
 - O botão **Resetar conta** paga cristais pelo capítulo alcançado, sem o limite de 5: até 15 cristais (`Resetar conta (+15 cristais)`).
 - As moedas dos capítulos 1 a 5 foram movidas para as novas faixas.
+- Reforço de testes, sem mudança para o jogador: todas as fases e o elemento do chefe dos capítulos 1 a 5 agora têm teste que falha se mudarem. Feito depois da versão, sem nova tag, porque só tocou testes e documentação.
 
 ### Corrigido
 
