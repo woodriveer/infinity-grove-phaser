@@ -1646,6 +1646,30 @@ describe('HeroUi drag to equip', () => {
         expect(ctx.query('.hero-error').hidden).toBe(true);
     });
 
+    it('a stale answer after a close and a reopen leaves the open piece detail alone', async () => {
+        const ctx = await start([ worn('a1', 'AMULET', null) ]);
+        let finish;
+
+        ctx.equipmentGateway.equip.mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
+        await dragTo(ctx, 'equip-piece-a1', 'lyra');
+        ctx.ui.close();
+        await open(ctx, 'equipment');
+        //  The tiles are disabled while the equip runs, so the detail opens by the call that a press on a tile makes
+        ctx.ui.render_equipment({ selected: 'a1' });
+
+        expect(ctx.testid('piece-detail')).not.toBeNull();
+
+        const redraw = vi.spyOn(ctx.ui, 'render_equipment');
+
+        finish({ capacity: 100, pieces: [ worn('a1', 'AMULET', 'lyra') ] });
+        await flush();
+
+        expect(redraw).not.toHaveBeenCalled();
+        expect(ctx.testid('piece-detail')).not.toBeNull();
+        expect(ctx.testid('piece-worn').textContent).toBe('Na mochila');
+        expect(ctx.testid('equipment-list')).toBeNull();
+    });
+
     it('a redraw during a drag still drops on the hero under the pointer', async () => {
         const ctx = await start([ worn('a1', 'AMULET', null) ]);
 
