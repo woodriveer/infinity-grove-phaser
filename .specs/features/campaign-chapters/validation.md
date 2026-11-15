@@ -11,7 +11,9 @@ Path shorthands used below: `BT` = `backend/src/test/kotlin/br/com/woodriver/inf
 
 ## Validation: campaign-chapters - FAIL
 
-**Verdict**: FAIL - 1 gap (Minor), ranked below. The round 2 gaps are closed. The gap left is the chapters 1 to 5 success criterion: the new sensor mutant F4 changes stage 5 of chapters 2 to 5 and survives the whole backend suite. Round 3 is the last round allowed, so this FAIL escalates to the user.
+**Verdict (current, round 4)**: FAIL - 1 gap (Minor): the boss element of chapters 2 to 5 is not pinned (mutant F8 survives). Round 3 gap 1 is closed (F4 killed). See `## Round 4` at the end of this file. The text below is the round 3 report, unchanged.
+
+**Round 3 verdict**: FAIL - 1 gap (Minor), ranked below. The round 2 gaps are closed. The gap left is the chapters 1 to 5 success criterion: the new sensor mutant F4 changes stage 5 of chapters 2 to 5 and survives the whole backend suite. Round 3 is the last round allowed, so this FAIL escalates to the user.
 
 **Spec-anchored check**: 36 of 36 ACs have `file:line` evidence matching the spec outcome (CHAP-08 AC 5 and CHAP-09 AC 7 by schema and Flyway replay, accepted residual). 4 of 5 Success Criteria match; "Chapters 1 to 5 answer the same definitions" does not (gap 1). One spec-precision note (stage element rotation, non-blocking).
 **Gate**: backend 935 passed, 0 failed, 0 skipped; game unit 1576 passed, 0 failed; campaign spec 11 passed; full e2e 291 passed, 7 failed, 2 skipped (fixme). The 7 failures are explained in Gate Check: 5 pass in isolation, 2 are `dragEquip` edge-scroll scenarios outside this feature.
@@ -24,7 +26,8 @@ Path shorthands used below: `BT` = `backend/src/test/kotlin/br/com/woodriver/inf
 
 - Round 1 at `42754ca`: FAIL, 12 ranked gaps, sensor 14 of 16 killed.
 - Round 2 at `b4e6985`: FAIL, 2 gaps (CHAP-04 AC 1 and 2 per stage for chapters 6 to 15; CHAP-06 AC 3 dialog above chapter 4), sensor 16 of 19 killed.
-- Round 3 at `37949f2` (this report): FAIL, 1 gap (chapters 1 to 5 per stage, F4 survives). Both round 2 gaps are closed: `BT domain/ChapterTest.kt:368-394` (every stage 1 to 10 of chapters 6 to 15; mutants N7, N8, F1, F2 killed) and `GS adapters/phaser/ClickerGame.test.js:4616-4632` (dialog at chapter 12 and completed; mutant F3 killed).
+- Round 3 at `37949f2`: FAIL, 1 gap (chapters 1 to 5 per stage, F4 survives). Both round 2 gaps are closed: `BT domain/ChapterTest.kt:368-394` (every stage 1 to 10 of chapters 6 to 15; mutants N7, N8, F1, F2 killed) and `GS adapters/phaser/ClickerGame.test.js:4616-4632` (dialog at chapter 12 and completed; mutant F3 killed).
+- Round 4 at `46edd83` (see `## Round 4` at the end): FAIL, 1 gap (boss element of chapters 2 to 5; mutant F8 survives). Round 3 gap 1 is closed: F4 killed by `BT domain/ChapterTest.kt:394`, and F5, F6, F7 and F9 killed too.
 
 ---
 
@@ -231,3 +234,83 @@ The owner accepted the feature `campaign-chapters` with gap 1 left open (per-sta
 
 - **Open follow-up**: close gap 1 with the test-only fix described under "Fix Plans" (extend `ChapterTest.kt:368-394` to chapters 1 to 5 and kill F4). `.specs/STATE.md` has no list for follow-ups (its Handoff block describes a paused feature), so it is recorded here and in `report.html` only.
 - **Deploy**: the owner restarts `./publish.sh` personally. Until then the deploy is pending; the release tag, the GitHub release and the production check wait for it. Tasks T13 and T14 (contract migration) wait for the deploy of T1 to T12 to be live.
+
+---
+
+## Round 4
+
+**Date**: 2026-11-15
+**Verdict**: FAIL - 1 gap (Minor): the boss element of chapters 2 to 5 is not pinned (mutant F8 survives). Round 3 gap 1 (per-stage definitions of chapters 1 to 5, mutant F4) is closed.
+**Diff range**: `37949f2..46edd83` on `main`. The commit under review is `46edd83` (test only, `BT domain/ChapterTest.kt`, 32 insertions, 21 deletions). The other commits in the range are the deferred contract tasks T13 and T14 (`a0c7066`, `ae88c42`; production `ChapterEntities.kt` and `V10__health_legacy_columns_drop.sql`; T14 is already the active slot `8018752` in `.deploy-state`), docs and the reversa files. `Chapter.kt` and `ChapterOrder.kt` have not changed since `37949f2`, and no `game/` file changed in the range.
+**Verifier**: fresh instance, round 4 (author ≠ verifier). graphify is not on PATH on this machine, so the source was read directly.
+
+Path shorthands as in round 3: `BT` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`, `BM` = `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/`.
+
+### 1. The new test asserts the spec values, not the production code
+
+Test: `BT domain/ChapterTest.kt:375-380` (`every stage of chapters 1 to 5 follows the release formulas`), helper `:384-404`, table `:336-340`, table test `:408-410`.
+
+- **Release formulas**: `spec.md:19` gives the release health factor `4^(c-1)` and defense `+5` per chapter. The test passes `factor = 1L shl (2 * (c - 1))` and `bonus = 5 * (c - 1)` (`:379`). It does not call `ChapterDefinition.healthFactor` or `defenseBonus`, so a wrong production factor cannot pass through the expectation.
+- **Stage formulas** (`:393-403`): phase health `(40 + 4(n-1)) x factor` (`:393-394`), miniboss `5 x` phase health (`:395`), miniboss defenses `min(10 + n + bonus, 80)` (`:397-398`), miniboss crit `min(10 + 2n + bonus, 70)` (`:399`). The caps are the Chapter Table caps. They do not bind for chapters 1 to 5 (largest values: boss defense 50, miniboss defense 40, crit 50).
+- **Element** (`:401`): `(n - 1 + c - 1) mod 5` mirrors the rotation of the release. The spec does not write the rotation (spec-precision note 1 of round 3, unchanged).
+- **Literal rows**: `:336-340` hold the Chapter Table literals of chapters 1 to 5 (`spec.md:70` is the chapter 5 row). Checked by hand: chapter 3 stage 10 phase health `76 x 16 = 1 216`, miniboss `6 080`, miniboss defense `10 + 10 + 10 = 30`, crit `10 + 20 + 10 = 40`; chapter 5 stage 10 phase health `(40 + 36) x 256 = 19 456` (`spec.md:70`).
+- **Same definitions as before the release**: the release code (`git show 91e3111:BM domain/Chapter.kt`) uses the same formulas for chapters 1 to 5: health fold `x4` (`:113`), defense bonus `5 (c-1)` (`:124`), element `(n-1+c-1) mod 5` (`:134`), phase monster defenses 0 (`:147`), boss element `(c+3) mod 5` (`:155`). Its caps (90 and 100, `:19-20`) do not bind for chapters 1 to 5 either. The expected values are therefore the pre-feature values.
+
+### 2. Backend totals
+
+Command: `cd backend && ./gradlew cleanTest test` on `46edd83`. BUILD SUCCESSFUL. JUnit XML (84 suites): **932 tests, 932 passed, 0 failed, 0 skipped**.
+
+Round 3 counted 935. The change is -3: four `@Test` cases removed with the legacy health columns in `a0c7066` and `ae88c42` (`ChapterRepositoryIT`: `a seeded chapter holds the same value in the legacy and the hit point columns`; `MonsterHealthMigrationIT`: `a database seeded with the linear health gets the grown one` and `a health tuned in the database survives`; `HealthHitPointsMigrationIT`: `the legacy health columns stay integer and accept null`), and one added (`ChapterTest.kt:376`). 935 - 4 + 1 = 932. The copy case `the expand migration copies every legacy health into the hit points` was renamed and removed; see residual R1.
+
+### 3. Discrimination sensor
+
+Isolated `git worktree` at `46edd83` under the session scratch directory. Each mutant changed one anchored line in the worktree copy and ran the whole backend suite (`cleanTest test`). The mutant was reverted with `git checkout --` in the worktree, the worktree was removed afterwards (extended-path delete), and the real tree's `git status --porcelain` was empty before and after. `git diff -- backend/src/main` is empty.
+
+Control, unmutated: 932 tests, 931 passed, 1 failed, `BT adapter/web/WalletFlowIT.kt:51` (intermittent, residual R3). The clean real-tree run is the baseline for the verdict.
+
+| Mutation | File:line | Description | Result |
+| --- | --- | --- | --- |
+| F4 | `BM domain/Chapter.kt:161` | Phase monster health of stage 5 doubled in chapters 2 to 5 (round 3 survivor) | Killed: `ChapterTest.kt:394` (1 failing test) |
+| F5 | `BM domain/Chapter.kt:167` | Miniboss crit resistance of stage 3 in chapter 3 plus 1 | Killed: `ChapterTest.kt:399` |
+| F6 | `BM domain/Chapter.kt:163` | Element rotation of chapter 4 shifted by one | Killed: `ChapterTest.kt:402` |
+| F7 | `BM domain/Chapter.kt:176` | Phase monster physical defense of stage 2 in chapter 3 set to 1 | Killed: `ChapterRepositoryIT.kt:209` (`assertEquals(5, monsters.size)`) |
+| F8 | `BM domain/Chapter.kt:184` | Boss element of chapter 2 shifted by one (FIRE to WATER) | **Survived**: 932 of 932 pass. Gap 1 |
+| F9 | `BM domain/Chapter.kt:172` | Phases per stage of chapter 4 set to 4 | Killed, indirectly: `ProgressTest.kt:148` (clear count of the chapter) |
+
+**Result**: 5 of 6 killed. F5 to F9 are five new mutations on the chapters 1 to 5 definitions. Across the campaign (round 3 total of 23 plus the 5 new): 28 mutations, 26 killed, 2 survived: M4 (equivalent, see round 2) and F8 (gap 1 of this round). F4 changed from survived to killed.
+
+**Sensor depth**: expanded (manual, behavior-level, one anchored line per mutant; no mutation tool configured).
+
+### 4. Ranked gaps
+
+1. **Minor - boss element of chapters 2 to 5 not pinned (F8 survives).** Spec anchor: Success Criterion `spec.md:309` ("Chapters 1 to 5 answer the same definitions as before the release"). The release rule is `(c + 3) mod 5` (`91e3111` `Chapter.kt:155`): chapter 1 DARKNESS, chapter 2 FIRE, chapter 3 WATER, chapter 4 NATURE, chapter 5 LIGHT. Only chapter 1 is pinned (`BT adapter/web/ProgressControllerIT.kt:118`, `definition.boss.element` DARKNESS). No assertion in the backend suite reads the boss element of chapters 2 to 5.
+   - Fix (test only): assert the boss element of chapters 1 to 5 with those literals, for example in `ChapterTest.kt:408-410` (`chapters 1 to 5 keep every column of the chapter table`). Then F8 must die. Production code is not to change.
+   - Spec-precision: the spec never states the boss element rule (the Chapter Table has no element column, and Q16 says only "enemy elements keep the rotating formula"). The chapters 6 to 15 boss elements therefore have no spec anchor. A spec edit would make them testable.
+   - Priority: Minor. Live chapters keep their stored rows (CHAP-01 AC 4), and only fresh seeds are affected.
+
+### 5. Residual (not gaps)
+
+- **R1. CHAP-08 AC 4 has no standing test since T14.** The case `the expand migration copies every legacy health into the hit points` was removed. `tasks.md` (T14, "Removals allowed", `:682-684`) lists it, and says the V8 backfill was verified by the T1 and T13 runs before the drop. The copy is now historical evidence only. A Flyway replay that migrates legacy rows to V8 would give standing evidence. Reported, not counted as a gap, because the removal is listed in the approved plan.
+- **R2. CHAP-08 AC 5 replays the T13 release now.** The round 3 replay of the pre-feature release (legacy integer reads and writes) is gone. `BT adapter/repository/PreviousBackendCompatibilityIT.kt` now checks the T13 release: entities `:59-99`, read path `:101-129`, write path `:148-168`, Flyway V1 to V9 `:170-206`. The spec ends the pre-feature compatibility at the contract (CHAP-08 AC 5: "compatibility with the pre-feature backend ends there by design"), so this is not a gap. The rollback drill recommended in round 3 is still open.
+- **R3. `WalletFlowIT` intermittent failure.** One failure in 8 full-suite runs of this round (the control, `WalletFlowIT.kt:51`, `wallet.copper` against `before.sum()`). It passed in the clean real-tree run, in the 6 mutant runs and in 3 class-only reruns. No Kotlin wallet or sync file under `backend/src/main` changed since `91e3111` (the wallet-named changes in the range are the V9 and V10 SQL). The test checks the at-most-once credit of AD-002 under six parallel syncs, so a rare race in production is not excluded by these runs. Follow-up: run `WalletFlowIT` in a loop and, if it fails, open a bug.
+- **R4. Game suites not re-run.** No `game/` file changed since `37949f2`. The round 3 figures stand (game unit 1576 passed; e2e 291 passed, 7 failed as explained in round 3, 2 skipped). They are not re-measured here.
+
+### 6. Requirement traceability (for the orchestrator to apply; the spec was not edited)
+
+| Requirement | Round 3 | Round 4 |
+| --- | --- | --- |
+| CHAP-04 | Verified (AC 1 to 5); Success Criterion open (gap 1) | Verified (AC 1 to 5); Success Criterion open: boss element of chapters 2 to 5 (gap 1, test only) |
+| CHAP-08 | Verified (AC 5 by replay, residual) | Verified (AC 1 to 3, 6); AC 4 historical (R1); AC 5 replays T13 (R2) |
+
+### Summary
+
+**Overall**: FAIL (round 4). The round 3 gap is closed, but the same success criterion has a second unpinned definition: the boss element of chapters 2 to 5. Three validation rounds are used up, so this goes to the owner.
+**Spec-anchored check**: round 3 gap 1 closed (F4, F5, F6 killed; F7 and F9 killed too). One new Minor gap (F8, boss element of chapters 2 to 5).
+**Sensor**: 5 of 6 killed this round; 26 of 28 across the campaign (F8 gap, M4 equivalent).
+**Gate**: backend 932 passed, 0 failed, 0 skipped (`cleanTest test`); game and e2e not re-run (no game change in range).
+
+**What works**: the release formulas of chapters 1 to 5 are asserted per stage (phase health, miniboss health, defenses, crit, element); the phase monster defenses and phase counts are covered by mutants F7 and F9; the chapter table literals of chapters 1 to 5 match the pre-feature code.
+
+**Issues found**: gap 1 of this round (boss element of chapters 2 to 5). It needs a test-only fix: the literals above, in `ChapterTest.kt:408-410`, then rerun F8.
+
+**Next steps** (owner decides): (a) one test-only fix to pin the boss element of chapters 1 to 5, then re-verify, or accept the gap as round 3 was accepted; (b) a spec edit that states the boss element rule (Q16 or a Chapter Table column) before chapters 6 to 15 can be pinned; (c) the rollback drill for the V10 deploy (round 3); (d) a loop run of `WalletFlowIT` (R3).
