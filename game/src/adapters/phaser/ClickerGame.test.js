@@ -4846,12 +4846,14 @@ describe('ClickerGame hero ascension', () => {
 
         crit.dice.value = 0.44;
         crit.click();
+        expect(crit.scene.monster.health).toBeCloseTo(1000 - 4.675, 9);
         expect(crit.texts.at(-1).text).toBe('4.7');
 
         const plain = await createScene({ start: big(), heroes: leaderAt('kael', 4), talents: [] });
 
         plain.dice.value = 0.45;
         plain.click();
+        expect(plain.scene.monster.health).toBeCloseTo(1000 - 1.7, 9);
         expect(plain.texts.at(-1).text).toBe('1.7');
     });
 
@@ -4860,12 +4862,14 @@ describe('ClickerGame hero ascension', () => {
 
         crit.dice.value = 0.69;
         crit.click();
+        expect(crit.scene.monster.health).toBeCloseTo(1000 - 12.8, 9);
         expect(crit.texts.at(-1).text).toBe('12.8');
 
         const plain = await createScene({ start: big(), heroes: leaderAt('kael', 9, [ 3, 3, 3 ]), talents: [] });
 
         plain.dice.value = 0.7;
         plain.click();
+        expect(plain.scene.monster.health).toBeCloseTo(1000 - 3.2, 9);
         expect(plain.texts.at(-1).text).toBe('3.2');
     });
 
