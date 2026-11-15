@@ -580,7 +580,7 @@ export const starPowerText = (stars) =>
 
 ---
 
-### T9: The scene uses the skill level of the payload [ ]
+### T9: The scene uses the skill level of the payload [x]
 
 **Owner**: game-dev
 **What**: `ClickerGame.useSkill` passes the level of the leader's skill to `SkillCombat.use`, and scene tests pin the click and skill numbers of 4 to 9 star leaders (ASC-03, spec AC 2 to 4; ASC-05; ASC-06, spec AC 2 to 4, 6; ASC-07 AC 8).
@@ -638,8 +638,8 @@ const slotText = (ctx, number) => slot(ctx, number).querySelector('.skill-slot-c
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] Step 0 printed nothing, or the task was reported blocked.
-- [ ] The nine cases pass; every existing `ClickerGame.test.js` case passes unchanged; the whole Vitest suite passes.
+- [x] Step 0 printed nothing, or the task was reported blocked.
+- [x] The nine cases pass; every existing `ClickerGame.test.js` case passes unchanged; the whole Vitest suite passes.
 
 **Commit**: `feat(game): fight with the skill level of the leader`
 

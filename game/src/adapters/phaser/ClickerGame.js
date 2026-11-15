@@ -12,6 +12,7 @@ import { healthText, Monster } from '../../domain/combat/monster';
 import { clickHits } from '../../domain/heroes/leaderBonus';
 import { ELEMENT_LABELS } from '../../domain/heroes/heroes';
 import { SkillCombat } from '../../domain/skills/skillCombat';
+import { skillLevelOf } from '../../domain/skills/skillLevel';
 import { monsterAfterBreak, talentComboCap, talentTimeBonusMs } from '../../domain/talents/talents';
 import { HeroUi } from './HeroUi';
 import { autoClickIntervalText, renderAutoClick } from './views/autoClickView';
@@ -925,10 +926,12 @@ export class ClickerGame extends Scene
             return;
         }
 
+        const skill = leader.skills.find((candidate) => candidate.slot === slot);
         const result = this.skills.use({
             heroId: leader.id,
             slot,
-            unlocked: leader.skills.find((skill) => skill.slot === slot)?.unlocked ?? false,
+            unlocked: skill?.unlocked ?? false,
+            level: skillLevelOf(skill),
             attacker: this.leaderAttacker(),
             monster: this.monster,
             boss: this.countdown !== null

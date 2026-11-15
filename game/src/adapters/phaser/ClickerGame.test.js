@@ -4775,3 +4775,120 @@ describe('ClickerGame account reset', () => {
         expect(ctx.scene.monster.health).toBeLessThan(1000);
     });
 });
+
+describe('ClickerGame hero ascension', () => {
+    const big = () => ({
+        ...progress(1, 'PHASE', 1),
+        definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000 })) }
+    });
+    //  levels: one number per slot, e.g. [ 2, 1, 1 ] for a 4-star hero (spec hero-ascension, Levels by stars)
+    const levelled = (levels) => heroSkills(true, true, true).map((skill, index) => ({ ...skill, level: levels[index] }));
+    const leaderAt = (id, stars, levels) => ({
+        leaderId: id,
+        heroes: [
+            { ...heroEntry(id, { [stars]: 1 }, stars), ...(levels && { skills: levelled(levels) }) },
+            heroEntry(id === 'kael' ? 'lyra' : 'kael', { 0: 1 }, 0)
+        ]
+    });
+    const key = (ctx, name) => ctx.handlers[`keydown-${name}`]();
+    const slot = (ctx, number) => ctx.control(`[data-testid="skill-slot-${number}"]`);
+    const slotText = (ctx, number) => slot(ctx, number).querySelector('.skill-slot-cooldown').textContent;
+
+    it('a 4 star Kael uses Corte Dimensional at level 2 for 31.875, shown 31.9', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderAt('kael', 4, [ 2, 1, 1 ]), talents: [] });
+
+        key(ctx, 'ONE');
+
+        expect(ctx.scene.monster.health).toBeCloseTo(968.125, 9);
+        expect(ctx.texts.at(-1).text).toBe('31.9');
+    });
+
+    it('a 4 star Kael uses Investida do Baluarte still at level 1 for 6.8', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderAt('kael', 4, [ 2, 1, 1 ]), talents: [] });
+
+        key(ctx, 'TWO');
+
+        expect(ctx.scene.monster.health).toBeCloseTo(993.2, 9);
+    });
+
+    it('a 9 star Kael uses Corte Dimensional at level 3 for 72', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderAt('kael', 9, [ 3, 3, 3 ]), talents: [] });
+
+        key(ctx, 'ONE');
+
+        expect(ctx.scene.monster.health).toBeCloseTo(928, 9);
+    });
+
+    it('a skill without a level in the payload is used at level 1', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderAt('kael', 4), talents: [] });
+
+        key(ctx, 'ONE');
+
+        expect(ctx.scene.monster.health).toBeCloseTo(974.5, 9);
+    });
+
+    it('clicks for 1.7, 2, 2.3, 2.6, 2.9 and 3.2 with 4 to 9 stars', async () => {
+        const texts = [];
+
+        for (const stars of [ 4, 5, 6, 7, 8, 9 ])
+        {
+            const ctx = await createScene({ start: big(), heroes: leaderAt('kael', stars), talents: [] });
+
+            ctx.click();
+            texts.push(ctx.texts.at(-1).text);
+        }
+
+        expect(texts).toEqual([ '1.7', '2', '2.3', '2.6', '2.9', '3.2' ]);
+    });
+
+    it('a 4 star leader crits on a roll of 0.44 for 4.7 and not on 0.45', async () => {
+        const crit = await createScene({ start: big(), heroes: leaderAt('kael', 4), talents: [] });
+
+        crit.dice.value = 0.44;
+        crit.click();
+        expect(crit.texts.at(-1).text).toBe('4.7');
+
+        const plain = await createScene({ start: big(), heroes: leaderAt('kael', 4), talents: [] });
+
+        plain.dice.value = 0.45;
+        plain.click();
+        expect(plain.texts.at(-1).text).toBe('1.7');
+    });
+
+    it('a 9 star leader crits on a roll of 0.69 for 12.8 and not on 0.70', async () => {
+        const crit = await createScene({ start: big(), heroes: leaderAt('kael', 9, [ 3, 3, 3 ]), talents: [] });
+
+        crit.dice.value = 0.69;
+        crit.click();
+        expect(crit.texts.at(-1).text).toBe('12.8');
+
+        const plain = await createScene({ start: big(), heroes: leaderAt('kael', 9, [ 3, 3, 3 ]), talents: [] });
+
+        plain.dice.value = 0.7;
+        plain.click();
+        expect(plain.texts.at(-1).text).toBe('3.2');
+    });
+
+    it('Ventos Ligeiros cast by a 5 star Lyra stays at +50 % after she fuses to 6 stars', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderAt('lyra', 5, [ 2, 2, 1 ]), talents: [] });
+
+        key(ctx, 'THREE');
+        heroesGateway.fuse.mockResolvedValue({ ...heroEntry('lyra', { 6: 1 }, 6), skills: levelled([ 2, 2, 2 ]) });
+        await ctx.scene.heroes.fuse('lyra', 5);
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBeCloseTo(1000 - 3.45, 9);
+    });
+
+    it('a fusion of the leader keeps the cooldown of a cooling slot', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderAt('kael', 3, [ 1, 1, 1 ]), talents: [] });
+
+        key(ctx, 'ONE');
+        ctx.scene.update(0, 5000);
+        heroesGateway.fuse.mockResolvedValue({ ...heroEntry('kael', { 4: 1 }, 4), skills: levelled([ 2, 1, 1 ]) });
+        await ctx.scene.heroes.fuse('kael', 3);
+
+        expect(slot(ctx, 1).getAttribute('data-state')).toBe('cooling');
+        expect(slotText(ctx, 1)).toBe('15s');
+    });
+});
