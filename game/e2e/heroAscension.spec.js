@@ -162,6 +162,8 @@ test.describe('Hero ascension', () => {
         await expect(page.getByTestId('skill-row-1').locator('.skill-level')).toHaveText('Nível 3 · +50% de poder');
         await expect(page.getByTestId('skill-row-2').locator('.skill-level')).toHaveText('Nível 3 · +50% de poder');
         await expect(page.getByTestId('skill-row-3').locator('.skill-level')).toHaveText('Nível 2 · +25% de poder');
+        expect(await colorOf(page.getByTestId('skill-row-1').locator('.skill-level'), 'backgroundColor')).toBe('rgb(217, 165, 33)');
+        expect(await colorOf(page.getByTestId('skill-row-1').locator('.skill-level'), 'color')).toBe('rgb(32, 30, 29)');
     });
 
     test('a 1-star hero shows Nível 1 on its unlocked skill and no level on the locked ones', async ({ page }) => {
