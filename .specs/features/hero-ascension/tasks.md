@@ -1117,5 +1117,5 @@ Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T3, `kotlin-back
 - [x] G2 (major) level 3 pill colour `rgb(217, 165, 33)` pinned in the 8-star e2e test; mutant M10 killed
 - [x] G3 (major) ASC-06 AC3 and AC4 assert the monster health (4.675, 1.7, 12.8, 3.2) in `ClickerGame.test.js`
 - [ ] G4 (major) e2e scenarios for ASC-06 AC3, AC4, AC6, ASC-07 AC3, ASC-08 AC8 in `heroAscension.spec.js`
-- [ ] G5 (minor) level 2 badge purple `rgb(122, 63, 160)` pinned in the 5-star e2e test
+- [x] G5 (minor) level 2 badge purple `rgb(122, 63, 160)` pinned in the 5-star e2e test
 - [x] G6 (minor) a 400 fusion answer re-reads the bag over HTTP in `HeroControllerIT.kt`

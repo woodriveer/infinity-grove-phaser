@@ -143,6 +143,8 @@ test.describe('Hero ascension', () => {
         await expect(page.getByTestId('skill-level-1')).toHaveText('Nv. 2');
         await expect(page.getByTestId('skill-level-2')).toHaveText('Nv. 2');
         await expect(page.getByTestId('skill-level-3')).toHaveCount(0);
+        expect(await colorOf(page.getByTestId('skill-level-1'), 'backgroundColor')).toBe('rgb(122, 63, 160)');
+        expect(await colorOf(page.getByTestId('skill-level-2'), 'backgroundColor')).toBe('rgb(122, 63, 160)');
     });
 
     test('an 8-star hero shows gold stars and levels 3, 3 and 2', async ({ page }) => {
