@@ -1,0 +1,1408 @@
+{
+  "generated_at": "2026-11-12T13:00:00Z",
+  "modules": [
+    {
+      "name": "session",
+      "path": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security + game/src/application/session",
+      "purpose": "Registration, login, JWT access tokens, rotating refresh tokens and the client session lifecycle",
+      "primary_files": [
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/User.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/RefreshToken.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/SessionService.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/UserService.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/SecurityConfig.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/JwtAccessTokenIssuer.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/UserController.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/AuthController.kt",
+        "game/src/application/session/sessionManager.js",
+        "game/src/adapters/http/httpClient.js",
+        "game/src/adapters/storage/sessionStore.js"
+      ],
+      "functions": [
+        {
+          "name": "User.register",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/User.kt",
+          "params": [
+            "username",
+            "rawPassword",
+            "hasher",
+            "repo",
+            "now"
+          ],
+          "returns": "User",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "SessionService.refresh",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/SessionService.kt",
+          "params": [
+            "rawRefreshToken"
+          ],
+          "returns": "AuthTokens",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "createSessionManager",
+          "file": "game/src/application/session/sessionManager.js",
+          "params": [
+            "{store, authGateway}"
+          ],
+          "returns": "manager",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [
+        {
+          "name": "User",
+          "fields": [
+            {
+              "name": "username",
+              "type": "String",
+              "required": true
+            },
+            {
+              "name": "password",
+              "type": "String (BCrypt)",
+              "required": true
+            },
+            {
+              "name": "createdAt",
+              "type": "Long",
+              "required": true
+            },
+            {
+              "name": "lastLoginAt",
+              "type": "Long",
+              "required": true
+            }
+          ],
+          "confidence": "confirmed"
+        },
+        {
+          "name": "RefreshToken",
+          "fields": [
+            {
+              "name": "tokenHash",
+              "type": "String (SHA-256)",
+              "required": true
+            },
+            {
+              "name": "username",
+              "type": "String",
+              "required": true
+            },
+            {
+              "name": "expiresAt",
+              "type": "Long",
+              "required": true
+            },
+            {
+              "name": "revoked",
+              "type": "Boolean",
+              "required": true
+            }
+          ],
+          "confidence": "confirmed"
+        }
+      ],
+      "business_rules": [
+        {
+          "description": "Password must have at least 8 characters",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/User.kt:65",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Refresh token TTL 30 days, access token 24 h",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/RefreshToken.kt:96",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Refresh rotates: old token revoked, new pair issued",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/SessionService.kt:348",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Password change revokes all refresh tokens",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/UserService.kt:420",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Unknown user at login answers 404, wrong password 401",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/ApiExceptionHandler.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "JWT secret must be at least 32 bytes or startup fails",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/SecurityProperties.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "PUT/DELETE /users/{username} and GET /users do not check that the caller is that user",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/UserController.kt",
+          "confidence": "unknown"
+        },
+        {
+          "description": "Client refresh is single-flight; a 401 retries once",
+          "location": "game/src/adapters/http/httpClient.js",
+          "confidence": "confirmed"
+        }
+      ],
+      "dependencies": [
+        "heroes"
+      ],
+      "algorithms": [
+        "refresh token rotation",
+        "single-flight refresh",
+        "retry-once 401 interceptor"
+      ],
+      "complexity": "medium"
+    },
+    {
+      "name": "heroes",
+      "path": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Hero*.kt + game/src/domain/heroes",
+      "purpose": "Hero catalog, card bag, fusion 0-9 stars, skill unlock and levels, leader",
+      "primary_files": [
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Hero.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroSeed.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerCards.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroView.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/HeroService.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/HeroController.kt",
+        "game/src/domain/heroes/heroes.js",
+        "game/src/domain/heroes/starBonus.js",
+        "game/src/domain/heroes/leaderBonus.js",
+        "game/src/application/heroes/heroCollection.js"
+      ],
+      "functions": [
+        {
+          "name": "PlayerCards.fuse",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerCards.kt",
+          "params": [
+            "heroId",
+            "stars"
+          ],
+          "returns": "PlayerCards",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "SkillView.levelOf",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroView.kt",
+          "params": [
+            "stars",
+            "slot"
+          ],
+          "returns": "Int",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "clickHits",
+          "file": "game/src/domain/heroes/leaderBonus.js",
+          "params": [
+            "heroId",
+            "random"
+          ],
+          "returns": "1|2",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [
+        {
+          "name": "PlayerCards",
+          "fields": [
+            {
+              "name": "username",
+              "type": "String",
+              "required": true
+            },
+            {
+              "name": "startingElement",
+              "type": "Element",
+              "required": true
+            },
+            {
+              "name": "leaderId",
+              "type": "String",
+              "required": true
+            },
+            {
+              "name": "copies",
+              "type": "Map<CopyKey,Int>",
+              "required": true
+            },
+            {
+              "name": "bosses",
+              "type": "BossRecord",
+              "required": true
+            }
+          ],
+          "confidence": "confirmed"
+        },
+        {
+          "name": "Hero",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "required": true
+            },
+            {
+              "name": "element",
+              "type": "Element",
+              "required": true
+            },
+            {
+              "name": "skills",
+              "type": "List<Skill> (3)",
+              "required": true
+            }
+          ],
+          "confidence": "confirmed"
+        }
+      ],
+      "business_rules": [
+        {
+          "description": "3 cards of the same stars (0..8) fuse into 1 card of the next stars",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerCards.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Skill slot n unlocks at n stars; level 1+(stars-slot)/3, max 3",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroView.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Only an owned hero can lead",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerCards.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Star bonus table 1..9 stars adds click damage, crit chance and crit damage",
+          "location": "game/src/domain/heroes/starBonus.js",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Only the Lyra leader bonus (30% double critical click) is applied",
+          "location": "game/src/domain/heroes/leaderBonus.js",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Seeder inserts missing heroes only, never overwrites",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/HeroSeeder.kt",
+          "confidence": "confirmed"
+        }
+      ],
+      "dependencies": [
+        "campaign"
+      ],
+      "algorithms": [
+        "star fusion",
+        "skill level formula"
+      ],
+      "complexity": "medium"
+    },
+    {
+      "name": "campaign",
+      "path": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Progress.kt + game/src/domain/campaign",
+      "purpose": "5 chapters x 10 stages x 5 phases, timed bosses, server-authoritative position and boss rewards",
+      "primary_files": [
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Chapter.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterOrder.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Progress.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/CardDrops.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/BossRecord.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/DropQueue.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/ProgressService.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/CardRewards.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/ChapterSeeder.kt",
+        "game/src/domain/campaign/campaign.js",
+        "game/src/domain/campaign/bossMap.js",
+        "game/src/application/campaign/campaignSession.js"
+      ],
+      "functions": [
+        {
+          "name": "ChapterDefinition.of",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Chapter.kt",
+          "params": [
+            "number"
+          ],
+          "returns": "ChapterDefinition",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "Progress.report",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Progress.kt",
+          "params": [
+            "reported",
+            "outcome",
+            "chapter"
+          ],
+          "returns": "Progress",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "CardDropper.drop",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/CardDrops.kt",
+          "params": [
+            "encounter",
+            "chapter",
+            "stage",
+            "startingElement",
+            "firstChapterBossWin",
+            "rates",
+            "heroes",
+            "chance"
+          ],
+          "returns": "Hero?",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "createCampaignSession",
+          "file": "game/src/application/campaign/campaignSession.js",
+          "params": [
+            "{gateway}"
+          ],
+          "returns": "session",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [
+        {
+          "name": "Progress",
+          "fields": [
+            {
+              "name": "username",
+              "type": "String",
+              "required": true
+            },
+            {
+              "name": "position",
+              "type": "ProgressPosition(chapter,stage,encounter,phase)",
+              "required": true
+            },
+            {
+              "name": "completed",
+              "type": "Boolean",
+              "required": true
+            }
+          ],
+          "confidence": "confirmed"
+        },
+        {
+          "name": "ChapterDefinition",
+          "fields": [
+            {
+              "name": "number",
+              "type": "Int",
+              "required": true
+            },
+            {
+              "name": "bossHealth",
+              "type": "Int",
+              "required": true
+            },
+            {
+              "name": "bossTimeLimitMs",
+              "type": "Long",
+              "required": true
+            },
+            {
+              "name": "stages",
+              "type": "List<StageDefinition>",
+              "required": true
+            },
+            {
+              "name": "boss",
+              "type": "EnemyStats",
+              "required": true
+            },
+            {
+              "name": "bossDropRuleId",
+              "type": "Int",
+              "required": true
+            }
+          ],
+          "confidence": "confirmed"
+        },
+        {
+          "name": "BossRecord",
+          "fields": [
+            {
+              "name": "clearedChapters",
+              "type": "Set<Int>",
+              "required": true
+            },
+            {
+              "name": "winsDay",
+              "type": "LocalDate?",
+              "required": false
+            },
+            {
+              "name": "winsToday",
+              "type": "Int",
+              "required": true
+            },
+            {
+              "name": "lastFarmWinAt",
+              "type": "Long?",
+              "required": false
+            }
+          ],
+          "confidence": "confirmed"
+        }
+      ],
+      "business_rules": [
+        {
+          "description": "Health factor 4^(chapter-1); monster (40+4(stage-1))*factor; miniboss x5 with 30 s; boss 2000*factor with 60 s",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Chapter.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Chapter elements: start, the element it beats, the third triad element, DARKNESS, LIGHT",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterOrder.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "A report from another position or after completion is a 409 with the stored progress",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Progress.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "FAILED on a boss returns to phase 5 of the same stage; on a phase it is a conflict",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Progress.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Miniboss card chance 0.07*stage; chapter boss drops the next chapter hero, 100% on the first win else 80%",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/CardDrops.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Copper allowance max 20, +1 per 1500 ms; queue of 20 pre-rolled values",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/DropQueue.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Campaign chapter boss wins count toward the farm daily limit but are not limited themselves",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/CardRewards.kt",
+          "confidence": "inferred"
+        },
+        {
+          "description": "The client applies moves optimistically and realigns on 409",
+          "location": "game/src/application/campaign/campaignSession.js",
+          "confidence": "confirmed"
+        }
+      ],
+      "dependencies": [
+        "heroes",
+        "equipment",
+        "talents",
+        "wallet"
+      ],
+      "algorithms": [
+        "position state machine",
+        "chapter generation",
+        "drop queue with token-bucket allowance",
+        "optimistic report queue"
+      ],
+      "complexity": "high"
+    },
+    {
+      "name": "combat",
+      "path": "game/src/domain/combat + game/src/domain/skills",
+      "purpose": "Client-only damage model: elements, critical hits, combo, leader attacker, 15 skills with effects",
+      "primary_files": [
+        "game/src/domain/combat/elements.js",
+        "game/src/domain/combat/damage.js",
+        "game/src/domain/combat/monster.js",
+        "game/src/domain/combat/combo.js",
+        "game/src/domain/combat/leaderAttacker.js",
+        "game/src/domain/skills/skillCatalog.js",
+        "game/src/domain/skills/skillCombat.js",
+        "game/src/domain/skills/skillDamage.js",
+        "game/src/domain/skills/skillLevel.js"
+      ],
+      "functions": [
+        {
+          "name": "elementMultiplier",
+          "file": "game/src/domain/combat/elements.js",
+          "params": [
+            "attacker",
+            "defender"
+          ],
+          "returns": "number",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "calculateDamage",
+          "file": "game/src/domain/combat/damage.js",
+          "params": [
+            "{attacker, defender, random, boss, forceCritical}"
+          ],
+          "returns": "{damage, critical}",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "SkillCombat.advance",
+          "file": "game/src/domain/skills/skillCombat.js",
+          "params": [
+            "ms"
+          ],
+          "returns": "ticks[]",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [
+        {
+          "name": "Attacker",
+          "fields": [
+            {
+              "name": "element",
+              "type": "Element",
+              "required": true
+            },
+            {
+              "name": "damageType",
+              "type": "PHYSICAL|MAGICAL",
+              "required": true
+            },
+            {
+              "name": "baseDamage",
+              "type": "number",
+              "required": true
+            },
+            {
+              "name": "critChance",
+              "type": "number",
+              "required": true
+            },
+            {
+              "name": "critMultiplier",
+              "type": "number",
+              "required": true
+            },
+            {
+              "name": "armorPierce",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "bossDamage",
+              "type": "number",
+              "required": false
+            }
+          ],
+          "confidence": "confirmed"
+        }
+      ],
+      "business_rules": [
+        {
+          "description": "Triad x2 / x0.5; LIGHT/DARKNESS vs triad x1.8, vs each other x0.9; triad vs LIGHT/DARKNESS x0.9",
+          "location": "game/src/domain/combat/elements.js",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "damage = base x element x (1-defense%) x crit x boss bonus; crit chance reduced by crit resistance",
+          "location": "game/src/domain/combat/damage.js",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Combo +1% per click, capped by the COMBO talent, lost after 1.5 s idle",
+          "location": "game/src/domain/combat/combo.js",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Skill level factor 1 + 0.25(level-1)",
+          "location": "game/src/domain/skills/skillLevel.js",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "DoT ticks never crit; a cast shot is lost if its target changes",
+          "location": "game/src/domain/skills/skillCombat.js",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "The backend never validates damage",
+          "location": "game/src/domain/combat/damage.js",
+          "confidence": "inferred"
+        }
+      ],
+      "dependencies": [
+        "heroes",
+        "equipment",
+        "talents"
+      ],
+      "algorithms": [
+        "damage formula",
+        "time-sliced effect simulation"
+      ],
+      "complexity": "high"
+    },
+    {
+      "name": "farm",
+      "path": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Farm.kt",
+      "purpose": "Replay beaten bosses of the current chapter for cards and equipment",
+      "primary_files": [
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Farm.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/FarmService.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/FarmController.kt",
+        "game/src/application/farm/farmSession.js",
+        "game/src/adapters/phaser/views/farmView.js",
+        "game/src/domain/campaign/bossMap.js"
+      ],
+      "functions": [
+        {
+          "name": "FarmBoss.beaten",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Farm.kt",
+          "params": [
+            "progress",
+            "chapter"
+          ],
+          "returns": "List<FarmBoss>",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "FarmService.report",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/FarmService.kt",
+          "params": [
+            "username",
+            "boss",
+            "outcome"
+          ],
+          "returns": "FarmResult",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [
+        {
+          "name": "FarmBoss",
+          "fields": [
+            {
+              "name": "kind",
+              "type": "Encounter",
+              "required": true
+            },
+            {
+              "name": "stage",
+              "type": "Int?",
+              "required": false
+            }
+          ],
+          "confidence": "confirmed"
+        }
+      ],
+      "business_rules": [
+        {
+          "description": "Only bosses beaten in the current chapter can be farmed",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Farm.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Chapter boss farm wins are limited to 10 per UTC day",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/BossRecord.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Farm wins at least 5000 ms apart",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/BossRecord.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Farm pays no copper and no talent points",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/FarmService.kt",
+          "confidence": "confirmed"
+        }
+      ],
+      "dependencies": [
+        "campaign",
+        "heroes",
+        "equipment"
+      ],
+      "algorithms": [],
+      "complexity": "low"
+    },
+    {
+      "name": "wallet",
+      "path": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Wallet.kt + game/src/domain/economy",
+      "purpose": "Copper wallet and server-rolled drop queues reconciled with the client ledger",
+      "primary_files": [
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Wallet.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/DropQueue.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/DropTable.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/WalletService.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/WalletAccess.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/WalletController.kt",
+        "game/src/domain/economy/walletLedger.js",
+        "game/src/application/wallet/walletSync.js"
+      ],
+      "functions": [
+        {
+          "name": "Wallet.credit",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Wallet.kt",
+          "params": [
+            "kills",
+            "table",
+            "roller",
+            "now"
+          ],
+          "returns": "SyncResult",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "WalletLedger.completeSync",
+          "file": "game/src/domain/economy/walletLedger.js",
+          "params": [
+            "{wallet, drops}"
+          ],
+          "returns": "void",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [
+        {
+          "name": "Wallet",
+          "fields": [
+            {
+              "name": "username",
+              "type": "String",
+              "required": true
+            },
+            {
+              "name": "copper",
+              "type": "Long",
+              "required": true
+            },
+            {
+              "name": "queues",
+              "type": "Map<Int,DropQueue>",
+              "required": true
+            }
+          ],
+          "confidence": "confirmed"
+        },
+        {
+          "name": "DropQueue",
+          "fields": [
+            {
+              "name": "ruleId",
+              "type": "Int",
+              "required": true
+            },
+            {
+              "name": "queue",
+              "type": "List<Int> (20)",
+              "required": true
+            },
+            {
+              "name": "allowance",
+              "type": "Int (0..20)",
+              "required": true
+            },
+            {
+              "name": "allowanceUpdatedAt",
+              "type": "Long",
+              "required": true
+            }
+          ],
+          "confidence": "confirmed"
+        }
+      ],
+      "business_rules": [
+        {
+          "description": "100 copper = 1 silver, 100 silver = 1 gold",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Wallet.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "An unknown rule id rejects the whole sync",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Wallet.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Kills above the allowance are discarded",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/DropQueue.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "The total is clamped at Long.MAX_VALUE",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Wallet.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Only one client sync in flight; a failed sync is retried",
+          "location": "game/src/domain/economy/walletLedger.js",
+          "confidence": "confirmed"
+        }
+      ],
+      "dependencies": [
+        "campaign"
+      ],
+      "algorithms": [
+        "two-sided queue reconciliation"
+      ],
+      "complexity": "medium"
+    },
+    {
+      "name": "equipment",
+      "path": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Equipment.kt + game/src/domain/equipment",
+      "purpose": "Boss-dropped pieces, bag, equip, refine, reroll, sale",
+      "primary_files": [
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Equipment.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PieceRoller.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerEquipment.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/SellBatch.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/EquipmentService.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/EquipmentRewards.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentController.kt",
+        "game/src/domain/equipment/equipment.js",
+        "game/src/domain/equipment/bulkSell.js",
+        "game/src/domain/equipment/leaderStats.js",
+        "game/src/application/equipment/equipmentCollection.js",
+        "game/src/adapters/phaser/views/dragEquip.js"
+      ],
+      "functions": [
+        {
+          "name": "PieceRoller.roll",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PieceRoller.kt",
+          "params": [
+            "encounter",
+            "rules",
+            "username",
+            "id",
+            "chance",
+            "chapter"
+          ],
+          "returns": "Piece?",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "Piece.refineCost",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Equipment.kt",
+          "params": [
+            "rules"
+          ],
+          "returns": "Long?",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "attackerFor",
+          "file": "game/src/domain/equipment/equipment.js",
+          "params": [
+            "base",
+            "pieces",
+            "bonus"
+          ],
+          "returns": "Attacker",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [
+        {
+          "name": "Piece",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "required": true
+            },
+            {
+              "name": "slot",
+              "type": "Slot",
+              "required": true
+            },
+            {
+              "name": "rarity",
+              "type": "Rarity",
+              "required": true
+            },
+            {
+              "name": "baseClick",
+              "type": "Int?",
+              "required": false
+            },
+            {
+              "name": "refine",
+              "type": "Int 0..10",
+              "required": true
+            },
+            {
+              "name": "affixes",
+              "type": "List<Affix>",
+              "required": true
+            },
+            {
+              "name": "heroId",
+              "type": "String?",
+              "required": false
+            }
+          ],
+          "confidence": "confirmed"
+        }
+      ],
+      "business_rules": [
+        {
+          "description": "Refine cost floor(500 x 1.7^refine) x rarity multiplier (1,2,3,5,8)",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Equipment.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Refined value floor(base x (10+refine)/10)",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Equipment.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Reroll costs 5000 from refine 5 and picks a type not held",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Equipment.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Sell price floor(100 x rarityIndex x (2+refine)/2)",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Equipment.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Rarity weights grow with the chapter; epic and legendary only from the chapter 5 boss",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PieceRoller.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "A drop into a full bag (100) is sold at once",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/EquipmentRewards.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "A hero wears one piece per slot; equip moves the old piece to the bag",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerEquipment.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Batch sale of 1..100 distinct ids, all or nothing",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/SellBatch.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Lock order player_cards then wallet (ADR 0008)",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/EquipmentService.kt",
+          "confidence": "confirmed"
+        }
+      ],
+      "dependencies": [
+        "heroes",
+        "wallet"
+      ],
+      "algorithms": [
+        "weighted rarity roll",
+        "deterministic draw order",
+        "drag with edge auto-scroll"
+      ],
+      "complexity": "high"
+    },
+    {
+      "name": "talents",
+      "path": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt + game/src/domain/talents",
+      "purpose": "Talent tree of 4 branches, 10 talents and 3 grades bought with first-clear points",
+      "primary_files": [
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/TalentService.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/TalentConfig.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/TalentRepository.kt",
+        "game/src/domain/talents/talents.js",
+        "game/src/application/talents/talentCollection.js"
+      ],
+      "functions": [
+        {
+          "name": "PlayerTalents.upgrade",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt",
+          "params": [
+            "definition",
+            "fromLevel",
+            "rules"
+          ],
+          "returns": "TalentUpgrade",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "TalentRules.award",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt",
+          "params": [
+            "position"
+          ],
+          "returns": "TalentAward",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "talentValue",
+          "file": "game/src/domain/talents/talents.js",
+          "params": [
+            "talents",
+            "id"
+          ],
+          "returns": "number",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [
+        {
+          "name": "PlayerTalents",
+          "fields": [
+            {
+              "name": "username",
+              "type": "String",
+              "required": true
+            },
+            {
+              "name": "levels",
+              "type": "Map<String,Int>",
+              "required": true
+            },
+            {
+              "name": "earned",
+              "type": "Int",
+              "required": true
+            }
+          ],
+          "confidence": "confirmed"
+        }
+      ],
+      "business_rules": [
+        {
+          "description": "Grade N costs N points per level and opens when grade N-1 reaches level 10",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "A first clear pays: phase 0, miniboss 2, chapter boss 5, once per position key",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Spent points are derived from the levels, never stored",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "An upgrade is refused when fromLevel differs from the stored level",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "The talent reset is free and keeps the awards",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/TalentService.kt",
+          "confidence": "confirmed"
+        }
+      ],
+      "dependencies": [
+        "campaign"
+      ],
+      "algorithms": [],
+      "complexity": "medium"
+    },
+    {
+      "name": "auto-click",
+      "path": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AutoClick.kt + game/src/domain/combat/autoClick.js",
+      "purpose": "Automatic clicks whose interval crystals shorten, open after chapter 1",
+      "primary_files": [
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AutoClick.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/AutoClickService.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/AutoClickConfig.kt",
+        "game/src/domain/combat/autoClick.js",
+        "game/src/application/autoClick/autoClickState.js",
+        "game/src/adapters/storage/autoClickPreference.js"
+      ],
+      "functions": [
+        {
+          "name": "PlayerAutoClick.upgrade",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AutoClick.kt",
+          "params": [
+            "fromLevel",
+            "unlocked",
+            "rules"
+          ],
+          "returns": "PlayerAutoClick",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "AutoClicker.advance",
+          "file": "game/src/domain/combat/autoClick.js",
+          "params": [
+            "ms"
+          ],
+          "returns": "Int",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [
+        {
+          "name": "PlayerAutoClick",
+          "fields": [
+            {
+              "name": "level",
+              "type": "Int",
+              "required": true
+            },
+            {
+              "name": "crystals",
+              "type": "Long",
+              "required": true
+            },
+            {
+              "name": "resets",
+              "type": "Int",
+              "required": true
+            }
+          ],
+          "confidence": "confirmed"
+        }
+      ],
+      "business_rules": [
+        {
+          "description": "Intervals 500/250/150/100/50 ms, prices 10/25/50/100 crystals",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AutoClick.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Unlocked when resets >= 1, completed, or chapter >= 2",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AutoClick.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "At most 5 auto clicks per frame",
+          "location": "game/src/domain/combat/autoClick.js",
+          "confidence": "confirmed"
+        }
+      ],
+      "dependencies": [
+        "campaign",
+        "account-reset"
+      ],
+      "algorithms": [],
+      "complexity": "low"
+    },
+    {
+      "name": "account-reset",
+      "path": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AccountReset.kt",
+      "purpose": "Prestige: give up the campaign and the talents for crystals from chapter 2",
+      "primary_files": [
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AccountReset.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/AccountResetService.kt",
+        "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/AccountResetController.kt",
+        "game/src/domain/campaign/accountReset.js",
+        "game/src/application/accountReset/accountReset.js"
+      ],
+      "functions": [
+        {
+          "name": "AccountReset.reward",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AccountReset.kt",
+          "params": [
+            "progress"
+          ],
+          "returns": "Int?",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "AccountResetService.reset",
+          "file": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/AccountResetService.kt",
+          "params": [
+            "username",
+            "fromChapter"
+          ],
+          "returns": "ResetResult",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [],
+      "business_rules": [
+        {
+          "description": "Reward min(chapter, 5), 5 when completed, closed in chapter 1",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AccountReset.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "A reset deletes talent levels and awards and keeps copper, equipment, cards, auto click and the boss record",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/AccountResetService.kt",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "fromChapter must equal the stored chapter",
+          "location": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/AccountReset.kt",
+          "confidence": "confirmed"
+        }
+      ],
+      "dependencies": [
+        "campaign",
+        "talents",
+        "auto-click"
+      ],
+      "algorithms": [],
+      "complexity": "low"
+    },
+    {
+      "name": "game-shell",
+      "path": "game/src/",
+      "purpose": "Phaser bootstrap, scenes, composition root, HUD, background play",
+      "primary_files": [
+        "game/src/main.js",
+        "game/src/composition.js",
+        "game/src/adapters/phaser/ClickerGame.js",
+        "game/src/adapters/phaser/MainMenu.js",
+        "game/src/adapters/phaser/HeroUi.js",
+        "game/src/adapters/phaser/backgroundFight.js"
+      ],
+      "functions": [
+        {
+          "name": "runInBackground",
+          "file": "game/src/adapters/phaser/backgroundFight.js",
+          "params": [
+            "{document, startTicker, now, loopFrame, step}"
+          ],
+          "returns": "void",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [],
+      "business_rules": [
+        {
+          "description": "A hidden tab steps the scenes every 1 s in 50 ms slices, at most 60 s of a gap",
+          "location": "game/src/adapters/phaser/backgroundFight.js",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "HUD text is HTML (ADR 0004); scenes get their services from the registry (ADR 0007)",
+          "location": "game/src/main.js",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "game/src/scenes/ClickerGame.js is an unused template leftover",
+          "location": "game/src/scenes/ClickerGame.js",
+          "confidence": "confirmed"
+        }
+      ],
+      "dependencies": [
+        "session",
+        "campaign",
+        "combat",
+        "wallet",
+        "heroes",
+        "equipment",
+        "talents",
+        "farm",
+        "auto-click",
+        "account-reset"
+      ],
+      "algorithms": [
+        "background stepping"
+      ],
+      "complexity": "high"
+    },
+    {
+      "name": "deploy",
+      "path": "deploy/",
+      "purpose": "Self-hosted continuous deploy: blue-green backend, regression gate, Worker publish, rollback",
+      "primary_files": [
+        "deploy/watcher.mjs",
+        "deploy/deploy.mjs",
+        "deploy/regression.mjs",
+        "deploy/lib/backendDeploy.mjs",
+        "deploy/lib/changes.mjs",
+        "deploy/lib/slots.mjs",
+        "deploy/lib/proxy.mjs",
+        "deploy/lib/previous.mjs",
+        "deploy/lib/workerPublish.mjs",
+        "publish.sh",
+        "deploy.sh",
+        "game/worker/index.js",
+        "backend/Dockerfile",
+        "backend/docker-compose.yml"
+      ],
+      "functions": [
+        {
+          "name": "tick",
+          "file": "deploy/watcher.mjs",
+          "params": [
+            "deps"
+          ],
+          "returns": "state",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "deployBackend",
+          "file": "deploy/lib/backendDeploy.mjs",
+          "params": [
+            "{exec, fetch, root, state, hash, log, sleep, now}"
+          ],
+          "returns": "{ok, state}",
+          "confidence": "confirmed"
+        },
+        {
+          "name": "classify",
+          "file": "deploy/lib/changes.mjs",
+          "params": [
+            "files"
+          ],
+          "returns": "{backend, game}",
+          "confidence": "confirmed"
+        }
+      ],
+      "entities": [
+        {
+          "name": "DeployState",
+          "fields": [
+            {
+              "name": "active",
+              "type": "{slot, commit}",
+              "required": true
+            },
+            {
+              "name": "previous",
+              "type": "{slot, commit, at}?",
+              "required": false
+            },
+            {
+              "name": "handled",
+              "type": "hash",
+              "required": true
+            },
+            {
+              "name": "tunnel",
+              "type": "url?",
+              "required": false
+            }
+          ],
+          "confidence": "inferred"
+        }
+      ],
+      "business_rules": [
+        {
+          "description": "Poll origin/main every 60 s; only commit trees are deployed",
+          "location": "deploy/watcher.mjs",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "A slot is ready on the first 401 from /progress",
+          "location": "deploy/lib/slots.mjs",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "The previous slot is kept 5 min for rollback",
+          "location": "deploy/lib/previous.mjs",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "A failed commit is marked handled and not retried",
+          "location": "deploy/lib/backendDeploy.mjs",
+          "confidence": "confirmed"
+        },
+        {
+          "description": "Game changes in a range whose backend deploy failed are not published",
+          "location": "deploy/watcher.mjs",
+          "confidence": "inferred"
+        }
+      ],
+      "dependencies": [],
+      "algorithms": [
+        "blue-green switch",
+        "change classification"
+      ],
+      "complexity": "high"
+    }
+  ]
+}

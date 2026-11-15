@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-11-12T12:00:00Z",
+  "project_root": "D:/Developer/infinity-grove",
+  "languages": [
+    { "name": "Kotlin", "extensions": [".kt", ".kts"], "file_count": 199 },
+    { "name": "JavaScript", "extensions": [".js", ".mjs"], "file_count": 202 },
+    { "name": "SQL", "extensions": [".sql"], "file_count": 7 },
+    { "name": "Python", "extensions": [".py"], "file_count": 4 },
+    { "name": "Bash", "extensions": [".sh"], "file_count": 3 }
+  ],
+  "primary_language": "Kotlin + JavaScript",
+  "frameworks": [
+    { "name": "Spring Boot", "version": "4.1.1", "source": "backend/build.gradle.kts" },
+    { "name": "Kotlin", "version": "2.3.21", "source": "backend/build.gradle.kts" },
+    { "name": "Flyway", "version": "Boot BOM", "source": "backend/build.gradle.kts" },
+    { "name": "Spring Data JPA", "version": "Boot BOM", "source": "backend/build.gradle.kts" },
+    { "name": "Spring Security OAuth2 Resource Server (JWT)", "version": "Boot BOM", "source": "backend/build.gradle.kts" },
+    { "name": "Phaser", "version": "3.80.1", "source": "game/package.json" },
+    { "name": "Vite", "version": "8.3.4", "source": "game/package.json" },
+    { "name": "axios", "version": "1.20.0", "source": "game/package.json" },
+    { "name": "Cloudflare Workers", "version": "compat 2025-09-01", "source": "game/wrangler.jsonc" },
+    { "name": "Traefik", "version": "v3.7.15", "source": "backend/docker-compose.yml" }
+  ],
+  "package_manager": "gradle (backend) + npm (game)",
+  "entry_points": [
+    { "path": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/InfinityGroveWsApplication.kt", "type": "server_entry" },
+    { "path": "game/src/main.js", "type": "app_entry" },
+    { "path": "game/src/composition.js", "type": "composition_root" },
+    { "path": "game/worker/index.js", "type": "edge_worker" },
+    { "path": "deploy/watcher.mjs", "type": "deploy_daemon" },
+    { "path": "deploy/deploy.mjs", "type": "cli" },
+    { "path": "deploy/regression.mjs", "type": "cli" },
+    { "path": "publish.sh", "type": "shell" },
+    { "path": "deploy.sh", "type": "shell" },
+    { "path": "start.sh", "type": "shell" }
+  ],
+  "config_files": [
+    "backend/src/main/resources/application.yaml",
+    "backend/build.gradle.kts",
+    "game/package.json",
+    "game/vite.config.js",
+    "game/vitest.config.js",
+    "game/playwright.config.js",
+    "game/ui-review.config.js",
+    "game/wrangler.jsonc",
+    "game/.env.development",
+    "game/.env.staging",
+    "game/.env.production",
+    "game/.env.pages"
+  ],
+  "ci_cd": [
+    "publish.sh",
+    "deploy/watcher.mjs",
+    "deploy/regression.mjs"
+  ],
+  "docker": {
+    "dockerfile": "backend/Dockerfile",
+    "compose": "backend/docker-compose.yml"
+  },
+  "database_hints": [
+    { "path": "backend/src/main/resources/db/migration/", "type": "migrations_dir" },
+    { "path": "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/", "type": "jpa_entities" }
+  ],
+  "test_framework": "JUnit 5 + Testcontainers (backend), Vitest (game unit), Playwright (e2e), node:test (deploy)",
+  "test_file_count": 186,
+  "modules": [
+    "session",
+    "heroes",
+    "campaign",
+    "combat",
+    "farm",
+    "wallet",
+    "equipment",
+    "talents",
+    "auto-click",
+    "account-reset",
+    "game-shell",
+    "deploy"
+  ],
+  "total_files": 774,
+  "organization_suggestion": {
+    "granularity": "hybrid",
+    "rationale": "Há roteamento centralizado (11 @RestController, 30 endpoints), pastas de domínio no game (domain/<x>, application/<x>) e 20 specs e2e de comportamento, com pesos parecidos.",
+    "signals": [
+      { "type": "centralized_routing", "evidence": ["backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/"] },
+      { "type": "top_level_domain_folders", "evidence": ["game/src/domain/", "game/src/application/"] },
+      { "type": "behavior_e2e_specs", "evidence": ["game/e2e/"] }
+    ],
+    "features": []
+  }
+}

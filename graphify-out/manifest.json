@@ -30,9 +30,9 @@
     "semantic_hash": "03dd35699a452eb9b5e136fd6ee704e7"
   },
   ".specs/lessons.json": {
-    "mtime": 1794605458.5446239,
-    "seen": 1794605498.475269,
-    "ast_hash": "61322e62ac71f418995f34e5ce15bb50",
+    "mtime": 1794655637.6681275,
+    "seen": 1794655688.3297448,
+    "ast_hash": "3cece7c42e040d756f868f1d4679021a",
     "semantic_hash": ""
   },
   "art/kael_rig/kael_rig.json": {
@@ -144,10 +144,10 @@
     "semantic_hash": "5c8e35a9832e99569298967cb6f93e25"
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ChapterEntities.kt": {
-    "mtime": 1792448843.8548546,
-    "seen": 1793499840.0436387,
-    "ast_hash": "5490fa30c632e10cd350f72120052061",
-    "semantic_hash": "5490fa30c632e10cd350f72120052061"
+    "mtime": 1794668947.9625175,
+    "seen": 1794669509.9351637,
+    "ast_hash": "b3d0427b2e753539e865d117540b10f6",
+    "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ChapterRepository.kt": {
     "mtime": 1792448853.3379254,
@@ -360,10 +360,10 @@
     "semantic_hash": "2b09576e8d185d59a68b605728046edf"
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/ProgressController.kt": {
-    "mtime": 1792671143.903473,
-    "seen": 1793499840.0436833,
-    "ast_hash": "1f7229298ceacdfa0e610ea36476f1c8",
-    "semantic_hash": "1f7229298ceacdfa0e610ea36476f1c8"
+    "mtime": 1794625441.107232,
+    "seen": 1794625454.0103333,
+    "ast_hash": "1de1f795700fda77fe5baba47c874abc",
+    "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/TalentController.kt": {
     "mtime": 1792747501.2899444,
@@ -420,16 +420,16 @@
     "semantic_hash": "923032d148c94f056af156d4948e73f9"
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Chapter.kt": {
-    "mtime": 1792630468.035276,
-    "seen": 1793499840.0436945,
-    "ast_hash": "b04b57fa5dc362375c5a8e9b4840ee7a",
-    "semantic_hash": "b04b57fa5dc362375c5a8e9b4840ee7a"
+    "mtime": 1794626707.280007,
+    "seen": 1794626713.8357694,
+    "ast_hash": "767f385945dd730d8b053d0fdb0a4a58",
+    "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterOrder.kt": {
-    "mtime": 1792319430.7134602,
-    "seen": 1793499840.0436957,
-    "ast_hash": "6595a858f41d79ff9b6dd7131d10b6ee",
-    "semantic_hash": "6595a858f41d79ff9b6dd7131d10b6ee"
+    "mtime": 1794626919.473312,
+    "seen": 1794626935.3558538,
+    "ast_hash": "5df47d6f5478d2b6a42c883afe0c2fa4",
+    "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/DropQueue.kt": {
     "mtime": 1792447962.3166006,
@@ -660,9 +660,9 @@
     "semantic_hash": "58f478848bb4f1aec864f098346f0109"
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/FarmService.kt": {
-    "mtime": 1794486963.141855,
-    "seen": 1794488879.4220748,
-    "ast_hash": "9b5d0c18ceb5bb546ae3d463cdde058d",
+    "mtime": 1794638641.9908574,
+    "seen": 1794638658.1180081,
+    "ast_hash": "8e3de0b5da0d0daaf723156137dfcf03",
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/HeroService.kt": {
@@ -775,44 +775,44 @@
   },
   "backend/src/main/resources/db/migration/V1__schema.sql": {
     "mtime": 1792449784.960996,
-    "seen": 1794617706.1969275,
-    "ast_hash": "",
+    "seen": 1794670352.4552066,
+    "ast_hash": "d917e3338c9056d8aaac8f370bd390df",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V2__lyra_leader_bonus.sql": {
     "mtime": 1792605371.3499,
-    "seen": 1794617706.196932,
-    "ast_hash": "",
+    "seen": 1794670352.4552119,
+    "ast_hash": "9a51abca3b1491c33d5977907b01ba3e",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V3__player_talents.sql": {
     "mtime": 1792605849.9148004,
-    "seen": 1794617706.1969376,
-    "ast_hash": "",
+    "seen": 1794670352.4552176,
+    "ast_hash": "b10217e52a9247c45a433db9d75fe079",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V4__monster_health_growth.sql": {
     "mtime": 1792630598.0998406,
-    "seen": 1794617706.1969433,
-    "ast_hash": "",
+    "seen": 1794670352.4552238,
+    "ast_hash": "1e48e5f4faf4c160984a351b3fa92fb1",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V5__talent_point_awards.sql": {
     "mtime": 1792670884.5568101,
-    "seen": 1794617706.1970031,
-    "ast_hash": "",
+    "seen": 1794670352.4552293,
+    "ast_hash": "9514a4aa17b5c5bde5c3d1a77e6ed100",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V6__auto_click.sql": {
     "mtime": 1793095910.2761598,
-    "seen": 1794617706.1970084,
-    "ast_hash": "",
+    "seen": 1794670352.455234,
+    "ast_hash": "33e41fc800e62d651ab8a37983a65d34",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V7__player_resets.sql": {
     "mtime": 1793130651.1664734,
-    "seen": 1794617706.197013,
-    "ast_hash": "",
+    "seen": 1794670352.4552379,
+    "ast_hash": "0f56b51412fb5f300cf56a15036d3de9",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/Fakes.kt": {
@@ -846,10 +846,10 @@
     "semantic_hash": "cb7b864333cf3f82a0adea8561459d5e"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/ChapterSeederIT.kt": {
-    "mtime": 1792449012.046804,
-    "seen": 1793499840.0437732,
-    "ast_hash": "404e92cd58f4ec2b6ac47ffd8e41ef2c",
-    "semantic_hash": "404e92cd58f4ec2b6ac47ffd8e41ef2c"
+    "mtime": 1794636015.967492,
+    "seen": 1794636074.5717995,
+    "ast_hash": "6f8101955c5c1d636de265c1a8de6efb",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/EquipmentConfigTest.kt": {
     "mtime": 1792352157.0872107,
@@ -870,10 +870,10 @@
     "semantic_hash": "ab4909a9c04a3315e587ef6bca19f26c"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ChapterRepositoryIT.kt": {
-    "mtime": 1792449993.6118166,
-    "seen": 1793499840.043778,
-    "ast_hash": "9d0640cf1ee51282e172f1436349d165",
-    "semantic_hash": "9d0640cf1ee51282e172f1436349d165"
+    "mtime": 1794670865.8163438,
+    "seen": 1794671263.7824898,
+    "ast_hash": "c3fdcd43c5315212acb7107395c6e51d",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/DropRuleRepositoryIT.kt": {
     "mtime": 1792448582.4762273,
@@ -882,10 +882,10 @@
     "semantic_hash": "5baa50775b0450c4569e9735230fdc30"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/EnemyRepositoryIT.kt": {
-    "mtime": 1792448719.0908577,
-    "seen": 1793499840.04378,
-    "ast_hash": "74f556554f49c386553c148fcdd6d789",
-    "semantic_hash": "74f556554f49c386553c148fcdd6d789"
+    "mtime": 1794627235.4272335,
+    "seen": 1794627705.6336887,
+    "ast_hash": "29e07cf23f0751e1e71c0f3c2f411304",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/EquipmentRepositoryIT.kt": {
     "mtime": 1792449908.5601373,
@@ -906,10 +906,10 @@
     "semantic_hash": "c1045b51f780aead437ad7bb903b7325"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/MonsterHealthMigrationIT.kt": {
-    "mtime": 1792673020.802855,
-    "seen": 1793499840.0437891,
-    "ast_hash": "550e68ce63ed250c8fae4adb1abdb171",
-    "semantic_hash": "550e68ce63ed250c8fae4adb1abdb171"
+    "mtime": 1794671066.0696075,
+    "seen": 1794671263.784273,
+    "ast_hash": "63b982cd5e416260f689f608bead7e6e",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/PlayerCardsRepositoryIT.kt": {
     "mtime": 1793451117.067933,
@@ -936,10 +936,10 @@
     "semantic_hash": "d8747f6cf9fae7ae9fd97c1b5ad4f9e9"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/SchemaConstraintsIT.kt": {
-    "mtime": 1792452168.4185412,
-    "seen": 1793499840.0437942,
-    "ast_hash": "4d2f2d28e5d25e0db5d02fda56a4e03f",
-    "semantic_hash": "4d2f2d28e5d25e0db5d02fda56a4e03f"
+    "mtime": 1794670856.3332336,
+    "seen": 1794671263.7855685,
+    "ast_hash": "aa2b3b44588bb352cec6a14502402729",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/SchemaValidationIT.kt": {
     "mtime": 1792452125.4711478,
@@ -990,10 +990,10 @@
     "semantic_hash": "abd1d05586089db50e97f6396566c50d"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/AccountResetControllerIT.kt": {
-    "mtime": 1793451835.4116485,
-    "seen": 1793499840.043804,
-    "ast_hash": "827a0b27b3d3c70123e744a8c112867e",
-    "semantic_hash": "827a0b27b3d3c70123e744a8c112867e"
+    "mtime": 1794627246.7504027,
+    "seen": 1794627705.6337554,
+    "ast_hash": "c4bc39b8264fd7af500675f3e2fff36b",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/ApiExceptionHandlerTest.kt": {
     "mtime": 1792352701.84435,
@@ -1020,9 +1020,9 @@
     "semantic_hash": "54d91f8d80d3effd93b7931f32d39e07"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/CardsFlowIT.kt": {
-    "mtime": 1794486963.1468878,
-    "seen": 1794488880.6335247,
-    "ast_hash": "7f93c4f561aff63c2fc7615b929eee6c",
+    "mtime": 1794638416.4151516,
+    "seen": 1794638658.118119,
+    "ast_hash": "2ed27efb7c3f192a9f1835d695f39582",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentBatchSellIT.kt": {
@@ -1062,10 +1062,10 @@
     "semantic_hash": "aea779388ff88e816d37d478ee6d16d6"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/FarmControllerIT.kt": {
-    "mtime": 1792671299.525639,
-    "seen": 1793499840.043819,
-    "ast_hash": "0f93c2e664ef87200a16465d020de8ad",
-    "semantic_hash": "0f93c2e664ef87200a16465d020de8ad"
+    "mtime": 1794638408.5696611,
+    "seen": 1794638658.1181302,
+    "ast_hash": "7e26f3ebc6fbb882792ac6a135132d3c",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/HeroControllerIT.kt": {
     "mtime": 1793451817.4113317,
@@ -1074,15 +1074,15 @@
     "semantic_hash": "28af0a743cdb460316bb0743e387ea97"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/ProgressControllerIT.kt": {
-    "mtime": 1792747021.437687,
-    "seen": 1793499840.043821,
-    "ast_hash": "3719c2d960e0263c07a415f7f9c2eba4",
-    "semantic_hash": "3719c2d960e0263c07a415f7f9c2eba4"
+    "mtime": 1794670128.8007197,
+    "seen": 1794670352.4554594,
+    "ast_hash": "ae4f34e5e49c866fdec6cb4afce3f529",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/SecurityIT.kt": {
-    "mtime": 1794486963.1478896,
-    "seen": 1794488881.0348294,
-    "ast_hash": "c9a1e7b3299b0f31f0c8cd3ef9e3c262",
+    "mtime": 1794626471.546798,
+    "seen": 1794626620.6121569,
+    "ast_hash": "ee7cc25770d3ca223c5012767448df94",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/TalentControllerIT.kt": {
@@ -1092,28 +1092,28 @@
     "semantic_hash": "a0fcb5e1b09cc5278bec0a8e073a7a0c"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/UserControllerIT.kt": {
-    "mtime": 1794486963.1488943,
-    "seen": 1794488881.035335,
-    "ast_hash": "b15e07298fe04ee04b7810fcd59d7abb",
+    "mtime": 1794626471.859904,
+    "seen": 1794626620.612167,
+    "ast_hash": "d833b56f66e904c5f5f8083d8edb364c",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/WalletControllerIT.kt": {
-    "mtime": 1792449932.9265707,
-    "seen": 1793499840.0438278,
-    "ast_hash": "2349d7b13ada351ad39854a4f64e45c0",
-    "semantic_hash": "2349d7b13ada351ad39854a4f64e45c0"
+    "mtime": 1794627260.645506,
+    "seen": 1794627705.633822,
+    "ast_hash": "e475b7e3b14021f7f08d45ed8dd9c1f7",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/WalletFlowIT.kt": {
-    "mtime": 1792449524.8391504,
-    "seen": 1793499840.0438287,
-    "ast_hash": "63b7d0f0867b98526e0ac7106cb8e41a",
-    "semantic_hash": "63b7d0f0867b98526e0ac7106cb8e41a"
+    "mtime": 1794627255.227828,
+    "seen": 1794627705.633827,
+    "ast_hash": "d594e534b0d909e8a7b5be53328c65c7",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/AccountResetTest.kt": {
-    "mtime": 1793130565.9003215,
-    "seen": 1793499840.0438297,
-    "ast_hash": "5c0b49287b6ecd63ebf898b306c32127",
-    "semantic_hash": "5c0b49287b6ecd63ebf898b306c32127"
+    "mtime": 1794627225.5778108,
+    "seen": 1794627705.6338315,
+    "ast_hash": "efef38977a62957a53f56151510cfde6",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/AutoClickTest.kt": {
     "mtime": 1793100293.1661234,
@@ -1128,22 +1128,22 @@
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/CardDropsTest.kt": {
-    "mtime": 1792340337.6813667,
-    "seen": 1793499840.043833,
-    "ast_hash": "47ea75e3cea6043b2a9cfe03fbf8c937",
-    "semantic_hash": "47ea75e3cea6043b2a9cfe03fbf8c937"
+    "mtime": 1794627227.815442,
+    "seen": 1794627705.633845,
+    "ast_hash": "6c2f9421ba57eb1fceac58491538cb5f",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterOrderTest.kt": {
-    "mtime": 1792319430.7456431,
-    "seen": 1793499840.0438342,
-    "ast_hash": "d6853ff6945355e99222284a8355fdfa",
-    "semantic_hash": "d6853ff6945355e99222284a8355fdfa"
+    "mtime": 1794627224.6005704,
+    "seen": 1794627705.6338487,
+    "ast_hash": "d00d3aff53c236da5184cd8e7f29456c",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/ChapterTest.kt": {
-    "mtime": 1792630644.281615,
-    "seen": 1793499840.0438354,
-    "ast_hash": "fbdbadb07be1bfae11af0ec970f1026e",
-    "semantic_hash": "fbdbadb07be1bfae11af0ec970f1026e"
+    "mtime": 1794641338.7823849,
+    "seen": 1794650780.5165477,
+    "ast_hash": "a7cfa305ed3da60ea5dc31763ef2c319",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/DropQueueTest.kt": {
     "mtime": 1792447977.6511476,
@@ -1218,10 +1218,10 @@
     "semantic_hash": "a5f7c26cc45971794d69e4a7d54eec58"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/ProgressTest.kt": {
-    "mtime": 1792328081.8007588,
-    "seen": 1793499840.043849,
-    "ast_hash": "c465f09b2023e2d0e62aa8a63e29fb0b",
-    "semantic_hash": "c465f09b2023e2d0e62aa8a63e29fb0b"
+    "mtime": 1794627230.540539,
+    "seen": 1794627705.6339025,
+    "ast_hash": "53bafadee62e9cca80d1260ee9fd2a75",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/RefreshTokenTest.kt": {
     "mtime": 1792238978.8221903,
@@ -1254,10 +1254,10 @@
     "semantic_hash": "69c13ac9b301113f8c3ba74b07e3561e"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/AccountResetServiceTest.kt": {
-    "mtime": 1793130913.4581678,
-    "seen": 1793499840.0438557,
-    "ast_hash": "650f05d3d006730f39e2ee2b247d1e48",
-    "semantic_hash": "650f05d3d006730f39e2ee2b247d1e48"
+    "mtime": 1794627234.1355536,
+    "seen": 1794627705.6339283,
+    "ast_hash": "0d1bb246f495662c2fdf0f298ef7c096",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/AutoClickServiceTest.kt": {
     "mtime": 1793130738.0544531,
@@ -1278,10 +1278,10 @@
     "semantic_hash": "9373aef61661fd00af1e2f2ceebd7eef"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/FarmServiceTest.kt": {
-    "mtime": 1792449365.0843842,
-    "seen": 1793499840.0438597,
-    "ast_hash": "984997127cb0ba3203e661906e7788eb",
-    "semantic_hash": "984997127cb0ba3203e661906e7788eb"
+    "mtime": 1794638641.7825384,
+    "seen": 1794638658.118203,
+    "ast_hash": "02e21652305019df1781d27dc7880818",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/HeroServiceTest.kt": {
     "mtime": 1793451795.8199332,
@@ -1290,9 +1290,9 @@
     "semantic_hash": "35d0e2c04d9f06de5b98600d92ddfbcc"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/ProgressServiceTest.kt": {
-    "mtime": 1794486963.1508946,
-    "seen": 1794488881.8968265,
-    "ast_hash": "f2a2934b5cfc2474fde772121f8a77f8",
+    "mtime": 1794627461.1623528,
+    "seen": 1794627705.633956,
+    "ast_hash": "e30bca5f3bff1d224b9c7545861f0b11",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/SessionServiceTest.kt": {
@@ -1584,9 +1584,9 @@
     "semantic_hash": "e9b0459c7965a67a1322b65a47c4912c"
   },
   "game/e2e/support/fakeBackend.js": {
-    "mtime": 1794486963.1544025,
-    "seen": 1794488882.3299425,
-    "ast_hash": "6d78b8c04d478a7c7b941089debb81f6",
+    "mtime": 1794636442.1139784,
+    "seen": 1794636457.6378639,
+    "ast_hash": "25b7dcb1e549b7794b57140527736f15",
     "semantic_hash": ""
   },
   "game/e2e/support/game.js": {
@@ -1794,9 +1794,9 @@
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/ClickerGame.test.js": {
-    "mtime": 1794605551.3654363,
-    "seen": 1794605631.0964215,
-    "ast_hash": "2d7ae43fbc465f4f9e8c017209a556db",
+    "mtime": 1794650759.4274914,
+    "seen": 1794650780.5171301,
+    "ast_hash": "4a689dc56c4a9172191b7e2dbd9449c7",
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/HeroUi.js": {
@@ -2202,16 +2202,16 @@
     "semantic_hash": "a22516704736884ea9dd4cd1a6ac43be"
   },
   "game/src/domain/campaign/accountReset.js": {
-    "mtime": 1793131183.300067,
-    "seen": 1793499840.044157,
-    "ast_hash": "0bac3f46dd5d70e49d8c40deb120f45b",
-    "semantic_hash": "0bac3f46dd5d70e49d8c40deb120f45b"
+    "mtime": 1794625398.141597,
+    "seen": 1794625454.0122445,
+    "ast_hash": "e17d76b1ea066487f8d3925c0d9a201e",
+    "semantic_hash": ""
   },
   "game/src/domain/campaign/accountReset.test.js": {
-    "mtime": 1793131183.3431175,
-    "seen": 1793499840.0441592,
-    "ast_hash": "f660fe4b8e0a53bd3cc2c1af88c24180",
-    "semantic_hash": "f660fe4b8e0a53bd3cc2c1af88c24180"
+    "mtime": 1794625399.4820178,
+    "seen": 1794625454.012251,
+    "ast_hash": "f10bf86401b80340d6ae5f29ec139114",
+    "semantic_hash": ""
   },
   "game/src/domain/campaign/bossCountdown.js": {
     "mtime": 1792570112.387992,
@@ -2244,10 +2244,10 @@
     "semantic_hash": "0260dd25857433c1940e366832c3fd66"
   },
   "game/src/domain/campaign/campaign.test.js": {
-    "mtime": 1792450281.3566723,
-    "seen": 1793499840.0441742,
-    "ast_hash": "7f3bee1dabc33f1e309ae7029551cdad",
-    "semantic_hash": "7f3bee1dabc33f1e309ae7029551cdad"
+    "mtime": 1794625279.4755826,
+    "seen": 1794625330.0299084,
+    "ast_hash": "7c1fe70f6dfdaccbf520cfbaa955aca9",
+    "semantic_hash": ""
   },
   "game/src/domain/combat/autoClick.js": {
     "mtime": 1793131183.25533,
@@ -2274,16 +2274,16 @@
     "semantic_hash": "256fa8b74a9017a712f9ea1c9dc5b904"
   },
   "game/src/domain/combat/damage.js": {
-    "mtime": 1792570112.3869927,
-    "seen": 1793499840.0441852,
-    "ast_hash": "792a771b1e8a9c116f93dee08cfc0736",
-    "semantic_hash": "792a771b1e8a9c116f93dee08cfc0736"
+    "mtime": 1794625190.8567934,
+    "seen": 1794625231.1028311,
+    "ast_hash": "1bf4d21db42ffa12dc72800b7c11c49f",
+    "semantic_hash": ""
   },
   "game/src/domain/combat/damage.test.js": {
-    "mtime": 1792570112.387992,
-    "seen": 1793499840.0441864,
-    "ast_hash": "9b252728d7773b8f37e2fd551ce80a99",
-    "semantic_hash": "9b252728d7773b8f37e2fd551ce80a99"
+    "mtime": 1794625192.2024035,
+    "seen": 1794625231.1028352,
+    "ast_hash": "0d585bbbc72ee58b1bc90e6df1d2d29a",
+    "semantic_hash": ""
   },
   "game/src/domain/combat/elements.js": {
     "mtime": 1794524396.2004938,
@@ -2310,16 +2310,16 @@
     "semantic_hash": "78a85ff4a83200c14eb886d8cbc40c8a"
   },
   "game/src/domain/combat/monster.js": {
-    "mtime": 1792603291.1489232,
-    "seen": 1793499840.0441926,
-    "ast_hash": "1795e19ee8ca6ae73126c7820ee0f647",
-    "semantic_hash": "1795e19ee8ca6ae73126c7820ee0f647"
+    "mtime": 1794625272.8181322,
+    "seen": 1794625330.0299542,
+    "ast_hash": "145a43fb8c46d18208d395e098d63a7a",
+    "semantic_hash": ""
   },
   "game/src/domain/combat/monster.test.js": {
-    "mtime": 1792603254.8227367,
-    "seen": 1793499840.0441937,
-    "ast_hash": "3eb7916808e03d8ae86d373faeea20b5",
-    "semantic_hash": "3eb7916808e03d8ae86d373faeea20b5"
+    "mtime": 1794625275.1703417,
+    "seen": 1794625330.0299573,
+    "ast_hash": "3431de7f0bc8121d88ea7ac3dccfe2c3",
+    "semantic_hash": ""
   },
   "game/src/domain/economy/walletLedger.js": {
     "mtime": 1792664650.5633779,
@@ -2664,9 +2664,9 @@
     "semantic_hash": "ed902f4366f40cd89ff7cc84438d64f5"
   },
   ".specs/LESSONS.md": {
-    "mtime": 1794605458.545624,
-    "seen": 1794605498.476781,
-    "ast_hash": "21ab030ec50502db96d3ff6151a4fcaa",
+    "mtime": 1794655637.6691306,
+    "seen": 1794655688.3334737,
+    "ast_hash": "762ddc64a4a95b10e45841d95bc38af2",
     "semantic_hash": ""
   },
   ".specs/STATE.md": {
@@ -2826,22 +2826,22 @@
     "semantic_hash": "9ea3faa9bffaf363516f58489a1cda0e"
   },
   ".specs/features/campaign-chapters/design.md": {
-    "mtime": 1793405182.4019709,
-    "seen": 1793499840.0443792,
-    "ast_hash": "7656c063811bd931fbf40c587bfa897c",
-    "semantic_hash": "7656c063811bd931fbf40c587bfa897c"
+    "mtime": 1794670026.928038,
+    "seen": 1794670352.459588,
+    "ast_hash": "c16a230ce3e401502525b62374d36ada",
+    "semantic_hash": ""
   },
   ".specs/features/campaign-chapters/spec.md": {
-    "mtime": 1793405492.858543,
-    "seen": 1793499840.0443814,
-    "ast_hash": "e723da0ee472421edecdf7594489d928",
-    "semantic_hash": "e723da0ee472421edecdf7594489d928"
+    "mtime": 1794670019.8001306,
+    "seen": 1794670352.4595964,
+    "ast_hash": "3014d5e62587d4f3b158756988b87aaa",
+    "semantic_hash": ""
   },
   ".specs/features/campaign-chapters/tasks.md": {
-    "mtime": 1793405477.9160144,
-    "seen": 1793499840.0443838,
-    "ast_hash": "5af359affcb81e4b9eaaf95ec9268688",
-    "semantic_hash": "5af359affcb81e4b9eaaf95ec9268688"
+    "mtime": 1794671228.9394064,
+    "seen": 1794671263.9629514,
+    "ast_hash": "2dafacae6dd20cc0a09be6a7a568e78d",
+    "semantic_hash": ""
   },
   ".specs/features/characters/design.md": {
     "mtime": 1792319205.8709924,
@@ -3054,10 +3054,10 @@
     "semantic_hash": "b64f50390144dfb99c3c3da57872292a"
   },
   ".specs/features/hero-team/spec.md": {
-    "mtime": 1793448049.2571182,
-    "seen": 1793499840.0444846,
-    "ast_hash": "13df932c5633661270180db053e48bba",
-    "semantic_hash": "13df932c5633661270180db053e48bba"
+    "mtime": 1794635586.9786067,
+    "seen": 1794635865.950406,
+    "ast_hash": "60a01440dcb7878079aaa1e4b274a939",
+    "semantic_hash": ""
   },
   ".specs/features/miniboss-adds/spec.md": {
     "mtime": 1793405081.213184,
@@ -3240,10 +3240,10 @@
     "semantic_hash": "54d6fab764b4d6e21058eb67e4414dac"
   },
   "CHANGELOG.md": {
-    "mtime": 1793472345.6853845,
-    "seen": 1793499840.0445518,
-    "ast_hash": "499b1dc1ff3ac92cad13e7d8f1e4fdd6",
-    "semantic_hash": "499b1dc1ff3ac92cad13e7d8f1e4fdd6"
+    "mtime": 1794664308.9535987,
+    "seen": 1794668891.6568809,
+    "ast_hash": "44ff0a999959d69d343d85b09f43a7e5",
+    "semantic_hash": ""
   },
   "CLAUDE.md": {
     "mtime": 1794486963.13428,
@@ -8677,14 +8677,14 @@
   },
   ".agents/skills/impeccable/scripts/data/font-index.json": {
     "mtime": 1794482528.8788726,
-    "seen": 1794617706.19467,
-    "ast_hash": "",
+    "seen": 1794670352.4535182,
+    "ast_hash": "4a4426c85ec12df1d9a487a39d656ff4",
     "semantic_hash": ""
   },
   ".claude/skills/impeccable/scripts/data/font-index.json": {
     "mtime": 1794482528.8788726,
-    "seen": 1794617706.1953862,
-    "ast_hash": "",
+    "seen": 1794670352.4540522,
+    "ast_hash": "4a4426c85ec12df1d9a487a39d656ff4",
     "semantic_hash": ""
   },
   ".specs/features/ui-redesign/design.md": {
@@ -8718,9 +8718,9 @@
     "semantic_hash": ""
   },
   "game/e2e/uiRedesign.spec.js": {
-    "mtime": 1794617455.8503265,
-    "seen": 1794617706.1977537,
-    "ast_hash": "06cd7677211c64adfd6235d44d3fab84",
+    "mtime": 1794627759.0923288,
+    "seen": 1794627820.751936,
+    "ast_hash": "81be2dac4fdca7f9c8bf99b085f49e3f",
     "semantic_hash": ""
   },
   "game/ui-review/uiRedesign.shots.js": {
@@ -9357,6 +9357,168 @@
     "mtime": 1794597189.070847,
     "seen": 1794597210.3895726,
     "ast_hash": "4df3dcfbea3177d2a947bc5d577b55cd",
+    "semantic_hash": ""
+  },
+  "backend/src/main/resources/db/migration/V8__health_hit_points_expand.sql": {
+    "mtime": 1794625035.328517,
+    "seen": 1794670352.455242,
+    "ast_hash": "6b9a3c8faa32c2acb44f1b179c5b9658",
+    "semantic_hash": ""
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/HealthHitPointsMigrationIT.kt": {
+    "mtime": 1794671066.0247545,
+    "seen": 1794671263.7837267,
+    "ast_hash": "13055134a8e3eec954b7582227afda80",
+    "semantic_hash": ""
+  },
+  "game/src/domain/combat/numberFormat.js": {
+    "mtime": 1794625030.252501,
+    "seen": 1794625231.1028998,
+    "ast_hash": "2b45b6cfb3784ee00e8e8169e1b49cf5",
+    "semantic_hash": ""
+  },
+  "game/src/domain/combat/numberFormat.test.js": {
+    "mtime": 1794625032.3490112,
+    "seen": 1794625231.1029062,
+    "ast_hash": "3b00539f9144a34b07b24515b31d4d17",
+    "semantic_hash": ""
+  },
+  "PROMPTS_ASSETS_MONSTROS.md": {
+    "mtime": 1794625128.1920607,
+    "seen": 1794625231.1090968,
+    "ast_hash": "3e6c490db934d0730ca4d8e13167dd13",
+    "semantic_hash": ""
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/CoinDropMigrationIT.kt": {
+    "mtime": 1794635858.0243711,
+    "seen": 1794635865.9411457,
+    "ast_hash": "2652580814a8858c39b0f63700c73f05",
+    "semantic_hash": ""
+  },
+  "backend/src/main/resources/db/migration/V9__coin_drop_rebalance.sql": {
+    "mtime": 1794626818.338048,
+    "seen": 1794670352.4552457,
+    "ast_hash": "5a8741c43238d1978562d8845d63bdf3",
+    "semantic_hash": ""
+  },
+  "game/e2e/campaignChapters.spec.js": {
+    "mtime": 1794636442.150977,
+    "seen": 1794636457.6378164,
+    "ast_hash": "6c68a539440f974ac3abce66bb0f1df8",
+    "semantic_hash": ""
+  },
+  "game/ui-review/campaignChapters.shots.js": {
+    "mtime": 1794634707.6859546,
+    "seen": 1794635500.428807,
+    "ast_hash": "8f8be36a137e34447cc05eefd79fe4f7",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review.html": {
+    "mtime": 1794634813.200504,
+    "seen": 1794635500.4295514,
+    "ast_hash": "1cf579e369a082da91b2d68ee6dc2e5f",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/validation.md": {
+    "mtime": 1794664280.8717196,
+    "seen": 1794668891.6565058,
+    "ast_hash": "c56b113ba42a2f12f3a08775228de9a3",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/01-hp-999-desktop.png": {
+    "mtime": 1794634719.8954077,
+    "seen": 1794635500.429781,
+    "ast_hash": "846865bf199638cee0e6934fa2dd9f52",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/01-hp-999-phone.png": {
+    "mtime": 1794634719.8773866,
+    "seen": 1794635500.4297824,
+    "ast_hash": "20c00cc4deae53832b8b2370470b9e89",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/02-hp-1k-desktop.png": {
+    "mtime": 1794634731.7275245,
+    "seen": 1794635500.4297836,
+    "ast_hash": "9868cab5cea84378c319c5b30d1e0bda",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/02-hp-1k-phone.png": {
+    "mtime": 1794634732.2109444,
+    "seen": 1794635500.4297848,
+    "ast_hash": "2247c08d135599b1651ad8cdcb5b96cd",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/03-hp-3b-chapter-15-desktop.png": {
+    "mtime": 1794634741.570932,
+    "seen": 1794635500.4297862,
+    "ast_hash": "e7928e3e9b2cc492abe65cdc054f75e3",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/03-hp-3b-chapter-15-phone.png": {
+    "mtime": 1794634741.8464973,
+    "seen": 1794635500.4297874,
+    "ast_hash": "4d5418042b1183b1424b25d7e27d0ec7",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/04-hp-1-5b-damage-number-desktop.png": {
+    "mtime": 1794634742.9326818,
+    "seen": 1794635500.4297886,
+    "ast_hash": "d0c988c986dea3ed9b0e538def158170",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/04-hp-1-5b-damage-number-phone.png": {
+    "mtime": 1794634743.1206794,
+    "seen": 1794635500.42979,
+    "ast_hash": "1ae9274f35e820c942ddbf46c343b066",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/05-damage-5k-chapter-12-desktop.png": {
+    "mtime": 1794634752.9146457,
+    "seen": 1794635500.429791,
+    "ast_hash": "0ac602194d765e495bcdf25859a0b9d7",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/05-damage-5k-chapter-12-phone.png": {
+    "mtime": 1794634755.3031995,
+    "seen": 1794635500.4297922,
+    "ast_hash": "5b2fcdaa57cae5d0baa218557eed2fa7",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/06-map-chapter-15-desktop.png": {
+    "mtime": 1794634762.7023573,
+    "seen": 1794635500.4297934,
+    "ast_hash": "e1252a97efc93ad7dc8ad91e038a9aff",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/06-map-chapter-15-phone.png": {
+    "mtime": 1794634764.7054963,
+    "seen": 1794635500.4297945,
+    "ast_hash": "9c52a8146fdb242d3d687570bff12f9f",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/07-reset-label-15-desktop.png": {
+    "mtime": 1794634773.6181457,
+    "seen": 1794635500.4297957,
+    "ast_hash": "bfcee17737fe104924f9b114933918cb",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/ui-review/07-reset-label-15-phone.png": {
+    "mtime": 1794634774.4688978,
+    "seen": 1794635500.4297972,
+    "ast_hash": "f46160295e6f983900e0faa7f0272746",
+    "semantic_hash": ""
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/PreviousBackendCompatibilityIT.kt": {
+    "mtime": 1794670881.0277474,
+    "seen": 1794671263.7846098,
+    "ast_hash": "35a6417dbe373e0dbd03786922585b23",
+    "semantic_hash": ""
+  },
+  ".specs/features/campaign-chapters/report.html": {
+    "mtime": 1794668856.4033246,
+    "seen": 1794668891.656483,
+    "ast_hash": "6c4f94ea7adbff1cf80ca4e8b47942fa",
     "semantic_hash": ""
   },
   "game/package-lock.json": {
