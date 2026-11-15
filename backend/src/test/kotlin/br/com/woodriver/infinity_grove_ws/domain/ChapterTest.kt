@@ -410,6 +410,23 @@ class ChapterTest {
     }
 
     @Test
+    fun `chapters 1 to 5 keep the boss elements of the release`() {
+        // Release rule (commit 91e3111, Chapter.kt:155): boss element Element.entries[(c + 3) mod 5],
+        // over FIRE, WATER, NATURE, LIGHT, DARKNESS. Written as literals, not as the formula.
+        val bossElements =
+            mapOf(
+                1 to Element.DARKNESS,
+                2 to Element.FIRE,
+                3 to Element.WATER,
+                4 to Element.NATURE,
+                5 to Element.LIGHT,
+            )
+        bossElements.forEach { (c, element) ->
+            assertEquals(element, ChapterDefinition.of(c).boss.element, "chapter $c boss element")
+        }
+    }
+
+    @Test
     fun `chapters 1 to 5 keep the 60 and 30 second limits`() {
         (1..5).forEach { c ->
             val chapter = ChapterDefinition.of(c)
