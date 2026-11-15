@@ -130,6 +130,7 @@ test.describe('Hero ascension', () => {
         await expect(stars).toHaveText('5★');
         await expect(stars).toHaveClass(/is-ascended/);
         expect(await colorOf(stars, 'color')).toBe('rgb(122, 63, 160)');
+        expect(await colorOf(stars, 'fontWeight')).toBe('800');
 
         await page.getByTestId('hero-card-kael').click();
 
@@ -154,6 +155,7 @@ test.describe('Hero ascension', () => {
         await expect(stars).toHaveClass(/is-exalted/);
         expect(await colorOf(stars, 'backgroundColor')).toBe('rgb(217, 165, 33)');
         expect(await colorOf(stars, 'color')).toBe('rgb(32, 30, 29)');
+        expect(await colorOf(stars, 'fontWeight')).toBe('800');
 
         await page.getByTestId('hero-card-kael').click();
 

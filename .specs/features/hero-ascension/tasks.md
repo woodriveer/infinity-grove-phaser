@@ -1113,7 +1113,7 @@ Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T3, `kotlin-back
 
 ## Verifier fix round 1 (validation.md, iteration 1 of 3)
 
-- [ ] G1 (major) gold chip `font-weight: 800` pinned in the 5-star and 8-star e2e tests; mutant M9 killed
+- [x] G1 (major) gold chip `font-weight: 800` pinned in the 5-star and 8-star e2e tests; mutant M9 killed
 - [ ] G2 (major) level 3 pill colour `rgb(217, 165, 33)` pinned in the 8-star e2e test; mutant M10 killed
 - [x] G3 (major) ASC-06 AC3 and AC4 assert the monster health (4.675, 1.7, 12.8, 3.2) in `ClickerGame.test.js`
 - [ ] G4 (major) e2e scenarios for ASC-06 AC3, AC4, AC6, ASC-07 AC3, ASC-08 AC8 in `heroAscension.spec.js`
