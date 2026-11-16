@@ -2124,7 +2124,7 @@ SPRING_DATASOURCE_PASSWORD=infinity
 
 ---
 
-### T19: The game README describes the Cloud Run deploy [ ]
+### T19: The game README describes the Cloud Run deploy [x]
 
 **Owner**: game-dev
 **What**: Rewrite the Deploy section of the game README: the workflow publishes the Worker after the backend, the Worker proxies to the Cloud Run service, the start screen waits, and the by-hand publish (SUPA-12; spec US-11 AC 3).
@@ -2161,8 +2161,8 @@ BACKEND_URL="$(gh variable get BACKEND_URL)" npm run deploy
 **Gate**: `git diff --check` prints nothing; `grep -c "publish.sh" game/readme.md` prints `0`; `grep -c "run.app" game/readme.md` prints `1`; `grep -c "CLOUD_RUN_PRODUCTION" game/readme.md` prints `1`; `grep -c -E "Fly.io|fly.dev|fly (deploy|logs|secrets)" game/readme.md` prints `0`.
 **Done when**:
 
-- [ ] The section matches the contract.
-- [ ] The five gate commands give the values above.
+- [x] The section matches the contract.
+- [x] The five gate commands give the values above.
 
 **Commit**: `docs(game): describe the Worker deploy to Cloud Run`
 
