@@ -1573,7 +1573,7 @@ followed by the rest of the current method unchanged (from `//  Scene may have b
 
 ---
 
-### T14: Postgres tool runner and the copy SQL [ ]
+### T14: Postgres tool runner and the copy SQL [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Build every `docker run postgres:<major>` call of the copy, passing connection values only by variable name, and hold every SQL text of the copy (SUPA-06, SUPA-08; spec US-6 AC 4, US-7 AC 8, 19, 20).
@@ -1670,7 +1670,7 @@ export const filterRestoreList = (text) =>
 **Gate**: Quick `node --test deploy/db/pgTools.test.mjs`, then Full (deploy) with `# tests 237`.
 **Done when**:
 
-- [ ] The 13 tests pass.
+- [x] The 13 tests pass.
 - [ ] Full (deploy) shows `# tests 237`, `# fail 2`, only the two known `not ok` lines.
 
 **Commit**: `feat(deploy): run the Postgres tools of the Supabase copy in containers`
