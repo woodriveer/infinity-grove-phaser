@@ -1,0 +1,154 @@
+# Production deploy (AD-023): the backend goes to Google Cloud Run, then the game Worker to Cloudflare.
+# Every job waits for the repository variable CLOUD_RUN_PRODUCTION=true, which the owner sets at the cutover. A run by hand in
+# mode build-only tests, builds and pushes the image of the newest backend commit (tag = the commit) and deploys nothing;
+# rehearsal does the same and reads the service. Any run first looks for that image and skips tests, build and push when it exists.
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - 'game/src/**'
+      - 'game/public/**'
+      - 'game/worker/**'
+      - 'game/index.html'
+      - 'game/vite.config.js'
+      - 'game/package.json'
+      - 'game/wrangler.jsonc'
+      - 'game/scripts/deploy.mjs'
+      - 'game/.env.pages'
+      - 'deploy/cloudrun/**'
+      - 'deploy/regression.mjs'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'deploy: the release; build-only: test and push the image of the newest backend commit; rehearsal: build-only plus reading the service'
+        type: choice
+        options: [ deploy, build-only, rehearsal ]
+        default: deploy
+
+# One production run at a time; a newer run waits and the running one is never cancelled halfway
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+env:
+  IMAGE: southamerica-east1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/infinity-grove/backend
+
+jobs:
+  backend:
+    if: vars.CLOUD_RUN_PRODUCTION == 'true' || inputs.mode == 'build-only' || inputs.mode == 'rehearsal'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # id-token: the GitHub OIDC token that Workload Identity Federation trades for a short-lived Google token (no JSON key)
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      BACKEND_URL: ${{ vars.BACKEND_URL }}
+      # a push has no inputs and deploys
+      MODE: ${{ inputs.mode || 'deploy' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - id: plan
+        name: Plan (newest backend commit against the one live on Cloud Run)
+        run: node deploy/cloudrun/cloudRunRelease.mjs plan
+      - name: Sign in to Google Cloud (Workload Identity Federation, no key)
+        if: steps.plan.outputs.deploy == 'true'
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - if: steps.plan.outputs.deploy == 'true'
+        uses: google-github-actions/setup-gcloud@v3
+      - id: image
+        name: Look for the image of this commit in Artifact Registry
+        if: steps.plan.outputs.deploy == 'true'
+        run: node deploy/cloudrun/cloudRunRelease.mjs image ${{ steps.plan.outputs.target }}
+      - if: steps.image.outputs.prebuilt == 'false'
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+      - name: Backend tests
+        if: steps.image.outputs.prebuilt == 'false'
+        working-directory: backend
+        run: chmod +x gradlew && ./gradlew ktlintCheck test --no-daemon
+      - name: Build the candidate image
+        if: steps.image.outputs.prebuilt == 'false'
+        run: docker build -t "$IMAGE:${{ steps.plan.outputs.target }}" backend
+      - name: Regression on a throwaway database
+        if: steps.image.outputs.prebuilt == 'false'
+        run: |
+          docker network create ci
+          docker run -d --name ci-postgres --network ci -e POSTGRES_DB=infinity_grove -e POSTGRES_USER=infinity -e POSTGRES_PASSWORD=infinity postgres:16
+          until docker exec ci-postgres pg_isready -U infinity -d infinity_grove; do sleep 1; done
+          docker run -d --name ci-backend --network ci -p 8080:8080 -e SPRING_DATASOURCE_URL=jdbc:postgresql://ci-postgres:5432/infinity_grove -e JWT_SECRET=ci-only-throwaway-secret-0123456789abcdef "$IMAGE:${{ steps.plan.outputs.target }}"
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8080/health && break; sleep 3; done
+          node deploy/regression.mjs http://127.0.0.1:8080
+      - name: Candidate logs
+        if: failure()
+        run: docker logs ci-backend || true
+      - name: Push the candidate image to Artifact Registry
+        if: steps.image.outputs.prebuilt == 'false'
+        run: gcloud auth configure-docker southamerica-east1-docker.pkg.dev --quiet && docker push "$IMAGE:${{ steps.plan.outputs.target }}"
+      - name: Read the Cloud Run service (rehearsal)
+        if: steps.plan.outputs.deploy == 'true' && env.MODE == 'rehearsal'
+        run: node deploy/cloudrun/cloudRunRelease.mjs inspect
+      - name: Deploy the revision without traffic (tag c-<commit>)
+        if: steps.plan.outputs.deploy == 'true' && env.MODE == 'deploy'
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: infinity-grove-backend
+          region: southamerica-east1
+          image: ${{ env.IMAGE }}:${{ steps.plan.outputs.target }}
+          tag: ${{ steps.plan.outputs.tag }}
+          no_traffic: true
+          env_vars: |-
+            APP_COMMIT=${{ steps.plan.outputs.target }}
+            JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=60
+          env_vars_update_strategy: overwrite
+          secrets: |-
+            JWT_SECRET=jwt-secret:latest
+            SPRING_DATASOURCE_URL=spring-datasource-url:latest
+            SPRING_DATASOURCE_USERNAME=spring-datasource-username:latest
+            SPRING_DATASOURCE_PASSWORD=spring-datasource-password:latest
+          secrets_update_strategy: overwrite
+          flags: >-
+            --port=8080 --cpu=1 --memory=1Gi --cpu-boost --concurrency=80 --timeout=120
+            --min-instances=0 --max-instances=1 --max=1
+            --service-account=${{ vars.GCP_RUNTIME_SA }}
+            --startup-probe=httpGet.path=/health,initialDelaySeconds=5,periodSeconds=5,timeoutSeconds=4,failureThreshold=36
+            --liveness-probe=httpGet.path=/health,periodSeconds=60,timeoutSeconds=5,failureThreshold=3
+      - name: Release on Cloud Run (health and regression on the tag URL, traffic, way back on failure)
+        if: steps.plan.outputs.deploy == 'true' && env.MODE == 'deploy'
+        run: node deploy/cloudrun/cloudRunRelease.mjs release ${{ steps.plan.outputs.target }}
+
+  game:
+    needs: backend
+    if: vars.CLOUD_RUN_PRODUCTION == 'true' && (inputs.mode || 'deploy') == 'deploy' && needs.backend.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Install
+        working-directory: game
+        run: npm install
+      - name: Publish the Worker (proxies /api to Cloud Run)
+        working-directory: game
+        run: npm run deploy
+        env:
+          BACKEND_URL: ${{ vars.BACKEND_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

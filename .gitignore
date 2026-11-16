@@ -7,3 +7,5 @@
 node_modules/
 __pycache__/
 backups/
+# short-lived credential file of google-github-actions/auth (Deploy workflow)
+gha-creds-*.json

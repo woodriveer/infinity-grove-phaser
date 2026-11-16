@@ -1095,7 +1095,7 @@ and in `main`, after the `image` branch and before `deps.log(USAGE);`:
 
 ---
 
-### T9: The Deploy workflow and the image cleanup policy [ ]
+### T9: The Deploy workflow and the image cleanup policy [x]
 
 **Owner**: kotlin-backend-dev
 **What**: The GitHub Actions workflow that replaces the watcher (Workload Identity Federation sign-in, the image lookup, and only when the image of the commit is missing: backend tests, the regression on a throwaway database and the push; then a revision with no traffic, `release` and the Worker), gated by `CLOUD_RUN_PRODUCTION`, with the manual modes `build-only` (prebuild the image, deploy nothing) and `rehearsal`; plus the Artifact Registry cleanup policy and the ignored credential file of the auth action (RUN-05, RUN-02, RUN-07, RUN-09; spec US-3 AC 1 to 4, US-4 AC 15 to 24, US-6 AC 6, 7, 11, US-12 AC 1, 6).
@@ -1320,8 +1320,8 @@ jobs:
 **Gate**: Quick `node --test deploy/cloudrun/workflow.test.mjs`, then Full (deploy) with `# tests 224`. The workflow itself first runs in the owner's rehearsal and prebuild (design O14 and O15, spec M9 and M15).
 **Done when**:
 
-- [ ] The 20 tests pass.
-- [ ] Full (deploy) shows `# tests 224`, `# fail 2`, only the two known `not ok` lines.
+- [x] The 20 tests pass.
+- [x] Full (deploy) shows `# tests 279` (the task's order gives 224; T14 to T17 landed first), `# fail 2`, only the two known `not ok` lines.
 - [ ] After the push, the GitHub Actions run of this commit shows both jobs as skipped (`CLOUD_RUN_PRODUCTION` is not set): `gh run list --workflow deploy.yml --limit 1 --json conclusion --jq '.[0].conclusion'` prints `skipped` or `success` with both jobs skipped in `gh run view`.
 
 **Commit**: `ci: deploy the backend to Cloud Run and the Worker after tests and regression`
