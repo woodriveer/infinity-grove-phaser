@@ -158,7 +158,7 @@ export const readDotenv = (path) => /* Record<string, string> | null */;
 
 ---
 
-### T2: Database `.env` rules [ ]
+### T2: Database `.env` rules [x]
 
 **Owner**: kotlin-backend-dev
 **What**: One pure module that says whether a `.env` may reach a slot, and in which mode (SUPA-02; spec US-1 AC 3 to 17, section Mensagens).
@@ -260,8 +260,8 @@ for (const [label, c] of [['space', ' '], ['tab', '\t'], ['#', '#'], ['$', '$'],
 **Gate**: Quick `node --test deploy/lib/databaseEnv.test.mjs`, then Full (deploy) with `# tests 159`.
 **Done when**:
 
-- [ ] The 32 tests pass (cases 19 to 26 are 8 separate tests).
-- [ ] Full (deploy) shows `# tests 159`, `# fail 2`, only the two known `not ok` lines.
+- [x] The 32 tests pass (cases 19 to 26 are 8 separate tests).
+- [x] Full (deploy) shows `# tests 159`, `# fail 2`, only the two known `not ok` lines.
 
 **Commit**: `feat(deploy): check the database settings of .env`
 
