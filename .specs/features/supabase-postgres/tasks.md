@@ -1740,7 +1740,7 @@ export const compareSnapshots = (local, remote) => /* { lines, differences, tabl
 
 ---
 
-### T16: Copy CLI: preflight, `check` and `verify` [ ]
+### T16: Copy CLI: preflight, `check` and `verify` [x]
 
 **Owner**: kotlin-backend-dev
 **What**: The CLI `node deploy/db/copyToSupabase.mjs check | verify` with every preflight refusal of the spec (SUPA-07, SUPA-09; spec US-7 AC 1 to 7, 14 to 18, 20).
@@ -1840,8 +1840,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
 **Gate**: Quick `node --test deploy/db/copyToSupabase.test.mjs`, then Full (deploy) with `# tests 267`.
 **Done when**:
 
-- [ ] The 18 tests pass.
-- [ ] No command of this task ran against the owner's `.env`: it is in Supabase mode, and no task before the cutover contacts the real Supabase.
+- [x] The 18 tests pass.
+- [x] No command of this task ran against the owner's `.env`: it is in Supabase mode, and no task before the cutover contacts the real Supabase.
 - [ ] Full (deploy) shows `# tests 267`, `# fail 2`, only the two known `not ok` lines.
 
 **Commit**: `feat(deploy): check and verify the Supabase copy`
