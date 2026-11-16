@@ -168,6 +168,17 @@ test('the Worker waits for a green backend job of a deploy run and proxies to th
     assert.ok(game.includes('          BACKEND_URL: ${{ vars.BACKEND_URL }}'));
 });
 
+test('the game job publishes the Worker with npm run deploy in game/, with both Cloudflare secrets in its env', () =>
+{
+    const step = game.split('\n      - ').find((block) => /^ {8}run: npm run deploy$/m.test(block));
+
+    assert.ok(step, 'a game step runs npm run deploy');
+    assert.match(step, /^ {8}working-directory: game$/m);
+    assert.match(step, /^ {8}env:$/m);
+    assert.match(step, /^ {10}CLOUDFLARE_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_API_TOKEN \}\}$/m);
+    assert.match(step, /^ {10}CLOUDFLARE_ACCOUNT_ID: \$\{\{ secrets\.CLOUDFLARE_ACCOUNT_ID \}\}$/m);
+});
+
 test('the only GitHub secrets are the Cloudflare ones and no address is hard-coded', () =>
 {
     assert.deepEqual(
