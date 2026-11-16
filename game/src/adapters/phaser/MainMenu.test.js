@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MainMenu } from './MainMenu';
 
 vi.mock('phaser', () => ({
@@ -7,12 +7,13 @@ vi.mock('phaser', () => ({
 
 const userApi = { login: vi.fn(), signUp: vi.fn() };
 const sessionManager = { restore: vi.fn(), start: vi.fn(), logout: vi.fn() };
+const backend = { wake: vi.fn() };
 
 const flush = () => new Promise((resolve) => setTimeout(resolve));
 
 //  Minimal Phaser stand-in: only what MainMenu touches. The form HTML is real DOM (jsdom).
 const createScene = (data = {}) => {
-    const registryData = { ...data, services: { session: sessionManager, users: userApi } };
+    const registryData = { ...data, services: { session: sessionManager, users: userApi, backend } };
     const doms = [];
     const form = { destroy: vi.fn(), setVisible: vi.fn() };
     const logo = { width: 2760, setScale: vi.fn() };
@@ -93,7 +94,10 @@ beforeEach(() => {
     vi.mocked(sessionManager.restore).mockReset().mockResolvedValue({ status: 'none' });
     vi.mocked(sessionManager.start).mockReset();
     vi.mocked(sessionManager.logout).mockReset().mockResolvedValue(undefined);
+    vi.mocked(backend.wake).mockReset().mockResolvedValue(true);
 });
+
+afterEach(() => vi.useRealTimers());
 
 describe('MainMenu authentication', () => {
     it('shows the auth form when there is no logged in user', async () => {
@@ -352,6 +356,108 @@ describe('MainMenu session restore', () => {
         expect(registryData.user).toBeUndefined();
         expect(welcomeTitle()).toBeUndefined();
         expect(scene.add.dom.mock.calls.length).toBe(domCount);
+    });
+});
+
+describe('MainMenu backend wake-up', () => {
+    const user = { username: 'yan', createdAt: 1, lastLoginAt: 2 };
+    const WAKE = 'Acordando o servidor, aguarde...';
+
+    it('asks the backend to wake up once, before the session restore', async () => {
+        const { scene } = createScene({ highscore: 0 });
+
+        await open(scene);
+
+        expect(backend.wake).toHaveBeenCalledTimes(1);
+        expect(backend.wake.mock.invocationCallOrder[0]).toBeLessThan(sessionManager.restore.mock.invocationCallOrder[0]);
+    });
+
+    it('keeps the pending dots for the first 2 s', () => {
+        vi.useFakeTimers();
+        backend.wake.mockReturnValue(new Promise(() => {}));
+        const { scene, message } = createScene({ highscore: 0 });
+
+        scene.create();
+        vi.advanceTimersByTime(1999);
+
+        expect(message()).toEqual({ text: '...', isError: false });
+        expect(sessionManager.restore).not.toHaveBeenCalled();
+    });
+
+    it('shows the wake-up notice after 2 s without the error style', () => {
+        vi.useFakeTimers();
+        backend.wake.mockReturnValue(new Promise(() => {}));
+        const { scene, message } = createScene({ highscore: 0 });
+
+        scene.create();
+        vi.advanceTimersByTime(1999);
+        vi.advanceTimersByTime(1);
+
+        expect(message()).toEqual({ text: WAKE, isError: false });
+    });
+
+    it('restores the session once the backend answers after the notice', async () => {
+        vi.useFakeTimers();
+        let resolveWake;
+        backend.wake.mockReturnValue(new Promise((r) => { resolveWake = r; }));
+        const { scene, form, message } = createScene({ highscore: 0 });
+
+        scene.create();
+        vi.advanceTimersByTime(2000);
+        resolveWake(true);
+        await vi.runAllTimersAsync();
+
+        expect(sessionManager.restore).toHaveBeenCalledTimes(1);
+        expect(message()).toEqual({ text: '', isError: false });
+        expect(form.getChildByName('login')).not.toBeNull();
+    });
+
+    it('shows no notice when the backend answers within 2 s', async () => {
+        vi.useFakeTimers();
+        const { scene } = createScene({ highscore: 0 });
+        const shown = vi.spyOn(scene, 'showMessage');
+
+        scene.create();
+        await vi.advanceTimersByTimeAsync(5000);
+
+        expect(shown.mock.calls.some(([text]) => text === WAKE)).toBe(false);
+    });
+
+    it('still restores the session when the backend cannot be reached', async () => {
+        backend.wake.mockResolvedValue(false);
+        vi.mocked(sessionManager.restore).mockResolvedValue({ status: 'offline', message: 'Cannot reach the server. Try again later.' });
+        const { scene, form, message } = createScene({ highscore: 0 });
+
+        await open(scene);
+
+        expect(message()).toEqual({ text: 'Cannot reach the server. Try again later.', isError: true });
+        expect(form.getChildByName('login')).not.toBeNull();
+    });
+
+    it('does nothing when the scene is left while the backend wakes up', async () => {
+        vi.useFakeTimers();
+        let resolveWake;
+        backend.wake.mockReturnValue(new Promise((r) => { resolveWake = r; }));
+        const { scene, message } = createScene({ highscore: 0 });
+
+        scene.create();
+        scene.sys.isActive.mockReturnValue(false);
+        vi.advanceTimersByTime(3000);
+
+        expect(message()).toEqual({ text: '...', isError: false });
+
+        resolveWake(true);
+        await vi.runAllTimersAsync();
+
+        expect(sessionManager.restore).not.toHaveBeenCalled();
+    });
+
+    it('does not wake the backend when a user is already in the registry', async () => {
+        const { scene } = createScene({ highscore: 0, user });
+
+        await open(scene);
+
+        expect(backend.wake).not.toHaveBeenCalled();
     });
 });
 

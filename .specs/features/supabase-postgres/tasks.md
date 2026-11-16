@@ -1397,7 +1397,7 @@ export const createHealthApi = (httpClient) => ({
 
 ---
 
-### T11: The start screen waits for the server [ ]
+### T11: The start screen waits for the server [x]
 
 **Owner**: game-dev
 **What**: `MainMenu` calls `backend.wake()` before the session restore and shows `Acordando o servidor, aguarde...` after 2 s of waiting (RUN-06; spec US-5 AC 1 to 7).
@@ -1468,8 +1468,8 @@ followed by the rest of the current method unchanged (from `//  Scene may have b
 **Gate**: Game unit `cd game && npm test && npm run build`.
 **Done when**:
 
-- [ ] The 8 new tests and every existing `MainMenu.test.js` test pass.
-- [ ] `npm test` reports 8 more tests than after T10, with none failing; `npm run build` exits 0.
+- [x] The 8 new tests and every existing `MainMenu.test.js` test pass.
+- [x] `npm test` reports 8 more tests than after T10, with none failing; `npm run build` exits 0.
 
 **Commit**: `feat(game): wait for the backend to wake up on the start screen`
 

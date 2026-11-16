@@ -4,6 +4,10 @@ import { STARTING_CHOICES } from '../../domain/heroes/heroes';
 const CHOOSE_PATH_TEXT = 'Escolha seu caminho';
 const TAGLINE_TEXT = 'Defenda a Grande Árvore das hordas do Submundo.';
 
+//  Cloud Run may be starting the backend from zero (spec supabase-postgres, RUN-06): after this long without an answer the message says so
+const WAKE_TEXT = 'Acordando o servidor, aguarde...';
+const WAKE_NOTICE_MS = 2000;
+
 //  Everything the player reads or clicks sits in a parchment oval with a dark wood rim on the left; x is the centre of that column
 const COLUMN_X = 216;
 const OVAL = { x: 170, y: 380, width: 700, height: 1040, color: 0xead6ad, rim: 0x5a3d26, rimWidth: 6, shadow: 0x2e2b25 };
@@ -69,7 +73,7 @@ export class MainMenu extends Scene
 
     create ()
     {
-        ({ session: this.session, users: this.users } = this.registry.get('services'));
+        ({ session: this.session, users: this.users, backend: this.backend } = this.registry.get('services'));
 
         this.add.image(512, 384, 'background');
         this.addLineup();
@@ -122,6 +126,20 @@ export class MainMenu extends Scene
 
     async restoreSession ()
     {
+        this.showMessage('...');
+
+        //  One wake-up call before any session call; the notice only shows when the backend takes longer than WAKE_NOTICE_MS
+        const notice = setTimeout(() =>
+        {
+            if (this.sys.isActive()) { this.showMessage(WAKE_TEXT); }
+        }, WAKE_NOTICE_MS);
+
+        await this.backend.wake();
+        clearTimeout(notice);
+
+        //  Scene may have been left while the wake-up was in flight
+        if (!this.sys.isActive()) { return; }
+
         this.showMessage('...');
 
         const result = await this.session.restore();
