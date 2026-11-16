@@ -558,6 +558,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: game/src/adapters/phaser/ClickerGame.test.js:4849 (game)
 - last seen: 2026-11-15T16:44:44Z
 
+### L-092 - Assert the value a timeout reaches at its call site, not only the exported constant that names it
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `deploy` · harmful: 0
+- features: supabase-postgres
+- evidence: C5 deploy/cloudrun/cloudRunRelease.mjs:37 (deploy)
+- last seen: 2026-11-16T18:46:27Z
+
+### L-093 - Assert the command each workflow job runs, not only its conditions, needs and environment
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `ci` · harmful: 0
+- features: supabase-postgres
+- evidence: W1 .github/workflows/deploy.yml:150 (ci)
+- last seen: 2026-11-16T18:46:27Z
+
+### L-094 - Test a numeric threshold at the boundary value itself, not only with a value far past it
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: supabase-postgres
+- evidence: D1 deploy/db/copyToSupabase.mjs:93; D2 deploy/db/copyToSupabase.mjs:82 (tests)
+- last seen: 2026-11-16T18:46:28Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

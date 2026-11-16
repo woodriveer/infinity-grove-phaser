@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 92,
+  "next_id": 95,
   "lessons": [
     {
       "id": "L-001",
@@ -1646,6 +1646,60 @@
       ],
       "created": "2026-11-15T16:44:44Z",
       "last_seen": "2026-11-15T16:44:44Z"
+    },
+    {
+      "id": "L-092",
+      "key": "surviving_mutant::assert the value a timeout reaches at its call site not only the exported constant that names it",
+      "text": "Assert the value a timeout reaches at its call site, not only the exported constant that names it",
+      "signal": "surviving_mutant",
+      "scope": "deploy",
+      "status": "candidate",
+      "features": [
+        "supabase-postgres"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C5 deploy/cloudrun/cloudRunRelease.mjs:37 (deploy)"
+      ],
+      "created": "2026-11-16T18:46:27Z",
+      "last_seen": "2026-11-16T18:46:27Z"
+    },
+    {
+      "id": "L-093",
+      "key": "surviving_mutant::assert the command each workflow job runs not only its conditions needs and environment",
+      "text": "Assert the command each workflow job runs, not only its conditions, needs and environment",
+      "signal": "surviving_mutant",
+      "scope": "ci",
+      "status": "candidate",
+      "features": [
+        "supabase-postgres"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "W1 .github/workflows/deploy.yml:150 (ci)"
+      ],
+      "created": "2026-11-16T18:46:27Z",
+      "last_seen": "2026-11-16T18:46:27Z"
+    },
+    {
+      "id": "L-094",
+      "key": "surviving_mutant::test a numeric threshold at the boundary value itself not only with a value far past it",
+      "text": "Test a numeric threshold at the boundary value itself, not only with a value far past it",
+      "signal": "surviving_mutant",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "supabase-postgres"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "D1 deploy/db/copyToSupabase.mjs:93; D2 deploy/db/copyToSupabase.mjs:82 (tests)"
+      ],
+      "created": "2026-11-16T18:46:28Z",
+      "last_seen": "2026-11-16T18:46:28Z"
     }
   ]
 }
