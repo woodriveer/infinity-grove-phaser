@@ -178,6 +178,14 @@
 - **Date**: 2026-11-12
 - **Status**: active (owner approval of spec `ui-redesign` on 2026-11-12)
 
+### AD-023
+- **Decision**: The production database is the managed Postgres of the Supabase project `jnqlrdnwwqslihncszej`. The slots reach it through the Session pooler (`aws-<N>-<region>.pooler.supabase.com:5432`, user `postgres.jnqlrdnwwqslihncszej`, database `postgres`, `sslmode=require`) with a Hikari pool of 5 per slot. The credentials live only in the gitignored repo-root `.env` (`SPRING_DATASOURCE_URL`, `_USERNAME`, `_PASSWORD`), which Compose hands to both slots with `env_file`. `deploy/lib/databaseEnv.mjs` checks it before `publish.sh` or the watcher starts a slot, and the watcher pauses while it is unusable. The local `postgres` and `pgadmin` move to the compose profile `local-db` (development, and the way back with `cp .env.example .env`). The game tables stay in `public`; the one-time copy (`deploy/db/copyToSupabase.mjs`) revokes every grant of `anon`, `authenticated` and `service_role` there, and the Data API is off. Integration tests stay on Testcontainers (spec `supabase-postgres`).
+- **Reason**: Owner request of 2026-11-15: move the database off the local Docker before the backend moves to a host with IPv4 outbound only, and keep the players' data. The direct connection is IPv6 only, and the Transaction pooler (6543) breaks Flyway and JDBC prepared statements.
+- **Trade-off**: Every query crosses the internet to the pooler region. Two slots share a pool of 15 server connections. A failing commit's Flyway migration now lands on the managed production database and is still not undone (AD-016 unchanged). Going back to the local database loses what was written on Supabase after the cutover. The Free plan has no managed backup (TD-003), and `sslmode=require` does not verify the server certificate (TD-004).
+- **Scope**: `backend/docker-compose.yml`, `publish.sh`, `start.sh`, `deploy/watcher.mjs`, `deploy/dbcheck.mjs`, `deploy/lib/dotenv.mjs`, `deploy/lib/databaseEnv.mjs`, `deploy/db/`, `.env.example`, `.gitignore`, `backend/src/main/resources/application.yaml` (`spring.datasource.hikari`), `backend/docs/adr/0012-supabase-postgres.md`
+- **Date**: 2026-11-15
+- **Status**: proposed (awaiting the owner's approval of spec `supabase-postgres` and answers Q1 to Q8); extends AD-016 (same blue-green rules, shared database now external) and the database of AD-010 (Flyway still owns the schema)
+
 ## Handoff
 
 - **Feature**: `ui-redesign` (Grove theme, AD-022), `.specs/features/ui-redesign/`
