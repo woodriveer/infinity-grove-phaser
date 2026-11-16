@@ -267,7 +267,7 @@ for (const [label, c] of [['space', ' '], ['tab', '\t'], ['#', '#'], ['$', '$'],
 
 ---
 
-### T3: `.env.example`, ignored backups and the secret guard [ ]
+### T3: `.env.example`, ignored backups and the secret guard [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Ship a local-mode `.env.example`, ignore `backups/`, create the owner's local `.env`, and pin the secret rules with tests (SUPA-06; spec US-3).
@@ -317,9 +317,9 @@ SPRING_DATASOURCE_PASSWORD=infinity
 **Gate**: Quick `node --test deploy/lib/secrets.test.mjs` (after `git add .env.example .gitignore`, so case 3 sees the example as tracked; commit before the Full gate), then Full (deploy) with `# tests 165`.
 **Done when**:
 
-- [ ] The 6 tests pass.
-- [ ] `test -f C:/Users/Internal.IT/Developer/infinity-grove-phaser/.env` succeeds and `git status --porcelain .env` prints nothing.
-- [ ] Full (deploy) shows `# tests 165`, `# fail 2`, only the two known `not ok` lines.
+- [x] The 6 tests pass.
+- [x] `test -f C:/Users/Internal.IT/Developer/infinity-grove-phaser/.env` succeeds and `git status --porcelain .env` prints nothing.
+- [x] Full (deploy) shows `# tests 165`, `# fail 2`, only the two known `not ok` lines.
 
 **Commit**: `chore(deploy): add .env.example and ignore database backups`
 

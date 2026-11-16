@@ -6,3 +6,4 @@
 .claude/worktrees/
 node_modules/
 __pycache__/
+backups/
