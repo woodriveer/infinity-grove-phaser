@@ -107,7 +107,7 @@ T14 → T15
 
 ## Task Breakdown
 
-### T1: `.env` parser [ ]
+### T1: `.env` parser [x]
 
 **Owner**: kotlin-backend-dev
 **What**: A pure parser that reads a `.env` the way Compose `env_file` reads plain values (SUPA-02, SUPA-06; spec Assumptions "Formato do `.env`").
@@ -151,8 +151,8 @@ export const readDotenv = (path) => /* Record<string, string> | null */;
 **Gate**: Quick `node --test deploy/lib/dotenv.test.mjs`, then Full (deploy) with `# tests 127`.
 **Done when**:
 
-- [ ] The 9 cases pass.
-- [ ] Full (deploy) shows `# tests 127`, `# fail 2`, only the two known `not ok` lines.
+- [x] The 9 cases pass.
+- [x] Full (deploy) shows `# tests 127`, `# fail 2`, only the two known `not ok` lines.
 
 **Commit**: `feat(deploy): parse the repo-root .env`
 
