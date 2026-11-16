@@ -163,6 +163,96 @@ export const imageCheck = ({ exec, root, log, output, image }, target) =>
     return 0;
 };
 
+const BY_HAND = `veja gcloud run revisions list --service ${SERVICE} --region ${REGION}`;
+const servingName = (previous) => previous ?? 'nenhuma revisão';
+
+//  Health and regression on the tag URL of the revision deployed with no traffic, then all the traffic to it, then the
+//  service URL; a failure before the switch leaves the traffic alone, a failure after it sends the traffic back
+export const release = async ({ exec, fetch, root, log, backendUrl }, target) =>
+{
+    if (!backendUrl)
+    {
+        log(MISSING_URL);
+
+        return 1;
+    }
+
+    const gcloud = (args) =>
+    {
+        const result = exec('gcloud', args, { cwd: root, shell: GCLOUD_SHELL });
+        printLines(log, result);
+
+        return result;
+    };
+    const tag = revisionTag(target);
+    const service = describeService(exec, root);
+
+    if (!service.ok)
+    {
+        log(DESCRIBE_ERROR);
+
+        return 1;
+    }
+
+    const previous = service.serving;
+    const candidate = service.tags.find((entry) => entry.tag === tag && entry.revision && entry.url);
+
+    if (!candidate)
+    {
+        log(`ERRO: a revisão de ${short(target)} (tag ${tag}) não está no serviço; o tráfego continua em ${servingName(previous)}`);
+
+        return 1;
+    }
+
+    if (await healthCommit(fetch, candidate.url) !== target)
+    {
+        gcloud(trafficArgs('--remove-tags', tag));
+        log(`ERRO: a revisão ${candidate.revision} de ${short(target)} não respondeu UP com o commit em ${candidate.url}/health; o tráfego continua em ${servingName(previous)}`);
+
+        return 1;
+    }
+
+    const regression = exec('node', ['deploy/regression.mjs', candidate.url], { cwd: root, env: { REGRESSION_COMMIT: short(target) } });
+    printLines(log, regression);
+
+    if (regression.status !== 0)
+    {
+        gcloud(trafficArgs('--remove-tags', tag));
+        log(`ERRO: a regressão falhou em ${short(target)}; o tráfego continua em ${servingName(previous)}`);
+
+        return 1;
+    }
+
+    if (gcloud(trafficArgs('--to-revisions', `${candidate.revision}=100`, '--clear-tags')).status !== 0)
+    {
+        log(`ERRO: não foi possível mandar o tráfego para ${candidate.revision}; o tráfego continua em ${servingName(previous)}`);
+
+        return 1;
+    }
+
+    if (await healthCommit(fetch, backendUrl) === target)
+    {
+        log(`Backend ${short(target)} no ar no Cloud Run (${candidate.revision})`);
+
+        return 0;
+    }
+
+    if (!previous)
+    {
+        log(`ERRO: o serviço não respondeu ${short(target)} no /health depois da troca e não há revisão anterior; ${BY_HAND}`);
+
+        return 1;
+    }
+
+    const back = trafficArgs('--to-revisions', `${previous}=100`);
+
+    log(gcloud(back).status === 0
+        ? `ERRO: o serviço não respondeu ${short(target)} no /health depois da troca; o tráfego voltou para ${previous}`
+        : `ERRO: o serviço não respondeu ${short(target)} no /health depois da troca e a volta para ${previous} falhou; rode gcloud ${back.join(' ')}`);
+
+    return 1;
+};
+
 export const main = async (args, deps) =>
 {
     if (args.length === 1 && args[0] === 'plan')
@@ -178,6 +268,11 @@ export const main = async (args, deps) =>
     if (args.length === 2 && args[0] === 'image' && isCommit(args[1]))
     {
         return imageCheck(deps, args[1]);
+    }
+
+    if (args.length === 2 && args[0] === 'release' && isCommit(args[1]))
+    {
+        return release(deps, args[1]);
     }
 
     deps.log(USAGE);

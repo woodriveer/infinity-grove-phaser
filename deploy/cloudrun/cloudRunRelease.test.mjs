@@ -4,8 +4,8 @@ import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-    DESCRIBE_ERROR, HEALTH_TIMEOUT_MS, MISSING_IMAGE, MISSING_URL, USAGE,
-    githubOutput, imageCheck, inspect, main, parseTraffic, plan, revisionTag, trafficArgs
+    DESCRIBE_ARGS, DESCRIBE_ERROR, HEALTH_TIMEOUT_MS, MISSING_IMAGE, MISSING_URL, USAGE,
+    githubOutput, imageCheck, inspect, main, parseTraffic, plan, release, revisionTag, trafficArgs
 } from './cloudRunRelease.mjs';
 
 const T = 'a'.repeat(40);
@@ -330,4 +330,143 @@ test('main runs image only for a full commit', async () =>
     assert.equal(await main(['image', 'abc1234'], fresh.deps), 1);
     assert.deepEqual(fresh.lines, [USAGE]);
     assert.deepEqual(fresh.calls, []);
+});
+
+const updates = (calls) => calls.filter((call) => call.command === 'gcloud' && call.args[2] === 'update-traffic');
+const REMOVE_TAG = ['run', 'services', 'update-traffic', 'infinity-grove-backend', '--region', 'southamerica-east1', '--remove-tags', 'c-aaaaaaa'];
+
+test('release checks the tagged revision, runs the regression on its URL and switches all the traffic', async () =>
+{
+    const { deps, calls, lines } = machine({ health: { [URL]: up(T) } });
+
+    assert.equal(await release(deps, T), 0);
+    assert.deepEqual(calls.map((call) => call.command), ['gcloud', 'node', 'gcloud']);
+    assert.deepEqual(calls[0].args, DESCRIBE_ARGS);
+    assert.deepEqual(calls[1].args, ['deploy/regression.mjs', TAG_URL]);
+    assert.deepEqual(calls[1].options.env, { REGRESSION_COMMIT: 'aaaaaaa' });
+    assert.deepEqual(calls[2].args, ['run', 'services', 'update-traffic', 'infinity-grove-backend', '--region', 'southamerica-east1', '--to-revisions', 'infinity-grove-backend-00008-def=100', '--clear-tags']);
+    assert.equal(lines.at(-1), 'Backend aaaaaaa no ar no Cloud Run (infinity-grove-backend-00008-def)');
+});
+
+test('release asks the tag URL before the switch and the service URL after it', async () =>
+{
+    const { deps, fetches } = machine({ health: { [URL]: up(T) } });
+
+    await release(deps, T);
+
+    assert.deepEqual(fetches.map((fetch) => fetch.url), [`${TAG_URL}/health`, `${URL}/health`]);
+    assert.ok(fetches[0].options.signal instanceof AbortSignal);
+    assert.ok(fetches[1].options.signal instanceof AbortSignal);
+});
+
+test('release stops when the service cannot be read', async () =>
+{
+    const { deps, calls, fetches, lines } = machine({ describe: { status: 1, stdout: '' } });
+
+    assert.equal(await release(deps, T), 1);
+    assert.deepEqual(lines, [DESCRIBE_ERROR]);
+    assert.equal(calls.length, 1);
+    assert.deepEqual(fetches, []);
+});
+
+test('release stops when the revision of the commit has no tag', async () =>
+{
+    const describe = { status: 0, stdout: traffic([{ revisionName: PREVIOUS, percent: 100 }]) };
+    const { deps, fetches, lines } = machine({ describe });
+
+    assert.equal(await release(deps, T), 1);
+    assert.deepEqual(lines, ['ERRO: a revisão de aaaaaaa (tag c-aaaaaaa) não está no serviço; o tráfego continua em infinity-grove-backend-00007-abc']);
+    assert.deepEqual(fetches, []);
+});
+
+test('a tagged revision that answers another commit gets no traffic and loses its tag', async () =>
+{
+    const { deps, calls, lines } = machine({ health: { [TAG_URL]: up(L) } });
+
+    assert.equal(await release(deps, T), 1);
+    assert.equal(updates(calls).length, 1);
+    assert.deepEqual(updates(calls)[0].args, REMOVE_TAG);
+    assert.equal(lines.at(-1), `ERRO: a revisão infinity-grove-backend-00008-def de aaaaaaa não respondeu UP com o commit em ${TAG_URL}/health; o tráfego continua em infinity-grove-backend-00007-abc`);
+    assert.ok(calls.every((call) => call.command !== 'node'));
+});
+
+test('a tagged revision that does not answer gets no traffic', async () =>
+{
+    const { deps, calls, lines } = machine({ health: { [TAG_URL]: 'fail' } });
+
+    assert.equal(await release(deps, T), 1);
+    assert.equal(lines.at(-1), `ERRO: a revisão infinity-grove-backend-00008-def de aaaaaaa não respondeu UP com o commit em ${TAG_URL}/health; o tráfego continua em infinity-grove-backend-00007-abc`);
+    assert.ok(calls.every((call) => call.command !== 'node'));
+});
+
+test('a failed regression keeps the traffic and drops the tag', async () =>
+{
+    const { deps, calls, lines } = machine({ health: { [URL]: up(T) }, regression: 1 });
+
+    assert.equal(await release(deps, T), 1);
+    assert.deepEqual(calls.map((call) => call.command), ['gcloud', 'node', 'gcloud']);
+    assert.deepEqual(calls[2].args, REMOVE_TAG);
+    assert.equal(lines.at(-1), 'ERRO: a regressão falhou em aaaaaaa; o tráfego continua em infinity-grove-backend-00007-abc');
+    assert.ok(calls.every((call) => !call.args.includes('--to-revisions')));
+});
+
+test('the regression output reaches the log', async () =>
+{
+    const { deps, lines } = machine({ health: { [URL]: up(T) }, regressionOut: 'Regressão OK: 12 verificações em 3.0 s\n' });
+
+    assert.equal(await release(deps, T), 0);
+    assert.deepEqual(lines, ['Regressão OK: 12 verificações em 3.0 s', 'Backend aaaaaaa no ar no Cloud Run (infinity-grove-backend-00008-def)']);
+});
+
+test('a failed switch says where the traffic stays', async () =>
+{
+    const { deps, fetches, lines } = machine({ health: { [URL]: up(T) }, trafficStatus: [1] });
+
+    assert.equal(await release(deps, T), 1);
+    assert.equal(lines.at(-1), 'ERRO: não foi possível mandar o tráfego para infinity-grove-backend-00008-def; o tráfego continua em infinity-grove-backend-00007-abc');
+    assert.equal(fetches.length, 1);
+});
+
+test('a service that does not answer the new commit after the switch goes back to the previous revision', async () =>
+{
+    const { deps, calls, lines } = machine();
+
+    assert.equal(await release(deps, T), 1);
+    assert.deepEqual(updates(calls).at(-1).args, ['run', 'services', 'update-traffic', 'infinity-grove-backend', '--region', 'southamerica-east1', '--to-revisions', 'infinity-grove-backend-00007-abc=100']);
+    assert.equal(lines.at(-1), 'ERRO: o serviço não respondeu aaaaaaa no /health depois da troca; o tráfego voltou para infinity-grove-backend-00007-abc');
+});
+
+test('a failed way back names the command to run by hand', async () =>
+{
+    const { deps, lines } = machine({ trafficStatus: [0, 1] });
+
+    assert.equal(await release(deps, T), 1);
+    assert.equal(lines.at(-1), 'ERRO: o serviço não respondeu aaaaaaa no /health depois da troca e a volta para infinity-grove-backend-00007-abc falhou; rode gcloud run services update-traffic infinity-grove-backend --region southamerica-east1 --to-revisions infinity-grove-backend-00007-abc=100');
+});
+
+test('with no previous revision a failed check only explains', async () =>
+{
+    const describe = { status: 0, stdout: traffic([{ revisionName: CANDIDATE, tag: 'c-aaaaaaa', url: TAG_URL }]) };
+    const { deps, calls, lines } = machine({ describe });
+
+    assert.equal(await release(deps, T), 1);
+    assert.equal(updates(calls).length, 1);
+    assert.equal(lines.at(-1), 'ERRO: o serviço não respondeu aaaaaaa no /health depois da troca e não há revisão anterior; veja gcloud run revisions list --service infinity-grove-backend --region southamerica-east1');
+});
+
+test('release fails without BACKEND_URL and runs nothing', async () =>
+{
+    const { deps, calls, fetches, lines } = machine({ backendUrl: '' });
+
+    assert.equal(await release(deps, T), 1);
+    assert.deepEqual(lines, [MISSING_URL]);
+    assert.deepEqual(calls, []);
+    assert.deepEqual(fetches, []);
+});
+
+test('main runs release', async () =>
+{
+    const { deps } = machine({ health: { [URL]: up(T) } });
+
+    assert.equal(await main(['release', T], deps), 0);
 });

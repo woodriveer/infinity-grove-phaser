@@ -948,7 +948,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
 
 ---
 
-### T8: `release`: check the tagged revision, switch the traffic, go back [ ]
+### T8: `release`: check the tagged revision, switch the traffic, go back [x]
 
 **Owner**: kotlin-backend-dev
 **What**: `release <commit>` finds the revision the workflow just created with no traffic, checks `/health` and runs the regression on its tag URL, sends it 100 % of the traffic and checks the service URL, and sends the traffic back to the previous revision on failure (RUN-04; spec US-4 AC 6 to 11).
@@ -1088,8 +1088,8 @@ and in `main`, after the `image` branch and before `deps.log(USAGE);`:
 **Gate**: Quick `node --test deploy/cloudrun/cloudRunRelease.test.mjs` (39 tests), then Full (deploy) with `# tests 204`.
 **Done when**:
 
-- [ ] The 14 new tests and the 25 of T7 pass.
-- [ ] Full (deploy) shows `# tests 204`, `# fail 2`, only the two known `not ok` lines.
+- [x] The 14 new tests and the 25 of T7 pass.
+- [x] Full (deploy) shows `# tests 259` (the task's order gives 204; T14 to T17 landed first), `# fail 2`, only the two known `not ok` lines.
 
 **Commit**: `feat(deploy): release a tagged Cloud Run revision and switch the traffic back on failure`
 
