@@ -1328,7 +1328,7 @@ jobs:
 
 ---
 
-### T10: Health adapter and the `backend` service of the game [ ]
+### T10: Health adapter and the `backend` service of the game [x]
 
 **Owner**: game-dev
 **What**: An http adapter whose `wake()` asks `GET /health` once with a 60 s timeout and never rejects, handed to the scenes as `services.backend` (RUN-06; spec US-5 AC 1, 5, 8).
@@ -1390,8 +1390,8 @@ export const createHealthApi = (httpClient) => ({
 **Gate**: Game unit `cd game && npm test && npm run build`.
 **Done when**:
 
-- [ ] The 4 new tests and the edited composition test pass.
-- [ ] `npm test` reports 4 more tests than before the task, with none failing; `npm run build` exits 0.
+- [x] The 4 new tests and the edited composition test pass.
+- [x] `npm test` reports 4 more tests than before the task, with none failing; `npm run build` exits 0.
 
 **Commit**: `feat(game): add the backend wake-up call`
 

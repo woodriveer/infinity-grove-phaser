@@ -4,6 +4,7 @@ import { authApi } from './adapters/http/authApi';
 import { createAutoClickApi } from './adapters/http/autoClickApi';
 import { createEquipmentApi } from './adapters/http/equipmentApi';
 import { createFarmApi } from './adapters/http/farmApi';
+import { createHealthApi } from './adapters/http/healthApi';
 import { createHeroesApi } from './adapters/http/heroesApi';
 import { createHttpClient } from './adapters/http/httpClient';
 import { createProgressApi } from './adapters/http/progressApi';
@@ -35,6 +36,7 @@ export const equipmentApi = createEquipmentApi(httpClient);
 export const talentApi = createTalentApi(httpClient);
 export const autoClickApi = createAutoClickApi(httpClient);
 export const accountResetApi = createAccountResetApi(httpClient);
+export const healthApi = createHealthApi(httpClient);
 
 //  A fresh wallet service, campaign session, hero collection, equipment collection, talent collection, farm session and auto click state
 //  per game scene
@@ -48,10 +50,11 @@ export const createAutoClickState = () => createAutoClickStateService({ gateway:
 //  The reset works on the session, the auto click state and the talent collection of the scene that asks for it
 export const createAccountReset = ({ session, autoClick, talents }) => createAccountResetService({ gateway: accountResetApi, session, autoClick, talents });
 
-//  What the scenes receive through the game registry (see main.js)
+//  What the scenes receive through the game registry (see main.js); backend.wake() waits for a backend Cloud Run is starting
 export const services = {
     session: sessionManager,
     users: userApi,
+    backend: healthApi,
     createWalletSync,
     createCampaignSession,
     createHeroCollection,
