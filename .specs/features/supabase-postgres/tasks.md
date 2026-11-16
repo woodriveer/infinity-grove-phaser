@@ -1677,7 +1677,7 @@ export const filterRestoreList = (text) =>
 
 ---
 
-### T15: Database snapshot and comparison [ ]
+### T15: Database snapshot and comparison [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Read row counts, sequences, Flyway history and Data API grants of one database, and compare two snapshots into the exact `verify` lines (SUPA-09; spec US-7 AC 14, 15).
@@ -1733,7 +1733,7 @@ export const compareSnapshots = (local, remote) => /* { lines, differences, tabl
 **Gate**: Quick `node --test deploy/db/snapshot.test.mjs`, then Full (deploy) with `# tests 249`.
 **Done when**:
 
-- [ ] The 12 tests pass.
+- [x] The 12 tests pass.
 - [ ] Full (deploy) shows `# tests 249`, `# fail 2`, only the two known `not ok` lines.
 
 **Commit**: `feat(deploy): compare the local and Supabase databases`
