@@ -225,6 +225,14 @@ test('check refuses a Supabase public schema with exactly one table', () =>
     assert.deepEqual(m.lines, ['ERRO: o schema public do Supabase já tem 1 tabelas; a cópia só roda num banco vazio']);
 });
 
+test('check refuses a Supabase on Postgres 16 whose public schema has tables', () =>
+{
+    const m = machine({ version: '160004', publicTables: '3' });
+
+    assert.equal(check(m.deps), 1);
+    assert.deepEqual(m.lines, ['ERRO: o schema public do Supabase já tem 3 tabelas; a cópia só roda num banco vazio']);
+});
+
 test('the version probe runs on postgres:17 and the rest on the Supabase major', () =>
 {
     const m = machine({ version: '180001' });
