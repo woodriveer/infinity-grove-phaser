@@ -677,7 +677,7 @@ class TestDatabaseIsolationIT : IntegrationTestBase() {
 
 ---
 
-### T7: `deploy/cloudrun/cloudRunRelease.mjs`: `plan`, `inspect`, `image` and the traffic reader [ ]
+### T7: `deploy/cloudrun/cloudRunRelease.mjs`: `plan`, `inspect`, `image` and the traffic reader [x]
 
 **Owner**: kotlin-backend-dev
 **What**: The CLI the Deploy workflow calls first: `plan` decides whether the newest `backend/` commit must go to Cloud Run, `inspect` prints the traffic and the tags of the service, `image` says whether the image of that commit is already in Artifact Registry (so a prebuilt image skips tests, build and push), and the helpers read `gcloud run services describe` (RUN-03; spec US-4 AC 1 to 5, 12, 13, 14).
@@ -941,8 +941,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
 **Gate**: Quick `node --test deploy/cloudrun/cloudRunRelease.test.mjs`, then Full (deploy) with `# tests 190`.
 **Done when**:
 
-- [ ] The 25 tests pass.
-- [ ] Full (deploy) shows `# tests 190`, `# fail 2`, only the two known `not ok` lines.
+- [x] The 25 tests pass.
+- [x] Full (deploy) shows `# tests 245` (the task's order gives 190; T14 to T17 landed first), `# fail 2`, only the two known `not ok` lines.
 
 **Commit**: `feat(deploy): plan the Cloud Run release and read the service traffic`
 
