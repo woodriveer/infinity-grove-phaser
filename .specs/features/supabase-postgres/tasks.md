@@ -1848,7 +1848,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
 
 ---
 
-### T17: Copy CLI: `copy` [ ]
+### T17: Copy CLI: `copy` [x]
 
 **Owner**: kotlin-backend-dev
 **What**: The `copy` command: dump the local `public` schema, restore it into Supabase in one transaction with the Data API grants revoked before and after, then verify (SUPA-08; spec US-7 AC 8 to 13).
@@ -1968,7 +1968,7 @@ export const copy = (deps) =>
 **Gate**: Quick `node --test deploy/db/copyToSupabase.test.mjs` (30 tests), then Full (deploy) with `# tests 279`.
 **Done when**:
 
-- [ ] The 12 new tests and the 18 of T16 pass.
+- [x] The 12 new tests and the 18 of T16 pass.
 - [ ] Full (deploy) shows `# tests 279`, `# pass 277`, `# fail 2`, only the two known `not ok` lines.
 
 **Commit**: `feat(deploy): copy the local database to Supabase`

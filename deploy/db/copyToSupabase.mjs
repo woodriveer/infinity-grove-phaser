@@ -1,11 +1,12 @@
 //  One-time copy of the local Postgres (public schema) to Supabase, run by hand during the cutover (spec supabase-postgres)
 //  Usage: node deploy/db/copyToSupabase.mjs check | copy | verify   (reads the repo-root .env; prints no secret)
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkDatabaseEnv } from '../lib/databaseEnv.mjs';
 import { readDotenv } from '../lib/dotenv.mjs';
 import { run } from '../lib/run.mjs';
-import { LOCAL_CONTAINER, LOCAL_TARGET, PROBE_IMAGE, SQL, psql, supabaseTarget, toolImage } from './pgTools.mjs';
+import { LOCAL_CONTAINER, LOCAL_TARGET, PROBE_IMAGE, SQL, filterRestoreList, pgRun, psql, supabaseTarget, toolImage } from './pgTools.mjs';
 import { compareSnapshots, takeSnapshot } from './snapshot.mjs';
 
 export const preflight = ({ exec, root, vars, forCopy }) =>
@@ -153,11 +154,90 @@ export const verify = (deps) =>
     return result.differences === 0 ? 0 : 1;
 };
 
+//  Dump the local public schema, restore it into Supabase in one transaction with the Data API grants revoked before and after, verify
+export const copy = (deps) =>
+{
+    const { exec, root, log, now } = deps;
+    const p = preflight({ ...deps, forCopy: true });
+
+    if (!p.ok)
+    {
+        p.errors.forEach((error) => log(`ERRO: ${error}`));
+
+        return 1;
+    }
+
+    const image = toolImage(p.major);
+    const stamp = `infinity_grove-${new Date(now()).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')}`;
+    mkdirSync(join(root, 'backups'), { recursive: true });
+
+    const dump = pgRun(exec, root, {
+        image, target: LOCAL_TARGET, mount: true,
+        command: ['pg_dump', '--format=custom', '--schema=public', '--no-owner', '--no-privileges', `--file=/backups/${stamp}.dump`]
+    });
+
+    if (dump.status !== 0)
+    {
+        log('ERRO: pg_dump falhou; nada foi escrito no Supabase');
+
+        return 1;
+    }
+
+    log(`Dump salvo em backups/${stamp}.dump`);
+
+    const list = pgRun(exec, root, { image, target: LOCAL_TARGET, mount: true, command: ['pg_restore', '--list', `/backups/${stamp}.dump`] });
+
+    if (list.status !== 0)
+    {
+        log('ERRO: pg_restore --list falhou; nada foi escrito no Supabase');
+
+        return 1;
+    }
+
+    writeFileSync(join(root, 'backups', `${stamp}.list`), filterRestoreList(String(list.stdout)));
+
+    if (psql(exec, root, image, p.target, SQL.revokeDefaults).status !== 0)
+    {
+        log('ERRO: não foi possível revogar as permissões padrão do Data API; nada foi restaurado');
+
+        return 1;
+    }
+
+    const restore = pgRun(exec, root, {
+        image, target: p.target, mount: true,
+        command: ['pg_restore', '--no-owner', '--no-privileges', '--exit-on-error', '--single-transaction',
+            `--use-list=/backups/${stamp}.list`, `--dbname=${p.target.database}`, `/backups/${stamp}.dump`]
+    });
+
+    if (restore.status !== 0)
+    {
+        log('ERRO: pg_restore falhou; a transação foi desfeita e o schema public do Supabase continua vazio');
+
+        return 1;
+    }
+
+    if (psql(exec, root, image, p.target, SQL.revokeExisting).status !== 0)
+    {
+        log('ERRO: não foi possível revogar as permissões do Data API nas tabelas copiadas');
+
+        return 1;
+    }
+
+    log(`Restaurado no Supabase (Postgres ${p.major})`);
+
+    return verify(deps);
+};
+
 export const main = (args, deps) =>
 {
     if (args[0] === 'check')
     {
         return check(deps);
+    }
+
+    if (args[0] === 'copy')
+    {
+        return copy(deps);
     }
 
     if (args[0] === 'verify')

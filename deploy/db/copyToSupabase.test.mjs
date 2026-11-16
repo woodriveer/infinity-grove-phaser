@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { check, main, verify } from './copyToSupabase.mjs';
+import { check, copy, main, verify } from './copyToSupabase.mjs';
 import { SQL } from './pgTools.mjs';
 
 const SUPABASE = {
@@ -286,4 +286,157 @@ test('no docker argument carries the password', () =>
     verify(m.deps);
 
     assert.equal(m.calls.some((call) => call.args.some((arg) => arg.includes(PASSWORD))), false);
+});
+
+const STAMP = 'infinity_grove-20261115T143000Z';
+
+const TOC = [';', '5; 2615 2200 SCHEMA - public pg_database_owner', '218; 1259 16385 TABLE public users infinity', ''].join('\n');
+
+//  The docker run calls only, with the tool arguments that follow the postgres image
+const runs = (calls) => calls.filter((call) => call.args[0] === 'run');
+
+const toolOf = (call) => call.args.slice(call.args.findIndex((arg) => arg.startsWith('postgres:')) + 1);
+
+//  Each tool call as a step name: the SQL for psql, the pg_restore mode, else the tool name; the preflight probes are left out
+const steps = (calls) => runs(calls)
+    .map((call) =>
+    {
+        const tool = toolOf(call);
+
+        if (tool[0] === 'psql')
+        {
+            return tool.at(-1);
+        }
+
+        if (tool[0] === 'pg_restore')
+        {
+            return `pg_restore ${tool[1]}`;
+        }
+
+        return tool[0];
+    })
+    .filter((step) => step !== SQL.version && step !== SQL.tableCount);
+
+test('a copy dumps, lists, revokes the defaults, restores, revokes the grants and verifies, in that order', () =>
+{
+    const m = machine({ list: TOC });
+
+    assert.equal(copy(m.deps), 0);
+
+    const order = steps(m.calls);
+
+    assert.deepEqual(order.slice(0, 5), ['pg_dump', 'pg_restore --list', SQL.revokeDefaults, 'pg_restore --no-owner', SQL.revokeExisting]);
+    assert.equal(order[5], SQL.tableCounts);
+    assert.deepEqual(m.lines, [
+        `Dump salvo em backups/${STAMP}.dump`,
+        'Restaurado no Supabase (Postgres 17)',
+        'users: local 3, supabase 3 OK',
+        'sequência refresh_tokens_id_seq: local 7, supabase 7 OK',
+        'Histórico do Flyway: 2 migrações, última 10 OK',
+        'Permissões do Data API: 0 OK',
+        'Verificação OK: 1 tabela(s), 3 linha(s)'
+    ]);
+});
+
+test('the dump reads only the public schema of the local database, without owners or grants', () =>
+{
+    const m = machine({ list: TOC });
+
+    copy(m.deps);
+
+    const dump = runs(m.calls).find((call) => toolOf(call)[0] === 'pg_dump');
+
+    assert.deepEqual(toolOf(dump), ['pg_dump', '--format=custom', '--schema=public', '--no-owner', '--no-privileges', `--file=/backups/${STAMP}.dump`]);
+    assert.equal(dump.env.PGHOST, 'postgres');
+    assert.equal(dump.env.PGDATABASE, 'infinity_grove');
+});
+
+test('the restore is one transaction that stops at the first error', () =>
+{
+    const m = machine({ list: TOC });
+
+    copy(m.deps);
+
+    const restore = runs(m.calls).find((call) => toolOf(call)[0] === 'pg_restore' && toolOf(call)[1] === '--no-owner');
+
+    assert.deepEqual(toolOf(restore), ['pg_restore', '--no-owner', '--no-privileges', '--exit-on-error', '--single-transaction', `--use-list=/backups/${STAMP}.list`, '--dbname=postgres', `/backups/${STAMP}.dump`]);
+    assert.equal(restore.env.PGHOST, 'aws-0-sa-east-1.pooler.supabase.com');
+});
+
+test('the restore list leaves out the public schema entry', () =>
+{
+    const m = machine({ list: TOC });
+
+    copy(m.deps);
+
+    assert.equal(readFileSync(join(m.deps.root, 'backups', `${STAMP}.list`), 'utf8'), [';', '218; 1259 16385 TABLE public users infinity', ''].join('\n'));
+});
+
+test('a failed dump writes nothing to Supabase', () =>
+{
+    const m = machine({ failing: ['pg_dump'] });
+
+    assert.equal(copy(m.deps), 1);
+    assert.equal(m.lines.at(-1), 'ERRO: pg_dump falhou; nada foi escrito no Supabase');
+    assert.equal(steps(m.calls).some((step) => step.startsWith('pg_restore') || step === SQL.revokeDefaults || step === SQL.revokeExisting), false);
+});
+
+test('a failed restore list writes nothing to Supabase', () =>
+{
+    const m = machine({ failing: ['list'] });
+
+    assert.equal(copy(m.deps), 1);
+    assert.equal(m.lines.at(-1), 'ERRO: pg_restore --list falhou; nada foi escrito no Supabase');
+    assert.equal(steps(m.calls).includes(SQL.revokeDefaults), false);
+});
+
+test('a failed default-privilege revoke stops before the restore', () =>
+{
+    const m = machine({ failing: ['revokeDefaults'] });
+
+    assert.equal(copy(m.deps), 1);
+    assert.equal(m.lines.at(-1), 'ERRO: não foi possível revogar as permissões padrão do Data API; nada foi restaurado');
+    assert.equal(steps(m.calls).includes('pg_restore --no-owner'), false);
+});
+
+test('a failed restore says the transaction was undone', () =>
+{
+    const m = machine({ failing: ['restore'] });
+
+    assert.equal(copy(m.deps), 1);
+    assert.equal(m.lines.at(-1), 'ERRO: pg_restore falhou; a transação foi desfeita e o schema public do Supabase continua vazio');
+    assert.equal(steps(m.calls).includes(SQL.revokeExisting), false);
+});
+
+test('a failed grant revoke stops before the verify', () =>
+{
+    const m = machine({ failing: ['revokeExisting'] });
+
+    assert.equal(copy(m.deps), 1);
+    assert.equal(m.lines.at(-1), 'ERRO: não foi possível revogar as permissões do Data API nas tabelas copiadas');
+    assert.equal(steps(m.calls).includes(SQL.tableCounts), false);
+});
+
+test('a failed preflight copies nothing', () =>
+{
+    const m = machine({ containers: ['infinity-grove-backend-blue|running'] });
+
+    assert.equal(copy(m.deps), 1);
+    assert.equal(steps(m.calls).includes('pg_dump'), false);
+});
+
+test('the backups folder is created under the repository root', () =>
+{
+    const m = machine({ list: TOC });
+
+    copy(m.deps);
+
+    assert.equal(existsSync(join(m.deps.root, 'backups')), true);
+});
+
+test('main runs copy', () =>
+{
+    const m = machine({ list: TOC });
+
+    assert.equal(main(['copy'], m.deps), 0);
 });
