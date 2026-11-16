@@ -20,7 +20,7 @@ As perguntas Q1 a Q8 estão respondidas (Assumptions), e Q12 foi respondida pelo
 
 ## Problem Statement
 
-O backend e o banco do jogo rodam só na máquina do dono: os slots blue-green do Docker, o Postgres local, o Traefik e o túnel `cloudflared`. O site só funciona enquanto o `publish.sh` está rodando. Esta feature tira os dois da máquina. O banco vai para o Postgres do projeto Supabase `jnqlrdnwwqslihncszej` pelo Session pooler `aws-1-sa-east-1.pooler.supabase.com:5432`, com os dados atuais (jogadores, progresso, histórico do Flyway). O backend vai para o serviço `infinity-grove-backend` do Google Cloud Run em `southamerica-east1` (São Paulo), ao lado do Supabase `sa-east-1`, construído do mesmo `backend/Dockerfile`. Um workflow do GitHub Actions publica cada commit de `main` depois dos testes e da regressão, autenticado por Workload Identity Federation (sem chave JSON), e o Worker do jogo passa a chamar a URL do serviço (`https://infinity-grove-backend-<número do projeto>.southamerica-east1.run.app`, variável `BACKEND_URL`).
+O backend e o banco do jogo rodam só na máquina do dono: os slots blue-green do Docker, o Postgres local, o Traefik e o túnel `cloudflared`. O site só funciona enquanto o `publish.sh` está rodando. Esta feature tira os dois da máquina. O banco vai para o Postgres do projeto Supabase `jnqlrdnwwqslihncszej` pelo Session pooler `aws-<N>-<region>.pooler.supabase.com:5432` (host real só no `.env` e no secret), com os dados atuais (jogadores, progresso, histórico do Flyway). O backend vai para o serviço `infinity-grove-backend` do Google Cloud Run em `southamerica-east1` (São Paulo), ao lado do Supabase `sa-east-1`, construído do mesmo `backend/Dockerfile`. Um workflow do GitHub Actions publica cada commit de `main` depois dos testes e da regressão, autenticado por Workload Identity Federation (sem chave JSON), e o Worker do jogo passa a chamar a URL do serviço (`https://infinity-grove-backend-<número do projeto>.southamerica-east1.run.app`, variável `BACKEND_URL`).
 
 ## Goals
 
@@ -46,6 +46,7 @@ O backend e o banco do jogo rodam só na máquina do dono: os slots blue-green d
 | Verificar o certificado do servidor (`sslmode=verify-full`) | Dívida TD-004. |
 | Remover `publish.sh`, `deploy.sh`, `deploy/watcher.mjs`, Traefik, Dozzle e o profile `deploy` do compose | Eles são a volta atrás por 30 dias (Q13). Dívida TD-005. |
 | Espera do servidor dentro da partida | Só a tela inicial espera (RUN-06). Uma chamada da partida com o serviço a frio pode passar dos 10 s do cliente. Dívida TD-006. |
+| Aviso de espera legível no celular na horizontal | A media query do aviso é de largura (640 px); na horizontal ele fica com cerca de 7,6 px, na mesma escala da frase e dos campos da tela inicial. Nenhum AC fixa tamanho de fonte (achado #2 do `ui-review.html`, Baixa). Dívida TD-007. |
 | CORS no backend | O Worker encaminha `/api` na mesma origem do site (`game/worker/index.js`); o navegador nunca chama o Cloud Run direto. |
 | Testes do jogo no workflow | O watcher também não os rodava. Os testes do jogo seguem no fluxo de cada feature. |
 
@@ -55,8 +56,8 @@ O backend e o banco do jogo rodam só na máquina do dono: os slots blue-green d
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --- | --- | --- | --- |
-| Tipo de conexão | Session pooler `aws-1-sa-east-1.pooler.supabase.com:5432`, usuário `postgres.jnqlrdnwwqslihncszej`, banco `postgres`, `sslmode=require`. O host fica fora do repositório (no `.env` da raiz e no secret `spring-datasource-url`). | A conexão direta só tem IPv6. O Transaction pooler (6543) quebra o Flyway e os prepared statements. `aws-0-sa-east-1` responde "tenant/user not found" para este projeto. | y (dono, Q1; host conferido pelo orquestrador) |
-| Plano do Supabase | Free, pool size 15 | Q2 | y (dono) |
+| Tipo de conexão | Session pooler `aws-<N>-<region>.pooler.supabase.com:5432`, usuário `postgres.jnqlrdnwwqslihncszej`, banco `postgres`, `sslmode=require`. O host fica fora do repositório (no `.env` da raiz e no secret `spring-datasource-url`). | A conexão direta só tem IPv6. O Transaction pooler (6543) quebra o Flyway e os prepared statements. `aws-0-sa-east-1` responde "tenant/user not found" para este projeto. | y (dono, Q1; host conferido pelo orquestrador) |
+| Plano do Supabase | Free, pool size 15 | Resposta do dono à Q2 (2026-11-16): o projeto está no plano Free. Daí o pool de 15 (design, "Connection budget") e a falta de backup gerenciado (TD-003). | y (dono, Q2) |
 | Banco local de reserva | O volume `backend_postgres_data` fica intacto por 30 dias depois da virada. Voltar perde o que foi gravado no Supabase depois da virada. | Q3 | y (dono) |
 | Data API do Supabase | Desligada no dashboard, e a cópia revoga os grants de `anon`, `authenticated` e `service_role` em `public` | Q5; as tabelas não têm RLS | y (dono) |
 | Senha do banco | Só letras e números (24) | Q6; o `.env` recusa espaço, `#`, `$`, aspas e `\` (SUPA-02) | y (dono) |
@@ -113,6 +114,7 @@ O backend e o banco do jogo rodam só na máquina do dono: os slots blue-green d
 - **TD-004**: `sslmode=require` cifra a conexão mas não verifica o certificado do servidor.
 - **TD-005**: `publish.sh`, `deploy.sh`, `deploy/watcher.mjs`, `deploy/deploy.mjs`, `deploy/lib/{backendDeploy,proxy,slots,previous,regressionRun,state,workerPublish,changes}.mjs`, o profile `deploy` do compose (slots, Traefik, Dozzle) e o volume local ficam só como volta atrás. Remover numa feature própria depois dos 30 dias de Q13.
 - **TD-006**: só a tela inicial espera o servidor acordar. Uma chamada feita no meio da partida, com o serviço escalado a zero, falha depois de 10 s (`VITE_API_TIMEOUT_MS`).
+- **TD-007**: no celular na horizontal (por exemplo 844x390, escala cerca de 0,51) o aviso `Acordando o servidor, aguarde...` e o resto da tela inicial ficam com cerca de 7,6 px na tela, porque a media query do aviso só olha a largura (640 px). Fica para uma feature própria de legibilidade da tela inicial na horizontal (achado #2 do `ui-review.html`).
 
 ---
 
@@ -130,10 +132,10 @@ As histórias são citadas pela ordem: US-1 Session pooler, US-2 checagem de sa�
 
 1. The backend SHALL abrir no máximo 5 conexões de banco por processo (`spring.datasource.hikari.maximum-pool-size: 5` no `application.yaml`).
 2. The backend SHALL manter no mínimo 1 conexão ociosa por processo (`spring.datasource.hikari.minimum-idle: 1`).
-3. The backend SHALL ler URL, usuário e senha do banco de `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` e `SPRING_DATASOURCE_PASSWORD`. Os padrões `localhost:5432/infinity_grove` e `infinity`/`infinity` do `application.yaml` continuam para o `bootRun` local.
+3. The backend SHALL ler URL, usuário e senha do banco de `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` e `SPRING_DATASOURCE_PASSWORD`. Os padrões `localhost:5432/infinity_grove` e `infinity`/`infinity` do `application.yaml` continuam para o `bootRun` local. Conferido pela configuração do `application.yaml` mais M3 e M4, sem teste automático: a troca pelas variáveis é o relaxed binding do próprio Spring Boot, e nos testes de integração o `@ServiceConnection` vence qualquer propriedade (decisão do product-owner, validação rodada 1).
 4. WHEN `checkDatabaseEnv` recebe `SPRING_DATASOURCE_URL=jdbc:postgresql://aws-0-sa-east-1.pooler.supabase.com:5432/postgres?sslmode=require`, `SPRING_DATASOURCE_USERNAME=postgres.jnqlrdnwwqslihncszej` e uma senha sem caractere recusado THEN it SHALL devolver `{ ok: true, mode: 'supabase', errors: [] }`.
 5. WHEN `checkDatabaseEnv` recebe `jdbc:postgresql://postgres:5432/infinity_grove` com `infinity`/`infinity` THEN it SHALL devolver `{ ok: true, mode: 'local', errors: [] }`.
-6. WHEN o host do pooler tem outro índice ou região (`aws-1-sa-east-1.pooler.supabase.com`, `aws-1-us-east-1.pooler.supabase.com`) ou `sslmode` é `verify-ca` ou `verify-full` THEN `checkDatabaseEnv` SHALL aceitar a configuração.
+6. WHEN o host do pooler tem outro índice ou região (`aws-<N>-<region>.pooler.supabase.com`, por exemplo `aws-1-us-east-1.pooler.supabase.com`) ou `sslmode` é `verify-ca` ou `verify-full` THEN `checkDatabaseEnv` SHALL aceitar a configuração.
 7. IF uma das três variáveis falta ou está vazia THEN `checkDatabaseEnv` SHALL incluir `falta <NOME> no .env` para cada uma, na ordem URL, USERNAME, PASSWORD.
 8. IF um dos três valores contém espaço, tab, `#`, `$`, `"`, `'`, `` ` `` ou `\` THEN `checkDatabaseEnv` SHALL incluir `<NOME> contém espaço, #, $, aspas ou barra invertida`.
 9. IF a URL não tem a forma `jdbc:postgresql://<host>:<porta>/<banco>[?parâmetros]` THEN `checkDatabaseEnv` SHALL incluir `SPRING_DATASOURCE_URL não é jdbc:postgresql://<host>:<porta>/<banco>` e devolver `mode: null`.

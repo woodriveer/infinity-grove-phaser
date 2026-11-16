@@ -1671,7 +1671,7 @@ export const filterRestoreList = (text) =>
 **Done when**:
 
 - [x] The 13 tests pass.
-- [ ] Full (deploy) shows `# tests 237`, `# fail 2`, only the two known `not ok` lines.
+- [x] Full (deploy) shows `# tests 237`, `# fail 2`, only the two known `not ok` lines. Met (Verifier, round 1): Phase 5 landed before Phase 3, so the count right after this task was 178; the feature total adds up to the measured `# tests 280` (165 + 13 + 12 + 30 + 39 + 20 + 1).
 
 **Commit**: `feat(deploy): run the Postgres tools of the Supabase copy in containers`
 
@@ -1734,7 +1734,7 @@ export const compareSnapshots = (local, remote) => /* { lines, differences, tabl
 **Done when**:
 
 - [x] The 12 tests pass.
-- [ ] Full (deploy) shows `# tests 249`, `# fail 2`, only the two known `not ok` lines.
+- [x] Full (deploy) shows `# tests 249`, `# fail 2`, only the two known `not ok` lines. Met (Verifier, round 1): Phase 5 landed before Phase 3, so the count right after this task was 190; the feature total adds up to the measured `# tests 280` (165 + 13 + 12 + 30 + 39 + 20 + 1).
 
 **Commit**: `feat(deploy): compare the local and Supabase databases`
 
@@ -1842,7 +1842,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
 
 - [x] The 18 tests pass.
 - [x] No command of this task ran against the owner's `.env`: it is in Supabase mode, and no task before the cutover contacts the real Supabase.
-- [ ] Full (deploy) shows `# tests 267`, `# fail 2`, only the two known `not ok` lines.
+- [x] Full (deploy) shows `# tests 267`, `# fail 2`, only the two known `not ok` lines. Met (Verifier, round 1): Phase 5 landed before Phase 3, so the count right after this task was 208; the feature total adds up to the measured `# tests 280` (165 + 13 + 12 + 30 + 39 + 20 + 1).
 
 **Commit**: `feat(deploy): check and verify the Supabase copy`
 
@@ -1969,7 +1969,7 @@ export const copy = (deps) =>
 **Done when**:
 
 - [x] The 12 new tests and the 18 of T16 pass.
-- [ ] Full (deploy) shows `# tests 279`, `# pass 277`, `# fail 2`, only the two known `not ok` lines.
+- [x] Full (deploy) shows `# tests 279`, `# pass 277`, `# fail 2`, only the two known `not ok` lines. Met (Verifier, round 1): Phase 5 landed before Phase 3, so the count right after this task was 220; the feature total adds up to the measured `# tests 280` (165 + 13 + 12 + 30 + 39 + 20 + 1).
 
 **Commit**: `feat(deploy): copy the local database to Supabase`
 

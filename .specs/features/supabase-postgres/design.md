@@ -144,7 +144,7 @@ Assumed traffic (no measurement exists; the owner's watcher had no counter): 10 
 
 ### `deploy/lib/dotenv.mjs` (T1, done) and `deploy/lib/databaseEnv.mjs` (T2, done)
 
-Unchanged. The pooler host regex is `^aws-\d+-[a-z0-9-]+\.pooler\.supabase\.com$` (`deploy/lib/databaseEnv.mjs:87`), so `aws-1-sa-east-1` is accepted; no fix task is needed. `loadDatabaseEnv` keeps its tests and has no production caller now.
+Unchanged. The pooler host regex is `^aws-\d+-[a-z0-9-]+\.pooler\.supabase\.com$` (`deploy/lib/databaseEnv.mjs:87`), so the real `aws-<N>-<region>` host is accepted; no fix task is needed. `loadDatabaseEnv` keeps its tests and has no production caller now.
 
 ### Health check (T4)
 
@@ -191,7 +191,7 @@ A `--way-back` flag is required; without it the script prints the Cloud Run mess
 ### Repo-root `.env` (gitignored; input of the copy and of `gcloud secrets create`)
 
 ```
-SPRING_DATASOURCE_URL=jdbc:postgresql://aws-1-sa-east-1.pooler.supabase.com:5432/postgres?sslmode=require
+SPRING_DATASOURCE_URL=jdbc:postgresql://aws-<N>-<region>.pooler.supabase.com:5432/postgres?sslmode=require
 SPRING_DATASOURCE_USERNAME=postgres.jnqlrdnwwqslihncszej
 SPRING_DATASOURCE_PASSWORD=<24 letters and digits>
 ```
