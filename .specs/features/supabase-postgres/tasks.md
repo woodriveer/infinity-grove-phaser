@@ -492,7 +492,7 @@ app:
 
 ---
 
-### T5: Hikari pool of 5 connections, 1 idle, and the port from `PORT` [ ]
+### T5: Hikari pool of 5 connections, 1 idle, and the port from `PORT` [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Cap the backend at 5 database connections and keep 1 idle, so the serving instance and the new revision's fit the Session pooler's 15, and listen on `PORT` with 8080 as default (SUPA-01, RUN-02; spec US-1 AC 1 to 3, US-3 AC 5, design "Connection budget" and "Pool and port").
@@ -597,9 +597,9 @@ class ServerPortConfigTest {
 **Gate**: Quick `cd backend && ./gradlew test --tests '*DatabasePoolConfigIT' --tests '*ServerPortConfigTest'`, then Backend `cd backend && ./gradlew ktlintCheck test`.
 **Done when**:
 
-- [ ] The 5 new tests pass.
-- [ ] `./gradlew ktlintCheck test` passes with 5 more `<testcase` elements than after T4.
-- [ ] `grep -c 'port: ${PORT:8080}' backend/src/main/resources/application.yaml` prints `1`.
+- [x] The 5 new tests pass.
+- [x] `./gradlew ktlintCheck test` passes with 5 more `<testcase` elements than after T4.
+- [x] `grep -c 'port: ${PORT:8080}' backend/src/main/resources/application.yaml` prints `1`.
 
 **Commit**: `feat(backend): cap the database pool at 5 and listen on the Cloud Run port`
 

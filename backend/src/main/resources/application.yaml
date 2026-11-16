@@ -1,3 +1,6 @@
+server:
+  # Cloud Run sends requests to $PORT (8080 unless the deploy says otherwise); Spring Boot reads SERVER_PORT, not PORT
+  port: ${PORT:8080}
 spring:
   application:
     name: infinity-grove-ws
@@ -6,6 +9,11 @@ spring:
     username: infinity
     password: infinity
     driver-class-name: org.postgresql.Driver
+    hikari:
+      # Supabase Session pooler (pool size 15): each client connection holds a server connection. The serving Cloud Run
+      # instance plus the one of a new revision take at most 2 x 5 = 10; one idle connection keeps little open between requests
+      maximum-pool-size: 5
+      minimum-idle: 1
   jpa:
     hibernate:
       # Flyway owns the schema (db/migration); Hibernate only checks the entities against it
