@@ -201,12 +201,28 @@ test('check refuses a Supabase older than 16', () =>
     assert.deepEqual(m.lines, ['ERRO: o Supabase roda Postgres 15; a cópia precisa de 16 ou mais']);
 });
 
+test('check accepts a Supabase on Postgres 16, the first major the copy supports', () =>
+{
+    const m = machine({ version: '160004' });
+
+    assert.equal(check(m.deps), 0);
+    assert.deepEqual(m.lines, ['Supabase: Postgres 16, schema public vazio', 'Pronto para copiar']);
+});
+
 test('check refuses a Supabase public schema with tables', () =>
 {
     const m = machine({ publicTables: '12' });
 
     assert.equal(check(m.deps), 1);
     assert.deepEqual(m.lines, ['ERRO: o schema public do Supabase já tem 12 tabelas; a cópia só roda num banco vazio']);
+});
+
+test('check refuses a Supabase public schema with exactly one table', () =>
+{
+    const m = machine({ publicTables: '1' });
+
+    assert.equal(check(m.deps), 1);
+    assert.deepEqual(m.lines, ['ERRO: o schema public do Supabase já tem 1 tabelas; a cópia só roda num banco vazio']);
 });
 
 test('the version probe runs on postgres:17 and the rest on the Supabase major', () =>
