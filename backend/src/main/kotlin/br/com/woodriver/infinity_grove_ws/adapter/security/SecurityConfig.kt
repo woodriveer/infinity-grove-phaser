@@ -21,7 +21,7 @@ import org.springframework.security.web.SecurityFilterChain
 import tools.jackson.databind.ObjectMapper
 import javax.crypto.spec.SecretKeySpec
 
-/** Stateless JWT resource server. Only sign-up, login, refresh and logout are public. */
+/** Stateless JWT resource server. Only sign-up, login, refresh, logout and the health check are public. */
 @Configuration
 @EnableWebSecurity
 class SecurityConfig {
@@ -49,6 +49,7 @@ class SecurityConfig {
                 authorize(HttpMethod.POST, "/users/login", permitAll)
                 authorize(HttpMethod.POST, "/auth/refresh", permitAll)
                 authorize(HttpMethod.POST, "/auth/logout", permitAll)
+                authorize(HttpMethod.GET, "/health", permitAll)
                 authorize("/error", permitAll)
                 authorize(anyRequest, authenticated)
             }

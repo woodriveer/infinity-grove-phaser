@@ -346,7 +346,7 @@ SPRING_DATASOURCE_PASSWORD=infinity
 
 ---
 
-### T4: Public `GET /health` with the database check and the commit [ ]
+### T4: Public `GET /health` with the database check and the commit [x]
 
 **Owner**: kotlin-backend-dev
 **What**: A public health route that answers 200 UP or 503 DOWN after `select 1` and names the commit of the running image (RUN-01; spec US-2 AC 1 to 5).
@@ -484,9 +484,9 @@ app:
 **Gate**: Quick `cd backend && ./gradlew test --tests '*Health*' --tests '*SecurityIT'`, then Backend `cd backend && ./gradlew ktlintCheck test`.
 **Done when**:
 
-- [ ] The 8 tests pass, and the existing `SecurityIT` tests pass unchanged.
-- [ ] `./gradlew ktlintCheck test` passes with 8 more `<testcase` elements than before the task.
-- [ ] `grep -c 'authorize(HttpMethod.GET, "/health", permitAll)' backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/SecurityConfig.kt` prints `1`.
+- [x] The 8 tests pass, and the existing `SecurityIT` tests pass unchanged.
+- [x] `./gradlew ktlintCheck test` passes with 8 more `<testcase` elements than before the task.
+- [x] `grep -c 'authorize(HttpMethod.GET, "/health", permitAll)' backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/security/SecurityConfig.kt` prints `1`.
 
 **Commit**: `feat(backend): add a public health check with the database and the commit`
 

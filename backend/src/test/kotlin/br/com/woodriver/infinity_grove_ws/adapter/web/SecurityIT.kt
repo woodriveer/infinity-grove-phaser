@@ -206,4 +206,14 @@ class SecurityIT : IntegrationTestBase() {
     fun `unauthenticated access to an unknown route is 401, not 403`() {
         assertUnauthenticated(given().get("/does-not-exist"))
     }
+
+    @Test
+    fun `the health check is public`() {
+        given().get("/health").then().statusCode(200)
+    }
+
+    @Test
+    fun `POST health without a token is 401`() {
+        assertUnauthenticated(given().contentType(ContentType.JSON).post("/health"))
+    }
 }
