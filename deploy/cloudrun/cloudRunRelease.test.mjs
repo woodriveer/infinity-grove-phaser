@@ -161,6 +161,45 @@ test('plan asks /health of BACKEND_URL with a timeout', async () =>
     assert.equal(HEALTH_TIMEOUT_MS, 90000);
 });
 
+//  The timeouts AbortSignal.timeout is asked for while the action runs; the real signal is still returned
+const timeoutsOf = async (action) =>
+{
+    const original = AbortSignal.timeout;
+    const asked = [];
+
+    AbortSignal.timeout = (ms) =>
+    {
+        asked.push(ms);
+
+        return original.call(AbortSignal, ms);
+    };
+
+    try
+    {
+        await action();
+    }
+    finally
+    {
+        AbortSignal.timeout = original;
+    }
+
+    return asked;
+};
+
+test('plan asks /health for 90 s at the call site', async () =>
+{
+    const { deps } = machine();
+
+    assert.deepEqual(await timeoutsOf(() => plan(deps)), [90000]);
+});
+
+test('release asks the tag URL and the service URL for 90 s each at the call site', async () =>
+{
+    const { deps } = machine({ health: { [URL]: up(T) } });
+
+    assert.deepEqual(await timeoutsOf(() => release(deps, T)), [90000, 90000]);
+});
+
 test('plan drops a trailing slash of BACKEND_URL', async () =>
 {
     const { deps, fetches } = machine({ backendUrl: `${URL}/` });
