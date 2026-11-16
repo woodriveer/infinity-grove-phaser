@@ -105,6 +105,8 @@ O backend e o banco do jogo rodam só na máquina do dono: os slots blue-green d
 | Quanto o jogo espera | Uma única chamada `GET /api/health` com 60 s de timeout, antes de restaurar a sessão. Qualquer erro segue para a restauração, que mostra a mensagem de servidor fora do ar como hoje. | Uma requisição espera na fila do Cloud Run até 3,5 vezes a partida média da instância (no mínimo 10 s); 60 s cobre uma partida da JVM com folga. Sem nova tentativa, o caso "servidor fora" não espera 60 s. | n |
 | Testes de integração | Continuam no `PostgreSQLContainer("postgres:17")` com `@ServiceConnection` | Pedido do dono. Um teste prova isso (SUPA-10). | y (dono) |
 | Limpeza do Fly | O dono apaga o app `infinity-grove-phaser` do Fly (dashboard ou `fly apps destroy`) e o branch `origin/flyio-new-files` antes da janela (O1). Nenhum arquivo do Fly entra em `main`. | O app tem secrets com o host errado `aws-0` e nunca chegou ao Supabase (o `public` tem 0 tabelas); o deploy dele pelo GitHub publicava sem teste | y (dono) |
+| Plural de `já tem <n> tabelas` com n = 1 | Fica como está: `já tem 1 tabelas`. Não vira follow-up. | É uma linha de erro de uma ferramenta que só o dono roda, uma vez, antes da virada; não é texto do jogador. Os casos reais são 0 (segue) ou o `public` inteiro de uma cópia repetida (12 ou mais). Mudar agora mexe no código e no teste de SUPA-07, que acabaram de passar no sensor (D1, D9), e reabre a verificação antes da virada. | y (product-owner, aceitação de 2026-11-16) |
+| Mensagens de login e de servidor fora em inglês | Fora do escopo desta feature. Viram a dívida TD-008, ao lado da TD-001 (AD-007). | Elas existem desde 2026-10-17 (`ApiError.js`, `sessionManager.js`, `BusinessException.kt`); esta feature não criou nem mudou nenhuma. A TD-001 cita os formulários de entrada e cadastro, mas não as mensagens que o backend manda no `detail` e a tela inicial mostra como vêm. | y (product-owner, aceitação de 2026-11-16) |
 
 **Open questions:** Q9 a Q11 e Q13 a Q15, no topo, cada uma com o padrão escolhido. Nenhuma bloqueia o código; Q14 e Q15 só mudam comandos do dono. Q12 está respondida (janela de cerca de 15 minutos).
 
@@ -115,6 +117,7 @@ O backend e o banco do jogo rodam só na máquina do dono: os slots blue-green d
 - **TD-005**: `publish.sh`, `deploy.sh`, `deploy/watcher.mjs`, `deploy/deploy.mjs`, `deploy/lib/{backendDeploy,proxy,slots,previous,regressionRun,state,workerPublish,changes}.mjs`, o profile `deploy` do compose (slots, Traefik, Dozzle) e o volume local ficam só como volta atrás. Remover numa feature própria depois dos 30 dias de Q13.
 - **TD-006**: só a tela inicial espera o servidor acordar. Uma chamada feita no meio da partida, com o serviço escalado a zero, falha depois de 10 s (`VITE_API_TIMEOUT_MS`).
 - **TD-007**: no celular na horizontal (por exemplo 844x390, escala cerca de 0,51) o aviso `Acordando o servidor, aguarde...` e o resto da tela inicial ficam com cerca de 7,6 px na tela, porque a media query do aviso só olha a largura (640 px). Fica para uma feature própria de legibilidade da tela inicial na horizontal (achado #2 do `ui-review.html`).
+- **TD-008**: a tela inicial mostra em inglês, contra AD-007, as mensagens de erro de entrada, cadastro e servidor fora. No jogo: `Cannot reach the server. Try again later.` e `Request failed (<status>)` (`game/src/application/ApiError.js`, `ApiError.from`) e o mesmo `Cannot reach the server. Try again later.` em `game/src/application/session/sessionManager.js` (resultado `offline`). Do backend, pelo campo `detail` que `MainMenu.showMessage` mostra como vem: `User '<username>' already exists`, `User '<username>' does not exist`, `Password is invalid`, `Refresh token is invalid` (`backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/BusinessException.kt`) e `Authentication is required` (`adapter/security/SecurityConfig.kt`). Elas são anteriores a esta feature (2026-10-17). Vão para a mesma feature de tradução da TD-001, que decide se o jogo traduz pelo `code` (as constantes do backend ficam em inglês, como diz a spec `characters`) ou se o backend passa a mandar o `detail` em português. Nessa feature, o `ui-artist` fotografa no celular em pé (390x844) a linha de erro mais longa com a fonte de 30 px do `.auth-message` (`3d92e79`), o que a revisão desta feature não capturou (observação 2 do `validation.md`).
 
 ---
 
@@ -431,28 +434,30 @@ Todas as mensagens novas, exatamente como aparecem. `<...>` é o valor do caso. 
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| SUPA-01 | P1: Session pooler - AC 1, 2, 3 (pool 5, ociosa 1, variáveis do Spring) | Tasks | Pending |
-| SUPA-02 | P1: Session pooler - AC 4 a 18 (checagem do `.env`) | Tasks | Implementing (T1, T2 feitos) |
-| SUPA-06 | P1: Segredos - AC 1 a 5 | Tasks | Implementing (T3 feito) |
-| SUPA-07 | P1: Dados - AC 1 a 7, 18, 20 (pré-checagem e `check`) | Tasks | Pending |
-| SUPA-08 | P1: Dados - AC 8 a 13, 19 (`copy`) | Tasks | Pending |
-| SUPA-09 | P1: Dados - AC 14 a 17 (`verify`) | Tasks | Pending |
-| SUPA-10 | P1: Testes nunca tocam no Supabase - AC 1, 2 | Tasks | Pending |
-| SUPA-11 | P1: Virada e volta - AC 1 a 10 | Tasks | Pending |
-| SUPA-12 | P2: Documentação - AC 1, 2, 3 | Tasks | Pending |
-| RUN-01 | P1: Checagem de saúde - AC 1 a 5 | Tasks | Pending |
-| RUN-02 | P1: Cloud Run roda o backend - AC 1 a 7 | Tasks | Pending |
-| RUN-03 | P1: Revisão que falha - AC 1 a 5, 12, 13, 14 (`plan`, `inspect`, `image`) | Tasks | Pending |
-| RUN-04 | P1: Revisão que falha - AC 6 a 11 (`release`, troca e volta) | Tasks | Pending |
-| RUN-05 | P1: Revisão que falha - AC 15 a 24 (workflow, modos `build-only` e `rehearsal`, reuso da imagem) | Tasks | Pending |
-| RUN-06 | P1: O jogo espera o servidor - AC 1 a 8 | Tasks | Pending |
-| RUN-07 | P1: Segredos - AC 6 a 12 | Tasks | Pending |
-| RUN-08 | P2: `publish.sh` só como volta - AC 1, 2 | Tasks | Pending |
-| RUN-09 | P2: Custo - AC 1 a 6 | Tasks | Pending |
+| SUPA-01 | P1: Session pooler - AC 1, 2, 3 (pool 5, ociosa 1, variáveis do Spring) | T5 | Verified (AC 3 pela config; M3 e M4 pendentes) |
+| SUPA-02 | P1: Session pooler - AC 4 a 18 (checagem do `.env`) | T1, T2 | Verified |
+| SUPA-06 | P1: Segredos - AC 1 a 5 | T1, T3, T14 | Verified |
+| SUPA-07 | P1: Dados - AC 1 a 7, 18, 20 (pré-checagem e `check`) | T16 | Verified (M1 pendente) |
+| SUPA-08 | P1: Dados - AC 8 a 13, 19 (`copy`) | T14, T17 | Verified (M2 pendente) |
+| SUPA-09 | P1: Dados - AC 14 a 17 (`verify`) | T15, T16 | Verified |
+| SUPA-10 | P1: Testes nunca tocam no Supabase - AC 1, 2 | T6 | Verified |
+| SUPA-11 | P1: Virada e volta - AC 1 a 10 | T20, T21 | Pending (virada) |
+| SUPA-12 | P2: Documentação - AC 1, 2, 3 | T18, T19 | Verified |
+| RUN-01 | P1: Checagem de saúde - AC 1 a 5 | T4 | Verified |
+| RUN-02 | P1: Cloud Run roda o backend - AC 1 a 7 | T5, T9, T21 | Verified (AC 6 e 7 pendentes em M11) |
+| RUN-03 | P1: Revisão que falha - AC 1 a 5, 12, 13, 14 (`plan`, `inspect`, `image`) | T7 | Verified |
+| RUN-04 | P1: Revisão que falha - AC 6 a 11 (`release`, troca e volta) | T8 | Verified |
+| RUN-05 | P1: Revisão que falha - AC 15 a 24 (workflow, modos `build-only` e `rehearsal`, reuso da imagem) | T9 | Verified (M9 pendente) |
+| RUN-06 | P1: O jogo espera o servidor - AC 1 a 8 | T10 a T13 | Verified (M10 pendente) |
+| RUN-07 | P1: Segredos - AC 6 a 12 | T9, T18, T20, T21 | Verified (AC 8, 9 e 12 pendentes em M11) |
+| RUN-08 | P2: `publish.sh` só como volta - AC 1, 2 | T22 | Pending (depois da virada) |
+| RUN-09 | P2: Custo - AC 1 a 6 | T9, T21 | Verified (AC 2 a 5 pendentes em M12 e M13) |
 
 Renomeados na revisão 3: FLY-01 → RUN-01, FLY-03 → RUN-03, FLY-04 → RUN-04, FLY-05 → RUN-05, FLY-06 → RUN-06, FLY-07 → RUN-07, FLY-08 → RUN-08. FLY-02 (`backend/fly.toml`) saiu; RUN-02 é a configuração do serviço do Cloud Run. RUN-09 é novo. Removidos na revisão 2: SUPA-03, SUPA-04, SUPA-05.
 
 **Coverage:** 18 total, 18 mapped to tasks, 0 unmapped
+
+**Aceite pré-virada** (`product-owner`, 2026-11-16, `tasks.md` seção "Acceptance"): 16 Verified e 2 Pending (SUPA-11, RUN-08). "Verified" cobre o que se confere sem secrets (validation.md, rodada 3, PASS); as checagens M1 a M15 ficam para a T20 e a T21.
 
 ---
 

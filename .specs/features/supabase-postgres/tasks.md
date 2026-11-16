@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/supabase-postgres/spec.md`
 **Design**: `.specs/features/supabase-postgres/design.md`
-**Status**: Approved 2026-11-16, revision 3 (backend on Google Cloud Run), with the recommended defaults of Q9 to Q11 and Q13 to Q15. T1 to T3 done.
+**Status**: Approved 2026-11-16, revision 3 (backend on Google Cloud Run), with the recommended defaults of Q9 to Q11 and Q13 to Q15. T1 to T19 done; Verifier PASS in round 3 (`74e3315`); accepted by `product-owner` for the pre-cutover scope on 2026-11-16 (see "Acceptance"). T20 to T22 pending.
 
 Rules for every task:
 
@@ -22,6 +22,36 @@ Rules for every task:
 - Never weaken, skip or delete a test to make a gate pass. Never run two suites at once in the same checkout, and never leave one running in the background.
 - Run `graphify update .` after a code task (AST only, no cost).
 - Order: Phases 2 to 6 are code. When T19 is committed, the Verifier runs and `product-owner` accepts. Phase 7 (T20, T21) changes production. It starts only after that acceptance, the owner steps O1 to O15 of the design (O15 prebuilds the image that goes live), and an explicit go-ahead from the owner in the conversation (blast radius rule). Phase 8 (T22) runs after T21, with a Verifier round scoped to it.
+
+---
+
+## Acceptance (product-owner, 2026-11-16)
+
+**Verdict: ACCEPTED for the pre-cutover scope (Phases 1 to 6, T1 to T19).** Phases 7 and 8 (T20, T21, T22) and the manual checks M1 to M15 are not part of this acceptance: they wait for the owner steps O1 to O15 of the design and for the owner's explicit go-ahead in the conversation. A second acceptance closes the feature after T21 (cutover goals) and after the T22 Verifier round (RUN-08).
+
+**Evidence read**: `validation.md` round 3 (`74e3315`, PASS): sensor 32 distinct mutants, 32 killed; deploy 284/286 (the 2 known `deploy/regression.test.mjs` child-exit failures, present before the feature), backend 949/949 with ktlint clean, game unit 1599/1599, e2e 313/314 (`dragEquip.spec.js:586`, a load flake outside the feature, passed alone), `wake.spec.js` 5/5. `ui-review.html`: APROVADO, finding #1 fixed in `3d92e79`, finding #2 (Low) is TD-007. `validate_state.py supabase-postgres` exits 0.
+
+**Spec goals** (`spec.md`, Goals). Every goal is an outcome of production, so each is checked here only for the part the code delivers; the production evidence is T20 and T21.
+
+| Goal | Pre-cutover part | Status |
+| --- | --- | --- |
+| 1. The site works without `publish.sh` | Workflow publishes the Worker with `BACKEND_URL` after a green backend job (RUN-05 AC 23, W1, W4, W5 killed) | Met in code; M4, M5 pending |
+| 2. Every row of `public` is on Supabase | `check`, `copy`, `verify` (SUPA-07 to SUPA-09; D1 to D9 killed) | Met in code; M1, M2 pending |
+| 3. A failing revision never takes traffic, and a bad switch goes back by itself | `plan`, `release`, workflow order (RUN-03 to RUN-05; C1 to C7, W2, W3 killed) | Met in code; M4, M9 pending |
+| 4. No secret in a versioned file, argument, log or report; no Google service account key | SUPA-06, RUN-07 AC 6, 7, 10, 11; Verifier secrets scan (observation 4) clean | Met in code; M8, M11 pending |
+| 5. Backend tests never reach Supabase | SUPA-10 (`TestDatabaseIsolationIT`) | Met |
+| 6. Cold start shows `Acordando o servidor, aguarde...` and reaches the form | RUN-06 AC 1 to 8 (G1 to G7 killed), `wake.spec.js` 5/5, ui-review approved | Met in code; M10 pending |
+| 7. US$ 0 of compute, a budget e-mail | RUN-09 AC 1 (cleanup policy JSON) | Met in code; M12, M13 pending |
+
+**Rulings on the open points**:
+
+1. `já tem 1 tabelas` (SUPA-07 AC 7 with n = 1) stays as it is; no follow-up. It is an operator line of a one-time tool, not player text, and changing it reopens SUPA-07 before the cutover. Recorded in `spec.md`, Assumptions.
+2. English login and server-down errors (AD-007): logged as debt TD-008 in `spec.md`, "Dívidas registradas", next to TD-001. They predate this feature (2026-10-17), so they do not block it.
+3. Verifier observation 1 (`deploy/db/copyToSupabase.mjs:91` reads a failed table count as 0): accepted risk, no task. The count runs right after a probe that connected, and a restore into a non-empty `public` fails inside one transaction (SUPA-08 AC 12, mutant D3 killed), so no data is at risk.
+4. Verifier observation 3 (`./publish.sh --way-back` named in `backend/readme.md` and ADR 0012 before T22): no task. Today's `publish.sh` ignores unknown arguments (`publish.sh:20-25`), so the documented command already runs the way back; T22 makes the flag required.
+5. Verifier note on SUPA-01 AC 3 (environment binding, no test): accepted by the ruling in `b2ca0ed`; M3 and M4 confirm it at the cutover.
+
+**Next step**: the owner runs O1 to O15 (design, "Owner steps") and says "go"; then `gitops` runs T20 and T21.
 
 ---
 
@@ -1322,7 +1352,7 @@ jobs:
 
 - [x] The 20 tests pass.
 - [x] Full (deploy) shows `# tests 279` (the task's order gives 224; T14 to T17 landed first), `# fail 2`, only the two known `not ok` lines.
-- [ ] After the push, the GitHub Actions run of this commit shows both jobs as skipped (`CLOUD_RUN_PRODUCTION` is not set): `gh run list --workflow deploy.yml --limit 1 --json conclusion --jq '.[0].conclusion'` prints `skipped` or `success` with both jobs skipped in `gh run view`.
+- [x] After the push, the GitHub Actions run of this commit shows both jobs as skipped (`CLOUD_RUN_PRODUCTION` is not set): `gh run list --workflow deploy.yml --limit 1 --json conclusion --jq '.[0].conclusion'` prints `skipped` or `success` with both jobs skipped in `gh run view`. Met: run `43910950673` (push of `fd782e6`) is `skipped` with jobs `backend` and `game` skipped (`validation.md`, Task Completion, T9).
 
 **Commit**: `ci: deploy the backend to Cloud Run and the Worker after tests and regression`
 
