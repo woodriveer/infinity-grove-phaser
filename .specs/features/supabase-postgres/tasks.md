@@ -605,7 +605,7 @@ class ServerPortConfigTest {
 
 ---
 
-### T6: The tests never reach Supabase [ ]
+### T6: The tests never reach Supabase [x]
 
 **Owner**: test-engineer
 **What**: Prove that the integration tests connect to the Testcontainers Postgres even when the datasource properties name a Supabase host (SUPA-10; spec US-8).
@@ -669,9 +669,9 @@ class TestDatabaseIsolationIT : IntegrationTestBase() {
 **Gate**: Quick `cd backend && ./gradlew test --tests '*TestDatabaseIsolationIT'`, then Backend `cd backend && ./gradlew ktlintCheck test`.
 **Done when**:
 
-- [ ] The 3 tests pass.
-- [ ] Mutation check by hand: with `@ServiceConnection` removed from `PostgresTestConfiguration.postgres()` in `IntegrationTestBase.kt`, `./gradlew test --tests '*TestDatabaseIsolationIT'` fails (the context tries the `.invalid` host). Revert the change before the commit and do not commit it.
-- [ ] `./gradlew ktlintCheck test` passes with 3 more `<testcase` elements than after T5.
+- [x] The 3 tests pass.
+- [x] Mutation check by hand: with `@ServiceConnection` removed from `PostgresTestConfiguration.postgres()` in `IntegrationTestBase.kt`, `./gradlew test --tests '*TestDatabaseIsolationIT'` fails (the context tries the `.invalid` host). Revert the change before the commit and do not commit it.
+- [x] `./gradlew ktlintCheck test` passes with 3 more `<testcase` elements than after T5.
 
 **Commit**: `test(backend): pin the integration tests to the Testcontainers Postgres`
 
