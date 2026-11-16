@@ -68,4 +68,24 @@ test.describe('Backend wake-up on the start screen', () => {
         await expect(menu.message).toHaveText('Cannot reach the server. Try again later.');
         expect(Date.now() - started).toBeLessThan(15000);
     });
+
+    test.describe('on a phone', () => {
+        test.use({ viewport: { width: 390, height: 844 } });
+
+        test('the wake notice is at least 11 px on screen', async ({ page }) => {
+            await mockBackend(page, { healthDelayMs: 4000 });
+            await page.goto('/');
+            await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
+            await page.locator('#game-container canvas').click();
+
+            const notice = page.getByRole('alert');
+
+            await expect(notice).toHaveText(WAKE, { timeout: 5000 });
+
+            //  The start screen is one canvas scaled down to the phone: the on-screen size is the CSS size times the scale of the box
+            const onScreenPx = await notice.evaluate((el) => parseFloat(getComputedStyle(el).fontSize) * (el.getBoundingClientRect().width / el.offsetWidth));
+
+            expect(onScreenPx).toBeGreaterThanOrEqual(11);
+        });
+    });
 });

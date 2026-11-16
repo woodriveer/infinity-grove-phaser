@@ -340,6 +340,13 @@ button:disabled {
     color: var(--ember-800);
 }
 
+/*  The start screen is one 1024 px canvas scaled down to the phone (about 0.38 at 390 px), so the 15 px notice rendered at about 6 px */
+@media (max-width: 640px) {
+    .auth-message {
+        font-size: 30px;
+    }
+}
+
 .welcome {
     display: flex;
     flex-direction: column;
