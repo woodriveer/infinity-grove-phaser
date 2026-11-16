@@ -107,17 +107,17 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
             <div>
                 <h1>Aviso de espera do servidor na tela inicial</h1>
                 <div class="meta">
-                    <code>.specs/features/supabase-postgres</code> · commits <code>da171ee</code> · 2026-11-16 · local (vite + backend falso, /api/health atrasado 20 s)
+                    <code>.specs/features/supabase-postgres</code> · commits <code>da171ee</code>, re-revisão de <code>3d92e79</code> · 2026-11-16 · local (vite + backend falso, /api/health atrasado 20 s)
                 </div>
             </div>
                         <span class="chip verdict ok">APROVADO</span>
         </div>
-        <p style="margin-top:16px">O aviso <code>Acordando o servidor, aguarde...</code> aparece no espaço da mensagem do oval de pergaminho, em uma linha, no estilo verde-musgo (não de erro), com contraste 6,90:1, sem sobrepor nada, e o formulário aparece depois com a mensagem vazia. O console está limpo nos dois tamanhos. Há um achado médio (texto pequeno no celular, herdado da escala do jogo); ele não bloqueia a aprovação.</p>
+        <p style="margin-top:16px">O aviso <code>Acordando o servidor, aguarde...</code> aparece no espaço da mensagem do oval de pergaminho, em uma linha, no estilo verde-musgo (não de erro), com contraste 6,90:1, sem sobrepor nada, e o formulário aparece depois com a mensagem vazia. O console está limpo nos dois tamanhos. Re-revisão do commit <code>3d92e79</code>: o achado #1 (texto minúsculo no celular) está RESOLVIDO. No celular o aviso agora usa 30 px de canvas (cerca de 11,4 px na tela), em duas linhas, legível, sem sobrepor nada e no mesmo estilo; o desktop está idêntico. Fica um achado baixo novo (#2, celular na horizontal, cerca de 7,6 px) que não bloqueia.</p>
         <div class="stats">
             <div class="stat"><div class="n">2</div><div class="l">telas e estados verificados</div></div>
             <div class="stat"><div class="n">4</div><div class="l">capturas (desktop + celular)</div></div>
             <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
-            <div class="stat"><div class="n">1</div><div class="l">achados médios e baixos</div></div>
+            <div class="stat"><div class="n">1</div><div class="l">achado aberto (baixo); #1 resolvido</div></div>
         </div>
     </section>
 
@@ -125,7 +125,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
         <h2>Fidelidade à spec</h2>
         <ul class="checks">
             <li class="yes"><span class="mark">✓</span><span>O aviso diz exatamente “Acordando o servidor, aguarde...” (três pontos, sem reticências), item 1 do T13 <code>RUN-06 AC 3</code></span></li>
-            <li class="yes"><span class="mark">✓</span><span>Fica no espaço da mensagem do oval (.auth-message, x 230 y 560 do canvas), em uma linha de cerca de 223 px dentro dos 340 px, no desktop e no celular, item 2 <code>RUN-06 AC 3</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Fica no espaço da mensagem do oval (.auth-message, x 230 y 560 do canvas), em uma linha no desktop (cerca de 223 px dentro dos 340 px) e duas linhas no celular (3d92e79), item 2 <code>RUN-06 AC 3</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Usa o estilo sem erro: 15 px, peso 700, cor verde-musgo #3d472b (accent-2-800), não ember-800, item 3 <code>RUN-06 AC 3</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Contraste do texto #3d472b sobre o pergaminho #ead6ad: 6,90:1, acima de 4,5:1 (o texto de erro #8a3510 daria 5,67:1), item 4 <code>RUN-06</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Nada o cobre: logo, frase (y 300) e o grupo de heróis ficam nos lugares, item 5 <code>RUN-06</code></span></li>
@@ -153,8 +153,8 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <a href="ui-review/01-wake-notice-phone.png" target="_blank"><img src="ui-review/01-wake-notice-phone.png" alt="Aviso de espera" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Aviso de espera</span>
-                        <span class="d">O mesmo estado no celular: a linha cabe, mas o texto fica minúsculo.</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #1</span></span>
+                        <span class="d">Re-revisão (3d92e79): duas linhas, cerca de 11,4 px efetivos, legível, sem sobrepor a frase nem o grupo de heróis; mesmo verde-musgo e mesma fonte.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">achado #1 resolvido</span></span>
                     </figcaption>
                 </figure>
             </div>
@@ -188,15 +188,26 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
         <h2>Achados</h2>
                         <article class="finding">
             <div>
-                <div class="top"><span class="chip sev-media">#1 · Média</span><strong>Texto do aviso minúsculo no celular</strong></div>
+                <div class="top"><span class="chip ok">#1 · Resolvido</span><span class="chip sev-media">Média</span><strong>Texto do aviso minúsculo no celular</strong></div>
                 <dl>
-                    <dt>Tela</dt><dd>Tela inicial, aviso de espera (celular 390×844)</dd>
-                    <dt>O que está errado</dt><dd>O canvas de 1024 px é reduzido a 390 px (escala 0,38), então os 15 px do aviso viram cerca de 6 px na tela, quase ilegíveis. É a única informação da tela enquanto o servidor acorda. A frase de apresentação sofre o mesmo: é uma limitação antiga da escala do jogo, não do aviso.</dd>
-                    <dt>Como deveria ficar</dt><dd>Aviso legível no celular, com pelo menos cerca de 11 px efetivos: por exemplo, aumentar o <code>font-size</code> de <code>.auth-message</code> em <code>@media (max-width: 640px)</code> (mantendo uma linha em 340 px ou permitindo duas linhas).</dd>
-                    <dt>Arquivo</dt><dd><code>game/public/style.css</code> (<code>.auth-message</code>, linhas 324-341)</dd>
+                    <dt>Situação</dt><dd>Resolvido em <code>3d92e79</code>: sob <code>@media (max-width: 640px)</code>, <code>.auth-message</code> usa <code>font-size: 30px</code> (cerca de 11,4 px na tela). O aviso quebra em duas linhas (“Acordando o servidor, / aguarde...”), legível, sem sobrepor o logo, a frase ou os heróis, com o mesmo verde-musgo. Desktop idêntico.</dd>
+                    <dt>Efeitos colaterais</dt><dd>Escolha de caminho (uiRedesign 04) no celular: a captura nova é idêntica à anterior; a mensagem fica vazia ali, então nada piora. A frase “Defenda a Grande…” cortada atrás do cartão é um defeito antigo da frase, não da mensagem. Mensagens de erro usam o mesmo espaço (centro y 560, 340 px): duas linhas de 42 px cabem acima da borda inferior e a cerca de 7 px de canvas abaixo dos botões; só uma mensagem de três linhas encostaria nos botões (não há hoje; o espaço tem pointer-events none).</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css</code></dd>
                 </dl>
             </div>
             <a href="ui-review/01-wake-notice-phone.png" target="_blank"><img src="ui-review/01-wake-notice-phone.png" alt="Captura do achado #1"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#2 · Baixa</span><strong>Celular na horizontal ainda mostra o aviso com cerca de 7,6 px</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Tela inicial em celulares na horizontal (por exemplo 844×390, escala cerca de 0,51); não capturada, calculado a partir da escala</dd>
+                    <dt>O que está errado</dt><dd>A media query é de largura (640 px), então a horizontal fica fora e mantém 15 px de canvas, cerca de 7,6 px na tela. É pequeno, mas melhor que os 6 px de antes e coerente com o resto da tela inicial (frase e campos têm a mesma escala).</dd>
+                    <dt>Como deveria ficar</dt><dd>Aceitável por ora. Se for tratar, usar a escala efetiva, por exemplo <code>@media (max-width: 900px) and (max-height: 500px)</code> com 24 px, no mesmo bloco de <code>.auth-message</code>.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css</code> (<code>.auth-message</code>)</dd>
+                </dl>
+            </div>
+            <a href="ui-review/01-wake-notice-phone.png" target="_blank"><img src="ui-review/01-wake-notice-phone.png" alt="Captura de referência"></a>
         </article>
             </section>
 
@@ -206,6 +217,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
             <li><span class="mark">✦</span><span>O aviso fica cerca de 230 px abaixo da frase, onde ficarão o formulário e os botões; funciona, mas parece solto. Se quiser, subir a mensagem para logo abaixo da frase (decisão do dono, a spec fixa y 560).</span></li>
             <li><span class="mark">✦</span><span>Uma pista de movimento (por exemplo, pontos que pulsam) mostraria que o jogo continua vivo durante uma espera de até 60 s; hoje o texto é estático.</span></li>
             <li><span class="mark">✦</span><span>O script das capturas agora espera o Preloader sair e atrasa o /api/health em 20 s: no Chromium sem GPU a transição de 1 s do Preloader fica lenta, e a barra de carregamento laranja aparecia sobre a tela nas primeiras capturas. Em jogo real ela some em 1 s, não é defeito do aviso.</span></li>
+            <li><span class="mark">✦</span><span>As mensagens de erro de login ainda aparecem em inglês (“Enter username and password”, em <code>MainMenu.js</code> linhas 173 e 213), contra o AD-007. É antigo e fora desta feature, mas vale uma tarefa.</span></li>
         </ul>
     </section>
 
