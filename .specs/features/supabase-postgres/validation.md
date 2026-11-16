@@ -3,9 +3,9 @@
 **Date**: 2026-11-16
 **Spec**: `.specs/features/supabase-postgres/spec.md` (revision 3)
 **Diff range**: `0adb119..origin/main` (`53729a5`), plus T1 to T3 at `afccf64`, `ea5014f`, `f407d25`. Scope: Phases 1 to 6 (T1 to T19) and the review fix `3d92e79`. Phase 7 (T20, T21) and Phase 8 (T22) are out of scope.
-**Verifier**: independent sub-agent (author ≠ verifier), round 1 of 3; round 2 appended at the end (diff `fa29984..3cc1bc5`)
+**Verifier**: independent sub-agent (author ≠ verifier), round 1 of 3; round 2 appended at the end (diff `fa29984..3cc1bc5`), round 3 after it (diff `89b9173..4b55a2e`)
 
-**Current verdict (round 2): FAIL**: one new mutant, D9, survived. See "Round 2" at the end.
+**Current verdict (round 3): PASS**: D9 is killed, all 7 mutants of the round are killed, and the final gate is green apart from the 2 known `regression.test.mjs` failures and 1 e2e load flake that passed alone. See "Round 3" at the end.
 
 **Round 1 verdict: FAIL**: every suite is green and no requirement is broken, but 4 of 29 mutants survived (C5, W1, D1, D2). Each one is a spec outcome that a test does not pin. All four are test-only fixes for `test-engineer`, listed under "Fix Plans".
 
@@ -277,7 +277,7 @@ Run 2, backend and game mutants (main checkout):
 
 Control: every kill command was run once on the unmutated tree and passed. That covers the four `.\gradlew.bat test --tests "*<Class>"` commands (`BUILD SUCCESSFUL`), both Vitest files (status 0), `npx playwright test e2e/wake.spec.js --workers=1` (status 0) and the deploy test files (green in the full suite). The first B1 to B4 run is **discarded**. It called `gradlew.bat` without `.\`, which `cmd` on this machine cannot find in the current directory. The control gave the same exit 1 on the clean tree, so its "killed" lines proved nothing. B1 to B4 were rerun with `.\gradlew.bat`, and the table above shows that rerun.
 
-**Total: 29 mutants, 25 killed, 4 survived (C5, W1, D1, D2)**. Result: ❌ FAIL (surviving mutants become fix tasks).
+**Total: 29 mutants, 25 killed, 4 survived (C5, W1, D1, D2)**. Round 1 sensor outcome: ❌ FAIL (surviving mutants become fix tasks).
 
 ---
 
@@ -517,3 +517,77 @@ Every other row is the same as in round 1.
 **Sensor**: 7 mutants this round, 6 killed, 1 survived (D9); feature total 32 distinct, 31 killed.
 **Gate**: deploy 283/285 (the 2 known failures), game unit 1599/1599, `wake.spec.js` 5/5; backend and full e2e deferred to the PASS round.
 **Next steps (round 3)**: rerun D9 plus the 6 killed mutants of this round, run the deploy suite, the game unit suite and `wake.spec.js`, then the full backend (`ktlintCheck test`) and the full e2e suite once as the final gate.
+
+---
+
+## Round 3 (final gate, 2026-11-16)
+
+**Diff range**: `89b9173..4b55a2e` (one commit, `4b55a2e`)
+**Verdict: PASS (round 3 of 3)**. D9 is killed by the new test. The 6 mutants killed in round 2 stay killed. The deploy, backend, game unit and full e2e suites are green, apart from the 2 known `regression.test.mjs` failures and 1 e2e load flake outside the feature that passed when rerun alone.
+
+### Scope of the fix commit
+
+`git diff --name-only 89b9173 4b55a2e` lists one file: `deploy/db/copyToSupabase.test.mjs` (+8, 0 removed). No production code, workflow or spec changed. `4b55a2e` is on `origin/main`.
+
+The new test is `deploy/db/copyToSupabase.test.mjs:228` `check refuses a Supabase on Postgres 16 whose public schema has tables`. It runs `machine({ version: '160004', publicTables: '3' })` and asserts `assert.equal(check(m.deps), 1)` and `assert.deepEqual(m.lines, ['ERRO: o schema public do Supabase já tem 3 tabelas; a cópia só roda num banco vazio'])`. That is the SUPA-07 AC 7 message and exit code (`spec.md:291`) on the Postgres 16 boundary, the exact Fix 5 of round 2. It matches the guard at `deploy/db/copyToSupabase.mjs:89` (`major >= 16`), which decides whether the table count runs.
+
+### Discrimination Sensor, round 3
+
+The run was `node scripts/sensor.mjs round2-mutants.json --json round3-sensor.json` (scratchpad), in the main checkout at `4b55a2e`, with no other suite running. The baseline `git status --porcelain` (graphify-out ignored) was `?? package-lock.json`, `?? package.json`. It was the same after the run (`diff` empty). It printed:
+
+| Mutant | File | Note | Outcome |
+| --- | --- | --- | --- |
+| C5 | `deploy/cloudrun/cloudRunRelease.mjs` | R1 survivor. RUN-03 AC1 / RUN-04 AC8: /health waits 1 s instead of 90 s | killed |
+| W1 | `.github/workflows/deploy.yml` | R1 survivor. RUN-05 AC23: the game job no longer publishes the Worker | killed |
+| D1 | `deploy/db/copyToSupabase.mjs` | R1 survivor. SUPA-07 AC7: a public schema with 1 table passes as empty | killed |
+| D2 | `deploy/db/copyToSupabase.mjs` | R1 survivor. SUPA-07 AC6: Postgres 16 refused (boundary) | killed |
+| W4 | `.github/workflows/deploy.yml` | New. RUN-05 AC23 / RUN-07 AC6: the publish step loses the Cloudflare account id | killed |
+| W5 | `.github/workflows/deploy.yml` | New. RUN-05 AC23: npm run deploy runs outside game/ | killed |
+| D9 | `deploy/db/copyToSupabase.mjs` | New. SUPA-07 AC7 at the 16 boundary: on Postgres 16 the table count is skipped | killed |
+
+**Sensor run**: 7 mutants, 7 killed, 0 survived, 0 invalid; isolation ok
+
+To confirm which test kills D9, I applied it to a copy of `deploy/` in the scratchpad (`major >= 16)` changed to `major > 16)`, one match, `:89`). I ran `node --test copyToSupabase.test.mjs` there and then deleted the copy. The result was `tests 33`, `pass 32`, `fail 1`. The one failing test was `check refuses a Supabase on Postgres 16 whose public schema has tables`, the new test.
+
+Feature total: **32 distinct mutants, 32 killed, 0 survived** (round 1: 29 with 25 killed; round 2: 3 new; round 3: D9 killed).
+
+### Gate, round 3 (final gate: foreground, one suite at a time)
+
+| Suite | Command | Result |
+| --- | --- | --- |
+| Deploy | `node --test "deploy/**/*.test.mjs"` | `tests 286`, `pass 284`, `fail 2`, `skipped 0`, `cancelled 0`. The 2 failures are `deploy/regression.test.mjs:385` `the CLI exits 0 when every check passes` and `:412` `the CLI exits 1 when a check fails`, both with `actual: 3221226505`. That is the known child exit code on this machine, unchanged since round 1. 286 = 285 + the new test. |
+| Backend | `cd backend && ./gradlew.bat ktlintCheck test --rerun` (Docker 29.9.3 up) | BUILD SUCCESSFUL in 1m 47s. `ktlintCheck` UP-TO-DATE, so lint is clean. **949 tests, 0 failures, 0 errors, 0 skipped**, summed over the 90 files in `build/test-results/test`. `jacocoTestReport` ran as the finalizer of `test`. I did not read its percentages, because `gitops` measures coverage. |
+| Game unit | `cd game && npm test` | **73 files, 1599 tests passed**, 0 failed (75.8 s). |
+| e2e | `cd game && npx playwright test --workers=2 --shard=k/9` for k = 1 to 9, one after another | **314 tests: 313 passed, 1 failed**. The suite takes about 56 min, more than one 10-minute call, so I split it into 9 shards (`fullyParallel: true`). The shards had 35, 35, 35, 35, 35, 35, 35, 35 and 34 tests. The Bash tool moved each shard to the background after 180 s. I waited for each one in the foreground and started the next only after it ended, so no two suites ever ran at once. The feature's `wake.spec.js` passed 5 of 5 (`:28`, `:40`, `:48`, `:57`, `:75`). |
+
+**e2e failure, rerun alone**: `dragEquip.spec.js:586` `Drag to equip edge scroll › scrolls the window while a piece is held near its top edge` failed in shard 3 (`Expected: 0`, `Received: 20`, the scroll position). Rerun alone with `npx playwright test e2e/dragEquip.spec.js:586 --workers=1`, it passed (16.5 s). This test also flaked under load in round 1 (`scrollTop` 28 instead of 0). The feature does not change `dragEquip.spec.js` or the drag code. It counts as a load flake.
+
+**Failures not caused by the feature**:
+- `deploy/regression.test.mjs:385` and `:412`: the child process exits with 3221226505 on this machine, the same as before the feature.
+- `game/e2e/dragEquip.spec.js:586`: an edge-scroll load flake. It passed alone.
+
+### Report edit
+
+Round 1 line 280 used to label its sensor outcome with the word "Result" and a colon. `validate_state.py` reads every such line together, so that historical line would have hidden this round's verdict. Its label now reads `Round 1 sensor outcome`. Its content is the same.
+
+### Requirement Traceability Update, round 3
+
+| Requirement | Round 2 | Round 3 |
+| --- | --- | --- |
+| SUPA-07 | ❌ Needs Fix (D9) | ✅ Verified (AC 6 `copyToSupabase.test.mjs:204`, AC 7 `:212`, `:220`, `:228`) |
+
+Every other row is the same as in round 2. Still pending, and not failures: M1 to M15 (manual production checks), SUPA-11 (T20, T21) and RUN-08 (T22), all out of scope. The spec.md rows are not edited by the Verifier.
+
+### Lessons, round 3
+
+None recorded. This round is a clean PASS with no new survivor, precision gap or deviation. L-095 (round 2, D9) stays a candidate. The fix in `4b55a2e` followed it.
+
+### Summary, round 3
+
+**Overall**: ✅ Ready (round 3 of 3), with M1 to M15 still pending as manual production checks.
+**Sensor**: 7 mutants this round, 7 killed, 0 survived; feature total 32 distinct, 32 killed.
+**Gate**: deploy 284/286 (2 known), backend 949/949 with ktlint clean, game unit 1599/1599, e2e 313/314 (1 load flake that passed alone), `wake.spec.js` 5/5.
+
+`validate_state.py supabase-postgres` exits 0 (`0 error(s)`).
+
+**Result**: PASS
