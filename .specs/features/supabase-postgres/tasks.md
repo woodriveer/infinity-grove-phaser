@@ -1538,7 +1538,7 @@ followed by the rest of the current method unchanged (from `//  Scene may have b
 
 ---
 
-### T13: UI review of the wake-up notice [ ]
+### T13: UI review of the wake-up notice [x]
 
 **Owner**: ui-artist
 **What**: Review the start screen while the server wakes up and after, on desktop and phone, and write the report (RUN-06; spec US-5 AC 2 to 4).
@@ -1566,8 +1566,8 @@ followed by the rest of the current method unchanged (from `//  Scene may have b
 **Gate**: `.specs/features/supabase-postgres/ui-review.html` exists, names the verdict and links the four PNGs.
 **Done when**:
 
-- [ ] Each of the 7 items has a result and a screenshot in the report.
-- [ ] Every finding is listed with the exact change it asks for; `product-owner` turns findings into tasks before the Verifier.
+- [x] Each of the 7 items has a result and a screenshot in the report.
+- [x] Every finding is listed with the exact change it asks for; `product-owner` turns findings into tasks before the Verifier.
 
 **Commit**: `docs(review): review the start screen while the server wakes up`
 

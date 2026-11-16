@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Aviso de espera do servidor na tela inicial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Aviso de espera do servidor na tela inicial</h1>
+                <div class="meta">
+                    <code>.specs/features/supabase-postgres</code> · commits <code>da171ee</code> · 2026-11-16 · local (vite + backend falso, /api/health atrasado 20 s)
+                </div>
+            </div>
+                        <span class="chip verdict ok">APROVADO</span>
+        </div>
+        <p style="margin-top:16px">O aviso <code>Acordando o servidor, aguarde...</code> aparece no espaço da mensagem do oval de pergaminho, em uma linha, no estilo verde-musgo (não de erro), com contraste 6,90:1, sem sobrepor nada, e o formulário aparece depois com a mensagem vazia. O console está limpo nos dois tamanhos. Há um achado médio (texto pequeno no celular, herdado da escala do jogo); ele não bloqueia a aprovação.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">2</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">4</div><div class="l">capturas (desktop + celular)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">1</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>O aviso diz exatamente “Acordando o servidor, aguarde...” (três pontos, sem reticências), item 1 do T13 <code>RUN-06 AC 3</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Fica no espaço da mensagem do oval (.auth-message, x 230 y 560 do canvas), em uma linha de cerca de 223 px dentro dos 340 px, no desktop e no celular, item 2 <code>RUN-06 AC 3</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Usa o estilo sem erro: 15 px, peso 700, cor verde-musgo #3d472b (accent-2-800), não ember-800, item 3 <code>RUN-06 AC 3</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Contraste do texto #3d472b sobre o pergaminho #ead6ad: 6,90:1, acima de 4,5:1 (o texto de erro #8a3510 daria 5,67:1), item 4 <code>RUN-06</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Nada o cobre: logo, frase (y 300) e o grupo de heróis ficam nos lugares, item 5 <code>RUN-06</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Depois da espera o formulário aparece e a mensagem fica vazia (02-form-after-wake), item 6 <code>RUN-06 AC 4</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Relatório de console dos dois projetos: clean (o aviso GPU stall due to ReadPixels do Chromium é filtrado como ambiental), item 7 <code>RUN-06</code></span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+                <div class="screen">
+            <h3>Tela inicial: servidor acordando</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/01-wake-notice-desktop.png" target="_blank"><img src="ui-review/01-wake-notice-desktop.png" alt="Aviso de espera" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Aviso de espera</span>
+                        <span class="d">Com 2 s ou mais sem resposta de /api/health: o aviso verde-musgo no espaço da mensagem, formulário ainda oculto.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/01-wake-notice-phone.png" target="_blank"><img src="ui-review/01-wake-notice-phone.png" alt="Aviso de espera" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Aviso de espera</span>
+                        <span class="d">O mesmo estado no celular: a linha cabe, mas o texto fica minúsculo.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #1</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Tela inicial: depois da espera</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/02-form-after-wake-desktop.png" target="_blank"><img src="ui-review/02-form-after-wake-desktop.png" alt="Formulário depois da espera" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Formulário depois da espera</span>
+                        <span class="d">O /api/health respondeu: usuário, senha e botões; a mensagem está vazia.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/02-form-after-wake-phone.png" target="_blank"><img src="ui-review/02-form-after-wake-phone.png" alt="Formulário depois da espera" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Formulário depois da espera</span>
+                        <span class="d">O mesmo estado no celular, sem sobras do aviso.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+                        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#1 · Média</span><strong>Texto do aviso minúsculo no celular</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Tela inicial, aviso de espera (celular 390×844)</dd>
+                    <dt>O que está errado</dt><dd>O canvas de 1024 px é reduzido a 390 px (escala 0,38), então os 15 px do aviso viram cerca de 6 px na tela, quase ilegíveis. É a única informação da tela enquanto o servidor acorda. A frase de apresentação sofre o mesmo: é uma limitação antiga da escala do jogo, não do aviso.</dd>
+                    <dt>Como deveria ficar</dt><dd>Aviso legível no celular, com pelo menos cerca de 11 px efetivos: por exemplo, aumentar o <code>font-size</code> de <code>.auth-message</code> em <code>@media (max-width: 640px)</code> (mantendo uma linha em 340 px ou permitindo duas linhas).</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css</code> (<code>.auth-message</code>, linhas 324-341)</dd>
+                </dl>
+            </div>
+            <a href="ui-review/01-wake-notice-phone.png" target="_blank"><img src="ui-review/01-wake-notice-phone.png" alt="Captura do achado #1"></a>
+        </article>
+            </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+                <ul class="checks">
+            <li><span class="mark">✦</span><span>O aviso fica cerca de 230 px abaixo da frase, onde ficarão o formulário e os botões; funciona, mas parece solto. Se quiser, subir a mensagem para logo abaixo da frase (decisão do dono, a spec fixa y 560).</span></li>
+            <li><span class="mark">✦</span><span>Uma pista de movimento (por exemplo, pontos que pulsam) mostraria que o jogo continua vivo durante uma espera de até 60 s; hoje o texto é estático.</span></li>
+            <li><span class="mark">✦</span><span>O script das capturas agora espera o Preloader sair e atrasa o /api/health em 20 s: no Chromium sem GPU a transição de 1 s do Preloader fica lenta, e a barra de carregamento laranja aparecia sobre a tela nas primeiras capturas. Em jogo real ela some em 1 s, não é defeito do aviso.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+                <p class="empty">Nenhum erro nem recurso faltando: relatório clean nos dois projetos (o aviso GPU stall due to ReadPixels, ambiental, é filtrado pelo script).</p>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-16</footer>
+</main>
+</body>
+</html>

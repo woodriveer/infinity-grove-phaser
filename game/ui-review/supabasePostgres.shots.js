@@ -3,7 +3,7 @@ import { mockBackend } from '../e2e/support/fakeBackend';
 import { shot } from './support/shots';
 
 //  Screenshots of the backend wake-up review (.specs/features/supabase-postgres/ui-review/): the start screen while GET /api/health
-//  takes 8 s, then the form. Everything runs on the fake backend; the wake-up answer is the only stubbed route.
+//  takes 20 s (a headless run fades the Preloader slowly), then the form. Everything runs on the fake backend; the wake-up answer is the only stubbed route.
 const WAKE = 'Acordando o servidor, aguarde...';
 
 //  Chromium's GPU process warns about ReadPixels when a headless screenshot reads the canvas; it is not a page problem (see the other review reports)
@@ -32,18 +32,22 @@ const watch = (page) => {
 const report = (testInfo, label, problems) => console.log(`CONSOLE-REPORT ${label} (${testInfo.project.name}): ${problems.length ? problems.join(' | ') : 'clean'}`);
 
 test('start screen while the server wakes up', async ({ page }, testInfo) => {
+    test.setTimeout(60000);
     const problems = watch(page);
 
-    await mockBackend(page, { healthDelayMs: 8000 });
+    await mockBackend(page, { healthDelayMs: 20000 });
     await page.goto('/');
     await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
     await page.locator('#game-container canvas').click();
 
     await expect(page.getByRole('alert')).toHaveText(WAKE, { timeout: 5000 });
     await page.mouse.move(0, 0);
+    //  The Preloader fades out for 1 s over MainMenu; shoot only after it is gone (same wait as openMainMenu)
+    await page.waitForFunction(() => !window.__PHASER_GAME__.scene.isActive('Preloader'), null, { timeout: 10000 });
+    await expect(page.getByRole('alert')).toHaveText(WAKE);
     await shot(page, testInfo, '01-wake-notice');
 
-    await expect(page.locator('.auth-form')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('.auth-form')).toBeVisible({ timeout: 30000 });
     await shot(page, testInfo, '02-form-after-wake');
     report(testInfo, 'start screen', problems);
 });
