@@ -576,6 +576,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: D1 deploy/db/copyToSupabase.mjs:93; D2 deploy/db/copyToSupabase.mjs:82 (tests)
 - last seen: 2026-11-16T18:46:28Z
 
+### L-095 - When one boundary value gates several checks, test every gated check at that boundary, not only the first one
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: supabase-postgres
+- evidence: D9 deploy/db/copyToSupabase.mjs:89 (tests)
+- last seen: 2026-11-16T19:37:06Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 95,
+  "next_id": 96,
   "lessons": [
     {
       "id": "L-001",
@@ -1700,6 +1700,24 @@
       ],
       "created": "2026-11-16T18:46:28Z",
       "last_seen": "2026-11-16T18:46:28Z"
+    },
+    {
+      "id": "L-095",
+      "key": "surviving_mutant::when one boundary value gates several checks test every gated check at that boundary not only the first one",
+      "text": "When one boundary value gates several checks, test every gated check at that boundary, not only the first one",
+      "signal": "surviving_mutant",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "supabase-postgres"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "D9 deploy/db/copyToSupabase.mjs:89 (tests)"
+      ],
+      "created": "2026-11-16T19:37:06Z",
+      "last_seen": "2026-11-16T19:37:06Z"
     }
   ]
 }

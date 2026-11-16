@@ -3,9 +3,11 @@
 **Date**: 2026-11-16
 **Spec**: `.specs/features/supabase-postgres/spec.md` (revision 3)
 **Diff range**: `0adb119..origin/main` (`53729a5`), plus T1 to T3 at `afccf64`, `ea5014f`, `f407d25`. Scope: Phases 1 to 6 (T1 to T19) and the review fix `3d92e79`. Phase 7 (T20, T21) and Phase 8 (T22) are out of scope.
-**Verifier**: independent sub-agent (author ≠ verifier), round 1 of 3
+**Verifier**: independent sub-agent (author ≠ verifier), round 1 of 3; round 2 appended at the end (diff `fa29984..3cc1bc5`)
 
-**Verdict: FAIL** — every suite is green and no requirement is broken, but 4 of 29 mutants survived (C5, W1, D1, D2). Each one is a spec outcome that a test does not pin. All four are test-only fixes for `test-engineer`, listed under "Fix Plans".
+**Current verdict (round 2): FAIL**: one new mutant, D9, survived. See "Round 2" at the end.
+
+**Round 1 verdict: FAIL**: every suite is green and no requirement is broken, but 4 of 29 mutants survived (C5, W1, D1, D2). Each one is a spec outcome that a test does not pin. All four are test-only fixes for `test-engineer`, listed under "Fix Plans".
 
 ---
 
@@ -328,7 +330,7 @@ Observations (not gaps, for `product-owner` to triage):
 1. `deploy/db/copyToSupabase.mjs:91` reads a failed `select count(*)` as `Number('') = 0`, so a failed table count counts as an empty schema. The single-transaction restore would still fail on any conflict, so no data is at risk. But `check` could print `Pronto para copiar` on a query that failed.
 2. `3d92e79` sets `.auth-message { font-size: 30px }` under `max-width: 640px` for every start-screen message, not only the wake notice. The phone screenshots show the notice and the empty message. The longer error lines (`Cannot reach the server. Try again later.`, the login errors) at 30 px on the phone were not captured.
 3. `backend/readme.md` ("Way back") and ADR 0012 already name `./publish.sh --way-back`, which only arrives in T22. Until T22 the way back is a plain `./publish.sh` (spec Assumptions, "Voltar atrás").
-4. Secrets scan: no password, token, `JWT_SECRET`, tunnel host, real `run.app` URL or project number is committed (`git grep` over `origin/main`). The only tracked `.env` files are the 5 allowed ones, and `.env` was not read. The project ref `jnqlrdnwwqslihncszej` appears outside `spec.md` in `deploy/lib/databaseEnv.mjs:5,112`, its tests, `deploy/db/*.test.mjs`, `.env.example:11`, `backend/readme.md:19`, ADR 0012 `:21`, `design.md`, `tasks.md` and `.specs/STATE.md`. That is by design: SUPA-02 AC 15 makes the ref part of an exact message. It is an identifier, not a credential. The real pooler host `aws-1-sa-east-1.pooler.supabase.com` appears only in `spec.md` and `design.md:194`. The spec says "O host fica fora do repositório" ("the host stays out of the repository") while naming it itself. The host is a shared regional pooler name, not a secret, but the owner may want `design.md:194` turned into `aws-<N>-<region>`.
+4. Secrets scan: no password, token, `JWT_SECRET`, tunnel host, real `run.app` URL or project number is committed (`git grep` over `origin/main`). The only tracked `.env` files are the 5 allowed ones, and `.env` was not read. The project ref `jnqlrdnwwqslihncszej` appears outside `spec.md` in `deploy/lib/databaseEnv.mjs:5,112`, its tests, `deploy/db/*.test.mjs`, `.env.example:11`, `backend/readme.md:19`, ADR 0012 `:21`, `design.md`, `tasks.md` and `.specs/STATE.md`. That is by design: SUPA-02 AC 15 makes the ref part of an exact message. It is an identifier, not a credential. The real pooler host (`aws-<N>-<region>`, redacted in round 2) appeared only in `spec.md` and `design.md:194`. The spec says "O host fica fora do repositório" ("the host stays out of the repository") while naming it itself. The host is a shared regional pooler name, not a secret, but the owner may want `design.md:194` turned into `aws-<N>-<region>`.
 
 ---
 
@@ -414,3 +416,104 @@ Candidates were added with `lessons.py add`. They are grounded in the surviving 
 **Pending (not failures)**: M1 to M15 (T20, T21), RUN-08 (T22), and ui-review finding #2 (Low, follow-up).
 
 **Next steps**: `test-engineer` writes Fixes 1 to 4, then the Verifier runs round 2. That round re-runs C5, W1, D1 and D2 plus 1 to 3 new mutants, the game unit suite and `wake.spec.js`. The full backend and e2e suites run only when that round is about to return PASS.
+
+---
+
+## Round 2 (re-verification, 2026-11-16)
+
+**Diff range**: `fa29984..3cc1bc5` (`b878ccf`, `b2ca0ed`, `df84bfa`, `3cc1bc5`)
+**Verdict: FAIL (round 2 of 3)**. The four round 1 survivors (C5, W1, D1, D2) are now killed, and so are two new mutants on the workflow step. A third new mutant, **D9, survived**: on Supabase Postgres 16 the copy skips the table count, so a `public` schema that already has tables passes `check`. The fix is test-only, for `test-engineer` (Fix 5 below).
+
+### Scope of the fix commits
+
+`git diff fa29984..origin/main --stat -- . ':!graphify-out'`: outside `.specs/`, only three test files changed. No production code changed.
+
+| File | Lines | Commit |
+| --- | --- | --- |
+| `deploy/cloudrun/cloudRunRelease.test.mjs` | +39 | `b878ccf` (C5) |
+| `deploy/cloudrun/workflow.test.mjs` | +11 | `df84bfa` (W1) |
+| `deploy/db/copyToSupabase.test.mjs` | +16 | `3cc1bc5` (D1, D2) |
+| `.specs/features/supabase-postgres/{spec,design,tasks}.md` | +14 / -11 | `b2ca0ed` (rulings) |
+
+The new tests assert the outcomes the spec defines:
+
+- `deploy/cloudrun/cloudRunRelease.test.mjs:189` `assert.deepEqual(await timeoutsOf(() => plan(deps)), [90000])` and `:196` `[90000, 90000]` for `release`, with the tag URL and the service URL. The spy wraps `AbortSignal.timeout` and still returns the real signal. RUN-03 AC 1 and RUN-04 AC 8 ("90 s").
+- `deploy/cloudrun/workflow.test.mjs:171`: the `game` step with `^ {8}run: npm run deploy$` has `working-directory: game`, `env:`, and both `secrets.CLOUDFLARE_*` lines. RUN-05 AC 23.
+- `deploy/db/copyToSupabase.test.mjs:204`: `version: '160004'` gives exit 0 with `['Supabase: Postgres 16, schema public vazio', 'Pronto para copiar']`. SUPA-07 AC 1 and AC 6 ("menor que 16" is refused, so 16 is accepted).
+- `deploy/db/copyToSupabase.test.mjs:220`: `publicTables: '1'` gives exit 1 with the exact AC 7 message. SUPA-07 AC 7.
+
+### The rulings in `b2ca0ed`, checked against the spec
+
+| Ruling | Where | Check |
+| --- | --- | --- |
+| SUPA-01 AC 3 is met by config plus M3 and M4, with no test | `spec.md:135` | ✅ The AC text now names how it is checked. M3 and M4 (`spec.md:472-473`) see the Cloud Run revision boot on Supabase and answer `/health` UP, which is only possible if the `SPRING_DATASOURCE_*` values reached the datasource. This matches the round 1 "Optional (Low)" item. SUPA-01 AC 3 moves from ⚠️ to ✅ (by ruling, manual M3 and M4 pending). |
+| The landscape-phone font becomes TD-007, out of scope | `spec.md:49` (Out of Scope row), `:117` (TD-007) | ✅ No AC sets a font size. RUN-06 AC 3 asks only for the text and no error style (`MainMenu.test.js:387`, `wake.spec.js:34-35`). The portrait phone check stays (`wake.spec.js:75`, "at least 11 px", 5/5 this round). |
+| Q2 answer (Free) recorded | `spec.md:60` | ✅ Free, pool size 15, with the date. It is consistent with the pool of 5 and 1 (SUPA-01 AC 1, 2) and TD-003. |
+| T14 to T17 total lines ticked | `tasks.md:1674`, `:1737`, `:1845`, `:1972` | ✅ Each line carries the round 1 reasoning. The total moved from 280 to 285 with the 5 new tests (2 + 1 + 2), as measured below. |
+| Pooler host is a placeholder | `spec.md:23`, `:59`, `:136`; `design.md:147`, `:194` | ✅ `git grep` of the real host over `origin/main` (graphify-out excluded) found it in one place only: this report's own round 1 observation 4. It is replaced by `aws-<N>-<region>` in this commit. SUPA-02 AC 6 keeps its meaning: its concrete example `aws-1-us-east-1` is still the one `deploy/lib/databaseEnv.test.mjs:34` asserts. |
+
+**Note (not a gap)**: with exactly one table the D1 message reads `já tem 1 tabelas`. That is the spec's literal `<n> tabelas` (`spec.md:291`), and the test pins it exactly. If the owner wants `tabela(s)`, as SUPA-09 AC 15 uses, that is a spec change for `product-owner`.
+
+### Discrimination Sensor, round 2
+
+The run was `node scripts/sensor.mjs round2-mutants.json` (scratchpad) in the main checkout at `3cc1bc5`, with no other suite running. The baseline `git status --porcelain` (graphify-out ignored) was `?? package-lock.json`, `?? package.json`, the same after the run. It printed:
+
+| Mutant | File | Note | Outcome |
+| --- | --- | --- | --- |
+| C5 | `deploy/cloudrun/cloudRunRelease.mjs` | R1 survivor. RUN-03 AC1 / RUN-04 AC8: /health waits 1 s instead of 90 s | killed |
+| W1 | `.github/workflows/deploy.yml` | R1 survivor. RUN-05 AC23: the game job no longer publishes the Worker | killed |
+| D1 | `deploy/db/copyToSupabase.mjs` | R1 survivor. SUPA-07 AC7: a public schema with 1 table passes as empty | killed |
+| D2 | `deploy/db/copyToSupabase.mjs` | R1 survivor. SUPA-07 AC6: Postgres 16 refused (boundary) | killed |
+| W4 | `.github/workflows/deploy.yml` | New. RUN-05 AC23 / RUN-07 AC6: the publish step loses the Cloudflare account id | killed |
+| W5 | `.github/workflows/deploy.yml` | New. RUN-05 AC23: npm run deploy runs outside game/ | killed |
+| D9 | `deploy/db/copyToSupabase.mjs` | New. SUPA-07 AC7 at the 16 boundary: on Postgres 16 the table count is skipped | survived |
+
+**Result**: 7 mutants, 6 killed, 1 survived, 0 invalid; isolation ok
+
+D9 is `deploy/db/copyToSupabase.mjs:89` `if (forCopy && major !== null && major >= 16)` changed to `major > 16`. This guard decides whether the table count runs. The D2 fix pinned the first guard at 16 (`:82`, the version check) but not this one. The only test on 16 (`copyToSupabase.test.mjs:204`) uses the default `publicTables: '0'`, and the table tests (`:212`, `:220`) run on the default `170004`. The mutant is not equivalent: on 16 with tables, `check` prints `Pronto para copiar` and `copy` would restore into a non-empty schema. SUPA-07 AC 7 has no version condition.
+
+Running total of the feature: round 1 had 29 mutants with 25 killed. Round 2 kills the 4 survivors and adds 3 new mutants, with 2 killed. **32 distinct mutants, 31 killed, 1 survived (D9).**
+
+### Gate, round 2 (foreground, one at a time)
+
+| Suite | Command | Result |
+| --- | --- | --- |
+| Deploy | `node --test --test-reporter=tap "deploy/**/*.test.mjs"` | `# tests 285`, `# pass 283`, `# fail 2`, `# skipped 0`. The only `not ok` lines are 268 `the CLI exits 0 when every check passes` and 270 `the CLI exits 1 when a check fails`, both at `deploy/regression.test.mjs` with `actual: 3221226505`, the known child exit code from round 1. 285 = 280 + the 5 new tests. |
+| Game unit | `cd game && npm test` | **73 files, 1599 tests passed**, 0 failed (69.3 s). It was run a second time only to read the `Test Files` line that the first output cut off; that run was also 73/73. |
+| e2e (feature spec) | `cd game && npx playwright test e2e/wake.spec.js --workers=1` | **5 passed** (48.5 s). |
+| Backend, full e2e | not run this round | The round returns FAIL, so the final-gate runs (`gradlew ktlintCheck test` and the full Playwright suite) wait for the round that is about to PASS. No backend or game code changed since round 1 (`git diff fa29984..3cc1bc5` touches neither `backend/` nor `game/`). Round 1 had 949/949 and 311/314 with 3 load flakes outside the feature. |
+
+Failures not caused by the feature: the 2 `deploy/regression.test.mjs` CLI tests (child exit 3221226505 on this machine, the same as before the feature).
+
+### Fix Plans, round 2
+
+#### Fix 5 (D9, SUPA-07 AC 7 at the Postgres 16 boundary): the table count also runs on 16
+- **Root cause**: no test combines `version: '160004'` with a non-empty `public`.
+- **Fix task** (`test-engineer`, test only): in `deploy/db/copyToSupabase.test.mjs`, add `check refuses a Supabase on Postgres 16 whose public schema has tables`. Use `machine({ version: '160004', publicTables: '3' })`, and expect `check(m.deps)` to be `1` and `m.lines` to deepEqual `['ERRO: o schema public do Supabase já tem 3 tabelas; a cópia só roda num banco vazio']`.
+- **Done when**: mutant D9 (`major >= 16)` changed to `major > 16)` in `deploy/db/copyToSupabase.mjs`) is killed, and the deploy suite shows `# tests 286` with only the 2 known failures.
+- **Priority**: Minor. Supabase runs 17 today, but the guard protects the one rule that keeps the copy off a non-empty database.
+
+### Requirement Traceability Update, round 2
+
+| Requirement | Round 1 | Round 2 |
+| --- | --- | --- |
+| SUPA-01 | ✅ Verified (AC 3 config only) | ✅ Verified (AC 3 by ruling, M3 and M4) |
+| SUPA-07 | ❌ Needs Fix (D1, D2) | ❌ Needs Fix (D9). AC 6 and the one-table case of AC 7 are now ✅ |
+| RUN-03 | ❌ Needs Fix (C5) | ✅ Verified (`cloudRunRelease.test.mjs:189`) |
+| RUN-04 | ❌ Needs Fix (C5) | ✅ Verified (`cloudRunRelease.test.mjs:196`) |
+| RUN-05 | ❌ Needs Fix (W1) | ✅ Verified (`workflow.test.mjs:171`; W1, W4, W5 killed) |
+
+Every other row is the same as in round 1.
+
+### Lessons, round 2
+
+- L-095 (D9), candidate: "When one boundary value gates several checks, test every gated check at that boundary, not only the first one." It refines L-094, which the D2 fix followed for the first guard only.
+
+`validate_state.py supabase-postgres` is expected to exit 1 ("verdict is FAIL") for this round.
+
+### Summary, round 2
+
+**Overall**: ❌ Not ready, round 2 of 3. One test-only fix is left (Fix 5).
+**Sensor**: 7 mutants this round, 6 killed, 1 survived (D9); feature total 32 distinct, 31 killed.
+**Gate**: deploy 283/285 (the 2 known failures), game unit 1599/1599, `wake.spec.js` 5/5; backend and full e2e deferred to the PASS round.
+**Next steps (round 3)**: rerun D9 plus the 6 killed mutants of this round, run the deploy suite, the game unit suite and `wake.spec.js`, then the full backend (`ktlintCheck test`) and the full e2e suite once as the final gate.
