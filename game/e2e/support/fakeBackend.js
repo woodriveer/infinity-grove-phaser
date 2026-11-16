@@ -224,11 +224,12 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  talentPoints {name: n} (points available at the start, on top of the ones the starting levels cost; first clears pay more) and
 //  autoClick {name: { level, crystals }} (default level 0 and 0 crystals; the upgrade follows AutoClickController) and
 //  lastChapter (the last chapter a cleared chapter boss opens, default 1: the boss of that chapter completes the campaign).
+//  healthDelayMs delays the answer of GET /api/health (the backend wake-up of spec supabase-postgres), which is counted by healthCalls() and kept out of calls.
 //  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens.
 export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
     cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = [],
-    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1
+    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1, healthDelayMs = 0
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -854,6 +855,17 @@ export async function mockBackend (page, {
         return route.fulfill(problem(404, 'Not found'));
     };
 
+    let healthCalls = 0;
+
+    //  GET /health of HealthController: UP with a fixed commit, after healthDelayMs; outside `calls` so the API call lists stay the same
+    await page.route('**/api/health', async (route) => {
+        healthCalls += 1;
+
+        if (healthDelayMs) { await new Promise((resolve) => setTimeout(resolve, healthDelayMs)); }
+
+        return route.fulfill({ json: { status: 'UP', commit: 'e2e' } });
+    });
+
     await page.route('**/api/users**', handler);
     await page.route('**/api/auth/**', handler);
     //  Not `**/api/wallet**`: that would also catch Vite's module request for /src/api/walletApi.js
@@ -877,6 +889,7 @@ export async function mockBackend (page, {
 
     return {
         calls,
+        healthCalls: () => healthCalls,
         users: store,
         wallets,
         progresses,
@@ -904,4 +917,5 @@ export async function mockBackend (page, {
 export const serverDown = async (page) => {
     await page.route('**/api/users**', (route) => route.abort('connectionrefused'));
     await page.route('**/api/auth/**', (route) => route.abort('connectionrefused'));
+    await page.route('**/api/health', (route) => route.abort('connectionrefused'));
 };

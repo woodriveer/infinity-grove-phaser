@@ -1475,7 +1475,7 @@ followed by the rest of the current method unchanged (from `//  Scene may have b
 
 ---
 
-### T12: e2e of the wake-up and the review screenshots [ ]
+### T12: e2e of the wake-up and the review screenshots [x]
 
 **Owner**: test-engineer
 **What**: The fake backend answers `/api/health` (with an optional delay, outside `calls`), an e2e spec covers the notice, the single call and the server-down path, and a shots file captures the screens for the `ui-artist` (RUN-06; spec US-5 AC 1 to 5).
@@ -1530,9 +1530,9 @@ followed by the rest of the current method unchanged (from `//  Scene may have b
 **Gate**: Game e2e `cd game && npx playwright test e2e/wake.spec.js e2e/session.spec.js e2e/auth.spec.js`, then `cd game && npx playwright test --workers=2`; then `cd game && npm run ui:shots -- supabasePostgres`.
 **Done when**:
 
-- [ ] The 4 tests of `wake.spec.js` pass, and `session.spec.js` and `auth.spec.js` pass unchanged.
-- [ ] The full e2e suite passes (flake rule of the Game e2e gate).
-- [ ] `.specs/features/supabase-postgres/ui-review/` holds `01-wake-notice-desktop.png`, `01-wake-notice-phone.png`, `02-form-after-wake-desktop.png` and `02-form-after-wake-phone.png`, and the run prints `CONSOLE-REPORT start screen (desktop): clean` and `CONSOLE-REPORT start screen (phone): clean`.
+- [x] The 4 tests of `wake.spec.js` pass, and `session.spec.js` and `auth.spec.js` pass unchanged.
+- [x] The full e2e suite passes (flake rule of the Game e2e gate).
+- [x] `.specs/features/supabase-postgres/ui-review/` holds `01-wake-notice-desktop.png`, `01-wake-notice-phone.png`, `02-form-after-wake-desktop.png` and `02-form-after-wake-phone.png`, and the run prints `CONSOLE-REPORT start screen (desktop): clean` and `CONSOLE-REPORT start screen (phone): clean`.
 
 **Commit**: `test(game): cover the backend wake-up on the start screen`
 
