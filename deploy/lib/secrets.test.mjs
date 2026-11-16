@@ -53,3 +53,16 @@ test('.env.example carries no Supabase password', () =>
     assert.ok(lines.includes('# SPRING_DATASOURCE_PASSWORD=<database password: letters and digits only>'));
     assert.equal(parseDotenv(readFileSync(join(ROOT, '.env.example'), 'utf8')).SPRING_DATASOURCE_PASSWORD, 'infinity');
 });
+
+test('.env.example names the copy and gcloud secrets create, not env_file, the slots or Fly', () =>
+{
+    const text = readFileSync(join(ROOT, '.env.example'), 'utf8');
+
+    assert.ok(text.includes('deploy/db/copyToSupabase.mjs'));
+    assert.ok(text.includes('gcloud secrets create'));
+
+    for (const word of ['env_file', 'slot', 'fly.io', 'fly secrets'])
+    {
+        assert.equal(text.toLowerCase().includes(word), false, word);
+    }
+});

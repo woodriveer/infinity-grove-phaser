@@ -1975,7 +1975,7 @@ export const copy = (deps) =>
 
 ---
 
-### T18: ADR 0012, the backend README and `.env.example` [ ]
+### T18: ADR 0012, the backend README and `.env.example` [x]
 
 **Owner**: kotlin-backend-dev
 **What**: Record the decision as ADR 0012, rewrite the backend README for production on Cloud Run and Supabase (removing the `docker compose down -v` advice without a warning), and reword the `.env.example` comments for its new use (SUPA-12, RUN-07; spec US-11 AC 1, 2, US-6 AC 10).
@@ -2116,9 +2116,9 @@ SPRING_DATASOURCE_PASSWORD=infinity
 **Gate**: Quick `node --test deploy/lib/secrets.test.mjs` (7 tests), then Full (deploy) with `# tests 280`; `git diff --check` prints nothing; `grep -c "docker compose down -v" backend/readme.md` prints `1` (only the warning heading); `grep -c -E "Fly.io|fly.toml|fly (deploy|logs|secrets)" backend/readme.md` prints `0`.
 **Done when**:
 
-- [ ] The ADR, the README and `.env.example` match the contract.
-- [ ] Full (deploy) shows `# tests 280`, `# fail 2`, only the two known `not ok` lines.
-- [ ] The three text gate commands give the values above.
+- [x] The ADR, the README and `.env.example` match the contract.
+- [x] Full (deploy) shows `# tests 280`, `# fail 2`, only the two known `not ok` lines.
+- [x] The three text gate commands give the values above.
 
 **Commit**: `docs(backend): record production on Cloud Run and Supabase`
 
