@@ -53,6 +53,9 @@ const DOUBLE_HIT_OFFSET = 36;
 const ELEMENT_WHEEL_HTML = '<div class="hud-box hud-wheel"></div>';
 //  Top centre of the screen, in the row of the stage and wallet pills
 const BOSS_TIMER = { x: 512, y: 44 };
+//  The stage plate starts at the left edge of its 400 px box (style.css .hud-stage); the timer keeps 12 px clear of the plate
+const STAGE_HUD_LEFT = STAGE_HUD.x - 200;
+const BOSS_TIMER_GAP = 12;
 //  Under the monster, clear of the damage numbers that rise above its health bar
 const ENEMY_STATS = { x: 670, y: 596 };
 //  The running skill effects, under the stage and countdown pills
@@ -766,6 +769,7 @@ export class ClickerGame extends Scene
         {
             this.countdown = new BossCountdown(encounter.timeLimitMs + bossTimeBonusMs(this.leaderPieces()) + talentTimeBonusMs(this.talents.talents(), encounter));
             this.showCountdown();
+            this.placeBossTimer();
         }
     }
 
@@ -820,9 +824,27 @@ export class ClickerGame extends Scene
 
     showCountdown ()
     {
-        this.bossTimer.textContent = `Time: ${this.countdown.seconds}`;
+        const text = `Time: ${this.countdown.seconds}`;
+
+        //  The pill's width follows its text, so the timer is placed again only when the text changes, not on every frame
+        if (this.bossTimer.textContent !== text)
+        {
+            this.bossTimer.textContent = text;
+            this.placeBossTimer();
+        }
+
         //  The ring of the timer fills with the share of the time left, 3 decimals (spec ui-redesign UIR-06)
         this.bossTimer.style.setProperty('--timer-left', Math.min(1, Math.max(0, this.countdown.remainingMs / this.countdown.limitMs)).toFixed(3));
+    }
+
+    //  The timer stays centred on x 512 while the stage plate ends 12 px before it; a longer plate pushes it right, 12 px after the plate
+    //  (spec boss-replay-chapters, UI review #1). offsetWidth is in scene px: Phaser scales the DOM layer with a transform
+    placeBossTimer ()
+    {
+        const plateEnd = STAGE_HUD_LEFT + this.stageHud.offsetWidth + BOSS_TIMER_GAP;
+        const timerStart = BOSS_TIMER.x - this.bossTimer.offsetWidth / 2;
+
+        this.bossTimer.style.setProperty('--timer-shift', `${Math.max(0, Math.ceil(plateEnd - timerStart))}px`);
     }
 
     hideCountdown ()
@@ -830,6 +852,7 @@ export class ClickerGame extends Scene
         this.countdown = null;
         this.bossTimer.textContent = '';
         this.bossTimer.style.removeProperty('--timer-left');
+        this.bossTimer.style.removeProperty('--timer-shift');
     }
 
     update (time, delta)

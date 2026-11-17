@@ -1263,6 +1263,87 @@ describe('ClickerGame stages', () => {
         expect(left(ctx)).toBe('');
     });
 
+    describe('boss timer beside the stage plate', () => {
+        //  jsdom has no layout (offsetWidth is 0): the widths of the plate and the timer are stubbed by class name
+        const widths = { 'stage-hud': 0, 'boss-timer': 0 };
+        const shift = (ctx) => ctx.hud('.boss-timer').style.getPropertyValue('--timer-shift');
+
+        beforeEach(() => {
+            vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(function () { return widths[this.className] ?? 0; });
+        });
+        afterEach(() => vi.restoreAllMocks());
+
+        it('keeps the timer centred when the plate ends 12 px before it', async () => {
+            widths['stage-hud'] = 262;
+            widths['boss-timer'] = 152;
+            const ctx = await createScene({ start: bossStart() });
+
+            expect(shift(ctx)).toBe('0px');
+        });
+
+        it('pushes the timer to 12 px after a plate that reaches it', async () => {
+            widths['stage-hud'] = 283;
+            widths['boss-timer'] = 152;
+            const ctx = await createScene({ start: bossStart() });
+
+            expect(shift(ctx)).toBe('15px');
+        });
+
+        it('pushes the timer after the widest earlier chapter plate', async () => {
+            widths['stage-hud'] = 346;
+            widths['boss-timer'] = 162;
+            const ctx = await createScene({ start: bossStart() });
+
+            expect(shift(ctx)).toBe('83px');
+        });
+
+        it('places the timer again when its text changes', async () => {
+            widths['stage-hud'] = 262;
+            widths['boss-timer'] = 152;
+            const ctx = await createScene({ start: bossStart() });
+            expect(shift(ctx)).toBe('0px');
+
+            widths['stage-hud'] = 300;
+            ctx.scene.update(0, 1001);
+
+            expect(timer(ctx)).toBe('Time: 29');
+            expect(shift(ctx)).toBe('32px');
+        });
+
+        it('does not place the timer again on a frame whose seconds do not change', async () => {
+            widths['stage-hud'] = 262;
+            widths['boss-timer'] = 152;
+            const ctx = await createScene({ start: bossStart() });
+
+            widths['stage-hud'] = 300;
+            ctx.scene.update(0, 100);
+
+            expect(timer(ctx)).toBe('Time: 30');
+            expect(shift(ctx)).toBe('0px');
+        });
+
+        it('removes --timer-shift when the boss is beaten', async () => {
+            widths['stage-hud'] = 283;
+            widths['boss-timer'] = 152;
+            const ctx = await createScene({ start: bossStart() });
+
+            killAll(ctx);
+
+            expect(shift(ctx)).toBe('');
+        });
+
+        it('removes --timer-shift when the boss runs out of time', async () => {
+            widths['stage-hud'] = 283;
+            widths['boss-timer'] = 152;
+            const ctx = await createScene({ start: bossStart() });
+
+            ctx.scene.update(0, 30000);
+
+            expect(shift(ctx)).toBe('');
+            expect(timer(ctx)).toBe('');
+        });
+    });
+
     it('moves to phase 1 of the next stage and hides the countdown when the miniboss dies in time', async () => {
         const ctx = await createScene({ start: bossStart() });
 

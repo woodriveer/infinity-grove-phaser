@@ -690,6 +690,9 @@ button:disabled {
     background-color: var(--wood-800);
     border: var(--frame-border);
     box-shadow: var(--frame-shadow);
+    /* Pushed right by the scene when the stage plate would reach it (spec boss-replay-chapters, UI review #1) */
+    position: relative;
+    left: var(--timer-shift, 0px);
 }
 
 /* The ring: the share of the time left in ember, set by ClickerGame as --timer-left (spec ui-redesign UIR-06) */

@@ -1173,7 +1173,7 @@ Nothing else in `ClickerGame.js` changes (`completeChapter` keeps `this.stageHud
 
 ---
 
-### T16: Boss timer beside the stage plate [ ]
+### T16: Boss timer beside the stage plate [x]
 
 **Owner**: game-dev
 **Goal**: The boss timer stays centred on x 512 while the stage plate leaves room, and otherwise starts 12 px after the plate's right edge, so it never covers the label (BRC-08; spec P1-Fight AC 15; UI review #1).
@@ -1275,9 +1275,9 @@ Each case sets `widths['stage-hud']` and `widths['boss-timer']` before `createSc
 **Gate**: quick - `cd game && npm test`, then build `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 7 new cases pass.
-- [ ] Every existing `ClickerGame.test.js` case passes unchanged, among them `counts the boss time down in whole seconds as the scene updates`, `sets --timer-left to 0.750 after 7.5 s of a 30 s countdown`, `removes --timer-left when the boss runs out of time` and `makes the stage position text click-through`.
-- [ ] `git diff --stat` lists only `ClickerGame.js`, `ClickerGame.test.js`, `style.css` and `tasks.md`.
+- [x] The 7 new cases pass.
+- [x] Every existing `ClickerGame.test.js` case passes unchanged, among them `counts the boss time down in whole seconds as the scene updates`, `sets --timer-left to 0.750 after 7.5 s of a 30 s countdown`, `removes --timer-left when the boss runs out of time` and `makes the stage position text click-through`.
+- [x] `git diff --stat` lists only `ClickerGame.js`, `ClickerGame.test.js`, `style.css` and `tasks.md`.
 
 **Commit**: `fix(game): keep the boss timer clear of a long stage plate`
 
