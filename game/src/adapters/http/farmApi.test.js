@@ -49,4 +49,35 @@ describe('farmApi', () => {
 
         await expect(farmApi.win({ kind: 'CHAPTER_BOSS' })).rejects.toThrow('too fast');
     });
+
+    it('get with a chapter calls GET /farm?chapter=<n> and returns the body', async () => {
+        httpClient.get.mockResolvedValue({ data: state });
+
+        await expect(farmApi.get(2)).resolves.toEqual(state);
+        expect(httpClient.get).toHaveBeenCalledWith('/farm?chapter=2');
+    });
+
+    it('win of a miniboss with a chapter sends the chapter beside the boss', async () => {
+        httpClient.post.mockResolvedValue({ data: { drop: null, chapterBossWinsLeft: 10 } });
+
+        await farmApi.win({ kind: 'MINIBOSS', stage: 3, chapter: 2 });
+
+        expect(httpClient.post).toHaveBeenCalledWith('/farm/outcome', { boss: { kind: 'MINIBOSS', stage: 3 }, outcome: 'CLEARED', chapter: 2 });
+    });
+
+    it('win of the chapter boss with a chapter sends no stage and the chapter', async () => {
+        httpClient.post.mockResolvedValue({ data: { drop: null, chapterBossWinsLeft: 9 } });
+
+        await farmApi.win({ kind: 'CHAPTER_BOSS', chapter: 1 });
+
+        expect(httpClient.post).toHaveBeenCalledWith('/farm/outcome', { boss: { kind: 'CHAPTER_BOSS' }, outcome: 'CLEARED', chapter: 1 });
+    });
+
+    it('win without a chapter sends no chapter key', async () => {
+        httpClient.post.mockResolvedValue({ data: { drop: null, chapterBossWinsLeft: 10 } });
+
+        await farmApi.win({ kind: 'MINIBOSS', stage: 2, chapter: undefined });
+
+        expect('chapter' in httpClient.post.mock.calls[0][1]).toBe(false);
+    });
 });

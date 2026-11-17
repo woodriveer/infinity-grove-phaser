@@ -334,7 +334,7 @@ private fun parseBodyChapter(value: Any?): Int? =
 
 ---
 
-### T4: Farm client sends and asks for a chapter [ ]
+### T4: Farm client sends and asks for a chapter [x]
 
 **Owner**: game-dev
 **Goal**: `farmApi.get(chapter)` asks for one chapter and `farmApi.win` sends `chapter` only when the boss carries one (BRC-03; spec P1-Fight AC 3-4).
@@ -377,7 +377,7 @@ Update the header comment lines 2-3 to describe `chapter`.
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 4 new cases pass; `get calls GET /farm and returns the response body` and `win sends only the kind and the stage of the boss` pass unchanged.
+- [x] The 4 new cases pass; `get calls GET /farm and returns the response body` and `win sends only the kind and the stage of the boss` pass unchanged.
 
 **Commit**: `feat(game): ask the farm for a chapter and report its wins`
 
