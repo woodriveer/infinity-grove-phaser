@@ -92,7 +92,9 @@ test.describe('Rever chefes: escolher capítulo', () => {
 
         await expect(farmLabel(page)).toHaveText('Rever chefe: Miniboss 3 (Capítulo 2)');
         await expect(page.getByTestId('monster-hp')).toHaveText('HP 2/2');
-        await expect(page.locator('.boss-timer')).toHaveText('Time: 45');
+        //  The limit is the chapter 2 miniboss time limit, exact; the display ticks down from it, so it is read as a number from 40 to 45
+        await expect.poll(() => countdownLimit(page)).toBe(45_000);
+        await expect(page.locator('.boss-timer')).toHaveText(/^Time: (4[0-5])$/);
 
         await menu.canvas.click();
 
