@@ -192,7 +192,7 @@
 - **Trade-off**: Chapter bosses become farmable from chapter 2 instead of only after chapter 15: up to 10 chapter boss wins a day can now give next-chapter cards at 80 % and pieces at 100 %, with epic and legendary pieces from the chapter 5 boss once a player is in chapter 6; the shared daily limit keeps the daily maximum where it was. A forged client can still claim wins (AD-002). A farm win of an earlier chapter boss missing from `cleared_chapters` counts as its first win and records the chapter. Resolves the "lose the chapter 5 farm list" trade-off of AD-019.
 - **Scope**: `backend` `Farm.kt`, `FarmService`, `FarmUseCase`, `FarmController`; `game/src/adapters/http/farmApi.js`, `game/src/application/farm/farmSession.js`, `game/src/domain/campaign/campaign.js`, `game/src/domain/campaign/bossMap.js`, `game/src/adapters/phaser/views/farmView.js`, `HeroUi`, `ClickerGame`, `game/public/style.css`; `game/e2e/support/fakeBackend.js`
 - **Date**: 2026-11-17
-- **Status**: proposed (product owner defaults Q1 to Q8 of the spec, awaiting the owner's answers). Supersedes the farm scope of AD-008 ("the farm lists only the bosses of the current chapter" and "a player cannot replay the bosses of earlier chapters")
+- **Status**: active (owner approval of 2026-11-17, "Aprovo os padrões", with the product owner defaults Q1 to Q8 of the spec). Supersedes the farm scope of AD-008 ("the farm lists only the bosses of the current chapter" and "a player cannot replay the bosses of earlier chapters")
 
 ## Handoff
 

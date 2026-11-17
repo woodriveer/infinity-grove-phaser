@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/boss-replay-chapters/spec.md`
 **Design**: `.specs/features/boss-replay-chapters/design.md`
-**Status**: Draft - waits for the owner's answers to Q1 to Q8 (spec Assumptions). A changed answer changes the tasks named in the "If the owner changes a default" table at the end before any task starts.
+**Status**: Approved by the owner on 2026-11-17 ("Aprovo os padrões"): every default of Q1 to Q8 accepted. T1 to T14 pending.
 
 Rules for every task:
 

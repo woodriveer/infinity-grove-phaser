@@ -1,7 +1,7 @@
 # Boss Replay Chapters Design
 
 **Spec**: `.specs/features/boss-replay-chapters/spec.md`
-**Status**: Draft (waits for the owner's answers to Q1 to Q8)
+**Status**: Approved by the owner on 2026-11-17 ("Aprovo os padrões"): every default of Q1 to Q8 accepted.
 
 `<main>` is `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws`, `<test>` is `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws`.
 
