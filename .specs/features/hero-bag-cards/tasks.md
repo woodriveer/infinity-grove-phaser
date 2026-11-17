@@ -694,7 +694,7 @@ Merge the imports with the existing ones of the file (one import line per module
 
 ---
 
-### T9: Hero detail with the fusion ladder (views/fusionLadderView.js) [ ]
+### T9: Hero detail with the fusion ladder (views/fusionLadderView.js) [x]
 
 **Owner**: game-dev
 **Goal**: Draw the hero detail: card, ladder rows, Fundir tudo, its confirmation, the result slot and the skills (BAG-12 to BAG-16, BAG-18, BAG-31 to BAG-34).
@@ -822,7 +822,7 @@ export const renderFuseAllResult = ({ heroName, fusions, stars, raised = [] }) =
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 14 new cases pass; every other game unit test passes.
+- [x] The 14 new cases pass; every other game unit test passes.
 
 **Commit**: `feat(game): draw the fusion ladder of a hero`
 

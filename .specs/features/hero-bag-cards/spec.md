@@ -216,13 +216,13 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-09 | P1: One card per hero | T8, T13 | Implementing |
 | BAG-10 | P1: One card per hero | T8, T11, T13 | Implementing |
 | BAG-11 | P1: One card per hero | T10, T13 | Pending |
-| BAG-12 | P1: Fusion ladder | T9, T11, T13 | Pending |
+| BAG-12 | P1: Fusion ladder | T9, T11, T13 | Implementing |
 | BAG-13 | P1: Fusion ladder | T6, T9, T13 | Implementing |
 | BAG-14 | P1: Fusion ladder | T6, T9, T10, T13 | Implementing |
 | BAG-15 | P1: Fusion ladder | T6, T9, T11, T13 | Implementing |
 | BAG-16 | P1: Fusion ladder | T6, T9, T13, T14 | Implementing |
 | BAG-17 | P1: Fusion ladder | T11, T13, T14 | Pending |
-| BAG-18 | P1: Fusion ladder | T9, T11, T12, T13 | Pending |
+| BAG-18 | P1: Fusion ladder | T9, T11, T12, T13 | Implementing |
 | BAG-19 | P1: Fusion ladder | T11, T13, T14 | Pending |
 | BAG-20 | P1: Fusion ladder | T11, T13 | Pending |
 | BAG-21 | P1: Fusion ladder | T5, T11, T12, T13, T14 | Implementing |
@@ -237,8 +237,8 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-30 | P1: Fundir tudo on the server | T3 | Implementing |
 | BAG-31 | P1: Fundir tudo on the screen | T6, T9, T12, T13 | Implementing |
 | BAG-32 | P1: Fundir tudo on the screen | T6, T9, T12, T13 | Implementing |
-| BAG-33 | P1: Fundir tudo on the screen | T9, T12, T13 | Pending |
-| BAG-34 | P1: Fundir tudo on the screen | T9, T12, T13 | Pending |
+| BAG-33 | P1: Fundir tudo on the screen | T9, T12, T13 | Implementing |
+| BAG-34 | P1: Fundir tudo on the screen | T9, T12, T13 | Implementing |
 | BAG-35 | P1: Fundir tudo on the screen | T4, T5, T6, T12, T13 | Implementing |
 | BAG-36 | P1: Fundir tudo on the screen | T6, T12, T13 | Implementing |
 | BAG-37 | P1: Fundir tudo on the screen | T12, T13 | Pending |
