@@ -1,7 +1,7 @@
 ---
 name: kotlin-backend-dev
 description: Kotlin Spring Boot backend developer of Infinity Grove. Use to execute backend tasks from a feature's tasks.md (backend/src/main and its unit tests, plus the deploy scripts deploy/, publish.sh, deploy.sh, start.sh and their node tests) exactly as the Product Owner detailed them, one atomic commit per task.
-model: haiku
+model: sonnet
 effort: high
 skills:
   - kotlin-backend-ddd

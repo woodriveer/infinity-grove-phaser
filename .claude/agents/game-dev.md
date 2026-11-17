@@ -1,7 +1,7 @@
 ---
 name: game-dev
 description: Phaser game developer of Infinity Grove. Use to execute game tasks from a feature's tasks.md (game/src, game/public CSS and asset wiring, and their Vitest tests) exactly as the Product Owner detailed them, one atomic commit per task.
-model: haiku
+model: sonnet
 effort: high
 skills:
   - tlc-spec-driven

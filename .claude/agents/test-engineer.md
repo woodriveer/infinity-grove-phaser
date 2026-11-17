@@ -1,7 +1,7 @@
 ---
 name: test-engineer
 description: Test specialist of Infinity Grove. Use to make sure every feature has unit tests (backend JUnit, game Vitest) and Playwright e2e tests for each acceptance criterion, to write the test tasks of tasks.md, to close Verifier gaps, and to run the suites with coverage for report.html. The Verifier is the separate `verifier` agent.
-model: haiku
+model: sonnet
 effort: high
 skills:
   - tlc-spec-driven
