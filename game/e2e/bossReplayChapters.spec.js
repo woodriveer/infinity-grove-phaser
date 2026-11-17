@@ -38,6 +38,8 @@ const openMap = async (page) => {
 const states = (page) => page.locator('.farm-map .map-node').evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-state')));
 const farmCalls = (backend) => backend.calls.filter((call) => call.path === '/farm/outcome');
 const farmLabel = (page) => page.locator('.stage-hud');
+//  The limit of the running boss countdown in ms, null while no boss counts down (the same read as skillsAll.spec.js)
+const countdownLimit = (page) => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').countdown?.limitMs ?? null);
 
 //  The computed value of a token of the page: a probe element with the same declaration resolves it the way a chip does
 const tokenValue = (page, property, value) => page.evaluate(([ name, declared ]) => {
@@ -108,7 +110,9 @@ test.describe('Rever chefes: escolher capítulo', () => {
         await page.getByTestId('farm-entry-chapter-boss').click();
 
         await expect(farmLabel(page)).toHaveText('Rever chefe: Chefe do capítulo (Capítulo 2)');
-        await expect(page.locator('.boss-timer')).toHaveText('Time: 50');
+        //  The limit is the chapter 2 boss time limit, exact; the display ticks down from it, so it is read as a number from 45 to 50
+        await expect.poll(() => countdownLimit(page)).toBe(50_000);
+        await expect(page.locator('.boss-timer')).toHaveText(/^Time: (4[5-9]|50)$/);
     });
 
     test('a fight of the current chapter is reported without a chapter', async ({ page }) => {
