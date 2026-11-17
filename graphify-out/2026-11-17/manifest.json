@@ -30,9 +30,9 @@
     "semantic_hash": "03dd35699a452eb9b5e136fd6ee704e7"
   },
   ".specs/lessons.json": {
-    "mtime": 1794915879.130724,
-    "seen": 1794919007.0248225,
-    "ast_hash": "d8384b2111b7e25521d3f3af25a1beba",
+    "mtime": 1794920909.8071706,
+    "seen": 1794921991.872327,
+    "ast_hash": "5acf6aa2286df43d8fd13b66b8dfaad6",
     "semantic_hash": ""
   },
   "art/kael_rig/kael_rig.json": {
@@ -1584,9 +1584,9 @@
     "semantic_hash": ""
   },
   "game/e2e/support/fakeBackend.js": {
-    "mtime": 1794894585.975636,
-    "seen": 1794900531.6171346,
-    "ast_hash": "7678d1a2ecfb1769ed2b73607a7313a8",
+    "mtime": 1794919090.7451453,
+    "seen": 1794921991.933981,
+    "ast_hash": "d41cf5822d11b1bbb1d1d449def17acf",
     "semantic_hash": ""
   },
   "game/e2e/support/game.js": {
@@ -1800,15 +1800,15 @@
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/HeroUi.js": {
-    "mtime": 1794918858.8932264,
-    "seen": 1794919007.0984802,
+    "mtime": 1794921942.027941,
+    "seen": 1794921991.9420252,
     "ast_hash": "4d4c3c4fbec8dd47e653374718606a49",
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/HeroUi.test.js": {
-    "mtime": 1794918825.6890714,
-    "seen": 1794919007.098485,
-    "ast_hash": "b495c07e8ed933c2cf703a03380bca16",
+    "mtime": 1794921168.2512572,
+    "seen": 1794921991.9420288,
+    "ast_hash": "666aa8ee4ed8d0a83bb0a479c50b9a9c",
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/MainMenu.js": {
@@ -2124,8 +2124,8 @@
     "semantic_hash": "39caa7e2b055793c9a3d78f7cfd88bb0"
   },
   "game/src/application/farm/farmSession.js": {
-    "mtime": 1794918863.7850637,
-    "seen": 1794919007.1128325,
+    "mtime": 1794920682.9013479,
+    "seen": 1794921991.95366,
     "ast_hash": "3dabe531c1271e8db3f5e5db20e6bd4d",
     "semantic_hash": ""
   },
@@ -2664,9 +2664,9 @@
     "semantic_hash": ""
   },
   ".specs/LESSONS.md": {
-    "mtime": 1794915879.130724,
-    "seen": 1794919007.1948876,
-    "ast_hash": "e0235aba70e607408571c99952c9d534",
+    "mtime": 1794920909.8081717,
+    "seen": 1794921992.0628932,
+    "ast_hash": "0499898f4ebe96dc389471ea27b54828",
     "semantic_hash": ""
   },
   ".specs/STATE.md": {
@@ -9798,9 +9798,9 @@
     "semantic_hash": ""
   },
   ".specs/features/boss-replay-chapters/tasks.md": {
-    "mtime": 1794918959.6112626,
-    "seen": 1794919007.197519,
-    "ast_hash": "f6f1deab6bc01891120129112f9d551d",
+    "mtime": 1794921412.3202999,
+    "seen": 1794921992.0673969,
+    "ast_hash": "00462fbd2af8f60e3bbfbf69264d56db",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/FarmBossTest.kt": {
@@ -9810,9 +9810,9 @@
     "semantic_hash": ""
   },
   "game/e2e/bossReplayChapters.spec.js": {
-    "mtime": 1794904662.0738235,
-    "seen": 1794919007.0840049,
-    "ast_hash": "4a74189326ca147f4820a68d250076be",
+    "mtime": 1794921315.3417063,
+    "seen": 1794921991.9305441,
+    "ast_hash": "c4682ad173d421f8b0c7f563dd05a707",
     "semantic_hash": ""
   },
   ".specs/features/ui-redesign/ui-review/38-refine-hover-desktop.png": {
@@ -9954,9 +9954,9 @@
     "semantic_hash": ""
   },
   ".specs/features/boss-replay-chapters/validation.md": {
-    "mtime": 1794915871.748834,
-    "seen": 1794919007.197524,
-    "ast_hash": "85baea3d46df0cc5dbcc24494c5fe102",
+    "mtime": 1794920894.4584184,
+    "seen": 1794921992.0676053,
+    "ast_hash": "70a2e48baa060ae7075518e82124db1d",
     "semantic_hash": ""
   },
   ".specs/features/ui-redesign/report.html": {

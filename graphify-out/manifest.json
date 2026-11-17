@@ -474,9 +474,9 @@
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroExceptions.kt": {
-    "mtime": 1794684226.6030154,
-    "seen": 1794753474.949083,
-    "ast_hash": "133ca9bf077ed1ff3fe8e0a72963921b",
+    "mtime": 1794947626.6630116,
+    "seen": 1794947873.786329,
+    "ast_hash": "0529442860da4392eb8833ebcb6bcd35",
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroSeed.kt": {
@@ -486,9 +486,9 @@
     "semantic_hash": "a34a3f991cc5fbed7aa13096abb6b7d1"
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroView.kt": {
-    "mtime": 1794684226.6040146,
-    "seen": 1794753474.9490862,
-    "ast_hash": "7d5e02512a370d0126fb46bafdbfba6e",
+    "mtime": 1794947626.6676087,
+    "seen": 1794947873.7870307,
+    "ast_hash": "74cc95a87bfb6b200b028790ba9e5c4d",
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PieceRoller.kt": {
@@ -498,9 +498,9 @@
     "semantic_hash": "fcadffbd6cbf560a9fe31d381326c0ab"
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerCards.kt": {
-    "mtime": 1794684226.605014,
-    "seen": 1794753474.949089,
-    "ast_hash": "447858fe97187cc74ea71afc3e271c0a",
+    "mtime": 1794947626.6956408,
+    "seen": 1794947873.7876556,
+    "ast_hash": "6df594419c1cf90b880c4439cae604cd",
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerEquipment.kt": {
@@ -666,10 +666,10 @@
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/HeroService.kt": {
-    "mtime": 1794684226.6210227,
-    "seen": 1794753474.949129,
-    "ast_hash": "7e1bb30083f2afd0eb16662bcd068a6d",
-    "semantic_hash": "7e1bb30083f2afd0eb16662bcd068a6d"
+    "mtime": 1794947626.69764,
+    "seen": 1794947873.8033583,
+    "ast_hash": "71eb529442c8603f5d130627f54cc83a",
+    "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/ProgressService.kt": {
     "mtime": 1794684226.6210227,
@@ -732,9 +732,9 @@
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/HeroUseCase.kt": {
-    "mtime": 1794684226.6270227,
-    "seen": 1794753474.9491446,
-    "ast_hash": "687961eeb0ea4fa622d3e0fb7624013f",
+    "mtime": 1794947626.701171,
+    "seen": 1794947873.8087208,
+    "ast_hash": "ba4183aec508fd71c24a90f5101732a2",
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/ProgressUseCase.kt": {
@@ -1176,10 +1176,10 @@
     "semantic_hash": "f488b6785f454f7458ed3a74babba49b"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroExceptionsTest.kt": {
-    "mtime": 1794684226.6830149,
-    "seen": 1794753474.9492505,
-    "ast_hash": "83779aeaa51572dc148282f8d2c88874",
-    "semantic_hash": "83779aeaa51572dc148282f8d2c88874"
+    "mtime": 1794947626.7085085,
+    "seen": 1794947873.8501055,
+    "ast_hash": "bcf1673a74d331e725f60c3a46576880",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroSeedTest.kt": {
     "mtime": 1794684226.684031,
@@ -1206,9 +1206,9 @@
     "semantic_hash": "f47161d065293b62600af92b70455973"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerCardsTest.kt": {
-    "mtime": 1794684226.687027,
-    "seen": 1794753474.9492576,
-    "ast_hash": "25b7826227521fca936aafcecf067397",
+    "mtime": 1794947626.7110207,
+    "seen": 1794947873.8521984,
+    "ast_hash": "d0c6c88437d5c65ac59143d3608aed64",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerEquipmentTest.kt": {
@@ -1284,10 +1284,10 @@
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/HeroServiceTest.kt": {
-    "mtime": 1794684226.6965654,
-    "seen": 1794753474.9492776,
-    "ast_hash": "35d0e2c04d9f06de5b98600d92ddfbcc",
-    "semantic_hash": "35d0e2c04d9f06de5b98600d92ddfbcc"
+    "mtime": 1794947626.713251,
+    "seen": 1794947873.8600004,
+    "ast_hash": "ae9614fd75024dd9a5ab631ecda4b780",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/ProgressServiceTest.kt": {
     "mtime": 1794684226.6965654,
@@ -1584,16 +1584,16 @@
     "semantic_hash": ""
   },
   "game/e2e/support/fakeBackend.js": {
-    "mtime": 1794919090.7451453,
-    "seen": 1794921991.933981,
-    "ast_hash": "d41cf5822d11b1bbb1d1d449def17acf",
+    "mtime": 1794922056.7017598,
+    "seen": 1794947873.8908894,
+    "ast_hash": "3208153f567223ddf62dcb9ad66f9ded",
     "semantic_hash": ""
   },
   "game/e2e/support/game.js": {
-    "mtime": 1794684226.74411,
-    "seen": 1794753474.9493623,
-    "ast_hash": "23c4dc1dda5fb91a8c53841a5ef13207",
-    "semantic_hash": "23c4dc1dda5fb91a8c53841a5ef13207"
+    "mtime": 1794938417.7019029,
+    "seen": 1794947873.890897,
+    "ast_hash": "20d1453e70b094ccf0a79bba56f1926a",
+    "semantic_hash": ""
   },
   "game/e2e/talents.spec.js": {
     "mtime": 1794889026.0081837,
@@ -1782,9 +1782,9 @@
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/Boot.js": {
-    "mtime": 1794684227.2996576,
-    "seen": 1794753474.9494119,
-    "ast_hash": "ff6cdc6419a21a8e314cc9d48e86377a",
+    "mtime": 1794938104.4654307,
+    "seen": 1794947873.907421,
+    "ast_hash": "c66951dec2c7ae6ebeb0b539adac257b",
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/ClickerGame.js": {
@@ -1800,8 +1800,8 @@
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/HeroUi.js": {
-    "mtime": 1794921942.027941,
-    "seen": 1794921991.9420252,
+    "mtime": 1794923003.0967646,
+    "seen": 1794947873.909311,
     "ast_hash": "4d4c3c4fbec8dd47e653374718606a49",
     "semantic_hash": ""
   },
@@ -1824,9 +1824,9 @@
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/Preloader.js": {
-    "mtime": 1794684227.306661,
-    "seen": 1794753474.9494221,
-    "ast_hash": "55a13beee08b352dc84944ce96e68727",
+    "mtime": 1794938104.4654307,
+    "seen": 1794947873.9111652,
+    "ast_hash": "8d1ee701f6d9cfd9cc4a2101389eb323",
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/backgroundFight.js": {
@@ -2466,9 +2466,9 @@
     "semantic_hash": "52847d544cbb9a9960ecccdf068a7e2e"
   },
   "game/src/main.js": {
-    "mtime": 1794684227.3718884,
-    "seen": 1794753474.9495888,
-    "ast_hash": "cdb48b518b3fff4e6b564bd07b5db08b",
+    "mtime": 1794938104.4654307,
+    "seen": 1794947873.9724612,
+    "ast_hash": "163129d1d22dbaaadd1b707ad8a7776c",
     "semantic_hash": ""
   },
   "game/src/mapPrompt.test.js": {
@@ -2544,9 +2544,9 @@
     "semantic_hash": ""
   },
   ".claude/agents/game-dev.md": {
-    "mtime": 1794684225.0716076,
-    "seen": 1794753474.9499297,
-    "ast_hash": "dec02cfc3c1436784b86960f2c366ccd",
+    "mtime": 1794943832.828831,
+    "seen": 1794947874.1175911,
+    "ast_hash": "b615e929a7f250146bff2809927fb609",
     "semantic_hash": ""
   },
   ".claude/agents/gitops.md": {
@@ -2556,9 +2556,9 @@
     "semantic_hash": ""
   },
   ".claude/agents/kotlin-backend-dev.md": {
-    "mtime": 1794787565.1351154,
-    "seen": 1794787721.2071877,
-    "ast_hash": "783e29549ebda344529ea63865877ece",
+    "mtime": 1794943832.8480344,
+    "seen": 1794947874.1181052,
+    "ast_hash": "f048520c9f4fdd758dee70ea10f92c48",
     "semantic_hash": ""
   },
   ".claude/agents/product-owner.md": {
@@ -2568,9 +2568,9 @@
     "semantic_hash": ""
   },
   ".claude/agents/test-engineer.md": {
-    "mtime": 1794773701.0821855,
-    "seen": 1794787721.2073302,
-    "ast_hash": "07e8c149d5396d92b0bc25ab307907a3",
+    "mtime": 1794943832.8666587,
+    "seen": 1794947874.1187882,
+    "ast_hash": "f6ec98c2b02717888da844a4c07747c9",
     "semantic_hash": ""
   },
   ".claude/agents/ui-artist.md": {
@@ -2670,9 +2670,9 @@
     "semantic_hash": ""
   },
   ".specs/STATE.md": {
-    "mtime": 1794918687.0699306,
-    "seen": 1794919007.1948905,
-    "ast_hash": "3a00021052241af2718d483a81c48c7b",
+    "mtime": 1794939047.3306484,
+    "seen": 1794947874.255146,
+    "ast_hash": "70e080df231d6e9f5b9f782f49808322",
     "semantic_hash": ""
   },
   ".specs/features/account-reset/design.md": {
@@ -3240,15 +3240,15 @@
     "semantic_hash": ""
   },
   "CHANGELOG.md": {
-    "mtime": 1794918039.2014914,
-    "seen": 1794919007.2113085,
-    "ast_hash": "41a23ba111fd2cc5d31af216668de803",
+    "mtime": 1794928158.9816663,
+    "seen": 1794947874.3259294,
+    "ast_hash": "589a0fa739dfa6ec7b1a7e8d4814fe01",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1794787563.9450588,
-    "seen": 1794787721.2807975,
-    "ast_hash": "2f234677de9198bf18afc6f3e4b1e8b2",
+    "mtime": 1794943832.9422321,
+    "seen": 1794947874.3259397,
+    "ast_hash": "a1413cf4e64574f2d943b76bce12b808",
     "semantic_hash": ""
   },
   "GEMINI.md": {
@@ -8718,15 +8718,15 @@
     "semantic_hash": ""
   },
   "game/e2e/uiRedesign.spec.js": {
-    "mtime": 1794888558.2376266,
-    "seen": 1794900531.617392,
-    "ast_hash": "7b05936d31d0c430e05c3927f4e39000",
+    "mtime": 1794938455.6524212,
+    "seen": 1794947873.8914845,
+    "ast_hash": "ec743dac4a5c5b792d96010db694c274",
     "semantic_hash": ""
   },
   "game/ui-review/uiRedesign.shots.js": {
-    "mtime": 1794881990.05493,
-    "seen": 1794900531.6539981,
-    "ast_hash": "d3cef1e6e61c5b4f38b196683a6896fe",
+    "mtime": 1794938455.654533,
+    "seen": 1794947873.9782233,
+    "ast_hash": "b019d8f2c4e4f4a081353d2a475dd25c",
     "semantic_hash": ""
   },
   "game/public/assets/ui-parchment.jpg": {
@@ -9557,12 +9557,6 @@
     "ast_hash": "b1b84018eea0ffb1423de5dcdec07db0",
     "semantic_hash": ""
   },
-  "package.json": {
-    "mtime": 1794774092.6239128,
-    "seen": 1794787721.175062,
-    "ast_hash": "69365fb1950e1cffeca9d8dd68124847",
-    "semantic_hash": ""
-  },
   ".specs/features/supabase-postgres/design.md": {
     "mtime": 1794857334.0043652,
     "seen": 1794857477.3163242,
@@ -9738,15 +9732,15 @@
     "semantic_hash": ""
   },
   "game/e2e/wake.spec.js": {
-    "mtime": 1794852380.8893645,
-    "seen": 1794852709.3173487,
-    "ast_hash": "e001392de0866c2ef721eb0ffc0936c5",
+    "mtime": 1794938428.657118,
+    "seen": 1794947873.891493,
+    "ast_hash": "3b8d124a6ce811844ee9290f80818057",
     "semantic_hash": ""
   },
   "game/ui-review/supabasePostgres.shots.js": {
-    "mtime": 1794851813.634373,
-    "seen": 1794852709.3474884,
-    "ast_hash": "aad4f0d46831186e3ce932ee57d70f56",
+    "mtime": 1794938455.6534247,
+    "seen": 1794947873.977599,
+    "ast_hash": "e6d500f27301a246b9d23811e82236ff",
     "semantic_hash": ""
   },
   ".specs/features/supabase-postgres/ui-review.html": {
@@ -9792,15 +9786,15 @@
     "semantic_hash": ""
   },
   ".specs/features/boss-replay-chapters/spec.md": {
-    "mtime": 1794918555.3691192,
-    "seen": 1794919007.1975172,
-    "ast_hash": "2b8611b752204e3ce560d8b20c45d193",
+    "mtime": 1794927489.219941,
+    "seen": 1794947874.2678027,
+    "ast_hash": "ad21ae955c5908f456d4ec37f6979e77",
     "semantic_hash": ""
   },
   ".specs/features/boss-replay-chapters/tasks.md": {
-    "mtime": 1794921412.3202999,
-    "seen": 1794921992.0673969,
-    "ast_hash": "00462fbd2af8f60e3bbfbf69264d56db",
+    "mtime": 1794927489.2212515,
+    "seen": 1794947874.26781,
+    "ast_hash": "fe379ce71c6c90c235da9cda9b2b96ff",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/FarmBossTest.kt": {
@@ -9810,9 +9804,9 @@
     "semantic_hash": ""
   },
   "game/e2e/bossReplayChapters.spec.js": {
-    "mtime": 1794921315.3417063,
-    "seen": 1794921991.9305441,
-    "ast_hash": "c4682ad173d421f8b0c7f563dd05a707",
+    "mtime": 1794922064.2831807,
+    "seen": 1794947873.8826659,
+    "ast_hash": "235d870814f7ee8d508b5ba98d30ae55",
     "semantic_hash": ""
   },
   ".specs/features/ui-redesign/ui-review/38-refine-hover-desktop.png": {
@@ -9954,9 +9948,9 @@
     "semantic_hash": ""
   },
   ".specs/features/boss-replay-chapters/validation.md": {
-    "mtime": 1794920894.4584184,
-    "seen": 1794921992.0676053,
-    "ast_hash": "70a2e48baa060ae7075518e82124db1d",
+    "mtime": 1794927404.685161,
+    "seen": 1794947874.2682908,
+    "ast_hash": "58af094a41e07ad81318d097cb746f79",
     "semantic_hash": ""
   },
   ".specs/features/ui-redesign/report.html": {
@@ -10001,16 +9995,70 @@
     "ast_hash": "128c0b6ca65375595bf285c0fca5dfb7",
     "semantic_hash": ""
   },
+  ".claude/launch.json": {
+    "mtime": 1794938134.8805454,
+    "seen": 1794947873.675861,
+    "ast_hash": "993d0c6ba6e1798601d7c1ceb62455e5",
+    "semantic_hash": ""
+  },
+  "game/e2e/splash.spec.js": {
+    "mtime": 1794939134.5872197,
+    "seen": 1794947873.8899133,
+    "ast_hash": "0a5db4f0d50c4ffaf8fe04cb9a230ef1",
+    "semantic_hash": ""
+  },
+  "game/src/adapters/phaser/Splash.js": {
+    "mtime": 1794944109.0187356,
+    "seen": 1794947873.9116793,
+    "ast_hash": "6bb3363cac2ec0cefc4fa4894845ab94",
+    "semantic_hash": ""
+  },
+  "game/src/adapters/phaser/Splash.test.js": {
+    "mtime": 1794944109.0224793,
+    "seen": 1794947873.911686,
+    "ast_hash": "cb6c59c6570464ea619b65d9684ad971",
+    "semantic_hash": ""
+  },
+  "game/src/adapters/phaser/splashPlan.js": {
+    "mtime": 1794938276.8949685,
+    "seen": 1794947873.912677,
+    "ast_hash": "385c1728721b7c000984e19d67b9e6d9",
+    "semantic_hash": ""
+  },
+  "game/src/adapters/phaser/splashPlan.test.js": {
+    "mtime": 1794938349.8413699,
+    "seen": 1794947873.9126852,
+    "ast_hash": "1fefd343bfbf1cc2cdea7f947708139c",
+    "semantic_hash": ""
+  },
+  ".specs/features/boss-replay-chapters/report-td-009.html": {
+    "mtime": 1794934391.4713552,
+    "seen": 1794947874.2672842,
+    "ast_hash": "2b54f1c96d25c3a99948001995659230",
+    "semantic_hash": ""
+  },
+  ".specs/features/hero-bag-cards/design.md": {
+    "mtime": 1794938564.536263,
+    "seen": 1794947874.299256,
+    "ast_hash": "bd4c5ff74e01f8f6137fe5097ca5661d",
+    "semantic_hash": ""
+  },
+  ".specs/features/hero-bag-cards/spec.md": {
+    "mtime": 1794947626.6540108,
+    "seen": 1794947874.299265,
+    "ast_hash": "d97f27a7247fec42ed761bd45a3b9811",
+    "semantic_hash": ""
+  },
+  ".specs/features/hero-bag-cards/tasks.md": {
+    "mtime": 1794947626.659013,
+    "seen": 1794947874.2992709,
+    "ast_hash": "d35b4bb96d8eb71d54e8406e1523ffab",
+    "semantic_hash": ""
+  },
   "game/package-lock.json": {
     "mtime": 1794687958.4424148,
     "seen": 1794753474.9509323,
     "ast_hash": "7e66a97089c53472c89fdf670195c5a7",
-    "semantic_hash": ""
-  },
-  "package-lock.json": {
-    "mtime": 1794774095.318776,
-    "seen": 1794787721.3620703,
-    "ast_hash": "0db1963e50a6298baa0833a992933353",
     "semantic_hash": ""
   }
 }
