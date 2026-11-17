@@ -66,4 +66,73 @@ describe('farmSession', () => {
 
         expect(farm.winsLeft()).toBe(7);
     });
+
+    describe('chapters', () => {
+        const D2 = { bossHealth: 2 };
+        const D3 = { bossHealth: 3 };
+
+        it('before it loads the chapter is null, the chapters are empty and no definition is known', () => {
+            expect(farm.chapter()).toBeNull();
+            expect(farm.chapters()).toEqual([]);
+            expect(farm.definitionOf(1)).toBeNull();
+        });
+
+        it('load without a chapter calls get with no argument', async () => {
+            await farm.load();
+
+            expect(gateway.get.mock.calls[0]).toEqual([]);
+        });
+
+        it('load with a chapter asks the gateway for that chapter', async () => {
+            await farm.load(2);
+
+            expect(gateway.get).toHaveBeenCalledWith(2);
+        });
+
+        it('load keeps the chapter, the chapters and the definition of the answer', async () => {
+            gateway.get.mockResolvedValueOnce({ chapter: 2, chapters: [ 1, 2, 3 ], bosses: [], chapterBossWinsLeft: 10, definition: D2 });
+
+            await farm.load(2);
+
+            expect(farm.chapter()).toBe(2);
+            expect(farm.chapters()).toEqual([ 1, 2, 3 ]);
+            expect(farm.definitionOf(2)).toBe(D2);
+        });
+
+        it('the definition of every loaded chapter stays known', async () => {
+            gateway.get.mockResolvedValueOnce({ chapter: 2, chapters: [ 1, 2, 3 ], bosses: [], chapterBossWinsLeft: 10, definition: D2 });
+            gateway.get.mockResolvedValueOnce({ chapter: 3, chapters: [ 1, 2, 3 ], bosses: [], chapterBossWinsLeft: 10, definition: D3 });
+
+            await farm.load(2);
+            await farm.load(3);
+
+            expect(farm.definitionOf(2)).toBe(D2);
+            expect(farm.definitionOf(3)).toBe(D3);
+            expect(farm.definitionOf(1)).toBeNull();
+            expect(farm.chapter()).toBe(3);
+        });
+
+        it('an answer without the new fields means no chapter and no chapters', async () => {
+            gateway.get.mockResolvedValueOnce({ bosses: [ { kind: 'MINIBOSS', stage: 1 } ], chapterBossWinsLeft: 10 });
+
+            await farm.load();
+
+            expect(farm.chapter()).toBeNull();
+            expect(farm.chapters()).toEqual([]);
+            expect(farm.definitionOf(1)).toBeNull();
+            expect(farm.bosses()).toHaveLength(1);
+        });
+
+        it('a failed load keeps the chapter, the chapters and the definitions', async () => {
+            gateway.get.mockResolvedValueOnce({ chapter: 2, chapters: [ 1, 2, 3 ], bosses: [], chapterBossWinsLeft: 10, definition: D2 });
+            await farm.load(2);
+            gateway.get.mockRejectedValueOnce(new ApiError('Cannot reach the server. Try again later.'));
+
+            await expect(farm.load(1)).rejects.toBeInstanceOf(ApiError);
+
+            expect(farm.chapter()).toBe(2);
+            expect(farm.chapters()).toEqual([ 1, 2, 3 ]);
+            expect(farm.definitionOf(2)).toBe(D2);
+        });
+    });
 });

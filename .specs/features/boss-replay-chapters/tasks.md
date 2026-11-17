@@ -383,7 +383,7 @@ Update the header comment lines 2-3 to describe `chapter`.
 
 ---
 
-### T5: Farm session keeps the chapter, the chapters and each definition [ ]
+### T5: Farm session keeps the chapter, the chapters and each definition [x]
 
 **Owner**: game-dev
 **Goal**: `farmSession.load(chapter)` keeps the listed chapter, the reached chapters and the definition of every chapter it loaded (BRC-03; spec P1-Choose AC 4, P1-Fight AC 1, P2-Compatibility AC 2).
@@ -446,7 +446,7 @@ load: async (selected) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 7 new cases pass; the 6 existing cases pass unchanged.
+- [x] The 7 new cases pass; the 6 existing cases pass unchanged.
 
 **Commit**: `feat(game): keep the farm chapter and its definition`
 

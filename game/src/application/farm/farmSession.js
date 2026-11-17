@@ -1,11 +1,15 @@
-//  The bosses the player may fight again and the chapter boss wins left today.
+//  The bosses the player may fight again, the chapter boss wins left today, the chapter of the last load, the chapters the player
+//  may pick and the definition of every chapter loaded.
 //  Port (ADR 0007):
-//    gateway  { get(), win(boss) }  the backend /farm calls. get -> { bosses, chapterBossWinsLeft }.
+//    gateway  { get(chapter?), win(boss) }  the backend /farm calls. get(chapter?) -> { chapter?, chapters?, bosses, chapterBossWinsLeft, definition? }.
 //             win -> { drop, chapterBossWinsLeft }, or rejects with an ApiError (409: daily limit, boss not available, too fast).
 export const createFarmSession = ({ gateway }) =>
 {
     let bosses = [];
     let winsLeft = null;
+    let chapter = null;
+    let chapters = [];
+    const definitions = new Map();
 
     return {
         //  The boss list of the last load; empty before it
@@ -14,13 +18,29 @@ export const createFarmSession = ({ gateway }) =>
         //  Chapter boss wins left today; null before the first load
         winsLeft: () => winsLeft,
 
-        //  Reads the farm state; rejects and keeps the previous state when the backend cannot be reached
-        load: async () =>
+        //  The chapter of the last load; null before it, or when the backend does not answer one (previous version)
+        chapter: () => chapter,
+
+        //  The chapters the player may pick, ascending; empty before the first load or from a previous backend
+        chapters: () => chapters,
+
+        //  The definition of a chapter loaded before, kept for the page's life; null when that chapter was never loaded
+        definitionOf: (number) => definitions.get(number) ?? null,
+
+        //  Reads the farm state of `selected` (undefined: the current chapter); rejects and keeps the previous state on failure
+        load: async (selected) =>
         {
-            const state = await gateway.get();
+            const state = await (selected === undefined ? gateway.get() : gateway.get(selected));
 
             bosses = state.bosses;
             winsLeft = state.chapterBossWinsLeft;
+            chapter = Number.isInteger(state.chapter) ? state.chapter : null;
+            chapters = Array.isArray(state.chapters) ? state.chapters : [];
+
+            if (chapter !== null && state.definition)
+            {
+                definitions.set(chapter, state.definition);
+            }
         },
 
         //  Reports one win (one request) and resolves with { drop, chapterBossWinsLeft }; a refusal rejects and changes nothing
