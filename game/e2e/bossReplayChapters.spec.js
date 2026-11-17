@@ -650,4 +650,42 @@ test.describe('Rever chefes: escolher capítulo', () => {
             await expect(page.getByTestId(`farm-chapter-${number}`)).toBeEnabled();
         }
     });
+
+    test('a new chapter load started before the late answer of a closed one arrives keeps the chips disabled until it answers', async ({ page }) => {
+        const { backend } = await startGame(page);
+        const releaseChapter2 = backend.holdFarm(2);
+        await openMap(page);
+
+        await page.getByTestId('farm-chapter-2').click();
+        await expect(page.getByTestId('farm-chapter-2')).toBeDisabled();
+        await page.getByTestId('hero-close').click();
+        await expect(page.locator('.hero-panel')).toBeHidden();
+
+        await openMap(page);
+        const releaseChapter1 = backend.holdFarm(1);
+        await page.getByTestId('farm-chapter-1').click();
+        await expect(page.getByTestId('farm-chapter-1')).toBeDisabled();
+
+        const read = farmAnswerRead(page, 2);
+        releaseChapter2();
+        await read;
+
+        for (const number of [ 1, 2, 3 ]) {
+            await expect(page.getByTestId(`farm-chapter-${number}`)).toBeDisabled();
+        }
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 3');
+        await expect(page.getByTestId('farm-chapter-3')).toHaveAttribute('aria-pressed', 'true');
+        expect(await states(page)).toEqual(CURRENT_STOPS);
+
+        const readChapter1 = farmAnswerRead(page, 1);
+        releaseChapter1();
+        await readChapter1;
+
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 1');
+        await expect(page.getByTestId('farm-chapter-1')).toHaveAttribute('aria-pressed', 'true');
+        for (const number of [ 1, 2, 3 ]) {
+            await expect(page.getByTestId(`farm-chapter-${number}`)).toBeEnabled();
+        }
+        expect(await states(page)).toEqual(Array(11).fill('defeated'));
+    });
 });

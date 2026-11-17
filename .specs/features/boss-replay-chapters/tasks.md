@@ -1754,6 +1754,8 @@ The chapter 3 map's stop states (the campaign at chapter 3 stage 4), used below 
 
 **Commit**: `test(e2e): cover closing Rever chefes during a chapter load`
 
+**Notes (TD-009 round 3, G2, `test-engineer`)**: EC3 has an e2e scenario, `a new chapter load started before the late answer of a closed one arrives keeps the chips disabled until it answers` (`bossReplayChapters.spec.js`; the sensor's chip `finally` mutant S8 is killed by it). EC4 (the game reopens Rever chefes after the last daily chapter boss win while a chapter load is pending) has no e2e scenario, because `holdFarm` cannot build its state: a chapter load is pending only while the panel is open, `hitMonster` ignores clicks while `heroUi.isOpen`, so the win has to come from the auto click (`autoClickFrame` does not check the panel), whose first strike lands 500 ms after the fight starts (`AUTO_CLICK_BASE_MS`). `holdFarm` holds only `GET /farm?chapter=n`, not the `POST /farm/outcome` that reports the win, so the scenario would race the timer. Unit coverage: `the scene reopening Rever chefes during a chapter load drops that load` (`HeroUi.test.js`). A hold on the outcome route in `fakeBackend.js` would make it deterministic; that is a test-support change, left to the owner's decision.
+
 No `ui-artist` task: T20 adds no element, text, style or state the player has not seen; the enabled and the disabled chips were reviewed in T14 and T19. The `verifier` re-verifies scoped to BRC-10 (T20, T21), with mutants on `farmSession.load`'s generation check, `cancel`, `dropFarmLoad` and the `finally` view check.
 
 ---
