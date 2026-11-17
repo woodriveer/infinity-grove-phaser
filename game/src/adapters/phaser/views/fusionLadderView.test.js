@@ -96,6 +96,40 @@ describe('renderBagHero', () => {
         expect(byTestid(detail, 'fusion-all').disabled).toBe(true);
     });
 
+    it('pending stars puts Fundindo... on that row button only', () => {
+        const detail = draw(kael({ 0: 6, 1: 3 }), { busy: true, pending: 0 });
+
+        expect(byTestid(detail, 'fusion-button-kael-0').textContent).toBe('Fundindo...');
+        expect(byTestid(detail, 'fusion-button-kael-0').disabled).toBe(true);
+        expect(byTestid(detail, 'fusion-button-kael-1').textContent).toBe('1★→2★');
+        expect(byTestid(detail, 'fusion-all').textContent).toBe('Fundir tudo');
+    });
+
+    it('pending all puts Fundindo... on Fundir tudo only', () => {
+        const detail = draw(kael({ 0: 6, 1: 3 }), { busy: true, pending: 'all' });
+
+        expect(byTestid(detail, 'fusion-all').textContent).toBe('Fundindo...');
+        expect(byTestid(detail, 'fusion-all').disabled).toBe(true);
+        expect(byTestid(detail, 'fusion-button-kael-0').textContent).toBe('0★→1★');
+        expect(byTestid(detail, 'fusion-button-kael-1').textContent).toBe('1★→2★');
+    });
+
+    it('busy marks the detail is-busy', () => {
+        const busy = draw(kael({ 0: 3 }), { busy: true });
+
+        expect(busy.classList.contains('is-busy')).toBe(true);
+        expect(busy.classList.contains('bag-detail')).toBe(true);
+        expect(busy.classList.contains('hero-detail')).toBe(true);
+        expect(draw(kael({ 0: 3 })).classList.contains('is-busy')).toBe(false);
+    });
+
+    it('busy without pending keeps every label', () => {
+        const detail = draw(kael({ 0: 3 }), { busy: true });
+
+        expect(byTestid(detail, 'fusion-button-kael-0').textContent).toBe('0★→1★');
+        expect(byTestid(detail, 'fusion-all').textContent).toBe('Fundir tudo');
+    });
+
     it('the confirmation shows the question and the preview and locks the ladder', () => {
         const detail = draw(kael({ 0: 45, 1: 1, 2: 2 }, 2), { confirming: true });
 

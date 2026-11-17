@@ -341,6 +341,80 @@ describe('HeroUi Mochila fusion', () => {
         expect(ctx.testid('fusion-result').textContent).toBe('Nova carta: Hero kael 1★');
     });
 
+    it('a row fusion in flight reads Fundindo... on its button and the text comes back with the answer', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 6 }), hero('lyra') ] } });
+        const pending = deferred();
+        ctx.heroesGateway.fuse.mockImplementation(() => pending.promise);
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+
+        ctx.testid('fusion-button-kael-0').click();
+
+        expect(ctx.testid('fusion-button-kael-0').textContent).toBe('Fundindo...');
+        expect(ctx.testid('fusion-all').textContent).toBe('Fundir tudo');
+        expect(ctx.testid('bag-entry-detail').classList.contains('is-busy')).toBe(true);
+
+        pending.resolve(hero('kael', { 0: 3, 1: 1 }));
+        await flush();
+
+        expect(ctx.testid('fusion-button-kael-0').textContent).toBe('0★→1★');
+        expect(ctx.testid('bag-entry-detail').classList.contains('is-busy')).toBe(false);
+    });
+
+    it('a failed row fusion gives the button its text back', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 6 }), hero('lyra') ] } });
+        const pending = deferred();
+        ctx.heroesGateway.fuse.mockImplementation(() => pending.promise);
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+        ctx.testid('fusion-button-kael-0').click();
+
+        pending.reject(new ApiError('x', { status: 409, code: 'NOT_ENOUGH_CARDS' }));
+        await flush();
+
+        expect(ctx.testid('fusion-button-kael-0').textContent).toBe('0★→1★');
+        expect(ctx.testid('bag-entry-detail').classList.contains('is-busy')).toBe(false);
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível fundir as cartas.');
+    });
+
+    it('Voltar and Kael again while the row fusion runs still reads Fundindo...', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 6 }), hero('lyra') ] } });
+        const pending = deferred();
+        ctx.heroesGateway.fuse.mockImplementation(() => pending.promise);
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+        ctx.testid('fusion-button-kael-0').click();
+
+        ctx.testid('hero-back').click();
+        ctx.testid('bag-card-kael').click();
+
+        expect(ctx.testid('fusion-button-kael-0').textContent).toBe('Fundindo...');
+    });
+
+    it('another hero opened while Kael fuses shows no Fundindo... and stays locked until the answer', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 6 }), hero('lyra', { 0: 3 }) ] } });
+        const pending = deferred();
+        ctx.heroesGateway.fuse.mockImplementation(() => pending.promise);
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+        ctx.testid('fusion-button-kael-0').click();
+
+        ctx.testid('hero-back').click();
+        ctx.testid('bag-card-lyra').click();
+
+        expect(ctx.testid('fusion-button-lyra-0').textContent).toBe('0★→1★');
+        expect(ctx.testid('fusion-button-lyra-0').disabled).toBe(true);
+        expect(ctx.testid('fusion-all').textContent).toBe('Fundir tudo');
+        expect(ctx.testid('fusion-all').disabled).toBe(true);
+        expect(ctx.testid('bag-entry-detail').classList.contains('is-busy')).toBe(true);
+
+        pending.resolve(hero('kael', { 0: 3, 1: 1 }));
+        await flush();
+
+        expect(ctx.testid('fusion-button-lyra-0').disabled).toBe(false);
+        expect(ctx.testid('bag-entry-detail').classList.contains('is-busy')).toBe(false);
+    });
+
     it('Voltar shows the cards with the counts after the fusion', async () => {
         const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 3 }), hero('lyra') ] } });
         ctx.heroesGateway.fuse.mockResolvedValue(hero('kael', { 1: 1 }));
@@ -985,6 +1059,42 @@ describe('HeroUi Fundir tudo', () => {
         await flush();
 
         expect(ctx.testid('fusion-all').disabled).toBe(true);
+    });
+
+    it('Fundir tudo in flight reads Fundindo... and Fundir tudo comes back with the answer', async () => {
+        const ctx = createUi({ list: ladder() });
+        const pending = deferred();
+        ctx.heroesGateway.fuseAll.mockImplementation(() => pending.promise);
+        await openKael(ctx);
+        ctx.testid('fusion-all').click();
+
+        ctx.testid('fusion-all-yes').click();
+
+        expect(ctx.testid('fusion-all').textContent).toBe('Fundindo...');
+        expect(ctx.testid('fusion-button-kael-0').textContent).toBe('0★→1★');
+        expect(ctx.testid('bag-entry-detail').classList.contains('is-busy')).toBe(true);
+
+        pending.resolve(cascaded());
+        await flush();
+
+        expect(ctx.testid('fusion-all').textContent).toBe('Fundir tudo');
+        expect(ctx.testid('bag-entry-detail').classList.contains('is-busy')).toBe(false);
+    });
+
+    it('a failed Fundir tudo gives Fundir tudo its text back', async () => {
+        const ctx = createUi({ list: ladder() });
+        const pending = deferred();
+        ctx.heroesGateway.fuseAll.mockImplementation(() => pending.promise);
+        await openKael(ctx);
+        ctx.testid('fusion-all').click();
+        ctx.testid('fusion-all-yes').click();
+
+        pending.reject(new ApiError('x', { status: 409, code: 'NOTHING_TO_FUSE' }));
+        await flush();
+
+        expect(ctx.testid('fusion-all').textContent).toBe('Fundir tudo');
+        expect(ctx.testid('fusion-all').disabled).toBe(false);
+        expect(ctx.testid('bag-entry-detail').classList.contains('is-busy')).toBe(false);
     });
 
     it('a failed cascade shows the error and keeps the counts', async () => {

@@ -1498,7 +1498,7 @@ button.bag-card:hover:not(:disabled) {
 
 ---
 
-### T18: Fundindo... on the fusion button in flight [ ]
+### T18: Fundindo... on the fusion button in flight [x]
 
 **Owner**: game-dev
 **Goal**: While a fusion request runs, the button that sent it reads `Fundindo...`, the detail carries `is-busy` and its disabled buttons show the progress cursor; the text comes back with the answer (BAG-41, BAG-18; spec D22; review finding #4).

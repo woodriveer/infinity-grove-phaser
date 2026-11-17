@@ -5,9 +5,11 @@ import { renderSkillList } from './catalogView';
 import { el, starsText } from './dom';
 
 const MAX_TEXT = 'Estrela máxima: não pode ser fundida';
+const BUSY_TEXT = 'Fundindo...';
 
-//  One ladder row: name, bar, count and the s★→s+1★ button; the 9-star row has the copies and the max text instead
-const renderRow = (hero, row, { locked, onFuse }) =>
+//  One ladder row: name, bar, count and the s★→s+1★ button; the 9-star row has the copies and the max text instead.
+//  `pending` is null, the star layer whose request runs, or 'all'; the button of the pending layer reads the busy text
+const renderRow = (hero, row, { locked, pending, onFuse }) =>
 {
     const node = el('div', [ 'fusion-row', row.canFuse ? 'is-ready' : '', row.isMax ? 'is-max' : '' ].filter(Boolean).join(' '), '', { testid: `fusion-row-${hero.id}-${row.stars}` });
 
@@ -22,7 +24,7 @@ const renderRow = (hero, row, { locked, onFuse }) =>
 
     const bar = el('span', 'fusion-bar', '', { role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '3', 'aria-valuenow': String(row.filled) });
     const fill = el('span', 'fusion-bar-fill');
-    const button = el('button', 'fusion-button', `${starsText(row.stars)}→${starsText(row.stars + 1)}`, { type: 'button', testid: `fusion-button-${hero.id}-${row.stars}` });
+    const button = el('button', 'fusion-button', pending === row.stars ? BUSY_TEXT : `${starsText(row.stars)}→${starsText(row.stars + 1)}`, { type: 'button', testid: `fusion-button-${hero.id}-${row.stars}` });
 
     fill.style.width = barWidth(row.filled);
     bar.append(fill);
@@ -55,18 +57,18 @@ const renderConfirm = (hero, { busy, onConfirmAll, onDeclineAll }) =>
     return box;
 };
 
-//  The hero detail of the Mochila. `busy`: a fusion request runs; `confirming`: the Fundir tudo question shows; `result`: a node or null.
+//  The hero detail of the Mochila. `busy`: a fusion request runs; `pending`: null, the star layer of the row fusion that runs or 'all'; `confirming`: the Fundir tudo question shows; `result`: a node or null.
 //  onFuse(stars), onFuseAll(), onConfirmAll(), onDeclineAll()
-export const renderBagHero = (hero, { busy = false, confirming = false, result = null, onFuse, onFuseAll, onConfirmAll, onDeclineAll }) =>
+export const renderBagHero = (hero, { busy = false, pending = null, confirming = false, result = null, onFuse, onFuseAll, onConfirmAll, onDeclineAll }) =>
 {
-    const detail = el('div', 'hero-detail bag-detail', '', { testid: 'bag-entry-detail' });
+    const detail = el('div', [ 'hero-detail', 'bag-detail', busy ? 'is-busy' : '' ].filter(Boolean).join(' '), '', { testid: 'bag-entry-detail' });
     const side = el('div', 'bag-detail-ladder');
     const list = el('div', 'fusion-list', '', { testid: 'fusion-list' });
     const locked = busy || confirming;
     const bar = el('div', 'fusion-all-bar');
-    const all = el('button', 'fusion-button fusion-all', 'Fundir tudo', { type: 'button', testid: 'fusion-all' });
+    const all = el('button', 'fusion-button fusion-all', pending === 'all' ? BUSY_TEXT : 'Fundir tudo', { type: 'button', testid: 'fusion-all' });
 
-    ladderRows(hero).forEach((row) => list.append(renderRow(hero, row, { locked, onFuse })));
+    ladderRows(hero).forEach((row) => list.append(renderRow(hero, row, { locked, pending, onFuse })));
     all.disabled = locked || !canFuseAny(hero);
     all.addEventListener('click', () => onFuseAll());
     bar.append(all);

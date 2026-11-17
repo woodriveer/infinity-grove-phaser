@@ -93,6 +93,8 @@ export class HeroUi
         this.equipBusy = false;
         this.sellMode = null;
         this.fusionBusy = false;
+        //  The fusion request that runs: { heroId, target } where target is the star layer of a row fusion or 'all'; null when none runs
+        this.fusionPending = null;
         this.bagHeroId = null;
         this.fuseAllAsking = false;
         this.farm = farm;
@@ -305,6 +307,7 @@ export class HeroUi
         this.bagHeroId = heroId;
         this.showDetail(renderBagHero(hero, {
             busy: this.fusionBusy,
+            pending: this.fusionPending?.heroId === heroId ? this.fusionPending.target : null,
             confirming: this.fuseAllAsking,
             result,
             onFuse: (stars) => this.fuse(heroId, stars),
@@ -347,6 +350,7 @@ export class HeroUi
         let result = null;
 
         this.fusionBusy = true;
+        this.fusionPending = { heroId, target: stars };
         this.openBagHero(heroId);
 
         try
@@ -372,6 +376,7 @@ export class HeroUi
         finally
         {
             this.fusionBusy = false;
+            this.fusionPending = null;
             this.redrawBag(view, heroId, result);
         }
     }
@@ -407,6 +412,7 @@ export class HeroUi
         let result = null;
 
         this.fusionBusy = true;
+        this.fusionPending = { heroId, target: 'all' };
         this.fuseAllAsking = false;
         this.openBagHero(heroId);
 
@@ -430,6 +436,7 @@ export class HeroUi
         finally
         {
             this.fusionBusy = false;
+            this.fusionPending = null;
             this.redrawBag(view, heroId, result);
         }
     }

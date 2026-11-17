@@ -2007,6 +2007,11 @@ button.bag-card:hover:not(:disabled) {
     background: var(--btn-bg);
 }
 
+/* A fusion request runs: the disabled buttons of the detail say "wait", not "not allowed" */
+.bag-detail.is-busy button:disabled {
+    cursor: progress;
+}
+
 /* ══ Equipment screen: the slots of every hero, the bag and one piece with its actions ══ */
 
 .equip-screen {
