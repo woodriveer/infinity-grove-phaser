@@ -835,7 +835,7 @@ The HUD button keeps calling `show('farm')` with no options, so every opening fr
 
 ---
 
-### T11: Earlier chapter farm fight in the scene [ ]
+### T11: Earlier chapter farm fight in the scene [x]
 
 **Owner**: game-dev
 **Goal**: `ClickerGame` fights a boss that carries a chapter with that chapter's definition from the farm session, repeats it with the same numbers, reports it with its chapter, and reopens Rever chefes on that chapter when its last daily chapter boss win is spent (BRC-06; spec P1-Fight AC 1-3, 13; edge case "no definition").
@@ -910,7 +910,7 @@ this.heroUi.show('farm', Number.isInteger(boss.chapter) ? { chapter: boss.chapte
 **Gate**: quick - `cd game && npm test`, then build `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 5 new cases pass; every existing `ClickerGame farm mode` case passes unchanged (`fights the beaten boss with its numbers and the farm label...`, `a chapter boss win that leaves 0 wins today ends the farm and shows the list with 0 left`, the switch cases that expect `win` called with `{ kind: 'MINIBOSS', stage: 1 }`).
+- [x] The 5 new cases pass; every existing `ClickerGame farm mode` case passes unchanged (`fights the beaten boss with its numbers and the farm label...`, `a chapter boss win that leaves 0 wins today ends the farm and shows the list with 0 left`, the switch cases that expect `win` called with `{ kind: 'MINIBOSS', stage: 1 }`).
 
 **Commit**: `feat(game): fight an earlier chapter boss with its own numbers`
 

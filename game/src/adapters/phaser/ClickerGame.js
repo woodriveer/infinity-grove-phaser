@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
-import { MINIBOSS } from '../../domain/campaign/campaign';
+import { MINIBOSS, farmEncounterOf } from '../../domain/campaign/campaign';
 import { AutoClicker, autoClickUnlocked } from '../../domain/combat/autoClick';
 import { resetReward } from '../../domain/campaign/accountReset';
 import { Combo, comboText } from '../../domain/combat/combo';
@@ -1179,10 +1179,31 @@ export class ClickerGame extends Scene
         return next;
     }
 
+    //  The fight of a farmed boss: a boss of another chapter fights with the definition the farm loaded for that chapter, any other with the
+    //  campaign's. Null when that chapter's definition was never loaded.
+    farmEncounterFor (boss)
+    {
+        if (!Number.isInteger(boss.chapter))
+        {
+            return this.session.farmEncounter(boss);
+        }
+
+        const definition = this.farm.definitionOf(boss.chapter);
+
+        return definition ? farmEncounterOf(definition, boss) : null;
+    }
+
     //  Fights a boss the player already beat again and again; the campaign position and its report queue are never touched
     startFarm (boss)
     {
         if (!this.session.loaded)
+        {
+            return;
+        }
+
+        const encounter = this.farmEncounterFor(boss);
+
+        if (!encounter)
         {
             return;
         }
@@ -1192,7 +1213,7 @@ export class ClickerGame extends Scene
         this.generation += 1;
         this.hideCountdown();
         this.tweens.killTweensOf(this.monsterParts);
-        this.showEncounter(this.session.farmEncounter(boss));
+        this.showEncounter(encounter);
     }
 
     //  A farm win is reported at once (one request); the same boss comes back for the next fight
@@ -1217,7 +1238,7 @@ export class ClickerGame extends Scene
             return this.session.encounter();
         }
 
-        return this.session.farmEncounter(this.farmBoss);
+        return this.farmEncounterFor(this.farmBoss);
     }
 
     //  The card of the win joins the bag; the chapter boss at 0 wins left today ends the farm and shows the list. A refusal (the boss
@@ -1246,7 +1267,7 @@ export class ClickerGame extends Scene
             if (boss.kind === 'CHAPTER_BOSS' && result.chapterBossWinsLeft <= 0 && this.farmBoss === boss)
             {
                 this.leaveFarm();
-                this.heroUi.show('farm');
+                this.heroUi.show('farm', Number.isInteger(boss.chapter) ? { chapter: boss.chapter } : {});
             }
         }
         catch (error)

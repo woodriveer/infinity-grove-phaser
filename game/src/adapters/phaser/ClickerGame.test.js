@@ -2485,6 +2485,90 @@ describe('ClickerGame farm mode', () => {
 
         expect(ctx.scene.tweens.killTweensOf).toHaveBeenCalledWith(ctx.scene.monsterParts);
     });
+
+    describe('a boss of an earlier chapter', () => {
+        //  Chapter 1 as the farm answers it: its minibosses have 77 health and 45 s, its chapter boss 60 health and 50 s
+        const atChapter2 = () => ({ ...progress(3, 'PHASE', 1), chapter: 2 });
+        const earlier = {
+            ...definition,
+            bossHealth: 60,
+            bossTimeLimitMs: 50_000,
+            stages: definition.stages.map((stage) => ({ ...stage, minibossHealth: 77, minibossTimeLimitMs: 45_000 }))
+        };
+        const ELEVEN = [ ...Array.from({ length: 10 }, (_, i) => ({ kind: 'MINIBOSS', stage: i + 1 })), { kind: 'CHAPTER_BOSS' } ];
+        const chapterOne = (winsLeft = 10) => ({ chapter: 1, chapters: [ 1, 2 ], bosses: ELEVEN, chapterBossWinsLeft: winsLeft, definition: earlier });
+
+        it('a boss of an earlier chapter fights with the numbers of that chapter and its label', async () => {
+            const ctx = await createScene({ start: atChapter2() });
+            farmGateway.get.mockResolvedValue(chapterOne());
+            await ctx.scene.farm.load(1);
+
+            ctx.scene.startFarm({ kind: 'MINIBOSS', stage: 3, chapter: 1 });
+
+            expect(label(ctx)).toBe('Rever chefe: Miniboss 3 (Capítulo 1)');
+            expect(ctx.scene.monster.maxHealth).toBe(77);
+            expect(ctx.hud('.boss-timer').textContent).toBe('Time: 45');
+            expect(campaignGateway.report).not.toHaveBeenCalled();
+        });
+
+        it('a win of an earlier chapter boss reports its chapter and brings the same boss of that chapter back', async () => {
+            const ctx = await createScene({ start: atChapter2() });
+            farmGateway.get.mockResolvedValue(chapterOne());
+            await ctx.scene.farm.load(1);
+            farmGateway.win.mockResolvedValue(farmWin());
+            ctx.scene.startFarm({ kind: 'MINIBOSS', stage: 3, chapter: 1 });
+
+            killAll(ctx);
+            await flush();
+
+            expect(farmGateway.win).toHaveBeenCalledTimes(1);
+            expect(farmGateway.win).toHaveBeenCalledWith({ kind: 'MINIBOSS', stage: 3, chapter: 1 });
+
+            advance(ctx);
+
+            expect(label(ctx)).toBe('Rever chefe: Miniboss 3 (Capítulo 1)');
+            expect(ctx.scene.monster.health).toBe(77);
+        });
+
+        it('an earlier chapter boss whose chapter was never loaded starts no fight', async () => {
+            const ctx = await createScene({ start: atChapter2() });
+
+            ctx.scene.startFarm({ kind: 'MINIBOSS', stage: 3, chapter: 1 });
+
+            expect(ctx.scene.farmBoss).toBeNull();
+            expect(label(ctx)).toBe('Stage 3/10  Phase 1/5');
+        });
+
+        it('the earlier chapter boss that spends the last daily win reopens Rever chefes on that chapter', async () => {
+            const ctx = await createScene({ start: atChapter2() });
+            farmGateway.get.mockImplementation((chapter) => Promise.resolve(chapterOne(0)));
+            await ctx.scene.farm.load(1);
+            farmGateway.win.mockResolvedValue(farmWin(null, 0));
+            ctx.scene.startFarm({ kind: 'CHAPTER_BOSS', chapter: 1 });
+
+            killAll(ctx);
+            await flush();
+
+            expect(ctx.scene.farmBoss).toBeNull();
+            expect(ctx.scene.heroUi.isOpen).toBe(true);
+            expect(farmGateway.get.mock.calls.at(-1)).toEqual([ 1 ]);
+            expect(testid(ctx, 'farm-map-title').textContent).toBe('Caminho do Capítulo 1');
+            expect(testid(ctx, 'farm-entry-chapter-boss').disabled).toBe(true);
+            expect(testid(ctx, 'farm-entry-chapter-boss').textContent).toContain('0 vitórias restantes hoje');
+        });
+
+        it('a chapter boss of an earlier chapter is labelled with its chapter', async () => {
+            const ctx = await createScene({ start: atChapter2() });
+            farmGateway.get.mockResolvedValue(chapterOne());
+            await ctx.scene.farm.load(1);
+
+            ctx.scene.startFarm({ kind: 'CHAPTER_BOSS', chapter: 1 });
+
+            expect(label(ctx)).toBe('Rever chefe: Chefe do capítulo (Capítulo 1)');
+            expect(ctx.scene.monster.maxHealth).toBe(60);
+            expect(ctx.hud('.boss-timer').textContent).toBe('Time: 50');
+        });
+    });
 });
 
 describe('ClickerGame equipment', () => {
