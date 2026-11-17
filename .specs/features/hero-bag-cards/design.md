@@ -17,7 +17,7 @@ graph TD
     BV --> BC[domain bagCards: frameTier, copyLayers, canFuseAny]
     BV -- card click --> OH[HeroUi.openBagHero]
     OH --> LV[fusionLadderView.renderBagHero]
-    LV --> BC2[domain bagCards: ladderRows, cascade, previewText]
+    LV --> BC2[domain bagCards: ladderRows, cascade, previewLines]
     LV -- row button --> F[HeroUi.fuse]
     LV -- Sim, fundir --> FA[HeroUi.fuseAll]
     F --> HC[heroCollection.fuse] --> API1[POST /heroes/id/fuse]
@@ -115,7 +115,7 @@ B is chosen (spec D12). The cascade is computed layer by layer in O(10) arithmet
 | `barWidth(filled)` | `'0%'`, `'33.333%'`, `'66.667%'`, `'100%'` |
 | `cascade(hero)` | `{ fusions, after: { 0: n, ..., 9: n } }` (same rule as the backend) |
 | `layersText(layers)` | `'45×0★ + 1×1★ + 2×2★'` (layers with copies ≥ 1 only) |
-| `previewText(hero)` | `'45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★'` |
+| `previewLines(hero)` (replaced `previewText` in T19, D21) | `{ before: 'Antes: 45×0★ + 1×1★ + 2×2★', after: 'Depois: 1×1★ + 1×2★ + 2×3★' }` |
 | `fuseAllQuestion(fusions)` | `'Fazer 22 fusões?'`, `'Fazer 1 fusão?'` |
 | `raisedSkills(beforeSkills, afterSkills)` | `[ { name, level } ]` in slot order: after level ≥ 2 and > before level (levels through `skillLevelOf`) |
 | `fuseAllResultText({ heroName, fusions, stars, raised })` | `'22 fusões. Melhor carta: Kael Raizférrea 3★'` plus `' · <name> no nível <level>'` per raised skill |
@@ -128,7 +128,7 @@ B is chosen (spec D12). The cascade is computed layer by layer in O(10) arithmet
 
 ### Game: `fusionLadderView.js` (new)
 
-- `renderBagHero(hero, { busy, confirming, result, onFuse, onFuseAll, onConfirmAll, onDeclineAll })`: `bag-entry-detail` with the card, the ladder, the Fundir tudo bar, the confirmation when `confirming`, the `result` node when given, and the skill list.
+- `renderBagHero(hero, { busy, pending, confirming, result, onFuse, onFuseAll, onConfirmAll, onDeclineAll })`: `bag-entry-detail` with the card, the ladder, the Fundir tudo bar, the confirmation when `confirming`, the `result` node when given, and the skill list. `pending` (T18, D22) is `null`, a star layer `0` to `8` or `'all'`: the button that sent the running request reads `Fundindo...`; `busy` adds the class `is-busy` to `bag-entry-detail`.
 - `renderFuseAllResult({ heroName, fusions, stars, raised })`: `div.fusion-result` `fusion-result` with `fuseAllResultText`.
 - `fusionView.js` keeps only `renderFusionResult` after T11 (`renderFusion` is deleted).
 
@@ -153,13 +153,14 @@ The panel `.hero-window` is 920 px wide (`style.css:1323`), 26 px side padding, 
 | ---- | ---- |
 | Box | `position: relative; display: flex; flex-direction: column; align-items: center; padding: 18px 8px 10px; border-radius: 10px; background: var(--parchment-300); font-family: var(--font-body); color: var(--ink-900); cursor: pointer` |
 | Art `.bag-card-portrait` | `<img src="assets/heroes/<id>_sprite.png">` (via `sprite()`), `width: 100%; height: 140px; object-fit: contain; object-position: bottom; padding: 8px 6px 4px; border-radius: 6px; background: radial-gradient(circle at 50% 45%, #5a3d26, #1c120c)` (the `.hero-card img` backdrop) |
-| Ribbon `.bag-card-ribbon` | `margin-top: -10px; width: calc(100% + 12px); padding: 4px 14px; text-align: center; font: 700 13px/1.15 var(--font-heading); color: var(--parchment-100); background: linear-gradient(180deg, var(--ember-700) 0%, #7a2e0c 100%); clip-path: polygon(0 0, 100% 0, 95% 50%, 100% 100%, 0 100%, 5% 50%)`; wraps to two lines for long names |
+| Ribbon `.bag-card-ribbon` | `margin-top: -10px; width: calc(100% + 12px); padding: 4px 14px; text-align: center; font: 700 13px/1.15 var(--font-heading); color: var(--parchment-100); background: linear-gradient(180deg, var(--ember-700) 0%, #7a2e0c 100%); clip-path: polygon(0 0, 100% 0, 95% 50%, 100% 100%, 0 100%, 5% 50%)`; wraps to two lines for long names. T17 (D26): `display: flex; align-items: center; justify-content: center; min-height: calc(2.3em + 8px)` (two lines of 1.15 plus the 4 px padding twice), so a one-line name is centred in a two-line ribbon and the chips of every card start at the same height |
 | Star badge `.bag-card-star` | `position: absolute; top: -12px; left: 50%; transform: translateX(-50%); min-width: 40px; height: 24px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; font: 700 14px var(--font-heading); background: var(--parchment-100); border: 2px solid var(--card-frame)`; also `.hero-stars` and the AD-020 tier class (`is-ascended` purple text, `is-exalted` gold chip `#d9a521`/`#201e1d`, which overrides the background) |
 | Chips `.bag-card-chips` | `display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 8px` |
+| Text above the ornaments (T17, finding #1) | `.bag-card-chips, .bag-card-ribbon, .bag-card-missing { position: relative; z-index: 1 }` and `.bag-card-star, .bag-card-fuse { z-index: 2 }` (both stay `position: absolute`): no `::before` or `::after` ornament is ever drawn over text |
 | Chip `.bag-card-chip` | `padding: 2px 6px; border-radius: 999px; font: 700 11px var(--font-body); color: var(--parchment-100); background: var(--wood-800)` |
-| Fundir badge `.bag-card-fuse` | `position: absolute; top: 6px; right: 6px; padding: 2px 8px; border-radius: 999px; font: 800 11px var(--font-body); color: var(--parchment-100); background: var(--ember-700); box-shadow: 0 0 0 2px var(--parchment-100)` |
+| Fundir badge `.bag-card-fuse` | `position: absolute; top: 6px; right: 6px; padding: 2px 8px; border-radius: 999px; font: 800 11px var(--font-body); color: var(--parchment-100); background: var(--ember-700); box-shadow: 0 0 0 2px var(--parchment-100)`; hidden on the detail card: `.bag-detail .bag-card-fuse { display: none }` (T17, D25) |
 | Not owned `.bag-card.is-grey` | `opacity: 0.55; cursor: default`; art `filter: grayscale(1)`; `.bag-card-missing` `margin-top: 8px; font: 700 12px var(--font-body); color: var(--color-neutral-700)` |
-| Hover (owned, button) | `box-shadow` of the frame plus `0 0 0 4px rgb(243 213 138 / 0.5)`; no transition, no animation |
+| Hover (owned, button) | `box-shadow: var(--card-shadow), 0 0 0 4px var(--gold-400); filter: brightness(1.06)` (T17, finding #2; was the half-transparent `rgb(243 213 138 / 0.5)` ring); no transition, no animation |
 | Focus | `.bag-card:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px }` |
 
 ### Card frames (CSS, no images)
@@ -168,9 +169,9 @@ Each frame sets `--card-frame` (used by the badge border) and draws its ornament
 
 | Tier | Stars | Border and shadow | Ornament (`::before` background) |
 | ---- | ----- | ----------------- | -------------------------------- |
-| `frame-wood` | 0 to 3 | `--card-frame: var(--bronze-500); border: 4px solid var(--wood-600); box-shadow: 0 0 0 2px var(--wood-900), inset 0 0 0 1px var(--bronze-500)` | Iron corners: four 12x12 px squares `linear-gradient(135deg, #8a8a8a, #3a3a3a)` at the four corners (`background-repeat: no-repeat; background-size: 12px 12px; background-position: top left, top right, bottom left, bottom right`) |
-| `frame-silver` | 4 to 6 | `--card-frame: #c9ced6; border: 4px solid #c9ced6; box-shadow: 0 0 0 2px #7d8590, inset 0 0 0 2px #5f8f4a` | Green vine leaves: four `radial-gradient(circle, #6fa85a 0 5px, transparent 6px)` 14x14 px at the four corners |
-| `frame-gold` | 7 to 9 | `--card-frame: #d9a521; border: 4px solid #d9a521; box-shadow: 0 0 0 2px #8a6a12, 0 0 12px rgb(255 214 90 / 0.6), inset 0 0 0 2px #f3d58a` | Runes: `repeating-linear-gradient(90deg, #8a6a12 0 6px, transparent 6px 12px)` as two 3 px strips along the top and bottom inner edges; sparkles: `::after` with three `radial-gradient(circle, #fff6c8 0 2px, transparent 3px)` dots at 18 % / 12 %, 82 % / 20 %, 70 % / 88 % |
+| `frame-wood` | 0 to 3 | `--card-frame: var(--bronze-500); border: 4px solid #a06a35; --card-shadow: 0 0 0 2px var(--wood-800), inset 0 0 0 1px #d49a5c` (T17, finding #3: warm brown; was `--wood-600` with a `--wood-900` ring, read as black) | Riveted iron corners: four 12x12 px squares `linear-gradient(135deg, #8a8a8a, #3a3a3a)` at the four corners, each with a rivet `radial-gradient(circle, #cfcfcf 0 1.5px, transparent 2px)` drawn on top in the same 12x12 px box (8 layers: the 4 rivets first, then the 4 squares; `background-size: 12px 12px`; `background-position` the four corners twice) |
+| `frame-silver` | 4 to 6 | `--card-frame: #c9ced6; border: 4px solid #c9ced6; box-shadow: 0 0 0 2px #7d8590, inset 0 0 0 2px #5f8f4a` | Green vine leaves: four `radial-gradient(circle, #6fa85a 0 5px, transparent 6px)` 14x14 px at the four corners, plus (T17, finding #3) two `radial-gradient(circle, #5f8f4a 0 4px, transparent 5px)` 10x10 px leaves per corner, one along the top or bottom edge and one along the side, 14 px from the corner: positions `left 14px top 0, left 0 top 14px, right 14px top 0, right 0 top 14px, left 14px bottom 0, left 0 bottom 14px, right 14px bottom 0, right 0 bottom 14px` |
+| `frame-gold` | 7 to 9 | `--card-frame: #d9a521; border: 4px solid #d9a521; box-shadow: 0 0 0 2px #8a6a12, 0 0 12px rgb(255 214 90 / 0.6), inset 0 0 0 2px #f3d58a` | Runes: `repeating-linear-gradient(90deg, #8a6a12 0 6px, transparent 6px 12px)` as two 3 px strips along the top and bottom inner edges; sparkles: `::after` with three `radial-gradient(circle, #fff6c8 0 2px, transparent 3px)` dots at 18 % / 8 %, 82 % / 14 %, 50 % / 99 % (T17, finding #1: on the frame edge and the portrait; was 18 % / 12 %, 82 % / 20 %, 70 % / 88 %, which fell on the chips) |
 
 **Are image frames needed?** No, not for this feature: the three tiers differ by colour, by ornament shape (iron squares, round leaves, rune strips with sparkles) and by glow, so they read apart at a glance and in grayscale. The owner's reference art (wood with iron corners, silver with green vines, gold with runes and sparkles) is richer than CSS can draw. If the owner wants it, a follow-up asset task adds `game/public/assets/card-frame-wood.png`, `card-frame-silver.png`, `card-frame-gold.png` (9-slice PNG with a transparent centre, 64x64 px slices, the art supplied by the owner) as `border-image` on the same classes; nothing else changes. That task is not part of `tasks.md` and needs the owner's art (Q3).
 
@@ -193,8 +194,14 @@ Each frame sets `--card-frame` (used by the badge border) and draws its ornament
 ### Fundir tudo
 
 - Button `fusion-all`: class `fusion-button fusion-all`, text `Fundir tudo`.
-- Confirmation `.fusion-all-confirm` (testid `fusion-all-confirm`): `margin-top: 10px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--parchment-100); border: var(--inset-border); display: flex; flex-direction: column; gap: 8px`. Question `p.fusion-all-question` `font: 700 16px var(--font-heading)`; preview `p.fusion-all-preview` `font: 600 14px var(--font-body)`; buttons row `.fusion-all-actions` (`display: flex; gap: 8px; justify-content: flex-end`): `Sim, fundir` (class `fusion-button`), `Não` (class `fusion-button is-secondary`, the wood `--btn-bg`).
-- Result: the existing `.fusion-result` (`style.css:1663`), placed under the confirmation spot.
+- Confirmation `.fusion-all-confirm` (testid `fusion-all-confirm`): `margin-top: 10px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--parchment-100); border: var(--inset-border); display: flex; flex-direction: column; gap: 8px`. Question `p.fusion-all-question` `font: 700 16px var(--font-heading)`; preview `div.fusion-all-preview` (T19, D21) `display: flex; flex-direction: column; gap: 2px; margin: 0; font: 600 15px var(--font-body)` holding `p.fusion-all-before` `Antes: <before>` and `p.fusion-all-after` `Depois: <after>` (`margin: 0; overflow-wrap: anywhere`; a long side wraps, never overflows); buttons row `.fusion-all-actions` (`display: flex; gap: 8px; justify-content: flex-end`): `Sim, fundir` (class `fusion-button`), `Não` (class `fusion-button is-secondary`, the wood `--btn-bg`).
+- Result: the existing `.fusion-result` (`style.css:1663`), placed under the confirmation spot; inside the Mochila `.bag-detail .fusion-result { font-size: 16px; line-height: 1.4; text-wrap: balance }` (T17, finding #5: the 20 px line left a one-word orphan).
+- In flight (T18, D22): the button that sent the request reads `Fundindo...`; `.bag-detail.is-busy button:disabled { cursor: progress }`; a button disabled for lack of copies keeps the global `button:disabled { cursor: not-allowed }`.
+
+### Rarity gems (`.piece-gems`, `.piece-gem`)
+
+- Row: `position: absolute; top: -5px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px` (computed `column-gap: 5px`; T7 centred it; T20 widened the gap from 2 px, D23).
+- Gem: `width: 10px; height: 10px` (was 7 px), border `1px solid var(--color-neutral-900)`, `transform: rotate(45deg)`, colour `var(--gem)`; the LEGENDARY row of 4 is 55 px wide inside the 60 px tile.
 
 ### HUD
 
@@ -214,7 +221,7 @@ Six buttons; the rail CSS is unchanged (`.hero-hud`, `style.css:1079`).
 | `fusion-row-<id>-<s>` | ladder row; `.fusion-name`, `.fusion-bar`, `.fusion-bar-fill`, `.fusion-copies`, `.fusion-max` |
 | `fusion-button-<id>-<s>` | row button |
 | `fusion-all` | Fundir tudo |
-| `fusion-all-confirm`, `fusion-all-question`, `fusion-all-preview`, `fusion-all-yes`, `fusion-all-no` | confirmation |
+| `fusion-all-confirm`, `fusion-all-question`, `fusion-all-preview`, `fusion-all-before`, `fusion-all-after`, `fusion-all-yes`, `fusion-all-no` | confirmation |
 | `fusion-result` | result line |
 
 ---

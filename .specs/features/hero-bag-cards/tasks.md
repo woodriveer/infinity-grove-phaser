@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/hero-bag-cards/spec.md`
 **Design**: `.specs/features/hero-bag-cards/design.md`
-**Status**: Approved on 2026-11-17 (the owner accepted the spec with the recommended answers to Q1 to Q8)
+**Status**: Approved on 2026-11-17 (the owner accepted the spec with the recommended answers to Q1 to Q8). T17 to T22 (Phases 7 and 8) were added by the product owner on 2026-11-17 from the T16 review (verdict ALTERAÇÕES, `4dc43c3`) and wait for the owner's approval with the rulings D22 to D26 of the spec
 
 Rules for every task:
 
@@ -105,6 +105,27 @@ T12 → T15
 T13 → T16
 T14 → T16
 T15 → T16
+```
+
+### Phase 7: UI review fixes (game-dev)
+
+Run in the order T17, T18, T19, T20 (one worker): all four edit `game/public/style.css`, and T18 and T19 both edit `fusionLadderView.js` and `HeroUi.test.js`.
+
+```
+T16 → T17
+T16 → T18
+T18 → T19
+T16 → T20
+```
+
+### Phase 8: e2e and re-review (test-engineer, ui-artist)
+
+```
+T17 → T21
+T18 → T21
+T19 → T21
+T20 → T21
+T21 → T22
 ```
 
 ---
@@ -1302,7 +1323,7 @@ const piece = (id, slot, rarity, refine = 0, heroId = null) => ({ id, slot, rari
 
 ---
 
-### T16: UI review of the Mochila [ ]
+### T16: UI review of the Mochila [x]
 
 **Owner**: ui-artist
 **Goal**: Check every changed screen against design.md § Layout and the owner's mockup and write the review (BAG-01 to BAG-22, BAG-31 to BAG-38, visual part).
@@ -1334,18 +1355,501 @@ const piece = (id, slot, rarity, refine = 0, heroId = null) => ({ id, slot, rari
 **Gate**: `test -s .specs/features/hero-bag-cards/ui-review.html && cd game && npm run ui:shots -- heroBagCards`
 **Done when**:
 
-- [ ] `ui-review.html` exists with a verdict, the 16 screenshots per project and the checks of step 3.
-- [ ] Each finding names a selector and an exact fix.
+- [x] `ui-review.html` exists with a verdict, the 16 screenshots per project and the checks of step 3.
+- [x] Each finding names a selector and an exact fix.
 
 **Commit**: `docs(hero-bag-cards): ui review of the Mochila cards and ladder`
+
+Result (`4dc43c3`): ALTERAÇÕES, no high finding. #1 (medium) gold sparkles over the chips, shots 02, 07 → T17. #2 (medium) hover ring almost invisible, shot 03 → T17. #3 (medium) wood frame reads black, silver frame bare, shots 01, 05 → T17. #4 (low) busy looks like disabled, shot 11 → T18. #5 (low) result line orphan, shot 10 → T17. #6 (low) preview without Antes/Depois, shot 08 → T19 (BAG-32 amended, D21). #7 (low) gems about 5 px, shots 14 to 16 → T20 (BAG-40, D23). #8 (low) phone text about 4 px: predates the feature, out of scope, `STATE.md` TD-010 (D27). Suggestions taken, both CSS-only in T17: no `Fundir` badge on the detail card (D25, BAG-08 amended) and a two-line ribbon (D26). Not taken: painted frame art (Out of Scope, Q3). All re-reviewed in T22; T21 pins BAG-08, BAG-18, BAG-32, BAG-40, BAG-41 in the browser.
+
+---
+
+### T17: Card frames, hover, sparkles, ribbon and result line styles [ ]
+
+**Owner**: game-dev
+**Goal**: Fix findings #1, #2, #3 and #5 of the T16 review and take the two review suggestions, in CSS only: the card text sits above every ornament, the hover ring shows, the wood frame reads as warm wood with riveted iron corners, the silver frame gets vines, the Mochila result line is 16 px and balanced, the detail card hides its Fundir badge and the ribbon reserves two lines (BAG-04, BAG-05, BAG-07, BAG-08, BAG-11, BAG-17, BAG-35; spec D24, D25, D26).
+**Where**: `game/public/style.css`
+**Read first**: `game/public/style.css` from the line `/* ══ Mochila: hero cards and the fusion ladder (spec hero-bag-cards) ══ */` (about `:1675`) to `.fusion-button.is-secondary` (about `:1965`), and `.fusion-result` (about `:1663-1673`); `.specs/features/hero-bag-cards/design.md` § Card, § Card frames, § Fundir tudo (the values marked T17); `.specs/features/hero-bag-cards/ui-review.html` findings #1, #2, #3, #5 and § Sugestões
+**Depends on**: T16
+**Requirement**: BAG-04, BAG-05, BAG-07, BAG-08, BAG-11, BAG-17, BAG-35
+
+**Contract**: locate each rule by its selector (line numbers drift). Only these nine edits; no other rule changes, no `transition`, no `animation`.
+
+1. `.bag-card` gains one line at the end of the rule: `isolation: isolate;` (the z-index of step 4 stays inside the card).
+2. `button.bag-card:hover:not(:disabled)` becomes exactly:
+
+```css
+button.bag-card:hover:not(:disabled) {
+    box-shadow: var(--card-shadow), 0 0 0 4px var(--gold-400);
+    filter: brightness(1.06);
+}
+```
+
+3. `.bag-card-ribbon` gains four lines at the top of the rule (every existing line stays):
+
+```css
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(2.3em + 8px);
+```
+
+4. Right after the `.bag-card-missing` rule, add:
+
+```css
+/* The card text sits above the frame ornaments (::before, ::after); the badges stay absolute */
+.bag-card-chips,
+.bag-card-ribbon,
+.bag-card-missing {
+    position: relative;
+    z-index: 1;
+}
+
+.bag-card-star,
+.bag-card-fuse {
+    z-index: 2;
+}
+```
+
+5. `.bag-card.frame-wood` becomes exactly:
+
+```css
+.bag-card.frame-wood {
+    --card-frame: var(--bronze-500);
+    --card-shadow: 0 0 0 2px var(--wood-800), inset 0 0 0 1px #d49a5c;
+    border: 4px solid #a06a35;
+    box-shadow: var(--card-shadow);
+}
+```
+
+6. `.bag-card.frame-wood::before` becomes exactly (the 4 rivets are listed first so they paint over the 4 iron squares):
+
+```css
+.bag-card.frame-wood::before {
+    background-image:
+        radial-gradient(circle, #cfcfcf 0 1.5px, transparent 2px),
+        radial-gradient(circle, #cfcfcf 0 1.5px, transparent 2px),
+        radial-gradient(circle, #cfcfcf 0 1.5px, transparent 2px),
+        radial-gradient(circle, #cfcfcf 0 1.5px, transparent 2px),
+        linear-gradient(135deg, #8a8a8a, #3a3a3a),
+        linear-gradient(135deg, #8a8a8a, #3a3a3a),
+        linear-gradient(135deg, #8a8a8a, #3a3a3a),
+        linear-gradient(135deg, #8a8a8a, #3a3a3a);
+    background-size: 12px 12px;
+    background-position: top left, top right, bottom left, bottom right, top left, top right, bottom left, bottom right;
+}
+```
+
+7. `.bag-card.frame-silver::before` becomes exactly (4 corner leaves of 14 px, then 8 vine leaves of 10 px, two per corner):
+
+```css
+.bag-card.frame-silver::before {
+    background-image:
+        radial-gradient(circle, #6fa85a 0 5px, transparent 6px),
+        radial-gradient(circle, #6fa85a 0 5px, transparent 6px),
+        radial-gradient(circle, #6fa85a 0 5px, transparent 6px),
+        radial-gradient(circle, #6fa85a 0 5px, transparent 6px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px);
+    background-size: 14px 14px, 14px 14px, 14px 14px, 14px 14px, 10px 10px, 10px 10px, 10px 10px, 10px 10px, 10px 10px, 10px 10px, 10px 10px, 10px 10px;
+    background-position:
+        top left, top right, bottom left, bottom right,
+        left 14px top 0, left 0 top 14px, right 14px top 0, right 0 top 14px,
+        left 14px bottom 0, left 0 bottom 14px, right 14px bottom 0, right 0 bottom 14px;
+}
+```
+
+8. In `.bag-card.frame-gold::after` only the `background-position` line changes, to `background-position: 18% 8%, 82% 14%, 50% 99%;`.
+9. Right after the `.bag-detail .bag-card` rule (`cursor: default`), add:
+
+```css
+.bag-detail .bag-card-fuse {
+    display: none;
+}
+
+.bag-detail .fusion-result {
+    font-size: 16px;
+    line-height: 1.4;
+    text-wrap: balance;
+}
+```
+
+**Steps**:
+
+1. Make edits 1 to 9 in order.
+2. `cd game && npm test && npm run build`.
+3. `cd game && npx playwright test e2e/heroBagCards.spec.js`. If only the two no-scrollbar tests (`the Mochila shows no scrollbar with every layer of every hero filled on desktop`, `the Mochila shows no scrollbar on a phone`) fail, delete the four ribbon lines of edit 3, rerun, and write "D26 not taken: the two-line ribbon makes the Mochila scroll" in the task summary; any other failure is a defect of this task.
+
+**Tests**: none (stylesheet; the visual result is checked by the ui-artist in T22, the no-scrollbar rule by the existing e2e of BAG-11)
+**Gate**: full - `cd game && npm test && npm run build && npx playwright test e2e/heroBagCards.spec.js`
+**Done when**:
+
+- [ ] `git diff game/public/style.css` changes only the rules of edits 1 to 9 (`.bag-card`, `button.bag-card:hover:not(:disabled)`, `.bag-card-ribbon`, the two new z-index rules, `.bag-card.frame-wood`, `.bag-card.frame-wood::before`, `.bag-card.frame-silver::before`, `.bag-card.frame-gold::after`, the two new `.bag-detail` rules).
+- [ ] `git diff game/public/style.css | grep "^+" | grep -n "transition\|animation"` prints nothing.
+- [ ] `npm test` and `npm run build` pass; the 15 tests of `e2e/heroBagCards.spec.js` pass.
+
+**Commit**: `style(game): fix the card frames, hover, sparkles and result line`
+
+---
+
+### T18: Fundindo... on the fusion button in flight [ ]
+
+**Owner**: game-dev
+**Goal**: While a fusion request runs, the button that sent it reads `Fundindo...`, the detail carries `is-busy` and its disabled buttons show the progress cursor; the text comes back with the answer (BAG-41, BAG-18; spec D22; review finding #4).
+**Where**: `game/src/adapters/phaser/views/fusionLadderView.js`
+**Also changes**: `game/src/adapters/phaser/HeroUi.js`, `game/public/style.css`, `game/src/adapters/phaser/views/fusionLadderView.test.js`, `game/src/adapters/phaser/HeroUi.test.js`
+**Read first**: `fusionLadderView.js` (whole file, 89 lines: `renderRow`, `renderBagHero`); `HeroUi.js` constructor (`this.fusionBusy = false;`, about `:95`), `openBagHero` (about `:301`), `fuse` (about `:339`), `fuseAll` (about `:398`); `fusionLadderView.test.js:1-10` (fixtures `kael`, `draw`, `byTestid`) and the case `busy disables every row button and Fundir tudo`; `HeroUi.test.js` `describe('HeroUi Mochila fusion')` (fixture `deferred` about `:310`, the case `a second click while a fusion runs sends one request and every fusion button is disabled`) and `describe('HeroUi Fundir tudo')` (fixtures `ladder`, `openKael`, `cascaded`, `deferred`); spec "Fusion ladder" AC 12 and the two edge cases that name BAG-41
+**Depends on**: T16
+**Requirement**: BAG-18, BAG-41
+
+**Contract**:
+
+`fusionLadderView.js`:
+
+```js
+const BUSY_TEXT = 'Fundindo...';
+
+//  renderRow gets `pending` (null, a star layer or 'all'); the row button of the pending layer reads Fundindo...
+const renderRow = (hero, row, { locked, pending, onFuse }) =>
+//  ...unchanged, except the button text:
+//  pending === row.stars ? BUSY_TEXT : `${starsText(row.stars)}→${starsText(row.stars + 1)}`
+
+//  renderBagHero gets `pending = null`:
+export const renderBagHero = (hero, { busy = false, pending = null, confirming = false, result = null, onFuse, onFuseAll, onConfirmAll, onDeclineAll }) =>
+//  detail class: [ 'hero-detail', 'bag-detail', busy ? 'is-busy' : '' ].filter(Boolean).join(' ')
+//  rows: renderRow(hero, row, { locked, pending, onFuse })
+//  Fundir tudo text: pending === 'all' ? BUSY_TEXT : 'Fundir tudo'
+```
+
+`HeroUi.js`:
+
+- constructor, right after `this.fusionBusy = false;`: `this.fusionPending = null;` with the comment `//  The fusion request that runs: { heroId, target } where target is the star layer of a row fusion or 'all'; null when none runs`.
+- `openBagHero`: in the options of `renderBagHero`, right after `busy: this.fusionBusy,` add `pending: this.fusionPending?.heroId === heroId ? this.fusionPending.target : null,`.
+- `fuse (heroId, stars)`: right after `this.fusionBusy = true;` add `this.fusionPending = { heroId, target: stars };`; in `finally`, right after `this.fusionBusy = false;` add `this.fusionPending = null;`.
+- `fuseAll (heroId)`: right after `this.fusionBusy = true;` add `this.fusionPending = { heroId, target: 'all' };`; in `finally`, right after `this.fusionBusy = false;` add `this.fusionPending = null;`.
+
+`style.css`, right after the `.fusion-button.is-secondary` rule:
+
+```css
+/* A fusion request runs: the disabled buttons of the detail say "wait", not "not allowed" */
+.bag-detail.is-busy button:disabled {
+    cursor: progress;
+}
+```
+
+The global `button:disabled { cursor: not-allowed; }` (about `style.css:203`) is not changed.
+
+**Steps**:
+
+1. Edit `fusionLadderView.js` (constant, `renderRow`, `renderBagHero`).
+2. Edit `HeroUi.js` (four places above).
+3. Add the CSS rule.
+4. Add the unit cases below.
+
+**Tests**: unit
+**Test cases**:
+
+`fusionLadderView.test.js`, inside `describe('renderBagHero')`:
+
+- `pending stars puts Fundindo... on that row button only`: `draw(kael({ 0: 6, 1: 3 }), { busy: true, pending: 0 })` → `fusion-button-kael-0` `textContent` `'Fundindo...'` and `disabled` true; `fusion-button-kael-1` `textContent` `'1★→2★'`; `fusion-all` `textContent` `'Fundir tudo'`.
+- `pending all puts Fundindo... on Fundir tudo only`: `draw(kael({ 0: 6, 1: 3 }), { busy: true, pending: 'all' })` → `fusion-all` `textContent` `'Fundindo...'` and `disabled` true; `fusion-button-kael-0` `'0★→1★'`; `fusion-button-kael-1` `'1★→2★'`.
+- `busy marks the detail is-busy`: `draw(kael({ 0: 3 }), { busy: true })` → `classList.contains('is-busy')` true, `classList.contains('bag-detail')` true, `classList.contains('hero-detail')` true; `draw(kael({ 0: 3 }))` → `classList.contains('is-busy')` false.
+- `busy without pending keeps every label`: `draw(kael({ 0: 3 }), { busy: true })` → `fusion-button-kael-0` `'0★→1★'`; `fusion-all` `'Fundir tudo'`.
+
+`HeroUi.test.js`, inside `describe('HeroUi Mochila fusion')` (use its `deferred`):
+
+- `a row fusion in flight reads Fundindo... on its button and the text comes back with the answer`: `createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 6 }), hero('lyra') ] } })`; `const pending = deferred(); ctx.heroesGateway.fuse.mockImplementation(() => pending.promise)`; `await open(ctx, 'bag')`; click `bag-card-kael`; click `fusion-button-kael-0` → `fusion-button-kael-0` `textContent` `'Fundindo...'`; `fusion-all` `textContent` `'Fundir tudo'`; `bag-entry-detail` `classList.contains('is-busy')` true. `pending.resolve(hero('kael', { 0: 3, 1: 1 }))`; `await flush()` → `fusion-button-kael-0` `'0★→1★'`; `bag-entry-detail` `classList.contains('is-busy')` false.
+- `a failed row fusion gives the button its text back`: same setup; click `fusion-button-kael-0`; `pending.reject(new ApiError('x', { status: 409, code: 'NOT_ENOUGH_CARDS' }))`; `await flush()` → `fusion-button-kael-0` `'0★→1★'`; `is-busy` false; `.hero-error` `textContent` `'Não foi possível fundir as cartas.'`.
+- `Voltar and Kael again while the row fusion runs still reads Fundindo...`: same setup; click `fusion-button-kael-0`; click `hero-back`; click `bag-card-kael` → `fusion-button-kael-0` `'Fundindo...'`.
+- `another hero opened while Kael fuses shows no Fundindo... and stays locked until the answer`: `createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 6 }), hero('lyra', { 0: 3 }) ] } })`; deferred `fuse`; open the bag; click `bag-card-kael`; click `fusion-button-kael-0`; click `hero-back`; click `bag-card-lyra` → `fusion-button-lyra-0` `textContent` `'0★→1★'` and `disabled` true; `fusion-all` `textContent` `'Fundir tudo'` and `disabled` true; `bag-entry-detail` `is-busy` true. `pending.resolve(hero('kael', { 0: 3, 1: 1 }))`; `await flush()` → `fusion-button-lyra-0` `disabled` false; `is-busy` false.
+
+`HeroUi.test.js`, inside `describe('HeroUi Fundir tudo')` (use its `deferred`, `ladder`, `openKael`, `cascaded`):
+
+- `Fundir tudo in flight reads Fundindo... and Fundir tudo comes back with the answer`: `createUi({ list: ladder() })`; `const pending = deferred(); ctx.heroesGateway.fuseAll.mockImplementation(() => pending.promise)`; `await openKael(ctx)`; click `fusion-all`; click `fusion-all-yes` → `fusion-all` `'Fundindo...'`; `fusion-button-kael-0` `'0★→1★'`; `bag-entry-detail` `is-busy` true. `pending.resolve(cascaded())`; `await flush()` → `fusion-all` `'Fundir tudo'`; `is-busy` false.
+- `a failed Fundir tudo gives Fundir tudo its text back`: same setup; yes; `pending.reject(new ApiError('x', { status: 409, code: 'NOTHING_TO_FUSE' }))`; `await flush()` → `fusion-all` `'Fundir tudo'` and `disabled` false (the 45/1/2 bag is unchanged); `is-busy` false.
+
+**Gate**: quick - `cd game && npm test && npm run build`
+**Done when**:
+
+- [ ] The 10 new cases pass (4 in `fusionLadderView.test.js`, 6 in `HeroUi.test.js`); every other game unit test passes unchanged.
+- [ ] `grep -n "Fundindo..." game/src/adapters/phaser/views/fusionLadderView.js` prints exactly one line (the constant).
+
+**Commit**: `feat(game): show Fundindo... on the fusion button in flight`
+
+---
+
+### T19: Split the Fundir tudo preview into Antes and Depois lines [ ]
+
+**Owner**: game-dev
+**Goal**: The confirmation of Fundir tudo shows two labelled preview lines, `Antes: <before>` and `Depois: <after>`, at 15 px, instead of the arrow line (BAG-32 as amended; spec D14, D21; review finding #6).
+**Where**: `game/src/domain/heroes/bagCards.js`
+**Also changes**: `game/src/domain/heroes/bagCards.test.js`, `game/src/adapters/phaser/views/fusionLadderView.js`, `game/src/adapters/phaser/views/fusionLadderView.test.js`, `game/src/adapters/phaser/HeroUi.test.js`, `game/public/style.css`
+**Read first**: `bagCards.js:60-77` (`layersText`, `previewText`); `bagCards.test.js:1-5` (imports, fixture `hero`) and `describe('previewText')` (about `:121-125`); `fusionLadderView.js` `renderConfirm` (after T18); `fusionLadderView.test.js` case `the confirmation shows the question and the preview and locks the ladder`; `HeroUi.test.js` case `Fundir tudo asks first with the count and the preview and sends nothing`; `style.css` rule `.fusion-all-preview` (about `:1951`); design.md § Fundir tudo
+**Depends on**: T18
+**Requirement**: BAG-32
+
+**Contract**:
+
+`bagCards.js`: delete `previewText` and its comment; in its place add
+
+```js
+//  The two lines of the Fundir tudo preview: { before: 'Antes: 45×0★ + 1×1★ + 2×2★', after: 'Depois: 1×1★ + 1×2★ + 2×3★' }
+export const previewLines = (hero) =>
+{
+    const { after } = cascade(hero);
+
+    return {
+        before: `Antes: ${layersText(copyLayers(hero))}`,
+        after: `Depois: ${layersText(LAYERS.map((stars) => ({ stars, copies: after[stars] })))}`
+    };
+};
+```
+
+`fusionLadderView.js`: in the import from `bagCards`, `previewText` becomes `previewLines`. In `renderConfirm`, the line `el('p', 'fusion-all-preview', previewText(hero), { testid: 'fusion-all-preview' }),` is replaced by the variable `preview`, built before `box.append(...)`:
+
+```js
+const { before, after } = previewLines(hero);
+const preview = el('div', 'fusion-all-preview', '', { testid: 'fusion-all-preview' });
+
+preview.append(
+    el('p', 'fusion-all-before', before, { testid: 'fusion-all-before' }),
+    el('p', 'fusion-all-after', after, { testid: 'fusion-all-after' })
+);
+```
+
+and `box.append(question, preview, actions)` keeps the order question, preview, actions.
+
+`style.css`: the `.fusion-all-preview` rule becomes exactly the two rules
+
+```css
+.fusion-all-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    font: 600 15px var(--font-body);
+}
+
+.fusion-all-before,
+.fusion-all-after {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+```
+
+**Steps**:
+
+1. Edit `bagCards.js`, then `fusionLadderView.js`, then `style.css`.
+2. Update the unit tests below.
+3. `grep -rn "previewText" game/src` must print nothing.
+
+**Tests**: unit
+**Test cases**:
+
+`bagCards.test.js`: in the import list `previewText` becomes `previewLines`; `describe('previewText')` and its one case are replaced by `describe('previewLines')` with (`toEqual`):
+
+- `previewLines of 45, 1 and 2 copies`: `hero({ 0: 45, 1: 1, 2: 2 })` → `{ before: 'Antes: 45×0★ + 1×1★ + 2×2★', after: 'Depois: 1×1★ + 1×2★ + 2×3★' }`.
+- `previewLines of 3 blank copies`: `hero({ 0: 3 })` → `{ before: 'Antes: 3×0★', after: 'Depois: 1×1★' }`.
+- `previewLines keeps the copies left and the 9-star copies`: `hero({ 8: 7, 9: 1 })` → `{ before: 'Antes: 7×8★ + 1×9★', after: 'Depois: 1×8★ + 3×9★' }`.
+
+`fusionLadderView.test.js`, case `the confirmation shows the question and the preview and locks the ladder`: the line that expects `fusion-all-preview` `textContent` `'45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★'` is replaced by:
+
+- `fusion-all-preview` `tagName` `'DIV'`; its children's `data-testid` `[ 'fusion-all-before', 'fusion-all-after' ]`;
+- `fusion-all-before` `textContent` `'Antes: 45×0★ + 1×1★ + 2×2★'`; `fusion-all-after` `textContent` `'Depois: 1×1★ + 1×2★ + 2×3★'`;
+- `fusion-all-preview` `textContent` does not contain `'→'`.
+
+Every other assertion of that case stays.
+
+`HeroUi.test.js`, case `Fundir tudo asks first with the count and the preview and sends nothing`: the line that expects `fusion-all-preview` `textContent` `'45×0★ ... → ...'` is replaced by `fusion-all-before` `textContent` `'Antes: 45×0★ + 1×1★ + 2×2★'` and `fusion-all-after` `textContent` `'Depois: 1×1★ + 1×2★ + 2×3★'`. Every other assertion stays.
+
+`e2e/heroBagCards.spec.js` test `Fundir tudo previews the cascade and Não sends nothing` still expects the arrow line and fails from this commit until T21 updates it; do not edit it here (owner `test-engineer`).
+
+**Gate**: quick - `cd game && npm test && npm run build`
+**Done when**:
+
+- [ ] The 3 `previewLines` cases and the two changed cases pass; every other game unit test passes.
+- [ ] `grep -rn "previewText\|→ 1×1★" game/src` prints nothing.
+
+**Commit**: `feat(game): split the Fundir tudo preview into Antes and Depois lines`
+
+---
+
+### T20: Larger rarity gems on the item tiles [ ]
+
+**Owner**: game-dev
+**Goal**: Each rarity gem is a 10x10 px square with a 5 px gap, so the colour reads at 8 px and the 4 LEGENDARY gems stay inside the 60 px tile, still centered (BAG-40, BAG-01; spec D23; review finding #7).
+**Where**: `game/public/style.css`
+**Read first**: `style.css` rules `.piece-gems` and `.piece-gem` (about `:2483-2499`); design.md § Rarity gems
+**Depends on**: T16
+**Requirement**: BAG-01, BAG-40
+
+**Contract**: three lines change, nothing else:
+
+- in `.piece-gems`: `gap: 2px;` becomes `gap: 5px;` (`top: -5px`, `left: 50%`, `transform: translateX(-50%)` stay);
+- in `.piece-gem`: `width: 7px;` becomes `width: 10px;` and `height: 7px;` becomes `height: 10px;` (border, `transform: rotate(45deg)` and `background` stay).
+
+**Steps**:
+
+1. Change the three lines.
+2. Run the gate.
+
+**Tests**: none (stylesheet; the e2e of BAG-40 is in T21; the existing centred-gems e2e of BAG-01 runs in the gate)
+**Gate**: full - `cd game && npm test && npm run build && npx playwright test e2e/heroBagCards.spec.js e2e/equipmentUi.spec.js e2e/bulkSell.spec.js --grep-invert "Fundir tudo previews the cascade"` (that one test expects the old arrow preview and fails from T19 until T21)
+**Done when**:
+
+- [ ] `git diff --stat game/public/style.css` shows 3 insertions and 3 deletions.
+- [ ] The gate passes, `the rarity gems sit centered on the top edge of every piece tile` included.
+
+**Commit**: `style(game): enlarge the rarity gems of the item tiles`
+
+---
+
+### T21: e2e of the review fixes [ ]
+
+**Owner**: test-engineer
+**Goal**: Pin in the browser the amended preview (BAG-32), the in-flight label and cursor (BAG-41, BAG-18), the hidden badge of the detail card (BAG-08) and the gem size (BAG-40).
+**Where**: `game/e2e/heroBagCards.spec.js`
+**Read first**: `game/e2e/heroBagCards.spec.js` (whole file: helpers `startWith`, `openBag`, `openHero`, `copiesText`, `posts`, `piece`, the constant `KAEL_LADDER`, and the tests named below); spec "Centered rarity gems" AC 3, "One card per hero" AC 6, "Fusion ladder" AC 12, "Fundir tudo on the screen" AC 2, the edge cases that name BAG-41; design.md § Rarity gems
+**Depends on**: T17, T18, T19, T20
+**Requirement**: BAG-08, BAG-18, BAG-32, BAG-40, BAG-41
+
+**Contract**: change three tests and add two, nothing else in the file. Every existing assertion of the changed tests stays, except the one preview line named in change 1.
+
+1. `Fundir tudo previews the cascade and Não sends nothing` (BAG-32): replace `await expect(page.getByTestId('fusion-all-preview')).toHaveText('45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★');` with:
+
+```js
+await expect(page.getByTestId('fusion-all-before')).toHaveText('Antes: 45×0★ + 1×1★ + 2×2★');
+await expect(page.getByTestId('fusion-all-after')).toHaveText('Depois: 1×1★ + 1×2★ + 2×3★');
+await expect(page.getByTestId('fusion-all-preview')).not.toContainText('→');
+await expect(page.getByTestId('fusion-all-before')).toHaveCSS('font-size', '15px');
+await expect(page.getByTestId('fusion-all-after')).toHaveCSS('font-size', '15px');
+
+const beforeBox = await page.getByTestId('fusion-all-before').boundingBox();
+const afterBox = await page.getByTestId('fusion-all-after').boundingBox();
+
+//  Two lines, Antes above Depois, neither wider than its box
+expect(beforeBox.y + beforeBox.height).toBeLessThanOrEqual(afterBox.y + 0.5);
+for (const id of [ 'fusion-all-before', 'fusion-all-after' ]) {
+    expect(await page.getByTestId(id).evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+}
+```
+
+2. `a card opens the ladder with the owned layers and the next reachable one` (BAG-08): right after `await expect(page.getByTestId('bag-detail-card-kael')).toBeVisible();` add `await expect(page.getByTestId('bag-detail-card-kael').locator('.bag-card-fuse')).toBeHidden();`.
+3. `a fusion in flight disables the ladder and keeps Voltar` (BAG-18, BAG-41): right after `await expect(page.getByTestId('hero-back')).toBeEnabled();` add
+
+```js
+await expect(page.getByTestId('fusion-button-kael-0')).toHaveText('Fundindo...');
+await expect(page.getByTestId('fusion-all')).toHaveText('Fundir tudo');
+await expect(page.getByTestId('bag-entry-detail')).toHaveClass(/\bis-busy\b/);
+await expect(page.getByTestId('fusion-button-kael-0')).toHaveCSS('cursor', 'progress');
+await expect(page.getByTestId('fusion-all')).toHaveCSS('cursor', 'progress');
+```
+
+and at the end of the test (after `copiesText(page, 'kael', 0)` `'3/3'`) add
+
+```js
+await expect(page.getByTestId('fusion-button-kael-0')).toHaveText('0★→1★');
+await expect(page.getByTestId('bag-entry-detail')).not.toHaveClass(/\bis-busy\b/);
+//  1/3 left on the 1-star row: disabled for lack of copies, so the cursor is not-allowed, not progress
+await expect(page.getByTestId('fusion-button-kael-1')).toBeDisabled();
+await expect(page.getByTestId('fusion-button-kael-1')).toHaveCSS('cursor', 'not-allowed');
+```
+
+4. New test after the previous one, `Fundir tudo in flight reads Fundindo... and comes back after the answer` (BAG-41): `await startWith(page, KAEL_LADDER)`; hold the request exactly as test 3 does, with the glob `'**/api/heroes/kael/fuse-all'`; `openHero(page, 'kael')`; click `fusion-all`; click `fusion-all-yes` → `fusion-all` `toHaveText('Fundindo...')` and `toBeDisabled()`; `fusion-button-kael-0` `toHaveText('0★→1★')` and `toBeDisabled()`; `bag-entry-detail` `toHaveClass(/\bis-busy\b/)`; `fusion-all` `toHaveCSS('cursor', 'progress')`. `release()` → `fusion-result` `toHaveText('22 fusões. Melhor carta: Kael Raizférrea 3★')`; `fusion-all` `toHaveText('Fundir tudo')` and `toBeDisabled()` (nothing left to fuse) and `toHaveCSS('cursor', 'not-allowed')`; `bag-entry-detail` `not.toHaveClass(/\bis-busy\b/)`.
+5. New test at the end of the describe, `each rarity gem is a 10 px square and the gem rows fit their tiles` (BAG-40): `await startWith(page, { 'kael:0': 1 }, { equipment: [ piece('m1', 'RING', 'LEGENDARY', 2), piece('w1', 'WEAPON', 'EPIC', 0, 'kael') ] })`; click `hud-equipment`; `equipment-list` visible. For `[ [ 'equip-piece-m1', 4, 55 ], [ 'equip-slot-kael-WEAPON', 3, 40 ] ]` as `[ testid, count, width ]`:
+
+```js
+const tile = page.getByTestId(testid);
+const gems = tile.locator('.piece-gem');
+
+await expect(gems).toHaveCount(count);
+for (let i = 0; i < count; i++) {
+    await expect(gems.nth(i)).toHaveCSS('width', '10px');
+    await expect(gems.nth(i)).toHaveCSS('height', '10px');
+}
+await expect(tile.locator('.piece-gems')).toHaveCSS('column-gap', '5px');
+
+const tileBox = await tile.boundingBox();
+const rowBox = await tile.locator('.piece-gems').boundingBox();
+//  The window is scaled to the viewport: the 60 px tile tells the factor
+const scale = tileBox.width / 60;
+
+expect(Math.abs(rowBox.width / scale - width)).toBeLessThanOrEqual(0.5);
+expect(rowBox.x).toBeGreaterThanOrEqual(tileBox.x);
+expect(rowBox.x + rowBox.width).toBeLessThanOrEqual(tileBox.x + tileBox.width);
+```
+
+**Steps**:
+
+1. Make changes 1 to 5.
+2. Run the gate.
+3. Run once `cd game && npx playwright test e2e/heroes.spec.js e2e/heroAscension.spec.js e2e/uiRedesign.spec.js e2e/equipmentUi.spec.js e2e/bulkSell.spec.js` (T17 to T20 changed shared CSS); a failure is rerun alone twice with `--workers=1` and counts as a flake only when it passes both times; report any other failure with its test name.
+
+**Tests**: e2e
+**Gate**: full - `cd game && npm test && npx playwright test e2e/heroBagCards.spec.js`
+**Done when**:
+
+- [ ] `e2e/heroBagCards.spec.js` has 17 tests (15 + 2) and all pass.
+- [ ] `grep -n "→ 1×1★" game/e2e/heroBagCards.spec.js` prints nothing.
+- [ ] The five files of step 3 pass (flakes named as such).
+
+**Commit**: `test(game): cover Fundindo..., the Antes/Depois preview and the gems`
+
+---
+
+### T22: UI re-review of the card, ladder and gem fixes [ ]
+
+**Owner**: ui-artist
+**Goal**: Check findings #1 to #7 of the T16 review and the two taken suggestions against the amended design.md on new screenshots; a pass closes the review, any new finding becomes a task (BAG-01, BAG-04, BAG-05, BAG-07, BAG-08, BAG-32, BAG-35, BAG-40, BAG-41, visual part; AD-022).
+**Where**: `game/ui-review/heroBagCards.shots.js`
+**Also changes**: `.specs/features/hero-bag-cards/ui-review.html`, `.specs/features/hero-bag-cards/ui-review/*.png`
+**Read first**: the T16 `ui-review.html` (findings #1 to #8, § Sugestões); `.claude/templates/ui-review.html`; `game/ui-review/heroBagCards.shots.js` (tests `fuse all`, `busy`); design.md § Card, § Card frames, § Fundir tudo, § Rarity gems (every value marked T17 to T20); spec D21 to D27
+**Depends on**: T21
+**Requirement**: BAG-01, BAG-04, BAG-05, BAG-07, BAG-08, BAG-32, BAG-35, BAG-40, BAG-41
+
+**Contract**: shots 01 to 16 are taken again with the same names (they overwrite the T16 files), with three script changes, both projects of `ui-review.config.js`:
+
+- test `fuse all`: the `PROBE preview` line logs `scrollWidth/clientWidth` of `fusion-all-before` and of `fusion-all-after` (two values) instead of `fusion-all-preview`.
+- test `busy`: before shot `11-fusion-busy`, wait for `fusion-button-kael-0` `toHaveText('Fundindo...')`.
+- new test `fuse all busy` after `busy`: `startWith(page, KAEL_LADDER)`, hold `'**/api/heroes/kael/fuse-all'` as the `busy` test holds `/fuse`, `openHero(page, 'kael')`, click `fusion-all`, click `fusion-all-yes`, wait for `fusion-all` `toHaveText('Fundindo...')`, `page.mouse.move(0, 0)`, shot `17-fuse-all-busy`, then `release()`.
+
+**Steps**:
+
+1. Change the script; run `cd game && npm run ui:shots -- heroBagCards`.
+2. Check, desktop and phone:
+   - #1 (shots 02, 07): no gold sparkle on a chip, the ribbon, the star badge or the `Não encontrado` text; the sparkles sit on the frame edge and the portrait.
+   - #2 (shots 01, 03): the hover ring of Kael is an opaque gold band outside the dark ring and the card is brighter than in 01.
+   - #3 (shots 01, 05, 02): the wood frame reads warm brown with a light rivet on each iron corner; the silver frame shows three leaves per corner; wood, silver and gold differ at a glance and in grayscale.
+   - #4 (shots 11, 17): `Fundindo...` on the clicked button only (row button in 11, `Fundir tudo` in 17); the other buttons keep their text.
+   - #5 (shot 10): the result line is 16 px and no line holds a single word.
+   - #6 (shot 08 and the probe): two lines `Antes: 45×0★ + 1×1★ + 2×2★` and `Depois: 1×1★ + 1×2★ + 2×3★`, 15 px, `scrollWidth <= clientWidth` on both.
+   - #7 (shots 14, 15, 16): each gem shows at least 8 px of colour, the 4 LEGENDARY gems do not touch, every row is centred and inside its tile.
+   - D25 (shot 05): the detail card shows no `Fundir` badge.
+   - D26 (shots 01, 02): the chips of every card start at the same height (skip and say so if T17 reported "D26 not taken").
+3. Rewrite `ui-review.html` from `.claude/templates/ui-review.html` as the round 2 review: verdict (APROVADO or ALTERAÇÕES), findings #1 to #7 and D25, D26 each marked resolved or not with the shot that shows it, finding #8 marked out of scope (TD-010), any new finding numbered from #9 with severity, selector, shot and exact fix.
+
+**Tests**: none (review task; the screenshots are not tests)
+**Gate**: build - `cd game && npm run ui:shots -- heroBagCards` exits 0
+**Done when**:
+
+- [ ] 34 PNG files (17 shots x 2 projects) are under `.specs/features/hero-bag-cards/ui-review/`.
+- [ ] `ui-review.html` names a verdict and states, for findings #1 to #7, D25 and D26, resolved or not with the shot that shows it.
+
+**Commit**: `docs(hero-bag-cards): ui re-review of the card, ladder and gem fixes`
 
 ---
 
 ## Phase Execution Map
 
-Phases run in sequence; tasks inside a phase run in the listed order (T1, T2, T3; T4, T5, T6; T7, T8, T9, T10; T11, T12; T13, T14, T15; T16).
+Phases run in sequence; tasks inside a phase run in the listed order (T1, T2, T3; T4, T5, T6; T7, T8, T9, T10; T11, T12; T13, T14, T15; T16; T17, T18, T19, T20; T21, T22).
 
-Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3 `kotlin-backend-dev`, T4 to T6 `game-dev`); batch 2 = Phases 3 and 4 (T7 to T12, `game-dev`); batch 3 = Phases 5 and 6 (T13 to T15 `test-engineer`, then T16 `ui-artist`). After T16 the `verifier` agent (Opus, not an author of this feature) runs as the Verifier; the `test-engineer` runs its author check first.
+Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3 `kotlin-backend-dev`, T4 to T6 `game-dev`); batch 2 = Phases 3 and 4 (T7 to T12, `game-dev`); batch 3 = Phases 5 and 6 (T13 to T15 `test-engineer`, then T16 `ui-artist`). Review round (added after T16): batch 4 = Phases 7 and 8 (T17 to T20 `game-dev`, then T21 `test-engineer`, then T22 `ui-artist`). After T22 the `verifier` agent (Opus, not an author of this feature) runs as the Verifier; the `test-engineer` runs its author check first.
 
 ---
 
@@ -1369,6 +1873,12 @@ Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3
 | T14: hero e2e migration | 2 spec files, locators only | ⚠️ OK |
 | T15: ui-redesign e2e and shots migration | 1 spec + 2 scripts, locators only | ⚠️ OK |
 | T16: UI review | 1 review | ✅ Granular |
+| T17: card and result CSS fixes | 1 stylesheet, 9 listed rules | ⚠️ OK (one review round of CSS-only fixes, every value given) |
+| T18: Fundindo... in flight | 1 view option + 1 HeroUi field + 1 CSS rule | ✅ Granular |
+| T19: Antes/Depois preview | 1 function + its view | ✅ Granular |
+| T20: larger gems | 3 CSS lines | ✅ Granular |
+| T21: e2e of the fixes | 1 spec file | ✅ Granular |
+| T22: UI re-review | 1 shots file + report | ✅ Granular |
 
 ## Diagram-Definition Cross-Check
 
@@ -1390,6 +1900,12 @@ Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3
 | T14 | T12 | T12 → T14 | ✅ Match |
 | T15 | T12 | T12 → T15 | ✅ Match |
 | T16 | T13, T14, T15 | T13 → T16, T14 → T16, T15 → T16 | ✅ Match |
+| T17 | T16 | T16 → T17 | ✅ Match |
+| T18 | T16 | T16 → T18 | ✅ Match |
+| T19 | T18 | T18 → T19 | ✅ Match |
+| T20 | T16 | T16 → T20 | ✅ Match |
+| T21 | T17, T18, T19, T20 | T17 → T21, T18 → T21, T19 → T21, T20 → T21 | ✅ Match |
+| T22 | T21 | T21 → T22 | ✅ Match |
 
 ## Test Co-location Validation
 
@@ -1411,7 +1927,13 @@ Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3
 | T14 | e2e | e2e | e2e | ✅ OK |
 | T15 | e2e | e2e | e2e | ✅ OK |
 | T16 | Review artifact | none | none | ✅ OK |
+| T17 | Stylesheet | none | none | ✅ OK |
+| T18 | Game views, `HeroUi`, stylesheet | unit | unit | ✅ OK |
+| T19 | Game domain, game views, stylesheet | unit | unit | ✅ OK |
+| T20 | Stylesheet | none | none | ✅ OK |
+| T21 | e2e | e2e | e2e | ✅ OK |
+| T22 | Review artifact | none | none | ✅ OK |
 
 ## Requirement Coverage
 
-Every BAG requirement maps to at least one task (spec § Requirement Traceability): 39 total, 39 mapped, 0 unmapped. Player-visible requirements with e2e: BAG-01 to BAG-21 and BAG-31 to BAG-39 (T13, T14, T15); BAG-22 (late answers) and BAG-23 to BAG-30 (server) are unit and integration only, as in `bulk-sell` D14.
+Every BAG requirement maps to at least one task (spec § Requirement Traceability): 41 total, 41 mapped, 0 unmapped (BAG-40 and BAG-41 added by the review round). Player-visible requirements with e2e: BAG-01 to BAG-21 and BAG-31 to BAG-39 (T13, T14, T15), BAG-40 and BAG-41 and the amended BAG-08 and BAG-32 (T21); BAG-22 (late answers) and BAG-23 to BAG-30 (server) are unit and integration only, as in `bulk-sell` D14.

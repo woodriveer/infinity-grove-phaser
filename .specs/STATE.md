@@ -213,6 +213,13 @@ TD-001 to TD-008 are recorded in the spec of the feature that found them (`chara
 - **Found**: Verifier round 1 of `boss-replay-chapters`, finding F1 (`5259af2`); ruled non-blocking by the product owner at acceptance (2026-11-17)
 - **Status**: resolved (2026-11-17): T20 and T21 of `.specs/features/boss-replay-chapters/tasks.md` done, Verifier round 3 PASS (`59efb0d`, sensor 10 of 10 killed), BRC-10 Verified and accepted by the product owner (`tasks.md` § Acceptance of Phase 8); ships in v0.3.1
 
+### TD-010
+- **Debt**: On a phone every panel text is too small to read. The game is one 1024x768 canvas (`game/src/main.js:14-23`, `Phaser.Scale.FIT`) and the DOM panel scales with it, so at 390x844 everything is drawn at about 0.38: the 11 px chips of the Mochila cards render at about 4 px, the 13 px ribbon at about 5 px, and the same holds for every screen (catalog, ladder, Equipamento, Talentos, Rever chefes). Only the start notice has a phone override today (`game/public/style.css:343-348`, `.auth-message` 30 px under `@media (max-width: 640px)`).
+- **Proposed rule**: On a viewport narrower than 640 px the panel screens get a phone layout (larger type and fewer columns, or a panel drawn outside the scaled canvas) so that no player-facing text renders below 11 px on screen at 390x844.
+- **Fix**: a dedicated feature (responsive panel layout); not part of `hero-bag-cards`, whose phone e2e only pins the no-scrollbar rule (BAG-11).
+- **Found**: `hero-bag-cards` ui-artist review T16, finding #8 (phone shots 01 to 16, commit `4dc43c3`); ruled out of scope by the product owner on 2026-11-17 (spec D27)
+- **Status**: open
+
 ## Handoff
 
 - **Features**: `ui-redesign` (AD-022, `.specs/features/ui-redesign/`) and `boss-replay-chapters` (AD-024, `.specs/features/boss-replay-chapters/`)
@@ -222,7 +229,7 @@ TD-001 to TD-008 are recorded in the spec of the feature that found them (`chara
 - **Next step**: `gitops` cuts patch release v0.3.1 (TD-009 fix, BRC-10): deploy check, production check, `report.html` of the TD-009 range, `CHANGELOG.md`, tag (v0.3.0 of both features is cut, `4f4f9c7`)
 - **Waiting for the owner**: `ui-redesign`: the PO rulings marked `n` in its spec Assumptions table (D2, D3, findings #10 to #13, the `Click to Start!` ruling; list in its `tasks.md` § Acceptance; #10 and #12 are owner art). `boss-replay-chapters`: nothing (the owner answered the F1 ruling on 2026-11-17: "Sim, corrija", fixed by TD-009 Phase 8, accepted)
 - **Blockers**: none
-- **Next candidate work**: `hero-bag-cards` (AD-025, `.specs/features/hero-bag-cards/`): spec, design and tasks T1 to T16 written by the product owner on 2026-11-17; waiting for the owner's approval and the answers to Q1 to Q8 of its spec before any task runs
+- **Next candidate work**: `hero-bag-cards` (AD-025, `.specs/features/hero-bag-cards/`): T1 to T15 done (the owner approved the spec with the recommended answers to Q1 to Q8); ui-artist review T16 gave ALTERAÇÕES (`4dc43c3`, findings #1 to #8). The product owner turned findings #1 to #7 and the two review suggestions into T17 to T22 (spec D21 to D27, new BAG-40 and BAG-41, amended BAG-08 and BAG-32); finding #8 is TD-010. Next: the owner approves T17 to T22 and the PO rulings D22 to D26 (marked `n`), then `game-dev` runs T17 to T20, `test-engineer` T21, `ui-artist` T22, then the Verifier
 - **Notes for the resume**: (1) a failing e2e test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both (seen so far: `dragEquip.spec.js:550`, `:586`, `:604`, `:670`, `talents.spec.js:148` and `:111`, `auth.spec.js:113`, `clickPower.spec.js:41`, `uiRedesign.spec.js:2089`, `uiRedesign.spec.js:1529`, `dragEquip.spec.js:640`). (2) The hero detail magenta test `shows no magenta in the detail of any of the five heroes` (`game/e2e/uiRedesign.spec.js:2089`) takes about 30 s alone of its 60 s budget and timed out under 3-worker load in round 3: the next task that touches that file splits it into one test per hero or marks it `test.slow()`, without changing an asserted value (Verifier note N1, owner `test-engineer`). (3) Line numbers quoted in `tasks.md` drift: locate edits by test name or exact text
 - **Uncommitted files**: owner's, never stage them: `CLAUDE.md`, `GEMINI.md`, `graphify-out/`, `.agents/`, `.claude/skills/impeccable/`, `.claude/skills/reversa-*/`
 - **Branch**: main
