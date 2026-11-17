@@ -1,5 +1,6 @@
 package br.com.woodriver.infinity_grove_ws.usecase
 
+import br.com.woodriver.infinity_grove_ws.domain.FuseAllView
 import br.com.woodriver.infinity_grove_ws.domain.HeroView
 import br.com.woodriver.infinity_grove_ws.domain.HeroesView
 
@@ -9,12 +10,20 @@ interface ListHeroesUseCase {
 }
 
 interface FuseCardsUseCase {
-    /** Turns 3 cards of [heroId] with [stars] stars (0 to 2) into one card of the next stars. */
+    /** Turns 3 cards of [heroId] with [stars] stars (0 to 8) into one card of the next stars. */
     fun fuse(
         username: String,
         heroId: String,
         stars: Int,
     ): HeroView
+}
+
+interface FuseAllCardsUseCase {
+    /** Fuses every layer of [heroId] from 0 stars up to 9 as far as the copies go and returns the hero and the number of fusions. */
+    fun fuseAll(
+        username: String,
+        heroId: String,
+    ): FuseAllView
 }
 
 interface SetLeaderUseCase {

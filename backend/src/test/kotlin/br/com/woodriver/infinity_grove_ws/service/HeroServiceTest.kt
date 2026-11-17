@@ -11,6 +11,7 @@ import br.com.woodriver.infinity_grove_ws.domain.HeroNotOwnedException
 import br.com.woodriver.infinity_grove_ws.domain.HeroSeed
 import br.com.woodriver.infinity_grove_ws.domain.InvalidFusionException
 import br.com.woodriver.infinity_grove_ws.domain.NotEnoughCardsException
+import br.com.woodriver.infinity_grove_ws.domain.NothingToFuseException
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCardsMissingException
 import br.com.woodriver.infinity_grove_ws.domain.User
@@ -216,5 +217,68 @@ class HeroServiceTest {
         service.fuse("yan", "kael", 0)
 
         assertEquals(mapOf(CopyKey("lyra", 0) to 1), cards.cards.getValue("ana").copies)
+    }
+
+    @Test
+    fun `fuse all stores the cascade and returns the hero with the fusion count`() {
+        player(extra = mapOf(CopyKey("kael", 0) to 45, CopyKey("kael", 1) to 1, CopyKey("kael", 2) to 2))
+
+        val result = service.fuseAll("yan", "kael")
+
+        assertEquals(22, result.fusions)
+        assertEquals(3, result.hero.stars)
+        assertEquals(mapOf(0 to 0, 1 to 1, 2 to 1, 3 to 2, 4 to 0, 5 to 0, 6 to 0, 7 to 0, 8 to 0, 9 to 0), result.hero.copies)
+        assertEquals(
+            mapOf(CopyKey("kael", 1) to 1, CopyKey("kael", 2) to 1, CopyKey("kael", 3) to 2),
+            cards.cards.getValue("yan").copies,
+        )
+    }
+
+    @Test
+    fun `fuse all of three 3-star cards returns a 4-star hero with levels 2, 1 and 1`() {
+        player(extra = mapOf(CopyKey("kael", 3) to 3))
+
+        val result = service.fuseAll("yan", "kael")
+
+        assertEquals(1, result.fusions)
+        assertEquals(4, result.hero.stars)
+        assertEquals(listOf(2, 1, 1), result.hero.skills.map { it.level })
+    }
+
+    @Test
+    fun `fuse all with nothing to fuse leaves the bag unchanged`() {
+        player()
+
+        assertFailsWith<NothingToFuseException> { service.fuseAll("yan", "kael") }
+
+        assertEquals(mapOf(CopyKey("kael", 0) to 1), cards.cards.getValue("yan").copies)
+    }
+
+    @Test
+    fun `fuse all of an unknown hero fails and leaves the bag unchanged`() {
+        player(extra = mapOf(CopyKey("kael", 0) to 3))
+
+        assertFailsWith<HeroNotFoundException> { service.fuseAll("yan", "ghost") }
+
+        assertEquals(mapOf(CopyKey("kael", 0) to 3), cards.cards.getValue("yan").copies)
+    }
+
+    @Test
+    fun `fuse all for an unknown user fails`() {
+        assertFailsWith<UserNotFoundException> { service.fuseAll("nobody", "kael") }
+    }
+
+    @Test
+    fun `fuse all is logged with the player and the hero`() {
+        player(extra = mapOf(CopyKey("kael", 0) to 3))
+
+        LogCapture(HeroService::class.java).use { serviceLogs ->
+            LogCapture(PlayerCards::class.java).use { cardLogs ->
+                service.fuseAll("yan", "kael")
+
+                assertTrue(serviceLogs.infos.any { it.contains("Fuse all requested username=yan hero=kael") })
+                assertTrue(cardLogs.infos.any { it.contains("fusions=1") })
+            }
+        }
     }
 }
