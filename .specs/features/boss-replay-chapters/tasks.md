@@ -620,7 +620,7 @@ In `renderFarm`, right after `screen.append(el('h3', 'farm-map-title', ...))`, a
 
 ---
 
-### T9: Grove style of the chapter chips [ ]
+### T9: Grove style of the chapter chips [x]
 
 **Owner**: game-dev
 **Goal**: The chips follow the Visual Spec of the spec in the Grove theme (BRC-04; spec Visual Spec; AD-022).
@@ -709,7 +709,7 @@ The disabled look comes from the existing global `button:disabled` rule (opacity
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `npm test` and `npm run build` pass; `git diff --stat` lists only `style.css` and `tasks.md`.
+- [x] `npm test` and `npm run build` pass; `git diff --stat` lists only `style.css` and `tasks.md`.
 
 **Commit**: `style(game): draw the chapter chips in the Grove theme`
 
