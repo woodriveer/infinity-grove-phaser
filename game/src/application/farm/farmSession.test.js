@@ -135,4 +135,72 @@ describe('farmSession', () => {
             expect(farm.definitionOf(2)).toBe(D2);
         });
     });
+
+    describe('cancel', () => {
+        const answerOf2 = { chapter: 2, chapters: [ 1, 2, 3 ], bosses: [], chapterBossWinsLeft: 4, definition: { bossHealth: 2 } };
+
+        it('cancel drops the answer of a load still pending', async () => {
+            let answer;
+            gateway.get.mockReturnValueOnce(new Promise((resolve) => { answer = resolve; }));
+            const pending = farm.load(2);
+            farm.cancel();
+
+            answer({ chapter: 2, chapters: [ 1, 2, 3 ], bosses: [ { kind: 'CHAPTER_BOSS' } ], chapterBossWinsLeft: 4, definition: { bossHealth: 2 } });
+            await pending;
+
+            expect(farm.bosses()).toEqual([]);
+            expect(farm.winsLeft()).toBeNull();
+            expect(farm.chapter()).toBeNull();
+            expect(farm.chapters()).toEqual([]);
+            expect(farm.definitionOf(2)).toBeNull();
+        });
+
+        it('cancel keeps the state already loaded', async () => {
+            await farm.load();
+
+            farm.cancel();
+
+            expect(farm.bosses()).toEqual(state.bosses);
+            expect(farm.winsLeft()).toBe(7);
+        });
+
+        it('a load started after cancel keeps its answer', async () => {
+            farm.cancel();
+
+            await farm.load();
+
+            expect(farm.bosses()).toEqual(state.bosses);
+            expect(farm.winsLeft()).toBe(7);
+        });
+
+        it('cancel drops only the loads started before it', async () => {
+            let answer;
+            gateway.get.mockReturnValueOnce(new Promise((resolve) => { answer = resolve; }));
+            const first = farm.load(2);
+            farm.cancel();
+
+            await farm.load();
+            answer(answerOf2);
+            await first;
+
+            expect(farm.bosses()).toEqual(state.bosses);
+            expect(farm.winsLeft()).toBe(7);
+            expect(farm.chapter()).toBeNull();
+            expect(farm.definitionOf(2)).toBeNull();
+        });
+
+        it('a load pending across a cancel still rejects with its failure and keeps the state', async () => {
+            await farm.load();
+            let fail;
+            gateway.get.mockReturnValueOnce(new Promise((_, reject) => { fail = reject; }));
+            const pending = farm.load(1);
+            farm.cancel();
+
+            fail(new ApiError('Cannot reach the server. Try again later.'));
+
+            await expect(pending).rejects.toBeInstanceOf(ApiError);
+            expect(farm.bosses()).toEqual(state.bosses);
+            expect(farm.winsLeft()).toBe(7);
+        });
+    });
 });

@@ -153,6 +153,8 @@ export class HeroUi
         const { title } = SCREENS.find(({ id }) => id === screen);
         const view = ++this.view;
 
+        this.dropFarmLoad();
+
         if (!this.open)
         {
             this.open = true;
@@ -234,11 +236,24 @@ export class HeroUi
         }
 
         this.view += 1;
+        this.dropFarmLoad();
         this.open = false;
         this.screen = null;
         this.sellMode = null;
         this.panel.hidden = true;
         this.body.replaceChildren();
+    }
+
+    //  Leaving Rever chefes or opening a screen over it drops a pending chapter load (TD-009): the chips are enabled again and the
+    //  farm session ignores its late answer. Runs before `this.screen` changes, so it reads the screen being left.
+    dropFarmLoad ()
+    {
+        this.farmBusy = false;
+
+        if (this.screen === 'farm')
+        {
+            this.farm.cancel();
+        }
     }
 
     setError (text)
@@ -713,7 +728,8 @@ export class HeroUi
         }));
     }
 
-    //  Loads another chapter of Rever chefes; the chips are disabled meanwhile and a failure keeps the map shown before
+    //  Loads another chapter of Rever chefes; the chips are disabled meanwhile and a failure keeps the map shown before.
+    //  A load dropped by show() or close() changes nothing when it ends: its view is old and farmBusy may belong to a newer load.
     async selectFarmChapter (chapter)
     {
         if (this.farmBusy)
@@ -737,16 +753,19 @@ export class HeroUi
         }
         finally
         {
-            this.farmBusy = false;
-
-            if (view === this.view && this.screen === 'farm')
+            if (view === this.view)
             {
-                this.render_farm();
+                this.farmBusy = false;
 
-                //  After the render: render_farm clears the error line first
-                if (failed)
+                if (this.screen === 'farm')
                 {
-                    this.setError(LOAD_FAILED);
+                    this.render_farm();
+
+                    //  After the render: render_farm clears the error line first
+                    if (failed)
+                    {
+                        this.setError(LOAD_FAILED);
+                    }
                 }
             }
         }

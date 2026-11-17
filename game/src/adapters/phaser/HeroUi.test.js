@@ -493,6 +493,144 @@ describe('HeroUi Rever chefes', () => {
             expect(ctx.testid('farm-chapters')).toBeNull();
             expect(ctx.testid('farm-entry-miniboss-1')).not.toBeNull();
         });
+
+        it('closing during a chapter load and reopening leaves the chips enabled on the current chapter', async () => {
+            const ctx = createUi();
+            let resolveChapter2;
+            setup(ctx, () => new Promise((resolve) => { resolveChapter2 = resolve; }));
+            await open(ctx, 'farm');
+
+            ctx.testid('farm-chapter-2').click();
+            expect(chipsOf(ctx).every((chip) => chip.disabled)).toBe(true);
+
+            ctx.testid('hero-close').click();
+            await open(ctx, 'farm');
+
+            expect(chipsOf(ctx).some((chip) => chip.disabled)).toBe(false);
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+            expect(ctx.testid('farm-chapter-3').getAttribute('aria-pressed')).toBe('true');
+
+            resolveChapter2(state2);
+            await flush();
+
+            expect(chipsOf(ctx).some((chip) => chip.disabled)).toBe(false);
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+            expect(ctx.testid('farm-chapter-3').getAttribute('aria-pressed')).toBe('true');
+        });
+
+        it('a chapter answer that arrives after closing and reopening changes neither the farm session nor the map', async () => {
+            const ctx = createUi();
+            let resolveChapter2;
+            setup(ctx, () => new Promise((resolve) => { resolveChapter2 = resolve; }));
+            await open(ctx, 'farm');
+            ctx.testid('farm-chapter-2').click();
+            ctx.testid('hero-close').click();
+            await open(ctx, 'farm');
+
+            resolveChapter2(state2);
+            await flush();
+
+            expect(ctx.farm.chapter()).toBe(3);
+            expect(ctx.farm.bosses()).toEqual(state3.bosses);
+            expect(ctx.farm.definitionOf(2)).toBeNull();
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+            expect(ctx.testid('farm-chapter-3').getAttribute('aria-pressed')).toBe('true');
+            expect(ctx.testid('farm-chapter-2').getAttribute('aria-pressed')).toBe('false');
+        });
+
+        it('a chapter load that fails after closing and reopening shows no error', async () => {
+            const ctx = createUi();
+            let rejectChapter2;
+            setup(ctx, () => new Promise((_, reject) => { rejectChapter2 = reject; }));
+            await open(ctx, 'farm');
+            ctx.testid('farm-chapter-2').click();
+            ctx.testid('hero-close').click();
+            await open(ctx, 'farm');
+
+            rejectChapter2(new ApiError('Cannot reach the server. Try again later.'));
+            await flush();
+
+            expect(ctx.query('.hero-error').hidden).toBe(true);
+            expect(ctx.query('.hero-error').textContent).toBe('');
+            expect(chipsOf(ctx).some((chip) => chip.disabled)).toBe(false);
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+        });
+
+        it('a late answer of a dropped chapter load leaves the chips of a newer load disabled', async () => {
+            const ctx = createUi();
+            const state1 = { chapter: 1, chapters: [ 1, 2, 3 ], bosses: ELEVEN, chapterBossWinsLeft: 10, definition: { bossHealth: 10, bossTimeLimitMs: 40_000, stages: tenStages() } };
+            let resolveChapter1;
+            let resolveChapter2;
+            ctx.ui.hooks.mapPosition = () => AT3;
+            ctx.farmGateway.get.mockImplementation((chapter) => {
+                if (chapter === 2) {
+                    return new Promise((resolve) => { resolveChapter2 = resolve; });
+                }
+                if (chapter === 1) {
+                    return new Promise((resolve) => { resolveChapter1 = resolve; });
+                }
+                return Promise.resolve(state3);
+            });
+            await open(ctx, 'farm');
+            ctx.testid('farm-chapter-2').click();
+            ctx.testid('hero-close').click();
+            await open(ctx, 'farm');
+            ctx.testid('farm-chapter-1').click();
+
+            resolveChapter2(state2);
+            await flush();
+
+            expect(chipsOf(ctx).every((chip) => chip.disabled)).toBe(true);
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+
+            //  A disabled button cannot be clicked in jsdom, so the method is called directly: the chapter 1 load still holds the busy flag
+            const asked = ctx.farmGateway.get.mock.calls.length;
+            ctx.ui.selectFarmChapter(2);
+            expect(ctx.farmGateway.get.mock.calls.length).toBe(asked);
+
+            resolveChapter1(state1);
+            await flush();
+
+            expect(title(ctx)).toBe('Caminho do Capítulo 1');
+            expect(ctx.testid('farm-chapter-1').getAttribute('aria-pressed')).toBe('true');
+            expect(chipsOf(ctx).some((chip) => chip.disabled)).toBe(false);
+            expect(ctx.farm.definitionOf(2)).toBeNull();
+        });
+
+        it('the scene reopening Rever chefes during a chapter load drops that load', async () => {
+            const ctx = createUi();
+            let resolveChapter2;
+            setup(ctx, () => new Promise((resolve) => { resolveChapter2 = resolve; }));
+            await open(ctx, 'farm');
+            ctx.testid('farm-chapter-2').click();
+
+            await ctx.ui.show('farm', {});
+
+            expect(chipsOf(ctx).some((chip) => chip.disabled)).toBe(false);
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+
+            resolveChapter2(state2);
+            await flush();
+
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+            expect(ctx.farm.chapter()).toBe(3);
+        });
+
+        it('closing another screen keeps a farm load the scene started', async () => {
+            const ctx = createUi();
+            let resolveCurrent;
+            ctx.ui.hooks.mapPosition = () => AT3;
+            ctx.farmGateway.get.mockImplementation(() => new Promise((resolve) => { resolveCurrent = resolve; }));
+            const pending = ctx.farm.load();
+
+            await open(ctx, 'heroes');
+            ctx.testid('hero-close').click();
+            resolveCurrent(state3);
+            await pending;
+
+            expect(ctx.farm.chapter()).toBe(3);
+            expect(ctx.farm.bosses()).toEqual(state3.bosses);
+        });
     });
 });
 

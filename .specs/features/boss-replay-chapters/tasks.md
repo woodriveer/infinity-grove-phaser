@@ -1500,7 +1500,7 @@ Bound changed by orchestrator ruling 2026-11-17: Cinzel's content box extends ~6
 
 ---
 
-### T20: Closing Rever chefes drops a pending chapter load [ ]
+### T20: Closing Rever chefes drops a pending chapter load [x]
 
 **Owner**: game-dev
 **Goal**: Closing Rever chefes, or opening a panel screen over it, drops a pending chapter load: the chips are enabled on the next opening and the late answer, a success or a failure, changes neither the farm session nor the panel (BRC-10; spec P1-Choose AC 14, 15 and the five TD-009 edge cases; `STATE.md` TD-009).
@@ -1665,9 +1665,9 @@ async selectFarmChapter (chapter)
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 5 new `farmSession.test.js` cases and the 6 new `HeroUi.test.js` cases pass.
-- [ ] Every existing case passes unchanged, among them `the chapter buttons are disabled while the chapter loads`, `a failed chapter load keeps the map and says Não foi possível carregar.` and `opening from the HUD again shows the current chapter`.
-- [ ] `git diff --stat` lists only `farmSession.js`, `farmSession.test.js`, `HeroUi.js`, `HeroUi.test.js` and `tasks.md`; `ClickerGame.js` is unchanged.
+- [x] The 5 new `farmSession.test.js` cases and the 6 new `HeroUi.test.js` cases pass.
+- [x] Every existing case passes unchanged, among them `the chapter buttons are disabled while the chapter loads`, `a failed chapter load keeps the map and says Não foi possível carregar.` and `opening from the HUD again shows the current chapter`.
+- [x] `git diff --stat` lists only `farmSession.js`, `farmSession.test.js`, `HeroUi.js`, `HeroUi.test.js` and `tasks.md`; `ClickerGame.js` is unchanged.
 
 **Commit**: `fix(game): drop a pending chapter load when Rever chefes closes`
 

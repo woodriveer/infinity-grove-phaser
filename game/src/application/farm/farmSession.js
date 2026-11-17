@@ -3,6 +3,7 @@
 //  Port (ADR 0007):
 //    gateway  { get(chapter?), win(boss) }  the backend /farm calls. get(chapter?) -> { chapter?, chapters?, bosses, chapterBossWinsLeft, definition? }.
 //             win -> { drop, chapterBossWinsLeft }, or rejects with an ApiError (409: daily limit, boss not available, too fast).
+//  cancel() drops the answer of every pending load (closing Rever chefes, TD-009).
 export const createFarmSession = ({ gateway }) =>
 {
     let bosses = [];
@@ -10,6 +11,8 @@ export const createFarmSession = ({ gateway }) =>
     let chapter = null;
     let chapters = [];
     const definitions = new Map();
+    //  Bumped by cancel(): the answer of a load started before the last cancel changes nothing (TD-009)
+    let generation = 0;
 
     return {
         //  The boss list of the last load; empty before it
@@ -27,10 +30,17 @@ export const createFarmSession = ({ gateway }) =>
         //  The definition of a chapter loaded before, kept for the page's life; null when that chapter was never loaded
         definitionOf: (number) => definitions.get(number) ?? null,
 
-        //  Reads the farm state of `selected` (undefined: the current chapter); rejects and keeps the previous state on failure
+        //  Reads the farm state of `selected` (undefined: the current chapter); rejects and keeps the previous state on failure.
+        //  An answer that arrives after cancel() is ignored; a failure still rejects.
         load: async (selected) =>
         {
+            const started = generation;
             const state = await (selected === undefined ? gateway.get() : gateway.get(selected));
+
+            if (started !== generation)
+            {
+                return;
+            }
 
             bosses = state.bosses;
             winsLeft = state.chapterBossWinsLeft;
@@ -41,6 +51,12 @@ export const createFarmSession = ({ gateway }) =>
             {
                 definitions.set(chapter, state.definition);
             }
+        },
+
+        //  Drops the answer of every load still pending; the state already loaded stays
+        cancel: () =>
+        {
+            generation += 1;
         },
 
         //  Reports one win (one request) and resolves with { drop, chapterBossWinsLeft }; a refusal rejects and changes nothing
