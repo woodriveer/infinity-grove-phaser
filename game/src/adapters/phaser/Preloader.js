@@ -60,19 +60,7 @@ export class Preloader extends Scene
             });
         });
 
-        //  When all the assets are loaded go to the next scene.
-        //  We can go there immediately via: this.scene.start('MainMenu');
-        //  Or we could use a Scene transition to fade between the two scenes:
-
-        this.scene.transition({
-            target: 'MainMenu',
-            duration: 1000,
-            moveBelow: true,
-            onUpdate: (progress) => {
-                this.cameras.main.setAlpha(1 - progress);
-            }
-        });
-
-        //  When the transition completes, it will move automatically to the MainMenu scene
+        //  When all the assets are loaded the splash plays, then hands over to the MainMenu
+        this.scene.start('Splash');
     }
 }

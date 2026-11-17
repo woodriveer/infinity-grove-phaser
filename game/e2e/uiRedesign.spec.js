@@ -2004,8 +2004,8 @@ test.describe('Grove theme', () => {
         await page.route('**/assets/heroes/vex_sprite.png', async (route) => { await held; await route.continue(); });
         await mockBackend(page, { users: { yan: 'secret123' } });
         await page.goto('/');
+        //  Boot starts the Preloader by itself, no click needed
         await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
-        await page.locator('#game-container canvas').click();
         //  The Preloader is still loading (held by the route), so it is not an active scene yet: its bar is what the test waits for
         await expect.poll(() => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('Preloader').children.list.length)).toBeGreaterThan(0);
 
@@ -2030,10 +2030,9 @@ test.describe('Grove theme', () => {
         await page.goto('/');
         await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
 
-        //  The Boot screen shows only the game background until the first click
+        //  Boot draws nothing of its own: behind the loading bar is only the game background
         expect(await page.evaluate(() => window.__PHASER_GAME__.config.backgroundColor.color)).toBe(0x1c120c);
 
-        await page.locator('#game-container canvas').click();
         await expect.poll(() => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('Preloader').children.list.length)).toBeGreaterThan(0);
 
         const children = await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('Preloader').children.list

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { mockBackend } from '../e2e/support/fakeBackend';
+import { skipSplash } from '../e2e/support/game';
 import { shot } from './support/shots';
 
 //  Screenshots of the backend wake-up review (.specs/features/supabase-postgres/ui-review/): the start screen while GET /api/health
@@ -37,13 +38,12 @@ test('start screen while the server wakes up', async ({ page }, testInfo) => {
 
     await mockBackend(page, { healthDelayMs: 20000 });
     await page.goto('/');
-    await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
-    await page.locator('#game-container canvas').click();
+    await skipSplash(page);
 
     await expect(page.getByRole('alert')).toHaveText(WAKE, { timeout: 5000 });
     await page.mouse.move(0, 0);
-    //  The Preloader fades out for 1 s over MainMenu; shoot only after it is gone (same wait as openMainMenu)
-    await page.waitForFunction(() => !window.__PHASER_GAME__.scene.isActive('Preloader'), null, { timeout: 10000 });
+    //  The Splash fades out over MainMenu; shoot only after it is gone (same wait as openMainMenu)
+    await page.waitForFunction(() => !window.__PHASER_GAME__.scene.isActive('Splash'), null, { timeout: 10000 });
     await expect(page.getByRole('alert')).toHaveText(WAKE);
     await shot(page, testInfo, '01-wake-notice');
 

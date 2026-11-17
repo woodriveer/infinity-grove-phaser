@@ -12,12 +12,7 @@ export class Boot extends Scene
         //  A global value to store the highscore in
         this.registry.set('highscore', 0);
 
-        // this.scene.start('Preloader');
-
-        this.input.once('pointerdown', () => {
-
-            this.scene.start('Preloader');
-
-        });
+        //  The game starts loading at once: no click before the splash (the game has no audio to unlock)
+        this.scene.start('Preloader');
     }
 }

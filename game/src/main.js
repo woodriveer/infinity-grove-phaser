@@ -3,6 +3,7 @@ import { ClickerGame } from './adapters/phaser/ClickerGame';
 import { Game } from 'phaser';
 import { MainMenu } from './adapters/phaser/MainMenu';
 import { Preloader } from './adapters/phaser/Preloader';
+import { Splash } from './adapters/phaser/Splash';
 import { runInBackground, startTicker } from './adapters/phaser/backgroundFight';
 import { services } from './composition';
 import * as Phaser from 'phaser';
@@ -34,6 +35,7 @@ const config = {
     scene: [
         Boot,
         Preloader,
+        Splash,
         MainMenu,
         ClickerGame
     ]

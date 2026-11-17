@@ -92,7 +92,6 @@ test('menu and preloader', async ({ page }, testInfo) => {
     await page.route('**/assets/heroes/vex_sprite.png', async (route) => { await held; await route.continue(); });
     await page.goto('/');
     await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
-    await page.locator('#game-container canvas').click();
     //  The Preloader is still loading (the route holds the sprite): its bar is drawn, the scene is not running yet
     await expect.poll(() => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('Preloader').children.list.length)).toBeGreaterThan(0);
     await page.mouse.move(0, 0);

@@ -1,6 +1,13 @@
 import { expect } from '@playwright/test';
 
-//  Boots the game through Boot -> Preloader and waits until MainMenu has rendered its DOM form
+//  The splash plays on its own after the loading bar (spec: no click before the start screen). Tests skip it with a
+//  click once it runs, which also exercises the skip; e2e/splash.spec.js checks that it moves on with no click.
+export async function skipSplash (page) {
+    await page.waitForFunction(() => window.__PHASER_GAME__?.scene.isActive('Splash'), null, { timeout: 30_000 });
+    await page.locator('#game-container canvas').click();
+}
+
+//  Boots the game through Boot -> Preloader -> Splash and waits until MainMenu has rendered its DOM form
 //  (state 'form', default) or the welcome block of a restored session (state 'welcome').
 export async function openMainMenu (page, { state = 'form', random = 0.99 } = {}) {
     await page.goto('/');
@@ -8,19 +15,17 @@ export async function openMainMenu (page, { state = 'form', random = 0.99 } = {}
     const canvas = page.locator('#game-container canvas');
     await expect(canvas).toBeVisible();
 
-    //  Boot only listens for the click once its create() ran; an earlier click would be lost
-    await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
-
     //  The critical roll is fixed (0.99 never crits a default monster) so click counts are deterministic
+    await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('services'));
     await page.evaluate((roll) => { window.__PHASER_GAME__.registry.get('services').random = () => roll; }, random);
-    await canvas.click();
+    await skipSplash(page);
 
     await expect(page.locator(state === 'welcome' ? '.welcome' : '.auth-form')).toBeVisible({ timeout: 15_000 });
 
-    //  MainMenu input stays disabled until the Preloader fade-out transition ends
+    //  MainMenu input stays disabled until the Splash fade-out transition ends
     await page.waitForFunction(() => {
-        const scene = window.__PHASER_GAME__.scene.getScene('MainMenu');
-        return scene.input.enabled && !window.__PHASER_GAME__.scene.isActive('Preloader');
+        const game = window.__PHASER_GAME__;
+        return game.scene.getScene('MainMenu').input.enabled && !game.scene.isActive('Preloader') && !game.scene.isActive('Splash');
     });
 
     return {

@@ -1,6 +1,6 @@
 import { expect, test } from './support/coverage';
 import { mockBackend, serverDown } from './support/fakeBackend';
-import { fillCredentials, openMainMenu, SESSION_KEY } from './support/game';
+import { fillCredentials, openMainMenu, SESSION_KEY, skipSplash } from './support/game';
 
 //  The backend wake-up of spec supabase-postgres (RUN-06): the start screen asks GET /api/health once before the session restore
 const WAKE = 'Acordando o servidor, aguarde...';
@@ -28,8 +28,7 @@ test.describe('Backend wake-up on the start screen', () => {
     test('while the server wakes up the start screen says so, then shows the form', async ({ page }) => {
         await mockBackend(page, { healthDelayMs: 4000 });
         await page.goto('/');
-        await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
-        await page.locator('#game-container canvas').click();
+        await skipSplash(page);
 
         await expect(page.getByRole('alert')).toHaveText(WAKE, { timeout: 5000 });
         await expect(page.getByRole('alert')).not.toHaveClass(/error/);
@@ -75,8 +74,7 @@ test.describe('Backend wake-up on the start screen', () => {
         test('the wake notice is at least 11 px on screen', async ({ page }) => {
             await mockBackend(page, { healthDelayMs: 4000 });
             await page.goto('/');
-            await page.waitForFunction(() => window.__PHASER_GAME__?.registry.has('highscore'));
-            await page.locator('#game-container canvas').click();
+            await skipSplash(page);
 
             const notice = page.getByRole('alert');
 
