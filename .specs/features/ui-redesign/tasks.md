@@ -11,7 +11,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 **Spec**: `.specs/features/ui-redesign/spec.md`
 **Design**: `.specs/features/ui-redesign/design.md`
 **Reference image**: `.specs/features/ui-redesign/reference.jpg` (look at it before any CSS task)
-**Status**: Approved by the owner on 2026-11-12, defaults of Q2 to Q5 accepted (Q1 decided as D1 on 2026-11-12: round auto click button, its window and the key `A`, tasks T13 to T16; written with the defaults of the open Q2 to Q5). T1 to T30 done. Phase 10 (T31 to T38, fixes of the T30 review) added on 2026-11-13, waiting for the owner's approval
+**Status**: Approved by the owner on 2026-11-12, defaults of Q2 to Q5 accepted (Q1 decided as D1 on 2026-11-12: round auto click button, its window and the key `A`, tasks T13 to T16; written with the defaults of the open Q2 to Q5). T1 to T30 done. Phase 10 (T31 to T38, fixes of the T30 review) added on 2026-11-13 and done the same day. On 2026-11-17 the owner approved Phase 10 and the fixes of the Verifier round 2 FAIL: "Sim, conclua". Phase 11 (T39 to T53) added on 2026-11-17 under that approval: T39 to T49 record the round 2 fixes already on `main` (2026-11-13 and 2026-11-14), T50 to T53 are open. The 27 "Done when" boxes of T1 to T19 left unticked by the executors were ticked on 2026-11-17 by the PO with the evidence of § Phase 11 notes
 
 Rules for every task:
 
@@ -51,7 +51,7 @@ Rules for every task:
 
 ## Execution Plan
 
-Phases run in order; tasks inside a phase run in order. Every task of Phases 1 to 7 is `game-dev` except T15 (`test-engineer`); Phase 8 is `test-engineer`; Phase 9 is `ui-artist`. Phase 10 fixes the findings of the T30 review: T31 to T36 `game-dev`, T37 `test-engineer`, T38 `ui-artist`.
+Phases run in order; tasks inside a phase run in order. Every task of Phases 1 to 7 is `game-dev` except T15 (`test-engineer`); Phase 8 is `test-engineer`; Phase 9 is `ui-artist`. Phase 10 fixes the findings of the T30 review: T31 to T36 `game-dev`, T37 `test-engineer`, T38 `ui-artist`. Phase 11 closes the Verifier round 2 FAIL: T39 and T49 `game-dev`, T40 to T48 `test-engineer` (all done, recorded), then the open T50 to T52 `test-engineer` and T53 `ui-artist`, the last task of the feature.
 
 ### Phase 1: Foundation
 
@@ -113,6 +113,12 @@ T29 → T30
 T30 → T31 → T32 → T33 → T34 → T35 → T36 → T37 → T38
 ```
 
+### Phase 11: Verifier round 2 fixes
+
+```
+T38 → T39 → T40 → T41 → T42 → T43 → T44 → T45 → T46 → T47 → T48 → T49 → T50 → T51 → T52 → T53
+```
+
 ---
 
 ## Task Breakdown
@@ -142,8 +148,8 @@ The two `preconnect` links and the `/style.css` link stay.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `grep -c Caprasimo game/index.html` prints `0` and `grep -c "family=Cinzel:wght@700" game/index.html` prints `1`.
-- [ ] The build passes.
+- [x] `grep -c Caprasimo game/index.html` prints `0` and `grep -c "family=Cinzel:wght@700" game/index.html` prints `1`.
+- [x] The build passes.
 
 **Commit**: `style(game): load the Cinzel heading font`
 
@@ -248,9 +254,9 @@ The two `preconnect` links and the `/style.css` link stay.
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `grep -c "Caprasimo" game/public/style.css` prints `0`.
-- [ ] `grep -c -- "--texture-parchment: none;" game/public/style.css` prints `1`.
-- [ ] The build and the whole Vitest suite pass.
+- [x] `grep -c "Caprasimo" game/public/style.css` prints `0`.
+- [x] `grep -c -- "--texture-parchment: none;" game/public/style.css` prints `1`.
+- [x] The build and the whole Vitest suite pass.
 
 **Commit**: `style(game): add the grove palette and recipe tokens`
 
@@ -423,8 +429,8 @@ The old `.tag-element` rule is gone on purpose: the element chip gets its dot in
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `grep -c "var(--btn-primary-bg)" game/public/style.css` prints `1`.
-- [ ] The build passes.
+- [x] `grep -c "var(--btn-primary-bg)" game/public/style.css` prints `1`.
+- [x] The build passes.
 
 **Commit**: `style(game): draw buttons, chips and coins in the grove look`
 
@@ -501,8 +507,8 @@ print('ok')
 
 **Done when**:
 
-- [ ] The gate prints `ok`.
-- [ ] `git diff --stat` shows only `art/tools/cutout_hero.py` and this file.
+- [x] The gate prints `ok`.
+- [x] `git diff --stat` shows only `art/tools/cutout_hero.py` and this file.
 
 **Commit**: `feat(art): flatten a cutout onto a background colour for thumbnails`
 
@@ -562,9 +568,9 @@ print('ok', total)
 
 **Done when**:
 
-- [ ] The check prints `ok` and a total under 2 000 000 bytes.
-- [ ] The three e2e suites pass unchanged.
-- [ ] `git diff --stat` lists exactly the 15 `.jpg` files and this file.
+- [x] The check prints `ok` and a total under 2 000 000 bytes.
+- [x] The three e2e suites pass unchanged.
+- [x] `git diff --stat` lists exactly the 15 `.jpg` files and this file.
 
 **Commit**: `fix(game): cut the magenta out of the skill thumbnails`
 
@@ -599,7 +605,7 @@ Write `background` before `background-color` in each rule (the shorthand resets 
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The build passes; no scene coordinate in `ClickerGame.js` or `HeroUi.js` changed (`git diff --stat` lists only `style.css` and this file).
+- [x] The build passes; no scene coordinate in `ClickerGame.js` or `HeroUi.js` changed (`git diff --stat` lists only `style.css` and this file).
 
 **Commit**: `style(game): draw the battle plaques, combo and notice in the grove look`
 
@@ -686,7 +692,7 @@ CSS: replace the rule `.boss-timer` and add `.boss-timer::before` right after it
 **Gate**: quick - `cd game && npm test`, then build - `cd game && npm run build`
 **Done when**:
 
-- [ ] The 7 cases pass; every existing `Time: <s>` test passes unchanged; the build passes.
+- [x] The 7 cases pass; every existing `Time: <s>` test passes unchanged; the build passes.
 
 **Commit**: `feat(game): show the boss time left as a ring`
 
@@ -762,7 +768,7 @@ Test updates in `ClickerGame.test.js` (exact replacements, nothing else):
 **Gate**: quick - `cd game && npm test`, then build - `cd game && npm run build`
 **Done when**:
 
-- [ ] The 3 new cases and every updated case pass; `grep -c "'#ffc6a5'\|'#f5ead8'\|0xc67139\|0xdcd3c4" game/src/adapters/phaser/ClickerGame.test.js` prints `0`; the build passes.
+- [x] The 3 new cases and every updated case pass; `grep -c "'#ffc6a5'\|'#f5ead8'\|0xc67139\|0xdcd3c4" game/src/adapters/phaser/ClickerGame.test.js` prints `0`; the build passes.
 
 **Commit**: `style(game): frame the health bar and draw gold damage numbers`
 
@@ -865,7 +871,7 @@ CSS: `.enemy-stats` - set `padding: 0;` `background: transparent;`; remove `bord
 **Gate**: quick - `cd game && npm test`, then build - `cd game && npm run build`
 **Done when**:
 
-- [ ] The 2 new cases and every existing enemy line test pass; the build passes.
+- [x] The 2 new cases and every existing enemy line test pass; the build passes.
 
 **Commit**: `feat(game): mark the enemy chips with their element and stat`
 
@@ -911,7 +917,7 @@ export const weaknessOf = (defender) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 6 cases pass with the whole Vitest suite (the architecture test of AD-003 included).
+- [x] The 6 cases pass with the whole Vitest suite (the architecture test of AD-003 included).
 
 **Commit**: `feat(game): name the element that beats an enemy`
 
@@ -998,7 +1004,7 @@ CSS: `.hud-enemy` - set `height: 80px;` `flex-direction: column;` `gap: 4px;` (w
 **Gate**: quick - `cd game && npm test`, then full (phase gate) - `cd game && npm test && npx playwright test`
 **Done when**:
 
-- [ ] The 9 cases pass; every Vitest and Playwright suite passes unchanged (`elements.spec.js` still reads the exact enemy line text).
+- [x] The 9 cases pass; every Vitest and Playwright suite passes unchanged (`elements.spec.js` still reads the exact enemy line text).
 
 **Commit**: `feat(game): show the element that beats the enemy`
 
@@ -1033,7 +1039,7 @@ CSS: `.hud-enemy` - set `height: 80px;` `flex-direction: column;` `gap: 4px;` (w
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The build passes; `HeroUi.js` is unchanged.
+- [x] The build passes; `HeroUi.js` is unchanged.
 
 **Commit**: `style(game): frame the hero rail buttons`
 
@@ -1094,7 +1100,7 @@ The AD-020 rules `.skill-level-badge` and `.skill-level-badge[data-level="3"]` d
 **Gate**: quick - `cd game && npm test`, then build - `cd game && npm run build`
 **Done when**:
 
-- [ ] The 2 cases pass with the whole Vitest suite; the build passes; `git diff game/public/style.css` touches no `.skill-level-badge` rule.
+- [x] The 2 cases pass with the whole Vitest suite; the build passes; `git diff game/public/style.css` touches no `.skill-level-badge` rule.
 
 **Commit**: `style(game): draw the battle bar, leader card and skills in the grove look`
 
@@ -1288,8 +1294,8 @@ Every existing auto click test (`toggle`, `interval`, `crystals`, `upgradeButton
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 21 new cases and every existing `ClickerGame.test.js` case pass.
-- [ ] `grep -n "366, y: 200" game/src/adapters/phaser/ClickerGame.js` prints nothing.
+- [x] The 21 new cases and every existing `ClickerGame.test.js` case pass.
+- [x] `grep -n "366, y: 200" game/src/adapters/phaser/ClickerGame.js` prints nothing.
 
 **Commit**: `feat(game): open the auto click from a round button or the A key`
 
@@ -1336,7 +1342,7 @@ No other line changes; test names stay.
 **Gate**: full - `cd game && npx playwright test e2e/autoClick.spec.js e2e/accountReset.spec.js`, then `cd game && npm test && npx playwright test`
 **Done when**:
 
-- [ ] Both suites pass with every test name unchanged; the whole Playwright suite passes.
+- [x] Both suites pass with every test name unchanged; the whole Playwright suite passes.
 
 **Commit**: `test(game): open the auto click window in the auto click and reset tests`
 
@@ -1555,7 +1561,7 @@ Other rules:
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The build passes; `grep -c "flex-wrap: wrap" game/public/style.css` is one less than before this task (the old card rule is gone) and `grep -c "auto-click-popover" game/public/style.css` prints `2`.
+- [x] The build passes; `grep -c "flex-wrap: wrap" game/public/style.css` is one less than before this task (the old card rule is gone) and `grep -c "auto-click-popover" game/public/style.css` prints `2`.
 
 **Commit**: `style(game): draw the round auto click and farm buttons and the auto click window`
 
@@ -1587,7 +1593,7 @@ Other rules:
 **Gate**: build, then full (phase gate) - `cd game && npm test && npm run build && npx playwright test`
 **Done when**:
 
-- [ ] The build and every Vitest and Playwright suite pass unchanged.
+- [x] The build and every Vitest and Playwright suite pass unchanged.
 
 **Commit**: `style(game): draw the pause and reset cards on parchment`
 
@@ -1627,7 +1633,7 @@ Other rules:
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The build passes.
+- [x] The build passes.
 
 **Commit**: `style(game): draw the main menu fields and path choice in the grove look`
 
@@ -1672,7 +1678,7 @@ Test stand-in (`MainMenu.test.js:36`): `ellipse: vi.fn(() => { const shape = {};
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 3 cases and every existing `MainMenu.test.js` case pass.
+- [x] The 3 cases and every existing `MainMenu.test.js` case pass.
 
 **Commit**: `style(game): draw the menu oval on parchment with a wood rim`
 
@@ -2810,13 +2816,448 @@ Decided by the PO on 2026-11-13; not tasks of this feature.
 | --- | --- | --- |
 | #6 Logo top left fades into the forest (battle) | Deferred | The logo is outside this spec (no UIR covers it) and is the same Phaser image as the main menu's; a readable version needs a light logo variant or a glow FX, which is new art or a scene change, not a CSS fix. Owner decides in a later art pass. |
 | #7 Card notice covers half of the combo chip (`10-notice`) | Deferred | Moving a HUD element other than the bottom bar's is Out of Scope in the spec; the overlap lasts the 3 s of the notice. Fixing it means moving `NOTICE` (`HeroUi.js`, y 120) or `COMBO_HUD` (`ClickerGame.js`, y 150), an owner decision. |
+| #10 Parchment texture has a seam and a darker band every 512 px (T38 review, medium) | Deferred to the owner's art pass (PO, 2026-11-17) | `game/public/assets/ui-parchment.jpg` is the owner's art made from the UIR-17 prompts; agents do not paint textures (Q4). The fix is a new image, not code: the review measured ink on the textured parchment above 11:1, so no text loses contrast. Owner action: regenerate a seamless 512 x 512 file (no edge vignette, mean luminance near 225, standard deviation at most 8, check a 2 x 2 tile) and replace the file; `style.css` does not change. |
+| #11 Disabled wood buttons near 2.7:1 (T38 review, low) | Kept at opacity 0.45 in this feature (PO, 2026-11-17) | UIR-02 AC 11, approved on 2026-11-12, says a disabled button keeps opacity `0.45`, and `uiRedesign.spec.js` test `keeps a disabled button at opacity 0.45` pins it. WCAG 2.x exempts inactive controls from 4.5:1. The review's `opacity: 0.65` changes every disabled button of the game, so it needs a spec change. The owner can pick it up in a later feature. |
+| #12 Pink fringe on the talent icons `talent-combo.png` and `talent-click-flat-damage.png` (T38 review, optional) | Deferred to the next art pass (PO, 2026-11-17) | The review marks it optional: it shows only at 6x zoom, and at game size (40 px desktop, about 17 px phone) it reads as a warm tint. The fix is a despill of two owner PNGs, not code. |
+| #13 Element line of the hero cards not aligned between one-line and two-line names (T38 review, optional) | Deferred (PO, 2026-11-17) | The review marks it optional. UIR-13 AC 13 (same card width and portrait height, name inside the card) is met and pinned. Reserving two name lines (`min-height: 2.4em`) is a new layout rule the spec does not state. It would be a visible change after the last review, and the owner asked to finish. Candidate for a later polish pass. |
+
+---
+
+### Phase 11 notes: closing the Verifier round 2 FAIL
+
+The Verifier's round 2 report (`validation.md`, 2026-11-13, verdict FAIL) ranks five points. Between 2026-11-13 21:33 and 2026-11-14 02:34 most of them were fixed straight on `main`, outside this file, and two spec amendments followed (`af8af7a`, `9b02759`). T39 to T49 record that work as tasks so every fix traces to a task and a commit. The PO checked each one on 2026-11-17: the commit is on `origin/main` and holds the named code or test cases. Their gates are re-run in full by the Verifier round 3, after T53. T50 to T53 are the open work.
+
+| Round 2 point | Closed by | State on 2026-11-17 |
+| --- | --- | --- |
+| 1. G1: the `A` guard misses `contenteditable=""` and `plaintext-only` (UIR-19 AC 12) | T39 (`941d3e7`) | Fixed; 6 unit cases |
+| 2. Surviving injections N10, N11, N12, N15, N16 | N12: T39; N15, N16: T41; N11: T42; N10: T43 | Each has a test that fails on the injected fault |
+| 3. 26 partial ACs | T41 to T49 (one row each below), the spec amendments `af8af7a` (UIR-02 AC 8, UIR-15 AC 6) and `9b02759` (UIR-04 AC 7, UIR-13 AC 4 and new AC 16), and the open T50 to T52 | The amendments left three values without a test: the enemy line's vertical centre (T50), the beaten map stops (T51), the 5.90-6.02 and 4.82 bounds of UIR-14 AC 15 (T52) |
+| 4. `Click to Start!` listed as a primary button but drawn as a `<p>` (UIR-02 AC 8) | PO ruling below; spec `af8af7a`; test T40 | Decided: a prompt, not a button |
+| 5. 27 unticked "Done when" boxes | PO ruling below | All 27 ticked, with evidence |
+
+Partial ACs of round 2, mapped: UIR-02 AC 7, AC 8 and UIR-04 AC 1, AC 3, UIR-10 AC 25, UIR-13 AC 1, UIR-14 AC 8, UIR-15 AC 2 (border style) -> T42; UIR-02 AC 9 (window buttons) -> T41; UIR-02 AC 10 (press of Refinar, equip, sell, bulk confirm, window buttons) -> T41 and T49; UIR-02 AC 12 and UIR-03 AC 15 -> T44; UIR-04 AC 7 -> T48 and T50; UIR-07 AC 17, AC 18 and UIR-08 AC 6 -> T43; UIR-11 AC 29 and UIR-19 AC 22 -> T45; UIR-13 AC 4 -> spec `9b02759` and T51; UIR-13 AC 5, AC 12, AC 13 -> T46; UIR-14 AC 9, AC 14, AC 15 -> T47 and T52; UIR-19 AC 12 -> T39.
+
+**Ruling on `Click to Start!` (PO, 2026-11-17).** The spec wording is fixed, and the prompt stays a prompt. `Click to Start!` is `<p class="welcome-start">` (`MainMenu.js:61`). A click anywhere on the canvas starts the game, and the prompt itself takes no pointer. Making it a real button would add a focus stop and hover and press states. It would also change the DOM (`<p>` to `<button>`) and narrow or duplicate what starts the game, which changes the game the player sees and uses. Fixing the wording changes nothing the player sees. The ember pill the ui-artist approved (T30, T38: "Click to Start! em ember") is pinned as UIR-15 AC 6, with no hover or press shade (spec `af8af7a`, test T40). The spec Assumptions table records this ruling.
+
+**Ruling on the 27 unticked boxes (PO, 2026-11-17).** The executors left these boxes unticked although each task was committed. The PO checked each condition at HEAD `77311ac` or at the task's own commit and ticked all 27:
+
+| Task | Box | Evidence |
+| --- | --- | --- |
+| T1 | Caprasimo 0, Cinzel 700 link 1 in `index.html` | Re-run at HEAD: `0` and `1` |
+| T1, T3, T18 | The build passes | Verifier round 2: `vite build` exit 0 (`validation.md` Summary) |
+| T2 | Caprasimo 0 in `style.css` | Re-run at HEAD: `0` |
+| T2 | `--texture-parchment: none;` count 1 | `1` at the T2 commit `e304c9a`; `0` at HEAD because `07910d4` switched the painted textures on (UIR-01 AC 6) |
+| T2, T10, T11, T13, T14, T17, T19 | Vitest suite and the named cases pass | Verifier round 2: 1536 unit tests passed, 0 failed |
+| T3 | `var(--btn-primary-bg)` count 1 | `1` at the T3 commit `a8a5428`; `7` at HEAD because later tasks gave more buttons the primary recipe |
+| T4 | Gate prints `ok`; diff only the tool and this file | Verifier round 2 re-ran the tool in both modes (UIR-16 AC 4, AC 5); `git show --stat 42643ae` lists `art/tools/cutout_hero.py` and `tasks.md` |
+| T5 | Check `ok`, total under 2 000 000 bytes; e2e suites pass; diff is the 15 JPEGs and this file | Verifier round 2: 15 JPEGs, 956 763 bytes, magenta 0.0000 %; `git show --stat e9e7414`: 16 files (15 `.jpg` and `tasks.md`) |
+| T6 | Only `style.css` and this file | `git show --stat 688564f`: `style.css` and `tasks.md` |
+| T7, T8, T9, T11, T15, T17 | Cases and e2e suites pass | Verifier round 2: 281 e2e passed, 0 failed (2 pre-existing `test.fixme` skips) |
+| T8 | Old colours count 0 in `ClickerGame.test.js` | Re-run at HEAD: `0` |
+| T12 | `HeroUi.js` unchanged | `git show --stat d2fa89f -- game/src/adapters/phaser/HeroUi.js` is empty |
+| T13 | No `.skill-level-badge` rule touched | `git show 03fe846 -- game/public/style.css` has 0 `skill-level-badge` lines |
+| T14 | `366, y: 200` gone from `ClickerGame.js` | Re-run at HEAD: no match |
+| T16 | `flex-wrap: wrap` one less; `auto-click-popover` count 2 | `auto-click-popover`: `2` at `707d401` and at HEAD. The count rule was wrong: T16 rewrote the old card rule in place as `.auto-click-popover`, which keeps `flex-wrap: wrap` (7 before and after). The old card is gone: `.hud-auto-click` went from the 260 x 160 card box to the 80 x 112 button box. Ticked on the intent |
+
+Rules for the open tasks T50 to T53 are those of § Review fixes: notes for Phase 10. The new e2e cases go inside `test.describe('Grove theme', ...)` of `game/e2e/uiRedesign.spec.js` and use only the helpers at its top. Locate edits by the test name or the exact line text, never by the line number. If an assertion fails by more than the tolerance it states, STOP and report the measured value: never change a spec value to pass.
+
+---
+
+### T39: Ignore the key A in every contenteditable element [x]
+
+**Owner**: game-dev
+**What**: `A` typed in any editable element (bare `contenteditable`, `""`, `"true"`, `"plaintext-only"`, or a child of one) does not open the auto click window; `contenteditable="false"`, radio and button inputs do not block it (round 2 gap G1 and survivor N12; spec UIR-19 AC 12).
+**Where**: `game/src/adapters/phaser/ClickerGame.js` (`isTextField`)
+**Also changes**: `game/src/adapters/phaser/ClickerGame.test.js`
+**Depends on**: T38
+**Requirement**: UIR-19
+
+**Contract**: the guard's selector `[contenteditable="true"]` became `[contenteditable]:not([contenteditable="false"])`; the rest of `isTextField` is unchanged:
+
+```js
+const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [contenteditable]:not([contenteditable="false"]), input:not([type="checkbox"]):not([type="radio"]):not([type="button"])'));
+```
+
+**Tests**: unit (`ClickerGame.test.js`, inside the auto click window `describe`): `ignores A typed in an element with a bare contenteditable attribute`, `ignores A typed in a plaintext-only contenteditable element`, `ignores A typed in a child of a contenteditable element` (each: window stays hidden); `opens the window with A pressed on an element with contenteditable="false"`, `opens the window with A pressed on a radio input`, `opens the window with A pressed on a button input` (each: window shown).
+**Gate**: quick - `cd game && npm test`
+**Done when**:
+
+- [x] Commit `941d3e7` is on `origin/main` with the selector above and the six cases (PO check, 2026-11-17).
+
+**Commit**: `fix(game): ignore the A key in every contenteditable element` (`941d3e7`)
+
+---
+
+### T40: Pin the ember prompt of Click to Start as a non-button [x]
+
+**Owner**: test-engineer
+**What**: The start prompt is asserted as the `<p>` of UIR-15 AC 6, with every value of the AC and no hover or press shade (round 2 point 4).
+**Where**: `game/e2e/uiRedesign.spec.js`
+**Depends on**: T39
+**Requirement**: UIR-15, UIR-02
+
+**Contract**: the welcome prompt `.welcome-start` has tag `P`, `QUIET`, Cinzel, weight `700`, `22px`, width `320px`, colour `rgb(244, 230, 200)`, background `rgb(168, 67, 26)`, border `2px solid rgb(224, 180, 90)`, radius `999px`, `filter: none`. With `:hover` and `:active` forced through CDP `CSS.forcePseudoState`, `filter` stays `none`. The Logout check moved to its own test.
+
+**Tests**: e2e `draws Click to Start as an ember prompt with no hover or press shade`; `draws Logout as a wood pill on the welcome`.
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [x] Commit `c56db8a` is on `origin/main` with both cases (PO check, 2026-11-17).
+
+**Commit**: `test(game): pin the ember prompt of Click to Start as a non-button` (`c56db8a`)
+
+---
+
+### T41: Pin the hover and press of the window buttons and the sell button [x]
+
+**Owner**: test-engineer
+**What**: `auto-click-upgrade` and `reset-account` each brighten to `brightness(1.15)` under the pointer and darken to `brightness(0.9)` when pressed, checked one at a time; the sell button gets the press check (survivors N15, N16; UIR-02 AC 9, AC 10; UIR-11 AC 29).
+**Where**: `game/e2e/uiRedesign.spec.js`
+**Depends on**: T40
+**Requirement**: UIR-02, UIR-11
+
+**Contract**: `expectShades(page, <button>)` on `auto-click-upgrade`, `reset-account` and `piece-sell`.
+
+**Tests**: e2e `brightens and darkens the upgrade and the reset buttons of the window, one at a time` (new); edited `draws the equip and sell buttons of a piece as wood pills and Refinar as an ember pill`, `brightens a hovered button and darkens a pressed one`, `draws the bag button to the fusion and the bulk sale confirmation as ember pills`.
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [x] Commit `5b79826` is on `origin/main` with the new case (PO check, 2026-11-17).
+
+**Commit**: `test(game): pin the hover and press shades of the window and sell buttons` (`5b79826`)
+
+---
+
+### T42: Pin the solid border style of the Grove panels and buttons [x]
+
+**Owner**: test-engineer
+**What**: Every border the spec calls solid is asserted `border-top-style: solid` next to its width and colour (survivor N11; UIR-02 AC 7, AC 8; UIR-04 AC 1, AC 3; UIR-10 AC 25; UIR-13 AC 1; UIR-14 AC 8; UIR-15 AC 2).
+**Where**: `game/e2e/uiRedesign.spec.js`
+**Depends on**: T41
+**Requirement**: UIR-02, UIR-04, UIR-10, UIR-13, UIR-14, UIR-15
+
+**Contract**: `'border-top-style': 'solid'` added to `EMBER_PILL` (`WOOD_PILL` already had it) and to the style checks of Fechar, Fundir (with `2px`), Login, the stage plaque and wallet, the skill frame, the hero window, the piece and skill tooltips and the login field.
+
+**Tests**: e2e, edited: `draws Fechar as a wood pill`, `draws Fundir as an ember pill`, `draws Login as an ember pill`, `draws the stage plaque, chapter tag and wallet scroll`, `draws the battle bar, leader card and skill frames`, `draws the hero window, title and inset cards`, `draws dark piece tiles and a parchment piece tooltip`, `draws the skill tooltip on parchment`, `draws the login fields on parchment with an ember border when focused`.
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [x] Commit `bac675a` is on `origin/main` with the edited cases (PO check, 2026-11-17).
+
+**Commit**: `test(game): pin the solid border style of the Grove panels and buttons` (`bac675a`)
+
+---
+
+### T43: Pin the 1 px border and the 12 px icons of the enemy chips [x]
+
+**Owner**: test-engineer
+**What**: Every enemy tag has a `1px` `solid` bronze border, the magical and crit icons are 12 px wide, and the weak chip is the dark chip (survivor N10; UIR-07 AC 17, AC 18; UIR-08 AC 6).
+**Where**: `game/e2e/uiRedesign.spec.js`
+**Depends on**: T42
+**Requirement**: UIR-07, UIR-08
+
+**Contract**: `.tag`: `border-top-width: 1px`, `border-top-style: solid`; the three stat icons: width `12px`; `weak-chip`: background `rgba(28, 18, 12, 0.85)`, `1px` solid border, text colour.
+
+**Tests**: e2e, edited: `draws the enemy chips with a dot and three icons, text unchanged`; `centres the weak chip of the <FIRE|WATER|NATURE> enemy over the enemy line within 1 scene px`.
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [x] Commit `57098e5` is on `origin/main` with the edited cases (PO check, 2026-11-17).
+
+**Commit**: `test(game): pin the 1 px border and the 12 px icons of the enemy chips` (`57098e5`)
+
+---
+
+### T44: Pin the radial coins and the still motion of the buttons [x]
+
+**Owner**: test-engineer
+**What**: Each wallet coin is a `radial-gradient`; every restyled button and the welcome prompt has `animation-name: none` and `transition-duration: 0s` (UIR-02 AC 12; UIR-03 AC 15).
+**Where**: `game/e2e/uiRedesign.spec.js`
+**Depends on**: T43
+**Requirement**: UIR-02, UIR-03
+
+**Contract**: `background-image` of each coin starts with `radial-gradient(`; `expectStyle(<button>, QUIET)` on Fechar, Fundir, Login, Sign up, Logout, Voltar, the pause buttons, the reset dialog buttons, equip, sell, Refinar, the bag button, the bulk sale confirmation and the two window buttons.
+
+**Tests**: e2e, edited: `draws metallic coins` and the button cases of T42 and T41 (`draws Voltar as a wood pill`, `draws the leave and confirm buttons of the pause menu as wood pills`, `draws the continue and stay buttons of the pause menu as ember pills`, `draws the reset button of the dialog as a wood pill and Cancelar as an ember pill`, `draws the secondary and primary buttons of the Sign up and login screen`, `holds the old card's controls in order, the reset from chapter 2`).
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [x] Commit `9e3bf31` is on `origin/main` with the edited cases (PO check, 2026-11-17).
+
+**Commit**: `test(game): pin the radial coins and the still motion of the buttons` (`9e3bf31`)
+
+---
+
+### T45: Pin the window tail, its upgrade colours and the phone scale [x]
+
+**Owner**: test-engineer
+**What**: The upgrade button has border `rgb(224, 180, 90)` and text `rgb(244, 230, 200)`; the window's tail sits over the button's horizontal span with the window above it; on the 390 px phone the key badge, the interval label and the window scale by 390/1024 (UIR-11 AC 29; UIR-19 AC 22).
+**Where**: `game/e2e/uiRedesign.spec.js`
+**Depends on**: T44
+**Requirement**: UIR-11, UIR-19
+
+**Tests**: e2e `points the tail of the window at the auto click button` (new); edited `brightens and darkens the upgrade and the reset buttons of the window, one at a time`, `keeps the round button and its window inside the scaled scene`.
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [x] Commit `96077f8` is on `origin/main` with the new case (PO check, 2026-11-17).
+
+**Commit**: `test(game): pin the window tail, its upgrade colours and the phone scale` (`96077f8`)
+
+---
+
+### T46: Pin the Cinzel names and the portrait vignette of the heroes [x]
+
+**Owner**: test-engineer
+**What**: The portraits sit on `radial-gradient(circle at 50% 45%, ...)`; the Líder row names are Cinzel; the hero card names are Cinzel 700 (UIR-13 AC 5, AC 12, AC 13).
+**Where**: `game/e2e/uiRedesign.spec.js`
+**Depends on**: T45
+**Requirement**: UIR-13
+
+**Tests**: e2e, edited: `draws the hero window, title and inset cards`, `draws every inner card on the inset recipe`, `draws the Líder rows in dark ink, the current one too`, `keeps the five hero cards the same size with every name inside its card`.
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [x] Commit `5dc8f14` is on `origin/main` with the edited cases (PO check, 2026-11-17).
+
+**Commit**: `test(game): pin the Cinzel names and the portrait vignette of the heroes` (`5dc8f14`)
+
+---
+
+### T47: Pin the talent bars, the max marks and the skill row padding [x]
+
+**Owner**: test-engineer
+**What**: Each talent card's 4 px left bar is its branch colour (TIME `rgb(59, 154, 166)`, BREAK `rgb(196, 73, 47)`, POWER `rgb(201, 154, 31)`, COMBO `rgb(138, 91, 214)`); `Nível máximo` of TIME, BREAK and COMBO is in their dark ink; the tooltip skill row has no border style and no padding on any side (UIR-14 AC 9, AC 14, AC 15).
+**Where**: `game/e2e/uiRedesign.spec.js`
+**Depends on**: T46
+**Requirement**: UIR-14
+
+**Tests**: e2e `draws the left bar of a talent card in the colour of its branch` (new), `writes Nível máximo of TIME, BREAK and COMBO in their dark ink` (new); edited `keeps the skill art and its text inside the skill tooltip, locked or not`.
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [x] Commit `ff29bff` is on `origin/main` with the two new cases (PO check, 2026-11-17).
+
+**Commit**: `test(game): pin the talent bars, the max marks and the skill row padding` (`ff29bff`)
+
+---
+
+### T48: Pin the battle HUD anchors to the baseline scene [x]
+
+**Owner**: test-engineer
+**What**: In one battle state, within 1 scene px: `.stage-hud` left 156 and centre y 44, `.wallet` right 1004 and centre y 44, `chapter-hud` centre (82, 96), `combo-hud` centre (670, 150), `.boss-timer` centre (512, 44), `.enemy-stats` centre x 670 (UIR-04 AC 7; the spec was amended to name these anchors in `9b02759`).
+**Where**: `game/e2e/uiRedesign.spec.js`
+**Depends on**: T47
+**Requirement**: UIR-04
+
+**Tests**: e2e `keeps the battle HUD on the scene anchors of the baseline` (new). The enemy line's vertical centre is left to T50.
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [x] Commit `b147d1e` is on `origin/main` with the new case (PO check, 2026-11-17).
+
+**Commit**: `test(game): pin the battle HUD anchors to the baseline scene` (`b147d1e`)
+
+---
+
+### T49: Let the press shade win on equip, Refinar and the bulk sale confirmation [x]
+
+**Owner**: game-dev
+**What**: Pressed, the equip, sell and `Refinar` buttons and `bulk-sell-confirm-yes` render `brightness(0.9)`. Three hover rules later in the file had the same specificity as the shared press rule and overrode it (UIR-02 AC 10; found by the test-engineer in `5b79826`).
+**Where**: `game/public/style.css`
+**Also changes**: `game/e2e/uiRedesign.spec.js`
+**Depends on**: T48
+**Requirement**: UIR-02
+
+**Contract**: the rules `.equip-button:hover:not(:disabled)`, `.equip-button[data-testid="piece-refine"]:hover:not(:disabled)` and `.bulk-sell-submit:hover:not(:disabled), .bulk-sell-yes:hover:not(:disabled)` were deleted. The shared hover and press rules after the comment `/* Every wood or ember button brightens under the pointer and darkens while pressed; ... */` already list `.equip-button` and `.bulk-sell-yes`. Hover stays `brightness(1.15)`.
+
+**Tests**: e2e, edited: `draws the equip and sell buttons of a piece as wood pills and Refinar as an ember pill` and `draws the bag button to the fusion and the bulk sale confirmation as ember pills`, which call `expectShades` (hover and press) instead of `expectHoverShade`.
+**Gate**: build - `cd game && npm test && npm run build`, then `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [x] `grep -c "^\.equip-button:hover:not(:disabled) {\|^\.bulk-sell-yes:hover:not(:disabled) {\|^\.bulk-sell-submit:hover:not(:disabled),\|^\.equip-button\[data-testid=\"piece-refine\"\]:hover" game/public/style.css` prints `0` at HEAD (the shared rule's lines end with `,` and do not match), and both edited cases call `expectShades` (PO check, 2026-11-17).
+
+**Commit**: landed inside `e027ff8` (`feat(game): compare a hovered piece with the one the leader wears`, another feature's commit), not as its own commit. It is recorded here so UIR-02 AC 10 traces to a change. The visible change (a darker pressed state) is judged in T53.
+
+---
+
+### T50: Pin the enemy line's vertical centre with and without the weak chip [ ]
+
+**Owner**: test-engineer
+**What**: The enemy line's vertical centre is y 609 while the weak chip shows above it, and y 596 while no chip shows (spec UIR-04 AC 7, amended 2026-11-14 in `9b02759`).
+**Where**: `game/e2e/uiRedesign.spec.js` (the test `keeps the battle HUD on the scene anchors of the baseline`, and one new test loop right after it)
+**Read first**: the test `keeps the battle HUD on the scene anchors of the baseline` (whole, including the comment block above it); the helpers `bare`, `startAs`, `canvasBox` at the top of the file; the loop `shows no weak element for the ${element} enemy` (the pattern of a test inside a `for`); spec UIR-04 AC 7 and UIR-08 AC 6
+**Depends on**: T49
+**Requirement**: UIR-04, UIR-08
+
+**Contract** (values from the spec, 1024 x 768 scene px, tolerance 1 scene px): `.enemy-stats` vertical centre = `609` for a FIRE miniboss (chip `Fraco: Água` shows, 22 px tall, 4 px gap); `596` for a LIGHT and for a DARKNESS phase enemy (no chip).
+
+**Steps**:
+
+1. In the comment block above `keeps the battle HUD on the scene anchors of the baseline`, replace the line `    //  The enemy line's vertical centre is not asserted: it moved from 596 to 609 with the weak chip (see the report)` with `    //  The enemy line's vertical centre is y 609 while the weak chip shows above it (UIR-04 AC7, amended 2026-11-14)`.
+2. In that test, right after the line `        await expect(page.locator('.boss-timer')).toBeVisible();`, add `        await expect(page.getByTestId('weak-chip')).toHaveText('Fraco: Água');`.
+3. In that test, right after the line `        expect(near(enemy.centreX, 670)).toBe(true);`, add `        expect(near(enemy.centreY, 609)).toBe(true);`.
+4. Right after the closing `    });` of that test, add the loop below.
+
+```js
+    //  UIR-04 AC7: with no weak chip the enemy line is alone in its box, centred on y 596
+    for (const element of [ 'LIGHT', 'DARKNESS' ])
+    {
+        test(`centres the enemy line on y 596 when the ${element} enemy shows no weak chip`, async ({ page }) => {
+            await startAs(page, { monster: bare(element) });
+            await expect(page.getByTestId('weak-chip')).toBeHidden();
+            await expect(page.locator('.enemy-stats')).toBeVisible();
+
+            const canvas = await canvasBox(page);
+            const line = await page.locator('.enemy-stats').boundingBox();
+            const centreY = ((line.y + line.height / 2 - canvas.y) * 768) / canvas.height;
+
+            expect(Math.abs(centreY - 596)).toBeLessThanOrEqual(1);
+        });
+    }
+```
+
+**Tests**: e2e, `uiRedesign.spec.js`:
+
+- `keeps the battle HUD on the scene anchors of the baseline` (edited): FIRE miniboss, chip text `Fraco: Água`, `.enemy-stats` centre y `609` within 1.
+- `centres the enemy line on y 596 when the LIGHT enemy shows no weak chip`: LIGHT phase enemy, chip hidden, centre y `596` within 1.
+- `centres the enemy line on y 596 when the DARKNESS enemy shows no weak chip`: DARKNESS phase enemy, chip hidden, centre y `596` within 1.
+
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [ ] The three cases pass and every other case of `uiRedesign.spec.js` passes unchanged.
+- [ ] `grep -c "The enemy line's vertical centre is not asserted" game/e2e/uiRedesign.spec.js` prints `0`.
+- [ ] Discrimination check: in a scratch copy, changing `gap: 4px;` of the rule `.hud-enemy` in `style.css` to `gap: 20px;` makes the edited case fail; the scratch is discarded and `git status --porcelain` matches the start.
+
+**Commit**: `test(game): pin the enemy line centre with and without the weak chip`
+
+---
+
+### T51: Pin the boss map look of the beaten stops [ ]
+
+**Owner**: test-engineer
+**What**: The beaten stops of `Rever chefes` keep the boss map look: background `rgb(225, 238, 204)`, a 3 px solid border `rgb(93, 160, 72)`, a miniboss stop 52 x 52 with radius `50%`, the chapter boss stop 96 x 80 with radius `24px` (spec UIR-13 AC 16, added 2026-11-14 in `9b02759`).
+**Where**: `game/e2e/uiRedesign.spec.js` (one new test right after `pulses the current map node unless the player prefers reduced motion`)
+**Read first**: the test `frames the chapter map with a wood and a bronze ring` (how the map opens); `game/e2e/farm.spec.js:5-33` (a completed campaign, and why the auto click is switched off); `game/src/adapters/phaser/views/farmView.js:9-38` (a beaten stop is a `button.map-node` with test id `farm-entry-<id>` and `data-state="defeated"`); `style.css` rules `.map-node`, `.map-node.is-boss`, `.map-node[data-state="defeated"]`
+**Depends on**: T50
+**Requirement**: UIR-13
+
+**Contract**: progress `{ stage: 1, encounter: 'CHAPTER_BOSS', phase: 1, completed: true }` on the one-stage chapter of `startAs` makes `farm-entry-miniboss-1` and `farm-entry-chapter-boss` beaten stops (the same state `farm.spec.js` uses). Computed values: see **What**.
+
+**Steps**:
+
+1. Add the test below right after `pulses the current map node unless the player prefers reduced motion`.
+
+```js
+    //  UIR-13 AC16: the beaten stops keep the boss map look, not the inset recipe of the hero screens
+    test('keeps the boss map look on the beaten stops', async ({ page }) => {
+        await startAs(page, {
+            progress: { stage: 1, encounter: 'CHAPTER_BOSS', phase: 1, completed: true },
+            //  A completed campaign unlocks the auto click; it stays off so nothing else changes the screen
+            setup: (p) => p.addInitScript(() => localStorage.setItem('infinity-grove.auto-click', 'off'))
+        });
+        await page.getByTestId('hud-farm').click();
+        await expect(page.getByTestId('farm-map')).toBeVisible();
+
+        const beaten = { 'background-color': 'rgb(225, 238, 204)', 'border-top-width': '3px', 'border-top-style': 'solid', 'border-top-color': 'rgb(93, 160, 72)' };
+        const miniboss = page.getByTestId('farm-entry-miniboss-1');
+        const boss = page.getByTestId('farm-entry-chapter-boss');
+
+        for (const stop of [ miniboss, boss ])
+        {
+            await expect(stop).toHaveAttribute('data-state', 'defeated');
+            await expect(stop).toHaveClass(/map-node/);
+        }
+
+        await expectStyle(miniboss, { ...beaten, width: '52px', height: '52px', 'border-top-left-radius': '50%' });
+        await expectStyle(boss, { ...beaten, width: '96px', height: '80px', 'border-top-left-radius': '24px' });
+    });
+```
+
+**Tests**: e2e `keeps the boss map look on the beaten stops`: completed chapter 1, `farm-entry-miniboss-1` and `farm-entry-chapter-boss` are `defeated` `map-node` buttons with background `rgb(225, 238, 204)`, border `3px solid rgb(93, 160, 72)`, `52px` x `52px` radius `50%` and `96px` x `80px` radius `24px`.
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js e2e/farm.spec.js e2e/bossMap.spec.js`
+**Done when**:
+
+- [ ] The new case passes; every case of the three files passes unchanged.
+- [ ] Discrimination check: in a scratch copy, changing `border-color: #5da048;` of `.map-node[data-state="defeated"]` to `#5da049` makes the new case fail; the scratch is discarded and `git status --porcelain` matches the start.
+
+**Commit**: `test(game): pin the boss map look of the beaten stops`
+
+---
+
+### T52: Pin the contrast bounds of the talent branch inks [ ]
+
+**Owner**: test-engineer
+**What**: The `Melhorar` button ink under text `rgb(244, 230, 200)` reads 5.90:1 to 6.02:1 and the branch title ink on `rgb(230, 208, 162)` at least 4.82:1, rounded to two decimals as the spec writes them (spec UIR-14 AC 15; round 2 noted they were asserted only as 4.5).
+**Where**: `game/e2e/uiRedesign.spec.js` (the test `draws the talent buttons, titles and max marks in the dark branch ink`)
+**Read first**: that test (whole); the helper `ratio` at the top of the file; spec UIR-14 AC 15
+**Depends on**: T51
+**Requirement**: UIR-14
+
+**Contract** (WCAG 2.x ratios computed by the PO from the spec colours, two decimals): button TIME 6.02, BREAK 5.96 or 5.97, POWER 5.90, COMBO 5.95; title TIME 4.92, BREAK 4.88, POWER 4.82, COMBO 4.87.
+
+**Steps**:
+
+1. In that test, replace the line `            expect(ratio(ink, 'rgb(244, 230, 200)')).toBeGreaterThanOrEqual(4.5);` with:
+
+```js
+            //  UIR-14 AC15: 5.90:1 to 6.02:1 under the button text, rounded to two decimals as the spec writes them
+            const buttonRatio = Number(ratio(ink, 'rgb(244, 230, 200)').toFixed(2));
+
+            expect(buttonRatio).toBeGreaterThanOrEqual(5.9);
+            expect(buttonRatio).toBeLessThanOrEqual(6.02);
+```
+
+2. In the same test, replace the line `            expect(ratio(ink, columnBack)).toBeGreaterThanOrEqual(4.5);` with `            expect(Number(ratio(ink, columnBack).toFixed(2))).toBeGreaterThanOrEqual(4.82);`.
+
+**Tests**: e2e `draws the talent buttons, titles and max marks in the dark branch ink` (edited): for each of TIME, BREAK, POWER, COMBO the button ratio is in `[5.90, 6.02]` and the title ratio is at least `4.82`.
+**Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
+**Done when**:
+
+- [ ] The edited case passes and every other case of `uiRedesign.spec.js` passes unchanged.
+- [ ] `grep -c "toBeGreaterThanOrEqual(4.82)" game/e2e/uiRedesign.spec.js` is one more than before the task.
+
+**Commit**: `test(game): pin the contrast bounds of the talent branch inks`
+
+---
+
+### T53: Final review of the Grove theme after the round 2 fixes [ ]
+
+**Owner**: ui-artist
+**What**: The last task of the feature. Confirm that nothing the player sees changed for the worse since T38 and judge the one visible change of Phase 11, the darker pressed state of equip, sell, `Refinar` and the bulk sale confirmation (T49). Record the PO rulings on findings #10 to #13 and the `Click to Start!` ruling, and write the final verdict (UIR-01 to UIR-19).
+**Where**: `.specs/features/ui-redesign/ui-review.html` (add a section; keep the history)
+**Also changes**: the PNG files of `.specs/features/ui-redesign/ui-review/` that step 1 rewrites
+**Read first**: the current `ui-review.html` (T38 section, findings #10 to #13); § Deferred review findings and § Phase 11 notes above; spec UIR-02 AC 9 to AC 11, UIR-15 AC 6; the cases `draws the equip and sell buttons of a piece as wood pills and Refinar as an ember pill` and `draws the bag button to the fusion and the bulk sale confirmation as ember pills` of `game/e2e/uiRedesign.spec.js`
+**Depends on**: T52
+**Requirement**: UIR-01, UIR-02, UIR-03, UIR-04, UIR-05, UIR-06, UIR-07, UIR-08, UIR-09, UIR-10, UIR-11, UIR-12, UIR-13, UIR-14, UIR-15, UIR-16, UIR-17, UIR-18, UIR-19
+
+**Steps**:
+
+1. Run `cd game && npm run ui:shots -- uiRedesign` on the current `main` and use those 66 files.
+2. Compare each shot with the T38 shot of the same name (`git show a9945af9:<path>` for the old file). For every shot that differs, name the cause. Allowed causes: (a) T49, which a still shot does not show because the shots take no pressed state; (b) another feature after T38 (for example the piece tooltip comparison of `e027ff8` in `28-piece-tooltip`, or the wake notice of `420c8bb` and `3d92e79` on the start screen). Judge (b) only for the Grove recipe: parchment, wood, ember, Cinzel, contrast at least 4.5:1. Its behaviour is that feature's review.
+3. Judge the pressed state of T49 by hand. Open the bag piece in Equipamento with enough silver for `Refinar` (the same setup as the case named under **Read first**). Hold the mouse down on `Refinar`, then on `piece-sell`, and take one screenshot each with Playwright or the browser. The pressed button must read darker than the hovered one, with the label readable. Put the two images under `.specs/features/ui-redesign/ui-review/` as `38-refine-pressed-desktop.png` and `39-sell-pressed-desktop.png`.
+4. Under the T38 findings, write the state of #10 to #13 as `adiado` (or `mantido` for #11), quoting the reason of § Deferred review findings.
+5. Confirm `Click to Start!` (shot `03-menu-welcome`): an ember pill with no hover or press look, as UIR-15 AC 6 states. It is a prompt, not a button (§ Phase 11 notes).
+6. Write the verdict: OK, or CHANGES with numbered findings (screen, selector, what is wrong, the exact fix). A new finding goes back to the PO, who turns it into a task or defers it. Write the text in Portuguese (AD-007).
+
+**Tests**: none - a visual review produces no code.
+**Gate**: `test -s .specs/features/ui-redesign/ui-review.html && grep -q "T53" .specs/features/ui-redesign/ui-review.html && grep -q "38-refine-pressed" .specs/features/ui-redesign/ui-review.html && grep -q "#13" .specs/features/ui-redesign/ui-review.html && test -s .specs/features/ui-redesign/ui-review/38-refine-pressed-desktop.png && test -s .specs/features/ui-redesign/ui-review/39-sell-pressed-desktop.png` exits 0.
+**Done when**:
+
+- [ ] `ui-review.html` has a T53 section with the verdict, the cause of every shot that differs from T38, the pressed-state judgement with the two images, the states of #10 to #13, and the `Click to Start!` check.
+- [ ] The commit holds `ui-review.html`, the two pressed-state images and any shot that step 1 changed.
+
+**Commit**: `docs(ui-redesign): close the grove theme review after the round 2 fixes`
+
+After T53, a fresh Verifier that wrote none of T39 to T53 runs round 3 of 3 (`.claude/agents/verifier.md`). It runs the full suites and the sensor. It re-injects N10, N11, N12, N15, N16, adds the three faults of the T50 and T51 discrimination checks, and adds at least one fault on T49 (put `.equip-button:hover:not(:disabled) { filter: brightness(1.15); }` back at the end of the file). Then `product-owner` acceptance and `gitops`.
 
 ---
 
 ## Phase Execution Map
 
 ```
-Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9 → Phase 10
+Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9 → Phase 10 → Phase 11
 
 Phase 1:  T1 → T2 → T3
 Phase 2:  T4 → T5
@@ -2828,9 +3269,10 @@ Phase 7:  T27
 Phase 8:  T28 → T29
 Phase 9:  T30
 Phase 10: T31 → T32 → T33 → T34 → T35 → T36 → T37 → T38
+Phase 11: T39 → T40 → T41 → T42 → T43 → T44 → T45 → T46 → T47 → T48 → T49 → T50 → T51 → T52 → T53
 ```
 
-Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`); batch 2 = Phase 3 (T6 to T11, `game-dev`); batch 3 = Phase 4 (T12 to T17, `game-dev`, except T15 which goes to `test-engineer` between T14 and T16); batch 4 = Phase 5 (T18 to T20, `game-dev`); batch 5 = Phases 6 and 7 (T21 to T27, `game-dev`); batch 6 = Phase 8 (T28, T29, `test-engineer`); then T30 (`ui-artist`). Batch 7 = Phase 10: T31 to T36 (`game-dev`, one worker, in order), then T37 (`test-engineer`), then T38 (`ui-artist`). A fresh `test-engineer` that wrote none of these tasks runs as the Verifier after T38.
+Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`); batch 2 = Phase 3 (T6 to T11, `game-dev`); batch 3 = Phase 4 (T12 to T17, `game-dev`, except T15 which goes to `test-engineer` between T14 and T16); batch 4 = Phase 5 (T18 to T20, `game-dev`); batch 5 = Phases 6 and 7 (T21 to T27, `game-dev`); batch 6 = Phase 8 (T28, T29, `test-engineer`); then T30 (`ui-artist`). Batch 7 = Phase 10: T31 to T36 (`game-dev`, one worker, in order), then T37 (`test-engineer`), then T38 (`ui-artist`). A fresh `test-engineer` that wrote none of these tasks runs as the Verifier after T38. Batch 8 = Phase 11: T39 to T49 are recorded as done (no worker); T50, T51, T52 (`test-engineer`, one worker, in order), then T53 (`ui-artist`), then the `verifier` agent for round 3 of 3, which wrote none of T39 to T53.
 
 ---
 
@@ -2876,6 +3318,21 @@ Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`);
 | T36 | 2 declarations, 1 e2e case | ✅ Granular |
 | T37 | 1 shots file and its design table | ✅ Granular |
 | T38 | 1 review file | ✅ Granular |
+| T39 | 1 selector, 6 unit cases | ✅ Granular |
+| T40 | 2 e2e cases | ✅ Granular |
+| T41 | 1 new and 3 edited e2e cases | ✅ Granular |
+| T42 | 1 property in 10 checks of 1 file | ✅ Cohesive (one property) |
+| T43 | 2 edited e2e cases | ✅ Granular |
+| T44 | 2 properties in the button checks of 1 file | ✅ Cohesive (one recipe) |
+| T45 | 1 new and 2 edited e2e cases | ✅ Granular |
+| T46 | 4 edited e2e cases | ✅ Granular |
+| T47 | 2 new and 1 edited e2e cases | ✅ Granular |
+| T48 | 1 e2e case | ✅ Granular |
+| T49 | 3 deleted rules, 2 edited e2e cases | ✅ Cohesive (one cascade fault) |
+| T50 | 1 edited e2e case and 1 test loop | ✅ Granular |
+| T51 | 1 e2e case | ✅ Granular |
+| T52 | 2 assertions of 1 e2e case | ✅ Granular |
+| T53 | 1 review file and its shots | ✅ Granular |
 
 ## Diagram-Definition Cross-Check
 
@@ -2919,6 +3376,21 @@ Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`);
 | T36 | T35 | T35 → T36 | ✅ Match |
 | T37 | T36 | T36 → T37 | ✅ Match |
 | T38 | T37 | T37 → T38 | ✅ Match |
+| T39 | T38 | T38 → T39 | ✅ Match |
+| T40 | T39 | T39 → T40 | ✅ Match |
+| T41 | T40 | T40 → T41 | ✅ Match |
+| T42 | T41 | T41 → T42 | ✅ Match |
+| T43 | T42 | T42 → T43 | ✅ Match |
+| T44 | T43 | T43 → T44 | ✅ Match |
+| T45 | T44 | T44 → T45 | ✅ Match |
+| T46 | T45 | T45 → T46 | ✅ Match |
+| T47 | T46 | T46 → T47 | ✅ Match |
+| T48 | T47 | T47 → T48 | ✅ Match |
+| T49 | T48 | T48 → T49 | ✅ Match |
+| T50 | T49 | T49 → T50 | ✅ Match |
+| T51 | T50 | T50 → T51 | ✅ Match |
+| T52 | T51 | T51 → T52 | ✅ Match |
+| T53 | T52 | T52 → T53 | ✅ Match |
 
 ## Test Co-location Validation
 
@@ -2962,3 +3434,18 @@ Packing for workers (~7 tasks): batch 1 = Phases 1 and 2 (T1 to T5, `game-dev`);
 | T36 | Game CSS (player-visible fix) | e2e | e2e | ✅ OK |
 | T37 | Review screenshots | none | none | ✅ OK |
 | T38 | Review document | none | none | ✅ OK |
+| T39 | Game scene | unit (jsdom) | unit | ✅ OK |
+| T40 | e2e | e2e | e2e | ✅ OK |
+| T41 | e2e | e2e | e2e | ✅ OK |
+| T42 | e2e | e2e | e2e | ✅ OK |
+| T43 | e2e | e2e | e2e | ✅ OK |
+| T44 | e2e | e2e | e2e | ✅ OK |
+| T45 | e2e | e2e | e2e | ✅ OK |
+| T46 | e2e | e2e | e2e | ✅ OK |
+| T47 | e2e | e2e | e2e | ✅ OK |
+| T48 | e2e | e2e | e2e | ✅ OK |
+| T49 | Game CSS (player-visible fix) | e2e | e2e | ✅ OK |
+| T50 | e2e | e2e | e2e | ✅ OK |
+| T51 | e2e | e2e | e2e | ✅ OK |
+| T52 | e2e | e2e | e2e | ✅ OK |
+| T53 | Review document | none | none | ✅ OK |

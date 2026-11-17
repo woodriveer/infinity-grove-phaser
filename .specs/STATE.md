@@ -189,11 +189,11 @@
 ## Handoff
 
 - **Feature**: `ui-redesign` (Grove theme, AD-022), `.specs/features/ui-redesign/`
-- **Phase / Task**: Execute, paused by the owner on 2026-11-13 between T19 and T20 (Phase 5). T1 to T19 done and pushed (last commit `92a3613`); T20 to T30 pending
-- **Completed**: Phases 1 to 4 with their phase gates (foundation, skill thumbnails without magenta, battle HUD, round auto click button with its window and the key `A`, pause and reset cards); T18 and T19 of Phase 5 (main menu)
-- **In-progress** (file:line): none. T20 (`Preloader.js`, new `Preloader.test.js`) was written, passed its unit gate and was reverted at the pause; redo it from the task
-- **Next step**: `game-dev` runs T20 with the Phase 5 gate, then T21 to T27; `test-engineer` T28 and T29; `ui-artist` T30; then a fresh `test-engineer` as Verifier, `product-owner` acceptance, `gitops` (deploy check, `report.html`, changelog, tag)
-- **Blockers**: none
-- **Notes for the resume**: (1) phase gate is `cd game && npm test && npm run build && npx playwright test --workers=2`; a failing e2e test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both (seen so far: `dragEquip.spec.js:550` and `:604`, `talents.spec.js:148` and `:111`, `auth.spec.js:113`, `clickPower.spec.js:41`). (2) Line numbers quoted in `tasks.md` have drifted: locate edits by selector or content. (3) Finding for T30: the leader's name is cut ("Kael Raizfé…") in the dark leader card of the battle bar. (4) The screenshot of the main menu after T19 was not taken
+- **Phase / Task**: Execute, Phase 11 of `tasks.md` (closing the Verifier round 2 FAIL). On 2026-11-17 the owner approved Phase 10 and the round 2 fixes: "Sim, conclua". T1 to T49 done: T39 to T49 record the round 2 fixes that landed on `main` on 2026-11-13 and 2026-11-14 (`941d3e7` to `b147d1e`, and the press fix inside `e027ff8`). T50 to T53 are open
+- **Completed**: Phases 1 to 10; spec amendments `af8af7a` (`Click to Start!` is a prompt, UIR-15 AC 6) and `9b02759` (UIR-04 AC 7 anchors, UIR-13 AC 16 map stops); PO rulings of 2026-11-17 in `tasks.md` § Phase 11 notes (Click to Start, the 27 ticked boxes) and § Deferred review findings (#10 to #13 of the T38 review)
+- **In-progress** (file:line): none
+- **Next step**: `test-engineer` runs T50, T51, T52 in order (one worker; e2e only, `game/e2e/uiRedesign.spec.js`), then `ui-artist` T53 (the last task). Then the `verifier` agent runs round 3 of 3 (full suites and sensor, the faults named after T53), then `product-owner` acceptance, then `gitops` (deploy check, `report.html`, changelog, tag)
+- **Blockers**: none. Round 3 is the last Verifier round before escalation to the owner
+- **Notes for the resume**: (1) phase gate is `cd game && npm test && npm run build && npx playwright test --workers=2`; a failing e2e test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both (seen so far: `dragEquip.spec.js:550` and `:604`, `talents.spec.js:148` and `:111`, `auth.spec.js:113`, `clickPower.spec.js:41`). (2) Line numbers quoted in `tasks.md` drift: locate edits by test name or exact text. (3) `validation.md` is still the round 2 report; round 3 rewrites it. (4) The owner confirms at acceptance the PO rulings marked `n` in the spec Assumptions table (enemy line D2, map stops D3, findings #10 to #13)
 - **Uncommitted files**: owner's, never stage them: `CLAUDE.md`, `GEMINI.md`, `graphify-out/`, `.agents/`, `.claude/skills/impeccable/`, `.claude/skills/reversa-*/`
 - **Branch**: main
