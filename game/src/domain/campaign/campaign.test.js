@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CHAPTER_BOSS, Campaign, FARM, MINIBOSS, PHASE } from './campaign';
+import { CHAPTER_BOSS, Campaign, FARM, MINIBOSS, PHASE, farmEncounterOf, farmLabel } from './campaign';
 import { DEFAULT_STATS } from '../combat/monster';
 
 //  3 stages; stage 2 has 3 phases so rules must use the current stage's phase count
@@ -230,5 +230,62 @@ describe('Campaign farm encounters', () => {
         done.farmEncounter({ kind: MINIBOSS, stage: 1 });
 
         expect(state(done)).toEqual(before);
+    });
+});
+
+describe('farm labels and farm fights of any chapter definition', () => {
+    const S3 = { element: 'NATURE', physicalDefense: 7, magicalDefense: 7, critResistance: 9 };
+    const SB = { element: 'FIRE', physicalDefense: 35, magicalDefense: 35, critResistance: 35 };
+    const D2 = {
+        bossHealth: 4321,
+        bossTimeLimitMs: 50_000,
+        boss: SB,
+        stages: [ 1, 2, 3 ].map((number) => ({ number, phasesPerStage: 5, monsterHealth: 1, minibossHealth: 70 + number, minibossTimeLimitMs: 45_000, miniboss: S3 }))
+    };
+
+    it('farmLabel of a boss without a chapter keeps today\'s labels', () => {
+        expect(farmLabel({ kind: MINIBOSS, stage: 3 })).toBe('Rever chefe: Miniboss 3');
+        expect(farmLabel({ kind: CHAPTER_BOSS })).toBe('Rever chefe: Chefe do capítulo');
+    });
+
+    it('farmLabel of a boss of another chapter adds the chapter', () => {
+        expect(farmLabel({ kind: MINIBOSS, stage: 3, chapter: 2 })).toBe('Rever chefe: Miniboss 3 (Capítulo 2)');
+        expect(farmLabel({ kind: CHAPTER_BOSS, chapter: 1 })).toBe('Rever chefe: Chefe do capítulo (Capítulo 1)');
+    });
+
+    it('farmEncounterOf builds a miniboss fight from the given definition', () => {
+        expect(farmEncounterOf(D2, { kind: MINIBOSS, stage: 3, chapter: 2 })).toEqual({
+            kind: FARM,
+            boss: { kind: MINIBOSS, stage: 3, chapter: 2 },
+            phase: 1,
+            health: 73,
+            stats: S3,
+            dropRuleId: null,
+            timeLimitMs: 45_000,
+            label: 'Rever chefe: Miniboss 3 (Capítulo 2)'
+        });
+    });
+
+    it('farmEncounterOf builds the chapter boss fight from the given definition', () => {
+        expect(farmEncounterOf(D2, { kind: CHAPTER_BOSS, chapter: 2 })).toEqual({
+            kind: FARM,
+            boss: { kind: CHAPTER_BOSS, chapter: 2 },
+            phase: 1,
+            health: 4321,
+            stats: SB,
+            dropRuleId: null,
+            timeLimitMs: 50_000,
+            label: 'Rever chefe: Chefe do capítulo (Capítulo 2)'
+        });
+    });
+
+    it('farmEncounterOf of a stage the definition does not have throws', () => {
+        expect(() => farmEncounterOf(D2, { kind: MINIBOSS, stage: 11 })).toThrow('Unknown stage: 11');
+    });
+
+    it('farmEncounterOf without stats uses the default stats', () => {
+        const withoutStats = { bossHealth: D2.bossHealth, bossTimeLimitMs: D2.bossTimeLimitMs, stages: D2.stages };
+
+        expect(farmEncounterOf(withoutStats, { kind: CHAPTER_BOSS }).stats).toEqual(DEFAULT_STATS);
     });
 });

@@ -452,7 +452,7 @@ load: async (selected) =>
 
 ---
 
-### T6: Farm fight of a given definition and its label [ ]
+### T6: Farm fight of a given definition and its label [x]
 
 **Owner**: game-dev
 **Goal**: A pure `farmEncounterOf(definition, boss)` builds a farm fight from any chapter definition, labelled by `farmLabel(boss)` with `(Capítulo <n>)` when the boss carries a chapter (BRC-06; spec P1-Fight AC 1-2).
@@ -501,7 +501,7 @@ The returned object is exactly `{ kind: FARM, boss, phase: 1, health, stats, dro
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 6 new cases pass; every existing `Campaign` farm case (`a farm encounter carries no drop rule`, `a miniboss uses the health, stats and time limit of its stage and is labelled for the farm`, and the rest of that `describe`) passes unchanged.
+- [x] The 6 new cases pass; every existing `Campaign` farm case (`a farm encounter carries no drop rule`, `a miniboss uses the health, stats and time limit of its stage and is labelled for the farm`, and the rest of that `describe`) passes unchanged.
 
 **Commit**: `feat(game): build a farm fight from any chapter definition`
 

@@ -18,6 +18,43 @@ export const CHAPTER_BOSS = 'CHAPTER_BOSS';
 //  The kind of an encounter that fights a defeated boss again; it never moves the campaign
 export const FARM = 'FARM';
 
+//  The HUD label of a farm fight: `Rever chefe: <boss>`, plus ` (Capítulo <n>)` when the boss belongs to another chapter than the campaign's
+export const farmLabel = (boss) => `Rever chefe: ${bossLabel(boss)}${Number.isInteger(boss.chapter) ? ` (Capítulo ${boss.chapter})` : ''}`;
+
+//  A boss already beaten, fought again with the numbers of `definition` (the payload shape of the header comment): the health, stats
+//  and time limit of the boss it is. It has no drop rule: farm fights drop no copper. Throws `Unknown stage: <n>` / `Unknown boss: <kind>`.
+export const farmEncounterOf = (definition, boss) =>
+{
+    const { kind, stage } = boss;
+    let health;
+    let stats;
+    let timeLimitMs;
+
+    if (kind === MINIBOSS)
+    {
+        const stageDefinition = definition.stages.find((item) => item.number === stage);
+
+        if (!stageDefinition)
+        {
+            throw new Error(`Unknown stage: ${stage}`);
+        }
+
+        ({ minibossHealth: health, minibossTimeLimitMs: timeLimitMs } = stageDefinition);
+        stats = stageDefinition.miniboss ?? DEFAULT_STATS;
+    }
+    else if (kind === CHAPTER_BOSS)
+    {
+        ({ bossHealth: health, bossTimeLimitMs: timeLimitMs } = definition);
+        stats = definition.boss ?? DEFAULT_STATS;
+    }
+    else
+    {
+        throw new Error(`Unknown boss: ${kind}`);
+    }
+
+    return { kind: FARM, boss, phase: 1, health, stats, dropRuleId: null, timeLimitMs, label: farmLabel(boss) };
+};
+
 export class Campaign
 {
     static fromProgress (progress)
@@ -105,34 +142,7 @@ export class Campaign
     //  It has no drop rule: farm fights drop no copper
     farmEncounter (boss)
     {
-        const { kind, stage } = boss;
-        let health;
-        let stats;
-        let timeLimitMs;
-
-        if (kind === MINIBOSS)
-        {
-            const definition = this.stageDefinition(stage);
-
-            if (!definition)
-            {
-                throw new Error(`Unknown stage: ${stage}`);
-            }
-
-            ({ minibossHealth: health, minibossTimeLimitMs: timeLimitMs } = definition);
-            stats = definition.miniboss ?? DEFAULT_STATS;
-        }
-        else if (kind === CHAPTER_BOSS)
-        {
-            ({ bossHealth: health, bossTimeLimitMs: timeLimitMs } = this.definition);
-            stats = this.definition.boss ?? DEFAULT_STATS;
-        }
-        else
-        {
-            throw new Error(`Unknown boss: ${kind}`);
-        }
-
-        return { kind: FARM, boss, phase: 1, health, stats, dropRuleId: null, timeLimitMs, label: `Rever chefe: ${bossLabel(boss)}` };
+        return farmEncounterOf(this.definition, boss);
     }
 
     //  The encounter was won: the campaign after it
