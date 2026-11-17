@@ -1343,6 +1343,19 @@ test.describe('Grove theme', () => {
         await expect(page.getByTestId('auto-click-popover')).toBeHidden();
     });
 
+    //  UIR-19 AC14: the reset dialog covers the bar, so A does nothing while it is open
+    test('ignores A while the reset dialog is open', async ({ page }) => {
+        await startAs(page, { progress: { chapter: 3 } });
+        await openAutoClick(page);
+        await page.getByTestId('reset-account').click();
+
+        await expect(page.locator('.reset-dialog')).toBeVisible();
+        await page.keyboard.press('a');
+
+        await expect(page.locator('.reset-dialog')).toBeVisible();
+        await expect(page.getByTestId('auto-click-popover')).toBeHidden();
+    });
+
     test('ignores A typed into a text field', async ({ page }) => {
         await startAs(page, { progress: { chapter: 2 } });
         await page.evaluate(() => {
@@ -2031,6 +2044,40 @@ test.describe('Grove theme', () => {
         expect(children.map((child) => child.type)).not.toContain('Image');
         expect(children).toContainEqual(expect.objectContaining({ type: 'Rectangle', x: 512, y: 384, width: 468, height: 32, fillColor: 0x2b1d14, isFilled: true }));
         expect(requests.filter((url) => url.includes('preloader.png'))).toEqual([]);
+    });
+
+    //  UIR-16 AC2: each of the 15 files is 512 px tall and its corner pixel (2, 2) lies within 12 of #1c120c on each channel
+    test('keeps every skill image 512 px tall on the dark corner of #1c120c', async ({ page }) => {
+        const names = [ 'kael_dimensional_cut', 'kael_charge', 'kael_screen', 'lyra_double_shot', 'lyra_focused_shot', 'lyra_rapid_wind',
+            'orina_grasp_prision', 'orina_tempest', 'orina_meteor_storm', 'seraphine_blessing', 'seraphine_holy_light', 'seraphine_bell_ringing',
+            'vex_poison_bomb', 'vex_smoke_bomb', 'vex_bleeding_blow' ];
+
+        await startAs(page, {});
+
+        const files = await page.evaluate((list) => Promise.all(list.map((name) => new Promise((resolve) => {
+            const image = new Image();
+
+            image.onload = () => {
+                const canvas = document.createElement('canvas');
+
+                canvas.width = image.naturalWidth;
+                canvas.height = image.naturalHeight;
+                canvas.getContext('2d').drawImage(image, 0, 0);
+                const [ r, g, b ] = canvas.getContext('2d').getImageData(2, 2, 1, 1).data;
+
+                resolve({ name, height: image.naturalHeight, corner: [ r, g, b ] });
+            };
+            image.onerror = () => resolve({ name, height: 0, corner: null });
+            image.src = `/assets/heroes/${name}.jpg`;
+        }))), names);
+
+        expect(files.map((file) => file.name)).toEqual(names);
+        for (const file of files)
+        {
+            expect(file.height, file.name).toBe(512);
+            expect(file.corner, file.name).not.toBeNull();
+            [ 28, 18, 12 ].forEach((channel, i) => expect(Math.abs(file.corner[i] - channel), file.name).toBeLessThanOrEqual(12));
+        }
     });
 
     test('shows no magenta in the skill bar', async ({ page }) => {
