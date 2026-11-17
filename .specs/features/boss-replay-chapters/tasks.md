@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/boss-replay-chapters/spec.md`
 **Design**: `.specs/features/boss-replay-chapters/design.md`
-**Status**: Approved by the owner on 2026-11-17 ("Aprovo os padrões"): every default of Q1 to Q8 accepted. T1 to T14 done; the T14 review asked for changes (finding #1 high, #2 low), so T15 to T19 (Phases 6 and 7) fix them under the PO rulings of the spec Assumptions table (rows "UI review #1" and "UI review #2").
+**Status**: Approved by the owner on 2026-11-17 ("Aprovo os padrões"): every default of Q1 to Q8 accepted. T1 to T19 done (Phases 1 to 7): the T14 review asked for changes (finding #1 high, #2 low), fixed by T15 to T19 under the PO rulings of the spec Assumptions table (rows "UI review #1" and "UI review #2"). Verifier round 1 PASS (`5259af2`); accepted by the product owner on 2026-11-17 (§ Acceptance).
 
 Rules for every task:
 
@@ -24,6 +24,38 @@ Rules for every task:
 - The 400 detail text is exactly `chapter must be an integer of at least 1`.
 - Hero of each chapter for a FIRE start (every test below registers FIRE): chapter 1 `kael` "Kael Raizférrea", 2 `lyra` "Lyra Folhaveloz", 3 `orina` "Orina Brumaestrela", 4 `vex` "Vex Sombraespinho", 5 `seraphine` "Seraphine Aurora"; chapters 6 to 15 repeat that order.
 - Seeded numbers used below (`ChapterDefinition.of(n)`): chapter 2 boss health 8000, boss defense 35, boss element FIRE, stage 1 miniboss health 800, drop rules 4/5/6; chapter 3 boss health 32000, stage 1 miniboss health 3200.
+
+---
+
+## Acceptance (product-owner, 2026-11-17)
+
+**Verdict: ACCEPTED.** All 19 tasks are done, the Verifier round 1 gives PASS and the ui-artist re-review (T19) gives APROVADO. No new task of this feature.
+
+**Evidence read**: `validation.md` round 1 (`5259af2`, diff range `9633d0f..b398ce6`): 35 of 35 ACs covered with `file:line` evidence, 7 of 7 edge cases, sensor 21 mutants and 21 killed (0 survived, 0 invalid, isolation ok), 0 spec-precision gaps on the ACs. Backend 991/991, game unit 1657/1657, e2e 342/343: the 1 failure (`dragEquip.spec.js:586`) passed alone twice with `--workers=1`, a load flake on the known list of `STATE.md` Handoff. No Flyway migration in the range. `ui-review.html` round 2 (`f31884d`): APROVADO, findings #1 (plate on two lines, timer beside it) and #2 (dot clear of the numeral) resolved on shots 03, 08, 09 and 01, 06, 07; 20 PNG files (10 shots x 2 projects).
+
+**Spec goals** (`spec.md`, Goals):
+
+| Goal | Evidence | Status |
+| --- | --- | --- |
+| 1. Chapters 1 to N on Rever chefes, any of them opens, the screen opens on the current chapter | P1-Choose AC 1 to 4, 8 (`e2e:99-120`, `:211-212`, `:256-257`, `:291-308`) | Met |
+| 2. On an earlier chapter map, 10 minibosses and the chapter boss `defeated` and fightable | P1-Choose AC 5, 12 (`e2e:119`, `:121`, `:198-199`); `FCIT:287` 11 bosses | Met |
+| 3. An earlier boss fights with its chapter's numbers and pays its chapter's rolls | P1-Fight AC 1, 5, 6, 7 (`e2e:132-139`, `FST:465`, `:484`, `:516`); sensor B3, B4, G9, G10 killed | Met |
+| 4. One daily limit (10) and one 5 s interval over every chapter | P1-Fight AC 8, 9 (`FST:539-542`, `:551`, `FCIT:350`) | Met |
+| 5. No migration; old game on new backend and new game on old backend both work | P2-Compat AC 1 to 3 (`FCIT:365`, `:422`, `HeroUi.test.js:488`, `farmSession.test.js:115`; 0 files under `db/migration`); `farm.spec.js` 9/9 and `bossMap.spec.js` 6/6 unchanged | Met |
+
+**Success criteria**: chapter 2 miniboss 3 reached from the HUD through Rever chefes, chip `2`, stop `3` (`e2e:131`); every AC has a named test and every visible one a scenario in `bossReplayChapters.spec.js` (26 scenarios); `farm.spec.js`, `bossMap.spec.js`, `FarmServiceTest` and `FarmControllerIT` existing cases pass unchanged. All three met.
+
+**Ruling on Verifier finding F1** (`HeroUi.js` `selectFarmChapter`, close the panel during a pending chapter load and reopen: the chips can stay disabled and the late answer overwrites the farm session; closing and reopening again clears it): not a gap of this spec, which says nothing about a close during a load. It does not block the release: it needs a close during a load, the panel recovers on the next reopen, and the late answer can only start a fight of a reached chapter that the backend accepts at that chapter's lower rewards. Logged as **TD-009** in `STATE.md` with the rule "closing Rever chefes cancels a pending chapter load; a late answer is ignored", for a `game-dev` fix task with a `HeroUi.test.js` case `closing during a chapter load and reopening leaves the chips enabled on the current chapter`.
+
+**Edits made at acceptance**:
+
+1. Spec traceability BRC-01 to BRC-09 set to Verified; Goals and Success Criteria ticked.
+2. Spec Assumptions Q1 to Q8 set to confirmed: the owner accepted every default on 2026-11-17 ("Aprovo os padrões", AD-024); the Open questions line says so.
+3. Spec Assumptions row "Verifier finding F1" added with the ruling above.
+
+**Waiting for the owner's confirmation**: the F1 ruling (ship now, fix as TD-009). Nothing else: Q1 to Q8 are confirmed.
+
+**Next step**: `gitops` releases `ui-redesign` and `boss-replay-chapters`: deploy check, `report.html` of each, `CHANGELOG.md`, release tag.
 
 ---
 

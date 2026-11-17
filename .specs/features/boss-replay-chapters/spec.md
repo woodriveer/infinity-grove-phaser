@@ -21,11 +21,11 @@ The Rever chefes screen (spec `boss-map`) shows only the current chapter, becaus
 
 ## Goals
 
-- [ ] A player who has reached chapter N sees chapters 1 to N on the Rever chefes screen and can open the map of any of them; the screen opens on the current chapter.
-- [ ] On the map of an earlier chapter, all 10 minibosses and the chapter boss are `defeated` and can be fought again.
-- [ ] A boss of an earlier chapter fights with that chapter's health, defense, critical resistance, element and time limit, and pays that chapter's card and equipment rolls.
-- [ ] The daily chapter boss limit (10) and the 5 s farm interval stay one per player across all chapters.
-- [ ] No Flyway migration; a game still on the previous version keeps working against the new backend, and the new game keeps working against the previous backend.
+- [x] A player who has reached chapter N sees chapters 1 to N on the Rever chefes screen and can open the map of any of them; the screen opens on the current chapter.
+- [x] On the map of an earlier chapter, all 10 minibosses and the chapter boss are `defeated` and can be fought again.
+- [x] A boss of an earlier chapter fights with that chapter's health, defense, critical resistance, element and time limit, and pays that chapter's card and equipment rolls.
+- [x] The daily chapter boss limit (10) and the 5 s farm interval stay one per player across all chapters.
+- [x] No Flyway migration; a game still on the previous version keeps working against the new backend, and the new game keeps working against the previous backend.
 
 ## Out of Scope
 
@@ -48,14 +48,14 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --- | --- | --- | --- |
-| Q1. Which chapters can be picked | Chapters 1 to the current campaign chapter (`progress.position.chapter` after `withNextChapterOpen`; a completed campaign reaches 1 to 15). An account reset brings the list back to chapter 1 only | The campaign position proves every earlier chapter was cleared in this run; keeping chapters after a reset would let a chapter 1 player farm chapter 15 pieces | n |
-| Q2. Daily chapter boss limit | One shared count of 10 wins per UTC day over every chapter, as today | No schema change; a per-chapter limit would multiply the chapter boss pieces and cards by up to 15 | n |
-| Q3. Rewards of an earlier chapter | That chapter's: the miniboss drops the hero of that chapter (7 % x stage), the chapter boss drops the hero of the next chapter (80 %), the piece uses that chapter's rarity tier; no copper, no talent points | Same rules as the current chapter, with the fought chapter as input | n |
-| Q4. Enemy numbers of an earlier chapter | That chapter's seeded health, defense, critical resistance, element and time limit | The owner's example; matches the rewards | n |
-| Q5. Selector look and visibility | A row of numbered chips `1` to `N` under the map title; the shown chapter is pressed (ember), the current campaign chapter carries a gold dot; the row is hidden while only chapter 1 is reached | Direct jump to any chapter in one click; 15 chips fit the 880 px map width in one row, and the phone scales that same layout (see the phone-row ruling below) | n |
-| Q6. Chapter shown when the screen opens | The current campaign chapter on every opening from the HUD button; when the last daily chapter boss win of an earlier chapter ends the farm, the screen reopens on that chapter | The owner's example default; the reopen keeps the player where they were | n |
-| Q7. HUD label of an earlier chapter fight | `Rever chefe: Miniboss <s> (Capítulo <n>)` and `Rever chefe: Chefe do capítulo (Capítulo <n>)`; a fight of the current chapter keeps `Rever chefe: Miniboss <s>` / `Rever chefe: Chefe do capítulo` | The player sees which chapter's numbers they face; current labels and their tests stay | n |
-| Q8. First win of an earlier chapter boss missing from `cleared_chapters` | A farm win of a chapter boss whose chapter is not in `cleared_chapters` counts as its first win: the card is certain and the chapter is added, as `CardRewards` does today | Only accounts whose record predates `cleared_chapters` can hit it; it reuses the existing rule | n |
+| Q1. Which chapters can be picked | Chapters 1 to the current campaign chapter (`progress.position.chapter` after `withNextChapterOpen`; a completed campaign reaches 1 to 15). An account reset brings the list back to chapter 1 only | The campaign position proves every earlier chapter was cleared in this run; keeping chapters after a reset would let a chapter 1 player farm chapter 15 pieces | y (owner, 2026-11-17, "Aprovo os padrões"; AD-024) |
+| Q2. Daily chapter boss limit | One shared count of 10 wins per UTC day over every chapter, as today | No schema change; a per-chapter limit would multiply the chapter boss pieces and cards by up to 15 | y (owner, 2026-11-17, "Aprovo os padrões"; AD-024) |
+| Q3. Rewards of an earlier chapter | That chapter's: the miniboss drops the hero of that chapter (7 % x stage), the chapter boss drops the hero of the next chapter (80 %), the piece uses that chapter's rarity tier; no copper, no talent points | Same rules as the current chapter, with the fought chapter as input | y (owner, 2026-11-17, "Aprovo os padrões"; AD-024) |
+| Q4. Enemy numbers of an earlier chapter | That chapter's seeded health, defense, critical resistance, element and time limit | The owner's example; matches the rewards | y (owner, 2026-11-17, "Aprovo os padrões"; AD-024) |
+| Q5. Selector look and visibility | A row of numbered chips `1` to `N` under the map title; the shown chapter is pressed (ember), the current campaign chapter carries a gold dot; the row is hidden while only chapter 1 is reached | Direct jump to any chapter in one click; 15 chips fit the 880 px map width in one row, and the phone scales that same layout (see the phone-row ruling below) | y (owner, 2026-11-17, "Aprovo os padrões"; AD-024) |
+| Q6. Chapter shown when the screen opens | The current campaign chapter on every opening from the HUD button; when the last daily chapter boss win of an earlier chapter ends the farm, the screen reopens on that chapter | The owner's example default; the reopen keeps the player where they were | y (owner, 2026-11-17, "Aprovo os padrões"; AD-024) |
+| Q7. HUD label of an earlier chapter fight | `Rever chefe: Miniboss <s> (Capítulo <n>)` and `Rever chefe: Chefe do capítulo (Capítulo <n>)`; a fight of the current chapter keeps `Rever chefe: Miniboss <s>` / `Rever chefe: Chefe do capítulo` | The player sees which chapter's numbers they face; current labels and their tests stay | y (owner, 2026-11-17, "Aprovo os padrões"; AD-024) |
+| Q8. First win of an earlier chapter boss missing from `cleared_chapters` | A farm win of a chapter boss whose chapter is not in `cleared_chapters` counts as its first win: the card is certain and the chapter is added, as `CardRewards` does today | Only accounts whose record predates `cleared_chapters` can hit it; it reuses the existing rule | y (owner, 2026-11-17, "Aprovo os padrões"; AD-024) |
 | Request field for the fought chapter | `POST /farm/outcome` takes an optional top-level `chapter`; absent means the current campaign chapter | A game on the previous version keeps working | y (technical, PO) |
 | A `GET /farm?chapter=N` above the reached chapter | Answers the reached chapter (`chapter` in the answer says which) | A stale screen after a reset in another tab still gets a valid map | y (technical, PO) |
 | When the game sends `chapter` | Only when the picked chapter differs from the current campaign chapter | Existing requests and their tests stay byte-identical | y (technical, PO) |
@@ -64,8 +64,9 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 | UI review #1, anchor of ui-redesign UIR-04 AC 7 | The timer anchor (512, 44) of UIR-04 AC 7 holds in its battle state (campaign miniboss: `Stage 10/10  Miniboss`, the widest campaign boss label, is a 262 px plate that ends at x 418, and 418 + 12 = 430 is left of the timer's edge at 436, so the push is 0); the timer moves only when a plate would reach it, which only farm labels do. No AD: this refines a spec AC of a finished feature, it does not change AD-022 | The e2e anchor test `keeps the battle HUD on the scene anchors of the baseline` stays unchanged and still passes | y (PO ruling, 2026-11-17) |
 | UI review #2 (T14): the 6 px gold dot touches the numeral of the current chip | Every chip gets `padding-bottom: 3px` (numeral baseline from 21.5 px to 20 px below the chip's top edge, the same on every chip so the row stays aligned) and the dot moves to `bottom: 1px` (its top edge 23 px below the chip's top edge, 1 px clear of the border). The numeral and the dot are 3 px apart; the dot stays 6 x 6 px `--gold-400` | Measured in Chromium: with `bottom: 3px` the dot spans 21 to 27 px and the baseline is at 21.5 px (overlap). Moving only the current chip's numeral (the reviewer's example) would put it 2 px above its neighbours; `bottom: 0` would merge the dot into the gold border of the pressed chip | y (PO ruling, 2026-11-17) |
 | Chip row on a phone (ruling on the test-engineer's spec-precision gap) | The edge case states what the player observes: at a 390 px viewport the 15 chips stay in one row inside the scaled map and no chip passes its right edge. The row does not wrap there, and no layout task is created. `flex-wrap: wrap` stays in the Visual Spec as a guard | The HUD is one 1024 px layout scaled down to the phone (`game/public/style.css`, the comment above the 640 px query), so the panel is never narrower than the 15 chips (about 760 px of the 880 px map). A phone-only reflow would change the game for one row and break the scaled-HUD pattern every screen uses | y (PO ruling) |
+| Verifier finding F1 (round 1): closing Rever chefes while a chapter load is pending and reopening it can leave the chips disabled, and the late answer overwrites the farm session under the map of the current chapter (`HeroUi.selectFarmChapter`) | Not part of this feature; logged as TD-009 in `STATE.md` with the rule "closing Rever chefes cancels a pending chapter load; a late answer is ignored", for a fix task of `game-dev` | No AC covers a close during a load (P1-Choose AC 8, 9 cover the HUD opening and the pending state); closing and reopening the panel again recovers; the late answer can only start a fight of a reached chapter, which the backend accepts with that chapter's lower rewards | y (PO ruling at acceptance, 2026-11-17) |
 
-**Open questions:** none unlogged - Q1 to Q8 carry the product owner defaults above and wait for the owner's confirmation.
+**Open questions:** none. The owner accepted every default of Q1 to Q8 on 2026-11-17 ("Aprovo os padrões", AD-024).
 
 ---
 
@@ -193,15 +194,15 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| BRC-01 | P2: Farm state per chapter (AC 1-4) | Tasks | Pending |
-| BRC-02 | P1: Fight an earlier chapter - backend report and rewards (AC 5-12) | Tasks | Pending |
-| BRC-03 | P1: Fight - game client and session carry the chapter (AC 3-4) | Tasks | Pending |
-| BRC-04 | P1: Choose a chapter - selector (AC 1-4, 7-11) | Tasks | Pending |
-| BRC-05 | P1: Choose a chapter - map of an earlier chapter (AC 5, 6, 12) | Tasks | Pending |
-| BRC-06 | P1: Fight - numbers, label, reopen on the limit (AC 1, 2, 13) | Tasks | Pending |
-| BRC-07 | P2: Compatibility both ways (AC 1-3) | Tasks | Pending |
-| BRC-08 | P1: Fight - plate on two lines and timer beside it (AC 14, 15; UI review #1) | Tasks | Pending |
-| BRC-09 | P1: Choose a chapter - dot clear of the numeral (AC 13; UI review #2) | Tasks | Pending |
+| BRC-01 | P2: Farm state per chapter (AC 1-4) | Tasks | Verified |
+| BRC-02 | P1: Fight an earlier chapter - backend report and rewards (AC 5-12) | Tasks | Verified |
+| BRC-03 | P1: Fight - game client and session carry the chapter (AC 3-4) | Tasks | Verified |
+| BRC-04 | P1: Choose a chapter - selector (AC 1-4, 7-11) | Tasks | Verified |
+| BRC-05 | P1: Choose a chapter - map of an earlier chapter (AC 5, 6, 12) | Tasks | Verified |
+| BRC-06 | P1: Fight - numbers, label, reopen on the limit (AC 1, 2, 13) | Tasks | Verified |
+| BRC-07 | P2: Compatibility both ways (AC 1-3) | Tasks | Verified |
+| BRC-08 | P1: Fight - plate on two lines and timer beside it (AC 14, 15; UI review #1) | Tasks | Verified |
+| BRC-09 | P1: Choose a chapter - dot clear of the numeral (AC 13; UI review #2) | Tasks | Verified |
 
 **Coverage:** 9 total, 9 mapped to tasks, 0 unmapped
 
@@ -209,6 +210,6 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 
 ## Success Criteria
 
-- [ ] A player in chapter 3 fights miniboss 3 of chapter 2 in two clicks from the HUD (open Rever chefes, chip `2`, stop `3`).
-- [ ] Every acceptance criterion above has a named unit or integration test, and every player-visible one an e2e scenario in `game/e2e/bossReplayChapters.spec.js`.
-- [ ] `farm.spec.js`, `bossMap.spec.js` and the backend `FarmServiceTest` / `FarmControllerIT` cases that exist today pass unchanged.
+- [x] A player in chapter 3 fights miniboss 3 of chapter 2 in two clicks from the HUD (open Rever chefes, chip `2`, stop `3`).
+- [x] Every acceptance criterion above has a named unit or integration test, and every player-visible one an e2e scenario in `game/e2e/bossReplayChapters.spec.js`.
+- [x] `farm.spec.js`, `bossMap.spec.js` and the backend `FarmServiceTest` / `FarmControllerIT` cases that exist today pass unchanged.

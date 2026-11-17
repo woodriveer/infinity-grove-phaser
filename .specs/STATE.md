@@ -194,16 +194,27 @@
 - **Date**: 2026-11-17
 - **Status**: active (owner approval of 2026-11-17, "Aprovo os padrões", with the product owner defaults Q1 to Q8 of the spec). Supersedes the farm scope of AD-008 ("the farm lists only the bosses of the current chapter" and "a player cannot replay the bosses of earlier chapters")
 
+## Technical Debt
+
+TD-001 to TD-008 are recorded in the spec of the feature that found them (`characters`, `unified-damage`, `supabase-postgres`). New debts are logged here.
+
+### TD-009
+- **Debt**: In Rever chefes, a chapter chip load still pending when the panel is closed and reopened leaves the chips disabled until the panel is reopened again, and its late answer overwrites the farm session (`bosses`, `chapter`) under the map of the current chapter. `game/src/adapters/phaser/HeroUi.js` `selectFarmChapter` (its `finally` clears `farmBusy` but skips the render once `this.view` changed); `game/src/application/farm/farmSession.js` `load`.
+- **Proposed rule**: Closing Rever chefes cancels a pending chapter load; a late answer is ignored.
+- **Fix**: one `game-dev` task: drop the stale answer (load guarded by the view, `farmBusy` reset in `close()` and `show()`), with the `HeroUi.test.js` case `closing during a chapter load and reopening leaves the chips enabled on the current chapter`.
+- **Found**: Verifier round 1 of `boss-replay-chapters`, finding F1 (`5259af2`); ruled non-blocking by the product owner at acceptance (2026-11-17)
+- **Status**: open
+
 ## Handoff
 
-- **Feature**: `ui-redesign` (Grove theme, AD-022), `.specs/features/ui-redesign/`
-- **Phase / Task**: Done. T1 to T53 done (Phases 1 to 11); Verifier round 3 PASS (`2110a69`: 107 of 107 ACs, sensor 16 of 16 killed, gaps none); ui-artist T53 APROVADO (`0101e6c`); accepted by the product owner on 2026-11-17 (`tasks.md` § Acceptance)
-- **Completed**: the whole feature; at acceptance the example of UIR-05 AC 10 became `HP 1K/1K` (`campaign-chapters` abbreviates the numbers, Verifier note N2)
+- **Features**: `ui-redesign` (AD-022, `.specs/features/ui-redesign/`) and `boss-replay-chapters` (AD-024, `.specs/features/boss-replay-chapters/`)
+- **Phase / Task**: both done and accepted by the product owner on 2026-11-17. `ui-redesign`: T1 to T53, Verifier round 3 PASS (`2110a69`), ui-artist T53 APROVADO (`0101e6c`). `boss-replay-chapters`: T1 to T19, Verifier round 1 PASS (`5259af2`: 35 of 35 ACs, sensor 21 of 21 killed), ui-artist re-review APROVADO (`f31884d`); acceptance in each `tasks.md` § Acceptance
+- **Completed**: both features; `boss-replay-chapters` traceability BRC-01 to BRC-09 Verified; Verifier finding F1 logged as TD-009
 - **In-progress** (file:line): none
-- **Next step**: `gitops` for `ui-redesign`: make sure `publish.sh` runs and the commits are live, `report.html`, `CHANGELOG.md`, release tag
-- **Waiting for the owner**: confirmation of the PO rulings marked `n` in the spec Assumptions table (enemy line D2, beaten map stops D3, findings #10 to #13 of the T38 review) and sight of the `Click to Start!` ruling (UIR-15 AC 6); the list is in `tasks.md` § Acceptance. #10 and #12 are owner art (a seamless `ui-parchment.jpg`; a despill of `talent-combo.png` and `talent-click-flat-damage.png`)
+- **Next step**: `gitops` releases `ui-redesign` and `boss-replay-chapters`: make sure the commits are on `origin/main` and live, `report.html` of each feature, `CHANGELOG.md`, release tag
+- **Waiting for the owner**: `ui-redesign`: the PO rulings marked `n` in its spec Assumptions table (D2, D3, findings #10 to #13, the `Click to Start!` ruling; list in its `tasks.md` § Acceptance; #10 and #12 are owner art). `boss-replay-chapters`: the F1 ruling (ship now, fix later as TD-009)
 - **Blockers**: none
-- **Other work on `main`**: `boss-replay-chapters` (AD-024) is in Execute: T1 to T14 done; the T14 UI review (`b4a4c16`) asked for changes, so T15 to T19 (plate on two lines, timer beside the plate, chip dot spacing, their e2e, re-review) are pending in its `tasks.md`
+- **Next candidate work**: the TD-009 fix task (`game-dev`)
 - **Notes for the resume**: (1) a failing e2e test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both (seen so far: `dragEquip.spec.js:550`, `:586`, `:604`, `:670`, `talents.spec.js:148` and `:111`, `auth.spec.js:113`, `clickPower.spec.js:41`, `uiRedesign.spec.js:2089`). (2) The hero detail magenta test `shows no magenta in the detail of any of the five heroes` (`game/e2e/uiRedesign.spec.js:2089`) takes about 30 s alone of its 60 s budget and timed out under 3-worker load in round 3: the next task that touches that file splits it into one test per hero or marks it `test.slow()`, without changing an asserted value (Verifier note N1, owner `test-engineer`). (3) Line numbers quoted in `tasks.md` drift: locate edits by test name or exact text
 - **Uncommitted files**: owner's, never stage them: `CLAUDE.md`, `GEMINI.md`, `graphify-out/`, `.agents/`, `.claude/skills/impeccable/`, `.claude/skills/reversa-*/`
 - **Branch**: main
