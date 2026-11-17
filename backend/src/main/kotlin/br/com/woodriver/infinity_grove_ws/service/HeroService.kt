@@ -1,5 +1,6 @@
 package br.com.woodriver.infinity_grove_ws.service
 
+import br.com.woodriver.infinity_grove_ws.domain.FuseAllView
 import br.com.woodriver.infinity_grove_ws.domain.Hero
 import br.com.woodriver.infinity_grove_ws.domain.HeroNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.HeroView
@@ -10,6 +11,7 @@ import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.port.HeroRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
+import br.com.woodriver.infinity_grove_ws.usecase.FuseAllCardsUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.FuseCardsUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.ListHeroesUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.SetLeaderUseCase
@@ -25,6 +27,7 @@ class HeroService(
     private val userRepository: UserRepositoryPort,
 ) : ListHeroesUseCase,
     FuseCardsUseCase,
+    FuseAllCardsUseCase,
     SetLeaderUseCase {
     override fun list(username: String): HeroesView {
         logger.info("Listing heroes username={}", username)
@@ -42,6 +45,17 @@ class HeroService(
         val fused = load(username).fuse(heroId, stars)
         playerCardsRepository.save(fused)
         return HeroView.of(hero, fused)
+    }
+
+    override fun fuseAll(
+        username: String,
+        heroId: String,
+    ): FuseAllView {
+        logger.info("Fuse all requested username={} hero={}", username, heroId)
+        val hero = requireHero(heroId)
+        val outcome = load(username).fuseAll(heroId)
+        playerCardsRepository.save(outcome.cards)
+        return FuseAllView(HeroView.of(hero, outcome.cards), outcome.fusions)
     }
 
     override fun setLeader(

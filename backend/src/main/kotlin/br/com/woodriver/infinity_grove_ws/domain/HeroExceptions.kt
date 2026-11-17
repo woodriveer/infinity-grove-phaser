@@ -29,6 +29,10 @@ class NotEnoughCardsException(
     stars: Int,
 ) : HeroConflictException("NOT_ENOUGH_CARDS", "Fewer than 3 cards of hero '$heroId' with $stars stars")
 
+class NothingToFuseException(
+    heroId: String,
+) : HeroConflictException("NOTHING_TO_FUSE", "Hero '$heroId' has no 3 cards of the same stars below 9")
+
 class HeroNotOwnedException(
     heroId: String,
 ) : HeroConflictException("HERO_NOT_OWNED", "Hero '$heroId' is not owned")

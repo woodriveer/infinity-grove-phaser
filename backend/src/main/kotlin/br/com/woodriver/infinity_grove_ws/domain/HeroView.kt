@@ -46,6 +46,12 @@ data class HeroView(
     }
 }
 
+/** The hero after a cascade fusion and the number of fusions it took. */
+data class FuseAllView(
+    val hero: HeroView,
+    val fusions: Int,
+)
+
 /** Every hero of the catalog as one player sees them, and the id of their leader. */
 data class HeroesView(
     val leaderId: String,

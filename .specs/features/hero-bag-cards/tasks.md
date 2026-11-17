@@ -111,7 +111,7 @@ T15 → T16
 
 ## Task Breakdown
 
-### T1: PlayerCards.fuseAll and NothingToFuseException [ ]
+### T1: PlayerCards.fuseAll and NothingToFuseException [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The domain cascade rule: fuse every layer of one hero from 0★ up to 9★ and count the fusions, or refuse with `NOTHING_TO_FUSE` (BAG-23, BAG-24, BAG-25, BAG-26).
@@ -191,14 +191,14 @@ Test case (`HeroExceptionsTest.kt`):
 **Gate**: quick - `cd backend && ./gradlew test --tests '*PlayerCardsTest*' --tests '*HeroExceptionsTest*'`
 **Done when**:
 
-- [ ] The 9 new cases pass and every earlier case of both files passes unchanged.
-- [ ] `cd backend && ./gradlew ktlintCheck` passes.
+- [x] The 9 new cases pass and every earlier case of both files passes unchanged.
+- [x] `cd backend && ./gradlew ktlintCheck` passes.
 
 **Commit**: `feat(backend): add the cascade fusion rule to PlayerCards`
 
 ---
 
-### T2: FuseAllCardsUseCase and HeroService.fuseAll [ ]
+### T2: FuseAllCardsUseCase and HeroService.fuseAll [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The service runs the cascade under the `player_cards` row lock, stores it and returns the hero with the fusion count (BAG-23, BAG-26, BAG-27).
@@ -261,8 +261,8 @@ override fun fuseAll(
 **Gate**: quick - `cd backend && ./gradlew test --tests '*HeroServiceTest*'`
 **Done when**:
 
-- [ ] The 6 new cases pass and every earlier `HeroServiceTest` case passes unchanged.
-- [ ] `cd backend && ./gradlew ktlintCheck` passes.
+- [x] The 6 new cases pass and every earlier `HeroServiceTest` case passes unchanged.
+- [x] `cd backend && ./gradlew ktlintCheck` passes.
 
 **Commit**: `feat(backend): fuse every layer of a hero in HeroService`
 
