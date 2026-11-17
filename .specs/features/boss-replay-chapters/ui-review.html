@@ -102,30 +102,31 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
 <main>
 <div class="brand">Infinity Grove · Revisão de UI</div>
 <section class="panel"><div class="head"><div><h1>Rever chefes: escolher capítulo</h1>
-<div class="meta"><code>.specs/features/boss-replay-chapters</code> · commits <code>até 3be7bbe</code> · 2026-11-17 · local (npm run ui:shots)</div></div>
-<span class="chip verdict changes">MUDANÇAS PEDIDAS</span></div>
-<p style="margin-top:16px">Os chips, o mapa de capítulo anterior, o estado desativado, o erro e o foco seguem a Visual Spec e o tema Grove. Um defeito bloqueia: o rótulo da luta no HUD é coberto pelo cronômetro e o capítulo não aparece. Há um detalhe baixo no ponto do chip atual.</p>
-<div class="stats"><div class="stat"><div class="n">7</div><div class="l">telas e estados verificados</div></div><div class="stat"><div class="n">14</div><div class="l">capturas (desktop + celular)</div></div><div class="stat"><div class="n">1</div><div class="l">achados de severidade alta</div></div><div class="stat"><div class="n">1</div><div class="l">achados médios e baixos</div></div></div></section>
+<div class="meta"><code>.specs/features/boss-replay-chapters</code> · commits <code>até db5db80</code> (rodada 2; rodada 1 em b4a4c16) · 2026-11-17 · local (npm run ui:shots)</div></div>
+<span class="chip verdict ok">APROVADO</span></div>
+<p style="margin-top:16px">Rodada 2, após T15 a T18. Os dois achados da rodada 1 estão resolvidos: o rótulo da luta de capítulo anterior agora ocupa duas linhas na placa, com o cronômetro ao lado, sem cobrir nada, e o ponto dourado do chip atual tem folga visível sob o numeral. O cronômetro da campanha normal continua centralizado (deslocamento 0 px). Nenhum achado novo.</p>
+<div class="stats"><div class="stat"><div class="n">10</div><div class="l">telas e estados verificados</div></div><div class="stat"><div class="n">20</div><div class="l">capturas (desktop + celular)</div></div><div class="stat"><div class="n">0</div><div class="l">achados abertos</div></div><div class="stat"><div class="n">2</div><div class="l">achados da rodada 1 resolvidos</div></div></div></section>
 <section class="panel"><h2>Fidelidade à spec</h2><ul class="checks"><li class="yes"><span class="mark">✓</span><span>Chips sob o título e acima do mapa, rótulo "Capítulo", chip pressionado em ember com borda dourada <code>Visual Spec: Placement, Pressed chip</code></span></li>
 <li class="yes"><span class="mark">✓</span><span>Chip de 32 px, pílula, Cinzel 700, fundo madeira, borda bronze; rótulo em Figtree na cor tinta <code>Visual Spec: Chip, Label</code></span></li>
 <li class="yes"><span class="mark">✓</span><span>Textos em português: Caminho do Capítulo n, Não foi possível carregar., Rever chefe: Miniboss 3 (Capítulo 2) <code>AD-007</code></span></li>
 <li class="yes"><span class="mark">✓</span><span>Chips desativados com a regra global durante o carregamento <code>Visual Spec: Disabled</code></span></li>
 <li class="yes"><span class="mark">✓</span><span>Anel de foco visível no chip 2 (Tab) <code>Visual Spec: Focus</code></span></li>
 <li class="yes"><span class="mark">✓</span><span>15 chips cabem na largura do mapa, também no celular <code>Visual Spec: Row</code></span></li>
-<li class="no"><span class="mark">✗</span><span>Ponto do capítulo atual sem cobrir o numeral <code>Visual Spec: Current campaign chapter</code> — o ponto encosta na base do numeral (achado #2)</span></li>
-<li class="no"><span class="mark">✗</span><span>Rótulo da luta Rever chefe: ... (Capítulo n) legível no HUD <code>spec: rótulo da luta</code> — o cronômetro cobre o final do texto (achado #1)</span></li>
+<li class="yes"><span class="mark">✓</span><span>Ponto do capítulo atual sob o numeral com folga visível, numerais numa linha <code>Visual Spec: Current campaign chapter</code> (achado #2 resolvido, capturas 01, 06, 07)</span></li>
+<li class="yes"><span class="mark">✓</span><span>Placa em duas linhas: rótulo em 19 px e <code>(Capítulo n)</code> em 14 px tinta, alinhado à esquerda; cronômetro 12 px após a placa, sem cobrir e antes da carteira <code>Visual Spec: HUD plate, Boss timer beside the plate</code> (achado #1 resolvido, capturas 03, 08)</span></li>
+<li class="yes"><span class="mark">✓</span><span>Luta do capítulo atual mantém uma linha de 19 px, cronômetro ao lado (captura 09); chefe da campanha normal com cronômetro centralizado (captura 10)</span></li>
 </ul></section>
 <section class="panel"><h2>Capturas</h2><div class="screen"><h3>Rever chefes, capítulo 3 atual</h3>
 <div class="shots">
 <figure>
 <a href="ui-review/01-chapter-3-current-desktop.png" target="_blank"><img src="ui-review/01-chapter-3-current-desktop.png" alt="Rever chefes, capítulo 3 atual" loading="lazy"></a>
-<figcaption><span class="t">Rever chefes, capítulo 3 atual</span><span class="d">Chip 3 pressionado (ember) com o ponto dourado; capítulos 1 e 2 em madeira. Na captura desktop a arte do mapa aparece cortada: a imagem ainda decodificava no disparo (a captura 04 mostra o mapa completo); não é defeito do jogo.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+<figcaption><span class="t">Rever chefes, capítulo 3 atual</span><span class="d">Chip 3 pressionado (ember) com o ponto dourado; capítulos 1 e 2 em madeira. Na captura desktop a arte do mapa aparece ainda sem carregar (imagem decodificando no disparo; a captura 06 mostra o mapa completo); não é defeito do jogo.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">achado #2 resolvido</span></span></figcaption>
 </figure>
 </div>
 <div class="shots phone" style="margin-top:16px">
 <figure>
 <a href="ui-review/01-chapter-3-current-phone.png" target="_blank"><img src="ui-review/01-chapter-3-current-phone.png" alt="Rever chefes, capítulo 3 atual" loading="lazy"></a>
-<figcaption><span class="t">Rever chefes, capítulo 3 atual</span><span class="d">Chip 3 pressionado (ember) com o ponto dourado; capítulos 1 e 2 em madeira.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+<figcaption><span class="t">Rever chefes, capítulo 3 atual</span><span class="d">Chip 3 pressionado (ember) com o ponto dourado; capítulos 1 e 2 em madeira.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">achado #2 resolvido</span></span></figcaption>
 </figure>
 </div></div>
 <div class="screen"><h3>Rever chefes, capítulo 2 escolhido</h3>
@@ -145,13 +146,13 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
 <div class="shots">
 <figure>
 <a href="ui-review/03-chapter-2-fight-label-desktop.png" target="_blank"><img src="ui-review/03-chapter-2-fight-label-desktop.png" alt="HUD durante Rever chefe: Miniboss 3 (Capítulo 2)" loading="lazy"></a>
-<figcaption><span class="t">HUD durante Rever chefe: Miniboss 3 (Capítulo 2)</span><span class="d">Rótulo da luta no topo, ao lado do cronômetro, que cobre o fim do texto.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-alta">achado #1</span></span></figcaption>
+<figcaption><span class="t">HUD durante Rever chefe: Miniboss 3 (Capítulo 2)</span><span class="d">Placa em duas linhas ("Rever chefe: Miniboss 3" e "(Capítulo 2)"); cronômetro à direita da placa, sem cobrir o texto.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">achado #1 resolvido</span></span></figcaption>
 </figure>
 </div>
 <div class="shots phone" style="margin-top:16px">
 <figure>
 <a href="ui-review/03-chapter-2-fight-label-phone.png" target="_blank"><img src="ui-review/03-chapter-2-fight-label-phone.png" alt="HUD durante Rever chefe: Miniboss 3 (Capítulo 2)" loading="lazy"></a>
-<figcaption><span class="t">HUD durante Rever chefe: Miniboss 3 (Capítulo 2)</span><span class="d">Rótulo da luta no topo, ao lado do cronômetro, que cobre o fim do texto.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-alta">achado #1</span></span></figcaption>
+<figcaption><span class="t">HUD durante Rever chefe: Miniboss 3 (Capítulo 2)</span><span class="d">Placa em duas linhas ("Rever chefe: Miniboss 3" e "(Capítulo 2)"); cronômetro à direita da placa, sem cobrir o texto.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">achado #1 resolvido</span></span></figcaption>
 </figure>
 </div></div>
 <div class="screen"><h3>Chips desativados durante o carregamento</h3>
@@ -184,42 +185,81 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
 <div class="shots">
 <figure>
 <a href="ui-review/06-fifteen-chapters-desktop.png" target="_blank"><img src="ui-review/06-fifteen-chapters-desktop.png" alt="Campanha completa: 15 chips" loading="lazy"></a>
-<figcaption><span class="t">Campanha completa: 15 chips</span><span class="d">Os 15 chips cabem numa linha dentro da largura do mapa nos dois tamanhos.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+<figcaption><span class="t">Campanha completa: 15 chips</span><span class="d">Os 15 chips cabem numa linha dentro da largura do mapa nos dois tamanhos.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">achado #2 resolvido</span></span></figcaption>
 </figure>
 </div>
 <div class="shots phone" style="margin-top:16px">
 <figure>
 <a href="ui-review/06-fifteen-chapters-phone.png" target="_blank"><img src="ui-review/06-fifteen-chapters-phone.png" alt="Campanha completa: 15 chips" loading="lazy"></a>
-<figcaption><span class="t">Campanha completa: 15 chips</span><span class="d">Os 15 chips cabem numa linha dentro da largura do mapa nos dois tamanhos.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+<figcaption><span class="t">Campanha completa: 15 chips</span><span class="d">Os 15 chips cabem numa linha dentro da largura do mapa nos dois tamanhos.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">achado #2 resolvido</span></span></figcaption>
 </figure>
 </div></div>
 <div class="screen"><h3>Foco do teclado no chip 2</h3>
 <div class="shots">
 <figure>
 <a href="ui-review/07-chip-focus-desktop.png" target="_blank"><img src="ui-review/07-chip-focus-desktop.png" alt="Foco do teclado no chip 2" loading="lazy"></a>
-<figcaption><span class="t">Foco do teclado no chip 2</span><span class="d">Anel de foco visível ao redor do chip 2.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+<figcaption><span class="t">Foco do teclado no chip 2</span><span class="d">Anel de foco visível ao redor do chip 2.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">achado #2 resolvido</span></span></figcaption>
 </figure>
 </div>
 <div class="shots phone" style="margin-top:16px">
 <figure>
 <a href="ui-review/07-chip-focus-phone.png" target="_blank"><img src="ui-review/07-chip-focus-phone.png" alt="Foco do teclado no chip 2" loading="lazy"></a>
-<figcaption><span class="t">Foco do teclado no chip 2</span><span class="d">Anel de foco visível ao redor do chip 2.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+<figcaption><span class="t">Foco do teclado no chip 2</span><span class="d">Anel de foco visível ao redor do chip 2.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">achado #2 resolvido</span></span></figcaption>
 </figure>
 </div></div>
+<div class="screen"><h3>HUD durante Rever chefe: Chefe do capítulo (Capítulo 14)</h3>
+<div class="shots">
+<figure>
+<a href="ui-review/08-chapter-14-boss-label-desktop.png" target="_blank"><img src="ui-review/08-chapter-14-boss-label-desktop.png" alt="HUD durante Rever chefe: Chefe do capítulo (Capítulo 14)" loading="lazy"></a>
+<figcaption><span class="t">HUD durante Rever chefe: Chefe do capítulo (Capítulo 14)</span><span class="d">O rótulo mais longo: duas linhas, placa de 346 px, cronômetro empurrado para a direita, antes da carteira.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">achado #1 resolvido</span></span></figcaption>
+</figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure>
+<a href="ui-review/08-chapter-14-boss-label-phone.png" target="_blank"><img src="ui-review/08-chapter-14-boss-label-phone.png" alt="HUD durante Rever chefe: Chefe do capítulo (Capítulo 14)" loading="lazy"></a>
+<figcaption><span class="t">HUD durante Rever chefe: Chefe do capítulo (Capítulo 14)</span><span class="d">O rótulo mais longo: duas linhas, placa de 346 px, cronômetro empurrado para a direita, antes da carteira.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">achado #1 resolvido</span></span></figcaption>
+</figure>
+</div>
+</div>
+<div class="screen"><h3>HUD durante Rever chefe: Miniboss 1 (capítulo atual)</h3>
+<div class="shots">
+<figure>
+<a href="ui-review/09-current-chapter-fight-label-desktop.png" target="_blank"><img src="ui-review/09-current-chapter-fight-label-desktop.png" alt="HUD durante Rever chefe: Miniboss 1 (capítulo atual)" loading="lazy"></a>
+<figcaption><span class="t">HUD durante Rever chefe: Miniboss 1 (capítulo atual)</span><span class="d">Rótulo de capítulo atual em uma linha de 19 px, cronômetro ao lado da placa.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption>
+</figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure>
+<a href="ui-review/09-current-chapter-fight-label-phone.png" target="_blank"><img src="ui-review/09-current-chapter-fight-label-phone.png" alt="HUD durante Rever chefe: Miniboss 1 (capítulo atual)" loading="lazy"></a>
+<figcaption><span class="t">HUD durante Rever chefe: Miniboss 1 (capítulo atual)</span><span class="d">Rótulo de capítulo atual em uma linha de 19 px, cronômetro ao lado da placa.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption>
+</figure>
+</div>
+</div>
+<div class="screen"><h3>HUD do chefe da campanha normal</h3>
+<div class="shots">
+<figure>
+<a href="ui-review/10-campaign-boss-timer-desktop.png" target="_blank"><img src="ui-review/10-campaign-boss-timer-desktop.png" alt="HUD do chefe da campanha normal" loading="lazy"></a>
+<figcaption><span class="t">HUD do chefe da campanha normal</span><span class="d">Rótulo da campanha, cronômetro centralizado na tela (deslocamento medido 0 px).</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption>
+</figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure>
+<a href="ui-review/10-campaign-boss-timer-phone.png" target="_blank"><img src="ui-review/10-campaign-boss-timer-phone.png" alt="HUD do chefe da campanha normal" loading="lazy"></a>
+<figcaption><span class="t">HUD do chefe da campanha normal</span><span class="d">Rótulo da campanha, cronômetro centralizado na tela (deslocamento medido 0 px).</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption>
+</figure>
+</div>
+</div>
 </section>
-<section class="panel"><h2>Achados</h2><article class="finding"><div><div class="top"><span class="chip sev-alta">#1 · Alta</span><strong>Rótulo da luta cortado pelo cronômetro</strong></div><dl>
-<dt>Tela</dt><dd>HUD em Rever chefe de capítulo anterior (desktop e celular)</dd>
-<dt>O que está errado</dt><dd>O rótulo <code>Rever chefe: Miniboss 3 (Capítulo 2)</code> fica atrás do anel do cronômetro: no desktop lê-se "Rever chefe: Miniboss 3 (" e no celular o mesmo, sem o capítulo. O número do capítulo é justamente a informação nova da feature e some.</dd>
-<dt>Como deveria ficar</dt><dd>O texto inteiro visível: a placa <code>.stage-hud</code> deve crescer com o conteúdo (ou o cronômetro ficar à direita da placa) sem sobreposição; se não couber no celular, quebrar em duas linhas ou reduzir a fonte.</dd>
-<dt>Arquivo</dt><dd><code>game/public/style.css</code> (<code>.stage-hud</code>, linha ~591) e o posicionamento do cronômetro <code>.boss-timer</code></dd></dl></div>
-<a href="ui-review/03-chapter-2-fight-label-desktop.png" target="_blank"><img src="ui-review/03-chapter-2-fight-label-desktop.png" alt="Captura do achado #1"></a></article>
-<div style="height:14px"></div><article class="finding"><div><div class="top"><span class="chip sev-baixa">#2 · Baixa</span><strong>Ponto dourado encosta no numeral do chip atual</strong></div><dl>
-<dt>Tela</dt><dd>Rever chefes, chip do capítulo atual (desktop e celular)</dd>
-<dt>O que está errado</dt><dd>O ponto de 6 px a 3 px da base de um chip de 32 px toca a parte de baixo do numeral (em "3" e "15" parece um ponto sob o dígito), prejudicando a leitura.</dd>
-<dt>Como deveria ficar</dt><dd>Numeral e ponto separados: subir o texto do chip atual alguns pixels (por exemplo <code>padding-bottom: 4px</code> em <code>.is-current</code>) ou deslocar o ponto, mantendo 6×6 e <code>--gold-400</code>.</dd>
-<dt>Arquivo</dt><dd><code>game/public/style.css</code> (<code>.farm-chapter.is-current::after</code>, linha ~2689)</dd></dl></div>
-<a href="ui-review/07-chip-focus-desktop.png" target="_blank"><img src="ui-review/07-chip-focus-desktop.png" alt="Captura do achado #2"></a></article>
+<section class="panel"><h2>Achados</h2><p class="empty">Nenhum achado aberto na rodada 2. Histórico da rodada 1 (b4a4c16):</p>
+<article class="finding"><div><div class="top"><span class="chip ok">#1 · Alta · RESOLVIDO (T15, T16, T18)</span><strong>Rótulo da luta cortado pelo cronômetro</strong></div><dl>
+<dt>Rodada 1</dt><dd>O cronômetro cobria o final de <code>Rever chefe: Miniboss 3 (Capítulo 2)</code> no desktop e no celular.</dd>
+<dt>Rodada 2</dt><dd>O capítulo está numa segunda linha de 14 px na cor tinta, a placa tem 54 px de altura, o cronômetro começa 12 px após a placa e termina antes da carteira, inclusive no rótulo mais longo (capítulo 14). Capturas 03 e 08.</dd></dl></div>
+<a href="ui-review/08-chapter-14-boss-label-desktop.png" target="_blank"><img src="ui-review/08-chapter-14-boss-label-desktop.png" alt="Captura do achado #1 resolvido"></a></article>
+<div style="height:14px"></div><article class="finding"><div><div class="top"><span class="chip ok">#2 · Baixa · RESOLVIDO (T17, T18)</span><strong>Ponto dourado encostava no numeral do chip atual</strong></div><dl>
+<dt>Rodada 1</dt><dd>O ponto de 6 px tocava a base do numeral.</dd>
+<dt>Rodada 2</dt><dd>O ponto está 1 px acima da borda, com folga visível sob o numeral, que fica numa linha em todos os chips (inclusive "15"). Capturas 01, 06 e 07.</dd></dl></div>
+<a href="ui-review/06-fifteen-chapters-desktop.png" target="_blank"><img src="ui-review/06-fifteen-chapters-desktop.png" alt="Captura do achado #2 resolvido"></a></article>
 </section>
 <section class="panel"><h2>Sugestões</h2><ul class="checks"><li><span class="mark">✦</span><span>O anel de foco (2 px) sobre o pergaminho é fino; um offset de 3 px o destacaria mais, sem defeito hoje.</span></li><li><span class="mark">✦</span><span>No celular a arte do jogo aparece em faixa 4:3 no meio da tela de 390×844 (comportamento já existente, fora desta feature).</span></li></ul></section>
-<section class="panel"><h2>Console e recursos</h2><p class="empty">Nenhum erro nem recurso faltando observado nas capturas (as 10 execuções do Playwright passaram; o console não foi inspecionado no Chrome).</p></section>
+<section class="panel"><h2>Console e recursos</h2><p class="empty">Nenhum erro nem recurso faltando observado nas capturas (as 20 execuções do Playwright passaram; o console não foi inspecionado no Chrome).</p></section>
 <footer>Revisão do ui-artist · 2026-11-17</footer></main></body></html>

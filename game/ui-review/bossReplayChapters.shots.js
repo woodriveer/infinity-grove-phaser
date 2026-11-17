@@ -80,3 +80,32 @@ test('07 chip focus', async ({ page }, testInfo) => {
     await expect(page.getByTestId('farm-chapter-2')).toBeFocused();
     await shot(page, testInfo, '07-chip-focus');
 });
+
+test('08 chapter 14 boss label', async ({ page }, testInfo) => {
+    await start(page, { progress: { yan: { chapter: 15, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1, completed: true } }, chapterDefinitions: { 14: CHAPTER_2 } });
+    await openMap(page);
+    await page.getByTestId('farm-chapter-14').click();
+    await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 14');
+    await page.getByTestId('farm-entry-chapter-boss').click();
+    await expect(page.locator('.stage-hud')).toHaveText('Rever chefe: Chefe do capítulo (Capítulo 14)');
+    await expect(page.locator('.boss-timer')).toBeVisible();
+    await shot(page, testInfo, '08-chapter-14-boss-label');
+});
+
+test('09 current chapter fight label', async ({ page }, testInfo) => {
+    await start(page, { definition: CHAPTER_2 });
+    await openMap(page);
+    await page.getByTestId('farm-entry-miniboss-1').click();
+    await expect(page.locator('.stage-hud')).toHaveText('Rever chefe: Miniboss 1');
+    await expect(page.locator('.boss-timer')).toBeVisible();
+    await shot(page, testInfo, '09-current-chapter-fight-label');
+});
+
+test('10 campaign boss timer stays centred', async ({ page }, testInfo) => {
+    await start(page, { progress: { yan: { chapter: 3, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1 } }, chapterDefinitions: { 3: CHAPTER_2 } });
+    await expect(page.locator('.boss-timer')).toBeVisible();
+    const box = await page.locator('.boss-timer').boundingBox();
+    const canvas = await page.locator('canvas').first().boundingBox();
+    console.log('TIMER centre offset', box.x + box.width / 2 - (canvas.x + canvas.width / 2), 'label', await page.locator('.stage-hud').textContent());
+    await shot(page, testInfo, '10-campaign-boss-timer');
+});
