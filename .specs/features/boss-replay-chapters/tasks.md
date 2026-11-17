@@ -952,7 +952,7 @@ this.heroUi.show('farm', Number.isInteger(boss.chapter) ? { chapter: boss.chapte
 
 ---
 
-### T13: e2e scenarios of the chapter selector [ ]
+### T13: e2e scenarios of the chapter selector [x]
 
 **Owner**: test-engineer
 **Goal**: One Playwright scenario per player-visible AC of the two P1 stories and per visible edge case (BRC-04, BRC-05, BRC-06; L-062, L-084).
@@ -1004,8 +1004,8 @@ The campaign (`definition` option) stays the default seed, whose miniboss 3 has 
 **Gate**: full - `cd game && npx playwright test e2e/bossReplayChapters.spec.js e2e/farm.spec.js e2e/bossMap.spec.js`
 **Done when**:
 
-- [ ] The 13 scenarios pass, and `farm.spec.js` and `bossMap.spec.js` pass unchanged.
-- [ ] No scenario asserts a stop position number.
+- [x] The 13 scenarios pass, and `farm.spec.js` and `bossMap.spec.js` pass unchanged.
+- [x] No scenario asserts a stop position number.
 
 **Commit**: `test(e2e): cover choosing an earlier chapter in Rever chefes`
 
