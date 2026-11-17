@@ -3,6 +3,37 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.3.0] - 2026-11-17
+
+Visual novo em todo o jogo, o tema Grove (`ui-redesign`), e a escolha do capítulo em **Rever chefes** (`boss-replay-chapters`).
+
+### Adicionado
+
+- Tema Grove em todas as telas, no computador e no celular: pergaminho e madeira, títulos em fonte Cinzel, botões em madeira e brasa, moedas metálicas, carregamento em dourado e brasa, janelas de heróis, fusão, equipamento, talentos e mapa no mesmo estilo.
+- Botão redondo de auto clique ao lado do botão de fazenda, com uma janela própria, e a tecla **A** para abri-la. A tecla é ignorada enquanto você digita em campos de texto.
+- Anel que mostra o tempo que resta do chefe, barra de vida emoldurada e números de dano dourados.
+- Fichas dos inimigos com o elemento e o atributo, o aviso do elemento que vence o inimigo e, ao passar o mouse sobre uma peça, a comparação com a peça que o líder usa.
+- Ícones novos para os talentos de clique direto e de combo, e para os graus 2 e 3.
+- Em **Rever chefes**, uma fileira **Capítulo** com uma ficha por capítulo alcançado (1 até o 15). A ficha do capítulo atual tem um ponto. Escolher outro capítulo mostra o mapa dele, todo concluído.
+- Dá para rever o miniboss e o chefe de um capítulo anterior com a vida, a defesa, o elemento e o tempo daquele capítulo. As cartas e as peças vêm com a raridade desse capítulo, e as 10 vitórias diárias valem para todos os capítulos.
+- A placa da luta de um capítulo anterior mostra o capítulo em uma segunda linha, e o relógio do chefe fica ao lado dela.
+- Servidor: `GET /farm` e `POST /farm/outcome` aceitam o parâmetro `chapter` (capítulos acima do atual são recusados com 409).
+
+### Alterado
+
+- Todas as telas foram redesenhadas no tema Grove; o jogo em si (regras, números e fluxo) não mudou.
+- Em **Rever chefes**, a fileira de fichas se mantém em uma linha no celular.
+
+### Corrigido
+
+- As paradas do mapa de chefes agora ficam sobre as pedras pintadas.
+- O nome do líder na carta de batalha quebra a linha em vez de vazar; a arte e o texto da dica de habilidade ficam dentro dela; as cinco cartas de herói têm o mesmo tamanho; as miniaturas das habilidades não têm mais borda magenta.
+- Textos de talentos e botões ficam legíveis sobre o pergaminho (tinta escura nos ramos).
+
+### Interno (sem mudança para o jogador)
+
+- Correções só de teste, sem nova versão: o teste do limite do COMBO 2 não depende mais da velocidade da máquina (`caa2490`) e os testes do tempo limite do chefe do capítulo 2 e do miniboss fixam o limite, não o relógio na tela (`6ff9ee8`, `6f69802`).
+
 ## [0.2.0] - 2026-11-14
 
 A campanha vai até o capítulo 15 (`campaign-chapters`). A feature foi aceita pelo dono com uma lacuna de teste em aberto, depois fechada sem nova versão (ver "Alterado"): as definições dos capítulos 1 a 5 agora estão fixadas em teste.
@@ -48,5 +79,6 @@ Primeira versão marcada. Traz a venda de equipamentos em lote (`bulk-sell`).
 - Os blocos dos heróis não se mexem mais quando o modo de seleção abre.
 - Os contornos das peças marcadas ficam separados uns dos outros no modo de seleção.
 
+[0.3.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.3.0
 [0.2.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.2.0
 [0.1.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.1.0
