@@ -111,7 +111,7 @@ T15 → T16
 
 ## Task Breakdown
 
-### T1: PlayerCards.fuseAll and NothingToFuseException [ ]
+### T1: PlayerCards.fuseAll and NothingToFuseException [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The domain cascade rule: fuse every layer of one hero from 0★ up to 9★ and count the fusions, or refuse with `NOTHING_TO_FUSE` (BAG-23, BAG-24, BAG-25, BAG-26).
@@ -191,8 +191,8 @@ Test case (`HeroExceptionsTest.kt`):
 **Gate**: quick - `cd backend && ./gradlew test --tests '*PlayerCardsTest*' --tests '*HeroExceptionsTest*'`
 **Done when**:
 
-- [ ] The 9 new cases pass and every earlier case of both files passes unchanged.
-- [ ] `cd backend && ./gradlew ktlintCheck` passes.
+- [x] The 9 new cases pass and every earlier case of both files passes unchanged.
+- [x] `cd backend && ./gradlew ktlintCheck` passes.
 
 **Commit**: `feat(backend): add the cascade fusion rule to PlayerCards`
 

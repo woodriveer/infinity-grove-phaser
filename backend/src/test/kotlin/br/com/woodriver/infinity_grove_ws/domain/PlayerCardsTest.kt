@@ -222,4 +222,72 @@ class PlayerCardsTest {
         assertEquals(9, cards.starsOf("kael"))
         assertEquals(1, cards.copiesOf("kael", 0))
     }
+
+    /** Kael holding the given [layers] (stars to copies) and nothing else. */
+    private fun bag(vararg layers: Pair<Int, Int>) =
+        PlayerCards("yan", Element.FIRE, "kael", layers.associate { (stars, count) -> CopyKey("kael", stars) to count })
+
+    @Test
+    fun `fuse all turns 45, 1 and 2 cards of 0, 1 and 2 stars into 1, 1 and 2 cards of 1, 2 and 3 stars in 22 fusions`() {
+        val outcome = bag(0 to 45, 1 to 1, 2 to 2).fuseAll("kael")
+
+        assertEquals(22, outcome.fusions)
+        assertEquals(mapOf(CopyKey("kael", 1) to 1, CopyKey("kael", 2) to 1, CopyKey("kael", 3) to 2), outcome.cards.copies)
+        assertEquals(3, outcome.cards.starsOf("kael"))
+    }
+
+    @Test
+    fun `fuse all turns 27 blank cards into one 3-star card in 13 fusions`() {
+        val outcome = bag(0 to 27).fuseAll("kael")
+
+        assertEquals(13, outcome.fusions)
+        assertEquals(mapOf(CopyKey("kael", 3) to 1), outcome.cards.copies)
+    }
+
+    @Test
+    fun `fuse all stops at 9 stars and never fuses 9-star cards`() {
+        val outcome = bag(8 to 7, 9 to 1).fuseAll("kael")
+
+        assertEquals(2, outcome.fusions)
+        assertEquals(mapOf(CopyKey("kael", 8) to 1, CopyKey("kael", 9) to 3), outcome.cards.copies)
+    }
+
+    @Test
+    fun `fuse all turns 19683 blank cards into one 9-star card in 9841 fusions`() {
+        val outcome = bag(0 to 19683).fuseAll("kael")
+
+        assertEquals(9841, outcome.fusions)
+        assertEquals(mapOf(CopyKey("kael", 9) to 1), outcome.cards.copies)
+    }
+
+    @Test
+    fun `fuse all of three 3-star cards makes one 4-star card in one fusion`() {
+        val outcome = bag(3 to 3).fuseAll("kael")
+
+        assertEquals(1, outcome.fusions)
+        assertEquals(mapOf(CopyKey("kael", 4) to 1), outcome.cards.copies)
+    }
+
+    @Test
+    fun `fuse all leaves the cards of every other hero, the leader and the boss record untouched`() {
+        val cards = PlayerCards("yan", Element.FIRE, "kael", mapOf(CopyKey("kael", 0) to 3, CopyKey("lyra", 0) to 5))
+
+        val outcome = cards.fuseAll("kael")
+
+        assertEquals(5, outcome.cards.copiesOf("lyra", 0))
+        assertEquals("kael", outcome.cards.leaderId)
+        assertEquals(cards.bosses, outcome.cards.bosses)
+    }
+
+    @Test
+    fun `fuse all with fewer than 3 cards on every layer below 9 is refused`() {
+        val e = assertFailsWith<NothingToFuseException> { bag(0 to 2, 1 to 2, 9 to 4).fuseAll("kael") }
+
+        assertEquals("NOTHING_TO_FUSE", e.code)
+    }
+
+    @Test
+    fun `fuse all of a hero not owned is refused`() {
+        assertFailsWith<NothingToFuseException> { bag(0 to 3).fuseAll("lyra") }
+    }
 }

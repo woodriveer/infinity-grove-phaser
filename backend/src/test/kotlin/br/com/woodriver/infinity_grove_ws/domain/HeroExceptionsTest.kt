@@ -46,4 +46,13 @@ class HeroExceptionsTest {
 
         assertEquals("PLAYER_WITHOUT_HEROES", e.code)
     }
+
+    @Test
+    fun `nothing to fuse is a 409 conflict with code NOTHING_TO_FUSE`() {
+        val e = NothingToFuseException("kael")
+
+        assertIs<HeroConflictException>(e)
+        assertEquals("NOTHING_TO_FUSE", e.code)
+        assertEquals("Hero 'kael' has no 3 cards of the same stars below 9", e.message)
+    }
 }

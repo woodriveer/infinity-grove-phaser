@@ -8,6 +8,12 @@ data class CopyKey(
     val stars: Int,
 )
 
+/** The cards after a cascade fusion of one hero and how many fusions it took. */
+data class FuseAllOutcome(
+    val cards: PlayerCards,
+    val fusions: Int,
+)
+
 /**
  * Everything one player holds about hero cards: the starting element, the leader, the bag (copies per hero and stars)
  * and what they did against chapter bosses. Every change returns a new value; the service stores it under the row lock.
@@ -47,6 +53,29 @@ data class PlayerCards(
         logger.info("Fusing cards username={} hero={} stars={}", username, heroId, stars)
         val spent = withCopies(heroId, stars, copiesOf(heroId, stars) - FUSION_SIZE)
         return spent.withCopies(heroId, stars + 1, spent.copiesOf(heroId, stars + 1) + 1)
+    }
+
+    /**
+     * Fuses every layer of [heroId] from 0 stars upward: layer s fuses (its copies plus the copies made from layer s - 1) / 3 times
+     * and keeps the rest; the 9-star layer receives the copies made from 8 stars and never fuses.
+     */
+    fun fuseAll(heroId: String): FuseAllOutcome {
+        var result = this
+        var carry = 0
+        var fusions = 0
+        for (stars in 0..LAST_FUSIBLE_STARS) {
+            val count = copiesOf(heroId, stars) + carry
+            carry = count / FUSION_SIZE
+            fusions += carry
+            result = result.withCopies(heroId, stars, count - carry * FUSION_SIZE)
+        }
+        if (fusions == 0) {
+            logger.warn("Fuse all rejected, nothing to fuse username={} hero={}", username, heroId)
+            throw NothingToFuseException(heroId)
+        }
+        result = result.withCopies(heroId, MAX_STARS, copiesOf(heroId, MAX_STARS) + carry)
+        logger.info("Fusing every layer username={} hero={} fusions={}", username, heroId, fusions)
+        return FuseAllOutcome(result, fusions)
     }
 
     fun withLeader(heroId: String): PlayerCards {
