@@ -64,7 +64,7 @@
 - **Trade-off**: A player cannot replay the bosses of earlier chapters; farming a miniboss every 5 s at 100 % makes cards cheap. Chapters 2 to 5 reuse the chapter 1 shape with scaled numbers (enemy design per chapter is still open, AD-006).
 - **Scope**: `backend` `Progress`, `ChapterDefinition.of`, `ChapterSeeder`, `application.yaml`; `game` `campaignSession`
 - **Date**: 2026-10-18
-- **Status**: active
+- **Status**: active; "the farm lists only the bosses of the current chapter" and its trade-off are superseded by AD-024 once spec `boss-replay-chapters` ships (proposed)
 
 ### AD-009
 - **Decision**: Equipment is server-authoritative like the cards: pieces are rolled by the backend in the boss report transaction, stored one row each in `equipment_pieces`, and refined, rerolled and sold with copper under the `player_cards` row lock (lock order `progress`, `player_cards`, `wallets`). The game computes damage from the pieces the server returns.
@@ -186,6 +186,14 @@
 - **Date**: 2026-11-16
 - **Status**: active (revision 3, approved by the owner on 2026-11-16 with the recommended defaults of Q9 to Q15). Supersedes, from the cutover on, the deploy mechanism of AD-016 (its expand/contract rule stays); extends the database of AD-010 (Flyway still owns the schema)
 
+### AD-024
+- **Decision**: The farm (Rever chefes) can replay any chapter the campaign has reached, not only the current one. The reached chapters are 1 to `progress.position.chapter` (after `withNextChapterOpen`; a completed campaign reaches 1 to 15), so an account reset brings them back to chapter 1. A chapter below the current one has all 10 minibosses and its chapter boss beaten. `GET /farm?chapter=<n>` answers that chapter (`chapter`, `chapters`, `bosses`, `chapterBossWinsLeft`, `definition`; a chapter above the reached one answers the reached one), and `POST /farm/outcome` takes an optional top-level `chapter` (absent: the current chapter; above it: 409 `BOSS_NOT_AVAILABLE`; not an integer of at least 1: 400). A boss of chapter c fights with chapter c's seeded numbers and pays chapter c's rolls: the miniboss card of chapter c's hero, the chapter boss card of chapter c + 1's hero, chapter c's piece rarity tier; still no copper and no talent points. The daily chapter boss limit (10) and the 5 s farm interval stay one per player across every chapter. The game shows a row of chapter chips under the map title (hidden while only chapter 1 is reached), opens on the current chapter, and sends `chapter` only for a chapter other than the current one. No Flyway migration (spec `boss-replay-chapters`).
+- **Reason**: Owner request of 2026-11-17 ("no rever chefe nao da pra escolher capitulo anterior"); the backend already keys every farm reward by a chapter number and stores every chapter definition, so the fought chapter only has to become an input.
+- **Trade-off**: Chapter bosses become farmable from chapter 2 instead of only after chapter 15: up to 10 chapter boss wins a day can now give next-chapter cards at 80 % and pieces at 100 %, with epic and legendary pieces from the chapter 5 boss once a player is in chapter 6; the shared daily limit keeps the daily maximum where it was. A forged client can still claim wins (AD-002). A farm win of an earlier chapter boss missing from `cleared_chapters` counts as its first win and records the chapter. Resolves the "lose the chapter 5 farm list" trade-off of AD-019.
+- **Scope**: `backend` `Farm.kt`, `FarmService`, `FarmUseCase`, `FarmController`; `game/src/adapters/http/farmApi.js`, `game/src/application/farm/farmSession.js`, `game/src/domain/campaign/campaign.js`, `game/src/domain/campaign/bossMap.js`, `game/src/adapters/phaser/views/farmView.js`, `HeroUi`, `ClickerGame`, `game/public/style.css`; `game/e2e/support/fakeBackend.js`
+- **Date**: 2026-11-17
+- **Status**: proposed (product owner defaults Q1 to Q8 of the spec, awaiting the owner's answers). Supersedes the farm scope of AD-008 ("the farm lists only the bosses of the current chapter" and "a player cannot replay the bosses of earlier chapters")
+
 ## Handoff
 
 - **Feature**: `ui-redesign` (Grove theme, AD-022), `.specs/features/ui-redesign/`
@@ -194,6 +202,7 @@
 - **In-progress** (file:line): none
 - **Next step**: `test-engineer` runs T50, T51, T52 in order (one worker; e2e only, `game/e2e/uiRedesign.spec.js`), then `ui-artist` T53 (the last task). Then the `verifier` agent runs round 3 of 3 (full suites and sensor, the faults named after T53), then `product-owner` acceptance, then `gitops` (deploy check, `report.html`, changelog, tag)
 - **Blockers**: none. Round 3 is the last Verifier round before escalation to the owner
+- **Queued**: `boss-replay-chapters` (AD-024, proposed): spec, design and tasks T1 to T14 written 2026-11-17; waits for the owner's answers to Q1 to Q8 and the approval of the tasks
 - **Notes for the resume**: (1) phase gate is `cd game && npm test && npm run build && npx playwright test --workers=2`; a failing e2e test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both (seen so far: `dragEquip.spec.js:550` and `:604`, `talents.spec.js:148` and `:111`, `auth.spec.js:113`, `clickPower.spec.js:41`). (2) Line numbers quoted in `tasks.md` drift: locate edits by test name or exact text. (3) `validation.md` is still the round 2 report; round 3 rewrites it. (4) The owner confirms at acceptance the PO rulings marked `n` in the spec Assumptions table (enemy line D2, map stops D3, findings #10 to #13)
 - **Uncommitted files**: owner's, never stage them: `CLAUDE.md`, `GEMINI.md`, `graphify-out/`, `.agents/`, `.claude/skills/impeccable/`, `.claude/skills/reversa-*/`
 - **Branch**: main
