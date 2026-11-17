@@ -3186,7 +3186,7 @@ const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [co
 
 ---
 
-### T52: Pin the contrast bounds of the talent branch inks [ ]
+### T52: Pin the contrast bounds of the talent branch inks [x]
 
 **Owner**: test-engineer
 **What**: The `Melhorar` button ink under text `rgb(244, 230, 200)` reads 5.90:1 to 6.02:1 and the branch title ink on `rgb(230, 208, 162)` at least 4.82:1, rounded to two decimals as the spec writes them (spec UIR-14 AC 15; round 2 noted they were asserted only as 4.5).
@@ -3215,8 +3215,8 @@ const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [co
 **Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
 **Done when**:
 
-- [ ] The edited case passes and every other case of `uiRedesign.spec.js` passes unchanged.
-- [ ] `grep -c "toBeGreaterThanOrEqual(4.82)" game/e2e/uiRedesign.spec.js` is one more than before the task.
+- [x] The edited case passes and every other case of `uiRedesign.spec.js` passes unchanged.
+- [x] `grep -c "toBeGreaterThanOrEqual(4.82)" game/e2e/uiRedesign.spec.js` is one more than before the task.
 
 **Commit**: `test(game): pin the contrast bounds of the talent branch inks`
 

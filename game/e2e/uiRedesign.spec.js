@@ -1732,10 +1732,14 @@ test.describe('Grove theme', () => {
 
             await expect(button).toBeEnabled();
             await expectStyle(button, { 'background-color': ink, color: 'rgb(244, 230, 200)' });
-            expect(ratio(ink, 'rgb(244, 230, 200)')).toBeGreaterThanOrEqual(4.5);
+            //  UIR-14 AC15: 5.90:1 to 6.02:1 under the button text, rounded to two decimals as the spec writes them
+            const buttonRatio = Number(ratio(ink, 'rgb(244, 230, 200)').toFixed(2));
+
+            expect(buttonRatio).toBeGreaterThanOrEqual(5.9);
+            expect(buttonRatio).toBeLessThanOrEqual(6.02);
             await expectStyle(column.locator('.talent-branch-title'), { color: ink });
             expect(columnBack).toBe('rgb(230, 208, 162)');
-            expect(ratio(ink, columnBack)).toBeGreaterThanOrEqual(4.5);
+            expect(Number(ratio(ink, columnBack).toFixed(2))).toBeGreaterThanOrEqual(4.82);
         }
 
         await expectStyle(page.getByTestId('talent-max-CLICK_DAMAGE'), { color: inks.POWER });
