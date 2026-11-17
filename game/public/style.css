@@ -611,6 +611,23 @@ button:disabled {
     display: none;
 }
 
+/* A farm fight of an earlier chapter: the tag ` (Capítulo <n>)` on a second, smaller line, so the plate stays narrow
+   and the boss timer has room (spec boss-replay-chapters, UI review #1) */
+.stage-hud:has(.stage-hud-chapter) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.stage-hud-chapter {
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--ink-600);
+    white-space: nowrap;
+}
+
 .chapter-hud {
     padding: 5px 14px;
     font-family: var(--font-heading);

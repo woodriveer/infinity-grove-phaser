@@ -20,6 +20,7 @@ import { RESET_ERROR_TEXT, renderResetButton, renderResetDialog, resetNoticeText
 import { el } from './views/dom';
 import { renderElementWheel } from './views/elementWheel';
 import { renderEffectTags, updateEffectTags } from './views/skillEffects';
+import { renderStageLabel } from './views/stageLabel';
 
 //  The leader hero stands on the ground line of the monster; y is its feet
 const CHARACTER = { x: 230, y: 612, height: 320 };
@@ -755,7 +756,7 @@ export class ClickerGame extends Scene
         this.monster = new Monster(encounter.health, encounter.dropRuleId, encounter.stats);
         this.updateHealthBar();
         this.monsterParts.forEach((part) => part.setAlpha(1));
-        this.stageHud.textContent = encounter.label;
+        renderStageLabel(this.stageHud, encounter.label);
         this.chapterHud.textContent = `Capítulo ${this.session.chapter}`;
         this.showAutoClick();
         this.monsterStats = encounter.stats;

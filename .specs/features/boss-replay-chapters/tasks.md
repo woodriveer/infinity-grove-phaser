@@ -1062,7 +1062,7 @@ Result (`b4a4c16`): MUDANÇAS PEDIDAS. Finding #1 (high): the timer covers the e
 
 ---
 
-### T15: Chapter tag on the second line of the stage plate [ ]
+### T15: Chapter tag on the second line of the stage plate [x]
 
 **Owner**: game-dev
 **Goal**: The ` (Capítulo <n>)` tag of an earlier chapter fight draws on a second, smaller line of the stage plate, so the plate stays narrow while its text stays the full label (BRC-08; spec P1-Fight AC 14; UI review #1).
@@ -1165,9 +1165,9 @@ Nothing else in `ClickerGame.js` changes (`completeChapter` keeps `this.stageHud
 **Gate**: quick - `cd game && npm test`, then build `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 6 `stageLabel.test.js` cases and the 2 new `ClickerGame.test.js` cases pass.
-- [ ] Every existing `ClickerGame.test.js` case passes unchanged, among them `a boss of an earlier chapter fights with the numbers of that chapter and its label` and `a chapter boss of an earlier chapter is labelled with its chapter` (they read `.stage-hud` `textContent`, which is unchanged).
-- [ ] `git diff --stat` lists only `stageLabel.js`, `stageLabel.test.js`, `ClickerGame.js`, `ClickerGame.test.js`, `style.css` and `tasks.md`.
+- [x] The 6 `stageLabel.test.js` cases and the 2 new `ClickerGame.test.js` cases pass.
+- [x] Every existing `ClickerGame.test.js` case passes unchanged, among them `a boss of an earlier chapter fights with the numbers of that chapter and its label` and `a chapter boss of an earlier chapter is labelled with its chapter` (they read `.stage-hud` `textContent`, which is unchanged).
+- [x] `git diff --stat` lists only `stageLabel.js`, `stageLabel.test.js`, `ClickerGame.js`, `ClickerGame.test.js`, `style.css` and `tasks.md`.
 
 **Commit**: `fix(game): draw the chapter of an earlier chapter fight on a second plate line`
 

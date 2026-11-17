@@ -1242,6 +1242,13 @@ describe('ClickerGame stages', () => {
         expect(timer(ctx)).toBe('');
     });
 
+    it('a campaign boss label has no chapter line', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        expect(label(ctx)).toBe('Stage 1/10  Miniboss');
+        expect(ctx.hud('.stage-hud .stage-hud-chapter')).toBeUndefined();
+    });
+
     it('removes --timer-left when the boss is beaten', async () => {
         const ctx = await createScene({ start: bossStart() });
 
@@ -2509,6 +2516,17 @@ describe('ClickerGame farm mode', () => {
             expect(ctx.scene.monster.maxHealth).toBe(77);
             expect(ctx.hud('.boss-timer').textContent).toBe('Time: 45');
             expect(campaignGateway.report).not.toHaveBeenCalled();
+        });
+
+        it('an earlier chapter fight draws its chapter on the second line of the plate', async () => {
+            const ctx = await createScene({ start: atChapter2() });
+            farmGateway.get.mockResolvedValue(chapterOne());
+            await ctx.scene.farm.load(1);
+
+            ctx.scene.startFarm({ kind: 'MINIBOSS', stage: 3, chapter: 1 });
+
+            expect(label(ctx)).toBe('Rever chefe: Miniboss 3 (Capítulo 1)');
+            expect(ctx.hud('.stage-hud .stage-hud-chapter').textContent).toBe(' (Capítulo 1)');
         });
 
         it('a win of an earlier chapter boss reports its chapter and brings the same boss of that chapter back', async () => {
