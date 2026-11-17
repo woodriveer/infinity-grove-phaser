@@ -146,11 +146,22 @@ test.describe('Talent points and the combo talent', () => {
     });
 
     test('COMBO 2 caps a streak of 30 clicks at +10%', async ({ page }) => {
-        const menu = await startGame(page, { talents: { yan: { COMBO: 2 } } });
+        await startGame(page, { talents: { yan: { COMBO: 2 } } });
 
-        await rapidClicks(menu, 30);
+        //  The combo decays by the frame time of the game, so 30 Playwright clicks with real frames between them can end the streak on a
+        //  loaded machine. The clicks and the read run in one call with no frame in between, through the scene's pointer handler (the one a
+        //  canvas click reaches). The point is off the monster, so the damage number takes its default spot.
+        const hud = await page.evaluate(() => {
+            const scene = window.__PHASER_GAME__.scene.getScene('ClickerGame');
 
-        await expect(page.getByTestId('combo-hud')).toHaveText('Combo x30 · +10%');
+            for (let i = 0; i < 30; i++) {
+                scene.hitMonster({ x: 0, y: 0 });
+            }
+
+            return document.querySelector('[data-testid="combo-hud"]').textContent;
+        });
+
+        expect(hud).toBe('Combo x30 · +10%');
     });
 
     test('a first miniboss clear pays 2 points that buy a COMBO level: Nível 1/10, Efeito: +5% and 1 point left', async ({ page }) => {
