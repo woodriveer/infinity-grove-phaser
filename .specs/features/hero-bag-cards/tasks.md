@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/hero-bag-cards/spec.md`
 **Design**: `.specs/features/hero-bag-cards/design.md`
-**Status**: Draft (waits for the owner's approval of the spec and the answers to Q1 to Q8)
+**Status**: Approved on 2026-11-17 (the owner accepted the spec with the recommended answers to Q1 to Q8)
 
 Rules for every task:
 
