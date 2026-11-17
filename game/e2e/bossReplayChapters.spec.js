@@ -688,4 +688,48 @@ test.describe('Rever chefes: escolher capítulo', () => {
         }
         expect(await states(page)).toEqual(Array(11).fill('defeated'));
     });
+
+    test('the game reopening Rever chefes after the last daily win keeps its map when a chapter load was pending', async ({ page }) => {
+        const { backend, menu } = await startGame(page, { cards: { yan: { cleared: [ 1, 2 ], winsDay: today(), winsToday: 9 } } });
+        await openMap(page);
+        await page.getByTestId('farm-chapter-2').click();
+        await expect(page.getByTestId('farm-entry-chapter-boss')).toContainText('1 vitórias restantes hoje');
+        await page.getByTestId('farm-entry-chapter-boss').click();
+
+        //  The fire click kills the chapter 2 boss: the last daily win is sent and its answer is held
+        const releaseOutcome = backend.holdOutcome();
+        await menu.canvas.click();
+        await expect.poll(() => farmCalls(backend).length).toBe(1);
+
+        //  Rever chefes opened over the fight with a chapter 1 load pending
+        const releaseChapter1 = backend.holdFarm(1);
+        await openMap(page);
+        await page.getByTestId('farm-chapter-1').click();
+        await expect(page.getByTestId('farm-chapter-1')).toBeDisabled();
+
+        //  The win is answered: the game reopens Rever chefes on the chapter it fought and the pending chapter 1 load is dropped
+        releaseOutcome();
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 2');
+        await expect(page.getByTestId('farm-chapter-2')).toHaveAttribute('aria-pressed', 'true');
+        for (const number of [ 1, 2, 3 ]) {
+            await expect(page.getByTestId(`farm-chapter-${number}`)).toBeEnabled();
+        }
+        await expect(page.getByTestId('farm-entry-chapter-boss')).toBeDisabled();
+        await expect(page.getByTestId('farm-entry-chapter-boss')).toContainText('0 vitórias restantes hoje');
+        expect(await states(page)).toEqual(Array(11).fill('defeated'));
+
+        //  The late chapter 1 answer changes neither the shown map nor the chips
+        const read = farmAnswerRead(page, 1);
+        releaseChapter1();
+        await read;
+
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 2');
+        await expect(page.getByTestId('farm-chapter-2')).toHaveAttribute('aria-pressed', 'true');
+        await expect(page.getByTestId('farm-chapter-1')).toHaveAttribute('aria-pressed', 'false');
+        for (const number of [ 1, 2, 3 ]) {
+            await expect(page.getByTestId(`farm-chapter-${number}`)).toBeEnabled();
+        }
+        expect(await states(page)).toEqual(Array(11).fill('defeated'));
+        await expect(page.getByTestId('farm-entry-chapter-boss')).toContainText('0 vitórias restantes hoje');
+    });
 });

@@ -232,7 +232,7 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  autoClick {name: { level, crystals }} (default level 0 and 0 crystals; the upgrade follows AutoClickController) and
 //  lastChapter (the last chapter a cleared chapter boss opens, default 1: the boss of that chapter completes the campaign).
 //  healthDelayMs delays the answer of GET /api/health (the backend wake-up of spec supabase-postgres), which is counted by healthCalls() and kept out of calls.
-//  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens, and holdFarm(chapter, { fail }) -> release() to hold the answer of GET /farm?chapter=n.
+//  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens, and holdFarm(chapter, { fail }) -> release() to hold the answer of GET /farm?chapter=n, and holdOutcome() -> release() to hold the answer of POST /farm/outcome.
 export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
     chapterDefinitions = {},
@@ -247,6 +247,8 @@ export async function mockBackend (page, {
     const rolled = new Map();
     //  GET /farm?chapter=n requests held by holdFarm(n), keyed by the query value: { released, fail }
     const farmHolds = new Map();
+    //  POST /farm/outcome requests wait on this promise while holdOutcome() holds them
+    let outcomeHold = null;
 
     const dropsOf = (ruleId) => (Array.isArray(drops) ? drops : drops[ruleId] ?? DEFAULT_DROPS);
     const nextDrop = (ruleId) => {
@@ -823,6 +825,11 @@ export async function mockBackend (page, {
             if (hold.fail) { return route.fulfill({ status: 500, body: '' }); }
         }
 
+        //  holdOutcome: a POST /farm/outcome is recorded above, then applied and answered only once the test releases it
+        if (method === 'POST' && path === '/farm/outcome' && outcomeHold) {
+            await outcomeHold;
+        }
+
         if (method === 'POST' && path === '/users') {
             const username = String(body.username ?? '').trim();
 
@@ -964,6 +971,17 @@ export async function mockBackend (page, {
             farmHolds.set(String(chapter), { released, fail });
             return () => {
                 farmHolds.delete(String(chapter));
+                release();
+            };
+        },
+        //  Holds every POST /farm/outcome until the returned release() runs: the win is applied and answered only then
+        holdOutcome: () => {
+            let release = () => {};
+            const held = new Promise((resolve) => { release = resolve; });
+
+            outcomeHold = held;
+            return () => {
+                if (outcomeHold === held) { outcomeHold = null; }
                 release();
             };
         }
