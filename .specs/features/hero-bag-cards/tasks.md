@@ -366,7 +366,7 @@ Add it after `fuse` and extend the comment block at the top of the file.
 
 ---
 
-### T5: heroCollection.fuseAll [ ]
+### T5: heroCollection.fuseAll [x]
 
 **Owner**: game-dev
 **Goal**: The collection replaces the fused hero, fires its listeners (skill bar) and resolves with `{ hero, fusions }` (BAG-21, BAG-35).
@@ -400,7 +400,7 @@ fuseAll: async (heroId) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 2 new cases pass; every other game unit test passes.
+- [x] The 2 new cases pass; every other game unit test passes.
 
 **Commit**: `feat(game): fuse every layer of a hero in the hero collection`
 

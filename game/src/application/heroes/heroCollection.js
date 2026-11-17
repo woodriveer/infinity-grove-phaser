@@ -2,8 +2,9 @@ import { applyDrop } from '../../domain/heroes/heroes';
 
 //  The heroes of the player as the backend sees them (catalog, bag, stars, leader), kept in step with every change.
 //  Port (ADR 0007):
-//    gateway  { list(), fuse(heroId, stars), setLeader(heroId) }  the backend /heroes and /leader calls.
-//             list -> { leaderId, heroes }, fuse -> the updated hero, setLeader -> { leaderId }. Each rejects with an ApiError.
+//    gateway  { list(), fuse(heroId, stars), fuseAll(heroId), setLeader(heroId) }  the backend /heroes and /leader calls.
+//             list -> { leaderId, heroes }, fuse -> the updated hero, fuseAll -> { hero, fusions }, setLeader -> { leaderId }.
+//             Each rejects with an ApiError.
 export const createHeroCollection = ({ gateway }) =>
 {
     let heroes = [];
@@ -61,6 +62,17 @@ export const createHeroCollection = ({ gateway }) =>
             changed();
 
             return hero;
+        },
+
+        //  Fuses every layer of a hero from 0 stars up; resolves with { hero, fusions }. A refusal rejects and keeps the heroes.
+        fuseAll: async (heroId) =>
+        {
+            const { hero, fusions } = await gateway.fuseAll(heroId);
+
+            heroes = heroes.map((candidate) => (candidate.id === hero.id ? hero : candidate));
+            changed();
+
+            return { hero, fusions };
         },
 
         //  The leader changes only after the backend accepted it

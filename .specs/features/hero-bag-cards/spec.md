@@ -225,7 +225,7 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-18 | P1: Fusion ladder | T9, T11, T12, T13 | Pending |
 | BAG-19 | P1: Fusion ladder | T11, T13, T14 | Pending |
 | BAG-20 | P1: Fusion ladder | T11, T13 | Pending |
-| BAG-21 | P1: Fusion ladder | T5, T11, T12, T13, T14 | Pending |
+| BAG-21 | P1: Fusion ladder | T5, T11, T12, T13, T14 | Implementing |
 | BAG-22 | P1: Fusion ladder | T11, T12 | Pending |
 | BAG-23 | P1: Fundir tudo on the server | T1, T2, T3 | Implementing |
 | BAG-24 | P1: Fundir tudo on the server | T1, T3 | Implementing |

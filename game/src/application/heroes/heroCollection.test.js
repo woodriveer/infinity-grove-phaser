@@ -14,7 +14,7 @@ describe('heroCollection', () => {
     let changes;
 
     beforeEach(() => {
-        gateway = { list: vi.fn().mockResolvedValue(payload()), fuse: vi.fn(), setLeader: vi.fn() };
+        gateway = { list: vi.fn().mockResolvedValue(payload()), fuse: vi.fn(), fuseAll: vi.fn(), setLeader: vi.fn() };
         collection = createHeroCollection({ gateway });
         changes = vi.fn();
         collection.onChange(changes);
@@ -80,6 +80,34 @@ describe('heroCollection', () => {
             gateway.fuse.mockRejectedValue(new ApiError('Fewer than 3 cards', { status: 409 }));
 
             await expect(collection.fuse('kael', 1)).rejects.toBeInstanceOf(ApiError);
+
+            expect(collection.heroes()).toEqual(payload().heroes);
+            expect(changes).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('fuseAll', () => {
+        it('fuseAll replaces the hero, fires the listeners and resolves with hero and fusions', async () => {
+            await collection.load();
+            changes.mockClear();
+            const fused = hero('kael', { 1: 1 }, { stars: 1, owned: true });
+            gateway.fuseAll.mockResolvedValue({ hero: fused, fusions: 1 });
+
+            await expect(collection.fuseAll('kael')).resolves.toEqual({ hero: fused, fusions: 1 });
+
+            expect(gateway.fuseAll).toHaveBeenCalledWith('kael');
+            expect(collection.heroes()[0].stars).toBe(1);
+            expect(collection.heroes()).toEqual([ fused, payload().heroes[1] ]);
+            expect(changes).toHaveBeenCalledTimes(1);
+        });
+
+        it('fuseAll that fails keeps the heroes and fires nothing', async () => {
+            await collection.load();
+            changes.mockClear();
+            const error = new ApiError('Nothing to fuse', { status: 409, code: 'NOTHING_TO_FUSE' });
+            gateway.fuseAll.mockRejectedValue(error);
+
+            await expect(collection.fuseAll('kael')).rejects.toBe(error);
 
             expect(collection.heroes()).toEqual(payload().heroes);
             expect(changes).not.toHaveBeenCalled();
