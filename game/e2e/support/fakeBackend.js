@@ -232,7 +232,7 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  autoClick {name: { level, crystals }} (default level 0 and 0 crystals; the upgrade follows AutoClickController) and
 //  lastChapter (the last chapter a cleared chapter boss opens, default 1: the boss of that chapter completes the campaign).
 //  healthDelayMs delays the answer of GET /api/health (the backend wake-up of spec supabase-postgres), which is counted by healthCalls() and kept out of calls.
-//  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens.
+//  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens, and holdFarm(chapter, { fail }) -> release() to hold the answer of GET /farm?chapter=n.
 export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
     chapterDefinitions = {},
@@ -245,6 +245,8 @@ export async function mockBackend (page, {
     let counter = 0;
     const wallets = new Map();
     const rolled = new Map();
+    //  GET /farm?chapter=n requests held by holdFarm(n), keyed by the query value: { released, fail }
+    const farmHolds = new Map();
 
     const dropsOf = (ruleId) => (Array.isArray(drops) ? drops : drops[ruleId] ?? DEFAULT_DROPS);
     const nextDrop = (ruleId) => {
@@ -812,6 +814,15 @@ export async function mockBackend (page, {
 
         if (delayMs) { await new Promise((resolve) => setTimeout(resolve, delayMs)); }
 
+        //  holdFarm: a held chapter answers only once the test releases it, from the state at that moment, or 500 when it was held with fail
+        const hold = method === 'GET' && path === '/farm' ? farmHolds.get(new URL(request.url()).searchParams.get('chapter')) : undefined;
+
+        if (hold) {
+            await hold.released;
+
+            if (hold.fail) { return route.fulfill({ status: 500, body: '' }); }
+        }
+
         if (method === 'POST' && path === '/users') {
             const username = String(body.username ?? '').trim();
 
@@ -944,6 +955,17 @@ export async function mockBackend (page, {
         //  Server-side revocation of every refresh token (e.g. password change)
         revokeAllRefreshTokens: () => {
             sessions.refresh.forEach((entry) => { entry.revoked = true; });
+        },
+        //  Holds every GET /farm?chapter=<chapter> until the returned release() runs; GET /farm without a chapter is never held
+        holdFarm: (chapter, { fail = false } = {}) => {
+            let release = () => {};
+            const released = new Promise((resolve) => { release = resolve; });
+
+            farmHolds.set(String(chapter), { released, fail });
+            return () => {
+                farmHolds.delete(String(chapter));
+                release();
+            };
         }
     };
 }

@@ -36,6 +36,14 @@ const openMap = async (page) => {
 };
 
 const states = (page) => page.locator('.farm-map .map-node').evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-state')));
+//  Resolves once the game has read the answer of GET /farm?chapter=<chapter>: the response is complete, then one frame and one task pass.
+//  Call it before releasing the hold, so the response is not missed.
+const farmAnswerRead = (page, chapter) => page.waitForResponse((response) => new URL(response.url()).pathname === '/api/farm'
+    && new URL(response.url()).searchParams.get('chapter') === String(chapter))
+    .then((response) => response.finished())
+    .then(() => page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve)))));
+//  The chapter 3 map's stop states: stages 1 to 3 defeated, stage 4 the current one, the rest locked
+const CURRENT_STOPS = [ 'defeated', 'defeated', 'defeated', 'current', ...Array(7).fill('locked') ];
 const farmCalls = (backend) => backend.calls.filter((call) => call.path === '/farm/outcome');
 const farmLabel = (page) => page.locator('.stage-hud');
 //  The limit of the running boss countdown in ms, null while no boss counts down (the same read as skillsAll.spec.js)
@@ -554,5 +562,92 @@ test.describe('Rever chefes: escolher capítulo', () => {
         expect(chip3.dotTop - chip3.baseline).toBeGreaterThanOrEqual(2);
         expect(Math.abs(chip1.baseline - chip3.baseline)).toBeLessThanOrEqual(0.5);
         await expect(page.getByTestId('farm-chapter-3')).toHaveText('3');
+    });
+
+    test('closing during a chapter load and reopening leaves the chips enabled on the current chapter', async ({ page }) => {
+        const { backend } = await startGame(page);
+        const releaseChapter2 = backend.holdFarm(2);
+        await openMap(page);
+
+        await page.getByTestId('farm-chapter-2').click();
+        await expect(page.getByTestId('farm-chapter-2')).toBeDisabled();
+        await page.getByTestId('hero-close').click();
+        await expect(page.locator('.hero-panel')).toBeHidden();
+
+        await openMap(page);
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 3');
+        await expect(page.getByTestId('farm-chapter-3')).toHaveAttribute('aria-pressed', 'true');
+        for (const number of [ 1, 2, 3 ]) {
+            await expect(page.getByTestId(`farm-chapter-${number}`)).toBeEnabled();
+        }
+        expect(await states(page)).toEqual(CURRENT_STOPS);
+
+        const read = farmAnswerRead(page, 2);
+        releaseChapter2();
+        await read;
+
+        for (const number of [ 1, 2, 3 ]) {
+            await expect(page.getByTestId(`farm-chapter-${number}`)).toBeEnabled();
+        }
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 3');
+    });
+
+    test('a chapter answer that arrives after closing and reopening does not change the shown chapter', async ({ page }) => {
+        const { backend } = await startGame(page);
+        const releaseChapter2 = backend.holdFarm(2);
+        await openMap(page);
+
+        await page.getByTestId('farm-chapter-2').click();
+        await expect(page.getByTestId('farm-chapter-2')).toBeDisabled();
+        await page.getByTestId('hero-close').click();
+        await openMap(page);
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 3');
+
+        const read = farmAnswerRead(page, 2);
+        releaseChapter2();
+        await read;
+
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 3');
+        await expect(page.getByTestId('farm-chapter-3')).toHaveAttribute('aria-pressed', 'true');
+        await expect(page.getByTestId('farm-chapter-2')).toHaveAttribute('aria-pressed', 'false');
+        expect(await states(page)).toEqual(CURRENT_STOPS);
+        await expect(page.getByTestId('farm-chapter-1')).toBeEnabled();
+
+        //  The busy render of a new chip draws the session's chapter: a stale chapter 2 in the session would show here
+        const releaseChapter1 = backend.holdFarm(1);
+        await page.getByTestId('farm-chapter-1').click();
+        await expect(page.getByTestId('farm-chapter-1')).toBeDisabled();
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 3');
+        await expect(page.getByTestId('farm-chapter-3')).toHaveAttribute('aria-pressed', 'true');
+        expect(await states(page)).toEqual(CURRENT_STOPS);
+
+        releaseChapter1();
+
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 1');
+        await expect(page.getByTestId('farm-chapter-1')).toHaveAttribute('aria-pressed', 'true');
+        expect(await states(page)).toEqual(Array(11).fill('defeated'));
+    });
+
+    test('a chapter load that fails after Esc closed Rever chefes shows no error on the reopened map', async ({ page }) => {
+        const { backend } = await startGame(page);
+        const releaseChapter1 = backend.holdFarm(1, { fail: true });
+        await openMap(page);
+
+        await page.getByTestId('farm-chapter-1').click();
+        await expect(page.getByTestId('farm-chapter-1')).toBeDisabled();
+        await page.keyboard.press('Escape');
+        await expect(page.locator('.hero-panel')).toBeHidden();
+
+        await openMap(page);
+        const read = farmAnswerRead(page, 1);
+        releaseChapter1();
+        await read;
+
+        await expect(page.locator('.hero-error')).toBeHidden();
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 3');
+        await expect(page.getByTestId('farm-chapter-3')).toHaveAttribute('aria-pressed', 'true');
+        for (const number of [ 1, 2, 3 ]) {
+            await expect(page.getByTestId(`farm-chapter-${number}`)).toBeEnabled();
+        }
     });
 });

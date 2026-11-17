@@ -1673,7 +1673,7 @@ async selectFarmChapter (chapter)
 
 ---
 
-### T21: e2e of closing Rever chefes during a chapter load [ ]
+### T21: e2e of closing Rever chefes during a chapter load [x]
 
 **Owner**: test-engineer
 **Goal**: The fake backend can hold the answer of `GET /farm?chapter=n` until the test releases it, and three Playwright scenarios prove what the player sees when Rever chefes is closed during a chapter load and reopened (BRC-10; spec P1-Choose AC 14, 15 and the TD-009 edge cases "close with `hero-close`" and "fails after Esc").
@@ -1748,9 +1748,9 @@ The chapter 3 map's stop states (the campaign at chapter 3 stage 4), used below 
 **Gate**: full - `cd game && npx playwright test e2e/bossReplayChapters.spec.js e2e/farm.spec.js e2e/bossMap.spec.js`
 **Done when**:
 
-- [ ] The 3 new scenarios pass, and every other scenario of `bossReplayChapters.spec.js`, `farm.spec.js` and `bossMap.spec.js` passes unchanged (a failing test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both).
-- [ ] Each of the 3 new scenarios asserts at least one chip `toBeEnabled()` after the reopen (on the code before T20 the reopened chips stay disabled, so every one of them fails there).
-- [ ] No scenario asserts a stop position number; `git diff --stat` lists only `fakeBackend.js`, `bossReplayChapters.spec.js` and `tasks.md`.
+- [x] The 3 new scenarios pass, and every other scenario of `bossReplayChapters.spec.js`, `farm.spec.js` and `bossMap.spec.js` passes unchanged (a failing test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both).
+- [x] Each of the 3 new scenarios asserts at least one chip `toBeEnabled()` after the reopen (on the code before T20 the reopened chips stay disabled, so every one of them fails there).
+- [x] No scenario asserts a stop position number; `git diff --stat` lists only `fakeBackend.js`, `bossReplayChapters.spec.js` and `tasks.md`.
 
 **Commit**: `test(e2e): cover closing Rever chefes during a chapter load`
 
