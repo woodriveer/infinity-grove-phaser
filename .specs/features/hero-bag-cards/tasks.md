@@ -1261,7 +1261,7 @@ const piece = (id, slot, rarity, refine = 0, heroId = null) => ({ id, slot, rari
 
 ---
 
-### T15: Move the ui-redesign e2e and the review shots onto the Mochila [ ]
+### T15: Move the ui-redesign e2e and the review shots onto the Mochila [x]
 
 **Owner**: test-engineer
 **Goal**: The `ui-redesign` style tests and the existing screenshot scripts stop using the Fusão screen, keeping every style value they assert (BAG-38).
@@ -1294,9 +1294,9 @@ const piece = (id, slot, rarity, refine = 0, heroId = null) => ({ id, slot, rari
 **Gate**: full - `cd game && npm test && npx playwright test e2e/uiRedesign.spec.js`
 **Done when**:
 
-- [ ] `uiRedesign.spec.js` passes; it has the same number of tests as before.
-- [ ] `grep -rn "hud-fusion\|bag-go-fusion\|bag-entry-\(kael\|lyra\)-\|fusion-empty" game/e2e game/ui-review` prints nothing.
-- [ ] Both shot scripts run without error.
+- [x] `uiRedesign.spec.js` passes; it has the same number of tests as before.
+- [x] `grep -rn "hud-fusion\|bag-go-fusion\|bag-entry-\(kael\|lyra\)-\|fusion-empty" game/e2e game/ui-review` prints nothing (only the two absence assertions `toHaveCount(0)` of `heroBagCards.spec.js`, required by T13, still name `hud-fusion` and `bag-entry-kael-`).
+- [x] Both shot scripts run without error.
 
 **Commit**: `test(game): move the ui-redesign checks and review shots onto the Mochila`
 

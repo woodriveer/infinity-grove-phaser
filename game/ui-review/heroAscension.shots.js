@@ -129,43 +129,45 @@ test('reference values', async ({ page }, testInfo) => {
     report(testInfo, 'reference values', problems);
 });
 
-//  The bag with entries of 4 to 9 stars, and the detail of a 9-star entry (gold chip) and of a 4-star entry (purple)
+//  The Mochila with a 9-star Kael and a 4-star Lyra, and the detail of each (gold and purple star badge) and of Kael with a layer ready to fuse
 test('bag', async ({ page }, testInfo) => {
     const problems = watch(page);
 
     await startAs(page, { 'kael:0': 2, 'kael:3': 1, 'kael:4': 1, 'kael:5': 2, 'kael:6': 1, 'kael:7': 1, 'kael:8': 3, 'kael:9': 1, 'lyra:4': 2 });
     await page.getByTestId('hud-bag').click();
-    await expect(page.getByTestId('bag-entry-kael-9')).toBeVisible();
+    await expect(page.getByTestId('bag-card-kael')).toBeVisible();
     await page.mouse.move(0, 0);
     await shot(page, testInfo, '51-bag');
 
-    await page.getByTestId('bag-entry-kael-9').click();
+    await page.getByTestId('bag-card-kael').click();
     await expect(page.getByTestId('bag-entry-detail')).toBeVisible();
     await page.mouse.move(0, 0);
     await shot(page, testInfo, '52-bag-detail-9');
     await page.getByTestId('hero-back').click();
 
-    await page.getByTestId('bag-entry-kael-4').click();
+    await page.getByTestId('bag-card-lyra').click();
     await page.mouse.move(0, 0);
     await shot(page, testInfo, '53-bag-detail-4');
     await page.getByTestId('hero-back').click();
 
-    await page.getByTestId('bag-entry-kael-8').click();
+    await page.getByTestId('bag-card-kael').click();
+    await expect(page.getByTestId('fusion-row-kael-8')).toBeVisible();
     await page.mouse.move(0, 0);
     await shot(page, testInfo, '54-bag-detail-8-can-fuse');
 
-    const chip = await styleOf(page.getByTestId('bag-entry-detail').locator('.hero-stars'), [ 'color', 'backgroundColor', 'boxShadow', 'borderRadius', 'padding' ]);
+    const chip = await styleOf(page.getByTestId('bag-detail-card-kael').locator('.bag-card-star'), [ 'color', 'backgroundColor', 'boxShadow', 'borderRadius', 'padding' ]);
 
     console.log(`BAGCHIP (${testInfo.project.name}): ${JSON.stringify(chip)}`);
     report(testInfo, 'bag', problems);
 });
 
-//  The fusion screen with rows past 3 stars, a selected row coming from the bag, a fusion result and a failed fusion
+//  The fusion ladder of the Mochila with rows past 3 stars, and the fusion results
 test('fusion', async ({ page }, testInfo) => {
     const problems = watch(page);
 
     await startAs(page, { 'kael:3': 3, 'kael:5': 4, 'kael:8': 3, 'lyra:6': 3, 'orina:0': 3 });
-    await page.getByTestId('hud-fusion').click();
+    await page.getByTestId('hud-bag').click();
+    await page.getByTestId('bag-card-kael').click();
     await expect(page.getByTestId('fusion-row-kael-8')).toBeVisible();
     await page.mouse.move(0, 0);
     await shot(page, testInfo, '61-fusion-rows');
@@ -179,11 +181,15 @@ test('fusion', async ({ page }, testInfo) => {
     await page.mouse.move(0, 0);
     await shot(page, testInfo, '63-fusion-result-9');
 
+    await page.getByTestId('hero-back').click();
+    await page.getByTestId('bag-card-lyra').click();
     await page.getByTestId('fusion-button-lyra-6').click();
     await expect(page.getByTestId('fusion-result')).toContainText('Lyra');
     await page.mouse.move(0, 0);
     await shot(page, testInfo, '64-fusion-result-7');
 
+    await page.getByTestId('hero-back').click();
+    await page.getByTestId('bag-card-kael').click();
     await page.getByTestId('fusion-button-kael-3').click();
     await expect(page.getByTestId('fusion-result')).toContainText('4★');
     await page.mouse.move(0, 0);

@@ -277,7 +277,8 @@ test.describe('Grove theme', () => {
 
     test('draws Fundir as an ember pill', async ({ page }) => {
         await startAs(page, { copies: { 'kael:1': 3 } });
-        await page.getByTestId('hud-fusion').click();
+        await openScreen(page, 'bag');
+        await page.getByTestId('bag-card-kael').click();
 
         await expectStyle(page.getByTestId('fusion-button-kael-1'), {
             'background-color': 'rgb(168, 67, 26)',
@@ -439,14 +440,14 @@ test.describe('Grove theme', () => {
         await expectShades(page, page.getByTestId('piece-refine'));
     });
 
-    test('draws the bag button to the fusion and the bulk sale confirmation as ember pills', async ({ page }) => {
+    test('draws the Fundir button of the ladder and the bulk sale confirmation as ember pills', async ({ page }) => {
         await startAs(page, { copies: { 'kael:3': 3 }, equipment: [ piece('c1', 'RING', 'COMMON') ] });
         await page.getByTestId('hud-bag').click();
-        await page.getByTestId('bag-entry-kael-3').click();
+        await page.getByTestId('bag-card-kael').click();
 
-        await expectStyle(page.getByTestId('bag-go-fusion'), EMBER_PILL);
-        await expectStyle(page.getByTestId('bag-go-fusion'), QUIET);
-        await expectShades(page, page.getByTestId('bag-go-fusion'));
+        await expectStyle(page.getByTestId('fusion-button-kael-3'), EMBER_PILL);
+        await expectStyle(page.getByTestId('fusion-button-kael-3'), QUIET);
+        await expectShades(page, page.getByTestId('fusion-button-kael-3'));
 
         await page.getByTestId('hero-close').click();
         await page.getByTestId('hud-equipment').click();
@@ -596,7 +597,8 @@ test.describe('Grove theme', () => {
         await page.getByTestId('hero-close').click();
 
         //  Fusion: row 3, then row 6 once the backend loses the copies
-        await page.getByTestId('hud-fusion').click();
+        await page.getByTestId('hud-bag').click();
+        await page.getByTestId('bag-card-kael').click();
         await check(page.getByTestId('fusion-button-kael-1'), page.getByTestId('fusion-button-kael-1'), 'rgb(244, 230, 200)', 'rgb(168, 67, 26)');
         backend.cardsOf('yan').copies['kael:1'] = 1;
         await page.getByTestId('fusion-button-kael-1').click();
@@ -624,7 +626,7 @@ test.describe('Grove theme', () => {
         const quiet = { 'animation-name': 'none', 'transition-duration': '0s' };
 
         //  UIR-03 AC15: every rail button is restyled, so every rail button is still
-        for (const id of [ 'hud-heroes', 'hud-bag', 'hud-fusion', 'hud-leader', 'hud-equipment', 'hud-talents', 'hud-farm' ])
+        for (const id of [ 'hud-heroes', 'hud-bag', 'hud-leader', 'hud-equipment', 'hud-talents', 'hud-farm' ])
         {
             await expectStyle(page.getByTestId(id), quiet);
         }
@@ -955,7 +957,7 @@ test.describe('Grove theme', () => {
     test('draws the rail as framed wood squares on parchment', async ({ page }) => {
         await startAs(page, {});
         const rail = [
-            [ 'hud-heroes', 'Heróis' ], [ 'hud-bag', 'Mochila' ], [ 'hud-fusion', 'Fusão' ], [ 'hud-leader', 'Líder' ],
+            [ 'hud-heroes', 'Heróis' ], [ 'hud-bag', 'Mochila' ], [ 'hud-leader', 'Líder' ],
             [ 'hud-equipment', 'Equipamento' ], [ 'hud-talents', 'Talentos' ], [ 'hud-farm', 'Rever chefes' ]
         ];
 
@@ -1456,11 +1458,14 @@ test.describe('Grove theme', () => {
         expect(Math.abs(bar.from - 624)).toBeLessThanOrEqual(1);
         expect(Math.abs(bar.to - 748)).toBeLessThanOrEqual(1);
 
-        //  The rail starts at x 907 and ends at y 609
+        //  The rail starts at x 907 and stays centred on y 370: six buttons (hero-bag-cards BAG-38) are 412 px tall, y 164..576,
+        //  where the seven of the Fusão days ended at y 609; UIR-19 AC21 keeps it above the bar (y 624)
         const rail = await page.locator('.hero-hud').boundingBox();
 
         expect(Math.abs(sceneSpan(canvas, rail).from - 907)).toBeLessThanOrEqual(1);
-        expect(Math.abs(sceneY(rail).to - 609)).toBeLessThanOrEqual(1);
+        expect(Math.abs(sceneY(rail).from - 164)).toBeLessThanOrEqual(1);
+        expect(Math.abs(sceneY(rail).to - 576)).toBeLessThanOrEqual(1);
+        expect(sceneY(rail).to).toBeLessThanOrEqual(609);
     });
 
     test('draws the farm switch as a round skull button with an ember ring when on', async ({ page }) => {
@@ -1543,7 +1548,8 @@ test.describe('Grove theme', () => {
         await page.getByTestId('hero-close').click();
 
         //  Fusion: a fusion row
-        await page.getByTestId('hud-fusion').click();
+        await openScreen(page, 'bag');
+        await page.getByTestId('bag-card-kael').click();
         await expectStyle(page.locator('.fusion-row').first(), INSET);
         await page.getByTestId('hero-close').click();
 
@@ -1566,15 +1572,11 @@ test.describe('Grove theme', () => {
         await page.getByTestId('hero-close').click();
     });
 
-    test('draws the empty lines of the fusion and the equipment on the inset recipe', async ({ page }) => {
+    test('draws the empty line of the equipment on the inset recipe', async ({ page }) => {
         const INSET = { 'background-color': 'rgb(230, 208, 162)', 'border-top-width': '1px', 'border-top-style': 'solid', 'border-top-color': 'rgba(90, 61, 38, 0.45)', 'border-top-left-radius': '8px' };
         await startAs(page, { copies: { 'kael:3': 1 }, equipment: [] });
 
-        //  One copy of each hero waits for no fusion, and no piece is in the bag
-        await page.getByTestId('hud-fusion').click();
-        await expectStyle(page.getByTestId('fusion-empty'), INSET);
-        await page.getByTestId('hero-close').click();
-
+        //  No piece is in the bag
         await openScreen(page, 'equipment');
         await expectStyle(page.getByTestId('equipment-empty'), INSET);
         await page.getByTestId('hero-close').click();
@@ -1636,7 +1638,8 @@ test.describe('Grove theme', () => {
 
     test('draws the error line in ember', async ({ page }) => {
         const { backend } = await startAs(page, { copies: { 'kael:4': 3 } });
-        await openScreen(page, 'fusion');
+        await openScreen(page, 'bag');
+        await page.getByTestId('bag-card-kael').click();
 
         backend.cardsOf('yan').copies['kael:4'] = 1;
         await page.getByTestId('fusion-button-kael-4').click();
@@ -2105,7 +2108,13 @@ test.describe('Grove theme', () => {
     test('shows no magenta in a bag entry and a skill tooltip', async ({ page }) => {
         await startAs(page, { copies: { 'lyra:3': 1 } });
         await openScreen(page, 'bag');
-        await page.getByTestId('bag-entry-lyra-3').click();
+        await page.getByTestId('bag-card-lyra').click();
+
+        //  The portrait of the card sits on the dark vignette (UIR-13 AC5)
+        const portrait = page.getByTestId('bag-detail-card-lyra').locator('.bag-card-portrait');
+
+        expect(await portrait.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('circle at 50% 45%');
+        expect(await portrait.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('rgb(90, 61, 38)');
 
         const arts = page.locator('img.skill-art, .skill-art img');
 

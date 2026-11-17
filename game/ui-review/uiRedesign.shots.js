@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { mockBackend } from '../e2e/support/fakeBackend';
-import { SESSION_KEY, activeSceneKeys, fillCredentials, openMainMenu } from '../e2e/support/game';
+import { SESSION_KEY, activeSceneKeys, fillCredentials, openMainMenu, skipSplash } from '../e2e/support/game';
 import { shot } from './support/shots';
 
 //  Screenshots of the Grove theme review (.specs/features/ui-redesign/ui-review/, design § Review Screenshots). Everything runs on the
@@ -99,6 +99,8 @@ test('menu and preloader', async ({ page }, testInfo) => {
 
     //  Once the sprite arrives the Preloader hands over to the menu form of the same page (no reload: a reload would keep the session)
     release();
+    //  The splash plays after the loading bar and before the menu
+    await skipSplash(page);
     const menu = {
         username: page.locator('.auth-form input[name="username"]'),
         password: page.locator('.auth-form input[name="password"]'),
@@ -251,24 +253,24 @@ test('hero screens', async ({ page }, testInfo) => {
     await page.getByTestId('hero-close').click();
 
     await page.getByTestId('hud-bag').click();
-    await expect(page.getByTestId('bag-entry-kael-1')).toBeVisible();
+    await expect(page.getByTestId('bag-card-kael')).toBeVisible();
     await page.mouse.move(0, 0);
     await settleImages(page);
     await shot(page, testInfo, '22-bag');
 
-    await page.getByTestId('bag-entry-kael-1').click();
+    await page.getByTestId('bag-card-kael').click();
     await expect(page.getByTestId('bag-entry-detail')).toBeVisible();
     await page.mouse.move(0, 0);
     await settleImages(page);
     await shot(page, testInfo, '23-bag-detail');
-    await page.getByTestId('bag-go-fusion').click();
-    await expect(page.getByTestId('fusion-row-kael-1')).toHaveClass(/is-selected/);
+    await expect(page.getByTestId('fusion-row-kael-1')).toBeVisible();
     await page.mouse.move(0, 0);
     await settleImages(page);
     await shot(page, testInfo, '32-fusion-selected');
 
     await page.getByTestId('hero-close').click();
-    await page.getByTestId('hud-fusion').click();
+    await page.getByTestId('hud-bag').click();
+    await page.getByTestId('bag-card-kael').click();
     await expect(page.getByTestId('fusion-button-kael-1')).toBeVisible();
     await page.mouse.move(0, 0);
     await settleImages(page);
@@ -330,7 +332,8 @@ test('fusion error', async ({ page }, testInfo) => {
     const problems = watch(page);
 
     await startAs(page, { copies: { 'kael:4': 3 } });
-    await page.getByTestId('hud-fusion').click();
+    await page.getByTestId('hud-bag').click();
+    await page.getByTestId('bag-card-kael').click();
     await expect(page.getByTestId('fusion-button-kael-4')).toBeVisible();
 
     await page.route('**/api/heroes/*/fuse', (route) => route.fulfill({ status: 500, json: { detail: 'fusion failed' } }));
