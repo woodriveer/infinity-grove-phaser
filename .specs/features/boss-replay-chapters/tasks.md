@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/boss-replay-chapters/spec.md`
 **Design**: `.specs/features/boss-replay-chapters/design.md`
-**Status**: Approved by the owner on 2026-11-17 ("Aprovo os padrões"): every default of Q1 to Q8 accepted. T1 to T14 pending.
+**Status**: Approved by the owner on 2026-11-17 ("Aprovo os padrões"): every default of Q1 to Q8 accepted. T1 to T14 done; the T14 review asked for changes (finding #1 high, #2 low), so T15 to T19 (Phases 6 and 7) fix them under the PO rulings of the spec Assumptions table (rows "UI review #1" and "UI review #2").
 
 Rules for every task:
 
@@ -87,6 +87,18 @@ T11 → T12 → T13
 
 ```
 T13 → T14
+```
+
+### Phase 6: UI review fixes (game)
+
+```
+T14 → T15 → T16 → T17
+```
+
+### Phase 7: UI review fixes (e2e and re-review)
+
+```
+T17 → T18 → T19
 ```
 
 ---
@@ -1011,7 +1023,7 @@ The campaign (`definition` option) stays the default seed, whose miniboss 3 has 
 
 ---
 
-### T14: UI review of the chapter selector [ ]
+### T14: UI review of the chapter selector [x]
 
 **Owner**: ui-artist
 **Goal**: Screenshots and a review of every changed screen against the spec's Visual Spec and the Grove theme (AD-022); findings become new tasks.
@@ -1041,10 +1053,411 @@ The campaign (`definition` option) stays the default seed, whose miniboss 3 has 
 **Gate**: build - `cd game && npm run ui:shots -- bossReplayChapters` exits 0
 **Done when**:
 
-- [ ] 14 PNG files (7 shots x 2 projects) are under `.specs/features/boss-replay-chapters/ui-review/`.
-- [ ] `ui-review.html` names a verdict and lists every finding with its shot.
+- [x] 14 PNG files (7 shots x 2 projects) are under `.specs/features/boss-replay-chapters/ui-review/`.
+- [x] `ui-review.html` names a verdict and lists every finding with its shot.
+
+Result (`b4a4c16`): MUDANÇAS PEDIDAS. Finding #1 (high): the timer covers the end of `Rever chefe: Miniboss 3 (Capítulo 2)`, desktop and phone, shot 03 → T15, T16, T18. Finding #2 (low): the gold dot touches the numeral of the current chip, shots 01, 06, 07 → T17, T18. Both re-reviewed in T19. The two suggestions (focus offset 3px, phone letterbox) are not taken: the focus ring meets the Visual Spec and the letterbox is outside this feature.
 
 **Commit**: `docs(boss-replay-chapters): review the chapter selector UI`
+
+---
+
+### T15: Chapter tag on the second line of the stage plate [ ]
+
+**Owner**: game-dev
+**Goal**: The ` (Capítulo <n>)` tag of an earlier chapter fight draws on a second, smaller line of the stage plate, so the plate stays narrow while its text stays the full label (BRC-08; spec P1-Fight AC 14; UI review #1).
+**Where**: `game/src/adapters/phaser/views/stageLabel.js` (new)
+**Also changes**: `game/src/adapters/phaser/views/stageLabel.test.js` (new), `game/src/adapters/phaser/ClickerGame.js`, `game/src/adapters/phaser/ClickerGame.test.js`, `game/public/style.css`
+**Read first**: `game/src/adapters/phaser/views/dom.js` (`el`), `ClickerGame.js` - search `this.stageHud.textContent = encounter.label;` in `showEncounter (encounter)` (about line 758) and the import `import { el } from './views/dom';` (about line 20); `style.css` - search `.stage-hud:empty {` (about line 610); `ClickerGame.test.js` - `describe('ClickerGame stages')` (about line 1111, helpers `label`, `bossStart`) and `describe('a boss of an earlier chapter')` (about line 2489, helpers `atChapter2`, `chapterOne`)
+**Depends on**: T14
+**Requirement**: BRC-08
+
+**Contract**:
+
+`game/src/adapters/phaser/views/stageLabel.js`, the whole file:
+
+```js
+import { el } from './dom';
+
+//  The stage plate of the HUD (spec boss-replay-chapters, UI review #1). A farm label of an earlier chapter ends with ` (Capítulo <n>)`:
+//  that tag goes in a span drawn on a second, smaller line (style.css .stage-hud-chapter), so the plate stays narrow. The plate's
+//  textContent is always the label unchanged.
+const CHAPTER_TAG = / \(Capítulo \d+\)$/;
+
+export const renderStageLabel = (node, label) =>
+{
+    const match = CHAPTER_TAG.exec(label);
+
+    if (!match)
+    {
+        node.textContent = label;
+
+        return;
+    }
+
+    node.replaceChildren(label.slice(0, match.index), el('span', 'stage-hud-chapter', match[0]));
+};
+```
+
+`ClickerGame.js`: add `import { renderStageLabel } from './views/stageLabel';` after the `./views/skillEffects` import, and in `showEncounter (encounter)` replace
+
+```js
+        this.stageHud.textContent = encounter.label;
+```
+
+with
+
+```js
+        renderStageLabel(this.stageHud, encounter.label);
+```
+
+Nothing else in `ClickerGame.js` changes (`completeChapter` keeps `this.stageHud.textContent = '';`).
+
+`style.css`: insert right after the `.stage-hud:empty { display: none; }` rule (nothing else changes):
+
+```css
+/* A farm fight of an earlier chapter: the tag ` (Capítulo <n>)` on a second, smaller line, so the plate stays narrow
+   and the boss timer has room (spec boss-replay-chapters, UI review #1) */
+.stage-hud:has(.stage-hud-chapter) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.stage-hud-chapter {
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--ink-600);
+    white-space: nowrap;
+}
+```
+
+`white-space: nowrap` drops the leading space of the span at the start of its line; the span's `textContent` keeps it.
+
+**Steps**:
+
+1. Create `stageLabel.js` with the contract above.
+2. Create `stageLabel.test.js` with the cases below (`import { describe, expect, it } from 'vitest';`, `import { renderStageLabel } from './stageLabel';`, each case builds `const node = document.createElement('div');`).
+3. Add the import and replace the one line in `showEncounter` of `ClickerGame.js`.
+4. Add the two `ClickerGame.test.js` cases below.
+5. Paste the CSS block after `.stage-hud:empty`.
+6. Run the gate.
+
+**Tests**: unit (jsdom)
+**Test cases**:
+
+`game/src/adapters/phaser/views/stageLabel.test.js`, `describe('renderStageLabel')`:
+
+- `writes a campaign label as one text`: `renderStageLabel(node, 'Stage 3/10  Miniboss')`; `node.textContent` is `'Stage 3/10  Miniboss'`, `node.childNodes.length` is 1, `node.querySelector('.stage-hud-chapter')` is null.
+- `writes a current chapter farm label as one text`: `renderStageLabel(node, 'Rever chefe: Chefe do capítulo')`; `node.textContent` is `'Rever chefe: Chefe do capítulo'`, `node.querySelector('.stage-hud-chapter')` is null.
+- `puts the chapter of an earlier chapter miniboss on its own line`: `renderStageLabel(node, 'Rever chefe: Miniboss 3 (Capítulo 2)')`; `node.textContent` is `'Rever chefe: Miniboss 3 (Capítulo 2)'`, `node.childNodes.length` is 2, `node.firstChild.nodeValue` is `'Rever chefe: Miniboss 3'`, `node.querySelector('.stage-hud-chapter').textContent` is `' (Capítulo 2)'` (leading space included).
+- `puts a two digit chapter of an earlier chapter boss on its own line`: `renderStageLabel(node, 'Rever chefe: Chefe do capítulo (Capítulo 14)')`; `node.firstChild.nodeValue` is `'Rever chefe: Chefe do capítulo'`, `node.querySelector('.stage-hud-chapter').textContent` is `' (Capítulo 14)'`.
+- `replaces the two lines when the next label has no chapter`: render `'Rever chefe: Miniboss 3 (Capítulo 2)'`, then `renderStageLabel(node, 'Stage 1/10  Phase 1/5')`; `node.textContent` is `'Stage 1/10  Phase 1/5'`, `node.childNodes.length` is 1, `node.querySelector('.stage-hud-chapter')` is null.
+- `leaves no child for an empty label`: render `'Rever chefe: Miniboss 3 (Capítulo 2)'`, then `renderStageLabel(node, '')`; `node.childNodes.length` is 0 (so `.stage-hud:empty` hides the plate).
+
+`game/src/adapters/phaser/ClickerGame.test.js`:
+
+- in `describe('ClickerGame stages')`, `a campaign boss label has no chapter line`: `createScene({ start: bossStart() })`; `label(ctx)` is `'Stage 1/10  Miniboss'` and `ctx.hud('.stage-hud .stage-hud-chapter')` is undefined.
+- in `describe('a boss of an earlier chapter')`, `an earlier chapter fight draws its chapter on the second line of the plate`: `createScene({ start: atChapter2() })`; `farmGateway.get.mockResolvedValue(chapterOne())`; `await ctx.scene.farm.load(1)`; `ctx.scene.startFarm({ kind: 'MINIBOSS', stage: 3, chapter: 1 })`; `label(ctx)` is `'Rever chefe: Miniboss 3 (Capítulo 1)'` and `ctx.hud('.stage-hud .stage-hud-chapter').textContent` is `' (Capítulo 1)'`.
+
+**Gate**: quick - `cd game && npm test`, then build `cd game && npm test && npm run build`
+**Done when**:
+
+- [ ] The 6 `stageLabel.test.js` cases and the 2 new `ClickerGame.test.js` cases pass.
+- [ ] Every existing `ClickerGame.test.js` case passes unchanged, among them `a boss of an earlier chapter fights with the numbers of that chapter and its label` and `a chapter boss of an earlier chapter is labelled with its chapter` (they read `.stage-hud` `textContent`, which is unchanged).
+- [ ] `git diff --stat` lists only `stageLabel.js`, `stageLabel.test.js`, `ClickerGame.js`, `ClickerGame.test.js`, `style.css` and `tasks.md`.
+
+**Commit**: `fix(game): draw the chapter of an earlier chapter fight on a second plate line`
+
+---
+
+### T16: Boss timer beside the stage plate [ ]
+
+**Owner**: game-dev
+**Goal**: The boss timer stays centred on x 512 while the stage plate leaves room, and otherwise starts 12 px after the plate's right edge, so it never covers the label (BRC-08; spec P1-Fight AC 15; UI review #1).
+**Where**: `game/src/adapters/phaser/ClickerGame.js`
+**Also changes**: `game/src/adapters/phaser/ClickerGame.test.js`, `game/public/style.css`
+**Read first**: `ClickerGame.js` - the constants `const STAGE_HUD = { x: 356, y: 44 };` (about line 42) and `const BOSS_TIMER = { x: 512, y: 44 };` (about line 55), `showEncounter (encounter)` (the `if (encounter.timeLimitMs)` block, about line 764), `showCountdown ()` and `hideCountdown ()` (about lines 820-832); `style.css` - the `.boss-timer {` rule (about line 661) and `.hud-stage` / `.hud-timer` (about lines 481 and 522: the plate's box is 400 px wide centred on x 356, so the plate starts at x 156; the timer's box is 240 px wide centred on x 512); `ClickerGame.test.js` - `describe('ClickerGame stages')` helpers `killAll`, `timer`, `left`, `bossStart` and the case `removes --timer-left when the boss is beaten` (about line 1245)
+**Depends on**: T15
+**Requirement**: BRC-08
+
+**Contract**:
+
+Constants, right after `const BOSS_TIMER = { x: 512, y: 44 };`:
+
+```js
+//  The stage plate starts at the left edge of its 400 px box (style.css .hud-stage); the timer keeps 12 px clear of the plate
+const STAGE_HUD_LEFT = STAGE_HUD.x - 200;
+const BOSS_TIMER_GAP = 12;
+```
+
+New method, right after `showCountdown ()`:
+
+```js
+    //  The timer stays centred on x 512 while the stage plate ends 12 px before it; a longer plate pushes it right, 12 px after the plate
+    //  (spec boss-replay-chapters, UI review #1). offsetWidth is in scene px: Phaser scales the DOM layer with a transform
+    placeBossTimer ()
+    {
+        const plateEnd = STAGE_HUD_LEFT + this.stageHud.offsetWidth + BOSS_TIMER_GAP;
+        const timerStart = BOSS_TIMER.x - this.bossTimer.offsetWidth / 2;
+
+        this.bossTimer.style.setProperty('--timer-shift', `${Math.max(0, Math.ceil(plateEnd - timerStart))}px`);
+    }
+```
+
+`showCountdown ()` becomes (the `--timer-left` line is unchanged):
+
+```js
+    showCountdown ()
+    {
+        const text = `Time: ${this.countdown.seconds}`;
+
+        //  The pill's width follows its text, so the timer is placed again only when the text changes, not on every frame
+        if (this.bossTimer.textContent !== text)
+        {
+            this.bossTimer.textContent = text;
+            this.placeBossTimer();
+        }
+
+        //  The ring of the timer fills with the share of the time left, 3 decimals (spec ui-redesign UIR-06)
+        this.bossTimer.style.setProperty('--timer-left', Math.min(1, Math.max(0, this.countdown.remainingMs / this.countdown.limitMs)).toFixed(3));
+    }
+```
+
+In `showEncounter (encounter)`, inside `if (encounter.timeLimitMs) { ... }`, add `this.placeBossTimer();` as the line right after `this.showCountdown();` (a new label with the same timer text must still move the timer).
+
+In `hideCountdown ()`, add `this.bossTimer.style.removeProperty('--timer-shift');` right after `this.bossTimer.style.removeProperty('--timer-left');`.
+
+`style.css`: add these two declarations as the last two lines inside the existing `.boss-timer { ... }` rule (nothing else changes):
+
+```css
+    /* Pushed right by the scene when the stage plate would reach it (spec boss-replay-chapters, UI review #1) */
+    position: relative;
+    left: var(--timer-shift, 0px);
+```
+
+Worked numbers (scene px; widths measured in Chromium with Cinzel): plate 262 + timer 152 → `0px`; plate 283 (`Miniboss 3` + `(Capítulo 2)` on two lines) + timer 152 → `15px`; plate 346 (`Chefe do capítulo` + `(Capítulo 14)`) + timer 162 → `83px`.
+
+**Steps**:
+
+1. Add the two constants.
+2. Add `placeBossTimer ()` after `showCountdown ()`.
+3. Rewrite `showCountdown ()` as above.
+4. Add the `this.placeBossTimer();` line in `showEncounter` and the `removeProperty('--timer-shift')` line in `hideCountdown`.
+5. Add the two CSS declarations to `.boss-timer`.
+6. Add the test block below to `ClickerGame.test.js` and run the gate.
+
+**Tests**: unit (jsdom)
+**Test cases** (`ClickerGame.test.js`, inside `describe('ClickerGame stages')`, after the case `sets no --timer-left on a phase monster`, in a nested `describe('boss timer beside the stage plate', () => { ... })`). jsdom has no layout (`offsetWidth` is 0), so the block stubs it by class name:
+
+```js
+        const widths = { 'stage-hud': 0, 'boss-timer': 0 };
+        const shift = (ctx) => ctx.hud('.boss-timer').style.getPropertyValue('--timer-shift');
+
+        beforeEach(() => {
+            vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(function () { return widths[this.className] ?? 0; });
+        });
+        afterEach(() => vi.restoreAllMocks());
+```
+
+Each case sets `widths['stage-hud']` and `widths['boss-timer']` before `createScene`:
+
+- `keeps the timer centred when the plate ends 12 px before it`: widths 262 / 152; `createScene({ start: bossStart() })`; `shift(ctx)` is `'0px'`.
+- `pushes the timer to 12 px after a plate that reaches it`: widths 283 / 152; `createScene({ start: bossStart() })`; `shift(ctx)` is `'15px'`.
+- `pushes the timer after the widest earlier chapter plate`: widths 346 / 162; `createScene({ start: bossStart() })`; `shift(ctx)` is `'83px'`.
+- `places the timer again when its text changes`: widths 262 / 152; `createScene({ start: bossStart() })`; `shift(ctx)` is `'0px'`; set `widths['stage-hud'] = 300`; `ctx.scene.update(0, 1001)`; `timer(ctx)` is `'Time: 29'` and `shift(ctx)` is `'32px'` (156 + 300 + 12 - 436).
+- `does not place the timer again on a frame whose seconds do not change`: widths 262 / 152; `createScene({ start: bossStart() })`; set `widths['stage-hud'] = 300`; `ctx.scene.update(0, 100)`; `timer(ctx)` is `'Time: 30'` and `shift(ctx)` is `'0px'`.
+- `removes --timer-shift when the boss is beaten`: widths 283 / 152; `createScene({ start: bossStart() })`; `killAll(ctx)`; `shift(ctx)` is `''`.
+- `removes --timer-shift when the boss runs out of time`: widths 283 / 152; `createScene({ start: bossStart() })`; `ctx.scene.update(0, 30000)`; `shift(ctx)` is `''` and `timer(ctx)` is `''`.
+
+**Gate**: quick - `cd game && npm test`, then build `cd game && npm test && npm run build`
+**Done when**:
+
+- [ ] The 7 new cases pass.
+- [ ] Every existing `ClickerGame.test.js` case passes unchanged, among them `counts the boss time down in whole seconds as the scene updates`, `sets --timer-left to 0.750 after 7.5 s of a 30 s countdown`, `removes --timer-left when the boss runs out of time` and `makes the stage position text click-through`.
+- [ ] `git diff --stat` lists only `ClickerGame.js`, `ClickerGame.test.js`, `style.css` and `tasks.md`.
+
+**Commit**: `fix(game): keep the boss timer clear of a long stage plate`
+
+---
+
+### T17: Gold dot clear of the chip numeral [ ]
+
+**Owner**: game-dev
+**Goal**: The gold dot of the current chapter's chip sits 3 px under the numeral, and every chip's numeral keeps one baseline (BRC-09; spec P1-Choose AC 13; Visual Spec rows Chip and Current campaign chapter; UI review #2).
+**Where**: `game/public/style.css`
+**Read first**: `style.css` - search `.farm-chapter {` (about line 2668) and `.farm-chapter.is-current::after {` (about line 2689)
+**Depends on**: T16
+**Requirement**: BRC-09
+
+**Contract**: two value edits, nothing else in the file changes.
+
+In `.farm-chapter { ... }` replace
+
+```css
+    padding: 0 10px;
+```
+
+with
+
+```css
+    /* 3px at the bottom lifts every numeral to a baseline 20px below the top edge, clear of the current chapter's dot (UI review #2) */
+    padding: 0 10px 3px;
+```
+
+In `.farm-chapter.is-current::after { ... }` replace
+
+```css
+    bottom: 3px;
+```
+
+with
+
+```css
+    bottom: 1px;
+```
+
+Result (measured in Chromium with Cinzel 700 15px in a 32px chip with a 2px border): numeral baseline 20px below the chip's top edge, dot from 23px to 29px, 1px clear of the border's inner edge. The dot keeps 6 x 6px, `--gold-400`, `left: 50%`, `margin-left: -3px`.
+
+**Steps**:
+
+1. Make the two edits.
+2. Run the gate.
+
+**Tests**: none (Test Coverage Matrix: CSS is checked by computed styles and geometry in T18 and by the `ui-artist` in T19)
+**Gate**: build - `cd game && npm test && npm run build`
+**Done when**:
+
+- [ ] `npm test` and `npm run build` pass.
+- [ ] `git diff` of `style.css` shows exactly the two changed declarations and the one comment line.
+- [ ] `git diff --stat` lists only `style.css` and `tasks.md`.
+
+**Commit**: `fix(game): lift the chip numerals clear of the current chapter dot`
+
+---
+
+### T18: e2e of the plate, the timer and the dot [ ]
+
+**Owner**: test-engineer
+**Goal**: Playwright pins what the player sees after T15 to T17: the whole earlier chapter label on two lines, the timer clear of the plate and of the wallet, the current chapter label still on one line, and the dot clear of the numeral (BRC-08, BRC-09; spec P1-Fight AC 14, 15; P1-Choose AC 13).
+**Where**: `game/e2e/bossReplayChapters.spec.js`
+**Read first**: `game/e2e/bossReplayChapters.spec.js:1-55` (setup, `startGame`, `openMap`, `farmLabel`, `CHAPTER_2`), the scenario `the chips and the label carry the Visual Spec sizes, weights, borders, radius, padding and shadow` (about line 341), `game/e2e/uiRedesign.spec.js` - the scenario `keeps the battle HUD on the scene anchors of the baseline` (about line 1778: the one-read `page.evaluate` of every box and the `scene()` conversion to the 1024 x 768 scene)
+**Depends on**: T17
+**Requirement**: BRC-08
+
+**Before starting**: another agent was editing `bossReplayChapters.spec.js` when this task was written. Run `git pull --rebase origin main` first; if `git status --short game/e2e/bossReplayChapters.spec.js` still shows edits you did not make, STOP and report it.
+
+**Contract**: one helper added after `countdownLimit` at the top of the file, reading every box in one synchronous step and converting it to scene px:
+
+```js
+//  The HUD boxes in the 1024 x 768 scene, read in one step: the plate, its first text line, its chapter line, the timer and the wallet
+const hudBoxes = (page) => page.evaluate(() => {
+    const canvas = document.querySelector('#game-container canvas').getBoundingClientRect();
+    const scene = (rect) => rect && {
+        left: ((rect.x - canvas.x) * 1024) / canvas.width,
+        right: ((rect.x + rect.width - canvas.x) * 1024) / canvas.width,
+        top: ((rect.y - canvas.y) * 768) / canvas.height,
+        bottom: ((rect.y + rect.height - canvas.y) * 768) / canvas.height,
+        centreY: ((rect.y + rect.height / 2 - canvas.y) * 768) / canvas.height,
+        width: (rect.width * 1024) / canvas.width,
+        height: (rect.height * 768) / canvas.height
+    };
+    const plate = document.querySelector('.stage-hud');
+    const range = document.createRange();
+
+    range.selectNodeContents(plate.firstChild);
+
+    return {
+        plate: scene(plate.getBoundingClientRect()),
+        firstLine: scene(range.getBoundingClientRect()),
+        chapterLine: scene(document.querySelector('.stage-hud .stage-hud-chapter')?.getBoundingClientRect()),
+        timer: scene(document.querySelector('.boss-timer').getBoundingClientRect()),
+        wallet: scene(document.querySelector('.wallet').getBoundingClientRect())
+    };
+});
+//  Spec P1-Fight AC 15: the timer's left edge is max(512 - width / 2, plate right + 12), within 1 scene px
+const expectTimerBesidePlate = ({ plate, timer, wallet }) => {
+    expect(Math.abs(timer.left - Math.max(512 - timer.width / 2, plate.right + 12))).toBeLessThanOrEqual(1);
+    expect(timer.left).toBeGreaterThanOrEqual(plate.right + 11);
+    expect(timer.right).toBeLessThan(wallet.left);
+};
+```
+
+**Steps**:
+
+1. Pull and check the file as said above.
+2. Add `hudBoxes` and `expectTimerBesidePlate`.
+3. In the existing scenario `the chips and the label carry the Visual Spec sizes, weights, borders, radius, padding and shadow`, change `expect(dot[2]).toBe('3px');` to `expect(dot[2]).toBe('1px');` (the spec amended the value: Visual Spec row "Current campaign chapter") and add `await expect(chip).toHaveCSS('padding-bottom', '3px');` after the `padding-left` line. No other existing line changes.
+4. Add the four scenarios below inside `test.describe('Rever chefes: escolher capítulo')`, each a `test(...)` with that exact name. Wait for the label with `await expect(farmLabel(page)).toHaveText(...)` and for the timer with `await expect(page.locator('.boss-timer')).toBeVisible()` before calling `hudBoxes`.
+
+**Tests**: e2e
+**Test cases**:
+
+- `the chapter 2 fight label shows whole on two lines and the timer stands clear of it`: `startGame(page)`; `openMap`; click `farm-chapter-2`; click `farm-entry-miniboss-3`; `farmLabel(page)` has text `Rever chefe: Miniboss 3 (Capítulo 2)`; `page.locator('.stage-hud .stage-hud-chapter')` evaluated `(node) => node.textContent` is `' (Capítulo 2)'`; `page.locator('.stage-hud .stage-hud-chapter')` has CSS `font-size` `14px` and `color` `rgb(107, 74, 43)`; then `const boxes = await hudBoxes(page)`: `Math.abs(boxes.plate.left - 156) <= 1`, `Math.abs(boxes.plate.centreY - 44) <= 1`, `boxes.plate.height <= 56`, `boxes.chapterLine.top >= boxes.firstLine.bottom - 1` (second line), `Math.abs(boxes.chapterLine.left - boxes.firstLine.left) <= 1` (left-aligned), `boxes.chapterLine.right <= boxes.plate.right` and `boxes.firstLine.right <= boxes.plate.right` (both lines inside the plate); `expectTimerBesidePlate(boxes)`.
+- `the longest earlier chapter label keeps the timer clear of the plate and the wallet`: `startGame(page, { progress: { yan: { chapter: 15, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1, completed: true } }, chapterDefinitions: { 14: CHAPTER_2 } })`; `openMap`; click `farm-chapter-14`; title `farm-map-title` `Caminho do Capítulo 14`; click `farm-entry-chapter-boss`; `farmLabel(page)` has text `Rever chefe: Chefe do capítulo (Capítulo 14)`; the chapter line's `textContent` is `' (Capítulo 14)'`; `const boxes = await hudBoxes(page)`: `boxes.plate.height <= 56`, `boxes.chapterLine.top >= boxes.firstLine.bottom - 1`; `expectTimerBesidePlate(boxes)`.
+- `a current chapter fight keeps its label on one line and the timer clear of it`: `startGame(page, { definition: CHAPTER_2 })`; `openMap`; click `farm-entry-miniboss-1`; `farmLabel(page)` has text `Rever chefe: Miniboss 1`; `page.locator('.stage-hud .stage-hud-chapter')` has count 0; `farmLabel(page)` has CSS `font-size` `19px`; `const boxes = await hudBoxes(page)`: `boxes.chapterLine` is undefined, `Math.abs(boxes.plate.left - 156) <= 1`; `expectTimerBesidePlate(boxes)`.
+- `the gold dot of the current chip sits under the numeral, clear of it`: `startGame(page)`; `openMap`; for `farm-chapter-1` and `farm-chapter-3` read, in one `evaluate` each:
+  ```js
+  (node) => {
+      const probe = document.createElement('span');
+
+      probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+      node.append(probe);
+      const chip = node.getBoundingClientRect();
+      const scale = chip.height / node.offsetHeight;
+      const baseline = (probe.getBoundingClientRect().top - chip.top) / scale;
+
+      probe.remove();
+      const after = getComputedStyle(node, '::after');
+
+      return { baseline, dotTop: node.offsetHeight - parseFloat(getComputedStyle(node).borderBottomWidth) - parseFloat(after.bottom) - parseFloat(after.height) };
+  }
+  ```
+  `farm-chapter-3` `dotTop` is `23`; `farm-chapter-3` `dotTop - baseline >= 2`; `Math.abs(chip1.baseline - chip3.baseline) <= 0.5` (one baseline across the row); `farm-chapter-3` text is still `3` after the read (the probe is gone).
+
+**Gate**: full - `cd game && npx playwright test e2e/bossReplayChapters.spec.js e2e/farm.spec.js e2e/bossMap.spec.js`, then `cd game && npx playwright test e2e/uiRedesign.spec.js -g "scene anchors"` (UIR-04 AC 7: the timer still centred on x 512 in a campaign boss fight)
+**Done when**:
+
+- [ ] The 4 new scenarios pass, and every other scenario of `bossReplayChapters.spec.js`, `farm.spec.js` and `bossMap.spec.js` passes.
+- [ ] `keeps the battle HUD on the scene anchors of the baseline` passes unchanged.
+- [ ] The only changed existing lines are the `dot[2]` value (`'3px'` to `'1px'`) and the added `padding-bottom` line; `git diff --stat` lists only `bossReplayChapters.spec.js` and `tasks.md`.
+
+**Commit**: `test(e2e): pin the two-line chapter plate, the timer beside it and the chip dot`
+
+---
+
+### T19: UI re-review of the plate, the timer and the dot [ ]
+
+**Owner**: ui-artist
+**Goal**: Check findings #1 and #2 of the T14 review against the amended Visual Spec on new screenshots; a pass closes the review, any finding becomes a task (BRC-08, BRC-09; AD-022).
+**Where**: `game/ui-review/bossReplayChapters.shots.js`
+**Also changes**: `.specs/features/boss-replay-chapters/ui-review.html`, `.specs/features/boss-replay-chapters/ui-review/*.png`
+**Read first**: spec Visual Spec rows "Chip", "Current campaign chapter", "HUD plate of an earlier chapter fight", "Boss timer beside the plate"; spec Assumptions rows "UI review #1" and "UI review #2"; the T14 `ui-review.html` (findings #1 and #2)
+**Depends on**: T18
+**Requirement**: BRC-08
+
+**Contract**: shots 01 to 07 are taken again unchanged (same names, they overwrite the T14 files), plus two new tests in `bossReplayChapters.shots.js`, both projects of `ui-review.config.js`:
+
+8. `08-chapter-14-boss-label` - `start(page, { progress: { yan: { chapter: 15, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1, completed: true } }, chapterDefinitions: { 14: CHAPTER_2 } })`, open the map, click `farm-chapter-14`, click `farm-entry-chapter-boss`, wait for `.stage-hud` text `Rever chefe: Chefe do capítulo (Capítulo 14)`, shot. The longest label: two lines, timer pushed right, clear of the wallet.
+9. `09-current-chapter-fight-label` - `start(page, { definition: CHAPTER_2 })`, open the map, click `farm-entry-miniboss-1`, wait for `.stage-hud` text `Rever chefe: Miniboss 1`, shot. A current chapter label on one 19px line with the timer beside it.
+
+**Steps**:
+
+1. Add tests 08 and 09; run `cd game && npm run ui:shots -- bossReplayChapters`.
+2. Check shots 03, 08, 09 (desktop and phone): the whole label is readable, the chapter line sits under the first line, left-aligned, 14px `--ink-600`; the timer starts 12px after the plate and never covers it; the timer ends before the wallet; the plate stays inside the top row (no overlap with the `Capítulo` tag at y 96 or the effects row).
+3. Check shots 01, 06, 07: the dot sits under the numeral with a visible gap; numerals of all chips on one line; the focus ring of 07 unchanged.
+4. Rewrite `ui-review.html` from `.claude/templates/ui-review.html` as the round 2 review: verdict (APROVADO or REPROVADO), findings #1 and #2 marked resolved with their shots, any new finding with severity and shot.
+
+**Tests**: none (review task; the screenshots are not tests)
+**Gate**: build - `cd game && npm run ui:shots -- bossReplayChapters` exits 0
+**Done when**:
+
+- [ ] 18 PNG files (9 shots x 2 projects) are under `.specs/features/boss-replay-chapters/ui-review/`.
+- [ ] `ui-review.html` names a verdict and states, for findings #1 and #2, resolved or not with the shot that shows it.
+
+**Commit**: `docs(ui-review): re-review the chapter plate, the boss timer and the chip dot`
 
 ---
 
@@ -1070,9 +1483,13 @@ Phase 2:  T4 ------→ T5 ------→ T6 ------→ T7         game-dev
 Phase 3:  T8 ------→ T9 ------→ T10 -----→ T11        game-dev
 Phase 4:  T12 -----→ T13                              test-engineer
 Phase 5:  T14                                         ui-artist
+Phase 6:  T15 -----→ T16 -----→ T17                   game-dev
+Phase 7:  T18 -----→ T19                              test-engineer, ui-artist
 ```
 
 14 tasks: batches by whole phases (~7 tasks each): batch 1 = Phases 1 (backend worker), batch 2 = Phases 2 and 3 (game worker, 8 tasks, one tight chain), batch 3 = Phases 4 and 5. Then the `verifier` runs.
+
+UI review fixes (T15 to T19): one game worker runs Phase 6 (3 tasks, one chain: T15 and T16 both edit `ClickerGame.js` and `style.css`, T17 edits `style.css`), then the `test-engineer` runs T18 and the `ui-artist` T19. The `verifier` re-verifies scoped to BRC-08 and BRC-09 and these five tasks, then runs the full suites for the final PASS round.
 
 ---
 
@@ -1094,6 +1511,11 @@ Phase 5:  T14                                         ui-artist
 | T12: fake backend farm | 1 handler | ✅ Granular |
 | T13: e2e spec | 1 spec file | ✅ Granular |
 | T14: UI review | 1 shots file + report | ✅ Granular |
+| T15: chapter line of the plate | 1 view function + 1 call site + 1 CSS block | ✅ Granular |
+| T16: timer beside the plate | 1 method + 3 call sites, 1 file (+ 2 CSS lines) | ✅ Granular |
+| T17: chip dot spacing | 2 CSS values | ✅ Granular |
+| T18: e2e of plate, timer, dot | 1 spec file | ✅ Granular |
+| T19: UI re-review | 1 shots file + report | ✅ Granular |
 
 ## Diagram-Definition Cross-Check
 
@@ -1113,6 +1535,11 @@ Phase 5:  T14                                         ui-artist
 | T12 | T11 | T11 → T12 | ✅ Match |
 | T13 | T12 | T12 → T13 | ✅ Match |
 | T14 | T13 | T13 → T14 | ✅ Match |
+| T15 | T14 | T14 → T15 | ✅ Match |
+| T16 | T15 | T15 → T16 | ✅ Match |
+| T17 | T16 | T16 → T17 | ✅ Match |
+| T18 | T17 | T17 → T18 | ✅ Match |
+| T19 | T18 | T18 → T19 | ✅ Match |
 
 ## Test Co-location Validation
 
@@ -1132,3 +1559,8 @@ Phase 5:  T14                                         ui-artist
 | T12 | e2e support | e2e | e2e | ✅ OK |
 | T13 | e2e | e2e | e2e | ✅ OK |
 | T14 | Review artefacts | none | none | ✅ OK |
+| T15 | Game view + scene + CSS | unit (jsdom) | unit (jsdom) | ✅ OK |
+| T16 | Game scene + CSS | unit (jsdom) | unit (jsdom) | ✅ OK |
+| T17 | Game CSS | none | none (checked in T18 and T19) | ✅ OK |
+| T18 | e2e | e2e | e2e | ✅ OK |
+| T19 | Review artefacts | none | none | ✅ OK |

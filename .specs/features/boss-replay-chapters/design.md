@@ -163,6 +163,8 @@ Errors: 400 ProblemDetail `{ "status": 400, "detail": "chapter must be an intege
 
 - **farmView** `renderFarm(bosses, winsLeft, { onPick, map, chapters = [], chapter = null, currentChapter = null, busy = false, onChapter = () => {} })` - draws the chip row when `chapters.length >= 2`.
 - **HeroUi** - `show('farm', { chapter })` loads that chapter (HUD opening passes none, so the current chapter loads); `render_farm` feeds the row, `farmMapPosition` and adds `chapter` to the picked boss only when the listed chapter differs from the current campaign chapter; `selectFarmChapter(n)` loads with the chips disabled.
+- **stageLabel** (UI review #1, T15) `renderStageLabel(node, label)` in `game/src/adapters/phaser/views/stageLabel.js` - a label ending with ` (Capítulo <n>)` becomes a text node plus `span.stage-hud-chapter`, so the tag draws on a second line; any other label is written as text. The plate's `textContent` is the label unchanged.
+- **ClickerGame timer placement** (UI review #1, T16) `placeBossTimer()` - writes `--timer-shift` = `max(0, ceil(156 + stageHud.offsetWidth + 12 - (512 - bossTimer.offsetWidth / 2)))` px; called after the countdown starts in `showEncounter` and when the timer text changes in `showCountdown` (not on every frame); `hideCountdown` removes it. `offsetWidth` is in scene px because Phaser scales the DOM layer with a transform.
 - **ClickerGame** - `farmEncounterFor(boss)`: `boss.chapter` integer → `farmEncounterOf(this.farm.definitionOf(boss.chapter), boss)` (null definition → no fight); else `this.session.farmEncounter(boss)`. `startFarm` and `nextFarmEncounter` use it; the chapter boss at 0 wins reopens `show('farm', { chapter: boss.chapter })` when the boss has a chapter.
 
 ---
