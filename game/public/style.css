@@ -2192,9 +2192,10 @@ button:disabled {
 .piece-gems {
     position: absolute;
     top: -5px;
-    left: 4px;
+    left: 50%;
     display: flex;
     gap: 2px;
+    transform: translateX(-50%);
     pointer-events: none;
 }
 

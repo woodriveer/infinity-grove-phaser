@@ -205,8 +205,8 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| BAG-01 | P1: Centered rarity gems | T7, T13, T16 | Pending |
-| BAG-02 | P1: Centered rarity gems | T7, T13 | Pending |
+| BAG-01 | P1: Centered rarity gems | T7, T13, T16 | Implementing |
+| BAG-02 | P1: Centered rarity gems | T7, T13 | Implementing |
 | BAG-03 | P1: One card per hero | T8, T11, T13 | Pending |
 | BAG-04 | P1: One card per hero | T8, T10, T13 | Pending |
 | BAG-05 | P1: One card per hero | T6, T8, T10, T13 | Implementing |

@@ -547,7 +547,7 @@ export const fuseAllResultText = ({ heroName, fusions, stars, raised = [] }) =>
 
 ---
 
-### T7: Center the rarity gems on the item tiles [ ]
+### T7: Center the rarity gems on the item tiles [x]
 
 **Owner**: game-dev
 **Goal**: The gem row of every piece tile sits centered on the top edge (BAG-01, BAG-02).
@@ -581,8 +581,8 @@ Nothing else in the file changes: `.piece-gem`, `.piece-refine`, `.piece-tile` a
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `git diff game/public/style.css` shows only the two lines of `.piece-gems`.
-- [ ] `npm test` and `npm run build` pass.
+- [x] `git diff game/public/style.css` shows only the two lines of `.piece-gems`.
+- [x] `npm test` and `npm run build` pass.
 
 **Commit**: `fix(game): center the rarity gems on the item tiles`
 
