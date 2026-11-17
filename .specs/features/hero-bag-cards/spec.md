@@ -209,18 +209,18 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-02 | P1: Centered rarity gems | T7, T13 | Pending |
 | BAG-03 | P1: One card per hero | T8, T11, T13 | Pending |
 | BAG-04 | P1: One card per hero | T8, T10, T13 | Pending |
-| BAG-05 | P1: One card per hero | T6, T8, T10, T13 | Pending |
+| BAG-05 | P1: One card per hero | T6, T8, T10, T13 | Implementing |
 | BAG-06 | P1: One card per hero | T8, T13 | Pending |
-| BAG-07 | P1: One card per hero | T6, T8, T13, T14 | Pending |
-| BAG-08 | P1: One card per hero | T6, T8, T13 | Pending |
+| BAG-07 | P1: One card per hero | T6, T8, T13, T14 | Implementing |
+| BAG-08 | P1: One card per hero | T6, T8, T13 | Implementing |
 | BAG-09 | P1: One card per hero | T8, T13 | Pending |
 | BAG-10 | P1: One card per hero | T8, T11, T13 | Pending |
 | BAG-11 | P1: One card per hero | T10, T13 | Pending |
 | BAG-12 | P1: Fusion ladder | T9, T11, T13 | Pending |
-| BAG-13 | P1: Fusion ladder | T6, T9, T13 | Pending |
-| BAG-14 | P1: Fusion ladder | T6, T9, T10, T13 | Pending |
-| BAG-15 | P1: Fusion ladder | T6, T9, T11, T13 | Pending |
-| BAG-16 | P1: Fusion ladder | T6, T9, T13, T14 | Pending |
+| BAG-13 | P1: Fusion ladder | T6, T9, T13 | Implementing |
+| BAG-14 | P1: Fusion ladder | T6, T9, T10, T13 | Implementing |
+| BAG-15 | P1: Fusion ladder | T6, T9, T11, T13 | Implementing |
+| BAG-16 | P1: Fusion ladder | T6, T9, T13, T14 | Implementing |
 | BAG-17 | P1: Fusion ladder | T11, T13, T14 | Pending |
 | BAG-18 | P1: Fusion ladder | T9, T11, T12, T13 | Pending |
 | BAG-19 | P1: Fusion ladder | T11, T13, T14 | Pending |
@@ -235,12 +235,12 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-28 | P1: Fundir tudo on the server | T3 | Implementing |
 | BAG-29 | P1: Fundir tudo on the server | T3 | Implementing |
 | BAG-30 | P1: Fundir tudo on the server | T3 | Implementing |
-| BAG-31 | P1: Fundir tudo on the screen | T6, T9, T12, T13 | Pending |
-| BAG-32 | P1: Fundir tudo on the screen | T6, T9, T12, T13 | Pending |
+| BAG-31 | P1: Fundir tudo on the screen | T6, T9, T12, T13 | Implementing |
+| BAG-32 | P1: Fundir tudo on the screen | T6, T9, T12, T13 | Implementing |
 | BAG-33 | P1: Fundir tudo on the screen | T9, T12, T13 | Pending |
 | BAG-34 | P1: Fundir tudo on the screen | T9, T12, T13 | Pending |
 | BAG-35 | P1: Fundir tudo on the screen | T4, T5, T6, T12, T13 | Implementing |
-| BAG-36 | P1: Fundir tudo on the screen | T6, T12, T13 | Pending |
+| BAG-36 | P1: Fundir tudo on the screen | T6, T12, T13 | Implementing |
 | BAG-37 | P1: Fundir tudo on the screen | T12, T13 | Pending |
 | BAG-38 | P2: One way into the cards | T11, T13, T15 | Pending |
 | BAG-39 | P2: One way into the cards | T11 | Pending |

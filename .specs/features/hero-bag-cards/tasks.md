@@ -406,7 +406,7 @@ fuseAll: async (heroId) =>
 
 ---
 
-### T6: Bag card and ladder rules (domain/heroes/bagCards.js) [ ]
+### T6: Bag card and ladder rules (domain/heroes/bagCards.js) [x]
 
 **Owner**: game-dev
 **Goal**: Every number and text the cards, the ladder and Fundir tudo show, as pure functions (BAG-05, BAG-07, BAG-08, BAG-13, BAG-14, BAG-15, BAG-16, BAG-31, BAG-32, BAG-35, BAG-36).
@@ -541,7 +541,7 @@ export const fuseAllResultText = ({ heroName, fusions, stars, raised = [] }) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 22 cases pass; the hexagonal import test of the game still passes (`bagCards.js` imports only from `domain/`).
+- [x] The 22 cases pass; the hexagonal import test of the game still passes (`bagCards.js` imports only from `domain/`).
 
 **Commit**: `feat(game): add the bag card and fusion ladder rules`
 
