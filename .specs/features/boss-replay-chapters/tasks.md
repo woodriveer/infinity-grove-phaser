@@ -1283,7 +1283,7 @@ Each case sets `widths['stage-hud']` and `widths['boss-timer']` before `createSc
 
 ---
 
-### T17: Gold dot clear of the chip numeral [ ]
+### T17: Gold dot clear of the chip numeral [x]
 
 **Owner**: game-dev
 **Goal**: The gold dot of the current chapter's chip sits 3 px under the numeral, and every chip's numeral keeps one baseline (BRC-09; spec P1-Choose AC 13; Visual Spec rows Chip and Current campaign chapter; UI review #2).
@@ -1330,9 +1330,9 @@ Result (measured in Chromium with Cinzel 700 15px in a 32px chip with a 2px bord
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `npm test` and `npm run build` pass.
-- [ ] `git diff` of `style.css` shows exactly the two changed declarations and the one comment line.
-- [ ] `git diff --stat` lists only `style.css` and `tasks.md`.
+- [x] `npm test` and `npm run build` pass.
+- [x] `git diff` of `style.css` shows exactly the two changed declarations and the one comment line.
+- [x] `git diff --stat` lists only `style.css` and `tasks.md`.
 
 **Commit**: `fix(game): lift the chip numerals clear of the current chapter dot`
 

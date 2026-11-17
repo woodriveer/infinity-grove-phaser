@@ -2686,7 +2686,8 @@ body.piece-dragging .piece-tooltip {
     position: relative;
     min-width: 40px;
     height: 32px;
-    padding: 0 10px;
+    /* 3px at the bottom lifts every numeral to a baseline 20px below the top edge, clear of the current chapter's dot (UI review #2) */
+    padding: 0 10px 3px;
     font-family: var(--font-heading);
     font-size: 15px;
     font-weight: 700;
@@ -2710,7 +2711,7 @@ body.piece-dragging .piece-tooltip {
     content: '';
     position: absolute;
     left: 50%;
-    bottom: 3px;
+    bottom: 1px;
     width: 6px;
     height: 6px;
     margin-left: -3px;
