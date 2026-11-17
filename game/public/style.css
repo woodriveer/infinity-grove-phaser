@@ -1993,8 +1993,17 @@ button.bag-card:hover:not(:disabled) {
 }
 
 .fusion-all-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
     margin: 0;
-    font: 600 14px var(--font-body);
+    font: 600 15px var(--font-body);
+}
+
+.fusion-all-before,
+.fusion-all-after {
+    margin: 0;
+    overflow-wrap: anywhere;
 }
 
 .fusion-all-actions {

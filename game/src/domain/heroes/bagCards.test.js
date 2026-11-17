@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-    barWidth, canFuseAny, cascade, chipText, copyLayers, frameTier, fuseAllQuestion, fuseAllResultText, ladderRows, layersText, previewText, raisedSkills
+    barWidth, canFuseAny, cascade, chipText, copyLayers, frameTier, fuseAllQuestion, fuseAllResultText, ladderRows, layersText, previewLines, raisedSkills
 } from './bagCards';
 
 const hero = (copies, skills = []) => ({ id: 'kael', name: 'Kael', copies, skills });
@@ -118,9 +118,17 @@ describe('layersText', () => {
     });
 });
 
-describe('previewText', () => {
-    it('previewText of 45, 1 and 2 copies', () => {
-        expect(previewText(hero({ 0: 45, 1: 1, 2: 2 }))).toBe('45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★');
+describe('previewLines', () => {
+    it('previewLines of 45, 1 and 2 copies', () => {
+        expect(previewLines(hero({ 0: 45, 1: 1, 2: 2 }))).toEqual({ before: 'Antes: 45×0★ + 1×1★ + 2×2★', after: 'Depois: 1×1★ + 1×2★ + 2×3★' });
+    });
+
+    it('previewLines of 3 blank copies', () => {
+        expect(previewLines(hero({ 0: 3 }))).toEqual({ before: 'Antes: 3×0★', after: 'Depois: 1×1★' });
+    });
+
+    it('previewLines keeps the copies left and the 9-star copies', () => {
+        expect(previewLines(hero({ 8: 7, 9: 1 }))).toEqual({ before: 'Antes: 7×8★ + 1×9★', after: 'Depois: 1×8★ + 3×9★' });
     });
 });
 

@@ -1584,7 +1584,7 @@ The global `button:disabled { cursor: not-allowed; }` (about `style.css:203`) is
 
 ---
 
-### T19: Split the Fundir tudo preview into Antes and Depois lines [ ]
+### T19: Split the Fundir tudo preview into Antes and Depois lines [x]
 
 **Owner**: game-dev
 **Goal**: The confirmation of Fundir tudo shows two labelled preview lines, `Antes: <before>` and `Depois: <after>`, at 15 px, instead of the arrow line (BAG-32 as amended; spec D14, D21; review finding #6).

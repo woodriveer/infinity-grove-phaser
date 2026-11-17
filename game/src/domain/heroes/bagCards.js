@@ -65,12 +65,15 @@ export const cascade = (hero) =>
 //  '45×0★ + 1×1★ + 2×2★' from [ { stars, copies } ]; layers with 0 copies are left out
 export const layersText = (layers) => layers.filter(({ copies }) => copies >= 1).map(({ stars, copies }) => `${copies}×${stars}★`).join(' + ');
 
-//  '45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★'
-export const previewText = (hero) =>
+//  The two lines of the Fundir tudo preview: { before: 'Antes: 45×0★ + 1×1★ + 2×2★', after: 'Depois: 1×1★ + 1×2★ + 2×3★' }
+export const previewLines = (hero) =>
 {
     const { after } = cascade(hero);
 
-    return `${layersText(copyLayers(hero))} → ${layersText(LAYERS.map((stars) => ({ stars, copies: after[stars] })))}`;
+    return {
+        before: `Antes: ${layersText(copyLayers(hero))}`,
+        after: `Depois: ${layersText(LAYERS.map((stars) => ({ stars, copies: after[stars] })))}`
+    };
 };
 
 //  'Fazer 22 fusões?' / 'Fazer 1 fusão?'

@@ -134,7 +134,11 @@ describe('renderBagHero', () => {
         const detail = draw(kael({ 0: 45, 1: 1, 2: 2 }, 2), { confirming: true });
 
         expect(byTestid(detail, 'fusion-all-question').textContent).toBe('Fazer 22 fusões?');
-        expect(byTestid(detail, 'fusion-all-preview').textContent).toBe('45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★');
+        expect(byTestid(detail, 'fusion-all-preview').tagName).toBe('DIV');
+        expect([ ...byTestid(detail, 'fusion-all-preview').children ].map((child) => child.getAttribute('data-testid'))).toEqual([ 'fusion-all-before', 'fusion-all-after' ]);
+        expect(byTestid(detail, 'fusion-all-before').textContent).toBe('Antes: 45×0★ + 1×1★ + 2×2★');
+        expect(byTestid(detail, 'fusion-all-after').textContent).toBe('Depois: 1×1★ + 1×2★ + 2×3★');
+        expect(byTestid(detail, 'fusion-all-preview').textContent).not.toContain('→');
         expect(byTestid(detail, 'fusion-all-yes').textContent).toBe('Sim, fundir');
         expect(byTestid(detail, 'fusion-all-no').textContent).toBe('Não');
         expect(byTestid(detail, 'fusion-button-kael-0').disabled).toBe(true);

@@ -1,4 +1,4 @@
-import { barWidth, canFuseAny, cascade, fuseAllQuestion, fuseAllResultText, ladderRows, previewText } from '../../../domain/heroes/bagCards';
+import { barWidth, canFuseAny, cascade, fuseAllQuestion, fuseAllResultText, ladderRows, previewLines } from '../../../domain/heroes/bagCards';
 import { starsClass } from '../../../domain/heroes/heroes';
 import { renderHeroCard } from './bagView';
 import { renderSkillList } from './catalogView';
@@ -47,10 +47,17 @@ const renderConfirm = (hero, { busy, onConfirmAll, onDeclineAll }) =>
     no.disabled = busy;
     yes.addEventListener('click', () => onConfirmAll());
     no.addEventListener('click', () => onDeclineAll());
+    const { before, after } = previewLines(hero);
+    const preview = el('div', 'fusion-all-preview', '', { testid: 'fusion-all-preview' });
+
+    preview.append(
+        el('p', 'fusion-all-before', before, { testid: 'fusion-all-before' }),
+        el('p', 'fusion-all-after', after, { testid: 'fusion-all-after' })
+    );
     actions.append(yes, no);
     box.append(
         el('p', 'fusion-all-question', fuseAllQuestion(cascade(hero).fusions), { testid: 'fusion-all-question' }),
-        el('p', 'fusion-all-preview', previewText(hero), { testid: 'fusion-all-preview' }),
+        preview,
         actions
     );
 

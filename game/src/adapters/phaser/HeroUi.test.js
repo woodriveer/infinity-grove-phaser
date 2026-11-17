@@ -956,7 +956,8 @@ describe('HeroUi Fundir tudo', () => {
         ctx.testid('fusion-all').click();
 
         expect(ctx.testid('fusion-all-question').textContent).toBe('Fazer 22 fusões?');
-        expect(ctx.testid('fusion-all-preview').textContent).toBe('45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★');
+        expect(ctx.testid('fusion-all-before').textContent).toBe('Antes: 45×0★ + 1×1★ + 2×2★');
+        expect(ctx.testid('fusion-all-after').textContent).toBe('Depois: 1×1★ + 1×2★ + 2×3★');
         expect(ctx.heroesGateway.fuseAll).not.toHaveBeenCalled();
         expect(ctx.testid('fusion-button-kael-0').disabled).toBe(true);
         expect(ctx.testid('fusion-all').disabled).toBe(true);
