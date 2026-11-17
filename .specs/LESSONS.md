@@ -582,6 +582,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: D9 deploy/db/copyToSupabase.mjs:89 (tests)
 - last seen: 2026-11-16T19:37:06Z
 
+### L-096 - When a screen disables controls while a request is pending, specify and test what closing and reopening the screen does to that pending request
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `game/ui-async` · harmful: 0
+- features: boss-replay-chapters
+- evidence: game/src/adapters/phaser/HeroUi.js:726 (validation.md F1) (game/ui-async)
+- last seen: 2026-11-17T11:44:39Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
