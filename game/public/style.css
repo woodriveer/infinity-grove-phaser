@@ -1692,10 +1692,12 @@ button:disabled {
     font-family: var(--font-body);
     color: var(--ink-900);
     cursor: pointer;
+    isolation: isolate;
 }
 
 button.bag-card:hover:not(:disabled) {
-    box-shadow: var(--card-shadow), 0 0 0 4px rgb(243 213 138 / 0.5);
+    box-shadow: var(--card-shadow), 0 0 0 4px var(--gold-400);
+    filter: brightness(1.06);
 }
 
 .bag-card:focus-visible {
@@ -1714,6 +1716,10 @@ button.bag-card:hover:not(:disabled) {
 }
 
 .bag-card-ribbon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(2.3em + 8px);
     margin-top: -10px;
     width: calc(100% + 12px);
     padding: 4px 14px;
@@ -1789,11 +1795,24 @@ button.bag-card:hover:not(:disabled) {
     color: var(--color-neutral-700);
 }
 
+/* The card text sits above the frame ornaments (::before, ::after); the badges stay absolute */
+.bag-card-chips,
+.bag-card-ribbon,
+.bag-card-missing {
+    position: relative;
+    z-index: 1;
+}
+
+.bag-card-star,
+.bag-card-fuse {
+    z-index: 2;
+}
+
 /* Card frames: colour, ornament shape and glow tell the tiers apart; drawn with CSS only, nothing moves */
 .bag-card.frame-wood {
     --card-frame: var(--bronze-500);
-    --card-shadow: 0 0 0 2px var(--wood-900), inset 0 0 0 1px var(--bronze-500);
-    border: 4px solid var(--wood-600);
+    --card-shadow: 0 0 0 2px var(--wood-800), inset 0 0 0 1px #d49a5c;
+    border: 4px solid #a06a35;
     box-shadow: var(--card-shadow);
 }
 
@@ -1822,12 +1841,16 @@ button.bag-card:hover:not(:disabled) {
 
 .bag-card.frame-wood::before {
     background-image:
+        radial-gradient(circle, #cfcfcf 0 1.5px, transparent 2px),
+        radial-gradient(circle, #cfcfcf 0 1.5px, transparent 2px),
+        radial-gradient(circle, #cfcfcf 0 1.5px, transparent 2px),
+        radial-gradient(circle, #cfcfcf 0 1.5px, transparent 2px),
         linear-gradient(135deg, #8a8a8a, #3a3a3a),
         linear-gradient(135deg, #8a8a8a, #3a3a3a),
         linear-gradient(135deg, #8a8a8a, #3a3a3a),
         linear-gradient(135deg, #8a8a8a, #3a3a3a);
     background-size: 12px 12px;
-    background-position: top left, top right, bottom left, bottom right;
+    background-position: top left, top right, bottom left, bottom right, top left, top right, bottom left, bottom right;
 }
 
 .bag-card.frame-silver::before {
@@ -1835,9 +1858,20 @@ button.bag-card:hover:not(:disabled) {
         radial-gradient(circle, #6fa85a 0 5px, transparent 6px),
         radial-gradient(circle, #6fa85a 0 5px, transparent 6px),
         radial-gradient(circle, #6fa85a 0 5px, transparent 6px),
-        radial-gradient(circle, #6fa85a 0 5px, transparent 6px);
-    background-size: 14px 14px;
-    background-position: top left, top right, bottom left, bottom right;
+        radial-gradient(circle, #6fa85a 0 5px, transparent 6px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px),
+        radial-gradient(circle, #5f8f4a 0 4px, transparent 5px);
+    background-size: 14px 14px, 14px 14px, 14px 14px, 14px 14px, 10px 10px, 10px 10px, 10px 10px, 10px 10px, 10px 10px, 10px 10px, 10px 10px, 10px 10px;
+    background-position:
+        top left, top right, bottom left, bottom right,
+        left 14px top 0, left 0 top 14px, right 14px top 0, right 0 top 14px,
+        left 14px bottom 0, left 0 bottom 14px, right 14px bottom 0, right 0 bottom 14px;
 }
 
 .bag-card.frame-gold::before {
@@ -1860,7 +1894,7 @@ button.bag-card:hover:not(:disabled) {
         radial-gradient(circle, #fff6c8 0 2px, transparent 3px),
         radial-gradient(circle, #fff6c8 0 2px, transparent 3px);
     background-size: 8px 8px;
-    background-position: 18% 12%, 82% 20%, 70% 88%;
+    background-position: 18% 8%, 82% 14%, 50% 99%;
 }
 
 /* The hero detail: the card on the left, the ladder on the right, the skills under both */
@@ -1878,6 +1912,16 @@ button.bag-card:hover:not(:disabled) {
 
 .bag-detail .bag-card {
     cursor: default;
+}
+
+.bag-detail .bag-card-fuse {
+    display: none;
+}
+
+.bag-detail .fusion-result {
+    font-size: 16px;
+    line-height: 1.4;
+    text-wrap: balance;
 }
 
 .bag-detail .fusion-row {

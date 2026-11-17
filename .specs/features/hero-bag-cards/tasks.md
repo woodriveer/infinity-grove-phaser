@@ -1364,7 +1364,7 @@ Result (`4dc43c3`): ALTERAÇÕES, no high finding. #1 (medium) gold sparkles ove
 
 ---
 
-### T17: Card frames, hover, sparkles, ribbon and result line styles [ ]
+### T17: Card frames, hover, sparkles, ribbon and result line styles [x]
 
 **Owner**: game-dev
 **Goal**: Fix findings #1, #2, #3 and #5 of the T16 review and take the two review suggestions, in CSS only: the card text sits above every ornament, the hover ring shows, the wood frame reads as warm wood with riveted iron corners, the silver frame gets vines, the Mochila result line is 16 px and balanced, the detail card hides its Fundir badge and the ribbon reserves two lines (BAG-04, BAG-05, BAG-07, BAG-08, BAG-11, BAG-17, BAG-35; spec D24, D25, D26).
