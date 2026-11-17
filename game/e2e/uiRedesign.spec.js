@@ -849,6 +849,7 @@ test.describe('Grove theme', () => {
         expect(await page.locator('.tag-element').getAttribute('data-element')).toBe('NATURE');
         expect((await css(page.locator('.tag-element'), [ 'background-color' ], '::before'))['background-color']).toBe('rgb(79, 154, 60)');
         expect((await css(page.locator('.tag-element'), [ 'width' ], '::before')).width).toBe('10px');
+        expect((await css(page.locator('.tag-element'), [ 'height' ], '::before')).height).toBe('10px');
         expect((await css(page.locator('[data-stat="physical"]'), [ 'background-color' ], '::before'))['background-color']).toBe('rgb(176, 122, 58)');
         expect((await css(page.locator('[data-stat="physical"]'), [ 'width' ], '::before')).width).toBe('12px');
         expect((await css(page.locator('[data-stat="magical"]'), [ 'background-color' ], '::before'))['background-color']).toBe('rgb(63, 143, 209)');
@@ -1115,12 +1116,22 @@ test.describe('Grove theme', () => {
         const canvas = await canvasBox(page);
 
         expect(await button.evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 56, 56 ]);
-        await expectStyle(button, { 'background-color': 'rgb(43, 29, 20)', 'border-top-width': '3px' });
+        await expectStyle(button, { 'background-color': 'rgb(43, 29, 20)', 'border-top-width': '3px', 'border-top-left-radius': '50%' });
         expect(await button.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('data:image/svg+xml');
         //  UIR-19 AC1: the pointer icon is drawn in rgb(243, 213, 138), #f3d58a
         expect(await button.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('%23f3d58a');
         await expect(page.getByTestId('auto-click-key')).toHaveText('A');
-        expect(await page.getByTestId('auto-click-key').evaluate((node) => node.offsetWidth)).toBe(20);
+        expect(await page.getByTestId('auto-click-key').evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 20, 20 ]);
+        //  UIR-19 AC2: the badge has the look of the skill key badges (UIR-10 AC26)
+        await expectStyle(page.getByTestId('auto-click-key'), {
+            'background-color': 'rgb(28, 18, 12)',
+            'border-top-width': '1px',
+            'border-top-color': 'rgb(224, 180, 90)',
+            'font-family': expect.stringMatching(/^"?Cinzel/),
+            'font-weight': '700',
+            'font-size': '12px',
+            color: 'rgb(243, 213, 138)'
+        });
         //  UIR-19 AC2: the key badge sits on the top left of the button
         const badgeBox = await page.getByTestId('auto-click-key').boundingBox();
         const buttonBox = await button.boundingBox();
@@ -1514,6 +1525,7 @@ test.describe('Grove theme', () => {
         //  UIR-13 AC5: the portrait of the detail sits on the dark vignette
         expect(await page.locator('.hero-detail-portrait').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('rgb(28, 18, 12)');
         expect(await page.locator('.hero-detail-portrait').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('circle at 50% 45%');
+        expect(await page.locator('.hero-detail-portrait').evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('rgb(90, 61, 38)');
         await page.getByTestId('hero-back').click();
         await page.getByTestId('hero-close').click();
 
@@ -1633,7 +1645,7 @@ test.describe('Grove theme', () => {
         await openScreen(page, 'leader');
 
         //  Kael leads, so his row is the current one (parchment-100); Lyra's row is an inset card (parchment-300)
-        for (const [ hero, background ] of [ [ 'kael', 'rgb(244, 230, 200)' ], [ 'lyra', 'rgb(230, 208, 162)' ] ])
+        for (const [ hero, background, expected ] of [ [ 'kael', 'rgb(244, 230, 200)', 13.56 ], [ 'lyra', 'rgb(230, 208, 162)', 11.09 ] ])
         {
             const row = page.getByTestId(`leader-entry-${hero}`);
             const { color, 'font-size': size, 'font-family': family } = await css(row.locator('.leader-name'), [ 'color', 'font-size', 'font-family' ]);
@@ -1645,6 +1657,8 @@ test.describe('Grove theme', () => {
             expect(family).toMatch(/^"?Cinzel/);
             expect(back).toBe(background);
             expect(ratio(color, back)).toBeGreaterThanOrEqual(4.5);
+            //  UIR-13 AC12: 13.56:1 on the current row, 11.09:1 on the other rows
+            expect(Number(ratio(color, back).toFixed(2))).toBe(expected);
         }
     });
 
