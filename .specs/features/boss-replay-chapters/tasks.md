@@ -1028,13 +1028,13 @@ The campaign (`definition` option) stays the default seed, whose miniboss 3 has 
 3. `03-chapter-2-fight-label` - the HUD during `Rever chefe: Miniboss 3 (Capítulo 2)`.
 4. `04-chips-loading` - chips disabled during a load held open with `page.route` (fulfil after the shot).
 5. `05-load-failed` - `Não foi possível carregar.` with chapter 3 still shown.
-6. `06-fifteen-chapters` - completed campaign, 15 chips (the phone shot shows the wrap).
+6. `06-fifteen-chapters` - completed campaign, 15 chips (the phone shot shows the 15 chips in one row inside the scaled map).
 7. `07-chip-focus` - keyboard focus on chip 2 (`Tab` to it).
 
 **Steps**:
 
 1. Write the shots file; run `cd game && npm run ui:shots -- bossReplayChapters`.
-2. Check each shot against the Visual Spec table (sizes, colours, fonts, placement, wrap, focus ring, disabled look, contrast of `--parchment-100` on `--wood-800` and on `--ember-700`, and of `--ink-600` on the parchment panel).
+2. Check each shot against the Visual Spec table (sizes, colours, fonts, placement, the phone row inside the scaled map, focus ring, disabled look, contrast of `--parchment-100` on `--wood-800` and on `--ember-700`, and of `--ink-600` on the parchment panel).
 3. Write `ui-review.html` with the verdict (APROVADO or REPROVADO) and each finding with severity; every finding the `product-owner` accepts becomes a task in this file.
 
 **Tests**: none (review task; the screenshots are not tests)

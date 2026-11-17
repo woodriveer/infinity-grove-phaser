@@ -52,7 +52,7 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 | Q2. Daily chapter boss limit | One shared count of 10 wins per UTC day over every chapter, as today | No schema change; a per-chapter limit would multiply the chapter boss pieces and cards by up to 15 | n |
 | Q3. Rewards of an earlier chapter | That chapter's: the miniboss drops the hero of that chapter (7 % x stage), the chapter boss drops the hero of the next chapter (80 %), the piece uses that chapter's rarity tier; no copper, no talent points | Same rules as the current chapter, with the fought chapter as input | n |
 | Q4. Enemy numbers of an earlier chapter | That chapter's seeded health, defense, critical resistance, element and time limit | The owner's example; matches the rewards | n |
-| Q5. Selector look and visibility | A row of numbered chips `1` to `N` under the map title; the shown chapter is pressed (ember), the current campaign chapter carries a gold dot; the row is hidden while only chapter 1 is reached | Direct jump to any chapter in one click; 15 chips fit the 880 px map width and wrap on a phone | n |
+| Q5. Selector look and visibility | A row of numbered chips `1` to `N` under the map title; the shown chapter is pressed (ember), the current campaign chapter carries a gold dot; the row is hidden while only chapter 1 is reached | Direct jump to any chapter in one click; 15 chips fit the 880 px map width in one row, and the phone scales that same layout (see the phone-row ruling below) | n |
 | Q6. Chapter shown when the screen opens | The current campaign chapter on every opening from the HUD button; when the last daily chapter boss win of an earlier chapter ends the farm, the screen reopens on that chapter | The owner's example default; the reopen keeps the player where they were | n |
 | Q7. HUD label of an earlier chapter fight | `Rever chefe: Miniboss <s> (Capítulo <n>)` and `Rever chefe: Chefe do capítulo (Capítulo <n>)`; a fight of the current chapter keeps `Rever chefe: Miniboss <s>` / `Rever chefe: Chefe do capítulo` | The player sees which chapter's numbers they face; current labels and their tests stay | n |
 | Q8. First win of an earlier chapter boss missing from `cleared_chapters` | A farm win of a chapter boss whose chapter is not in `cleared_chapters` counts as its first win: the card is certain and the chapter is added, as `CardRewards` does today | Only accounts whose record predates `cleared_chapters` can hit it; it reuses the existing rule | n |
@@ -60,6 +60,7 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 | A `GET /farm?chapter=N` above the reached chapter | Answers the reached chapter (`chapter` in the answer says which) | A stale screen after a reset in another tab still gets a valid map | y (technical, PO) |
 | When the game sends `chapter` | Only when the picked chapter differs from the current campaign chapter | Existing requests and their tests stay byte-identical | y (technical, PO) |
 | Loading a chapter | The chips are disabled while the request runs; the shown map stays until the answer | A double click cannot race two loads | y (technical, PO) |
+| Chip row on a phone (ruling on the test-engineer's spec-precision gap) | The edge case states what the player observes: at a 390 px viewport the 15 chips stay in one row inside the scaled map and no chip passes its right edge. The row does not wrap there, and no layout task is created. `flex-wrap: wrap` stays in the Visual Spec as a guard | The HUD is one 1024 px layout scaled down to the phone (`game/public/style.css`, the comment above the 640 px query), so the panel is never narrower than the 15 chips (about 760 px of the 880 px map). A phone-only reflow would change the game for one row and break the scaled-HUD pattern every screen uses | y (PO ruling) |
 
 **Open questions:** none unlogged - Q1 to Q8 carry the product owner defaults above and wait for the owner's confirmation.
 
@@ -158,7 +159,7 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 - WHEN a player stored as completed at chapter 5 (opened to chapter 6 by `withNextChapterOpen`) calls `GET /farm?chapter=5` THEN the backend SHALL answer 11 bosses of chapter 5.
 - IF `POST /farm/outcome` names `chapter` 2 with a miniboss of stage 11 THEN the backend SHALL answer 409 `BOSS_NOT_AVAILABLE`.
 - IF the player's account is reset while an earlier chapter map is open in another tab THEN the next win report SHALL answer 409 `BOSS_NOT_AVAILABLE`, and the game SHALL end the farm and reload the farm state, as today.
-- WHEN the panel is narrower than 15 chips (phone, 390 px) THEN the chip row SHALL wrap and no chip SHALL extend past the right edge of the map.
+- WHEN the game is shown at a 390 px viewport (phone, the 1024 px layout scaled down) THEN the 15 chapter chips SHALL stay inside the scaled map, with no chip extending past its left or right edge.
 - IF the game holds no definition of the picked chapter THEN the game SHALL not start the fight.
 
 ---
@@ -168,7 +169,7 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 | Element | Rule |
 | --- | --- |
 | Placement | `.farm-chapters` is a row between the title `farm-map-title` and the map `farm-map` (and above `farm-empty` when present) |
-| Row | `display: flex; flex-wrap: wrap; align-items: center; gap: 6px` |
+| Row | `display: flex; flex-wrap: wrap; align-items: center; gap: 6px`. The 15 chips fit one row of the 880 px map, so the wrap does not act at 1024 px nor on the scaled phone; it stays as a guard |
 | Label `Capítulo` | `.farm-chapters-label`, Figtree (`--font-body`) 14px weight 600, colour `--ink-600`, margin-right 4px |
 | Chip | `button.farm-chapter`, `type="button"`, min-width 40px, height 32px, padding `0 10px`, `border-radius: 999px`, Cinzel (`--font-heading`) 700 15px, colour `--parchment-100`, background `--btn-bg` with `background-color: --wood-800`, border `2px solid --bronze-500`, `box-shadow: --btn-shadow`, `position: relative` |
 | Pressed chip | `[aria-pressed="true"]`: background `--btn-primary-bg`, `background-color: --ember-700`, border-color `--gold-400` |
