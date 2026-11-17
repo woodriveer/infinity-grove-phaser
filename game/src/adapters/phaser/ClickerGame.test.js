@@ -4076,6 +4076,15 @@ describe('ClickerGame auto click', () => {
         expect(popover(ctx).hidden).toBe(true);
     });
 
+    //  An input without a type attribute is a text input (UIR-19 AC12: every input other than checkbox, radio or button)
+    it('ignores A typed into an input without a type, which is a text field', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        press(ctx, 'A', { repeat: false, target: document.createElement('input') });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
     it('ignores A typed into a textarea', async () => {
         const ctx = await createScene({ start: atChapter(2) });
 
