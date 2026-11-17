@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Rever chefes: escolher capítulo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+<div class="brand">Infinity Grove · Revisão de UI</div>
+<section class="panel"><div class="head"><div><h1>Rever chefes: escolher capítulo</h1>
+<div class="meta"><code>.specs/features/boss-replay-chapters</code> · commits <code>até 3be7bbe</code> · 2026-11-17 · local (npm run ui:shots)</div></div>
+<span class="chip verdict changes">MUDANÇAS PEDIDAS</span></div>
+<p style="margin-top:16px">Os chips, o mapa de capítulo anterior, o estado desativado, o erro e o foco seguem a Visual Spec e o tema Grove. Um defeito bloqueia: o rótulo da luta no HUD é coberto pelo cronômetro e o capítulo não aparece. Há um detalhe baixo no ponto do chip atual.</p>
+<div class="stats"><div class="stat"><div class="n">7</div><div class="l">telas e estados verificados</div></div><div class="stat"><div class="n">14</div><div class="l">capturas (desktop + celular)</div></div><div class="stat"><div class="n">1</div><div class="l">achados de severidade alta</div></div><div class="stat"><div class="n">1</div><div class="l">achados médios e baixos</div></div></div></section>
+<section class="panel"><h2>Fidelidade à spec</h2><ul class="checks"><li class="yes"><span class="mark">✓</span><span>Chips sob o título e acima do mapa, rótulo "Capítulo", chip pressionado em ember com borda dourada <code>Visual Spec: Placement, Pressed chip</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Chip de 32 px, pílula, Cinzel 700, fundo madeira, borda bronze; rótulo em Figtree na cor tinta <code>Visual Spec: Chip, Label</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Textos em português: Caminho do Capítulo n, Não foi possível carregar., Rever chefe: Miniboss 3 (Capítulo 2) <code>AD-007</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Chips desativados com a regra global durante o carregamento <code>Visual Spec: Disabled</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Anel de foco visível no chip 2 (Tab) <code>Visual Spec: Focus</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>15 chips cabem na largura do mapa, também no celular <code>Visual Spec: Row</code></span></li>
+<li class="no"><span class="mark">✗</span><span>Ponto do capítulo atual sem cobrir o numeral <code>Visual Spec: Current campaign chapter</code> — o ponto encosta na base do numeral (achado #2)</span></li>
+<li class="no"><span class="mark">✗</span><span>Rótulo da luta Rever chefe: ... (Capítulo n) legível no HUD <code>spec: rótulo da luta</code> — o cronômetro cobre o final do texto (achado #1)</span></li>
+</ul></section>
+<section class="panel"><h2>Capturas</h2><div class="screen"><h3>Rever chefes, capítulo 3 atual</h3>
+<div class="shots">
+<figure>
+<a href="ui-review/01-chapter-3-current-desktop.png" target="_blank"><img src="ui-review/01-chapter-3-current-desktop.png" alt="Rever chefes, capítulo 3 atual" loading="lazy"></a>
+<figcaption><span class="t">Rever chefes, capítulo 3 atual</span><span class="d">Chip 3 pressionado (ember) com o ponto dourado; capítulos 1 e 2 em madeira. Na captura desktop a arte do mapa aparece cortada: a imagem ainda decodificava no disparo (a captura 04 mostra o mapa completo); não é defeito do jogo.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+</figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure>
+<a href="ui-review/01-chapter-3-current-phone.png" target="_blank"><img src="ui-review/01-chapter-3-current-phone.png" alt="Rever chefes, capítulo 3 atual" loading="lazy"></a>
+<figcaption><span class="t">Rever chefes, capítulo 3 atual</span><span class="d">Chip 3 pressionado (ember) com o ponto dourado; capítulos 1 e 2 em madeira.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+</figure>
+</div></div>
+<div class="screen"><h3>Rever chefes, capítulo 2 escolhido</h3>
+<div class="shots">
+<figure>
+<a href="ui-review/02-chapter-2-all-beaten-desktop.png" target="_blank"><img src="ui-review/02-chapter-2-all-beaten-desktop.png" alt="Rever chefes, capítulo 2 escolhido" loading="lazy"></a>
+<figcaption><span class="t">Rever chefes, capítulo 2 escolhido</span><span class="d">Título "Caminho do Capítulo 2", 11 paradas derrotadas, nenhuma atual.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption>
+</figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure>
+<a href="ui-review/02-chapter-2-all-beaten-phone.png" target="_blank"><img src="ui-review/02-chapter-2-all-beaten-phone.png" alt="Rever chefes, capítulo 2 escolhido" loading="lazy"></a>
+<figcaption><span class="t">Rever chefes, capítulo 2 escolhido</span><span class="d">Título "Caminho do Capítulo 2", 11 paradas derrotadas, nenhuma atual.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption>
+</figure>
+</div></div>
+<div class="screen"><h3>HUD durante Rever chefe: Miniboss 3 (Capítulo 2)</h3>
+<div class="shots">
+<figure>
+<a href="ui-review/03-chapter-2-fight-label-desktop.png" target="_blank"><img src="ui-review/03-chapter-2-fight-label-desktop.png" alt="HUD durante Rever chefe: Miniboss 3 (Capítulo 2)" loading="lazy"></a>
+<figcaption><span class="t">HUD durante Rever chefe: Miniboss 3 (Capítulo 2)</span><span class="d">Rótulo da luta no topo, ao lado do cronômetro, que cobre o fim do texto.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-alta">achado #1</span></span></figcaption>
+</figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure>
+<a href="ui-review/03-chapter-2-fight-label-phone.png" target="_blank"><img src="ui-review/03-chapter-2-fight-label-phone.png" alt="HUD durante Rever chefe: Miniboss 3 (Capítulo 2)" loading="lazy"></a>
+<figcaption><span class="t">HUD durante Rever chefe: Miniboss 3 (Capítulo 2)</span><span class="d">Rótulo da luta no topo, ao lado do cronômetro, que cobre o fim do texto.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-alta">achado #1</span></span></figcaption>
+</figure>
+</div></div>
+<div class="screen"><h3>Chips desativados durante o carregamento</h3>
+<div class="shots">
+<figure>
+<a href="ui-review/04-chips-loading-desktop.png" target="_blank"><img src="ui-review/04-chips-loading-desktop.png" alt="Chips desativados durante o carregamento" loading="lazy"></a>
+<figcaption><span class="t">Chips desativados durante o carregamento</span><span class="d">Chips com opacidade reduzida enquanto o capítulo 1 carrega.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption>
+</figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure>
+<a href="ui-review/04-chips-loading-phone.png" target="_blank"><img src="ui-review/04-chips-loading-phone.png" alt="Chips desativados durante o carregamento" loading="lazy"></a>
+<figcaption><span class="t">Chips desativados durante o carregamento</span><span class="d">Chips com opacidade reduzida enquanto o capítulo 1 carrega.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption>
+</figure>
+</div></div>
+<div class="screen"><h3>Não foi possível carregar.</h3>
+<div class="shots">
+<figure>
+<a href="ui-review/05-load-failed-desktop.png" target="_blank"><img src="ui-review/05-load-failed-desktop.png" alt="Não foi possível carregar." loading="lazy"></a>
+<figcaption><span class="t">Não foi possível carregar.</span><span class="d">Faixa de erro sob o título; mapa do capítulo 3 mantido e chip 3 ainda pressionado.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption>
+</figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure>
+<a href="ui-review/05-load-failed-phone.png" target="_blank"><img src="ui-review/05-load-failed-phone.png" alt="Não foi possível carregar." loading="lazy"></a>
+<figcaption><span class="t">Não foi possível carregar.</span><span class="d">Faixa de erro sob o título; mapa do capítulo 3 mantido e chip 3 ainda pressionado.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption>
+</figure>
+</div></div>
+<div class="screen"><h3>Campanha completa: 15 chips</h3>
+<div class="shots">
+<figure>
+<a href="ui-review/06-fifteen-chapters-desktop.png" target="_blank"><img src="ui-review/06-fifteen-chapters-desktop.png" alt="Campanha completa: 15 chips" loading="lazy"></a>
+<figcaption><span class="t">Campanha completa: 15 chips</span><span class="d">Os 15 chips cabem numa linha dentro da largura do mapa nos dois tamanhos.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+</figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure>
+<a href="ui-review/06-fifteen-chapters-phone.png" target="_blank"><img src="ui-review/06-fifteen-chapters-phone.png" alt="Campanha completa: 15 chips" loading="lazy"></a>
+<figcaption><span class="t">Campanha completa: 15 chips</span><span class="d">Os 15 chips cabem numa linha dentro da largura do mapa nos dois tamanhos.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+</figure>
+</div></div>
+<div class="screen"><h3>Foco do teclado no chip 2</h3>
+<div class="shots">
+<figure>
+<a href="ui-review/07-chip-focus-desktop.png" target="_blank"><img src="ui-review/07-chip-focus-desktop.png" alt="Foco do teclado no chip 2" loading="lazy"></a>
+<figcaption><span class="t">Foco do teclado no chip 2</span><span class="d">Anel de foco visível ao redor do chip 2.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+</figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure>
+<a href="ui-review/07-chip-focus-phone.png" target="_blank"><img src="ui-review/07-chip-focus-phone.png" alt="Foco do teclado no chip 2" loading="lazy"></a>
+<figcaption><span class="t">Foco do teclado no chip 2</span><span class="d">Anel de foco visível ao redor do chip 2.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #2</span></span></figcaption>
+</figure>
+</div></div>
+</section>
+<section class="panel"><h2>Achados</h2><article class="finding"><div><div class="top"><span class="chip sev-alta">#1 · Alta</span><strong>Rótulo da luta cortado pelo cronômetro</strong></div><dl>
+<dt>Tela</dt><dd>HUD em Rever chefe de capítulo anterior (desktop e celular)</dd>
+<dt>O que está errado</dt><dd>O rótulo <code>Rever chefe: Miniboss 3 (Capítulo 2)</code> fica atrás do anel do cronômetro: no desktop lê-se "Rever chefe: Miniboss 3 (" e no celular o mesmo, sem o capítulo. O número do capítulo é justamente a informação nova da feature e some.</dd>
+<dt>Como deveria ficar</dt><dd>O texto inteiro visível: a placa <code>.stage-hud</code> deve crescer com o conteúdo (ou o cronômetro ficar à direita da placa) sem sobreposição; se não couber no celular, quebrar em duas linhas ou reduzir a fonte.</dd>
+<dt>Arquivo</dt><dd><code>game/public/style.css</code> (<code>.stage-hud</code>, linha ~591) e o posicionamento do cronômetro <code>.boss-timer</code></dd></dl></div>
+<a href="ui-review/03-chapter-2-fight-label-desktop.png" target="_blank"><img src="ui-review/03-chapter-2-fight-label-desktop.png" alt="Captura do achado #1"></a></article>
+<div style="height:14px"></div><article class="finding"><div><div class="top"><span class="chip sev-baixa">#2 · Baixa</span><strong>Ponto dourado encosta no numeral do chip atual</strong></div><dl>
+<dt>Tela</dt><dd>Rever chefes, chip do capítulo atual (desktop e celular)</dd>
+<dt>O que está errado</dt><dd>O ponto de 6 px a 3 px da base de um chip de 32 px toca a parte de baixo do numeral (em "3" e "15" parece um ponto sob o dígito), prejudicando a leitura.</dd>
+<dt>Como deveria ficar</dt><dd>Numeral e ponto separados: subir o texto do chip atual alguns pixels (por exemplo <code>padding-bottom: 4px</code> em <code>.is-current</code>) ou deslocar o ponto, mantendo 6×6 e <code>--gold-400</code>.</dd>
+<dt>Arquivo</dt><dd><code>game/public/style.css</code> (<code>.farm-chapter.is-current::after</code>, linha ~2689)</dd></dl></div>
+<a href="ui-review/07-chip-focus-desktop.png" target="_blank"><img src="ui-review/07-chip-focus-desktop.png" alt="Captura do achado #2"></a></article>
+</section>
+<section class="panel"><h2>Sugestões</h2><ul class="checks"><li><span class="mark">✦</span><span>O anel de foco (2 px) sobre o pergaminho é fino; um offset de 3 px o destacaria mais, sem defeito hoje.</span></li><li><span class="mark">✦</span><span>No celular a arte do jogo aparece em faixa 4:3 no meio da tela de 390×844 (comportamento já existente, fora desta feature).</span></li></ul></section>
+<section class="panel"><h2>Console e recursos</h2><p class="empty">Nenhum erro nem recurso faltando observado nas capturas (as 10 execuções do Playwright passaram; o console não foi inspecionado no Chrome).</p></section>
+<footer>Revisão do ui-artist · 2026-11-17</footer></main></body></html>
