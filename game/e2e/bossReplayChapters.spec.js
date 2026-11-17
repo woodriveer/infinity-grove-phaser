@@ -39,6 +39,18 @@ const states = (page) => page.locator('.farm-map .map-node').evaluateAll((nodes)
 const farmCalls = (backend) => backend.calls.filter((call) => call.path === '/farm/outcome');
 const farmLabel = (page) => page.locator('.stage-hud');
 
+//  The computed value of a token of the page: a probe element with the same declaration resolves it the way a chip does
+const tokenValue = (page, property, value) => page.evaluate(([ name, declared ]) => {
+    const probe = document.createElement('div');
+
+    probe.style.setProperty(name, declared);
+    document.body.append(probe);
+    const computed = getComputedStyle(probe).getPropertyValue(name);
+
+    probe.remove();
+    return computed;
+}, [ property, value ]);
+
 test.describe('Rever chefes: escolher capítulo', () => {
     test('at chapter 3 the selector lists chapters 1 to 3 with chapter 3 pressed and its map', async ({ page }) => {
         await startGame(page);
@@ -227,5 +239,165 @@ test.describe('Rever chefes: escolher capítulo', () => {
 
         await expect(page.locator('.farm-chapters-label')).toHaveCSS('color', 'rgb(107, 74, 43)');
         await expect(page.locator('.farm-chapters-label')).toHaveCSS('font-family', /Figtree/);
+    });
+    test('the selector is a group labelled Escolher capítulo and only the shown chapter is pressed', async ({ page }) => {
+        await startGame(page);
+        await openMap(page);
+
+        await expect(page.getByTestId('farm-chapters')).toHaveAttribute('role', 'group');
+        await expect(page.getByTestId('farm-chapters')).toHaveAttribute('aria-label', 'Escolher capítulo');
+        await expect(page.locator('.farm-chapters-label')).toHaveText('Capítulo');
+        await expect(page.getByTestId('farm-chapter-1')).toHaveAttribute('aria-pressed', 'false');
+        await expect(page.getByTestId('farm-chapter-2')).toHaveAttribute('aria-pressed', 'false');
+    });
+
+    test('choosing chapter 2 asks the farm for GET /farm?chapter=2', async ({ page }) => {
+        await startGame(page);
+        await openMap(page);
+
+        const request = page.waitForRequest((candidate) => new URL(candidate.url()).pathname === '/api/farm' && new URL(candidate.url()).searchParams.has('chapter'));
+        await page.getByTestId('farm-chapter-2').click();
+
+        const sent = await request;
+        expect(sent.method()).toBe('GET');
+        expect(new URL(sent.url()).search).toBe('?chapter=2');
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 2');
+    });
+
+    test('clicking the pressed chapter button sends no request', async ({ page }) => {
+        const { backend } = await startGame(page);
+        await openMap(page);
+        const before = backend.calls.filter((call) => call.path === '/farm').length;
+
+        await page.getByTestId('farm-chapter-3').click();
+        //  The next chapter's answer is the first request after the pressed click: one more call proves the pressed one sent none
+        await page.getByTestId('farm-chapter-2').click();
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 2');
+
+        expect(backend.calls.filter((call) => call.path === '/farm').length).toBe(before + 1);
+    });
+
+    test('while a chapter loads every chapter button is disabled, dimmed and shows the map shown before', async ({ page }) => {
+        await startGame(page);
+        let release = () => {};
+        const held = new Promise((resolve) => { release = resolve; });
+        //  Registered after the backend's routes: holds the answer for chapter 2 until the test releases it, then the backend answers
+        await page.route((url) => url.pathname === '/api/farm' && url.searchParams.get('chapter') === '2', async (route) => {
+            await held;
+            await route.fallback();
+        });
+        await openMap(page);
+
+        await page.getByTestId('farm-chapter-2').click();
+
+        for (const number of [ 1, 2, 3 ]) {
+            await expect(page.getByTestId(`farm-chapter-${number}`)).toBeDisabled();
+        }
+        await expect(page.getByTestId('farm-chapter-1')).toHaveCSS('opacity', '0.45');
+        await expect(page.getByTestId('farm-chapter-1')).toHaveCSS('cursor', 'not-allowed');
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 3');
+        expect(await states(page)).toEqual([ 'defeated', 'defeated', 'defeated', 'current', ...Array(7).fill('locked') ]);
+
+        release();
+
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 2');
+        for (const number of [ 1, 2, 3 ]) {
+            await expect(page.getByTestId(`farm-chapter-${number}`)).toBeEnabled();
+        }
+    });
+
+    test('the map of a completed campaign at chapter 15 shows 11 defeated stops and no current stop', async ({ page }) => {
+        await startGame(page, { progress: { yan: { chapter: 15, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1, completed: true } } });
+        await openMap(page);
+
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 15');
+        expect(await states(page)).toEqual(Array(11).fill('defeated'));
+    });
+
+    //  The HUD is one 1024 px layout scaled to the phone (style.css, the comment above the 640 px query), so the row never reflows here:
+    //  the observable edge is that every chip stays inside the scaled map at 390 px
+    test('on a phone all 15 chapter chips stay inside the scaled map and none passes its edge', async ({ page }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await startGame(page, { progress: { yan: { chapter: 15, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1, completed: true } } });
+        await openMap(page);
+
+        const board = await page.getByTestId('farm-map').boundingBox();
+
+        expect(board.width).toBeLessThanOrEqual(390);
+        for (const chip of await page.locator('.farm-chapter').all()) {
+            const box = await chip.boundingBox();
+
+            expect(box.x).toBeGreaterThanOrEqual(board.x);
+            expect(box.x + box.width).toBeLessThanOrEqual(board.x + board.width);
+        }
+    });
+
+    test('the chips and the label carry the Visual Spec sizes, weights, borders, radius, padding and shadow', async ({ page }) => {
+        await startGame(page);
+        await openMap(page);
+
+        const row = page.getByTestId('farm-chapters');
+        await expect(row).toHaveCSS('display', 'flex');
+        await expect(row).toHaveCSS('flex-wrap', 'wrap');
+        await expect(row).toHaveCSS('align-items', 'center');
+        await expect(row).toHaveCSS('row-gap', '6px');
+        await expect(row).toHaveCSS('column-gap', '6px');
+
+        const label = page.locator('.farm-chapters-label');
+        await expect(label).toHaveCSS('font-size', '14px');
+        await expect(label).toHaveCSS('font-weight', '600');
+        await expect(label).toHaveCSS('margin-right', '4px');
+
+        const chip = page.getByTestId('farm-chapter-1');
+        await expect(chip).toHaveCSS('font-size', '15px');
+        await expect(chip).toHaveCSS('font-weight', '700');
+        await expect(chip).toHaveCSS('min-width', '40px');
+        await expect(chip).toHaveCSS('padding-top', '0px');
+        await expect(chip).toHaveCSS('padding-right', '10px');
+        await expect(chip).toHaveCSS('padding-left', '10px');
+        await expect(chip).toHaveCSS('border-top-width', '2px');
+        await expect(chip).toHaveCSS('border-top-style', 'solid');
+        await expect(chip).toHaveCSS('border-radius', '999px');
+        await expect(chip).toHaveCSS('position', 'relative');
+        //  The token values come from the page itself: a probe element with the same var() resolves the same computed value
+        expect(await chip.evaluate((node) => getComputedStyle(node).boxShadow)).toBe(await tokenValue(page, 'box-shadow', 'var(--btn-shadow)'));
+        expect(await chip.evaluate((node) => getComputedStyle(node).backgroundImage)).toBe(await tokenValue(page, 'background-image', 'var(--btn-bg)'));
+
+        const pressed = page.getByTestId('farm-chapter-3');
+        expect(await pressed.evaluate((node) => getComputedStyle(node).backgroundImage)).toBe(await tokenValue(page, 'background-image', 'var(--btn-primary-bg)'));
+
+        const dot = await pressed.evaluate((node) => {
+            const after = getComputedStyle(node, '::after');
+
+            return [ after.width, after.height, after.bottom, after.marginLeft, after.left ];
+        });
+        expect(dot.slice(0, 2)).toEqual([ '6px', '6px' ]);
+        expect(dot[2]).toBe('3px');
+        expect(dot[3]).toBe('-3px');
+    });
+
+    test('the chips react to hover, press and keyboard focus as the Visual Spec says', async ({ page }) => {
+        await startGame(page);
+        await openMap(page);
+
+        await page.getByTestId('farm-chapter-1').hover();
+        await expect(page.getByTestId('farm-chapter-1')).toHaveCSS('filter', 'brightness(1.15)');
+
+        //  The pressed chip stays enabled: a press on it sends no request, so the press is read without a load
+        await page.getByTestId('farm-chapter-3').hover();
+        await page.mouse.down();
+        await expect(page.getByTestId('farm-chapter-3')).toHaveCSS('filter', 'brightness(0.9)');
+        await page.mouse.up();
+
+        //  Tab and Shift+Tab bring the focus back to chip 1 by the keyboard, so the focus ring is the :focus-visible one
+        await page.getByTestId('farm-chapter-1').focus();
+        await page.keyboard.press('Tab');
+        await page.keyboard.press('Shift+Tab');
+        const chip = page.getByTestId('farm-chapter-1');
+        await expect(chip).toBeFocused();
+        await expect(chip).toHaveCSS('outline-style', 'solid');
+        await expect(chip).toHaveCSS('outline-width', '2px');
+        await expect(chip).toHaveCSS('outline-color', 'rgb(204, 78, 26)');
+        await expect(chip).toHaveCSS('outline-offset', '2px');
     });
 });
