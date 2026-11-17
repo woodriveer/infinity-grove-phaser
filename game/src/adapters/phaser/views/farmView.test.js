@@ -123,9 +123,9 @@ describe('renderFarm', () => {
         {
             expect([ node.style.left, node.style.top ]).toEqual([ `${MAP_STOPS[ids[index]].x}%`, `${MAP_STOPS[ids[index]].y}%` ]);
         });
-        expect(nodes[0].style.left).toBe('10%');
-        expect(nodes[10].style.left).toBe('84%');
-        expect(nodes[10].style.top).toBe('16%');
+        expect(nodes[0].style.left).toBe('45%');
+        expect(nodes[10].style.left).toBe('70%');
+        expect(nodes[10].style.top).toBe('21%');
     });
 
     it('uses assets/boss-map.jpg as the background and draws no trail while it loads', () => {
@@ -143,8 +143,8 @@ describe('renderFarm', () => {
         expect(find(screen, 'farm-map').classList.contains('is-fallback')).toBe(true);
         expect(screen.querySelector('.farm-map-image')).toBeNull();
         expect(screen.querySelector('.farm-trail polyline').getAttribute('points').split(' ')).toHaveLength(13);
-        expect(screen.querySelector('.farm-trail polyline').getAttribute('points').split(' ')[0]).toBe('10,84');
-        expect(screen.querySelector('.farm-trail polyline').getAttribute('points').split(' ').at(-1)).toBe('84,16');
+        expect(screen.querySelector('.farm-trail polyline').getAttribute('points').split(' ')[0]).toBe('45,82');
+        expect(screen.querySelector('.farm-trail polyline').getAttribute('points').split(' ').at(-1)).toBe('70,21');
     });
 
     it('lists a stage without a position as a plain button below the map', () => {

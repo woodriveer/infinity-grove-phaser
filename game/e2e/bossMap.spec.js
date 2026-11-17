@@ -68,11 +68,11 @@ test.describe('Chapter map', () => {
         const first = await page.getByTestId('farm-entry-miniboss-1').boundingBox();
         const boss = await page.getByTestId('map-node-chapter-boss').boundingBox();
 
-        //  Stop 1 sits at 10 % / 84 % of the map and the chapter boss at 84 % / 16 %
-        expect((first.x + first.width / 2 - board.x) / board.width).toBeCloseTo(0.1, 1);
-        expect((first.y + first.height / 2 - board.y) / board.height).toBeCloseTo(0.84, 1);
-        expect((boss.x + boss.width / 2 - board.x) / board.width).toBeCloseTo(0.84, 1);
-        expect((boss.y + boss.height / 2 - board.y) / board.height).toBeCloseTo(0.16, 1);
+        //  Stop 1 sits at 45 % / 82 % of the map and the chapter boss at 70 % / 21 %
+        expect((first.x + first.width / 2 - board.x) / board.width).toBeCloseTo(0.45, 1);
+        expect((first.y + first.height / 2 - board.y) / board.height).toBeCloseTo(0.82, 1);
+        expect((boss.x + boss.width / 2 - board.x) / board.width).toBeCloseTo(0.70, 1);
+        expect((boss.y + boss.height / 2 - board.y) / board.height).toBeCloseTo(0.21, 1);
     });
 
     test('shows the painted map at 880 x 495, or scaled down with the same ratio, without the dashed trail once the image loads', async ({ page }) => {

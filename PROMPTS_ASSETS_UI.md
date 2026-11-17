@@ -44,19 +44,19 @@ border, no watermark, no compass, no legend.
 
 | Ponto | x | y | Observação |
 |---|---|---|---|
-| Fase 1 | 10 | 84 | início, perto das raízes da Grande Árvore (canto inferior esquerdo) |
-| Fase 2 | 28 | 88 | |
-| Fase 3 | 46 | 84 | |
-| Fase 4 | 64 | 88 | |
-| Curva da direita | 88 | 76 | a estrada sobe, sem clareira |
-| Fase 5 | 80 | 62 | fileira do meio, andando para a esquerda |
-| Fase 6 | 58 | 56 | |
-| Fase 7 | 36 | 60 | |
-| Curva da esquerda | 12 | 48 | a estrada sobe, sem clareira |
-| Fase 8 | 20 | 30 | fileira de cima, andando para a direita |
-| Fase 9 | 40 | 24 | |
-| Fase 10 | 60 | 30 | |
-| Chefe | 84 | 16 | fortaleza corrompida, canto superior direito |
+| Fase 1 | 45 | 82 | início, perto das raízes da Grande Árvore (canto inferior esquerdo) |
+| Fase 2 | 63 | 82 | |
+| Fase 3 | 81 | 82 | |
+| Curva da direita | 90 | 74 | a estrada sobe, sem clareira |
+| Fase 4 | 88 | 63 | |
+| Fase 5 | 70 | 51 | fileira do meio, andando para a esquerda |
+| Fase 6 | 51 | 51 | |
+| Fase 7 | 33 | 51 | |
+| Curva da esquerda | 16 | 46 | a estrada sobe, sem clareira |
+| Fase 8 | 17 | 34 | fileira de cima, andando para a direita |
+| Fase 9 | 33 | 19 | |
+| Fase 10 | 51 | 19 | |
+| Chefe | 70 | 21 | fortaleza corrompida, no fim da estrada, junto ao castelo |
 
 As posições são um alvo, não precisam ser exatas. O que importa: ordem do caminho, 10 clareiras iguais e vazias e o chefe grande no fim.
 
