@@ -37,6 +37,7 @@ const createUi = ({ list = catalog(), farmGet = farmState(), equipmentList = { c
     const heroesGateway = {
         list: vi.fn(() => (list instanceof Error ? Promise.reject(list) : Promise.resolve(list))),
         fuse: vi.fn(),
+        fuseAll: vi.fn(),
         setLeader: vi.fn()
     };
     const equipmentGateway = {
@@ -856,6 +857,178 @@ describe('HeroUi Mochila without fusions', () => {
         expect(ctx.testid('fusion-button-kael-0').disabled).toBe(true);
         expect(ctx.testid('fusion-all').disabled).toBe(true);
         expect(ctx.testid('fusion-row-kael-1')).toBeNull();
+    });
+});
+
+describe('HeroUi Fundir tudo', () => {
+    const ladder = () => ({ leaderId: 'kael', heroes: [ hero('kael', { 0: 45, 1: 1, 2: 2 }), hero('lyra') ] });
+    const openKael = async (ctx) => {
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+    };
+    const cascaded = () => ({ hero: hero('kael', { 1: 1, 2: 1, 3: 2 }), fusions: 22 });
+    const deferred = () => {
+        const slot = {};
+
+        slot.promise = new Promise((resolve, reject) => { slot.resolve = resolve; slot.reject = reject; });
+
+        return slot;
+    };
+
+    it('Fundir tudo asks first with the count and the preview and sends nothing', async () => {
+        const ctx = createUi({ list: ladder() });
+        await openKael(ctx);
+
+        ctx.testid('fusion-all').click();
+
+        expect(ctx.testid('fusion-all-question').textContent).toBe('Fazer 22 fusões?');
+        expect(ctx.testid('fusion-all-preview').textContent).toBe('45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★');
+        expect(ctx.heroesGateway.fuseAll).not.toHaveBeenCalled();
+        expect(ctx.testid('fusion-button-kael-0').disabled).toBe(true);
+        expect(ctx.testid('fusion-all').disabled).toBe(true);
+    });
+
+    it('Não closes the question, sends nothing and keeps the counts', async () => {
+        const ctx = createUi({ list: ladder() });
+        await openKael(ctx);
+        ctx.testid('fusion-all').click();
+
+        ctx.testid('fusion-all-no').click();
+
+        expect(ctx.testid('fusion-all-confirm')).toBeNull();
+        expect(ctx.heroesGateway.fuseAll).not.toHaveBeenCalled();
+        expect(ctx.testid('fusion-row-kael-0').querySelector('.fusion-copies').textContent).toBe('45/3');
+        expect(ctx.testid('fusion-button-kael-0').disabled).toBe(false);
+    });
+
+    it('Sim, fundir sends one fuse-all and shows the result', async () => {
+        const ctx = createUi({ list: ladder() });
+        ctx.heroesGateway.fuseAll.mockResolvedValue(cascaded());
+        await openKael(ctx);
+        ctx.testid('fusion-all').click();
+
+        ctx.testid('fusion-all-yes').click();
+        await flush();
+
+        expect(ctx.heroesGateway.fuseAll).toHaveBeenCalledTimes(1);
+        expect(ctx.heroesGateway.fuseAll).toHaveBeenCalledWith('kael');
+        expect(ctx.testid('fusion-result').textContent).toBe('22 fusões. Melhor carta: Hero kael 3★');
+        expect(ctx.testid('fusion-all-confirm')).toBeNull();
+        expect(ctx.testid('fusion-row-kael-0')).toBeNull();
+        expect(ctx.testid('fusion-row-kael-3').querySelector('.fusion-copies').textContent).toBe('2/3');
+        expect(ctx.query('.hero-error').hidden).toBe(true);
+    });
+
+    it('the result names the skills the cascade raised', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 3: 9 }), hero('lyra') ] } });
+        ctx.heroesGateway.fuseAll.mockResolvedValue({
+            hero: hero('kael', { 5: 1 }, { stars: 5, skills: skills(true, true, true).map((skill, index) => ({ ...skill, level: [ 2, 2, 1 ][index] })) }),
+            fusions: 4
+        });
+        await openKael(ctx);
+        ctx.testid('fusion-all').click();
+
+        ctx.testid('fusion-all-yes').click();
+        await flush();
+
+        expect(ctx.testid('fusion-result').textContent).toBe('4 fusões. Melhor carta: Hero kael 5★ · Skill 1 no nível 2 · Skill 2 no nível 2');
+    });
+
+    it('one fusion reads 1 fusão', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 3 }), hero('lyra') ] } });
+        ctx.heroesGateway.fuseAll.mockResolvedValue({ hero: hero('kael', { 1: 1 }), fusions: 1 });
+        await openKael(ctx);
+
+        ctx.testid('fusion-all').click();
+
+        expect(ctx.testid('fusion-all-question').textContent).toBe('Fazer 1 fusão?');
+
+        ctx.testid('fusion-all-yes').click();
+        await flush();
+
+        expect(ctx.testid('fusion-result').textContent).toBe('1 fusão. Melhor carta: Hero kael 1★');
+    });
+
+    it('the cascade lights the skills of the leader on the bar without reloading', async () => {
+        const ctx = createUi({ list: ladder() });
+        ctx.heroesGateway.fuseAll.mockResolvedValue(cascaded());
+        await openKael(ctx);
+        ctx.testid('fusion-all').click();
+
+        ctx.testid('fusion-all-yes').click();
+        await flush();
+
+        expect(ctx.testid('skill-slot-3').getAttribute('data-unlocked')).toBe('true');
+        expect(ctx.heroesGateway.list).toHaveBeenCalledTimes(1);
+    });
+
+    it('every fusion button is disabled while the cascade runs and a second call sends nothing', async () => {
+        const ctx = createUi({ list: ladder() });
+        const pending = deferred();
+        ctx.heroesGateway.fuseAll.mockImplementation(() => pending.promise);
+        await openKael(ctx);
+        ctx.testid('fusion-all').click();
+
+        ctx.testid('fusion-all-yes').click();
+
+        const buttons = [ ...ctx.testid('bag-entry-detail').querySelectorAll('button') ];
+
+        expect(ctx.testid('fusion-all-confirm')).toBeNull();
+        expect(buttons.length).toBeGreaterThan(0);
+        expect(buttons.every((button) => button.disabled)).toBe(true);
+
+        ctx.ui.fuseAll('kael');
+
+        expect(ctx.heroesGateway.fuseAll).toHaveBeenCalledTimes(1);
+
+        pending.resolve(cascaded());
+        await flush();
+
+        expect(ctx.testid('fusion-all').disabled).toBe(true);
+    });
+
+    it('a failed cascade shows the error and keeps the counts', async () => {
+        const ctx = createUi({ list: ladder() });
+        ctx.heroesGateway.fuseAll.mockRejectedValue(new ApiError('x', { status: 409, code: 'NOTHING_TO_FUSE' }));
+        await openKael(ctx);
+        const before = ctx.heroes.heroes();
+        ctx.testid('fusion-all').click();
+
+        ctx.testid('fusion-all-yes').click();
+        await flush();
+
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível fundir as cartas.');
+        expect(ctx.testid('fusion-row-kael-0').querySelector('.fusion-copies').textContent).toBe('45/3');
+        expect(ctx.testid('fusion-result')).toBeNull();
+        expect(ctx.testid('fusion-all-confirm')).toBeNull();
+        expect(ctx.heroes.heroes()).toEqual(before);
+    });
+
+    it('an answer of the cascade after the panel was closed draws nothing', async () => {
+        const ctx = createUi({ list: ladder() });
+        const pending = deferred();
+        ctx.heroesGateway.fuseAll.mockImplementation(() => pending.promise);
+        await openKael(ctx);
+        ctx.testid('fusion-all').click();
+        ctx.testid('fusion-all-yes').click();
+
+        ctx.ui.close();
+        pending.resolve(cascaded());
+        await flush();
+
+        expect(ctx.query('.hero-body').childElementCount).toBe(0);
+    });
+
+    it('opening the Mochila again hides a question left open', async () => {
+        const ctx = createUi({ list: ladder() });
+        await openKael(ctx);
+        ctx.testid('fusion-all').click();
+
+        ctx.ui.close();
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+
+        expect(ctx.testid('fusion-all-confirm')).toBeNull();
     });
 });
 

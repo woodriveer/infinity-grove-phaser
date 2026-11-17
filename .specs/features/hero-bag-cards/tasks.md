@@ -1026,7 +1026,7 @@ async fuseAll () {}
 
 ---
 
-### T12: Fundir tudo in HeroUi [ ]
+### T12: Fundir tudo in HeroUi [x]
 
 **Owner**: game-dev
 **Goal**: `Fundir tudo` asks, previews, sends one `fuse-all`, shows the result or the error (BAG-18, BAG-21, BAG-22, BAG-31 to BAG-37).
@@ -1118,7 +1118,7 @@ async fuseAll (heroId)
 **Gate**: quick - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 10 new cases pass; every other game unit test passes.
+- [x] The 10 new cases pass; every other game unit test passes.
 
 **Commit**: `feat(game): fuse every layer of a hero with Fundir tudo`
 

@@ -2,13 +2,14 @@ import { farmMapPosition } from '../../domain/campaign/bossMap';
 import { bagPieces, selectedInBag, sellNotice as sellNoticeText, toggleRarity, toggleSelected } from '../../domain/equipment/bulkSell';
 import { dropLabel, wornBy } from '../../domain/equipment/equipment';
 import { leaderStats } from '../../domain/equipment/leaderStats';
+import { raisedSkills } from '../../domain/heroes/bagCards';
 import { raisedSkillSlot, skillLevelOf } from '../../domain/skills/skillLevel';
 import { renderBagCards } from './views/bagView';
 import { renderCatalog, renderHeroDetail } from './views/catalogView';
 import { renderEquipment, renderEquipmentUnavailable, renderLeaderStats, renderPieceDetail } from './views/equipmentView';
 import { el } from './views/dom';
 import { renderFarm } from './views/farmView';
-import { renderBagHero } from './views/fusionLadderView';
+import { renderBagHero, renderFuseAllResult } from './views/fusionLadderView';
 import { renderFusionResult } from './views/fusionView';
 import { renderLeaderPicker } from './views/leaderView';
 import { refreshSkillBar, renderLeaderCard, renderSkillBar } from './views/skillBar';
@@ -375,12 +376,63 @@ export class HeroUi
         }
     }
 
-    //  Fundir tudo before T12: kept as no-ops so the buttons of the detail do nothing until the cascade is wired
-    askFuseAll () {}
+    //  Fundir tudo asks first: the detail redraws with the question and the preview, and nothing is sent until Sim, fundir
+    askFuseAll ()
+    {
+        if (this.fusionBusy || this.bagHeroId === null)
+        {
+            return;
+        }
 
-    declineFuseAll () {}
+        this.fuseAllAsking = true;
+        this.openBagHero(this.bagHeroId);
+    }
 
-    async fuseAll () {}
+    declineFuseAll ()
+    {
+        this.fuseAllAsking = false;
+        this.openBagHero(this.bagHeroId);
+    }
+
+    //  One request fuses every layer of the hero; the answer is the best card and the number of fusions
+    async fuseAll (heroId)
+    {
+        if (this.fusionBusy)
+        {
+            return;
+        }
+
+        const view = this.view;
+        const before = this.heroes.heroes().find((candidate) => candidate.id === heroId);
+        let result = null;
+
+        this.fusionBusy = true;
+        this.fuseAllAsking = false;
+        this.openBagHero(heroId);
+
+        try
+        {
+            const { hero, fusions } = await this.heroes.fuseAll(heroId);
+
+            if (view === this.view)
+            {
+                this.setError('');
+                result = renderFuseAllResult({ heroName: hero.name, fusions, stars: hero.stars, raised: raisedSkills(before?.skills, hero.skills) });
+            }
+        }
+        catch
+        {
+            if (view === this.view)
+            {
+                this.setError(FUSE_FAILED);
+            }
+        }
+        finally
+        {
+            this.fusionBusy = false;
+            this.redrawBag(view, heroId, result);
+        }
+    }
 
     render_leader ()
     {
