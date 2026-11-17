@@ -588,4 +588,41 @@ class FarmServiceTest {
 
         assertEquals(atChapter3, progresses.findForUpdate("yan"))
     }
+
+    @Test
+    fun `an earlier chapter miniboss of stage 3 drops its hero below six percent`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+        chance = SequenceChanceRoller(0.0599)
+
+        assertEquals(CardDrop("lyra", "Lyra Folhaveloz", 0), firstThree.report("yan", miniboss3, Outcome.CLEARED, 2).drop)
+        assertEquals(1, blank("lyra"))
+    }
+
+    @Test
+    fun `an earlier chapter miniboss of stage 3 drops nothing at six percent`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+        chance = SequenceChanceRoller(0.06)
+
+        assertNull(firstThree.report("yan", miniboss3, Outcome.CLEARED, 2).drop)
+        assertEquals(0, blank("lyra"))
+    }
+
+    @Test
+    fun `an earlier chapter miniboss rolls the rarity of that chapter and not of the current one`() {
+        //  Chapter 5 is open: its miniboss tier reaches rare at this roll, chapter 2's stops at uncommon
+        player(Progress("yan", ProgressPosition(5, 4, Encounter.PHASE, 1)), BossRecord(clearedChapters = setOf(1, 2, 3, 4)))
+        equipmentChance = SequenceChanceRoller(0.0, 0.99)
+
+        val result = firstThree.report("yan", miniboss3, Outcome.CLEARED, 2)
+
+        assertEquals(Rarity.UNCOMMON, result.equipmentDrop!!.piece.rarity)
+    }
+
+    @Test
+    fun `the chapter 15 boss drops the hero of chapter 15 and no hero of chapter 16`() {
+        player()
+        chance = SequenceChanceRoller(0.0)
+
+        assertEquals(CardDrop("seraphine", "Seraphine Aurora", 0), service.report("yan", chapterBoss, Outcome.CLEARED, 15).drop)
+    }
 }

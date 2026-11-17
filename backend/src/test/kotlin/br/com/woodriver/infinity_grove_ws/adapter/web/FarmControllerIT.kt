@@ -395,6 +395,30 @@ class FarmControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `a win with a chapter below 1 drops no card`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+        chance.value = 0.0
+
+        win(token, miniboss3, chapter = 0).then().statusCode(400)
+
+        assertEquals(1, jpaCardCopyRepository.findAllByUsername("yan").size)
+    }
+
+    @Test
+    fun `a farm win of an earlier chapter boss pays no talent points and keeps the campaign`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+        chance.value = 0.0
+
+        win(token, chapterBoss, chapter = 2).then().statusCode(200)
+
+        assertEquals(0, talentRepository.earnedPoints("yan"))
+        val stored = jpaProgressRepository.findById("yan").get()
+        assertEquals(listOf(3, 4, "PHASE", false), listOf(stored.chapter, stored.stage, stored.encounter, stored.completed))
+    }
+
+    @Test
     fun `a win with a null chapter fights the current chapter`() {
         val token = register()
         progressAt(4, "PHASE", chapter = 3)
