@@ -146,8 +146,14 @@ const heroView = (cards, hero) => {
     };
 };
 
-//  The bosses the player has beaten, as the backend lists them for the farm
-const beatenBosses = (progress, definition) => {
+//  The bosses the player has beaten, as the backend lists them for the farm: a chapter below the campaign's lists every miniboss and its chapter
+//  boss; the campaign's own chapter keeps the rule of the stage
+const CHAPTER_MESSAGE = 'chapter must be an integer of at least 1';
+const beatenBosses = (progress, definition, chapter = progress.chapter ?? 1) => {
+    if (chapter < (progress.chapter ?? 1)) {
+        return [ ...definition.stages.map((stage) => ({ kind: 'MINIBOSS', stage: stage.number })), { kind: 'CHAPTER_BOSS' } ];
+    }
+
     const minibosses = definition.stages
         .filter((stage) => progress.completed || stage.number < progress.stage || (stage.number === progress.stage && progress.encounter === 'CHAPTER_BOSS'))
         .map((stage) => ({ kind: 'MINIBOSS', stage: stage.number }));
@@ -216,7 +222,8 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  wallets {name: copper} (starting totals), drops (the repeating list every rule's queue is rolled from, or
 //  {ruleId: list} to roll each listed rule from its own list and the others from the default list),
 //  progress {name: {stage, encounter, phase, completed}} (starting positions, default stage 1 phase 1) and
-//  definition (the chapter every player plays, default the backend seed),
+//  definition (the chapter every player plays, default the backend seed) and
+//  chapterDefinitions {n: definition} (the definition GET /farm answers for chapter n, default definition),
 //  cards {name: { start, leader, copies: { 'kael:0': 3 }, cleared: [1], winsDay, winsToday }} (starting bags; a player not listed holds one blank Kael card),
 //  chances (the repeating list the drop rolls read, default never drops) and farmMinIntervalMs (default 0, the backend has 5000),
 //  equipment {name: [raw pieces]} (starting bags, default empty), equipmentDrops (the pieces the next won bosses drop, one each, in order) and
@@ -228,6 +235,7 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens.
 export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
+    chapterDefinitions = {},
     cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = [],
     talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1, healthDelayMs = 0
 } = {}) {
@@ -686,31 +694,56 @@ export async function mockBackend (page, {
         return route.fulfill({ json: change() });
     };
 
+    const definitionOf = (number) => chapterDefinitions[number] ?? definition;
+
+    //  FarmController: GET /farm?chapter=n answers the chapter it lists (a chapter above the reached one answers the reached one), POST /farm/outcome
+    //  fights the chapter it names (absent: the reached one), and a chapter that is not an integer of at least 1 answers 400
     const handleFarm = (route, method, path, body, now) => {
         const username = authenticated(route, now);
 
         if (!username) { return null; }
 
         const cards = cardsOf(username);
-        const beaten = beatenBosses(progressOf(username), definition);
+        const progress = progressOf(username);
+        const reached = progress.chapter ?? 1;
 
         if (method === 'GET' && path === '/farm') {
-            return route.fulfill({ json: { bosses: beaten, chapterBossWinsLeft: winsLeft(cards) } });
+            const raw = new URL(route.request().url()).searchParams.get('chapter');
+
+            if (raw !== null && (!/^\d+$/.test(raw) || Number(raw) < 1)) { return route.fulfill(problem(400, CHAPTER_MESSAGE)); }
+
+            const listed = raw === null ? reached : Math.min(Number(raw), reached);
+
+            return route.fulfill({
+                json: {
+                    chapter: listed,
+                    chapters: Array.from({ length: reached }, (_, i) => i + 1),
+                    bosses: beatenBosses(progress, definitionOf(listed), listed),
+                    chapterBossWinsLeft: winsLeft(cards),
+                    definition: definitionOf(listed)
+                }
+            });
         }
 
         if (method === 'POST' && path === '/farm/outcome') {
             const { boss, outcome } = body;
             const valid = [ 'CLEARED', 'FAILED' ].includes(outcome) && boss && ((boss.kind === 'MINIBOSS' && Number.isInteger(boss.stage)) || (boss.kind === 'CHAPTER_BOSS' && boss.stage === undefined));
+            const requested = body.chapter ?? null;
 
             if (!valid) { return route.fulfill(problem(400, 'Farm report is invalid')); }
-            if (!beaten.some((candidate) => candidate.kind === boss.kind && candidate.stage === boss.stage)) { return route.fulfill(problem(409, 'Boss has not been beaten yet', 'BOSS_NOT_AVAILABLE')); }
+            if (requested !== null && !(Number.isInteger(requested) && requested >= 1)) { return route.fulfill(problem(400, CHAPTER_MESSAGE)); }
+
+            const fought = requested ?? reached;
+
+            if (fought > reached) { return route.fulfill(problem(409, 'Boss has not been beaten yet', 'BOSS_NOT_AVAILABLE')); }
+            if (!beatenBosses(progress, definitionOf(fought), fought).some((candidate) => candidate.kind === boss.kind && candidate.stage === boss.stage)) { return route.fulfill(problem(409, 'Boss has not been beaten yet', 'BOSS_NOT_AVAILABLE')); }
             if (outcome === 'FAILED') { return route.fulfill({ json: { drop: null, chapterBossWinsLeft: winsLeft(cards) } }); }
             if (boss.kind === 'CHAPTER_BOSS' && winsLeft(cards) === 0) { return route.fulfill(problem(409, 'Daily limit reached', 'DAILY_LIMIT_REACHED')); }
             if (cards.lastFarmWin !== null && now - cards.lastFarmWin < farmMinIntervalMs) { return route.fulfill(problem(409, 'Farm win too fast', 'FARM_TOO_FAST')); }
 
             cards.lastFarmWin = now;
 
-            const drop = awardCards(cards, boss.kind, 1, true);
+            const drop = awardCards(cards, boss.kind, fought, true);
 
             return route.fulfill({ json: { drop, chapterBossWinsLeft: winsLeft(cards), equipmentDrop: awardEquipment(username, boss.kind) } });
         }
@@ -877,7 +910,8 @@ export async function mockBackend (page, {
     await page.route('**/api/heroes', handler);
     await page.route('**/api/heroes/**', handler);
     await page.route('**/api/leader', handler);
-    await page.route('**/api/farm', handler);
+    //  A predicate, not a glob: a glob does not match the query string of GET /farm?chapter=n
+    await page.route((url) => url.pathname === '/api/farm', handler);
     await page.route('**/api/farm/**', handler);
     await page.route('**/api/equipment', handler);
     await page.route('**/api/equipment/**', handler);

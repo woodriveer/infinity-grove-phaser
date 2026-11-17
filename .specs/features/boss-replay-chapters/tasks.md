@@ -916,7 +916,7 @@ this.heroUi.show('farm', Number.isInteger(boss.chapter) ? { chapter: boss.chapte
 
 ---
 
-### T12: Fake backend farm per chapter [ ]
+### T12: Fake backend farm per chapter [x]
 
 **Owner**: test-engineer
 **Goal**: The e2e fake backend answers `GET /farm[?chapter=n]` and `POST /farm/outcome` with `chapter` like the T3 backend, with an optional definition per chapter (BRC-07 for the e2e harness; design API Contract).
@@ -945,8 +945,8 @@ this.heroUi.show('farm', Number.isInteger(boss.chapter) ? { chapter: boss.chapte
 **Gate**: full - `cd game && npx playwright test e2e/farm.spec.js e2e/bossMap.spec.js e2e/drops.spec.js`
 **Done when**:
 
-- [ ] Every test of the three specs passes unchanged (a failing test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both).
-- [ ] `git diff --stat` lists only `fakeBackend.js` and `tasks.md`.
+- [x] Every test of the three specs passes unchanged (a failing test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both).
+- [x] `git diff --stat` lists only `fakeBackend.js` and `tasks.md`.
 
 **Commit**: `test(e2e): let the fake backend farm any reached chapter`
 
