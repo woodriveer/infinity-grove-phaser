@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/boss-replay-chapters/spec.md`
 **Design**: `.specs/features/boss-replay-chapters/design.md`
-**Status**: Approved by the owner on 2026-11-17 ("Aprovo os padrões"): every default of Q1 to Q8 accepted. T1 to T19 done (Phases 1 to 7): the T14 review asked for changes (finding #1 high, #2 low), fixed by T15 to T19 under the PO rulings of the spec Assumptions table (rows "UI review #1" and "UI review #2"). Verifier round 1 PASS (`5259af2`); accepted by the product owner on 2026-11-17 (§ Acceptance). Follow-up Phase 8 (TD-009, owner 2026-11-17 "Sim, corrija"): T20 (`game-dev`) and T21 (`test-engineer`) open, for BRC-10 (spec P1-Choose AC 14, 15).
+**Status**: Approved by the owner on 2026-11-17 ("Aprovo os padrões"): every default of Q1 to Q8 accepted. T1 to T19 done (Phases 1 to 7): the T14 review asked for changes (finding #1 high, #2 low), fixed by T15 to T19 under the PO rulings of the spec Assumptions table (rows "UI review #1" and "UI review #2"). Verifier round 1 PASS (`5259af2`); accepted by the product owner on 2026-11-17 (§ Acceptance). Follow-up Phase 8 (TD-009, owner 2026-11-17 "Sim, corrija"): T20 (`game-dev`) and T21 (`test-engineer`) done for BRC-10 (spec P1-Choose AC 14, 15); Verifier round 3 PASS (`59efb0d`); accepted by the product owner on 2026-11-17 (§ Acceptance of Phase 8).
 
 Rules for every task:
 
@@ -56,6 +56,27 @@ Rules for every task:
 **Waiting for the owner's confirmation**: the F1 ruling (ship now, fix as TD-009). Nothing else: Q1 to Q8 are confirmed.
 
 **Next step**: `gitops` releases `ui-redesign` and `boss-replay-chapters`: deploy check, `report.html` of each, `CHANGELOG.md`, release tag.
+
+### Acceptance of Phase 8 (product-owner, 2026-11-17, TD-009)
+
+**Verdict: ACCEPTED.** T20 and T21 are done, the Verifier round 3 (TD-009 final gate) gives PASS. No new task of this feature.
+
+**Evidence read**: `validation.md` § Round 3 (`59efb0d`, diff range `7952162..09b3dfc`, TD-009 range `2a271cc..09b3dfc`): the round-2 gaps G1 (surviving S9), G2 (EC3 and EC4 without e2e) and G3 (stop click) closed by tests only (`9489020`, `deceb67`, `09b3dfc`); `HeroUi.js` and `farmSession.js` byte-identical to round 2. Sensor 10 mutants, 10 killed (S9 included), 0 survived, 0 invalid, isolation ok. 0 spec-precision gaps. Backend 991/991, game unit 1670/1670, e2e 345/350: the 5 failures (`uiRedesign.spec.js:1529`, `:2089`, `dragEquip.spec.js:586`, `:640`, `clickPower.spec.js:41`) each passed alone twice with `--workers=1`, in files the TD-009 range does not touch; load flakes, now on the known list of `STATE.md` Handoff. No `ui-artist` review: T20 and T21 add no element, text, style or state the player has not seen (T21 note above).
+
+**Spec goal 6** ("Closing Rever chefes while a chapter loads never leaves the chapter buttons disabled, and the late answer of that load never changes the farm state or the map shown"):
+
+| Criterion | Evidence (`validation.md` § Round 3) | Status |
+| --- | --- | --- |
+| P1-Choose AC 14, every trigger: `hero-close`, Esc, a stop click, the game opening a screen over it, the player opening another screen over it | `HeroUi.test.js:497`, `:657`, `:600`, `:635`; `bossReplayChapters.spec.js:567`, `:631`, `:692` | Met |
+| P1-Choose AC 15, success and failure answers change nothing | `farmSession.test.js:142`, `:192`; `HeroUi.test.js:521`, `:541`; `bossReplayChapters.spec.js:595`, `:631`, `:654`, `:692` | Met |
+| TD-009 edge cases EC1 to EC5 | EC1 to EC4 unit and e2e; EC5 (`HeroUi.test.js:619`) unit only, not player-visible by itself, as the success criterion allows | Met |
+| Every existing test passes unchanged | round-3 diff only adds cases; full suites above | Met |
+
+**Edits made at acceptance**: spec Goal 6 and the TD-009 success criterion ticked; BRC-10 set to Verified; `STATE.md` TD-009 set to resolved, the load-flake list extended with `uiRedesign.spec.js:1529` and `dragEquip.spec.js:640` (`clickPower.spec.js:41` was already on it), Handoff next step set to `gitops`.
+
+**Waiting for the owner's confirmation**: nothing.
+
+**Next step**: `gitops` cuts patch release v0.3.1 (TD-009 fix): deploy check, production check, `report.html` of the TD-009 range, `CHANGELOG.md`, tag.
 
 ---
 

@@ -26,7 +26,7 @@ The Rever chefes screen (spec `boss-map`) shows only the current chapter, becaus
 - [x] A boss of an earlier chapter fights with that chapter's health, defense, critical resistance, element and time limit, and pays that chapter's card and equipment rolls.
 - [x] The daily chapter boss limit (10) and the 5 s farm interval stay one per player across all chapters.
 - [x] No Flyway migration; a game still on the previous version keeps working against the new backend, and the new game keeps working against the previous backend.
-- [ ] Closing Rever chefes while a chapter loads never leaves the chapter buttons disabled, and the late answer of that load never changes the farm state or the map shown (TD-009).
+- [x] Closing Rever chefes while a chapter loads never leaves the chapter buttons disabled, and the late answer of that load never changes the farm state or the map shown (TD-009).
 
 ## Out of Scope
 
@@ -212,7 +212,7 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 | BRC-07 | P2: Compatibility both ways (AC 1-3) | Tasks | Verified |
 | BRC-08 | P1: Fight - plate on two lines and timer beside it (AC 14, 15; UI review #1) | Tasks | Verified |
 | BRC-09 | P1: Choose a chapter - dot clear of the numeral (AC 13; UI review #2) | Tasks | Verified |
-| BRC-10 | P1: Choose a chapter - a pending chapter load dropped on close (AC 14, 15; TD-009) | Tasks | Pending |
+| BRC-10 | P1: Choose a chapter - a pending chapter load dropped on close (AC 14, 15; TD-009) | Tasks | Verified |
 
 **Coverage:** 10 total, 10 mapped to tasks (BRC-10: T20, T21), 0 unmapped
 
@@ -223,4 +223,4 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 - [x] A player in chapter 3 fights miniboss 3 of chapter 2 in two clicks from the HUD (open Rever chefes, chip `2`, stop `3`).
 - [x] Every acceptance criterion above has a named unit or integration test, and every player-visible one an e2e scenario in `game/e2e/bossReplayChapters.spec.js`.
 - [x] `farm.spec.js`, `bossMap.spec.js` and the backend `FarmServiceTest` / `FarmControllerIT` cases that exist today pass unchanged.
-- [ ] TD-009: P1-Choose AC 14 and 15 and their five edge cases each have a named unit test (`HeroUi.test.js`, `farmSession.test.js`), the player-visible ones an e2e scenario in `bossReplayChapters.spec.js`, and every existing test passes unchanged.
+- [x] TD-009: P1-Choose AC 14 and 15 and their five edge cases each have a named unit test (`HeroUi.test.js`, `farmSession.test.js`), the player-visible ones an e2e scenario in `bossReplayChapters.spec.js`, and every existing test passes unchanged.
