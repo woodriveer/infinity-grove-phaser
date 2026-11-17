@@ -3081,7 +3081,7 @@ const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [co
 
 ---
 
-### T50: Pin the enemy line's vertical centre with and without the weak chip [ ]
+### T50: Pin the enemy line's vertical centre with and without the weak chip [x]
 
 **Owner**: test-engineer
 **What**: The enemy line's vertical centre is y 609 while the weak chip shows above it, and y 596 while no chip shows (spec UIR-04 AC 7, amended 2026-11-14 in `9b02759`).
@@ -3126,9 +3126,9 @@ const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [co
 **Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js`
 **Done when**:
 
-- [ ] The three cases pass and every other case of `uiRedesign.spec.js` passes unchanged.
-- [ ] `grep -c "The enemy line's vertical centre is not asserted" game/e2e/uiRedesign.spec.js` prints `0`.
-- [ ] Discrimination check: in a scratch copy, changing `gap: 4px;` of the rule `.hud-enemy` in `style.css` to `gap: 20px;` makes the edited case fail; the scratch is discarded and `git status --porcelain` matches the start.
+- [x] The three cases pass and every other case of `uiRedesign.spec.js` passes unchanged.
+- [x] `grep -c "The enemy line's vertical centre is not asserted" game/e2e/uiRedesign.spec.js` prints `0`.
+- [x] Discrimination check: in a scratch copy, changing `gap: 4px;` of the rule `.hud-enemy` in `style.css` to `gap: 20px;` makes the edited case fail; the scratch is discarded and `git status --porcelain` matches the start.
 
 **Commit**: `test(game): pin the enemy line centre with and without the weak chip`
 

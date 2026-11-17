@@ -1746,13 +1746,14 @@ test.describe('Grove theme', () => {
     //  UIR-04 AC7: the battle HUD keeps its place on the scene. The anchors are the ones the redesign keeps when a plaque grows:
     //  the centre of the chapter tag, the boss timer, the combo and the enemy line, the centre line of the plaques, the left of the
     //  stage plaque and the right of the wallet. The values are the baseline's (5d98b6f) in a 1024 x 768 scene, same battle state.
-    //  The enemy line's vertical centre is not asserted: it moved from 596 to 609 with the weak chip (see the report)
+    //  The enemy line's vertical centre is y 609 while the weak chip shows above it (UIR-04 AC7, amended 2026-11-14)
     test('keeps the battle HUD on the scene anchors of the baseline', async ({ page }) => {
         const menu = await startAs(page, { progress: MINIBOSS, talents: { COMBO: 10 } });
 
         for (let i = 0; i < 3; i++) { await menu.canvas.click(); }
         await expect(page.getByTestId('combo-hud')).toBeVisible();
         await expect(page.locator('.boss-timer')).toBeVisible();
+        await expect(page.getByTestId('weak-chip')).toHaveText('Fraco: Água');
 
         //  One read of every box: the combo hides after a short while, so the boxes are taken in the same synchronous step
         const { canvas, boxes } = await page.evaluate(() => {
@@ -1804,7 +1805,24 @@ test.describe('Grove theme', () => {
         expect(near(timer.centreX, 512)).toBe(true);
         expect(near(timer.centreY, 44)).toBe(true);
         expect(near(enemy.centreX, 670)).toBe(true);
+        expect(near(enemy.centreY, 609)).toBe(true);
     });
+
+    //  UIR-04 AC7: with no weak chip the enemy line is alone in its box, centred on y 596
+    for (const element of [ 'LIGHT', 'DARKNESS' ])
+    {
+        test(`centres the enemy line on y 596 when the ${element} enemy shows no weak chip`, async ({ page }) => {
+            await startAs(page, { monster: bare(element) });
+            await expect(page.getByTestId('weak-chip')).toBeHidden();
+            await expect(page.locator('.enemy-stats')).toBeVisible();
+
+            const canvas = await canvasBox(page);
+            const line = await page.locator('.enemy-stats').boundingBox();
+            const centreY = ((line.y + line.height / 2 - canvas.y) * 768) / canvas.height;
+
+            expect(Math.abs(centreY - 596)).toBeLessThanOrEqual(1);
+        });
+    }
 
     //  UIR-14 AC9: each card keeps its branch colour on its left edge (an inset bar of 4 px). The colours are the baseline's (5d98b6f, style.css:1647-1650)
     test('draws the left bar of a talent card in the colour of its branch', async ({ page }) => {
