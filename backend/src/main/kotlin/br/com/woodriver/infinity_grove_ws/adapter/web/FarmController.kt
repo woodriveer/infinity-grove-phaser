@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.security.Principal
 
@@ -27,11 +28,21 @@ data class FarmBossResponse(
 }
 
 data class FarmStateResponse(
+    val chapter: Int,
+    val chapters: List<Int>,
     val bosses: List<FarmBossResponse>,
     val chapterBossWinsLeft: Int,
+    val definition: ChapterResponse,
 ) {
     companion object {
-        fun from(state: FarmState) = FarmStateResponse(state.bosses.map(FarmBossResponse::from), state.chapterBossWinsLeft)
+        fun from(state: FarmState) =
+            FarmStateResponse(
+                chapter = state.chapter,
+                chapters = state.chapters,
+                bosses = state.bosses.map(FarmBossResponse::from),
+                chapterBossWinsLeft = state.chapterBossWinsLeft,
+                definition = ChapterResponse.from(state.definition),
+            )
     }
 }
 
@@ -60,7 +71,10 @@ class FarmController(
     private val equipmentRules: EquipmentRules,
 ) {
     @GetMapping
-    fun get(principal: Principal) = FarmStateResponse.from(getFarm.state(principal.name))
+    fun get(
+        principal: Principal,
+        @RequestParam(name = "chapter", required = false) chapter: String?,
+    ) = FarmStateResponse.from(getFarm.state(principal.name, parseQueryChapter(chapter)))
 
     @PostMapping("/outcome")
     fun outcome(
@@ -69,8 +83,19 @@ class FarmController(
     ): FarmResultResponse {
         val boss = parseBoss(body["boss"])
         val outcome = parseOutcome(body["outcome"])
-        return FarmResultResponse.from(reportFarm.report(principal.name, boss, outcome), equipmentRules)
+        val chapter = parseBodyChapter(body["chapter"])
+        return FarmResultResponse.from(reportFarm.report(principal.name, boss, outcome, chapter), equipmentRules)
     }
+
+    private fun parseQueryChapter(text: String?): Int? =
+        text?.let { it.toIntOrNull()?.takeIf { number -> number >= 1 } ?: throw IllegalArgumentException(FarmBoss.CHAPTER_MESSAGE) }
+
+    private fun parseBodyChapter(value: Any?): Int? =
+        when (value) {
+            null -> null
+            is Int -> value.also { require(it >= 1) { FarmBoss.CHAPTER_MESSAGE } }
+            else -> throw IllegalArgumentException(FarmBoss.CHAPTER_MESSAGE)
+        }
 
     private fun parseBoss(value: Any?): FarmBoss {
         val fields = value as? Map<*, *> ?: throw IllegalArgumentException("boss is required")

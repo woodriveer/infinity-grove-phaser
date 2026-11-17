@@ -252,7 +252,7 @@ Rules, in this order:
 
 ---
 
-### T3: `chapter` on both farm routes [ ]
+### T3: `chapter` on both farm routes [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: `GET /farm?chapter=<n>` and `POST /farm/outcome` with `"chapter": <n>` reach the T2 service, and `GET /farm` answers `chapter`, `chapters` and `definition` (BRC-01, BRC-02, BRC-07; spec P2-State AC 1-4, P1-Fight AC 10-11, P2-Compatibility AC 1).
@@ -327,8 +327,8 @@ private fun parseBodyChapter(value: Any?): Int? =
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`, then build `cd backend && ./gradlew build`
 **Done when**:
 
-- [ ] The 10 new cases pass; every existing `FarmControllerIT` and `CardsFlowIT` case passes unchanged (the old `GET farm ...` cases still read `bosses` and `chapterBossWinsLeft`).
-- [ ] `node deploy/regression.mjs` is not changed (it calls no `/farm` route).
+- [x] The 10 new cases pass; every existing `FarmControllerIT` and `CardsFlowIT` case passes unchanged (the old `GET farm ...` cases still read `bosses` and `chapterBossWinsLeft`).
+- [x] `node deploy/regression.mjs` is not changed (it calls no `/farm` route).
 
 **Commit**: `feat(backend): choose the farm chapter on the farm routes`
 

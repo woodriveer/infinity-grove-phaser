@@ -46,7 +46,14 @@ class FarmControllerIT : IntegrationTestBase() {
         token: String,
         boss: String,
         outcome: String = "CLEARED",
-    ): Response = asUser(token).contentType(ContentType.JSON).body("""{"boss":$boss,"outcome":"$outcome"}""").post("/farm/outcome")
+        chapter: Any? = null,
+    ): Response {
+        val chapterField = if (chapter == null) "" else ",\"chapter\":$chapter"
+        return asUser(token)
+            .contentType(ContentType.JSON)
+            .body("""{"boss":$boss,"outcome":"$outcome"$chapterField}""")
+            .post("/farm/outcome")
+    }
 
     private val miniboss3 = """{"kind":"MINIBOSS","stage":3}"""
     private val chapterBoss = """{"kind":"CHAPTER_BOSS"}"""
@@ -257,5 +264,148 @@ class FarmControllerIT : IntegrationTestBase() {
         win(token, miniboss3).then().statusCode(200)
 
         assertEquals(0, talentRepository.earnedPoints("yan"))
+    }
+
+    @Test
+    fun `GET farm answers the current chapter, the reached chapters and the chapter definition`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+
+        asUser(token)
+            .get("/farm")
+            .then()
+            .statusCode(200)
+            .body("chapter", equalTo(3))
+            .body("chapters", equalTo(listOf(1, 2, 3)))
+            .body("bosses.stage", equalTo(listOf(1, 2, 3)))
+            .body("definition.bossHealth", equalTo(32000))
+            .body("definition.stages", hasSize<Any>(10))
+            .body("definition.stages[0].minibossHealth", equalTo(3200))
+    }
+
+    @Test
+    fun `GET farm of an earlier chapter answers its eleven bosses and its definition`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+
+        asUser(token)
+            .get("/farm?chapter=2")
+            .then()
+            .statusCode(200)
+            .body("chapter", equalTo(2))
+            .body("bosses", hasSize<Any>(11))
+            .body("bosses[10].kind", equalTo("CHAPTER_BOSS"))
+            .body("bosses[10].stage", nullValue())
+            .body("definition.bossHealth", equalTo(8000))
+            .body("definition.stages[0].minibossHealth", equalTo(800))
+            .body("definition.boss.element", equalTo("FIRE"))
+            .body("definition.boss.physicalDefense", equalTo(35))
+            .body("chapterBossWinsLeft", equalTo(10))
+    }
+
+    @Test
+    fun `GET farm above the reached chapter answers the reached chapter`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+
+        asUser(token)
+            .get("/farm?chapter=9")
+            .then()
+            .statusCode(200)
+            .body("chapter", equalTo(3))
+            .body("bosses.stage", equalTo(listOf(1, 2, 3)))
+    }
+
+    @Test
+    fun `GET farm with a chapter that is not an integer of at least 1 answers 400`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+
+        listOf("0", "-1", "abc", "2.5").forEach { chapter ->
+            asUser(token)
+                .get("/farm?chapter=$chapter")
+                .then()
+                .statusCode(400)
+                .body("detail", equalTo("chapter must be an integer of at least 1"))
+        }
+    }
+
+    @Test
+    fun `an earlier chapter miniboss win drops the hero of that chapter and leaves the campaign`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+        chance.value = 0.0
+
+        win(token, miniboss3, chapter = 2)
+            .then()
+            .statusCode(200)
+            .body("drop.heroId", equalTo("lyra"))
+            .body("drop.heroName", equalTo("Lyra Folhaveloz"))
+
+        val stored = jpaProgressRepository.findById("yan").get()
+        assertEquals(listOf(3, 4, "PHASE", false), listOf(stored.chapter, stored.stage, stored.encounter, stored.completed))
+    }
+
+    @Test
+    fun `an earlier chapter boss win uses one of the shared daily wins`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+        chance.value = 0.0
+
+        win(token, chapterBoss, chapter = 1)
+            .then()
+            .statusCode(200)
+            .body("drop.heroId", equalTo("lyra"))
+            .body("chapterBossWinsLeft", equalTo(9))
+
+        asUser(token).get("/farm?chapter=2").then().body("chapterBossWinsLeft", equalTo(9))
+    }
+
+    @Test
+    fun `a win without a chapter still fights the current chapter`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+        chance.value = 0.0
+
+        win(token, miniboss3).then().statusCode(200).body("drop.heroId", equalTo("orina"))
+    }
+
+    @Test
+    fun `a win of a chapter above the current one answers 409 BOSS_NOT_AVAILABLE`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+        chance.value = 0.0
+
+        win(token, miniboss3, chapter = 4).then().statusCode(409).body("code", equalTo("BOSS_NOT_AVAILABLE"))
+
+        assertEquals(1, jpaCardCopyRepository.findAllByUsername("yan").size)
+    }
+
+    @Test
+    fun `a win with a chapter that is not an integer of at least 1 answers 400`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+
+        listOf<Any>(0, "\"2\"", 2.5).forEach { chapter ->
+            win(token, miniboss3, chapter = chapter)
+                .then()
+                .statusCode(400)
+                .body("detail", equalTo("chapter must be an integer of at least 1"))
+        }
+    }
+
+    @Test
+    fun `a win with a null chapter fights the current chapter`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+        chance.value = 0.0
+
+        asUser(token)
+            .contentType(ContentType.JSON)
+            .body("""{"boss":$miniboss3,"outcome":"CLEARED","chapter":null}""")
+            .post("/farm/outcome")
+            .then()
+            .statusCode(200)
+            .body("drop.heroId", equalTo("orina"))
     }
 }
