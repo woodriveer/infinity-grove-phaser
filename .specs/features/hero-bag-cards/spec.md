@@ -256,7 +256,7 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-37 | P1: Fundir tudo on the screen | T12, T13 | Implementing |
 | BAG-38 | P2: One way into the cards | T11, T13, T15 | Implementing |
 | BAG-39 | P2: One way into the cards | T11 | Implementing |
-| BAG-40 | P1: Centered rarity gems | T20, T21, T22 | Pending |
+| BAG-40 | P1: Centered rarity gems | T20, T21, T22 | Implementing |
 | BAG-41 | P1: Fusion ladder | T18, T21, T22 | Implementing |
 
 **ID format:** `BAG-<NN>`

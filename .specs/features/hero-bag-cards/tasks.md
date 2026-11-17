@@ -1680,7 +1680,7 @@ Every other assertion of that case stays.
 
 ---
 
-### T20: Larger rarity gems on the item tiles [ ]
+### T20: Larger rarity gems on the item tiles [x]
 
 **Owner**: game-dev
 **Goal**: Each rarity gem is a 10x10 px square with a 5 px gap, so the colour reads at 8 px and the 4 LEGENDARY gems stay inside the 60 px tile, still centered (BAG-40, BAG-01; spec D23; review finding #7).
