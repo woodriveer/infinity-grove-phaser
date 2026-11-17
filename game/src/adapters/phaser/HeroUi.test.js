@@ -88,12 +88,13 @@ const open = async (ctx, screen) => {
 };
 
 describe('HeroUi HUD', () => {
-    it('shows the seven buttons Heróis, Mochila, Fusão, Líder, Equipamento, Talentos and Rever chefes', () => {
+    it('shows the six buttons Heróis, Mochila, Líder, Equipamento, Talentos and Rever chefes', () => {
         const { testid } = createUi();
 
-        expect([ 'heroes', 'bag', 'fusion', 'leader', 'equipment', 'talents', 'farm' ].map((id) => testid(`hud-${id}`).textContent)).toEqual([
-            'Heróis', 'Mochila', 'Fusão', 'Líder', 'Equipamento', 'Talentos', 'Rever chefes'
+        expect([ 'heroes', 'bag', 'leader', 'equipment', 'talents', 'farm' ].map((id) => testid(`hud-${id}`).textContent)).toEqual([
+            'Heróis', 'Mochila', 'Líder', 'Equipamento', 'Talentos', 'Rever chefes'
         ]);
+        expect(testid('hud-fusion')).toBeNull();
     });
 
     it('keeps the panel hidden until a button is pressed', () => {
@@ -198,33 +199,31 @@ describe('HeroUi Heróis', () => {
 });
 
 describe('HeroUi Mochila', () => {
-    it('lists the cards, shows an entry and opens Fusão with that entry selected', async () => {
+    it('shows one card per hero and opens the ladder of an owned hero', async () => {
         const ctx = createUi();
         await open(ctx, 'bag');
 
-        expect(ctx.testid('bag-entry-kael-0')).not.toBeNull();
-        expect(ctx.testid('bag-entry-lyra-0')).not.toBeNull();
-        expect(ctx.testid('bag-entry-orina-0')).toBeNull();
+        expect(ctx.testid('bag-card-kael').disabled).toBe(false);
+        expect(ctx.testid('bag-card-lyra').disabled).toBe(false);
+        expect(ctx.testid('bag-card-orina').disabled).toBe(true);
 
-        ctx.testid('bag-entry-kael-0').click();
+        ctx.testid('bag-card-kael').click();
 
         expect(ctx.testid('bag-entry-detail')).not.toBeNull();
         expect(ctx.root[1].querySelectorAll('.skill-row')).toHaveLength(3);
-
-        ctx.testid('bag-go-fusion').click();
-        await flush();
-
-        expect(ctx.query('.hero-title').textContent).toBe('Fusão');
-        expect(ctx.testid('fusion-row-kael-0').classList.contains('is-selected')).toBe(true);
+        expect(ctx.testid('fusion-row-kael-0').querySelector('.fusion-copies').textContent).toBe('3/3');
+        expect(ctx.testid('fusion-row-kael-1').querySelector('.fusion-copies').textContent).toBe('0/3');
+        expect(ctx.testid('hero-back').hidden).toBe(false);
     });
 });
 
-describe('HeroUi Fusão', () => {
+describe('HeroUi Mochila fusion', () => {
     it('fuses, shows the new card, updates the screen and lights the first skill of the leader on the bar', async () => {
         const ctx = createUi();
         const fused = hero('kael', { 1: 1 });
         ctx.heroesGateway.fuse.mockResolvedValue(fused);
-        await open(ctx, 'fusion');
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
         expect(ctx.testid('fusion-button-kael-0')).not.toBeNull();
         expect(ctx.root[2].querySelectorAll('.skill-slot.is-locked')).toHaveLength(3);
 
@@ -234,7 +233,7 @@ describe('HeroUi Fusão', () => {
         expect(ctx.heroesGateway.fuse).toHaveBeenCalledWith('kael', 0);
         expect(ctx.testid('fusion-result').textContent).toBe('Nova carta: Hero kael 1★');
         expect(ctx.testid('fusion-row-kael-0')).toBeNull();
-        expect(ctx.testid('fusion-empty').textContent).toBe('Nenhuma fusão disponível');
+        expect(ctx.testid('fusion-row-kael-1').querySelector('.fusion-copies').textContent).toBe('1/3');
         expect(ctx.testid('skill-slot-1').getAttribute('data-unlocked')).toBe('true');
         expect(ctx.testid('skill-slot-2').getAttribute('data-unlocked')).toBe('false');
     });
@@ -242,7 +241,8 @@ describe('HeroUi Fusão', () => {
     it('shows a Portuguese error line and leaves the bag unchanged when the fusion fails', async () => {
         const ctx = createUi();
         ctx.heroesGateway.fuse.mockRejectedValue(new ApiError('Fewer than 3 cards', { status: 409, code: 'NOT_ENOUGH_CARDS' }));
-        await open(ctx, 'fusion');
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
         const before = ctx.heroes.heroes();
 
         ctx.testid('fusion-button-kael-0').click();
@@ -257,7 +257,8 @@ describe('HeroUi Fusão', () => {
     it('shows the Nv. 2 badge on slot 1 after the leader fuses to 4 stars, without reloading', async () => {
         const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 3: 3 }), hero('lyra') ] } });
         ctx.heroesGateway.fuse.mockResolvedValue(hero('kael', { 4: 1 }, { stars: 4, skills: skills(true, true, true).map((skill, index) => ({ ...skill, level: [ 2, 1, 1 ][index] })) }));
-        await open(ctx, 'fusion');
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
 
         ctx.testid('fusion-button-kael-3').click();
         await flush();
@@ -270,7 +271,8 @@ describe('HeroUi Fusão', () => {
     it('a 3 star fusion names skill 1 at level 2', async () => {
         const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 3: 3 }), hero('lyra') ] } });
         ctx.heroesGateway.fuse.mockResolvedValue(hero('kael', { 4: 1 }, { stars: 4, skills: skills(true, true, true).map((skill, index) => ({ ...skill, level: [ 2, 1, 1 ][index] })) }));
-        await open(ctx, 'fusion');
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
 
         ctx.testid('fusion-button-kael-3').click();
         await flush();
@@ -281,7 +283,8 @@ describe('HeroUi Fusão', () => {
     it('a 5 star fusion names skill 3 at level 2', async () => {
         const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 5: 3 }, { stars: 5 }), hero('lyra') ] } });
         ctx.heroesGateway.fuse.mockResolvedValue(hero('kael', { 6: 1 }, { stars: 6, skills: skills(true, true, true).map((skill) => ({ ...skill, level: 2 })) }));
-        await open(ctx, 'fusion');
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
 
         ctx.testid('fusion-button-kael-5').click();
         await flush();
@@ -292,7 +295,8 @@ describe('HeroUi Fusão', () => {
     it('a failed 3 star fusion shows the Portuguese error and keeps the row', async () => {
         const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 3: 3 }), hero('lyra') ] } });
         ctx.heroesGateway.fuse.mockRejectedValue(new ApiError('Fewer than 3 cards', { status: 409, code: 'NOT_ENOUGH_CARDS' }));
-        await open(ctx, 'fusion');
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
 
         ctx.testid('fusion-button-kael-3').click();
         await flush();
@@ -300,6 +304,136 @@ describe('HeroUi Fusão', () => {
         expect(ctx.query('.hero-error').textContent).toBe('Não foi possível fundir as cartas.');
         expect(ctx.testid('fusion-row-kael-3').querySelector('.fusion-copies').textContent).toBe('3/3');
         expect(ctx.testid('fusion-result')).toBeNull();
+    });
+
+    const deferred = () => {
+        const slot = {};
+
+        slot.promise = new Promise((resolve, reject) => { slot.resolve = resolve; slot.reject = reject; });
+
+        return slot;
+    };
+
+    it('a second click while a fusion runs sends one request and every fusion button is disabled', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 6 }), hero('lyra') ] } });
+        let finish;
+        ctx.heroesGateway.fuse.mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+
+        ctx.testid('fusion-button-kael-0').click();
+
+        const buttons = [ ...ctx.testid('bag-entry-detail').querySelectorAll('button') ];
+
+        expect(buttons.length).toBeGreaterThan(0);
+        expect(buttons.every((button) => button.disabled)).toBe(true);
+        expect(ctx.testid('hero-back').hidden).toBe(false);
+
+        ctx.ui.fuse('kael', 0);
+
+        expect(ctx.heroesGateway.fuse).toHaveBeenCalledTimes(1);
+
+        finish(hero('kael', { 0: 3, 1: 1 }));
+        await flush();
+
+        expect(ctx.testid('fusion-button-kael-0').disabled).toBe(false);
+        expect(ctx.testid('fusion-result').textContent).toBe('Nova carta: Hero kael 1★');
+    });
+
+    it('Voltar shows the cards with the counts after the fusion', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 3 }), hero('lyra') ] } });
+        ctx.heroesGateway.fuse.mockResolvedValue(hero('kael', { 1: 1 }));
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+        ctx.testid('fusion-button-kael-0').click();
+        await flush();
+
+        ctx.testid('hero-back').click();
+
+        expect(ctx.testid('bag-list')).not.toBeNull();
+        expect([ ...ctx.testid('bag-card-kael').querySelectorAll('.bag-card-chip') ].map((chip) => chip.textContent)).toEqual([ '1★×1' ]);
+        expect(ctx.testid('bag-card-star-kael').textContent).toBe('1★');
+        expect(ctx.testid('bag-card-fuse-kael')).toBeNull();
+    });
+
+    it('Voltar while a fusion runs shows the cards and the answer redraws them', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 3 }), hero('lyra') ] } });
+        const pending = deferred();
+        ctx.heroesGateway.fuse.mockImplementation(() => pending.promise);
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+        ctx.testid('fusion-button-kael-0').click();
+
+        ctx.testid('hero-back').click();
+
+        expect(ctx.testid('bag-list')).not.toBeNull();
+
+        pending.resolve(hero('kael', { 1: 1 }));
+        await flush();
+
+        expect(ctx.testid('bag-entry-detail')).toBeNull();
+        expect([ ...ctx.testid('bag-card-kael').querySelectorAll('.bag-card-chip') ].map((chip) => chip.textContent)).toEqual([ '1★×1' ]);
+    });
+
+    it('an answer after the panel was closed draws nothing', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 3 }), hero('lyra') ] } });
+        const pending = deferred();
+        ctx.heroesGateway.fuse.mockImplementation(() => pending.promise);
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+        ctx.testid('fusion-button-kael-0').click();
+
+        ctx.ui.close();
+        pending.resolve(hero('kael', { 1: 1 }));
+        await flush();
+
+        expect(ctx.query('.hero-body').childElementCount).toBe(0);
+        expect(ctx.query('.hero-error').hidden).toBe(true);
+    });
+
+    it('an answer after another screen opened draws nothing in the panel', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 3 }), hero('lyra') ] } });
+        const pending = deferred();
+        ctx.heroesGateway.fuse.mockImplementation(() => pending.promise);
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+        ctx.testid('fusion-button-kael-0').click();
+
+        await open(ctx, 'heroes');
+        pending.resolve(hero('kael', { 1: 1 }));
+        await flush();
+
+        expect(ctx.testid('hero-grid')).not.toBeNull();
+        expect(ctx.testid('bag-entry-detail')).toBeNull();
+    });
+
+    it('a failed fusion after Voltar shows the error over the cards', async () => {
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 3 }), hero('lyra') ] } });
+        const pending = deferred();
+        ctx.heroesGateway.fuse.mockImplementation(() => pending.promise);
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+        ctx.testid('fusion-button-kael-0').click();
+        ctx.testid('hero-back').click();
+
+        pending.reject(new ApiError('x', { status: 409, code: 'NOT_ENOUGH_CARDS' }));
+        await flush();
+
+        expect(ctx.testid('bag-list')).not.toBeNull();
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível fundir as cartas.');
+    });
+
+    it('opening the Mochila again shows the cards, not the last detail', async () => {
+        const ctx = createUi();
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
+
+        ctx.ui.close();
+        await open(ctx, 'bag');
+
+        expect(ctx.testid('bag-list')).not.toBeNull();
+        expect(ctx.testid('bag-entry-detail')).toBeNull();
+        expect(ctx.testid('hero-back').hidden).toBe(true);
     });
 });
 
@@ -712,14 +846,16 @@ describe('HeroUi skill bar', () => {
     });
 });
 
-describe('HeroUi Fusão without fusions', () => {
-    it('says no fusion is available when no hero has 3 copies', async () => {
+describe('HeroUi Mochila without fusions', () => {
+    it('a hero with fewer than 3 copies has its row button and Fundir tudo disabled', async () => {
         const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 2 }), hero('lyra') ] } });
 
-        await open(ctx, 'fusion');
+        await open(ctx, 'bag');
+        ctx.testid('bag-card-kael').click();
 
-        expect(ctx.testid('fusion-empty').textContent).toBe('Nenhuma fusão disponível');
-        expect(ctx.testid('fusion-list')).toBeNull();
+        expect(ctx.testid('fusion-button-kael-0').disabled).toBe(true);
+        expect(ctx.testid('fusion-all').disabled).toBe(true);
+        expect(ctx.testid('fusion-row-kael-1')).toBeNull();
     });
 });
 

@@ -865,7 +865,7 @@ No `transition` and no `animation` in the block. Do not change any existing rule
 
 ---
 
-### T11: Wire the Mochila to the cards and the ladder; remove the Fusão screen [ ]
+### T11: Wire the Mochila to the cards and the ladder; remove the Fusão screen [x]
 
 **Owner**: game-dev
 **Goal**: The Mochila shows the cards, a card opens the ladder, a row button fuses once with a busy lock, and the Fusão HUD button and screen are gone (BAG-03, BAG-10, BAG-12, BAG-15, BAG-17 to BAG-22, BAG-38, BAG-39).
@@ -1018,9 +1018,9 @@ async fuseAll () {}
 **Gate**: quick - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `HeroUi.test.js`, `bagView.test.js`, `fusionView.test.js` pass with the changes listed and the 7 new cases; every other game unit test passes.
-- [ ] `grep -rn "hud-fusion\|render_fusion\|renderBagEntry\|renderFusion(" game/src` prints nothing.
-- [ ] The e2e specs `heroes.spec.js`, `heroAscension.spec.js` and `uiRedesign.spec.js` are expected to fail on the Fusão locators until T14 and T15; no e2e file is edited in this task.
+- [x] `HeroUi.test.js`, `bagView.test.js`, `fusionView.test.js` pass with the changes listed and the 7 new cases; every other game unit test passes.
+- [x] `grep -rn "hud-fusion\|render_fusion\|renderBagEntry\|renderFusion(" game/src` prints nothing.
+- [x] The e2e specs `heroes.spec.js`, `heroAscension.spec.js` and `uiRedesign.spec.js` are expected to fail on the Fusão locators until T14 and T15; no e2e file is edited in this task.
 
 **Commit**: `feat(game): show hero cards and the fusion ladder in the Mochila`
 

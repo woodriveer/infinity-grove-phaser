@@ -221,12 +221,12 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-14 | P1: Fusion ladder | T6, T9, T10, T13 | Implementing |
 | BAG-15 | P1: Fusion ladder | T6, T9, T11, T13 | Implementing |
 | BAG-16 | P1: Fusion ladder | T6, T9, T13, T14 | Implementing |
-| BAG-17 | P1: Fusion ladder | T11, T13, T14 | Pending |
+| BAG-17 | P1: Fusion ladder | T11, T13, T14 | Implementing |
 | BAG-18 | P1: Fusion ladder | T9, T11, T12, T13 | Implementing |
-| BAG-19 | P1: Fusion ladder | T11, T13, T14 | Pending |
-| BAG-20 | P1: Fusion ladder | T11, T13 | Pending |
+| BAG-19 | P1: Fusion ladder | T11, T13, T14 | Implementing |
+| BAG-20 | P1: Fusion ladder | T11, T13 | Implementing |
 | BAG-21 | P1: Fusion ladder | T5, T11, T12, T13, T14 | Implementing |
-| BAG-22 | P1: Fusion ladder | T11, T12 | Pending |
+| BAG-22 | P1: Fusion ladder | T11, T12 | Implementing |
 | BAG-23 | P1: Fundir tudo on the server | T1, T2, T3 | Implementing |
 | BAG-24 | P1: Fundir tudo on the server | T1, T3 | Implementing |
 | BAG-25 | P1: Fundir tudo on the server | T1, T3 | Implementing |
@@ -242,8 +242,8 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-35 | P1: Fundir tudo on the screen | T4, T5, T6, T12, T13 | Implementing |
 | BAG-36 | P1: Fundir tudo on the screen | T6, T12, T13 | Implementing |
 | BAG-37 | P1: Fundir tudo on the screen | T12, T13 | Pending |
-| BAG-38 | P2: One way into the cards | T11, T13, T15 | Pending |
-| BAG-39 | P2: One way into the cards | T11 | Pending |
+| BAG-38 | P2: One way into the cards | T11, T13, T15 | Implementing |
+| BAG-39 | P2: One way into the cards | T11 | Implementing |
 
 **ID format:** `BAG-<NN>`
 

@@ -2234,12 +2234,13 @@ describe('ClickerGame hero screens', () => {
         await flush();
     };
 
-    it('shows the five hero buttons in the HUD and none of them in the pause menu', async () => {
+    it('shows the four hero buttons in the HUD and none of them in the pause menu', async () => {
         const ctx = await createScene();
 
-        expect([ 'heroes', 'bag', 'fusion', 'leader', 'farm' ].map((id) => testid(ctx, `hud-${id}`)?.textContent)).toEqual([
-            'Heróis', 'Mochila', 'Fusão', 'Líder', 'Rever chefes'
+        expect([ 'heroes', 'bag', 'leader', 'farm' ].map((id) => testid(ctx, `hud-${id}`)?.textContent)).toEqual([
+            'Heróis', 'Mochila', 'Líder', 'Rever chefes'
         ]);
+        expect(testid(ctx, 'hud-fusion') ?? null).toBeNull();
         expect(ctx.control('.pause-menu').querySelector('[data-testid^="hud-"]')).toBeNull();
     });
 
@@ -2311,7 +2312,7 @@ describe('ClickerGame hero screens', () => {
     it('Esc closes an open hero screen first and does not open the pause menu', async () => {
         const ctx = await createScene({ start: bossStart() });
 
-        await openPanel(ctx, 'fusion');
+        await openPanel(ctx, 'leader');
         ctx.handlers['keydown-ESC']();
 
         expect(ctx.scene.heroUi.isOpen).toBe(false);

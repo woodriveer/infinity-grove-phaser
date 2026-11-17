@@ -3,12 +3,13 @@ import { bagPieces, selectedInBag, sellNotice as sellNoticeText, toggleRarity, t
 import { dropLabel, wornBy } from '../../domain/equipment/equipment';
 import { leaderStats } from '../../domain/equipment/leaderStats';
 import { raisedSkillSlot, skillLevelOf } from '../../domain/skills/skillLevel';
-import { renderBag, renderBagEntry } from './views/bagView';
+import { renderBagCards } from './views/bagView';
 import { renderCatalog, renderHeroDetail } from './views/catalogView';
 import { renderEquipment, renderEquipmentUnavailable, renderLeaderStats, renderPieceDetail } from './views/equipmentView';
 import { el } from './views/dom';
 import { renderFarm } from './views/farmView';
-import { renderFusion, renderFusionResult } from './views/fusionView';
+import { renderBagHero } from './views/fusionLadderView';
+import { renderFusionResult } from './views/fusionView';
 import { renderLeaderPicker } from './views/leaderView';
 import { refreshSkillBar, renderLeaderCard, renderSkillBar } from './views/skillBar';
 import { renderTalents, renderTalentsUnavailable } from './views/talentsView';
@@ -27,7 +28,6 @@ const icon = (paths) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="n
 const ICONS = {
     heroes: icon('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>'),
     bag: icon('<path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"></path><path d="M8 10h8"></path><path d="M8 18h8"></path><path d="M8 22v-6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v6"></path><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>'),
-    fusion: icon('<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>'),
     leader: icon('<path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path><path d="M5 21h14"></path>'),
     equipment: icon('<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>'),
     talents: icon('<path d="M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3"></path><path d="M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4"></path><path d="M5 21h14"></path>'),
@@ -37,7 +37,6 @@ const ICONS = {
 const SCREENS = [
     { id: 'heroes', label: 'Heróis', title: 'Heróis' },
     { id: 'bag', label: 'Mochila', title: 'Mochila' },
-    { id: 'fusion', label: 'Fusão', title: 'Fusão' },
     { id: 'leader', label: 'Líder', title: 'Líder' },
     { id: 'equipment', label: 'Equipamento', title: 'Equipamento' },
     { id: 'talents', label: 'Talentos', title: 'Talentos' },
@@ -73,7 +72,7 @@ const BAR_HTML = '<div class="skill-bar-host"></div>';
 const LEADER_HTML = '<div class="leader-host"></div>';
 const NOTICE_HTML = '<div class="hud-box hud-notice"><div class="card-notice" data-testid="card-notice" hidden></div></div>';
 
-//  The hero screens on top of the combat scene: seven HUD buttons, one panel that shows the screen that was opened (Heróis, Mochila, Fusão,
+//  The hero screens on top of the combat scene: six HUD buttons, one panel that shows the screen that was opened (Heróis, Mochila,
 //  Líder, Equipamento, Talentos, Rever chefes), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
 //  It is plain DOM placed with scene.add.dom.
 //  Collaborators: heroes (heroCollection), equipment (equipmentCollection), talents (talentCollection), farm (farmSession) and the scene hooks
@@ -92,6 +91,9 @@ export class HeroUi
         this.talentBusy = false;
         this.equipBusy = false;
         this.sellMode = null;
+        this.fusionBusy = false;
+        this.bagHeroId = null;
+        this.fuseAllAsking = false;
         this.farm = farm;
         this.hooks = { startFarm, walletCopper, useSkill, skillState, mapPosition };
         this.open = false;
@@ -164,6 +166,8 @@ export class HeroUi
 
         this.screen = screen;
         this.sellMode = null;
+        this.bagHeroId = null;
+        this.fuseAllAsking = false;
         this.title.textContent = title;
         this.setError('');
 
@@ -240,6 +244,8 @@ export class HeroUi
         this.open = false;
         this.screen = null;
         this.sellMode = null;
+        this.bagHeroId = null;
+        this.fuseAllAsking = false;
         this.panel.hidden = true;
         this.body.replaceChildren();
     }
@@ -278,35 +284,69 @@ export class HeroUi
         }));
     }
 
-    render_bag ()
+    render_bag ({ keepError = false } = {})
     {
-        this.setError('');
-        this.body.replaceChildren(renderBag(this.heroes.heroes(), {
-            onSelect: (entry) =>
-            {
-                const hero = this.heroes.heroes().find((candidate) => candidate.id === entry.heroId);
-
-                this.showDetail(renderBagEntry(entry, hero, { onFuse: (picked) => this.show('fusion', { selected: picked }) }), () => this.render_bag());
-            }
-        }));
+        if (!keepError)
+        {
+            this.setError('');
+        }
+        this.bagHeroId = null;
+        this.fuseAllAsking = false;
+        this.backButton.hidden = true;
+        this.body.replaceChildren(renderBagCards(this.heroes.heroes(), { onSelect: (hero) => this.openBagHero(hero.id) }));
     }
 
-    render_fusion ({ selected = null, result = null } = {})
+    //  The detail of one hero of the Mochila; `result` is the result line node of the last fusion, or null
+    openBagHero (heroId, { result = null } = {})
     {
-        this.body.replaceChildren(renderFusion(this.heroes.heroes(), {
-            selected,
-            onFuse: (heroId, stars) => this.fuse(heroId, stars)
-        }));
+        const hero = this.heroes.heroes().find((candidate) => candidate.id === heroId);
 
-        if (result)
+        this.bagHeroId = heroId;
+        this.showDetail(renderBagHero(hero, {
+            busy: this.fusionBusy,
+            confirming: this.fuseAllAsking,
+            result,
+            onFuse: (stars) => this.fuse(heroId, stars),
+            onFuseAll: () => this.askFuseAll(),
+            onConfirmAll: () => this.fuseAll(heroId),
+            onDeclineAll: () => this.declineFuseAll()
+        }), () => this.render_bag());
+    }
+
+    //  After a fusion answer: nothing when the panel moved on; the detail of the same hero with the result; else what is shown now
+    redrawBag (view, heroId, result)
+    {
+        if (view !== this.view || this.screen !== 'bag')
         {
-            this.body.append(renderFusionResult(result));
+            return;
+        }
+
+        if (this.bagHeroId === heroId)
+        {
+            this.openBagHero(heroId, { result });
+        }
+        else if (this.bagHeroId !== null)
+        {
+            this.openBagHero(this.bagHeroId);
+        }
+        else
+        {
+            this.render_bag({ keepError: true });
         }
     }
 
     async fuse (heroId, stars)
     {
+        if (this.fusionBusy)
+        {
+            return;
+        }
+
         const view = this.view;
+        let result = null;
+
+        this.fusionBusy = true;
+        this.openBagHero(heroId);
 
         try
         {
@@ -318,10 +358,7 @@ export class HeroUi
 
                 const raised = hero.skills?.find((skill) => skill.slot === raisedSkillSlot(stars + 1));
 
-                this.render_fusion({
-                    selected: { heroId, stars },
-                    result: { heroName: hero.name, stars: stars + 1, skillName: raised?.name ?? '', level: skillLevelOf(raised) }
-                });
+                result = renderFusionResult({ heroName: hero.name, stars: stars + 1, skillName: raised?.name ?? '', level: skillLevelOf(raised) });
             }
         }
         catch
@@ -331,7 +368,19 @@ export class HeroUi
                 this.setError(FUSE_FAILED);
             }
         }
+        finally
+        {
+            this.fusionBusy = false;
+            this.redrawBag(view, heroId, result);
+        }
     }
+
+    //  Fundir tudo before T12: kept as no-ops so the buttons of the detail do nothing until the cascade is wired
+    askFuseAll () {}
+
+    declineFuseAll () {}
+
+    async fuseAll () {}
 
     render_leader ()
     {
