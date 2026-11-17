@@ -507,7 +507,7 @@ The returned object is exactly `{ kind: FARM, boss, phase: 1, health, stats, dro
 
 ---
 
-### T7: Map position of an earlier chapter [ ]
+### T7: Map position of an earlier chapter [x]
 
 **Owner**: game-dev
 **Goal**: A pure `farmMapPosition(current, listedChapter, stageCount)` gives the map of an earlier chapter a completed position, so every stop comes from the boss list and none is `current` (BRC-05; spec P1-Choose AC 5-6).
@@ -543,7 +543,7 @@ export const farmMapPosition = (current, listedChapter, stageCount) =>
 **Gate**: quick - `cd game && npm test`, then build `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 3 new cases pass; every existing `bossMapStops` case passes unchanged.
+- [x] The 3 new cases pass; every existing `bossMapStops` case passes unchanged.
 
 **Commit**: `feat(game): draw the map of an earlier chapter as cleared`
 

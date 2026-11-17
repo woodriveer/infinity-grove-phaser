@@ -38,3 +38,10 @@ export const bossMapStops = ({ bosses, position, stageCount }) =>
         return { ...stop, id, state };
     });
 };
+
+//  The position the map is drawn from: `current` (the campaign: { chapter, stage, kind, stageCount, completed }) for the current chapter,
+//  or a completed position of `listedChapter` for an earlier one. A null `listedChapter` (a previous backend) means the current chapter.
+export const farmMapPosition = (current, listedChapter, stageCount) =>
+    (listedChapter === null || listedChapter === undefined || listedChapter === current.chapter
+        ? current
+        : { chapter: listedChapter, stage: stageCount, kind: CHAPTER_BOSS, stageCount, completed: true });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bossMapStops, stopId } from './bossMap';
+import { bossMapStops, farmMapPosition, stopId } from './bossMap';
 import { CHAPTER_BOSS, MINIBOSS } from './campaign';
 
 const minibosses = (...stages) => stages.map((stage) => ({ kind: MINIBOSS, stage }));
@@ -65,5 +65,26 @@ describe('stopId', () => {
     it('names a miniboss by its stage and the chapter boss alone', () => {
         expect(stopId({ kind: MINIBOSS, stage: 7 })).toBe('miniboss-7');
         expect(stopId({ kind: CHAPTER_BOSS })).toBe('chapter-boss');
+    });
+});
+
+describe('farmMapPosition', () => {
+    const AT3 = { chapter: 3, stage: 4, kind: 'PHASE', stageCount: 10, completed: false };
+    const ELEVEN = [ ...Array.from({ length: 10 }, (_, i) => ({ kind: MINIBOSS, stage: i + 1 })), { kind: CHAPTER_BOSS } ];
+
+    it('the current chapter, or no listed chapter, keeps the campaign position', () => {
+        expect(farmMapPosition(AT3, 3, 10)).toBe(AT3);
+        expect(farmMapPosition(AT3, null, 10)).toBe(AT3);
+        expect(farmMapPosition(AT3, undefined, 10)).toBe(AT3);
+    });
+
+    it('an earlier chapter is drawn as completed', () => {
+        expect(farmMapPosition(AT3, 2, 10)).toEqual({ chapter: 2, stage: 10, kind: CHAPTER_BOSS, stageCount: 10, completed: true });
+    });
+
+    it('the stops of an earlier chapter are all defeated and none is current', () => {
+        const stops = bossMapStops({ bosses: ELEVEN, position: farmMapPosition(AT3, 2, 10), stageCount: 10 });
+
+        expect(stops.map((stop) => stop.state)).toEqual(Array(11).fill('defeated'));
     });
 });
