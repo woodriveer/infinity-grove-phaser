@@ -46,7 +46,7 @@ const watch = (page) => {
 const report = (testInfo, label, problems) => console.log(`CONSOLE-REPORT ${label} (${testInfo.project.name}): ${problems.length ? problems.join(' | ') : 'clean'}`);
 
 //  Logs in as yan with Kael as leader and waits for the fight
-const startAs = async (page, { monster = bare('FIRE'), copies, progress, talents, talentPoints, equipment } = {}) => {
+const startAs = async (page, { monster = bare('FIRE'), copies, progress, talents, talentPoints, equipment, wallet } = {}) => {
     await mockBackend(page, {
         users: { yan: 'secret123' },
         definition: chapter(monster),
@@ -54,7 +54,8 @@ const startAs = async (page, { monster = bare('FIRE'), copies, progress, talents
         ...(progress && { progress: { yan: progress } }),
         ...(talents && { talents: { yan: talents } }),
         ...(talentPoints !== undefined && { talentPoints: { yan: talentPoints } }),
-        ...(equipment && { equipment: { yan: equipment } })
+        ...(equipment && { equipment: { yan: equipment } }),
+        ...(wallet !== undefined && { wallets: { yan: wallet } })
     });
 
     const menu = await openMainMenu(page);
@@ -341,4 +342,33 @@ test('fusion error', async ({ page }, testInfo) => {
     await shot(page, testInfo, '25-fusion-error');
 
     report(testInfo, 'fusion error', problems);
+});
+
+//  T53: the pressed look of Refinar and Vender (UIR-02 AC10, T49). Desktop only: the mouse is held down while the shot is taken.
+test('pressed buttons', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'the pressed state is judged on desktop');
+    const problems = watch(page);
+
+    await startAs(page, { copies: { 'kael:3': 1 }, equipment: [ piece('r1', 'RING', 'COMMON') ], wallet: 600 });
+    await page.getByTestId('hud-equipment').click();
+    await page.getByTestId('equip-piece-r1').click();
+    await expect(page.getByTestId('piece-refine')).toBeEnabled();
+    await settleImages(page);
+
+    for (const [ id, name ] of [ [ 'piece-refine', '38-refine-pressed' ], [ 'piece-sell', '39-sell-pressed' ] ])
+    {
+        const button = page.getByTestId(id);
+        const box = await button.boundingBox();
+
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.waitForTimeout(300);
+        await shot(page, testInfo, `${name.replace('pressed', 'hover')}`);
+        await page.mouse.down();
+        await page.waitForTimeout(300);
+        await shot(page, testInfo, name);
+        await page.mouse.move(0, 0);
+        await page.mouse.up();
+    }
+
+    report(testInfo, 'pressed buttons', problems);
 });

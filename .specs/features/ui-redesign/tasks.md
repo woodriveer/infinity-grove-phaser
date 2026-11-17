@@ -3222,7 +3222,7 @@ const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [co
 
 ---
 
-### T53: Final review of the Grove theme after the round 2 fixes [ ]
+### T53: Final review of the Grove theme after the round 2 fixes [x]
 
 **Owner**: ui-artist
 **What**: The last task of the feature. Confirm that nothing the player sees changed for the worse since T38 and judge the one visible change of Phase 11, the darker pressed state of equip, sell, `Refinar` and the bulk sale confirmation (T49). Record the PO rulings on findings #10 to #13 and the `Click to Start!` ruling, and write the final verdict (UIR-01 to UIR-19).
@@ -3245,8 +3245,8 @@ const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [co
 **Gate**: `test -s .specs/features/ui-redesign/ui-review.html && grep -q "T53" .specs/features/ui-redesign/ui-review.html && grep -q "38-refine-pressed" .specs/features/ui-redesign/ui-review.html && grep -q "#13" .specs/features/ui-redesign/ui-review.html && test -s .specs/features/ui-redesign/ui-review/38-refine-pressed-desktop.png && test -s .specs/features/ui-redesign/ui-review/39-sell-pressed-desktop.png` exits 0.
 **Done when**:
 
-- [ ] `ui-review.html` has a T53 section with the verdict, the cause of every shot that differs from T38, the pressed-state judgement with the two images, the states of #10 to #13, and the `Click to Start!` check.
-- [ ] The commit holds `ui-review.html`, the two pressed-state images and any shot that step 1 changed.
+- [x] `ui-review.html` has a T53 section with the verdict, the cause of every shot that differs from T38, the pressed-state judgement with the two images, the states of #10 to #13, and the `Click to Start!` check.
+- [x] The commit holds `ui-review.html`, the two pressed-state images and any shot that step 1 changed.
 
 **Commit**: `docs(ui-redesign): close the grove theme review after the round 2 fixes`
 
