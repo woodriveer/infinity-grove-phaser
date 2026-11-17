@@ -215,7 +215,7 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-08 | P1: One card per hero | T6, T8, T13 | Implementing |
 | BAG-09 | P1: One card per hero | T8, T13 | Implementing |
 | BAG-10 | P1: One card per hero | T8, T11, T13 | Implementing |
-| BAG-11 | P1: One card per hero | T10, T13 | Pending |
+| BAG-11 | P1: One card per hero | T10, T13 | Implementing |
 | BAG-12 | P1: Fusion ladder | T9, T11, T13 | Implementing |
 | BAG-13 | P1: Fusion ladder | T6, T9, T13 | Implementing |
 | BAG-14 | P1: Fusion ladder | T6, T9, T10, T13 | Implementing |

@@ -828,7 +828,7 @@ export const renderFuseAllResult = ({ heroName, fusions, stars, raised = [] }) =
 
 ---
 
-### T10: Styles of the hero cards and the ladder [ ]
+### T10: Styles of the hero cards and the ladder [x]
 
 **Owner**: game-dev
 **Goal**: The card grid fits the panel without a scrollbar; frames, badge, ribbon, chips, ladder rows and Fundir tudo look as design.md § Layout (BAG-04, BAG-05, BAG-11, BAG-14).
@@ -857,9 +857,9 @@ No `transition` and no `animation` in the block. Do not change any existing rule
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `git diff game/public/style.css` only adds lines (no existing line changed or removed).
-- [ ] The block has no `transition` and no `animation` (`grep -n "transition\|animation"` on the added lines prints nothing).
-- [ ] `npm test` and `npm run build` pass.
+- [x] `git diff game/public/style.css` only adds lines (no existing line changed or removed).
+- [x] The block has no `transition` and no `animation` (`grep -n "transition\|animation"` on the added lines prints nothing).
+- [x] `npm test` and `npm run build` pass.
 
 **Commit**: `style(game): style the hero cards and the fusion ladder`
 
