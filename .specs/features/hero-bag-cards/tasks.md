@@ -1124,7 +1124,7 @@ async fuseAll (heroId)
 
 ---
 
-### T13: Fake backend fuse-all and the e2e of the Mochila [ ]
+### T13: Fake backend fuse-all and the e2e of the Mochila [x]
 
 **Owner**: test-engineer
 **Goal**: Prove every player-visible criterion of the cards, the ladder, Fundir tudo, the rail and the gems in the browser (BAG-01 to BAG-21, BAG-31 to BAG-38).
@@ -1209,8 +1209,8 @@ const piece = (id, slot, rarity, refine = 0, heroId = null) => ({ id, slot, rari
 **Gate**: full - `cd game && npm test && npx playwright test e2e/heroBagCards.spec.js`
 **Done when**:
 
-- [ ] The 15 cases of `heroBagCards.spec.js` pass (a failing one is rerun alone twice with `--workers=1` before it counts as a flake).
-- [ ] `cd game && npm test` passes.
+- [x] The 15 cases of `heroBagCards.spec.js` pass (a failing one is rerun alone twice with `--workers=1` before it counts as a flake).
+- [x] `cd game && npm test` passes.
 
 **Commit**: `test(game): cover the Mochila hero cards and Fundir tudo end to end`
 

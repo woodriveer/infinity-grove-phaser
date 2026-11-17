@@ -605,6 +605,33 @@ export async function mockBackend (page, {
             return route.fulfill({ json: heroView(cards, hero) });
         }
 
+        //  POST /heroes/:id/fuse-all: every layer from 0 stars up, all or nothing (HeroController.fuseAll)
+        const fuseAll = path.match(/^\/heroes\/([^/]+)\/fuse-all$/);
+
+        if (method === 'POST' && fuseAll) {
+            const hero = HEROES.find((candidate) => candidate.id === decodeURIComponent(fuseAll[1]));
+
+            if (!hero) { return route.fulfill(problem(404, `Hero '${fuseAll[1]}' not found`, 'HERO_NOT_FOUND')); }
+
+            const next = {};
+            let carry = 0;
+            let fusions = 0;
+
+            for (let stars = 0; stars <= 8; stars++) {
+                const count = copiesOf(cards, hero.id, stars) + carry;
+
+                carry = Math.floor(count / FUSION_SIZE);
+                fusions += carry;
+                next[stars] = count - carry * FUSION_SIZE;
+            }
+            next[9] = copiesOf(cards, hero.id, 9) + carry;
+
+            if (fusions === 0) { return route.fulfill(problem(409, 'Nothing to fuse', 'NOTHING_TO_FUSE')); }
+
+            Object.entries(next).forEach(([ stars, count ]) => { cards.copies[`${hero.id}:${stars}`] = count; });
+            return route.fulfill({ json: { hero: heroView(cards, hero), fusions } });
+        }
+
         if (method === 'PUT' && path === '/leader') {
             const hero = HEROES.find((candidate) => candidate.id === body.heroId);
 

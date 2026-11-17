@@ -241,7 +241,7 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-34 | P1: Fundir tudo on the screen | T9, T12, T13 | Implementing |
 | BAG-35 | P1: Fundir tudo on the screen | T4, T5, T6, T12, T13 | Implementing |
 | BAG-36 | P1: Fundir tudo on the screen | T6, T12, T13 | Implementing |
-| BAG-37 | P1: Fundir tudo on the screen | T12, T13 | Pending |
+| BAG-37 | P1: Fundir tudo on the screen | T12, T13 | Implementing |
 | BAG-38 | P2: One way into the cards | T11, T13, T15 | Implementing |
 | BAG-39 | P2: One way into the cards | T11 | Implementing |
 
