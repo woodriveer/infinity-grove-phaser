@@ -1889,6 +1889,30 @@ test.describe('Grove theme', () => {
         await expectStyle(current, { 'animation-name': 'none' });
     });
 
+    //  UIR-13 AC16: the beaten stops keep the boss map look, not the inset recipe of the hero screens
+    test('keeps the boss map look on the beaten stops', async ({ page }) => {
+        await startAs(page, {
+            progress: { stage: 1, encounter: 'CHAPTER_BOSS', phase: 1, completed: true },
+            //  A completed campaign unlocks the auto click; it stays off so nothing else changes the screen
+            setup: (p) => p.addInitScript(() => localStorage.setItem('infinity-grove.auto-click', 'off'))
+        });
+        await page.getByTestId('hud-farm').click();
+        await expect(page.getByTestId('farm-map')).toBeVisible();
+
+        const beaten = { 'background-color': 'rgb(225, 238, 204)', 'border-top-width': '3px', 'border-top-style': 'solid', 'border-top-color': 'rgb(93, 160, 72)' };
+        const miniboss = page.getByTestId('farm-entry-miniboss-1');
+        const boss = page.getByTestId('farm-entry-chapter-boss');
+
+        for (const stop of [ miniboss, boss ])
+        {
+            await expect(stop).toHaveAttribute('data-state', 'defeated');
+            await expect(stop).toHaveClass(/map-node/);
+        }
+
+        await expectStyle(miniboss, { ...beaten, width: '52px', height: '52px', 'border-top-left-radius': '50%' });
+        await expectStyle(boss, { ...beaten, width: '96px', height: '80px', 'border-top-left-radius': '24px' });
+    });
+
     test('draws the element wheel on parchment', async ({ page }) => {
         await startAs(page, {});
 

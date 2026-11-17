@@ -3134,7 +3134,7 @@ const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [co
 
 ---
 
-### T51: Pin the boss map look of the beaten stops [ ]
+### T51: Pin the boss map look of the beaten stops [x]
 
 **Owner**: test-engineer
 **What**: The beaten stops of `Rever chefes` keep the boss map look: background `rgb(225, 238, 204)`, a 3 px solid border `rgb(93, 160, 72)`, a miniboss stop 52 x 52 with radius `50%`, the chapter boss stop 96 x 80 with radius `24px` (spec UIR-13 AC 16, added 2026-11-14 in `9b02759`).
@@ -3179,8 +3179,8 @@ const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [co
 **Gate**: `cd game && npx playwright test e2e/uiRedesign.spec.js e2e/farm.spec.js e2e/bossMap.spec.js`
 **Done when**:
 
-- [ ] The new case passes; every case of the three files passes unchanged.
-- [ ] Discrimination check: in a scratch copy, changing `border-color: #5da048;` of `.map-node[data-state="defeated"]` to `#5da049` makes the new case fail; the scratch is discarded and `git status --porcelain` matches the start.
+- [x] The new case passes; every case of the three files passes unchanged.
+- [x] Discrimination check: in a scratch copy, changing `border-color: #5da048;` of `.map-node[data-state="defeated"]` to `#5da049` makes the new case fail; the scratch is discarded and `git status --porcelain` matches the start.
 
 **Commit**: `test(game): pin the boss map look of the beaten stops`
 
