@@ -268,7 +268,7 @@ override fun fuseAll(
 
 ---
 
-### T3: POST /heroes/{id}/fuse-all endpoint [ ]
+### T3: POST /heroes/{id}/fuse-all endpoint [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Expose the cascade as `POST /heroes/{id}/fuse-all` answering `{ hero, fusions }` (BAG-23 to BAG-30).
@@ -322,9 +322,9 @@ No request body is read. `NothingToFuseException` (409) and `HeroNotFoundExcepti
 **Gate**: full - `cd backend && ./gradlew build`
 **Done when**:
 
-- [ ] The 7 new cases pass; every earlier `HeroControllerIT` case passes unchanged.
-- [ ] `./gradlew build` (tests + ktlint) passes.
-- [ ] No file under `backend/src/main/resources/db/migration` is added or changed.
+- [x] The 7 new cases pass; every earlier `HeroControllerIT` case passes unchanged.
+- [x] `./gradlew build` (tests + ktlint) passes.
+- [x] No file under `backend/src/main/resources/db/migration` is added or changed.
 
 **Commit**: `feat(backend): add POST /heroes/{id}/fuse-all`
 

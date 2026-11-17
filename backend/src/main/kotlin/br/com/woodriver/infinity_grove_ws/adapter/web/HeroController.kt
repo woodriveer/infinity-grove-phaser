@@ -4,6 +4,7 @@ import br.com.woodriver.infinity_grove_ws.domain.HeroView
 import br.com.woodriver.infinity_grove_ws.domain.HeroesView
 import br.com.woodriver.infinity_grove_ws.domain.InvalidFusionException
 import br.com.woodriver.infinity_grove_ws.domain.SkillView
+import br.com.woodriver.infinity_grove_ws.usecase.FuseAllCardsUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.FuseCardsUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.ListHeroesUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.SetLeaderUseCase
@@ -80,6 +81,11 @@ data class HeroesResponse(
     }
 }
 
+data class FuseAllResponse(
+    val hero: HeroResponse,
+    val fusions: Int,
+)
+
 data class LeaderResponse(
     val leaderId: String,
 )
@@ -88,6 +94,7 @@ data class LeaderResponse(
 class HeroController(
     private val listHeroes: ListHeroesUseCase,
     private val fuseCards: FuseCardsUseCase,
+    private val fuseAllCards: FuseAllCardsUseCase,
     private val setLeader: SetLeaderUseCase,
 ) {
     @GetMapping("/heroes")
@@ -101,6 +108,15 @@ class HeroController(
     ): HeroResponse {
         val stars = body["stars"] as? Int ?: throw InvalidFusionException("stars must be an integer")
         return HeroResponse.from(fuseCards.fuse(principal.name, id, stars))
+    }
+
+    @PostMapping("/heroes/{id}/fuse-all")
+    fun fuseAll(
+        principal: Principal,
+        @PathVariable id: String,
+    ): FuseAllResponse {
+        val result = fuseAllCards.fuseAll(principal.name, id)
+        return FuseAllResponse(HeroResponse.from(result.hero), result.fusions)
     }
 
     @PutMapping("/leader")

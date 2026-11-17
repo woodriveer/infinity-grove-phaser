@@ -49,6 +49,11 @@ class HeroControllerIT : IntegrationTestBase() {
         body: String,
     ): Response = asUser(token).contentType(ContentType.JSON).body(body).post("/heroes/$heroId/fuse")
 
+    private fun fuseAll(
+        token: String,
+        heroId: String,
+    ): Response = asUser(token).contentType(ContentType.JSON).body("{}").post("/heroes/$heroId/fuse-all")
+
     private fun leader(
         token: String,
         body: String,
@@ -340,5 +345,112 @@ class HeroControllerIT : IntegrationTestBase() {
             .then()
             .body("leaderId", equalTo("kael"))
             .body("heroes[1].copies.0", equalTo(2))
+    }
+
+    @Test
+    fun `fuse all answers the hero and 22 fusions for 45, 1 and 2 cards of 0, 1 and 2 stars`() {
+        val token = register()
+        give("yan", "kael", 0, 45)
+        give("yan", "kael", 1, 1)
+        give("yan", "kael", 2, 2)
+
+        fuseAll(token, "kael")
+            .then()
+            .statusCode(200)
+            .body("fusions", equalTo(22))
+            .body("hero.id", equalTo("kael"))
+            .body("hero.stars", equalTo(3))
+            .body("hero.copies.0", equalTo(0))
+            .body("hero.copies.1", equalTo(1))
+            .body("hero.copies.2", equalTo(1))
+            .body("hero.copies.3", equalTo(2))
+
+        assertEquals(mapOf(1 to 1, 2 to 1, 3 to 2), jpaCardCopyRepository.findAllByUsername("yan").associate { it.stars to it.copies })
+    }
+
+    @Test
+    fun `fuse all of 19683 blank cards answers one 9-star card and 9841 fusions`() {
+        val token = register()
+        give("yan", "kael", 0, 19683)
+
+        fuseAll(token, "kael")
+            .then()
+            .statusCode(200)
+            .body("fusions", equalTo(9841))
+            .body("hero.stars", equalTo(9))
+            .body("hero.skills.level", equalTo(listOf(3, 3, 3)))
+
+        assertEquals(mapOf(9 to 1), jpaCardCopyRepository.findAllByUsername("yan").associate { it.stars to it.copies })
+    }
+
+    @Test
+    fun `fuse all leaves the wallet, the leader and the other heroes unchanged`() {
+        val token = register()
+        jpaWalletRepository.save(WalletEntity("yan", 900))
+        give("yan", "kael", 0, 3)
+        give("yan", "lyra", 0, 5)
+
+        fuseAll(token, "kael").then().statusCode(200)
+
+        asUser(token)
+            .get("/wallet")
+            .then()
+            .body("wallet.gold", equalTo(0))
+            .body("wallet.silver", equalTo(9))
+            .body("wallet.copper", equalTo(0))
+        asUser(token)
+            .get("/heroes")
+            .then()
+            .body("leaderId", equalTo("kael"))
+            .body("heroes[1].id", equalTo("lyra"))
+            .body("heroes[1].copies.0", equalTo(5))
+    }
+
+    @Test
+    fun `fuse all with nothing to fuse answers 409 NOTHING_TO_FUSE and keeps the bag`() {
+        val token = register()
+
+        fuseAll(token, "kael").then().statusCode(409).body("code", equalTo("NOTHING_TO_FUSE"))
+
+        assertEquals(mapOf(0 to 1), jpaCardCopyRepository.findAllByUsername("yan").associate { it.stars to it.copies })
+    }
+
+    @Test
+    fun `fuse all of an unknown hero answers 404 HERO_NOT_FOUND`() {
+        val token = register()
+
+        fuseAll(token, "ghost").then().statusCode(404).body("code", equalTo("HERO_NOT_FOUND"))
+    }
+
+    @Test
+    fun `fuse all answers 401 without a token`() {
+        given()
+            .contentType(ContentType.JSON)
+            .body("{}")
+            .post("/heroes/kael/fuse-all")
+            .then()
+            .statusCode(401)
+    }
+
+    @Test
+    fun `two simultaneous fuse all of the same three cards give exactly one 200 and one 409`() {
+        val token = register()
+        give("yan", "kael", 0, 3)
+        val pool = Executors.newFixedThreadPool(2)
+        val start = CountDownLatch(1)
+
+        val calls =
+            (1..2).map {
+                pool.submit<Int> {
+                    start.await(5, TimeUnit.SECONDS)
+                    fuseAll(token, "kael").statusCode()
+                }
+            }
+        start.countDown()
+        val statuses = calls.map { it.get(15, TimeUnit.SECONDS) }.sorted()
+        pool.shutdown()
+
+        assertEquals(listOf(200, 409), statuses)
+        assertEquals(mapOf(1 to 1), jpaCardCopyRepository.findAllByUsername("yan").associate { it.stars to it.copies })
     }
 }

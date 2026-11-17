@@ -232,9 +232,9 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-25 | P1: Fundir tudo on the server | T1, T3 | Implementing |
 | BAG-26 | P1: Fundir tudo on the server | T1, T2, T3 | Implementing |
 | BAG-27 | P1: Fundir tudo on the server | T2, T3 | Implementing |
-| BAG-28 | P1: Fundir tudo on the server | T3 | Pending |
-| BAG-29 | P1: Fundir tudo on the server | T3 | Pending |
-| BAG-30 | P1: Fundir tudo on the server | T3 | Pending |
+| BAG-28 | P1: Fundir tudo on the server | T3 | Implementing |
+| BAG-29 | P1: Fundir tudo on the server | T3 | Implementing |
+| BAG-30 | P1: Fundir tudo on the server | T3 | Implementing |
 | BAG-31 | P1: Fundir tudo on the screen | T6, T9, T12, T13 | Pending |
 | BAG-32 | P1: Fundir tudo on the screen | T6, T9, T12, T13 | Pending |
 | BAG-33 | P1: Fundir tudo on the screen | T9, T12, T13 | Pending |
