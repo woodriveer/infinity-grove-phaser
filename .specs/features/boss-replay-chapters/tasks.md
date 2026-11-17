@@ -1338,7 +1338,7 @@ Result (measured in Chromium with Cinzel 700 15px in a 32px chip with a 2px bord
 
 ---
 
-### T18: e2e of the plate, the timer and the dot [ ]
+### T18: e2e of the plate, the timer and the dot [x]
 
 **Owner**: test-engineer
 **Goal**: Playwright pins what the player sees after T15 to T17: the whole earlier chapter label on two lines, the timer clear of the plate and of the wallet, the current chapter label still on one line, and the dot clear of the numeral (BRC-08, BRC-09; spec P1-Fight AC 14, 15; P1-Choose AC 13).
@@ -1393,10 +1393,11 @@ const expectTimerBesidePlate = ({ plate, timer, wallet }) => {
 4. Add the four scenarios below inside `test.describe('Rever chefes: escolher capítulo')`, each a `test(...)` with that exact name. Wait for the label with `await expect(farmLabel(page)).toHaveText(...)` and for the timer with `await expect(page.locator('.boss-timer')).toBeVisible()` before calling `hudBoxes`.
 
 **Tests**: e2e
+Bound changed by orchestrator ruling 2026-11-17: Cinzel's content box extends ~6.7 px below the baseline, so the chapter line is compared with the first line's baseline
 **Test cases**:
 
-- `the chapter 2 fight label shows whole on two lines and the timer stands clear of it`: `startGame(page)`; `openMap`; click `farm-chapter-2`; click `farm-entry-miniboss-3`; `farmLabel(page)` has text `Rever chefe: Miniboss 3 (Capítulo 2)`; `page.locator('.stage-hud .stage-hud-chapter')` evaluated `(node) => node.textContent` is `' (Capítulo 2)'`; `page.locator('.stage-hud .stage-hud-chapter')` has CSS `font-size` `14px` and `color` `rgb(107, 74, 43)`; then `const boxes = await hudBoxes(page)`: `Math.abs(boxes.plate.left - 156) <= 1`, `Math.abs(boxes.plate.centreY - 44) <= 1`, `boxes.plate.height <= 56`, `boxes.chapterLine.top >= boxes.firstLine.bottom - 1` (second line), `Math.abs(boxes.chapterLine.left - boxes.firstLine.left) <= 1` (left-aligned), `boxes.chapterLine.right <= boxes.plate.right` and `boxes.firstLine.right <= boxes.plate.right` (both lines inside the plate); `expectTimerBesidePlate(boxes)`.
-- `the longest earlier chapter label keeps the timer clear of the plate and the wallet`: `startGame(page, { progress: { yan: { chapter: 15, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1, completed: true } }, chapterDefinitions: { 14: CHAPTER_2 } })`; `openMap`; click `farm-chapter-14`; title `farm-map-title` `Caminho do Capítulo 14`; click `farm-entry-chapter-boss`; `farmLabel(page)` has text `Rever chefe: Chefe do capítulo (Capítulo 14)`; the chapter line's `textContent` is `' (Capítulo 14)'`; `const boxes = await hudBoxes(page)`: `boxes.plate.height <= 56`, `boxes.chapterLine.top >= boxes.firstLine.bottom - 1`; `expectTimerBesidePlate(boxes)`.
+- `the chapter 2 fight label shows whole on two lines and the timer stands clear of it`: `startGame(page)`; `openMap`; click `farm-chapter-2`; click `farm-entry-miniboss-3`; `farmLabel(page)` has text `Rever chefe: Miniboss 3 (Capítulo 2)`; `page.locator('.stage-hud .stage-hud-chapter')` evaluated `(node) => node.textContent` is `' (Capítulo 2)'`; `page.locator('.stage-hud .stage-hud-chapter')` has CSS `font-size` `14px` and `color` `rgb(107, 74, 43)`; then `const boxes = await hudBoxes(page)`: `Math.abs(boxes.plate.left - 156) <= 1`, `Math.abs(boxes.plate.centreY - 44) <= 1`, `boxes.plate.height <= 56`, `boxes.chapterLine.top >= boxes.firstLineBaseline` (second line), `Math.abs(boxes.chapterLine.left - boxes.firstLine.left) <= 1` (left-aligned), `boxes.chapterLine.right <= boxes.plate.right` and `boxes.firstLine.right <= boxes.plate.right` (both lines inside the plate); `expectTimerBesidePlate(boxes)`.
+- `the longest earlier chapter label keeps the timer clear of the plate and the wallet`: `startGame(page, { progress: { yan: { chapter: 15, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1, completed: true } }, chapterDefinitions: { 14: CHAPTER_2 } })`; `openMap`; click `farm-chapter-14`; title `farm-map-title` `Caminho do Capítulo 14`; click `farm-entry-chapter-boss`; `farmLabel(page)` has text `Rever chefe: Chefe do capítulo (Capítulo 14)`; the chapter line's `textContent` is `' (Capítulo 14)'`; `const boxes = await hudBoxes(page)`: `boxes.plate.height <= 56`, `boxes.chapterLine.top >= boxes.firstLineBaseline`; `expectTimerBesidePlate(boxes)`.
 - `a current chapter fight keeps its label on one line and the timer clear of it`: `startGame(page, { definition: CHAPTER_2 })`; `openMap`; click `farm-entry-miniboss-1`; `farmLabel(page)` has text `Rever chefe: Miniboss 1`; `page.locator('.stage-hud .stage-hud-chapter')` has count 0; `farmLabel(page)` has CSS `font-size` `19px`; `const boxes = await hudBoxes(page)`: `boxes.chapterLine` is undefined, `Math.abs(boxes.plate.left - 156) <= 1`; `expectTimerBesidePlate(boxes)`.
 - `the gold dot of the current chip sits under the numeral, clear of it`: `startGame(page)`; `openMap`; for `farm-chapter-1` and `farm-chapter-3` read, in one `evaluate` each:
   ```js
@@ -1420,9 +1421,9 @@ const expectTimerBesidePlate = ({ plate, timer, wallet }) => {
 **Gate**: full - `cd game && npx playwright test e2e/bossReplayChapters.spec.js e2e/farm.spec.js e2e/bossMap.spec.js`, then `cd game && npx playwright test e2e/uiRedesign.spec.js -g "scene anchors"` (UIR-04 AC 7: the timer still centred on x 512 in a campaign boss fight)
 **Done when**:
 
-- [ ] The 4 new scenarios pass, and every other scenario of `bossReplayChapters.spec.js`, `farm.spec.js` and `bossMap.spec.js` passes.
-- [ ] `keeps the battle HUD on the scene anchors of the baseline` passes unchanged.
-- [ ] The only changed existing lines are the `dot[2]` value (`'3px'` to `'1px'`) and the added `padding-bottom` line; `git diff --stat` lists only `bossReplayChapters.spec.js` and `tasks.md`.
+- [x] The 4 new scenarios pass, and every other scenario of `bossReplayChapters.spec.js`, `farm.spec.js` and `bossMap.spec.js` passes.
+- [x] `keeps the battle HUD on the scene anchors of the baseline` passes unchanged.
+- [x] The only changed existing lines are the `dot[2]` value (`'3px'` to `'1px'`) and the added `padding-bottom` line; `git diff --stat` lists only `bossReplayChapters.spec.js` and `tasks.md`.
 
 **Commit**: `test(e2e): pin the two-line chapter plate, the timer beside it and the chip dot`
 

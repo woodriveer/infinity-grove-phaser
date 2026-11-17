@@ -40,6 +40,44 @@ const farmCalls = (backend) => backend.calls.filter((call) => call.path === '/fa
 const farmLabel = (page) => page.locator('.stage-hud');
 //  The limit of the running boss countdown in ms, null while no boss counts down (the same read as skillsAll.spec.js)
 const countdownLimit = (page) => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').countdown?.limitMs ?? null);
+//  The HUD boxes in the 1024 x 768 scene, read in one step: the plate, its first text line, its chapter line, the timer and the wallet
+const hudBoxes = (page) => page.evaluate(() => {
+    const canvas = document.querySelector('#game-container canvas').getBoundingClientRect();
+    const scene = (rect) => rect && {
+        left: ((rect.x - canvas.x) * 1024) / canvas.width,
+        right: ((rect.x + rect.width - canvas.x) * 1024) / canvas.width,
+        top: ((rect.y - canvas.y) * 768) / canvas.height,
+        bottom: ((rect.y + rect.height - canvas.y) * 768) / canvas.height,
+        centreY: ((rect.y + rect.height / 2 - canvas.y) * 768) / canvas.height,
+        width: (rect.width * 1024) / canvas.width,
+        height: (rect.height * 768) / canvas.height
+    };
+    const plate = document.querySelector('.stage-hud');
+    const range = document.createRange();
+
+    range.selectNodeContents(plate.firstChild);
+    //  The baseline of the first line: the top of its content box plus the font's ascent, in the plate's scaled px
+    const plateStyle = getComputedStyle(plate);
+    const ctx = document.createElement('canvas').getContext('2d');
+
+    ctx.font = `${plateStyle.fontWeight} ${plateStyle.fontSize} ${plateStyle.fontFamily}`;
+    const ascent = ctx.measureText(plate.firstChild.textContent).fontBoundingBoxAscent * (plate.getBoundingClientRect().height / plate.offsetHeight);
+
+    return {
+        plate: scene(plate.getBoundingClientRect()),
+        firstLine: scene(range.getBoundingClientRect()),
+        firstLineBaseline: ((range.getBoundingClientRect().top + ascent - canvas.y) * 768) / canvas.height,
+        chapterLine: scene(document.querySelector('.stage-hud .stage-hud-chapter')?.getBoundingClientRect()),
+        timer: scene(document.querySelector('.boss-timer').getBoundingClientRect()),
+        wallet: scene(document.querySelector('.wallet').getBoundingClientRect())
+    };
+});
+//  Spec P1-Fight AC 15: the timer's left edge is max(512 - width / 2, plate right + 12), within 1 scene px
+const expectTimerBesidePlate = ({ plate, timer, wallet }) => {
+    expect(Math.abs(timer.left - Math.max(512 - timer.width / 2, plate.right + 12))).toBeLessThanOrEqual(1);
+    expect(timer.left).toBeGreaterThanOrEqual(plate.right + 11);
+    expect(timer.right).toBeLessThan(wallet.left);
+};
 
 //  The computed value of a token of the page: a probe element with the same declaration resolves it the way a chip does
 const tokenValue = (page, property, value) => page.evaluate(([ name, declared ]) => {
@@ -361,6 +399,7 @@ test.describe('Rever chefes: escolher capítulo', () => {
         await expect(chip).toHaveCSS('padding-top', '0px');
         await expect(chip).toHaveCSS('padding-right', '10px');
         await expect(chip).toHaveCSS('padding-left', '10px');
+        await expect(chip).toHaveCSS('padding-bottom', '3px');
         await expect(chip).toHaveCSS('border-top-width', '2px');
         await expect(chip).toHaveCSS('border-top-style', 'solid');
         await expect(chip).toHaveCSS('border-radius', '999px');
@@ -378,7 +417,7 @@ test.describe('Rever chefes: escolher capítulo', () => {
             return [ after.width, after.height, after.bottom, after.marginLeft, after.left ];
         });
         expect(dot.slice(0, 2)).toEqual([ '6px', '6px' ]);
-        expect(dot[2]).toBe('3px');
+        expect(dot[2]).toBe('1px');
         expect(dot[3]).toBe('-3px');
         expect(await pressed.evaluate((node) => getComputedStyle(node, '::after').borderTopLeftRadius)).toBe('50%');
     });
@@ -425,5 +464,95 @@ test.describe('Rever chefes: escolher capítulo', () => {
         await expect(chip).toHaveCSS('outline-width', '2px');
         await expect(chip).toHaveCSS('outline-color', 'rgb(204, 78, 26)');
         await expect(chip).toHaveCSS('outline-offset', '2px');
+    });
+
+    test('the chapter 2 fight label shows whole on two lines and the timer stands clear of it', async ({ page }) => {
+        await startGame(page);
+        await openMap(page);
+        await page.getByTestId('farm-chapter-2').click();
+        await page.getByTestId('farm-entry-miniboss-3').click();
+
+        await expect(farmLabel(page)).toHaveText('Rever chefe: Miniboss 3 (Capítulo 2)');
+        expect(await page.locator('.stage-hud .stage-hud-chapter').evaluate((node) => node.textContent)).toBe(' (Capítulo 2)');
+        await expect(page.locator('.stage-hud .stage-hud-chapter')).toHaveCSS('font-size', '14px');
+        await expect(page.locator('.stage-hud .stage-hud-chapter')).toHaveCSS('color', 'rgb(107, 74, 43)');
+
+        await expect(page.locator('.boss-timer')).toBeVisible();
+        const boxes = await hudBoxes(page);
+
+        expect(Math.abs(boxes.plate.left - 156)).toBeLessThanOrEqual(1);
+        expect(Math.abs(boxes.plate.centreY - 44)).toBeLessThanOrEqual(1);
+        expect(boxes.plate.height).toBeLessThanOrEqual(56);
+        expect(boxes.chapterLine.top).toBeGreaterThanOrEqual(boxes.firstLineBaseline);
+        expect(Math.abs(boxes.chapterLine.left - boxes.firstLine.left)).toBeLessThanOrEqual(1);
+        expect(boxes.chapterLine.right).toBeLessThanOrEqual(boxes.plate.right);
+        expect(boxes.firstLine.right).toBeLessThanOrEqual(boxes.plate.right);
+        expectTimerBesidePlate(boxes);
+    });
+
+    test('the longest earlier chapter label keeps the timer clear of the plate and the wallet', async ({ page }) => {
+        await startGame(page, { progress: { yan: { chapter: 15, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1, completed: true } }, chapterDefinitions: { 14: CHAPTER_2 } });
+        await openMap(page);
+        await page.getByTestId('farm-chapter-14').click();
+        await expect(page.getByTestId('farm-map-title')).toHaveText('Caminho do Capítulo 14');
+
+        await page.getByTestId('farm-entry-chapter-boss').click();
+
+        await expect(farmLabel(page)).toHaveText('Rever chefe: Chefe do capítulo (Capítulo 14)');
+        expect(await page.locator('.stage-hud .stage-hud-chapter').evaluate((node) => node.textContent)).toBe(' (Capítulo 14)');
+
+        await expect(page.locator('.boss-timer')).toBeVisible();
+        const boxes = await hudBoxes(page);
+
+        expect(boxes.plate.height).toBeLessThanOrEqual(56);
+        expect(boxes.chapterLine.top).toBeGreaterThanOrEqual(boxes.firstLineBaseline);
+        expectTimerBesidePlate(boxes);
+    });
+
+    test('a current chapter fight keeps its label on one line and the timer clear of it', async ({ page }) => {
+        await startGame(page, { definition: CHAPTER_2 });
+        await openMap(page);
+
+        await page.getByTestId('farm-entry-miniboss-1').click();
+
+        await expect(farmLabel(page)).toHaveText('Rever chefe: Miniboss 1');
+        await expect(page.locator('.stage-hud .stage-hud-chapter')).toHaveCount(0);
+        await expect(farmLabel(page)).toHaveCSS('font-size', '19px');
+
+        await expect(page.locator('.boss-timer')).toBeVisible();
+        const boxes = await hudBoxes(page);
+
+        expect(boxes.chapterLine).toBeUndefined();
+        expect(Math.abs(boxes.plate.left - 156)).toBeLessThanOrEqual(1);
+        expectTimerBesidePlate(boxes);
+    });
+
+    test('the gold dot of the current chip sits under the numeral, clear of it', async ({ page }) => {
+        await startGame(page);
+        await openMap(page);
+
+        //  The numeral's baseline is read with a zero-size probe at the baseline of the chip; the dot's top is from its ::after box
+        const measure = (node) => {
+            const probe = document.createElement('span');
+
+            probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+            node.append(probe);
+            const chip = node.getBoundingClientRect();
+            const scale = chip.height / node.offsetHeight;
+            const baseline = (probe.getBoundingClientRect().top - chip.top) / scale;
+
+            probe.remove();
+            const after = getComputedStyle(node, '::after');
+
+            return { baseline, dotTop: node.offsetHeight - parseFloat(getComputedStyle(node).borderBottomWidth) - parseFloat(after.bottom) - parseFloat(after.height) };
+        };
+
+        const chip1 = await page.getByTestId('farm-chapter-1').evaluate(measure);
+        const chip3 = await page.getByTestId('farm-chapter-3').evaluate(measure);
+
+        expect(chip3.dotTop).toBe(23);
+        expect(chip3.dotTop - chip3.baseline).toBeGreaterThanOrEqual(2);
+        expect(Math.abs(chip1.baseline - chip3.baseline)).toBeLessThanOrEqual(0.5);
+        await expect(page.getByTestId('farm-chapter-3')).toHaveText('3');
     });
 });
