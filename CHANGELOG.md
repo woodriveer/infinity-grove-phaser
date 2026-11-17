@@ -3,6 +3,14 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.3.1] - 2026-11-17
+
+Correção em **Rever chefes** (`boss-replay-chapters`).
+
+### Corrigido
+
+- Em **Rever chefes**, fechar a janela enquanto um capítulo ainda carrega não deixa mais as fichas de capítulo desativadas ao reabrir: a janela volta no capítulo atual com todas as fichas ativas, e a resposta atrasada do capítulo anterior é ignorada.
+
 ## [0.3.0] - 2026-11-17
 
 Visual novo em todo o jogo, o tema Grove (`ui-redesign`), e a escolha do capítulo em **Rever chefes** (`boss-replay-chapters`).
@@ -79,6 +87,7 @@ Primeira versão marcada. Traz a venda de equipamentos em lote (`bulk-sell`).
 - Os blocos dos heróis não se mexem mais quando o modo de seleção abre.
 - Os contornos das peças marcadas ficam separados uns dos outros no modo de seleção.
 
+[0.3.1]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.3.1
 [0.3.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.3.0
 [0.2.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.2.0
 [0.1.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.1.0
