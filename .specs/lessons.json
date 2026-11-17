@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 97,
+  "next_id": 100,
   "lessons": [
     {
       "id": "L-001",
@@ -1736,6 +1736,60 @@
       ],
       "created": "2026-11-17T11:44:39Z",
       "last_seen": "2026-11-17T11:44:39Z"
+    },
+    {
+      "id": "L-097",
+      "key": "surviving_mutant::when a guard reads a field that the same method overwrites right after the screen being left the previous state test a transition where the old and new values differ a same value transition cannot tell the call order apart",
+      "text": "When a guard reads a field that the same method overwrites right after (the screen being left, the previous state), test a transition where the old and new values differ; a same-value transition cannot tell the call order apart.",
+      "signal": "surviving_mutant",
+      "scope": "game/adapters",
+      "status": "candidate",
+      "features": [
+        "boss-replay-chapters"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md round 2 S9 (HeroUi.js:156) (game/adapters)"
+      ],
+      "created": "2026-11-17T13:08:29Z",
+      "last_seen": "2026-11-17T13:08:29Z"
+    },
+    {
+      "id": "L-098",
+      "key": "ac_gap::when an ac lists several triggers for one outcome give each trigger its own test a shared code path covered by another trigger is not evidence for the rest",
+      "text": "When an AC lists several triggers for one outcome, give each trigger its own test; a shared code path covered by another trigger is not evidence for the rest.",
+      "signal": "ac_gap",
+      "scope": "game/adapters",
+      "status": "candidate",
+      "features": [
+        "boss-replay-chapters"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md round 2 G3 (P1-Choose AC 14, HeroUi.js:725) (game/adapters)"
+      ],
+      "created": "2026-11-17T13:08:29Z",
+      "last_seen": "2026-11-17T13:08:29Z"
+    },
+    {
+      "id": "L-099",
+      "key": "ac_gap::when the spec promises an e2e scenario for every player visible edge case the e2e task lists each visible edge case or the spec records which ones stay unit only",
+      "text": "When the spec promises an e2e scenario for every player-visible edge case, the e2e task lists each visible edge case or the spec records which ones stay unit-only.",
+      "signal": "ac_gap",
+      "scope": "tasks",
+      "status": "candidate",
+      "features": [
+        "boss-replay-chapters"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md round 2 G2 (TD-009 EC3, EC4) (tasks)"
+      ],
+      "created": "2026-11-17T13:08:29Z",
+      "last_seen": "2026-11-17T13:08:29Z"
     }
   ]
 }

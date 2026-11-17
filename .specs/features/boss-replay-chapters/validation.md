@@ -1,6 +1,6 @@
 # Boss Replay Chapters Validation
 
-**Verdict**: PASS (round 1 of 3)
+**Verdict**: FAIL (round 2 of 3, TD-009 scope: § Round 2 at the end of this file). Round 1: PASS.
 **Date**: 2026-11-17
 **Spec**: `.specs/features/boss-replay-chapters/spec.md` (with the PO rulings of `3be7bbe` phone chip row and `e4575da` two-line plate, timer placement and dot gap; T18 bound changed by the orchestrator ruling recorded in `tasks.md` T18)
 **Diff range**: `9633d0f..b398ce6` (spec `021f33d` to the T19 tick `b398ce6`). Feature commits: `1a3c3d6 7c74035 19aab04 67f0f68 b55ff63 95553ea 9a2f6c7 3e6dab5 50d3039 40037ba 1dcc5ab 26d1747 46dd914 8224d6f 81df831 457c537 6ff9ee8 6f69802 e26eced 2cbfc1a b80c826 db5db80`, plus the docs commits `5f1b5e5 b4a4c16 3be7bbe e4575da f31884d b398ce6`. Commits of other features in the range (`ac3108f`, `de08ebe`, `caa2490`, `4cbad4c`, `fa225c5`, `1aa7901`, ui-redesign docs) are out of scope.
@@ -188,3 +188,121 @@ B6 is killed by the three-chapter fixture of `FarmServiceTest` (`FST:78`): chapt
 **Gate**: backend 991/991, game unit 1657/1657, e2e 342/343 (the 1 is the `dragEquip.spec.js:586` load flake).
 
 **Next steps**: `product-owner` accepts against the spec and rules on F1 (fix task for `game-dev`, or accept as is); then `gitops`.
+
+---
+
+# Round 2 (TD-009 re-verification, BRC-10)
+
+**Round 2 result**: FAIL (round 2 of 3)
+**Date**: 2026-11-17
+**Scope**: BRC-10, spec P1-Choose AC 14 and 15 and the five TD-009 edge cases (`2a271cc`), against T20 `37860dc` (`game/src/application/farm/farmSession.js`, `game/src/adapters/phaser/HeroUi.js`, `farmSession.test.js`, `HeroUi.test.js`) and T21 `4990872` (`game/e2e/support/fakeBackend.js`, three scenarios in `game/e2e/bossReplayChapters.spec.js`).
+**Diff range**: `2a271cc..4990872`. Production code (`git diff --numstat`): `game/src/application/farm/farmSession.js` +17/-1, `game/src/adapters/phaser/HeroUi.js` +27/-8. No `backend/` file; `ClickerGame.js` unchanged.
+**Verifier**: independent sub-agent (author != verifier). No code or test was changed. Abbreviations: `HUT` = `game/src/adapters/phaser/HeroUi.test.js`, `FST` = `game/src/application/farm/farmSession.test.js`, `E2E` = `game/e2e/bossReplayChapters.spec.js`.
+
+## Task Completion
+
+| Task | Status | Notes |
+| --- | --- | --- |
+| T20 | Done | `37860dc`; `git show --stat` lists only `farmSession.js`, `farmSession.test.js`, `HeroUi.js`, `HeroUi.test.js`, `tasks.md` (Done-when 3 holds) |
+| T21 | Done | `4990872`; lists only `bossReplayChapters.spec.js`, `fakeBackend.js`, `tasks.md` |
+
+## Pre-T20 check (the new tests must fail on the code before the fix)
+
+Scratch worktree `git worktree add --detach .claude/worktrees/verifier-td009 HEAD`, then `git checkout 37860dc~1 -- game/src/application/farm/farmSession.js game/src/adapters/phaser/HeroUi.js` inside it (the T20 and T21 tests stay at HEAD), `game/node_modules` linked by a junction. Removed afterwards (junction first, then `git worktree remove --force`); the main tree's porcelain is unchanged.
+
+| Run on pre-T20 code | Outcome |
+| --- | --- |
+| `npx playwright test e2e/bossReplayChapters.spec.js -g "<the three TD-009 scenarios>"` | 3 failed, 0 passed. `E2E:567` fails at `E2E:581` (`farm-chapter-1` disabled after the reopen), `E2E:595` at `E2E:614` (`farm-chapter-1` disabled after the late answer), `E2E:631` at `E2E:650` (`farm-chapter-1` disabled after Esc and the reopen) |
+| `npx vitest run src/adapters/phaser/HeroUi.test.js src/application/farm/farmSession.test.js` | 10 of the 11 new cases fail (all 5 `FST` `cancel` cases, 5 of the 6 `HUT` cases); 139 passed. The one that passes, `HUT:619` `closing another screen keeps a farm load the scene started`, guards that the fix does not cancel too much, so it passes on the old code by design |
+
+Every new e2e scenario discriminates the bug it was written for.
+
+## Spec-Anchored Acceptance Criteria (BRC-10)
+
+| Criterion | Spec-defined outcome | `file:line` + assertion | Result |
+| --- | --- | --- | --- |
+| P1-Choose AC 14, trigger `hero-close` | reopened map: `farm-chapter-3` pressed, every chip enabled, current chapter shown | `HUT:497` `chipsOf(ctx).some((chip) => chip.disabled)` false, title `Caminho do Capítulo 3`, `farm-chapter-3` `aria-pressed` `'true'`; `E2E:567` chips 1 to 3 `toBeEnabled()` (`E2E:581`), title, pressed, `states` equals `CURRENT_STOPS` (`E2E:583`) | PASS |
+| P1-Choose AC 14, trigger Esc | same | `E2E:631` `page.keyboard.press('Escape')`, then chips 1 to 3 `toBeEnabled()` (`E2E:650`), title and `farm-chapter-3` pressed | PASS |
+| P1-Choose AC 14, trigger "the game opens a panel screen over it" (scene `show('farm')`) | load dropped, chips enabled, current chapter | `HUT:600` `await ctx.ui.show('farm', {})`, chips enabled, title `Caminho do Capítulo 3`, `ctx.farm.chapter()` 3 after the late answer | PASS |
+| P1-Choose AC 14, trigger: the player opens another panel screen over Rever chefes (HUD button; switching screens keeps the panel open, `HUT:121`) | the chapter request is dropped (`HeroUi.js:247-248` comment of `dropFarmLoad`: "Leaving Rever chefes or opening a screen over it") | no test; mutant S9 survives | GAP (G1) |
+| P1-Choose AC 14, trigger: a click on a stop during the load | the request is dropped (the stop calls `close()`, `HeroUi.js:725`) | no test clicks a stop during a load; covered only through the shared `close()` path (S7, S10 killed) | GAP (G3, minor) |
+| P1-Choose AC 15, success answer | farm state (bosses, wins left, chapter, chapters, definitions), title, stops, pressed chip, chip states, error line unchanged | `FST:142` `bosses` `[]`, `winsLeft` null, `chapter` null, `chapters` `[]`, `definitionOf(2)` null; `HUT:521` `farm.chapter()` 3, `bosses` `state3.bosses`, `definitionOf(2)` null, title, `farm-chapter-3` pressed, `farm-chapter-2` `'false'`; `E2E:595` pressed (`E2E:612`), `states` `CURRENT_STOPS` (`E2E:613`), `farm-chapter-1` enabled (`E2E:614`), session check by the busy render of chip 1 (`E2E:622`) | PASS |
+| P1-Choose AC 15, failure answer | no error line, chips enabled, map kept | `FST:192` rejects with `ApiError`, state kept; `HUT:541` `.hero-error` hidden and `''`, chips enabled, title; `E2E:646` `.hero-error` `toBeHidden()` | PASS |
+
+## Edge Cases (TD-009)
+
+- [x] EC1 `hero-close` while chapter 2 is pending, reopen, late answer: `HUT:497`, `E2E:567` (before and after the answer, `E2E:581`, `E2E:590`); the later `farm-chapter-1` click keeps `Caminho do Capítulo 3` while chapter 1 loads: `E2E:595` (`E2E:622`, then `Caminho do Capítulo 1` at `E2E:626`).
+- [x] EC2 failure after Esc: `E2E:631` (`E2E:646`, `E2E:650`); unit with `hero-close`: `HUT:541`.
+- [x] EC3 a new request on the reopened map before the late answer: chips stay disabled until it answers, then the new chapter: `HUT:559` (chips all disabled after the stale answer, `selectFarmChapter(2)` sends nothing, then `Caminho do Capítulo 1`, pressed, chips enabled). No e2e scenario (G2).
+- [x] EC4 the game reopens Rever chefes itself during a pending request: `HUT:600`. No e2e scenario (G2).
+- [x] EC5 a scene reload after a refused farm win survives opening and closing another screen: `HUT:619` (`farm.chapter()` 3, `bosses` `state3.bosses`). Not player-visible by itself.
+
+## Discrimination Sensor
+
+Run: `node scripts/sensor.mjs <scratchpad>/mutants.json --json <scratchpad>/sensor-out.json` from the repo root, 12 mutants on the T20 code. S10 to S12 run through the T21 scenarios (`npx playwright test e2e/bossReplayChapters.spec.js -g "<scenario>"`), the others through one Vitest file (`HeroUi.test.js` or `farmSession.test.js`). Exit 1 (one survivor), isolation ok.
+
+| Mutant | File | Note | Outcome |
+| --- | --- | --- | --- |
+| S1 | `game/src/application/farm/farmSession.js` | load keeps a late answer (generation check off) | killed |
+| S2 | `game/src/application/farm/farmSession.js` | cancel() does nothing | killed |
+| S3 | `game/src/adapters/phaser/HeroUi.js` | dropFarmLoad keeps farmBusy | killed |
+| S4 | `game/src/adapters/phaser/HeroUi.js` | dropFarmLoad cancels when leaving any screen | killed |
+| S5 | `game/src/adapters/phaser/HeroUi.js` | dropFarmLoad never cancels the session load | killed |
+| S6 | `game/src/adapters/phaser/HeroUi.js` | show() does not drop the load | killed |
+| S7 | `game/src/adapters/phaser/HeroUi.js` | close() does not drop the load | killed |
+| S8 | `game/src/adapters/phaser/HeroUi.js` | chip finally ignores the view (stale load clears farmBusy, renders) | killed |
+| S9 | `game/src/adapters/phaser/HeroUi.js` | show() drops after this.screen changes (reads the new screen) | survived |
+| S10 | `game/src/adapters/phaser/HeroUi.js` | S7 through e2e | killed |
+| S11 | `game/src/adapters/phaser/HeroUi.js` | S3 through e2e (Esc path) | killed |
+| S12 | `game/src/application/farm/farmSession.js` | S1 through e2e | killed |
+
+**S9** moves `this.dropFarmLoad()` in `show()` (`HeroUi.js:156`) below `this.screen = screen;`, so it reads the screen being opened instead of the one being left. With it, opening any other screen from the HUD while a chapter load is pending resets `farmBusy` but does not call `farm.cancel()`, and the late answer writes the chapter 2 `bosses`, `winsLeft`, `chapter`, `chapters` and definition into the session, which AC 15 says stay as they were. Every test passes because the only `show()`-over-farm test (`HUT:600`) opens `farm` over `farm`, where both orders cancel. The mutant is not equivalent: the trigger is reachable (`HUT:121` switches screens with the panel open; the HUD buttons call `this.show(id)`, `HeroUi.js:110`) and the comment of `dropFarmLoad` names this case.
+
+**Sensor depth**: lightweight plus (12 mutants over every new branch of T20: the generation check, `cancel`, both `dropFarmLoad` calls and its two statements, the `finally` view check and the call order in `show()`; three repeated through e2e).
+**Sensor**: 12 mutants, 11 killed, 1 survived (S9).
+
+## Gate Check (round 2 scope)
+
+| Suite | Command | Outcome |
+| --- | --- | --- |
+| Game unit | `cd game && npm test` | 74 files, 1668 tests passed, 0 failed (round 1: 1657; +11 = 5 `FST` + 6 `HUT`, the counts of T20 Done-when 1) |
+| e2e (feature scope) | `cd game && npx playwright test e2e/bossReplayChapters.spec.js e2e/farm.spec.js e2e/bossMap.spec.js` (project config, 3 workers) | 44 passed, 0 failed (7.8 min): `bossReplayChapters.spec.js` 29 (26 + 3 new), `farm.spec.js` 9, `bossMap.spec.js` 6 |
+| Backend | not run this round | no `backend/` file in `2a271cc..4990872`; round 1 991/991 |
+| Full e2e | not run this round | the round returns FAIL; the full suites run once, in the round that returns PASS |
+
+- **Failures not caused by the feature**: none.
+- **Test integrity**: no existing test changed or deleted (the T20 and T21 diffs only add cases; `farm.spec.js` and `bossMap.spec.js` untouched).
+
+## Code Quality
+
+| Principle | Status |
+| --- | --- |
+| Minimum code | PASS: a generation counter in the session and one `dropFarmLoad()` in `HeroUi`, as the T20 contract says |
+| Surgical changes | PASS: only the files of the T20 and T21 contracts; `ClickerGame.js` unchanged |
+| No scope creep | PASS |
+| Matches patterns | PASS: reuses the `view` counter guard; `holdFarm` follows the other fake backend controls |
+| Spec-anchored outcome check | PASS for every covered trigger and outcome; G1 and G3 are untested triggers of AC 14 |
+| Every test maps to a requirement | PASS: each of the 14 new tests names AC 14, AC 15 or a TD-009 edge case |
+| Documented guidelines followed | `CLAUDE.md`, `.claude/agents/verifier.md`, `tasks.md` Test Coverage Matrix |
+
+## Gaps (ranked)
+
+1. **G1 (surviving mutant S9, AC 14 and 15)**, owner `test-engineer`: add a `HeroUi.test.js` case in `describe('choosing a chapter')`, e.g. `opening another screen over Rever chefes during a chapter load drops that load`: open `farm`, click `farm-chapter-2` with the answer held, `await open(ctx, 'heroes')` (or click `hud-heroes`), resolve the chapter 2 answer, `await flush()`, then `expect(ctx.farm.chapter()).toBe(3)`, `expect(ctx.farm.bosses()).toEqual(state3.bosses)`, `expect(ctx.farm.definitionOf(2)).toBeNull()`. On S9 it must fail at `farm.chapter()`. No production change.
+2. **G2 (spec success criterion "the player-visible ones an e2e scenario")**, owner `product-owner` to rule, then `test-engineer`: EC3 (a new chip load on the reopened map before the late answer) and EC4 (the game reopening Rever chefes after the last daily win during a chapter load) are player-visible and have unit tests only (`HUT:559`, `HUT:600`). T21 scoped e2e to EC1 and EC2. Either add the two scenarios (EC3 is a short extension of `E2E:595`: click `farm-chapter-1` under `holdFarm(1)` before `releaseChapter2()`) or record in the spec that unit coverage suffices for them.
+3. **G3 (AC 14 trigger "a click on a stop")**, owner `test-engineer`, minor: no test clicks a stop while a chapter load is pending; the path is `onPick` then `close()` (`HeroUi.js:723-727`), whose drop S7 and S10 cover. One `HUT` case (click `farm-entry-miniboss-1` during a held chapter 2 load, resolve it, assert `farm.chapter()` 3 and `hooks.startFarm` called with a chapter 3 boss and no `chapter` field) closes it and can share the setup of G1.
+
+## Requirement Traceability Update
+
+| Requirement | Previous Status | New Status |
+| --- | --- | --- |
+| BRC-10 | Pending | Needs fix (G1; G2 waits for a PO ruling) |
+
+## Summary
+
+**Overall**: Not ready. The TD-009 fix works: the three new e2e scenarios fail on the code before T20 and pass on it, and 10 of the 11 new unit cases fail before T20. One trigger of AC 14, the player opening another screen over Rever chefes during a chapter load, has no test, and the sensor shows it (S9 survives).
+
+**Spec-anchored check**: AC 15 and the `hero-close`, Esc and scene `show('farm')` triggers of AC 14 match the spec outcome; 2 triggers of AC 14 untested (G1, G3); 2 visible edge cases without e2e (G2).
+**Sensor**: 11/12 killed (S9 survived).
+**Gate**: game unit 1668/1668, e2e 44/44 (feature scope); backend not run (no backend change).
+
+**Next steps**: `test-engineer` adds the G1 case (and G3 if bundled); `product-owner` rules on G2; then Verifier round 3: S9 re-run plus 1 to 3 new mutants, the game unit suite, the feature e2e files, and the full backend and e2e suites as the final gate.

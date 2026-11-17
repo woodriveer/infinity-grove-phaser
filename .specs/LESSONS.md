@@ -588,6 +588,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: game/src/adapters/phaser/HeroUi.js:726 (validation.md F1) (game/ui-async)
 - last seen: 2026-11-17T11:44:39Z
 
+### L-097 - When a guard reads a field that the same method overwrites right after (the screen being left, the previous state), test a transition where the old and new values differ; a same-value transition cannot tell the call order apart.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game/adapters` · harmful: 0
+- features: boss-replay-chapters
+- evidence: validation.md round 2 S9 (HeroUi.js:156) (game/adapters)
+- last seen: 2026-11-17T13:08:29Z
+
+### L-098 - When an AC lists several triggers for one outcome, give each trigger its own test; a shared code path covered by another trigger is not evidence for the rest.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `game/adapters` · harmful: 0
+- features: boss-replay-chapters
+- evidence: validation.md round 2 G3 (P1-Choose AC 14, HeroUi.js:725) (game/adapters)
+- last seen: 2026-11-17T13:08:29Z
+
+### L-099 - When the spec promises an e2e scenario for every player-visible edge case, the e2e task lists each visible edge case or the spec records which ones stay unit-only.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `tasks` · harmful: 0
+- features: boss-replay-chapters
+- evidence: validation.md round 2 G2 (TD-009 EC3, EC4) (tasks)
+- last seen: 2026-11-17T13:08:29Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
