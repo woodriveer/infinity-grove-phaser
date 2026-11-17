@@ -93,7 +93,7 @@ T13 → T14
 
 ## Task Breakdown
 
-### T1: Beaten bosses of any chapter and the reached chapters [ ]
+### T1: Beaten bosses of any chapter and the reached chapters [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: `FarmBoss.beaten` answers the bosses of any chapter number, and a new `FarmBoss.reachedChapters` lists chapters 1 to the current one (BRC-01; spec P2-State AC 2-4).
@@ -158,8 +158,8 @@ return minibosses.map { FarmBoss(Encounter.MINIBOSS, it) } + chapterBoss
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 7 new cases pass; every existing `FarmServiceTest` and `FarmControllerIT` case passes unchanged.
-- [ ] `git diff --stat` lists only `Farm.kt`, `FarmBossTest.kt` and `tasks.md`.
+- [x] The 7 new cases pass; every existing `FarmServiceTest` and `FarmControllerIT` case passes unchanged.
+- [x] `git diff --stat` lists only `Farm.kt`, `FarmBossTest.kt` and `tasks.md`.
 
 **Commit**: `feat(backend): list the beaten bosses of any reached chapter`
 
