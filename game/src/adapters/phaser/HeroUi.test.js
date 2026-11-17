@@ -362,6 +362,138 @@ describe('HeroUi Rever chefes', () => {
         expect(ctx.query('.hero-error').textContent).toBe('Não foi possível carregar.');
         expect(ctx.testid('farm-list')).toBeNull();
     });
+
+    describe('choosing a chapter', () => {
+        const AT3 = { chapter: 3, stage: 4, kind: 'PHASE', stageCount: 10, completed: false };
+        const minibosses = (...stages) => stages.map((stage) => ({ kind: 'MINIBOSS', stage }));
+        const ELEVEN = [ ...minibosses(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), { kind: 'CHAPTER_BOSS' } ];
+        const tenStages = () => Array.from({ length: 10 }, (_, index) => ({ number: index + 1 }));
+        const DEF2 = { bossHealth: 20, bossTimeLimitMs: 50_000, stages: tenStages() };
+        const DEF3 = { bossHealth: 30, bossTimeLimitMs: 60_000, stages: tenStages() };
+        const state3 = { chapter: 3, chapters: [ 1, 2, 3 ], bosses: minibosses(1, 2, 3), chapterBossWinsLeft: 10, definition: DEF3 };
+        const state2 = { chapter: 2, chapters: [ 1, 2, 3 ], bosses: ELEVEN, chapterBossWinsLeft: 10, definition: DEF2 };
+        const chipsOf = (ctx) => [ ...ctx.query('.farm-chapters').querySelectorAll('.farm-chapter') ];
+        const stopsOf = (ctx) => [ ...ctx.query('.farm-map').querySelectorAll('.map-node') ];
+        const title = (ctx) => ctx.testid('farm-map-title').textContent;
+
+        //  Chapter 3 is the campaign's; the chapter 2 answer is made by `chapter2()` when a chip asks for chapter 2
+        const setup = (ctx, chapter2 = () => Promise.resolve(state2)) => {
+            ctx.ui.hooks.mapPosition = () => AT3;
+            ctx.farmGateway.get.mockImplementation((chapter) => (chapter === 2 ? chapter2() : Promise.resolve(state3)));
+        };
+
+        it('opening Rever chefes loads the current chapter and shows the chapter buttons of the answer', async () => {
+            const ctx = createUi();
+            setup(ctx);
+
+            await open(ctx, 'farm');
+
+            expect(ctx.farmGateway.get.mock.calls[0]).toEqual([]);
+            expect(ctx.testid('farm-chapter-3').getAttribute('aria-pressed')).toBe('true');
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+        });
+
+        it('a chapter button loads that chapter and draws its map with every stop defeated', async () => {
+            const ctx = createUi();
+            setup(ctx);
+            await open(ctx, 'farm');
+
+            ctx.testid('farm-chapter-2').click();
+            await flush();
+
+            expect(ctx.farmGateway.get.mock.calls.at(-1)).toEqual([ 2 ]);
+            expect(title(ctx)).toBe('Caminho do Capítulo 2');
+            expect(stopsOf(ctx).map((node) => node.getAttribute('data-state'))).toEqual(Array(11).fill('defeated'));
+            expect(ctx.testid('farm-chapter-2').getAttribute('aria-pressed')).toBe('true');
+        });
+
+        it('the chapter buttons are disabled while the chapter loads', async () => {
+            const ctx = createUi();
+            let resolveChapter2;
+            setup(ctx, () => new Promise((resolve) => { resolveChapter2 = resolve; }));
+            await open(ctx, 'farm');
+
+            ctx.testid('farm-chapter-2').click();
+
+            expect(chipsOf(ctx).every((chip) => chip.disabled)).toBe(true);
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+
+            resolveChapter2(state2);
+            await flush();
+
+            expect(chipsOf(ctx).some((chip) => chip.disabled)).toBe(false);
+        });
+
+        it('a failed chapter load keeps the map and says Não foi possível carregar.', async () => {
+            const ctx = createUi();
+            setup(ctx, () => Promise.reject(new ApiError('Cannot reach the server. Try again later.')));
+            await open(ctx, 'farm');
+
+            ctx.testid('farm-chapter-2').click();
+            await flush();
+
+            expect(ctx.query('.hero-error').textContent).toBe('Não foi possível carregar.');
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+            expect(ctx.testid('farm-chapter-3').getAttribute('aria-pressed')).toBe('true');
+            expect(chipsOf(ctx).some((chip) => chip.disabled)).toBe(false);
+        });
+
+        it('a stop of an earlier chapter starts the farm fight with that chapter', async () => {
+            const ctx = createUi();
+            setup(ctx);
+            await open(ctx, 'farm');
+            ctx.testid('farm-chapter-2').click();
+            await flush();
+
+            ctx.testid('farm-entry-miniboss-3').click();
+
+            expect(ctx.hooks.startFarm).toHaveBeenCalledWith({ kind: 'MINIBOSS', stage: 3, chapter: 2 });
+            expect(ctx.ui.isOpen).toBe(false);
+        });
+
+        it('a stop of the current chapter starts the farm fight without a chapter', async () => {
+            const ctx = createUi();
+            setup(ctx);
+            await open(ctx, 'farm');
+
+            ctx.testid('farm-entry-miniboss-1').click();
+
+            expect(ctx.hooks.startFarm).toHaveBeenCalledWith({ kind: 'MINIBOSS', stage: 1 });
+        });
+
+        it('show farm with a chapter loads that chapter', async () => {
+            const ctx = createUi();
+            setup(ctx);
+
+            await ctx.ui.show('farm', { chapter: 2 });
+
+            expect(ctx.farmGateway.get.mock.calls.at(-1)).toEqual([ 2 ]);
+            expect(title(ctx)).toBe('Caminho do Capítulo 2');
+        });
+
+        it('opening from the HUD again shows the current chapter', async () => {
+            const ctx = createUi();
+            setup(ctx);
+            await open(ctx, 'farm');
+            ctx.testid('farm-chapter-2').click();
+            await flush();
+            ctx.testid('hero-close').click();
+
+            await open(ctx, 'farm');
+
+            expect(ctx.farmGateway.get.mock.calls.at(-1)).toEqual([]);
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+        });
+
+        it('a farm answer without the new fields shows no chapter buttons', async () => {
+            const ctx = createUi();
+
+            await open(ctx, 'farm');
+
+            expect(ctx.testid('farm-chapters')).toBeNull();
+            expect(ctx.testid('farm-entry-miniboss-1')).not.toBeNull();
+        });
+    });
 });
 
 describe('HeroUi skill bar', () => {

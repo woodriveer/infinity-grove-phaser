@@ -715,7 +715,7 @@ The disabled look comes from the existing global `button:disabled` rule (opacity
 
 ---
 
-### T10: Rever chefes loads, switches and reopens chapters [ ]
+### T10: Rever chefes loads, switches and reopens chapters [x]
 
 **Owner**: game-dev
 **Goal**: `HeroUi` opens Rever chefes on the current chapter, switches chapters from the chips with the chips disabled while loading, keeps the map and shows `Não foi possível carregar.` on a failed load, passes the chapter of an earlier chapter to the fight, and opens a given chapter through `show('farm', { chapter })` (BRC-04, BRC-05; spec P1-Choose AC 4, 8-10, P1-Fight AC 13, P2-Compatibility AC 2).
@@ -829,7 +829,7 @@ The HUD button keeps calling `show('farm')` with no options, so every opening fr
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 9 new cases pass; the 3 existing `HeroUi Rever chefes` cases pass unchanged.
+- [x] The 9 new cases pass; the 3 existing `HeroUi Rever chefes` cases pass unchanged.
 
 **Commit**: `feat(game): pick the chapter on Rever chefes`
 

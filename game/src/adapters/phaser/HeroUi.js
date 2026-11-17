@@ -1,3 +1,4 @@
+import { farmMapPosition } from '../../domain/campaign/bossMap';
 import { bagPieces, selectedInBag, sellNotice as sellNoticeText, toggleRarity, toggleSelected } from '../../domain/equipment/bulkSell';
 import { dropLabel, wornBy } from '../../domain/equipment/equipment';
 import { leaderStats } from '../../domain/equipment/leaderStats';
@@ -96,6 +97,7 @@ export class HeroUi
         this.open = false;
         this.view = 0;
         this.noticeId = 0;
+        this.farmBusy = false;
 
         const hud = this.createDom(HUD, HUD_HTML);
 
@@ -179,7 +181,7 @@ export class HeroUi
         {
             if (screen === 'farm')
             {
-                await this.farm.load();
+                await this.farm.load(options.chapter);
             }
             else if (screen === 'equipment')
             {
@@ -688,14 +690,66 @@ export class HeroUi
     render_farm ()
     {
         this.setError('');
+
+        const current = this.hooks.mapPosition?.() ?? DEFAULT_POSITION;
+        const listed = this.farm.chapter();
+        const definition = listed === null ? null : this.farm.definitionOf(listed);
+        const map = farmMapPosition(current, listed, definition?.stages?.length ?? current.stageCount);
+        //  The fight of another chapter than the campaign's carries that chapter; the current chapter's fight stays as it was
+        const other = listed !== null && listed !== current.chapter;
+
         this.body.replaceChildren(renderFarm(this.farm.bosses(), this.farm.winsLeft(), {
-            map: this.hooks.mapPosition?.() ?? DEFAULT_POSITION,
+            map,
+            chapters: this.farm.chapters(),
+            chapter: listed,
+            currentChapter: current.chapter,
+            busy: this.farmBusy,
+            onChapter: (chapter) => this.selectFarmChapter(chapter),
             onPick: (boss) =>
             {
                 this.close();
-                this.hooks.startFarm(boss);
+                this.hooks.startFarm(other ? { ...boss, chapter: listed } : boss);
             }
         }));
+    }
+
+    //  Loads another chapter of Rever chefes; the chips are disabled meanwhile and a failure keeps the map shown before
+    async selectFarmChapter (chapter)
+    {
+        if (this.farmBusy)
+        {
+            return;
+        }
+
+        const view = this.view;
+        let failed = false;
+
+        this.farmBusy = true;
+        this.render_farm();
+
+        try
+        {
+            await this.farm.load(chapter);
+        }
+        catch
+        {
+            failed = true;
+        }
+        finally
+        {
+            this.farmBusy = false;
+
+            if (view === this.view && this.screen === 'farm')
+            {
+                this.render_farm();
+
+                //  After the render: render_farm clears the error line first
+                if (failed)
+                {
+                    this.setError(LOAD_FAILED);
+                }
+            }
+        }
     }
 
     //  The leader card and its three slots; empty until the heroes load
