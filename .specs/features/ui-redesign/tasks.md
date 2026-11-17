@@ -11,7 +11,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 **Spec**: `.specs/features/ui-redesign/spec.md`
 **Design**: `.specs/features/ui-redesign/design.md`
 **Reference image**: `.specs/features/ui-redesign/reference.jpg` (look at it before any CSS task)
-**Status**: Approved by the owner on 2026-11-12, defaults of Q2 to Q5 accepted (Q1 decided as D1 on 2026-11-12: round auto click button, its window and the key `A`, tasks T13 to T16; written with the defaults of the open Q2 to Q5). T1 to T30 done. Phase 10 (T31 to T38, fixes of the T30 review) added on 2026-11-13 and done the same day. On 2026-11-17 the owner approved Phase 10 and the fixes of the Verifier round 2 FAIL: "Sim, conclua". Phase 11 (T39 to T53) added on 2026-11-17 under that approval: T39 to T49 record the round 2 fixes already on `main` (2026-11-13 and 2026-11-14), T50 to T53 are open. The 27 "Done when" boxes of T1 to T19 left unticked by the executors were ticked on 2026-11-17 by the PO with the evidence of § Phase 11 notes
+**Status**: Approved by the owner on 2026-11-12, defaults of Q2 to Q5 accepted (Q1 decided as D1 on 2026-11-12: round auto click button, its window and the key `A`, tasks T13 to T16; written with the defaults of the open Q2 to Q5). T1 to T53 done (Phases 1 to 11). Verifier round 3 PASS (`2110a69`); accepted by the product owner on 2026-11-17 (§ Acceptance) on 2026-11-13 and done the same day. On 2026-11-17 the owner approved Phase 10 and the fixes of the Verifier round 2 FAIL: "Sim, conclua". Phase 11 (T39 to T53) added on 2026-11-17 under that approval: T39 to T49 record the round 2 fixes already on `main` (2026-11-13 and 2026-11-14), T50 to T53 are open. The 27 "Done when" boxes of T1 to T19 left unticked by the executors were ticked on 2026-11-17 by the PO with the evidence of § Phase 11 notes
 
 Rules for every task:
 
@@ -23,6 +23,45 @@ Rules for every task:
 - Never change player text, a `data-testid`, a class name the tests read, or a scene coordinate, unless the task says so.
 - A test that pinned an old colour or font is updated to the new spec value and renamed after the new look, exactly as the task says. Never delete or weaken any other test to pass a gate.
 - **Phase gate**: the last task of every phase also runs `cd game && npm test && npx playwright test`; every suite must pass unchanged.
+
+---
+
+## Acceptance (product-owner, 2026-11-17)
+
+**Verdict: ACCEPTED.** All 53 tasks are done, the Verifier round 3 gives PASS and the ui-artist's final review (T53) gives APROVADO. No new task.
+
+**Evidence read**: `validation.md` round 3 (`2110a69`, PASS at `caa2490`): 107 of 107 ACs covered with `file:line` evidence, 10 of 10 testable edge cases, sensor 16 mutants and 16 killed, gaps none. Game unit 1620/1620, backend 985/985, e2e 315/319: the 4 failures (`dragEquip.spec.js:586`, `dragEquip.spec.js:670`, `clickPower.spec.js:41`, `uiRedesign.spec.js:2089`) each passed alone twice with `--workers=1`, so they count as load flakes by the rule of `STATE.md` Handoff. `ui-review.html` T53 section (`0101e6c`): APROVADO, every shot that differs from T38 has a named cause, the pressed state of T49 is darker than the hover on `Refinar` and `Vender` (shots 38 and 39), no new finding. `validate_state.py ui-redesign` exits 0.
+
+**Spec goals** (`spec.md`, Goals):
+
+| Goal | Evidence | Status |
+| --- | --- | --- |
+| 1. Every screen in the Grove theme, desktop and phone | UIR-01 to UIR-15, UIR-18, UIR-19 verified; T53 review of 66 shots (desktop and phone) plus 4 hover and press shots | Met. The parchment seam (#10) waits for the owner's new texture file; no text loses contrast on it |
+| 2. No magenta on any skill thumbnail | UIR-16 verified: 15 JPEGs, 956 763 bytes, magenta 0.0000 % (round 2), assets unchanged since; e2e `shows no magenta in the detail of any of the five heroes` | Met |
+| 3. No rule, request, control, text or test id changes; the suites pass | Unit, backend and e2e as above; the one behaviour change is D1 (owner decision); the one new text is `Fraco: <elemento>`; `HP 1K/1K` comes from `campaign-chapters`, not from this feature | Met |
+| 4. Contrast and focus at least as good as today | Every pair of `design.md` § Contrast reaches 4.5:1; focus outline 3.15:1 on parchment and 3.63:1 on wood; the talent inks pinned in [5.90, 6.02] and at least 4.82 (UIR-14 AC 15) | Met. Disabled wood buttons near 2.7:1 (#11) are outside the table and exempt in WCAG 2.x; kept at opacity 0.45 per UIR-02 AC 11 |
+
+**Success criteria**: ui-artist review APROVADO (T53); unit and e2e suites pass with `e2e/uiRedesign.spec.js` added (4 load flakes, each passed alone twice); the 15 skill images total 956 763 bytes, under 2 MB. All three met.
+
+**Edits made at acceptance**:
+
+1. UIR-05 AC 10: the example of the kept text is now `HP 1K/1K` (Verifier note N2). No value of the AC changes; the Assumptions table records it.
+2. Spec Goals and Success Criteria ticked; traceability UIR-01 to UIR-19 set to Verified.
+3. Assumptions rows "Scope of the redesign" and "Kind of change" set to confirmed: the owner approved the spec on 2026-11-12 (§ Open Questions).
+
+**Waiting for the owner's confirmation** (rows marked `n` in the spec Assumptions table; the feature ships with these defaults):
+
+1. D2: the enemy line drops 13 px (centre y 609 instead of y 596) while the `Fraco: <elemento>` chip shows (UIR-04 AC 7).
+2. D3: the beaten stops of the boss map keep the boss map look (UIR-13 AC 16), not the inset recipe of the other inner cards (UIR-13 AC 4).
+3. Finding #10: parchment seam every 512 px. Owner art: a new seamless `game/public/assets/ui-parchment.jpg` (512 x 512, no vignette, mean luminance near 225, standard deviation at most 8); `style.css` does not change.
+4. Finding #11: disabled buttons stay at opacity 0.45 (about 2.7:1). Raising it to 0.65 changes every disabled button and needs a new feature.
+5. Finding #12: pink fringe on `talent-combo.png` and `talent-click-flat-damage.png`, seen only at 6x zoom. Owner art pass.
+6. Finding #13: the element line of the hero cards is not aligned between one-line and two-line names. Candidate for a later polish pass (`min-height: 2.4em` on the name).
+7. `Click to Start!` stays a prompt (`<p>`), not a button (UIR-15 AC 6). The PO ruled it under the owner's "Sim, conclua" of 2026-11-17; listed so the owner sees it.
+
+**Not tasks of this feature**: the T53 suggestions. The English menu and HUD texts are TD-001. The 90 px `Chefe` card that covers the last stone of the boss map belongs to the boss map, for the owner to decide. Verifier note N1 (`uiRedesign.spec.js:2089` runs about 30 s of its 60 s budget) is in the `STATE.md` Handoff for the next change to that file.
+
+**Next step**: `gitops`: deploy check, `report.html`, `CHANGELOG.md`, release tag.
 
 ---
 

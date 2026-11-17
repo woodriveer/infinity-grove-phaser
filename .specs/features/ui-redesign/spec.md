@@ -27,10 +27,10 @@ The game looks like a flat mobile app: cream pills with large rounded corners ov
 
 ## Goals
 
-- [ ] Every screen of the game (login and path choice, preloader, battle HUD, every hero screen, overlays, tooltips and notices) uses the Grove theme of `design.md`: the palette, Cinzel for headings, parchment panels and dark wood frames, on desktop and phone.
-- [ ] No skill thumbnail shows its magenta chroma-key background anywhere (15 images, 5 heroes).
-- [ ] No game rule, request, control behaviour, text or test id changes: the existing Vitest and Playwright suites pass, with only the visual values listed in `tasks.md` updated.
-- [ ] Text contrast and focus visibility are at least as good as today: every pair of the design's contrast table reaches 4.5:1, the focus ring reaches 3:1 on parchment and on wood.
+- [x] Every screen of the game (login and path choice, preloader, battle HUD, every hero screen, overlays, tooltips and notices) uses the Grove theme of `design.md`: the palette, Cinzel for headings, parchment panels and dark wood frames, on desktop and phone.
+- [x] No skill thumbnail shows its magenta chroma-key background anywhere (15 images, 5 heroes).
+- [x] No game rule, request, control behaviour, text or test id changes: the existing Vitest and Playwright suites pass, with only the visual values listed in `tasks.md` updated.
+- [x] Text contrast and focus visibility are at least as good as today: every pair of the design's contrast table reaches 4.5:1, the focus ring reaches 3:1 on parchment and on wood.
 
 ## Out of Scope
 
@@ -57,8 +57,8 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --- | --- | --- | --- |
-| Scope of the redesign | Every screen: login and path choice, preloader, battle HUD, every hero screen (Heróis, detail, Mochila, bulk sell, Fusão, Líder, Equipamento with tiles and tooltip, Talentos, Rever chefes), pause, reset dialog, auto click, farm switch, notices, element wheel, skill tooltip; desktop and phone viewports | Orchestrator assumption 1; one theme for the whole game | n (owner confirms at approval) |
-| Kind of change | Visual only: no backend change, no new game rule; layout changes only where the data already exists (timer ring, enemy chips, weak element chip, round farm button). The one behaviour change is D1: the auto click controls move into a window opened by a round button or the key `A` | Orchestrator assumption 2; D1 is the owner's decision | n (D1: y) |
+| Scope of the redesign | Every screen: login and path choice, preloader, battle HUD, every hero screen (Heróis, detail, Mochila, bulk sell, Fusão, Líder, Equipamento with tiles and tooltip, Talentos, Rever chefes), pause, reset dialog, auto click, farm switch, notices, element wheel, skill tooltip; desktop and phone viewports | Orchestrator assumption 1; one theme for the whole game | y (owner approved the spec, 2026-11-12) |
+| Kind of change | Visual only: no backend change, no new game rule; layout changes only where the data already exists (timer ring, enemy chips, weak element chip, round farm button). The one behaviour change is D1: the auto click controls move into a window opened by a round button or the key `A` | Orchestrator assumption 2; D1 is the owner's decision | y (owner approved the spec, 2026-11-12; D1: y) |
 | How the look is built | CSS tokens and recipes in `game/public/style.css`, the Cinzel web font and the existing assets; Phaser colours for the HP bar, damage numbers, menu oval and preloader bar; painted textures only through prompts (Q4) | Orchestrator assumption 3; ships without new art | y |
 | Tests and accessibility | Every existing test id, class name and text stays; contrast and focus are not reduced; no new animation | Orchestrator assumption 4 | y |
 | Auto click placement | D1: round button at scene (867, 686) in the battle bar, window above it; the left card is removed | Owner decision 2026-11-12 | y |
@@ -78,6 +78,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 | Beaten stops of the boss map (Verifier round 3, D3) | The `farm-entry-<id>` stops keep the boss map look (UIR-13 AC 16), not the inset recipe; "farm entries" leaves the inset list of AC 4 | The farm list rows the AC named no longer render (the boss map replaced them); an inset rectangle on a round map stop would break the map | n (product owner, 2026-11-14; owner confirms at acceptance) |
 | `Click to Start!` (Verifier round 2, spec-precision gap) | A prompt, not a button: `<p class="welcome-start">` stays, a click anywhere on the canvas starts the game, and the prompt is drawn as an ember pill with no hover or press shade (UIR-15 AC 6); it leaves the primary button list of UIR-02 AC 8 (amended `af8af7a`) | Fixing the wording changes nothing the player sees; a real button would add a focus stop, hover and press states and a second way to start, a change to the game the ui-artist already approved (T30, T38) | y (product owner ruling, 2026-11-17, under the owner's approval of the round 2 fixes: "Sim, conclua") |
 | Findings #10 to #13 of the T38 review | #10 (parchment seam) and #12 (pink fringe on two talent icons) wait for the owner's art pass; #11 keeps opacity `0.45` per UIR-02 AC 11; #13 (element line of the hero cards) is deferred polish | #10 and #12 are owner art, not code (Q4); #11 would change an approved AC and every disabled button; #13 is optional per the review and adds a layout rule the spec does not state | n (product owner, 2026-11-17; owner confirms at acceptance) |
+| Example of UIR-05 AC 10 (Verifier round 3, note N2) | The example reads `HP 1K/1K`: `campaign-chapters` (`a582a3e`) abbreviates the HP numbers on purpose; the AC's font, colour and stroke are unchanged and still asserted | The redesign changes no text; the abbreviation belongs to another feature, so the example follows the game | y (product owner, 2026-11-17; editorial, no value of the AC changes) |
 | Reference rendering for numbers in tests | Colours are asserted as the computed `rgb(...)` strings of `design.md`; the contrast ratios are computed from those values (WCAG 2.x relative luminance) | L-013: exact markers, not adjectives | y |
 
 **Open questions:** none - Q1 is decided (D1) and the owner accepted the defaults of Q2 to Q5 and approved the spec on 2026-11-12.
@@ -132,7 +133,7 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 7. Every HUD element SHALL keep the scene anchor it has at baseline `5d98b6f`, measured in the 1024 x 768 scene within 1 scene px in the same battle state: the left edge of `.stage-hud` at x 156 and its vertical centre at y 44, the right edge of `.wallet` at x 1004 and its vertical centre at y 44, the centre of `chapter-hud` at (82, 96), of `combo-hud` at (670, 150) and of `.boss-timer` at (512, 44), and the horizontal centre of `.enemy-stats` at x 670; the exceptions are the three of the battle bar that make room for the auto click button (the skill bar moves from x 586 to x 550, the farm button from x 918 to x 951, the auto click from (366, 200) to (867, 686)) and the vertical centre of the enemy line, which shares the box `.hud-enemy` (460 x 80, centred on (670, 596)) with the weak chip of UIR-08 as one column centred on y 596 (chip, 4 px gap, line): WHILE the chip renders (FIRE, WATER or NATURE encounter, chip 22 px tall) the vertical centre of `.enemy-stats` SHALL be y 609, and WHILE no chip renders (LIGHT or DARKNESS encounter) it SHALL be y 596. (Amended 2026-11-14, Verifier round 3: the anchors are the ones the e2e test measures; the 13 px drop of the line under the chip is accepted.)  <!-- UIR-04 -->
 8. The monster health bar SHALL keep 240 x 16 px and its position, with the back colour `0x2a1410` and the fill colour `0xc0392b`.  <!-- UIR-05 -->
 9. The box over the bar (`.hud-monster-hp`) SHALL draw a frame of a 2 px ring `rgb(28, 18, 12)` inside a 2 px ring `rgb(176, 122, 58)` and a gloss gradient, and SHALL stay click-through.  <!-- UIR-05 -->
-10. The HP text (`monster-hp`, e.g. `HP 1000/1000`) SHALL keep its text and render in Figtree 800 12 px, colour `rgb(255, 244, 220)` with a 3 px stroke `rgb(28, 18, 12)`.  <!-- UIR-05 -->
+10. The HP text (`monster-hp`, e.g. `HP 1K/1K`; `campaign-chapters` abbreviates the numbers since `a582a3e`) SHALL keep its text and render in Figtree 800 12 px, colour `rgb(255, 244, 220)` with a 3 px stroke `rgb(28, 18, 12)`.  <!-- UIR-05 -->
 11. WHEN a hit that is not critical lands THEN its number SHALL be a Phaser text with fontFamily `Cinzel`, fontStyle `700`, fontSize 32, colour `#ffd35c`, stroke `#2a1408` and strokeThickness 8.  <!-- UIR-05 -->
 12. WHEN a critical hit lands THEN its number SHALL be a Phaser text with fontFamily `Cinzel`, fontStyle `700`, fontSize 48, colour `#ff8a1f`, stroke `#2a1408` and strokeThickness 8.  <!-- UIR-05 -->
 13. WHILE a miniboss or chapter boss countdown runs, the timer (`.boss-timer`) SHALL keep its text (`Time: <seconds>`) and render as a dark frame pill: background-color `rgb(43, 29, 20)`, a 2 px solid border `rgb(176, 122, 58)`, Cinzel 700 20 px, text `rgb(243, 213, 138)`, led by a 32 px progress ring.  <!-- UIR-06 -->
@@ -326,32 +327,32 @@ Every ambiguity is resolved or recorded here - nothing is left silently unclear.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| UIR-01 | P1: Grove theme foundation | Tasks | In Tasks |
-| UIR-02 | P1: Grove theme foundation | Tasks | In Tasks |
-| UIR-03 | P1: Grove theme foundation | Tasks | In Tasks |
-| UIR-04 | P1: Battle HUD | Tasks | In Tasks |
-| UIR-05 | P1: Battle HUD | Tasks | In Tasks |
-| UIR-06 | P1: Battle HUD | Tasks | In Tasks |
-| UIR-07 | P1: Battle HUD | Tasks | In Tasks |
-| UIR-08 | P2: Weak element chip | Tasks | In Tasks |
-| UIR-09 | P1: Battle HUD | Tasks | In Tasks |
-| UIR-10 | P1: Battle HUD | Tasks | In Tasks |
-| UIR-11 | P1: Battle HUD | Tasks | In Tasks |
-| UIR-12 | P1: Battle HUD | Tasks | In Tasks |
-| UIR-13 | P1: Hero screens | Tasks | In Tasks |
-| UIR-14 | P1: Hero screens | Tasks | In Tasks |
-| UIR-15 | P2: Main menu and preloader | Tasks | In Tasks |
-| UIR-16 | P1: Skill thumbnails without magenta | Tasks | In Tasks |
-| UIR-17 | P3: Painted textures | Tasks | In Tasks |
-| UIR-18 | P1: Review screenshots | Tasks | In Tasks |
-| UIR-19 | P1: Round auto click button and its window | Tasks | In Tasks |
+| UIR-01 | P1: Grove theme foundation | Done | Verified |
+| UIR-02 | P1: Grove theme foundation | Done | Verified |
+| UIR-03 | P1: Grove theme foundation | Done | Verified |
+| UIR-04 | P1: Battle HUD | Done | Verified |
+| UIR-05 | P1: Battle HUD | Done | Verified |
+| UIR-06 | P1: Battle HUD | Done | Verified |
+| UIR-07 | P1: Battle HUD | Done | Verified |
+| UIR-08 | P2: Weak element chip | Done | Verified |
+| UIR-09 | P1: Battle HUD | Done | Verified |
+| UIR-10 | P1: Battle HUD | Done | Verified |
+| UIR-11 | P1: Battle HUD | Done | Verified |
+| UIR-12 | P1: Battle HUD | Done | Verified |
+| UIR-13 | P1: Hero screens | Done | Verified |
+| UIR-14 | P1: Hero screens | Done | Verified |
+| UIR-15 | P2: Main menu and preloader | Done | Verified |
+| UIR-16 | P1: Skill thumbnails without magenta | Done | Verified |
+| UIR-17 | P3: Painted textures | Done | Verified |
+| UIR-18 | P1: Review screenshots | Done | Verified |
+| UIR-19 | P1: Round auto click button and its window | Done | Verified |
 
-**Coverage:** 19 total, 19 mapped to tasks, 0 unmapped.
+**Coverage:** 19 total, 19 mapped to tasks, 0 unmapped; 19 verified (Verifier round 3, `2110a69`), accepted by the product owner on 2026-11-17 (`tasks.md` § Acceptance).
 
 ---
 
 ## Success Criteria
 
-- [ ] The ui-artist review of the `ui:shots` screenshots (desktop and phone) finds every screen in the Grove theme and no magenta.
-- [ ] `cd game && npm test` and `cd game && npx playwright test` pass, with `e2e/uiRedesign.spec.js` added.
-- [ ] The 15 skill images total under 2 MB (today about 36 MB; a trial cut at quality 88 gave 0.96 MB).
+- [x] The ui-artist review of the `ui:shots` screenshots (desktop and phone) finds every screen in the Grove theme and no magenta.
+- [x] `cd game && npm test` and `cd game && npx playwright test` pass, with `e2e/uiRedesign.spec.js` added.
+- [x] The 15 skill images total under 2 MB (today about 36 MB; a trial cut at quality 88 gave 0.96 MB).
