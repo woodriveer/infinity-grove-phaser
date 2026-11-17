@@ -30,6 +30,7 @@ import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCardsMissingException
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
+import br.com.woodriver.infinity_grove_ws.domain.Rarity
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import java.time.LocalDate
@@ -73,6 +74,13 @@ class FarmServiceTest {
     private val completed = Progress("yan", ProgressPosition(15, 10, Encounter.CHAPTER_BOSS, 1), completed = true)
     private val miniboss3 = FarmBoss(Encounter.MINIBOSS, 3)
     private val chapterBoss = FarmBoss(Encounter.CHAPTER_BOSS)
+    private val atChapter3 = Progress("yan", ProgressPosition(3, 4, Encounter.PHASE, 1))
+    private val firstThree get() = farmWith(ChapterDefinition.of(1), ChapterDefinition.of(2), ChapterDefinition.of(3))
+
+    private fun cleared(): Set<Int> {
+        val cards = playerCards.cards.getValue("yan")
+        return cards.bosses.clearedChapters
+    }
 
     private fun player(
         progress: Progress = completed,
@@ -387,5 +395,197 @@ class FarmServiceTest {
         assertFailsWith<DailyLimitReachedException> { service.report("yan", chapterBoss, Outcome.CLEARED) }
 
         assertTrue(equipment.pieces.isEmpty())
+    }
+
+    @Test
+    fun `state lists the current chapter by default with every reached chapter`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+
+        val state = firstThree.state("yan")
+
+        assertEquals(3, state.chapter)
+        assertEquals(listOf(1, 2, 3), state.chapters)
+        assertEquals(listOf(1, 2, 3), state.bosses.map { it.stage })
+        assertEquals(ChapterDefinition.of(3), state.definition)
+    }
+
+    @Test
+    fun `state of an earlier chapter lists its ten minibosses, its chapter boss and its definition`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+
+        val state = firstThree.state("yan", 2)
+
+        assertEquals(2, state.chapter)
+        assertEquals(listOf(1, 2, 3), state.chapters)
+        assertEquals(11, state.bosses.size)
+        assertEquals(chapterBoss, state.bosses.last())
+        assertEquals(ChapterDefinition.of(2), state.definition)
+        assertEquals(10, state.chapterBossWinsLeft)
+    }
+
+    @Test
+    fun `state of a chapter above the reached one answers the reached chapter`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+
+        val state = firstThree.state("yan", 9)
+
+        assertEquals(3, state.chapter)
+        assertEquals(listOf(1, 2, 3), state.bosses.map { it.stage })
+    }
+
+    @Test
+    fun `state of a completed campaign reaches chapters 1 to 15`() {
+        player()
+
+        val state = service.state("yan")
+
+        assertEquals((1..15).toList(), state.chapters)
+        assertEquals(15, state.chapter)
+    }
+
+    @Test
+    fun `state refuses a chapter below 1`() {
+        assertEquals(
+            "chapter must be an integer of at least 1",
+            assertFailsWith<IllegalArgumentException> { firstThree.state("yan", 0) }.message,
+        )
+    }
+
+    @Test
+    fun `a player opened from chapter 5 to chapter 6 farms all eleven bosses of chapter 5`() {
+        player(Progress("yan", ProgressPosition(5, 10, Encounter.CHAPTER_BOSS, 1), completed = true))
+
+        val state = farmWith(ChapterDefinition.of(5), ChapterDefinition.of(6)).state("yan", 5)
+
+        assertEquals(5, state.chapter)
+        assertEquals(11, state.bosses.size)
+    }
+
+    @Test
+    fun `an earlier chapter miniboss farm win drops the hero of that chapter`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+        chance = SequenceChanceRoller(0.0)
+
+        val result = firstThree.report("yan", miniboss3, Outcome.CLEARED, 2)
+
+        assertEquals(CardDrop("lyra", "Lyra Folhaveloz", 0), result.drop)
+        assertEquals(1, blank("lyra"))
+    }
+
+    @Test
+    fun `a report without a chapter fights the current chapter`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+        chance = SequenceChanceRoller(0.0)
+
+        assertEquals("orina", firstThree.report("yan", miniboss3, Outcome.CLEARED).drop?.heroId)
+    }
+
+    @Test
+    fun `an earlier chapter boss farm win drops the hero of the next chapter and counts for today`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+        chance = SequenceChanceRoller(0.2999)
+
+        val result = firstThree.report("yan", chapterBoss, Outcome.CLEARED, 2)
+
+        assertEquals("orina", result.drop?.heroId)
+        assertEquals(9, result.chapterBossWinsLeft)
+        assertEquals(setOf(1, 2), cleared())
+    }
+
+    @Test
+    fun `an earlier chapter boss farm win at a roll of thirty percent drops nothing`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+        chance = SequenceChanceRoller(0.30)
+
+        val result = firstThree.report("yan", chapterBoss, Outcome.CLEARED, 2)
+
+        assertNull(result.drop)
+        assertEquals(9, result.chapterBossWinsLeft)
+    }
+
+    @Test
+    fun `an earlier chapter boss missing from the cleared chapters drops its card for certain and is recorded`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1)))
+        chance = SequenceChanceRoller(0.99)
+
+        assertEquals("orina", firstThree.report("yan", chapterBoss, Outcome.CLEARED, 2).drop?.heroId)
+        assertEquals(setOf(1, 2), cleared())
+    }
+
+    @Test
+    fun `an earlier chapter boss rolls the rarity of that chapter`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+        equipmentChance = SequenceChanceRoller(0.0, 0.99)
+
+        val result = firstThree.report("yan", chapterBoss, Outcome.CLEARED, 2)
+
+        assertEquals(Rarity.UNCOMMON, result.equipmentDrop!!.piece.rarity)
+    }
+
+    @Test
+    fun `the same rolls at chapter 15 give a legendary piece`() {
+        player()
+        equipmentChance = SequenceChanceRoller(0.0, 0.99)
+
+        val result = service.report("yan", chapterBoss, Outcome.CLEARED)
+
+        assertEquals(Rarity.LEGENDARY, result.equipmentDrop!!.piece.rarity)
+    }
+
+    @Test
+    fun `chapter boss wins of every chapter share one daily limit`() {
+        player(atChapter3, BossRecord(setOf(1, 2), today, 9, null))
+
+        assertEquals(0, firstThree.report("yan", chapterBoss, Outcome.CLEARED, 1).chapterBossWinsLeft)
+        clock.millis += 5000
+
+        assertFailsWith<DailyLimitReachedException> { firstThree.report("yan", chapterBoss, Outcome.CLEARED, 2) }
+    }
+
+    @Test
+    fun `the farm interval spans chapters`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+        firstThree.report("yan", miniboss3, Outcome.CLEARED, 1)
+        clock.millis += 4999
+
+        assertFailsWith<FarmTooFastException> { firstThree.report("yan", miniboss3, Outcome.CLEARED, 2) }
+    }
+
+    @Test
+    fun `a boss of a chapter above the current one is not available and changes nothing`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+        chance = SequenceChanceRoller(0.0)
+        equipmentChance = SequenceChanceRoller(0.0)
+
+        assertFailsWith<BossNotAvailableException> { firstThree.report("yan", miniboss3, Outcome.CLEARED, 4) }
+
+        assertEquals(0, blank("vex"))
+        assertTrue(equipment.pieces.isEmpty())
+        assertEquals(10, firstThree.state("yan").chapterBossWinsLeft)
+    }
+
+    @Test
+    fun `a miniboss of stage 11 of an earlier chapter is not available`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+
+        assertFailsWith<BossNotAvailableException> { firstThree.report("yan", FarmBoss(Encounter.MINIBOSS, 11), Outcome.CLEARED, 2) }
+    }
+
+    @Test
+    fun `a report refuses a chapter below 1`() {
+        assertEquals(
+            "chapter must be an integer of at least 1",
+            assertFailsWith<IllegalArgumentException> { firstThree.report("yan", miniboss3, Outcome.CLEARED, 0) }.message,
+        )
+    }
+
+    @Test
+    fun `an earlier chapter farm report never changes the campaign position`() {
+        player(atChapter3, BossRecord(clearedChapters = setOf(1, 2)))
+        chance = SequenceChanceRoller(0.0)
+
+        firstThree.report("yan", miniboss3, Outcome.CLEARED, 2)
+
+        assertEquals(atChapter3, progresses.findForUpdate("yan"))
     }
 }

@@ -165,7 +165,7 @@ return minibosses.map { FarmBoss(Encounter.MINIBOSS, it) } + chapterBoss
 
 ---
 
-### T2: Farm state and farm report of a chosen chapter [ ]
+### T2: Farm state and farm report of a chosen chapter [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: `FarmService.state` answers any reached chapter with its definition, and `FarmService.report` rolls the card and the piece of the fought chapter, with one shared daily limit and one farm interval (BRC-01, BRC-02; spec P1-Fight AC 5-12, P2-State AC 1-4).
@@ -245,8 +245,8 @@ Rules, in this order:
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 19 new cases pass; every existing `FarmServiceTest` case passes unchanged (including `a player completed at chapter 5 cannot report a chapter 5 boss win as a farm win once chapter 6 is open`, which still sends no chapter).
-- [ ] `git diff` touches no file under `backend/src/main/resources/db/migration`.
+- [x] The 19 new cases pass; every existing `FarmServiceTest` case passes unchanged (including `a player completed at chapter 5 cannot report a chapter 5 boss win as a farm win once chapter 6 is open`, which still sends no chapter).
+- [x] `git diff` touches no file under `backend/src/main/resources/db/migration`.
 
 **Commit**: `feat(backend): farm the bosses of any reached chapter with its rewards`
 

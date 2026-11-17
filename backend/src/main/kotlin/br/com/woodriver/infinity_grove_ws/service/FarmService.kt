@@ -33,22 +33,32 @@ class FarmService(
     private val equipmentRewards: EquipmentRewards,
 ) : GetFarmUseCase,
     ReportFarmUseCase {
-    override fun state(username: String): FarmState {
-        logger.info("Getting farm state username={}", username)
+    override fun state(
+        username: String,
+        chapter: Int?,
+    ): FarmState {
+        require(chapter == null || chapter >= 1) { FarmBoss.CHAPTER_MESSAGE }
+        logger.info("Getting farm state username={} chapter={}", username, chapter)
         val progress = loadProgress(username)
         val cards = loadCards(username)
-        return FarmState(FarmBoss.beaten(progress, chapterOf(progress)), winsLeft(cards))
+        val current = progress.position.chapter
+        val listed = minOf(chapter ?: current, current)
+        val definition = chapterOf(listed)
+        return FarmState(FarmBoss.beaten(progress, definition), winsLeft(cards), listed, FarmBoss.reachedChapters(progress), definition)
     }
 
     override fun report(
         username: String,
         boss: FarmBoss,
         outcome: Outcome,
+        chapter: Int?,
     ): FarmResult {
-        logger.info("Reporting farm outcome username={} boss={} outcome={}", username, boss.label(), outcome)
+        require(chapter == null || chapter >= 1) { FarmBoss.CHAPTER_MESSAGE }
+        logger.info("Reporting farm outcome username={} boss={} chapter={} outcome={}", username, boss.label(), chapter, outcome)
         val progress = loadProgress(username)
-        if (boss !in FarmBoss.beaten(progress, chapterOf(progress))) {
-            logger.warn("Farm report rejected, boss not beaten username={} boss={}", username, boss.label())
+        val fought = chapter ?: progress.position.chapter
+        if (fought > progress.position.chapter || boss !in FarmBoss.beaten(progress, chapterOf(fought))) {
+            logger.warn("Farm report rejected, boss not beaten username={} boss={} chapter={}", username, boss.label(), fought)
             throw BossNotAvailableException(boss.label())
         }
         val cards = loadCards(username)
@@ -58,9 +68,9 @@ class FarmService(
         if (boss.kind == Encounter.CHAPTER_BOSS) cards.bosses.requireWinsLeft(rewards.today(), rates.chapterBossDailyLimit)
         val spaced = cards.withBosses(cards.bosses.afterFarmWin(rewards.now(), rates.farmMinIntervalMs))
         // A farmed miniboss rolls the chance of its own stage; the chapter boss has no stage
-        val (updated, drop) = rewards.award(spaced, boss.kind, progress.position.chapter, boss.stage ?: 0, fromFarm = true)
+        val (updated, drop) = rewards.award(spaced, boss.kind, fought, boss.stage ?: 0, fromFarm = true)
         playerCardsRepository.save(updated)
-        return FarmResult(drop, winsLeft(updated), equipmentRewards.award(username, boss.kind, progress.position.chapter))
+        return FarmResult(drop, winsLeft(updated), equipmentRewards.award(username, boss.kind, fought))
     }
 
     private fun winsLeft(cards: PlayerCards) = cards.bosses.winsLeft(rewards.today(), rewards.rates().chapterBossDailyLimit)
@@ -80,8 +90,7 @@ class FarmService(
             throw PlayerCardsMissingException(username)
         }
 
-    private fun chapterOf(progress: Progress): ChapterDefinition =
-        chapterRepository.findByNumber(progress.position.chapter) ?: throw ChapterNotFoundException(progress.position.chapter)
+    private fun chapterOf(number: Int): ChapterDefinition = chapterRepository.findByNumber(number) ?: throw ChapterNotFoundException(number)
 
     private companion object {
         private val logger = LoggerFactory.getLogger(FarmService::class.java)

@@ -46,10 +46,13 @@ data class FarmBoss(
     }
 }
 
-/** The bosses to choose from and the chapter boss wins left today. */
+/** The bosses of [chapter] to choose from, the chapter boss wins left today, the chapters the player may farm and the chapter's numbers. */
 data class FarmState(
     val bosses: List<FarmBoss>,
     val chapterBossWinsLeft: Int,
+    val chapter: Int,
+    val chapters: List<Int>,
+    val definition: ChapterDefinition,
 )
 
 /** The card and the piece of equipment a farm win dropped, if any, and the chapter boss wins left today. */
