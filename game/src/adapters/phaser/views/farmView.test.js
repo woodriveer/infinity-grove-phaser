@@ -168,4 +168,79 @@ describe('renderFarm', () => {
     it('shows no extra list when every stage has a position', () => {
         expect(show().querySelector('.farm-extra')).toBeNull();
     });
+
+    describe('chapter chips', () => {
+        const chipsOf = (screen) => [ ...screen.querySelectorAll('.farm-chapter') ];
+        const ELEVEN = [ ...minibosses(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), { kind: 'CHAPTER_BOSS' } ];
+        const EARLIER = { chapter: 2, stage: 10, kind: 'CHAPTER_BOSS', stageCount: 10, completed: true };
+
+        it('shows no chapter row without chapters or with a single chapter', () => {
+            expect(find(show(), 'farm-chapters')).toBeNull();
+            expect(find(show(minibosses(1), 10, { chapters: [ 1 ], chapter: 1, currentChapter: 1 }), 'farm-chapters')).toBeNull();
+        });
+
+        it('shows the label Capítulo and one button per chapter with the shown one pressed', () => {
+            const screen = show(minibosses(1, 2, 3), 10, { chapters: [ 1, 2, 3 ], chapter: 3, currentChapter: 3 });
+            const row = find(screen, 'farm-chapters');
+
+            expect(row.getAttribute('role')).toBe('group');
+            expect(row.getAttribute('aria-label')).toBe('Escolher capítulo');
+            expect(row.querySelector('.farm-chapters-label').textContent).toBe('Capítulo');
+            expect(chipsOf(screen).map((chip) => chip.textContent)).toEqual([ '1', '2', '3' ]);
+            expect(chipsOf(screen).map((chip) => chip.getAttribute('aria-pressed'))).toEqual([ 'false', 'false', 'true' ]);
+            expect(find(screen, 'farm-chapter-2').getAttribute('aria-label')).toBe('Capítulo 2');
+            expect(find(screen, 'farm-chapter-2').getAttribute('type')).toBe('button');
+        });
+
+        it('marks the current campaign chapter with is-current and the title Capítulo atual', () => {
+            const screen = show(minibosses(1, 2, 3), 10, { chapters: [ 1, 2, 3 ], chapter: 2, currentChapter: 3 });
+
+            expect(find(screen, 'farm-chapter-3').classList.contains('is-current')).toBe(true);
+            expect(find(screen, 'farm-chapter-3').getAttribute('title')).toBe('Capítulo atual');
+            expect(find(screen, 'farm-chapter-2').classList.contains('is-current')).toBe(false);
+            expect(find(screen, 'farm-chapter-2').getAttribute('title')).toBeNull();
+        });
+
+        it('a click on another chapter calls onChapter with its number and the pressed one calls nothing', () => {
+            const onChapter = vi.fn();
+            const screen = show(minibosses(1, 2, 3), 10, { chapters: [ 1, 2, 3 ], chapter: 3, currentChapter: 3, onChapter });
+
+            find(screen, 'farm-chapter-1').click();
+            find(screen, 'farm-chapter-3').click();
+
+            expect(onChapter).toHaveBeenCalledTimes(1);
+            expect(onChapter).toHaveBeenCalledWith(1);
+        });
+
+        it('busy disables every chapter button', () => {
+            const busy = show(minibosses(1, 2, 3), 10, { chapters: [ 1, 2, 3 ], chapter: 3, currentChapter: 3, busy: true });
+            const idle = show(minibosses(1, 2, 3), 10, { chapters: [ 1, 2, 3 ], chapter: 3, currentChapter: 3, busy: false });
+
+            expect(chipsOf(busy).map((chip) => chip.disabled)).toEqual([ true, true, true ]);
+            expect(chipsOf(idle).map((chip) => chip.disabled)).toEqual([ false, false, false ]);
+        });
+
+        it('the row sits between the title and the map', () => {
+            const withBosses = show(minibosses(1), 10, { chapters: [ 1, 2 ], chapter: 2, currentChapter: 2 });
+            const empty = show([], 10, { chapters: [ 1, 2 ], chapter: 2, currentChapter: 2 });
+
+            expect([ ...withBosses.children ].map((child) => child.className)).toEqual([ 'farm-map-title', 'farm-chapters', 'farm-map' ]);
+            expect([ ...empty.children ].map((child) => child.className)).toEqual([ 'farm-map-title', 'farm-chapters', 'hero-empty', 'farm-map' ]);
+        });
+
+        it('the map of an earlier chapter is titled with that chapter and every stop is defeated', () => {
+            const screen = renderFarm(ELEVEN, 10, { onPick: vi.fn(), map: EARLIER, chapters: [ 1, 2, 3 ], chapter: 2, currentChapter: 3 });
+
+            expect(find(screen, 'farm-map-title').textContent).toBe('Caminho do Capítulo 2');
+            expect(stops(screen).map((node) => node.getAttribute('data-state'))).toEqual(Array(11).fill('defeated'));
+            expect(find(screen, 'farm-entry-chapter-boss').textContent).toContain('10 vitórias restantes hoje');
+        });
+
+        it('the chapter boss of an earlier chapter is disabled at 0 wins left', () => {
+            const screen = renderFarm(ELEVEN, 0, { onPick: vi.fn(), map: EARLIER, chapters: [ 1, 2, 3 ], chapter: 2, currentChapter: 3 });
+
+            expect(find(screen, 'farm-entry-chapter-boss').disabled).toBe(true);
+            expect(find(screen, 'farm-entry-chapter-boss').textContent).toContain('0 vitórias restantes hoje');
+        });
+    });
 });

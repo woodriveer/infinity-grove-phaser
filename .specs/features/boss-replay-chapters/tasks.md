@@ -549,7 +549,7 @@ export const farmMapPosition = (current, listedChapter, stageCount) =>
 
 ---
 
-### T8: Chapter chips on the map screen [ ]
+### T8: Chapter chips on the map screen [x]
 
 **Owner**: game-dev
 **Goal**: `renderFarm` draws the row of chapter chips between the title and the map, with the shown chapter pressed, the current campaign chapter marked and every chip disabled while busy (BRC-04; spec P1-Choose AC 1-2, 7, 9, 11; Visual Spec "Placement").
@@ -614,7 +614,7 @@ In `renderFarm`, right after `screen.append(el('h3', 'farm-map-title', ...))`, a
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 8 new cases pass; every existing `renderFarm` case passes unchanged.
+- [x] The 8 new cases pass; every existing `renderFarm` case passes unchanged.
 
 **Commit**: `feat(game): show the chapter chips on the boss map`
 
