@@ -1,71 +1,70 @@
-# Graph Report - infinity-grove  (2026-11-14)
+# Graph Report - infinity-grove-phaser  (2026-11-17)
 
 ## Corpus Check
-- 1266 files · ~1,255,473 words
+- 1314 files · ~1,391,532 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 34 file(s) not represented in the graph (top: (none) 14, .toml 10, .cmd 2)
+- Unclassified: 36 file(s) not represented in the graph (top: (none) 14, .toml 11, .cmd 2)
 
 ## Summary
-- 14075 nodes · 25381 edges · 944 communities (839 shown, 105 thin omitted)
-- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 1148 edges (avg confidence: 0.88)
-- Token cost: 0 input · 0 output
+- 14751 nodes · 26750 edges · 991 communities (870 shown, 121 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 1410 edges (avg confidence: 0.89)
+- Token cost: 2,481,280 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ae88c427`
+- Built from commit: `deceb67f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- EquipmentService.kt
+- RefreshToken
 - .agents/skills/impeccable/scripts/live-browser.js
 - EquipmentRules
-- User
+- RefreshTokenSecretPort
 - PlayerCardsTest
 - ClickerGame Combat Loop
 - uiRedesign.spec.js
 - phaser/ClickerGame.js
-- Spec-Anchored Acceptance Criteria
-- EquipmentServiceTest.kt
-- TalentRepositoryIT
+- FarmBoss
+- EquipmentServiceTest
+- ApiExceptionHandler.kt
 - Spec Lessons Playbook
-- TalentControllerIT
+- UserEntity
 - E2E Test Helpers
 - Execution Plan
 - Progress Service Tests
-- Campaign Chapters 6 to 15 Validation
+- TalentRules
 - SkillCombat
-- DropTableTest
-- ResetRepositoryIT
-- farmView.js
-- EnemyRepository.kt
+- .beaten
+- vitest
+- cloudRunRelease.mjs
 - tlc-spec-driven skill (Spec-Driven Development)
 - E2E Fake Backend
-- HeroControllerIT
-- vitest
-- applyEditing
+- AutoClickRules
+- secrets.test.mjs
+- CardDropsTest
 - ProgressControllerIT
-- SecurityProperties
+- copyToSupabase.mjs
 - Decisions Log and Agent Team
-- Equipment Service Tests
-- el
+- applyEditing
+- HeroUi.js
 - Bulk Sell Feature
-- CardsAtomicityIT.kt
+- farmView.js
 - HeroUi Equipment Panel
-- TalentRepositoryPort
-- EnemyRepositoryIT.kt
-- ref_node_assert
-- ChapterSeederIT
+- Encounter
+- HeroControllerIT
+- AuthControllerIT
+- RefreshTokenRepository.kt
 - Wallet Feature Spec
 - Kael Rig Art Tools
 - .claude/skills/impeccable/scripts/live-browser.js
 - Spring Config
-- .agents/skills/reversa-highcharts-visualizer/scripts/sample_data.py
+- SecurityIT
 - Campaign Chapters Spec
-- Piece
+- AccountResetControllerIT.kt
 - User Service Tests
-- talents.js
-- UserControllerIT
-- Rarity
+- leaderStats.js
+- SecurityConfig.kt
+- TalentControllerIT
 - PlayerTalents
 - Equipment Reroll Tests
 - Lessons Script
@@ -74,8 +73,8 @@
 - validate_tasks.py
 - Normalized Schema Spec
 - Persistent Session Spec
-- DropRule
-- Code Analysis — infinity-grove
+- TalentPointsMigrationIT
+- HealthController.kt
 - Test
 - SchemaConstraintsIT
 - el
@@ -84,42 +83,41 @@
 - Bulk sell UI review: rarity filter press
 - Combat HUD Specification
 - Heróis catalog modal five hero cards wit
-- ApiExceptionHandler.kt
+- Fakes.kt
 - connectSSE
-- CardDropsTest
-- CoinDropMigrationIT
+- PreviousBackendCompatibilityIT
+- WalletControllerIT
 - .agents/skills/impeccable/scripts/modern-screenshot.umd.js
 - PieceRollerTest
 - backendDeploymjs
 - dragEquip.spec.js
 - .claude/skills/impeccable/scripts/modern-screenshot.umd.js
 - el
-- ProgressTest
+- UserControllerIT
 - EnemyStats
 - Equipment Design
-- SecurityConfig.kt
-- farm.spec.js
+- User
 - ProgressService
 - initPageChat
-- AccountResetServiceTest
-- gitops agent (release engineer, Sonnet)
+- assertequals
+- AutoClickControllerIT
 - heroAscensionshotsjs
-- elementWheel.js
+- IntegrationTestBase.kt
 - skillLevel.js
 - Hero detail view class, element, stars, 
 - CLAUDEmd Project Instructions
 - Kael bearded warrior in bark-and-moss ar
 - Ato 1 — Bosque Desperto (capítulos 1 a 5)
-- .elements
+- ChapterRepositoryIT
 - TalentServiceTest
-- resolveLiveInjectionAnchor
+- HeroRepositoryPort
 - el
 - Hero Team Specification
 - Backend ADR 0005: Wallet and drops
 - initPageChat
-- FarmService.kt
-- Wallet
-- WalletControllerIT
+- sensor.mjs
+- Rarity
+- Spec-Anchored Acceptance Criteria
 - Prompts prontos — 18 ícones dos graus 2 e 3
 - Elements and Enemy Attributes Design
 - Hero detail at 5 stars desktop
@@ -127,38 +125,37 @@
 - Stages Specification
 - Infinity Grove Game Briefing README
 - Orina silver-haired star mage, constella
-- backendDeploy.test.mjs
-- ChapterRepository
+- Boss Replay Chapters Tasks
+- Catálogo de Gráficos Highcharts
 - regressiontestmjs
-- Progress
+- ProgressRepository.kt
 - UI Redesign (Grove Theme) Specification
 - packagejson
 - Stages Design
 - Unified Damage Specification
-- EquipmentResponses.kt
+- with
 - initGlobalBar
 - argparse
 - Catálogo de Gráficos Highcharts
 - skillsAllspecjs
-- Ato 2 — Raízes Profundas (capítulos 6 a 10)
+- Supabase Postgres Tasks
 - Bulk-sell selection bar
 - Hero Skills Tasks
 - Talent Points Tasks
-- HeroController.kt
+- Modules identified
 - WalletEntity
-- RefreshTokenRepository.kt
+- FarmControllerIT
 - Ato 3 — Copa Celeste (capítulos 11 a 15)
 - Skill Mechanics table 15 skills
 - Talents Specification
 - Kael Cutout Rig body-part sprites on mag
 - Backend ADR 0007: Hero cards
-- Test
-- TalentRepository
+- FarmServiceTest
 - initGlobalBar
-- Task Breakdown
+- PlayerCardsRepositoryIT
 - setLiveState
-- SessionServiceTest
-- assertequals
+- game
+- WalletTest
 - setLiveState
 - Bulk sell of bag pieces (Vender varias)
 - Characters Tasks T1-T53
@@ -169,50 +166,49 @@
 - Characters Hero Cards, Bag and Fusion Sp
 - Hero Skills Design
 - Hero Skills Specification
-- .heroes
-- DropQueueTest
-- AccountResetControllerIT.kt
-- FarmControllerIT
-- RefreshTokenSecretPort
+- ProgressRepositoryIT.kt
+- CopyKey
+- ProgressTest
+- EquipmentControllerIT
+- mode
 - applyEditing
-- SecurityIT
 - specifymd reference
 - Click Power Specification
 - Drops Design
 - Kael Sheet 2 Index arm parts
 - Game ADR 0007: Modular hexagonal game
-- .check
-- bulkSell.spec.js
-- ChapterDefinition
-- AutoClickControllerIT
-- HeroSeederIT
+- Supabase Postgres Validation
+- Catálogo de Nós N8N e Mapeamento Python
+- secrets.test.mjs
+- HeroRepositoryIT
+- Task Breakdown
 - .agents/skills/reversa-screen-translator/references/templates/golden_manifest.yaml
 - Blue-green backend deploy
 - Campaign Chapters 6 to 15 Specification
 - Monster Death Specification
 - Sheet 3: Kael's Shield Arm and Shield in
 - .claude/skills/reversa-screen-translator/references/templates/golden_manifest.yaml
-- .agents/skills/impeccable/reference/new-work.md
+- .agents/skills/impeccable/SKILL.md
 - .claude/skills/impeccable/SKILL.md
 - .agents/skills/impeccable/reference/live.md
-- BCryptPasswordHasher
-- ResetRepository.kt
-- UserTest
+- AccountResetServiceTest
+- LyraLeaderBonusMigrationIT
+- CoinDropMigrationIT
 - architecturetestjs
 - Game ADR 0001: HTTP client and API layer
 - .claude/skills/impeccable/reference/live.md
 - re
-- IntegrationTestBase.kt
-- CopyKey
+- Backend ADR 0004: Session tokens
+- JdbcDatabaseHealth
 - Unified Damage Design
-- WalletTest
+- steps
 - Kael Sheet 1 Index 6 numbered part boxes
 - backend-green
 - postgres
-- Backend ADR 0004: Session tokens
+- Task Breakdown
 - Game ADR 0004: Testing strategy
 - Entrevista
-- EquipmentControllerIT
+- backend
 - Kael combat stance art sword and tree sh
 - Entrevista
 - Drops Tasks
@@ -222,43 +218,46 @@
 - Vex hooded rogue/alchemist: dark purple 
 - dozzle
 - pgadmin
-- CrystalRepository.kt
+- DropQueueTest
 - .claude/skills/reversa-spec-sdd/scripts/spec_scorer.py
 - AccountResetService
-- PreviousBackendCompatibilityIT
+- SchemaValidationIT.kt
 - Vex hooded rogue/assassin hero: spiked p
 - Pre-existing ClickerGame farm mode failures (9e11bf9)
 - Catálogo de Nós N8N e Mapeamento Python
 - publishsh
-- serve
+- elementWheel.js
+- Preloader
 - main.js
-- AutoClickController.kt
 - showToast
-- Game ADR 0006: Wallet and drops in the g
-- scheduleAcceptCleanup
-- TalentController.kt
-- ProgressController.kt
+- Campaign Chapters 6 to 15 Validation
+- env
+- Drag to Equip Validation
+- ProgressRepositoryPort
 - showToast
-- .users
+- Supabase Postgres Design
 - .agents/skills/reversa-designer/SKILL.md
 - proxy
 - .agents/skills/reversa-screen-translator/SKILL.md
-- AutoClickTest
+- TalentService
+- EquipmentServiceTest.kt
 - .claude/skills/reversa-designer/SKILL.md
-- EquipmentRefineIT.kt
+- DatabasePoolConfigIT
 - .claude/skills/reversa-screen-translator/SKILL.md
-- ref_node_child_process
+- Code Analysis — infinity-grove
 - uiRedesign.shots.js
 - backend-blue
 - .agents/skills/reversa-pricing-research/SKILL.md
-- heroAscension.spec.js
+- dragEquip.test.js
+- Cenários de Erro e Tratamento
 - Orina character turnaround front, side, 
+- HealthHitPointsMigrationIT
 - MainMenu
 - .claude/skills/reversa-pricing-research/SKILL.md
 - services
 - postgres
 - healthcheck
-- Encounter
+- .elements
 - .agents/skills/impeccable/reference/adapt.md
 - .agents/skills/impeccable/reference/document.md
 - Gold Coin Spritesheet tree emblem, spin 
@@ -276,12 +275,15 @@
 - HeroTest
 - Click Damage Talent Icon golden vine gau
 - Game Favicon pixel-art browser tab icon
-- SellBatch
+- Cenários de Erro e Tratamento
 - Spec: [Nome da Feature]
-- WalletRepositoryIT
-- TalentDefinition
-- AutoClickRepository.kt
+- PlayerEquipment
+- DropRuleRepository
+- HeroSeederIT
+- scripts
+- Game ADR 0006: Wallet and drops in the game
 - deployBackend (deploy/lib/backendDeploy.mjs)
+- resolveLiveInjectionAnchor
 - .claude/skills/impeccable/reference/adapt.md
 - .claude/skills/impeccable/reference/document.md
 - handleManualEditActivity
@@ -289,8 +291,9 @@
 - hooks.yml
 - .agents/skills/impeccable/reference/onboard.md
 - Catalogo de modelos de venda e regras de viabilidade (versao 1.0)
-- UserEntity
-- IntegrationTestBase
+- Plano de Exploração — infinity-grove
+- bulkSell.spec.js
+- MainMenu.test.js
 - .claude/skills/impeccable/reference/onboard.md
 - Catalogo de modelos de venda e regras de viabilidade (versao 1.0)
 - Comportamento ao ser ativado
@@ -300,7 +303,6 @@
 - The Toolkit
 - .agents/skills/reversa-n8n/SKILL.md
 - .agents/skills/reversa-pricing-advisor/SKILL.md
-- RefreshTokenRepositoryIT
 - The Toolkit
 - .claude/skills/reversa-n8n/SKILL.md
 - .claude/skills/reversa-pricing-advisor/SKILL.md
@@ -320,8 +322,7 @@
 - .agents/skills/reversa-reconstructor/SKILL.md
 - .agents/skills/reversa-reviewer/SKILL.md
 - Guia de Metodologia — Spec-Driven Development
-- EquipmentService
-- ChapterSeederIT
+- PlayerCards
 - Agentes do Reversa — guia com analogias
 - Politica de pesquisa (research-policy.md)
 - .claude/skills/reversa-reconstructor/SKILL.md
@@ -330,12 +331,10 @@
 - .agents/skills/reversa-code-express/SKILL.md
 - Etapas do ciclo
 - .agents/skills/reversa-docs-storyteller/SKILL.md
-- Encounter
 - Procedimento
 - .claude/skills/reversa-code-express/SKILL.md
 - Etapas do ciclo
 - .claude/skills/reversa-docs-storyteller/SKILL.md
-- EquipmentRerollIT
 - Procedimento
 - actOnAgentTarget
 - Code City
@@ -347,7 +346,7 @@
 - .agents/skills/reversa-pricing-estimate/SKILL.md
 - Formula de dimensionamento (sizing-formula.md)
 - .agents/skills/reversa-writer/SKILL.md
-- Player tables (cascade with `users`)
+- heroAscension.spec.js
 - actOnAgentTarget
 - Code City
 - .claude/skills/reversa-curator/SKILL.md
@@ -365,8 +364,8 @@
 - .agents/skills/reversa-debugger/SKILL.md
 - properties
 - .agents/skills/reversa-inspector/SKILL.md
-- implement.md reference
-- AutoClickRules
+- HealthIT.kt
+- EquipmentDropFlowIT
 - .claude/skills/impeccable/reference/animate.md
 - Handle `generate`
 - Layer Stack 3D
@@ -394,7 +393,7 @@
 - .agents/skills/reversa-ideator/SKILL.md
 - Reclassificação durante revisão
 - Fluxo de Trabalho
-- PlayerAutoClick
+- ADR 0012: Production on Google Cloud Run and Supabase Postgres
 - New visual work
 - .claude/skills/impeccable/reference/optimize.md
 - Processo
@@ -406,7 +405,6 @@
 - .claude/skills/reversa-ideator/SKILL.md
 - Reclassificação durante revisão
 - Fluxo de Trabalho
-- Affix
 - Processo — para cada módulo do plano
 - Padrões Three.js para Visualização de Arquitetura
 - Etapa 2: views em `<contexto>/generated/`
@@ -456,8 +454,7 @@
 - .agents/skills/reversa-researcher/SKILL.md
 - Adapter Pairs
 - Decisão de Modernização de Telas
-- SecurityProperties
-- TalentConfig.kt
+- ServerPortConfigTest.kt
 - .claude/skills/impeccable/reference/critique.md
 - Simplify the Design
 - Hardening Dimensions
@@ -479,7 +476,6 @@
 - .claude/skills/reversa-researcher/SKILL.md
 - Adapter Pairs
 - Decisão de Modernização de Telas
-- Preloader
 - Chapter map (Caminho do Capitulo, 10 minibosses + chapter boss)
 - .agents/skills/impeccable/reference/clarify.md
 - Nielsen's 10 Heuristics
@@ -506,13 +502,11 @@
 - .agents/skills/reversa-simplify/SKILL.md
 - .agents/skills/reversa-standardize/SKILL.md
 - Processo
-- BossRecord
-- design.md reference
+- package.json
 - .claude/skills/impeccable/reference/clarify.md
 - Nielsen's 10 Heuristics
 - .claude/skills/impeccable/reference/polish.md
 - .claude/skills/impeccable/reference/quieter.md
-- AutoClickRepositoryIT
 - .claude/skills/reversa-add/SKILL.md
 - Fluxo de Trabalho
 - .claude/skills/reversa-decouple/SKILL.md
@@ -559,7 +553,7 @@
 - .agents/skills/reversa-to-do/SKILL.md
 - [Nome da Unit], Design Técnico
 - [Nome da Unit]
-- Drag to Equip Specification
+- Round 3 (final gate, 2026-11-16)
 - Generate Combined Critique Report
 - Init flow
 - .claude/skills/reversa-audit/SKILL.md
@@ -625,10 +619,9 @@
 - Exemplos de Specs: Boa vs. Ruim
 - Rubrica de Avaliação de Specs
 - Estratégias
-- HeroSeeder
 - Android platform
 - Persona-Based Design Testing
-- PlayerCardsRepositoryIT
+- EquipmentRefineIT
 - Registro de Bugs (Reversa Bugs)
 - .agents/skills/reversa-depth-inspection/SKILL.md
 - Checklist de honra ao paradigma alvo
@@ -638,12 +631,10 @@
 - Catalogo de comissoes de lojas de apps
 - .agents/skills/reversa-sync/SKILL.md
 - [Nome da Unit], Tarefas de Implementação
-- AutoClickService
-- SecurityPropertiesStartupTest.kt
-- HeroRepositoryIT
+- EquipmentController
 - Android platform
 - Persona-Based Design Testing
-- Equipment UI Specification
+- SecurityPropertiesStartupTest.kt
 - Registro de Bugs (Reversa Bugs)
 - .claude/skills/reversa-depth-inspection/SKILL.md
 - Checklist de honra ao paradigma alvo
@@ -679,7 +670,7 @@
 - Impeccable Asset Producer
 - Diagnostic Scan
 - installation
-- tasks.md reference
+- contenttype
 - Diagnostic Scan
 - interface
 - interface
@@ -754,9 +745,8 @@
 - interface
 - interface
 - interface
-- Extracao das metricas
-- EquipmentDropFlowIT
-- HealthHitPointsMigrationIT.kt
+- Ato 2 — Raízes Profundas (capítulos 6 a 10)
+- IntegrationTestBase
 - interface
 - interface
 - interface
@@ -833,11 +823,10 @@
 - Impeccable Asset Producer
 - check-legacy-policy.mjs
 - Dependencies — infinity-grove
-- Operate mode depth (and Read notes)
+- Diagnostic Scan
 - Reversa
 - interface
-- Operate mode depth (and Read notes)
-- WalletConfig.kt
+- .agents/skills/impeccable/reference/bolder.md
 - highcharts_accessibility
 - highcharts
 - highcharts_sankey
@@ -853,8 +842,8 @@
 - Schema da oportunidade e da transformação
 - Registro de Qualidade de Código (Reversa Refactor)
 - interface
-- UI review HTML template
-- Equipment Tasks
+- Visualize: Direction Comps & Asset Production
+- WalletRepositoryIT
 - highcharts_accessibility
 - highcharts
 - highcharts_sankey
@@ -918,7 +907,7 @@
 - Third-Party Notices
 - interview
 - bind-to-extraction.sh
-- .agents/skills/impeccable/reference/doctor.md
+- Diagnostic Scan
 - Flowchart — auto-click
 - .agents/skills/reversa-especialista-d3/references/interatividade.md
 - .claude/skills/reversa-especialista-d3/references/interatividade.md
@@ -926,46 +915,70 @@
 - account-reset.md
 - farm.md
 - Extract Flow
-- TalentService
-- .claude/skills/impeccable/reference/doctor.md
+- .claude/skills/impeccable/reference/bolder.md
 - Extract Flow
-- InfinityGroveWsApplicationTests
-- MonsterHealthMigrationIT.kt
+- Visualize: Direction Comps & Asset Production
+- UserTest
 - Region map
-- TalentBranch
-- changes.mjs
+- Adaptation Strategies
+- Impeccable Documenter
 - Region map
+- Adaptation Strategies
+- Impeccable Documenter
+- given
+- Operate
+- Persuade and Experience
 - clickPower.spec.js
-- ChapterRepositoryIT
-- Code search graceful degradation (ast-grep > ripgrep > grep)
-- .agents/skills/impeccable/SKILL.md
-- .claude/skills/impeccable/SKILL.md
+- Read
+- Operate
+- Round 2 (re-verification, 2026-11-16)
+- Persuade and Experience
+- Operate mode depth (and Read notes)
+- Read
+- Operate mode depth (and Read notes)
+- ChapterRepositoryPort
 - HeroSeedTest
-- PlayerCards
+- Equipment Tasks
+- Player tables (cascade with `users`)
+- verifier.md
+- Piece
+- SecurityProperties
+- RefreshTokenRepositoryIT
+- TestDatabaseIsolationIT
+- TalentController.kt
+- scheduleAcceptCleanup
+- TalentConfig.kt
+- Affix
+- bossReplayChapters.spec.js
+- Round 5
+- Spec-Anchored Acceptance Criteria
+- centre
+- Spec-Anchored Acceptance Criteria
+- InfinityGroveWsApplicationTests
 
 ## God Nodes (most connected - your core abstractions)
-1. `IntegrationTestBase` - 107 edges
-2. `ClickerGame` - 80 edges
-3. `Progress` - 78 edges
-4. `vitest` - 75 edges
-5. `mockBackend()` - 71 edges
-6. `LESSONS.md lessons playbook` - 63 edges
-7. `ProgressPosition` - 62 edges
-8. `ProgressServiceTest` - 61 edges
-9. `el()` - 61 edges
-10. `User` - 60 edges
+1. `IntegrationTestBase` - 116 edges
+2. `ClickerGame` - 89 edges
+3. `Progress` - 86 edges
+4. `mockBackend()` - 83 edges
+5. `FarmServiceTest` - 77 edges
+6. `vitest` - 77 edges
+7. `ProgressPosition` - 68 edges
+8. `el()` - 64 edges
+9. `LESSONS.md lessons playbook` - 63 edges
+10. `ProgressServiceTest` - 61 edges
 
 ## Surprising Connections (you probably didn't know these)
-- ``hero_skills`` --references--> `Skill`  [INFERRED]
-  _reversa_sdd/data-dictionary.md → backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Hero.kt
-- `Catalog (`domain/Talents.kt`, `TalentCatalog`) 🟢` --references--> `TalentCatalog`  [INFERRED]
-  _reversa_sdd/code-analysis.md → backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt
-- ``drop_rules` (seeded by `ChapterSeeder`, 3 per chapter)` --references--> `ChapterSeeder`  [INFERRED]
-  _reversa_sdd/data-dictionary.md → backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/ChapterSeeder.kt
-- `Position state machine (`domain/Progress.kt`) 🟢` --references--> `ProgressConflictException`  [INFERRED]
-  _reversa_sdd/code-analysis.md → backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/BusinessException.kt
-- `Diretrizes de código` --references--> `setup()`  [INFERRED]
-  .agents/skills/reversa-selo-generativo/SKILL.md → game/src/adapters/phaser/views/dragEquip.test.js
+- `T14: UI review of the chapter selector [x]` --references--> `mockBackend()`  [INFERRED]
+  .specs/features/boss-replay-chapters/tasks.md → game/e2e/support/fakeBackend.js
+- `T6: e2e of the drag to equip [x]` --references--> `mockBackend()`  [INFERRED]
+  .specs/features/drag-equip/tasks.md → game/e2e/support/fakeBackend.js
+- `T4: HeroUi.dropEquip [x]` --references--> `createUi()`  [INFERRED]
+  .specs/features/drag-equip/tasks.md → game/src/adapters/phaser/HeroUi.test.js
+- `T13: Parchment battle bar, dark leader card and framed skills [x]` --references--> `createUi()`  [INFERRED]
+  .specs/features/ui-redesign/tasks.md → game/src/adapters/phaser/HeroUi.test.js
+- `If the owner changes a default` --references--> `BossRecord`  [INFERRED]
+  .specs/features/boss-replay-chapters/tasks.md → backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/BossRecord.kt
 
 ## Import Cycles
 - None detected.
@@ -1028,115 +1041,131 @@
 - **Orina character and skill art set** — art_orina_position_orina, art_orina_meteor_storm_meteor_storm, art_orina_tempest_tempest, art_orina_side_view_magic_image, art_orina_side_view_no_magic_image [INFERRED 0.95]
 - **Seraphine character and skill art set** — art_seraphine_position_seraphine, art_seraphine_bell_ringing_bell_ringing, art_seraphine_blessing_blessing, art_seraphine_holy_light_holy_light, art_seraphine_protection_globe_protection_globe [INFERRED 0.95]
 
-## Communities (944 total, 105 thin omitted)
+## Communities (991 total, 121 thin omitted)
 
-### Community 0 - "EquipmentService.kt"
-Cohesion: 0.17
-Nodes (12): BatchSaleResponse, EquipmentChangeResponse, EquipmentController, EquipmentResponse, BatchSale, EquipmentChange, EquipPieceUseCase, ListEquipmentUseCase (+4 more)
+### Community 0 - "RefreshToken"
+Cohesion: 0.08
+Nodes (7): IssuedRefreshToken, RefreshToken, RefreshTokenRepositoryPort, RefreshTokenTest, FakeRefreshTokenSecrets, InMemoryRefreshTokenRepository, SessionServiceTest
 
 ### Community 1 - ".agents/skills/impeccable/scripts/live-browser.js"
 Cohesion: 0.03
 Nodes (137): applyGlobalBarLabelState(), applyLiveBarPreference(), applyPlaceholderDimensions(), applyPlaceholderSizingStyles(), averageRgb01(), beginEditPin(), bindEditBadgeProxy(), bufferToBase64() (+129 more)
 
 ### Community 2 - "EquipmentRules"
-Cohesion: 0.08
-Nodes (14): EquipmentConfig, EquipmentProperties, UuidIdGenerator, EquipmentRules, IdGeneratorPort, EquipmentRewards, WalletAccess, EquipmentConfigTest (+6 more)
-
-### Community 3 - "User"
-Cohesion: 0.04
-Nodes (30): UserRepository, AuthController, RefreshTokenRequest, AuthResponse, CreateUserRequest, LoginRequest, UpdatePasswordRequest, UserController (+22 more)
+Cohesion: 0.09
+Nodes (14): EquipmentConfig, EquipmentProperties, UuidIdGenerator, AffixResponse, EquipmentDropResponse, PieceResponse, EquipmentRules, EquipmentDrop (+6 more)
 
 ### Community 5 - "ClickerGame Combat Loop"
 Cohesion: 0.06
-Nodes (5): ClickerGame, resetNoticeText(), BossCountdown, formatDamage(), Boss timer ring
+Nodes (7): ClickerGame, resetNoticeText(), BossCountdown, formatDamage(), Game: `farmView`, `HeroUi`, `ClickerGame`, T11: Earlier chapter farm fight in the scene [x], Boss timer ring
 
 ### Community 6 - "uiRedesign.spec.js"
-Cohesion: 0.08
-Nodes (28): Faixa e confianca, Sem fontes aceitas, colorOf(), autoClickOpen(), channels(), chapter(), css(), EMBER_PILL (+20 more)
+Cohesion: 0.06
+Nodes (37): colorOf(), autoClickOpen(), channels(), chapter(), css(), EMBER_PILL, enterGame(), expectHoverShade() (+29 more)
 
 ### Community 7 - "phaser/ClickerGame.js"
 Cohesion: 0.04
-Nodes (53): ADR-0004, AUTO_CLICK_HUD, BATTLE_BAR, BOSS_TIMER, CHAPTER_HUD, CHARACTER, COIN, coinMetal() (+45 more)
+Nodes (55): ADR-0004, AUTO_CLICK_HUD, BATTLE_BAR, BOSS_TIMER, CHAPTER_HUD, CHARACTER, COIN, coinMetal() (+47 more)
 
-### Community 8 - "Spec-Anchored Acceptance Criteria"
-Cohesion: 0.06
-Nodes (32): lastText(), fill(), Discrimination Sensor, Edge cases (spec § Edge Cases), Gate Check, Lessons, Real tree isolation, Requirement Traceability (proposed; spec.md not edited by the Verifier) (+24 more)
+### Community 8 - "FarmBoss"
+Cohesion: 0.05
+Nodes (12): FarmBossResponse, FarmController, FarmResultResponse, FarmStateResponse, DropResponse, FarmResult, FarmState, FarmService (+4 more)
 
-### Community 9 - "EquipmentServiceTest.kt"
-Cohesion: 0.10
-Nodes (23): EquipmentConflictException, EquipmentNotFoundException, EquipmentRequestException, InvalidAffixException, InvalidSellBatchException, MaxRefineException, NoAffixLeftException, NotEnoughCopperException (+15 more)
+### Community 10 - "ApiExceptionHandler.kt"
+Cohesion: 0.08
+Nodes (30): ApiExceptionHandler, ResetChapterMismatchException, ResetConflictException, ResetLockedException, AutoClickConflictException, AutoClickLevelMismatchException, AutoClickLockedException, AutoClickMaxLevelException (+22 more)
 
 ### Community 11 - "Spec Lessons Playbook"
 Cohesion: 0.04
 Nodes (59): Candidate to confirmed promotion and quarantine, Confirmed lessons (L-010, L-039), L-001: Assert realised end state of a tween, L-002: Prove fail-fast startup by booting context, L-003: Test cross-module edge case at the boundary, L-004: Assert placeholder entity dimensions from Assumptions, L-005: Put sizes and positions into the AC, L-006: Test adapter omits extra stored data (+51 more)
 
+### Community 12 - "UserEntity"
+Cohesion: 0.10
+Nodes (12): JpaUserRepository, UserEntity, MonsterHealthMigrationIT, WalletFlowIT, 1. The new test asserts the spec values, not the production code, 2. Backend totals, 3. Discrimination sensor, 4. Ranked gaps (+4 more)
+
 ### Community 13 - "E2E Test Helpers"
-Cohesion: 0.06
-Nodes (44): CHAPTER, startGame(), CHAPTER, startGame(), AT_STAGE_4, PIXEL, startGame(), bare (+36 more)
+Cohesion: 0.05
+Nodes (47): CHAPTER, startGame(), CHAPTER, startGame(), AT_STAGE_4, PIXEL, startGame(), bare (+39 more)
 
 ### Community 14 - "Execution Plan"
-Cohesion: 0.10
-Nodes (20): p(), Diagram-Definition Cross-Check, Execution Plan, Execution Protocol (MANDATORY -- do not skip), Gate Check Commands, Phase 10: Review fixes, Phase 1: Foundation, Phase 2: Skill thumbnails (+12 more)
+Cohesion: 0.09
+Nodes (21): Acceptance (product-owner, 2026-11-17), Diagram-Definition Cross-Check, Execution Plan, Execution Protocol (MANDATORY -- do not skip), Gate Check Commands, Phase 10: Review fixes, Phase 11: Verifier round 2 fixes, Phase 1: Foundation (+13 more)
 
 ### Community 15 - "Progress Service Tests"
-Cohesion: 0.13
-Nodes (3): ProgressPosition, ProgressServiceTest, EquipmentRepositoryPort
+Cohesion: 0.10
+Nodes (5): Progress, ProgressPosition, LogCapture, ProgressServiceTest, EquipmentRepositoryPort
 
-### Community 16 - "Campaign Chapters 6 to 15 Validation"
-Cohesion: 0.08
-Nodes (24): sceneTexts(), monster(), Campaign Chapters 6 to 15 Validation, Campaign goes on (CHAP-01, CHAP-02, CHAP-03), Chapter numbers (CHAP-04, CHAP-05), Coin drops (CHAP-09), Discrimination Sensor, Edge Cases (+16 more)
+### Community 16 - "TalentRules"
+Cohesion: 0.14
+Nodes (13): TalentAward, TalentBranch, BREAK, COMBO, POWER, TIME, TalentCatalog, TalentDefinition (+5 more)
 
 ### Community 17 - "SkillCombat"
-Cohesion: 0.04
-Nodes (41): calculateDamage(), MAGICAL, PHYSICAL, PLAYER, DAMAGE_PER_CLICK, DEFAULT_STATS, healthText(), Monster (+33 more)
+Cohesion: 0.05
+Nodes (32): calculateDamage(), MAGICAL, PHYSICAL, PLAYER, DAMAGE_PER_CLICK, DEFAULT_STATS, healthText(), Monster (+24 more)
 
-### Community 20 - "farmView.js"
-Cohesion: 0.06
-Nodes (32): renderFarm(), renderStop(), renderTrail(), AT_BOSS, AT_STAGE_4, show(), BEND_LEFT, BEND_RIGHT (+24 more)
+### Community 19 - ".beaten"
+Cohesion: 0.12
+Nodes (14): FarmBossTest, Boss Replay Chapters Specification, Edge Cases, Goals, Out of Scope, P1: Choose an earlier chapter on the map ⭐ MVP, P1: Fight an earlier chapter boss with its numbers and rewards ⭐ MVP, P2: Compatibility both ways (+6 more)
+
+### Community 20 - "vitest"
+Cohesion: 0.02
+Nodes (125): ADR-0007, createAccountResetApi(), authApi, authClient, authResponse, createAutoClickApi(), state, config (+117 more)
+
+### Community 21 - "cloudRunRelease.mjs"
+Cohesion: 0.10
+Nodes (36): DESCRIBE_ARGS, DESCRIBE_ERROR, describeService(), GCLOUD_SHELL, githubOutput(), HEALTH_TIMEOUT_MS, healthCommit(), imageArgs() (+28 more)
 
 ### Community 22 - "tlc-spec-driven skill (Spec-Driven Development)"
-Cohesion: 0.10
-Nodes (14): Mode 2: Verifier, context-limits.md reference, Context zones (<40k healthy, 40-60k moderate, >60k critical), Spec/design/tasks file token limits, Lesson signals (ac_gap, surviving_mutant, spec_precision_gap, spec_deviation, gate_fail), .specs/lessons.json canonical store, lessons.md reference, Batching algorithm (~7 tasks per worker, whole phases) (+6 more)
+Cohesion: 0.03
+Nodes (40): CHANGELOG.md in Keep a Changelog format (Portuguese), gitops agent (release engineer, Sonnet), report.html release report, SemVer releases from v0.1.0 with GitHub release, Mode 1: test tasks (AC to test map), Mode 2: Verifier, test-engineer agent (Haiku), Test suites (backend JUnit/JaCoCo, game Vitest, Playwright e2e, deploy node --test) (+32 more)
 
 ### Community 23 - "E2E Fake Backend"
 Cohesion: 0.08
-Nodes (40): AFFIX_TYPES, afterOutcome(), AUTO_CLICK_INTERVALS, AUTO_CLICK_PRICES, beatenBosses(), chapterElements(), coins(), copiesOf() (+32 more)
+Nodes (42): AFFIX_TYPES, afterOutcome(), AUTO_CLICK_INTERVALS, AUTO_CLICK_PRICES, beatenBosses(), chapterElements(), coins(), copiesOf() (+34 more)
 
-### Community 25 - "vitest"
-Cohesion: 0.02
-Nodes (114): createAccountResetApi(), authApi, authClient, authResponse, createAutoClickApi(), state, config, loadConfig() (+106 more)
+### Community 24 - "AutoClickRules"
+Cohesion: 0.05
+Nodes (18): AutoClickConfig, AutoClickProperties, AutoClickController, AutoClickResponse, AutoClickStepResponse, AutoClickRules, AutoClickStep, autoClickUnlocked() (+10 more)
 
-### Community 26 - "applyEditing"
+### Community 25 - "secrets.test.mjs"
+Cohesion: 0.16
+Nodes (18): checkDatabaseEnv(), DATABASE_VARS, jdbcParts(), loadDatabaseEnv(), SUPABASE_PROJECT_REF, LOCAL, SUPABASE, parseDotenv() (+10 more)
+
+### Community 28 - "copyToSupabase.mjs"
+Cohesion: 0.13
+Nodes (31): check(), copy(), main(), preflight(), LOCAL, runs(), steps(), SUPABASE (+23 more)
+
+### Community 29 - "Decisions Log and Agent Team"
+Cohesion: 0.09
+Nodes (16): game-dev agent (Phaser developer, Haiku), kotlin-backend-dev agent (Haiku), ACCEPT / REJECT against spec, product-owner agent (Opus), Playwright UI shots (npm run ui:shots, desktop 1280x720 + phone 390x844), ui-artist agent (art director, Sonnet), Organic look palette (forest, cream panels, terracotta, sage; Caprasimo + Figtree), Review sections: Fidelidade a spec, Capturas, Achados, Sugestoes, Console e recursos (+8 more)
+
+### Community 30 - "applyEditing"
 Cohesion: 0.06
 Nodes (43): addManualContextText(), applyEditing(), buildLocatorForLeaf(), canRestoreManualEditElement(), collectEditableTextRows(), visit(), collectManualContextPieces(), walk() (+35 more)
 
-### Community 29 - "Decisions Log and Agent Team"
-Cohesion: 0.14
-Nodes (8): game-dev agent (Phaser developer, Haiku), ACCEPT / REJECT against spec, product-owner agent (Opus), L-052: Catalog/scope change must amend spec or add a STATE decision, L-055: Decision adding endpoint states status, body and texts, STATE.md (Decisions log + Handoff), TD-001: existing English text debt, TD-002: contract of duplicate defense columns
-
-### Community 31 - "el"
+### Community 31 - "HeroUi.js"
 Cohesion: 0.05
-Nodes (56): createHeroesApi(), hero, heroes, renderBag(), renderBagEntry(), hero(), skill(), renderCatalog() (+48 more)
+Nodes (71): BADGED, DEFAULT_POSITION, HUD, ICONS, LEADER, NOTICE, PANEL, SCREENS (+63 more)
 
 ### Community 32 - "Bulk Sell Feature"
 Cohesion: 0.09
 Nodes (33): BatchSaleResponse { equipment, wallet, sold, earned }, Bulk Sell Tasks, bulkSell.spec.js e2e, bulkSell.js selection rules (toggleRarity, sellTotal, sellNotice), equipmentApi.sellMany, equipmentCollection.sellMany (reload on failure), EquipmentService.sellAll (one transaction under player lock), fakeBackend POST /equipment/sell branch (+25 more)
 
-### Community 33 - "CardsAtomicityIT.kt"
-Cohesion: 0.09
-Nodes (8): CardCopyEntity, PlayerCardsEntity, JpaCardCopyRepository, JpaPlayerCardsRepository, PlayerCardsRepository, CardsAtomicityIT, DownForBoomConfiguration, PlayerCardsRepositoryPort
+### Community 33 - "farmView.js"
+Cohesion: 0.05
+Nodes (41): ADR-0006, renderChapters(), renderFarm(), renderStop(), renderTrail(), AT_BOSS, AT_STAGE_4, show() (+33 more)
 
 ### Community 34 - "HeroUi Equipment Panel"
-Cohesion: 0.05
-Nodes (32): HeroUi, createUi(), Architecture Overview, Code Reuse Analysis, Components, Drag state machine (per press), Drag to Equip Design, `dragEquip.js` (new) (+24 more)
-
-### Community 35 - "TalentRepositoryPort"
 Cohesion: 0.07
-Nodes (17): AccountResetController, ResetResponse, TalentRepositoryPort, AccountResetService, ResetAccountUseCase, ResetResult, Backend 🟢, CI/CD (+9 more)
+Nodes (25): HeroUi, createUi(), cancel(), farmMapPosition(), Assumptions & Open Questions, T10: Rever chefes loads, switches and reopens chapters [x], T20: Closing Rever chefes drops a pending chapter load [x], Test Coverage Matrix (+17 more)
 
-### Community 37 - "ref_node_assert"
-Cohesion: 0.23
-Nodes (4): REGRESSION_IMAGE, runRegression(), writeSuite(), run()
+### Community 35 - "Encounter"
+Cohesion: 0.09
+Nodes (17): CardConfig, CardProperties, RandomChanceRoller, CardDropper, CardDropRates, Encounter, CHAPTER_BOSS, MINIBOSS (+9 more)
+
+### Community 38 - "RefreshTokenRepository.kt"
+Cohesion: 0.17
+Nodes (3): RefreshTokenEntity, JpaRefreshTokenRepository, RefreshTokenRepository
 
 ### Community 39 - "Wallet Feature Spec"
 Cohesion: 0.11
@@ -1151,44 +1180,48 @@ Cohesion: 0.03
 Nodes (137): applyGlobalBarLabelState(), applyLiveBarPreference(), applyPlaceholderDimensions(), applyPlaceholderSizingStyles(), averageRgb01(), beginEditPin(), bindEditBadgeProxy(), bufferToBase64() (+129 more)
 
 ### Community 42 - "Spring Config"
-Cohesion: 0.06
-Nodes (32): app, auto-click, cards, equipment, security, name, intervals-ms, prices (+24 more)
+Cohesion: 0.05
+Nodes (38): app, auto-click, cards, commit, equipment, security, name, intervals-ms (+30 more)
 
-### Community 43 - ".agents/skills/reversa-highcharts-visualizer/scripts/sample_data.py"
-Cohesion: 0.06
-Nodes (20): sample_column(), sample_funnel(), sample_gauge(), sample_heatmap(), sample_line(), sample_pie(), sample_sankey(), sample_scatter() (+12 more)
+### Community 43 - "SecurityIT"
+Cohesion: 0.21
+Nodes (3): SecurityIT, T4: Public `GET /health` with the database check and the commit [x], RUN-01: `GET /health` (US-2)
 
 ### Community 44 - "Campaign Chapters Spec"
 Cohesion: 0.11
 Nodes (28): Campaign Chapters Design, CardDrops minOf(chapter + 1, MAX_CHAPTER), ChapterDefinition (healthFactor, defenseBonus, coinFactor, dropRules), ChapterOrder.MAX_CHAPTER = 15 (element cycles every 5), ChapterSeeder (seeds 1..MAX_CHAPTER, inserts only missing), formatDamage, formatShort (K/M/B/T) in numberFormat.js, Progress.withNextChapterOpen (+20 more)
 
-### Community 45 - "Piece"
-Cohesion: 0.08
-Nodes (6): EquipmentRepository, JpaPieceRepository, Piece, PlayerEquipment, EquipmentRepositoryPort, Formulas (`Piece`) 🟢
+### Community 47 - "leaderStats.js"
+Cohesion: 0.07
+Nodes (39): GLYPHS, renderCard(), renderTalents(), renderTalentsUnavailable(), catalog, points(), show(), tree() (+31 more)
 
-### Community 47 - "talents.js"
-Cohesion: 0.08
-Nodes (38): GLYPHS, renderCard(), renderTalents(), renderTalentsUnavailable(), catalog, points(), show(), tree() (+30 more)
+### Community 48 - "SecurityConfig.kt"
+Cohesion: 0.15
+Nodes (4): ProblemAuthenticationEntryPoint, SecurityConfig, Test Coverage Matrix, Code Quality
 
-### Community 49 - "Rarity"
+### Community 49 - "TalentControllerIT"
 Cohesion: 0.09
-Nodes (19): AffixType, ARMOR_PIERCE_PCT, BOSS_DAMAGE_PCT, BOSS_TIME_SECONDS, CLICK_DAMAGE_PCT, CRIT_CHANCE, CRIT_DAMAGE_PCT, Rarity (+11 more)
+Nodes (8): JpaTalentAwardRepository, JpaTalentRepository, TalentAwardEntity, TalentAwardKey, TalentEntity, TalentKey, TalentRepository, TalentControllerIT
+
+### Community 50 - "PlayerTalents"
+Cohesion: 0.17
+Nodes (3): PlayerTalents, TalentPoints, TalentsTest
 
 ### Community 52 - "Lessons Script"
 Cohesion: 0.18
 Nodes (19): _auto_prune(), cmd_add(), cmd_init(), cmd_list(), cmd_penalize(), cmd_prune(), cmd_status(), _find() (+11 more)
 
 ### Community 53 - "Task Breakdown"
-Cohesion: 0.06
-Nodes (32): Deferred review findings, T10: The element that beats an enemy [x], T11: Weak element chip above the enemy line [x], T12: Hero rail of framed squares [x], T16: Round auto click and farm buttons, the auto click window [x], T17: Dim layer, pause card and reset card [x], T18: Main menu fields, buttons and path choice [x], T19: Parchment menu oval with a wood rim [x] (+24 more)
+Cohesion: 0.04
+Nodes (47): canvasBox(), Deferred review findings, Phase 11 notes: closing the Verifier round 2 FAIL, T10: The element that beats an enemy [x], T11: Weak element chip above the enemy line [x], T12: Hero rail of framed squares [x], T13: Parchment battle bar, dark leader card and framed skills [x], T15: Open the auto click window in the existing browser tests [x] (+39 more)
 
 ### Community 54 - "connectSSE"
 Cohesion: 0.06
 Nodes (90): abortSvelteComponentInjection(), applyParamDefaults(), applyParamValue(), applySavedSessionMeta(), buildParamsPanel(), captureAndEmit(), checkpointPayload(), cleanup() (+82 more)
 
 ### Community 55 - "validate_tasks.py"
-Cohesion: 0.21
-Nodes (8): _autodetect(), check(), main(), parse_diagram_edges(), parse_phase_membership(), parse_tasks(), resolve_tasks(), section_present()
+Cohesion: 0.12
+Nodes (14): Tiered gates (Quick / Full / Build), Diagram-definition cross-check, Gate Check Commands, tasks.md reference, tasks.md template, Test Coverage Matrix, _autodetect(), check() (+6 more)
 
 ### Community 56 - "Normalized Schema Spec"
 Cohesion: 0.13
@@ -1198,21 +1231,25 @@ Nodes (24): Normalized Schema Context, Deferred: per-stage card/equipment drop c
 Cohesion: 0.12
 Nodes (26): Persistent Session Design, authApi (raw axios, no interceptors), httpClient auth interceptors (skipAuth), JwtAccessTokenIssuer (NimbusJwtEncoder HS256), MainMenu restore/logout flow, RefreshToken domain model, SecurityConfig (stateless JWT resource server), sessionManager (single-flight refresh) (+18 more)
 
-### Community 58 - "DropRule"
-Cohesion: 0.09
-Nodes (6): DropRuleEntity, DropRuleRepository, JpaDropRuleRepository, DropRule, DropRuleRepositoryIT, WalletServiceTest
+### Community 59 - "HealthController.kt"
+Cohesion: 0.20
+Nodes (5): HealthController, HealthResponse, DatabaseHealthPort, FixedDatabaseHealth, HealthControllerTest
 
-### Community 59 - "Code Analysis — infinity-grove"
-Cohesion: 0.12
-Nodes (16): Chapter generation (`domain/Chapter.kt`, `ChapterDefinition.of(n)`) 🟢, Chapter order (`domain/ChapterOrder.kt`) 🟢, Code Analysis — infinity-grove, Copper drop queue (`domain/DropQueue.kt`, `DropTable.kt`) 🟢, Drops (`domain/PieceRoller.kt`, `service/EquipmentRewards.kt`) 🟢, Game, Game 🟢, Module `account-reset` (+8 more)
+### Community 60 - "Test"
+Cohesion: 0.09
+Nodes (4): ChapterDefinition, StageDefinition, ChapterTableRow, ChapterTest
+
+### Community 61 - "SchemaConstraintsIT"
+Cohesion: 0.05
+Nodes (7): JpaResetRepository, ResetEntity, ResetRepository, ResetRepositoryIT, Probe, SchemaConstraintsIT, TalentRepositoryIT
 
 ### Community 62 - "el"
-Cohesion: 0.05
-Nodes (77): Equipment UI Tasks, BADGED, DEFAULT_POSITION, HUD, ICONS, LEADER, NOTICE, PANEL (+69 more)
+Cohesion: 0.04
+Nodes (68): button(), rarityButton(), renderBulkSellBar(), bar(), rarities(), button(), EMPTY_TEXT, renderEquipment() (+60 more)
 
 ### Community 63 - "watchermjs"
-Cohesion: 0.19
-Nodes (14): main(), machine(), STATE, acquireLock(), clearStaleLock(), readState(), releaseLock(), writeState() (+6 more)
+Cohesion: 0.09
+Nodes (27): backend, game, ROOT, yaml, main(), machine(), STATE, changedFiles() (+19 more)
 
 ### Community 64 - "WalletLedger"
 Cohesion: 0.14
@@ -1230,25 +1267,21 @@ Nodes (21): healthText (HP text), Leader skill bar (lock marks), TD-001 existing
 Cohesion: 0.11
 Nodes (24): Battle HUD (stage/phase pill, currencies, element wheel, side menu, enemy HP bar, resistances strip), Enemy area shows translucent placeholder box instead of a monster sprite, UI review: skill bar at 3 stars (desktop), Kael Raizférrea (Fire warrior hero, leader +25% boss damage), Kael skills: Corte Dimensional (20s), Investida do Baluarte (25s), Brado Aterrador (30s), Skill icons with unkeyed magenta background, Bottom skill bar (Q/W/E skill buttons, leader portrait, Farm boss toggle), UI review: skill bar at 3 stars (phone) (+16 more)
 
-### Community 68 - "ApiExceptionHandler.kt"
-Cohesion: 0.09
-Nodes (25): ApiExceptionHandler, ResetChapterMismatchException, ResetConflictException, ResetLockedException, ResetRequestException, AutoClickConflictException, AutoClickLevelMismatchException, AutoClickLockedException (+17 more)
+### Community 68 - "Fakes.kt"
+Cohesion: 0.04
+Nodes (29): RandomDropRoller, WalletConfig, CoinsResponse, SyncResponse, WalletController, WalletResponse, InvalidKillsException, DropTable (+21 more)
 
 ### Community 69 - "connectSSE"
 Cohesion: 0.06
 Nodes (90): abortSvelteComponentInjection(), applyParamDefaults(), applyParamValue(), applySavedSessionMeta(), buildParamsPanel(), captureAndEmit(), checkpointPayload(), cleanup() (+82 more)
-
-### Community 71 - "CoinDropMigrationIT"
-Cohesion: 0.10
-Nodes (4): CoinDropMigrationIT, SeededRule, LyraLeaderBonusMigrationIT, TalentPointsMigrationIT
 
 ### Community 72 - ".agents/skills/impeccable/scripts/modern-screenshot.umd.js"
 Cohesion: 0.09
 Nodes (53): ae(), be(), bt(), Ce(), Ct(), de(), dt(), _e() (+45 more)
 
 ### Community 74 - "backendDeploymjs"
-Cohesion: 0.23
-Nodes (18): deployBackend(), KEEP_MS, rollback(), sweepPrevious(), buildImage(), COMPOSE, containerOf(), imageOf() (+10 more)
+Cohesion: 0.11
+Nodes (26): deployBackend(), failures, STATE, switchLine(), KEEP_MS, rollback(), sweepPrevious(), STATE (+18 more)
 
 ### Community 75 - "dragEquip.spec.js"
 Cohesion: 0.20
@@ -1263,40 +1296,44 @@ Cohesion: 0.08
 Nodes (54): actionLabel(), applyConfigureBarChrome(), bindConfigureCountPillTooltip(), bindConfigureInlineControlHover(), bindConfigureModifierPillHover(), buildConfigureActionControl(), buildConfigureCountControl(), buildConfigureRow() (+46 more)
 
 ### Community 79 - "EnemyStats"
-Cohesion: 0.21
-Nodes (6): ChapterEntity, enemy(), EnemyEntity, StageEntity, EnemyStats, StageDefinition
+Cohesion: 0.07
+Nodes (12): ChapterEntity, enemy(), EnemyEntity, StageEntity, ChapterRepository, JpaChapterRepository, JpaStageRepository, EnemyRepository (+4 more)
 
 ### Community 80 - "Equipment Design"
 Cohesion: 0.19
 Nodes (11): Equipment Design, equipment_pieces table, EquipmentRewards, EquipmentService, PieceRoller, PlayerEquipment, Affix bands per rarity, Equipment Specification (+3 more)
 
-### Community 82 - "farm.spec.js"
-Cohesion: 0.22
-Nodes (3): COMPLETED, FAST_BOSSES, startGame()
+### Community 81 - "User"
+Cohesion: 0.03
+Nodes (40): UserRepository, BCryptPasswordHasher, AuthController, RefreshTokenRequest, AuthResponse, CreateUserRequest, LoginRequest, UpdatePasswordRequest (+32 more)
 
-### Community 83 - "ProgressService"
-Cohesion: 0.13
-Nodes (14): CardDrop, EquipmentDrop, ProgressView, ProgressService, GetProgressUseCase, OutcomeResult, ReportOutcomeUseCase, Backend 🟢 (+6 more)
+### Community 82 - "ProgressService"
+Cohesion: 0.08
+Nodes (21): ChapterResponse, EnemyStatsResponse, ProgressController, ProgressResponse, StageResponse, ChapterNotFoundException, InvalidOutcomeException, CardDrop (+13 more)
 
 ### Community 84 - "initPageChat"
 Cohesion: 0.08
 Nodes (54): agentHasWorkInFlight(), armPageChatForTyping(), attachSteerFocusDebug(), attachSteerFocusGuard(), buildSteerProcessingDots(), buildSteerQueueHint(), clearSteerAwaitTimer(), clearSteerFocusRecoverTimer() (+46 more)
 
-### Community 86 - "gitops agent (release engineer, Sonnet)"
-Cohesion: 0.25
-Nodes (7): CHANGELOG.md in Keep a Changelog format (Portuguese), gitops agent (release engineer, Sonnet), report.html release report, SemVer releases from v0.1.0 with GitHub release, Mode 1: test tasks (AC to test map), test-engineer agent (Haiku), Test suites (backend JUnit/JaCoCo, game Vitest, Playwright e2e, deploy node --test)
+### Community 85 - "assertequals"
+Cohesion: 0.07
+Nodes (10): UserNotFoundException, FakePasswordHasher, InMemoryHeroRepository, InMemoryPlayerCardsRepository, InMemoryProgressRepository, InMemoryResetRepository, InMemoryUserRepository, InMemoryWalletRepository (+2 more)
+
+### Community 86 - "AutoClickControllerIT"
+Cohesion: 0.07
+Nodes (8): AutoClickEntity, AutoClickRepository, JpaAutoClickRepository, CrystalEntity, CrystalRepository, JpaCrystalRepository, AutoClickRepositoryIT, AutoClickControllerIT
 
 ### Community 87 - "heroAscensionshotsjs"
-Cohesion: 0.09
-Nodes (17): BAG, BAG_RARITIES, piece(), SLOTS, WORN, bare, start(), BAG (+9 more)
+Cohesion: 0.06
+Nodes (24): serverDown(), AT_CHAPTER_3, CHAPTER_2, nature, start(), BAG, BAG_RARITIES, piece() (+16 more)
 
-### Community 88 - "elementWheel.js"
-Cohesion: 0.04
-Nodes (55): 4. Manipulação de dados, 10. Produtividade e SaaS, 11. Credenciais e autenticação, 12. Padrões arquiteturais sugeridos, 13. Tratamento de erros e retries, 14. Observabilidade, 1. Triggers (entrada do workflow), 2. HTTP e APIs (+47 more)
+### Community 88 - "IntegrationTestBase.kt"
+Cohesion: 0.06
+Nodes (11): CardCopyEntity, PlayerCardsEntity, JpaCardCopyRepository, JpaPlayerCardsRepository, PlayerCardsRepository, CardsAtomicityIT, DownForBoomConfiguration, ChanceTestConfiguration (+3 more)
 
 ### Community 89 - "skillLevel.js"
-Cohesion: 0.13
-Nodes (14): Leader attribute panel, Hero Ascension Design, PlayerCards LAST_FUSIBLE_STARS / MAX_STARS 9, SkillView.levelOf, starsClass (is-ascended / is-exalted), ASC-01..ASC-08, Hero Ascension Specification, Hero Ascension Tasks (+6 more)
+Cohesion: 0.04
+Nodes (48): Equipment UI coverage (unit 96.62%, e2e 90.52%), Tela de equipamento release report, ClickerGame farm mode failures (since 9e11bf9), Equipment UI Specification, EQU-01..EQU-06, Leader attribute panel, Piece hover tooltip, Equipment UI Tasks (+40 more)
 
 ### Community 90 - "Hero detail view class, element, stars, "
 Cohesion: 0.11
@@ -1314,9 +1351,9 @@ Nodes (20): Charge (Kael skill), Kael Charge skill art, Dimensional Cut (Kael sk
 Cohesion: 0.12
 Nodes (16): 10. `a1-darkness-miniboss.png` — Tecelã da Noite, 11. `boss-c01.png` — Lobo Umbral, o Devorador da Clareira, 12. `boss-c02.png` — Urso Fornalha, 13. `boss-c03.png` — Hidra do Brejo, 14. `boss-c04.png` — Mãe-Espinheira, 15. `boss-c05.png` — Coruja Áurea, Guardiã da Seiva, 1. `a1-fire-monster.png` — Brasinha, 2. `a1-water-monster.png` — Gota-do-Brejo (+8 more)
 
-### Community 96 - "resolveLiveInjectionAnchor"
-Cohesion: 0.16
-Nodes (19): buildSvelteExpressionTextMap(), buildSveltePropValuesFromLiveElement(), buildSveltePropValuesV2(), cloneWithoutElements(), collectTextNodes(), collectVisibleTexts(), cssEscapeIdent(), elementMatchesOriginalMarkup() (+11 more)
+### Community 96 - "HeroRepositoryPort"
+Cohesion: 0.13
+Nodes (9): HeroSeeder, HeroRepositoryPort, Catalog tables (seeded at startup, never overwritten), `chapters`, `drop_rules` (seeded by `ChapterSeeder`, 3 per chapter), `enemies`, `hero_skills`, `heroes` (seeded by `HeroSeeder`) (+1 more)
 
 ### Community 97 - "el"
 Cohesion: 0.08
@@ -1334,13 +1371,17 @@ Nodes (7): Backend ADR 0005: Wallet and drops, WalletService (pessimistic lock),
 Cohesion: 0.08
 Nodes (54): agentHasWorkInFlight(), armPageChatForTyping(), attachSteerFocusDebug(), attachSteerFocusGuard(), buildSteerProcessingDots(), buildSteerQueueHint(), clearSteerAwaitTimer(), clearSteerFocusRecoverTimer() (+46 more)
 
-### Community 101 - "FarmService.kt"
-Cohesion: 0.09
-Nodes (14): FarmBossResponse, FarmController, FarmResultResponse, FarmStateResponse, FarmBoss, FarmResult, FarmState, Outcome (+6 more)
+### Community 101 - "sensor.mjs"
+Cohesion: 0.18
+Nodes (8): env, status, applyMutant(), gitPorcelain(), main(), MutantError, runSensor(), summary()
 
-### Community 102 - "Wallet"
-Cohesion: 0.05
-Nodes (21): ChapterSeeder, CoinsResponse, SyncResponse, WalletController, WalletResponse, InvalidKillsException, DropTable, SyncResult (+13 more)
+### Community 102 - "Rarity"
+Cohesion: 0.09
+Nodes (19): AffixType, ARMOR_PIERCE_PCT, BOSS_DAMAGE_PCT, BOSS_TIME_SECONDS, CLICK_DAMAGE_PCT, CRIT_CHANCE, CRIT_DAMAGE_PCT, Rarity (+11 more)
+
+### Community 103 - "Spec-Anchored Acceptance Criteria"
+Cohesion: 0.12
+Nodes (17): RUN-02: The Cloud Run service (US-3), RUN-03: `plan`, `inspect`, `image`, usage (US-4 AC 1 to 5, 12 to 14), RUN-04: `release` (US-4 AC 6 to 11), RUN-05: The workflow (US-4 AC 15 to 24), RUN-06: The game waits for the server (US-5), RUN-07: Secrets in CI and the cloud (US-6 AC 6 to 12), RUN-08: `publish.sh` is only the way back — ⏭️ T22, out of scope, RUN-09: Cost (US-12) (+9 more)
 
 ### Community 104 - "Prompts prontos — 18 ícones dos graus 2 e 3"
 Cohesion: 0.10
@@ -1370,29 +1411,25 @@ Nodes (17): Bênção da Grande Árvore (x1.3 every strike), Brado Aterrador (-3
 Cohesion: 0.12
 Nodes (18): Orina Meteor Storm concept art, Meteor Storm (Orina skill: green rune circle launching star meteors), Orina character turnaround (front/side/back), Orina (silver-haired star mage, constellation robe, branch staff with star crystal), Orina side view casting nature/star magic swirl, Orina side view casting pose without effects, Orina Tempest concept art, Tempest (Orina skill: cosmic storm cloud raining lightning) (+10 more)
 
-### Community 111 - "backendDeploy.test.mjs"
-Cohesion: 0.16
-Nodes (8): failures, STATE, switchLine(), STATE, switchLine(), renderConf(), switchScript(), switchTo()
+### Community 111 - "Boss Replay Chapters Tasks"
+Cohesion: 0.11
+Nodes (18): Acceptance (product-owner, 2026-11-17), Boss Replay Chapters Tasks, Diagram-Definition Cross-Check, Execution Plan, Execution Protocol (MANDATORY -- do not skip), Gate Check Commands, If the owner changes a default, Phase 1: Backend farm per chapter (+10 more)
 
-### Community 112 - "ChapterRepository"
-Cohesion: 0.30
-Nodes (3): ChapterRepository, JpaChapterRepository, JpaStageRepository
+### Community 112 - "Catálogo de Gráficos Highcharts"
+Cohesion: 0.10
+Nodes (20): 10. Funnel & Pyramid, 11. Wordcloud, 12. Network Graph, 13. Box Plot & Histogram, 14. Stock Charts (Highstock), 15. Maps (Highmaps), 16. Gantt Chart, 17. Outros Tipos (+12 more)
 
 ### Community 113 - "regressiontestmjs"
 Cohesion: 0.15
-Nodes (11): CheckFailed, expect(), expectStatus(), runSuite(), CHAPTER_ONE, CHAPTER_TWO, early, failures (+3 more)
-
-### Community 114 - "Progress"
-Cohesion: 0.11
-Nodes (4): JpaProgressRepository, ProgressRepository, Progress, ProgressRepositoryPort
+Nodes (10): CheckFailed, expect(), expectStatus(), runSuite(), CHAPTER_ONE, CHAPTER_TWO, early, failures (+2 more)
 
 ### Community 115 - "UI Redesign (Grove Theme) Specification"
 Cohesion: 0.10
 Nodes (20): Assumptions & Open Questions, Decided, Edge Cases, Goals, Open Questions for the Owner, Out of Scope, P1: Battle HUD in the Grove theme ⭐ MVP, P1: Grove theme foundation ⭐ MVP (+12 more)
 
 ### Community 116 - "packagejson"
-Cohesion: 0.07
-Nodes (32): dependencies, axios@^1.20.0, devDependencies, jsdom@^29.1.1, nyc@^18.0.0, @playwright/test@^1.64.1, vite@^8.3.4, vite-plugin-istanbul@^9.0.1 (+24 more)
+Cohesion: 0.15
+Nodes (16): devDependencies, jsdom@^29.1.1, nyc@^18.0.0, @playwright/test@^1.64.1, vite@^8.3.4, vite-plugin-istanbul@^9.0.1, vitest@^5.0.5, @vitest/coverage-v8@^5.0.5 (+8 more)
 
 ### Community 117 - "Stages Design"
 Cohesion: 0.21
@@ -1402,29 +1439,29 @@ Nodes (16): Stages Design, Campaign (game domain, pure), CampaignSession (report
 Cohesion: 0.18
 Nodes (13): PlayerTalents.fromStored tolerant load, talentCollection RETIRED_TALENT_IDS filter, V8__unified_damage.sql migration, Unified Damage Specification, MAGICAL_BREAK retired talent, Orina leader bonus '+20% de dano total.', Player-Facing Texts without damage types, Open question Q1: refund in points or coins (+5 more)
 
-### Community 119 - "EquipmentResponses.kt"
-Cohesion: 0.48
-Nodes (3): AffixResponse, EquipmentDropResponse, PieceResponse
+### Community 119 - "with"
+Cohesion: 0.11
+Nodes (18): with, distribution, env_vars, env_vars_update_strategy, fetch-depth, flags, image, java-version (+10 more)
 
 ### Community 120 - "initGlobalBar"
 Cohesion: 0.07
 Nodes (47): agentStatusText(), barPaletteForTheme(), brandMarkSvg(), buildDesignHeader(), cursorForInsertAxis(), designPanelCss(), detectPageTheme(), own() (+39 more)
 
 ### Community 121 - "argparse"
-Cohesion: 0.07
-Nodes (30): analyze_series(), is_temporal(), main(), suggest_charts(), detect_encoding(), main(), parse_csv(), parse_excel() (+22 more)
+Cohesion: 0.04
+Nodes (42): analyze_series(), is_temporal(), main(), suggest_charts(), detect_encoding(), main(), parse_csv(), parse_excel() (+34 more)
 
 ### Community 122 - "Catálogo de Gráficos Highcharts"
-Cohesion: 0.04
-Nodes (42): 10. Funnel & Pyramid, 11. Wordcloud, 12. Network Graph, 13. Box Plot & Histogram, 14. Stock Charts (Highstock), 15. Maps (Highmaps), 16. Gantt Chart, 17. Outros Tipos (+34 more)
+Cohesion: 0.10
+Nodes (20): 10. Funnel & Pyramid, 11. Wordcloud, 12. Network Graph, 13. Box Plot & Histogram, 14. Stock Charts (Highstock), 15. Maps (Highmaps), 16. Gantt Chart, 17. Outros Tipos (+12 more)
 
 ### Community 123 - "skillsAllspecjs"
-Cohesion: 0.14
-Nodes (10): ARMORED, bare(), chapter(), DARKNESS, dealt(), ELEMENT_OF, health(), scene() (+2 more)
+Cohesion: 0.15
+Nodes (9): ARMORED, bare(), chapter(), DARKNESS, dealt(), ELEMENT_OF, health(), scene() (+1 more)
 
-### Community 124 - "Ato 2 — Raízes Profundas (capítulos 6 a 10)"
-Cohesion: 0.12
-Nodes (16): 16. `a2-fire-monster.png` — Salamandra de Magma, 17. `a2-water-monster.png` — Caranguejo de Gruta, 18. `a2-nature-monster.png` — Larva-Raiz, 19. `a2-light-monster.png` — Cristalito, 20. `a2-darkness-monster.png` — Sombra Rastejante, 21. `a2-fire-miniboss.png` — Golem de Carvão, 22. `a2-water-miniboss.png` — Enguia Abissal, 23. `a2-nature-miniboss.png` — Troll Fúngico (+8 more)
+### Community 124 - "Supabase Postgres Tasks"
+Cohesion: 0.11
+Nodes (18): Acceptance (product-owner, 2026-11-16), Diagram-Definition Cross-Check, Execution Plan, Execution Protocol (MANDATORY -- do not skip), Gate Check Commands, Phase 1: The `.env` rules (done), Phase 2: Backend for Cloud Run, Phase 3: The release script and the Deploy workflow (+10 more)
 
 ### Community 125 - "Bulk-sell selection bar"
 Cohesion: 0.13
@@ -1438,17 +1475,17 @@ Nodes (14): calculateDamage (click damage formula), Tiro Preciso aimed shot (2 s
 Cohesion: 0.20
 Nodes (13): combo.js combo cap min(streak, COMBO), Talent Points Tasks, e2e fakeBackend.js, NOT_ENOUGH_TALENT_POINTS error, ProgressService first-clear award, talent_point_awards table, TalentService (points spend under progress lock), talentsView.js Talentos screen (+5 more)
 
-### Community 128 - "HeroController.kt"
-Cohesion: 0.09
-Nodes (13): HeroController, HeroesResponse, HeroResponse, LeaderResponse, SkillResponse, HeroesView, HeroView, SkillView (+5 more)
+### Community 128 - "Modules identified"
+Cohesion: 0.11
+Nodes (13): HeroController, HeroesResponse, HeroResponse, LeaderResponse, SkillResponse, PlayerCardsMissingException, HeroesView, HeroView (+5 more)
 
 ### Community 129 - "WalletEntity"
 Cohesion: 0.11
 Nodes (6): WalletDropQueueEntity, WalletEntity, JpaWalletDropQueueRepository, JpaWalletRepository, WalletRepository, EquipmentBatchSellIT
 
-### Community 130 - "RefreshTokenRepository.kt"
-Cohesion: 0.06
-Nodes (11): RefreshTokenEntity, JpaRefreshTokenRepository, RefreshTokenRepository, IssuedRefreshToken, RefreshToken, AccessToken, AccessTokenIssuerPort, RefreshTokenRepositoryPort (+3 more)
+### Community 130 - "FarmControllerIT"
+Cohesion: 0.10
+Nodes (24): FarmControllerIT, T3: `chapter` on both farm routes [x], Boss Replay Chapters Validation, Discrimination Sensor, Discrimination Sensor, Edge Cases, Edge Cases (TD-009), Finding outside the ACs (non-blocking, spec-precision gap) (+16 more)
 
 ### Community 131 - "Ato 3 — Copa Celeste (capítulos 11 a 15)"
 Cohesion: 0.12
@@ -1470,25 +1507,21 @@ Nodes (14): Kael Armored Belt Skirt (tassets), Kael Wood-Grain Breastplate with 
 Cohesion: 0.16
 Nodes (12): ProgressService, Backend ADR 0007: Hero cards, CardDropper / CardRewards server-rolled drops, ChanceRollerPort, ChapterOrder by starting element, PlayerCards aggregate, PieceRoller, Game ADR 0009: Hero cards in the game (+4 more)
 
-### Community 137 - "TalentRepository"
-Cohesion: 0.16
-Nodes (7): JpaTalentAwardRepository, JpaTalentRepository, TalentAwardEntity, TalentAwardKey, TalentKey, TalentRepository, Rules 🟢
+### Community 136 - "FarmServiceTest"
+Cohesion: 0.08
+Nodes (6): BossRecord, FarmBoss, BossRecordTest, SequenceChanceRoller, FarmServiceTest, Card drops (`domain/CardDrops.kt`, `service/CardRewards.kt`) 🟢
 
 ### Community 138 - "initGlobalBar"
 Cohesion: 0.07
 Nodes (47): agentStatusText(), barPaletteForTheme(), brandMarkSvg(), buildDesignHeader(), cursorForInsertAxis(), designPanelCss(), detectPageTheme(), own() (+39 more)
 
-### Community 139 - "Task Breakdown"
-Cohesion: 0.03
-Nodes (82): Cenários de Erro e Tratamento, ERR-01: p5.js indisponível (CDN inacessível), ERR-02: Canvas não suportado pelo browser, ERR-03: Seed inválido ou ausente, ERR-04: Tamanho extremo, ERR-05: Paleta com cores inválidas, ERR-06: Contraste insuficiente, ERR-07: Padrão escolhido incompatível com estilo (+74 more)
-
 ### Community 140 - "setLiveState"
 Cohesion: 0.12
 Nodes (47): beginNewLiveConfiguration(), cancelEditing(), cancelEditingToPicking(), cancelInsertConfigure(), cleanupAcceptedSession(), clearAnnotations(), clearInsertPicking(), clearScrollY() (+39 more)
 
-### Community 142 - "assertequals"
-Cohesion: 0.06
-Nodes (12): UserNotFoundException, InMemoryAutoClickRepository, InMemoryChapterRepository, InMemoryEquipmentRepository, InMemoryHeroRepository, InMemoryPlayerCardsRepository, InMemoryProgressRepository, InMemoryResetRepository (+4 more)
+### Community 141 - "game"
+Cohesion: 0.15
+Nodes (12): concurrency, cancel-in-progress, group, env, IMAGE, if, needs, runs-on (+4 more)
 
 ### Community 143 - "setLiveState"
 Cohesion: 0.12
@@ -1526,17 +1559,9 @@ Nodes (7): Carrilhão da Aurora time shield (+4 s), Hero Skills Context, Hero Sk
 Cohesion: 0.22
 Nodes (8): Hero Skills Specification, Bomba de Veneno poison stacks (max 3), Requirements SKILL-01..SKILL-08, Hero Skills Validation, Hero skills discrimination sensor (50 mutants, 0 survivors), Mutant M1b (critical flag dropped for ticks/aimed shot), Mutants N4/N5 (partial pause), Verdict PASS iteration 3 (799 unit tests)
 
-### Community 153 - ".heroes"
-Cohesion: 0.17
-Nodes (7): HeroEntity, HeroSkillEntity, Hero, Skill, HeroSeed, Backend, Module `heroes`
-
-### Community 154 - "DropQueueTest"
-Cohesion: 0.20
-Nodes (3): AcceptedKills, DropQueue, DropQueueTest
-
-### Community 157 - "RefreshTokenSecretPort"
-Cohesion: 0.12
-Nodes (4): Sha256RefreshTokenSecrets, RefreshTokenSecretPort, Sha256RefreshTokenSecretsTest, FakeRefreshTokenSecrets
+### Community 157 - "mode"
+Cohesion: 0.18
+Nodes (11): mode, default, description, options, type, on, push, workflow_dispatch (+3 more)
 
 ### Community 158 - "applyEditing"
 Cohesion: 0.06
@@ -1562,9 +1587,21 @@ Nodes (11): Kael (character rig), Kael Upper Arm with Pauldron (sheet 2 #4), Kae
 Cohesion: 0.21
 Nodes (10): Game ADR 0007: Modular hexagonal game, architecture.test.js import rule, main.js composition root, Game ADR 0008: Stages, BossCountdown, Campaign domain (transition table), campaignSession (ordered report queue), progressApi (+2 more)
 
-### Community 169 - "HeroSeederIT"
+### Community 165 - "Supabase Postgres Validation"
+Cohesion: 0.12
+Nodes (15): Discrimination Sensor, Edge Cases, Fix 1 (C5, RUN-03 AC 1 / RUN-04 AC 8): the 90 s health timeout reaches the request, Fix 2 (W1, RUN-05 AC 23): the game job publishes the Worker, Fix 3 (D1, SUPA-07 AC 7): a single table makes `public` non-empty, Fix 4 (D2, SUPA-07 AC 6): Postgres 16 is accepted, Fix Plans, Gate Check (+7 more)
+
+### Community 166 - "Catálogo de Nós N8N e Mapeamento Python"
+Cohesion: 0.11
+Nodes (17): 10. Produtividade e SaaS, 11. Credenciais e autenticação, 12. Padrões arquiteturais sugeridos, 13. Tratamento de erros e retries, 14. Observabilidade, 1. Triggers (entrada do workflow), 2. HTTP e APIs, 3. Lógica e fluxo (+9 more)
+
+### Community 167 - "secrets.test.mjs"
+Cohesion: 0.08
+Nodes (23): Checagens, Edge Cases, Goals, O que o Verifier confere sem secrets, O que só se confere contra a produção (T20 e T21, `gitops` com o dono), Out of Scope, P1: O backend responde à checagem de saúde ⭐ MVP, P1: O Cloud Run roda o backend ⭐ MVP (+15 more)
+
+### Community 169 - "Task Breakdown"
 Cohesion: 0.18
-Nodes (4): HeroRepository, JpaHeroRepository, JpaHeroSkillRepository, HeroSeederIT
+Nodes (11): T13: UI review of the wake-up notice [x], T14: Postgres tool runner and the copy SQL [x], T15: Database snapshot and comparison [x], T18: ADR 0012, the backend README and `.env.example` [x], T19: The game README describes the Cloud Run deploy [x], T20: Cutover to Cloud Run and Supabase [ ], T21: Production checks after the cutover [ ], T22: `publish.sh` only runs as the way back [ ] (+3 more)
 
 ### Community 170 - ".agents/skills/reversa-screen-translator/references/templates/golden_manifest.yaml"
 Cohesion: 0.05
@@ -1590,21 +1627,17 @@ Nodes (11): Kael Rig, Kael Set B Left Upper Arm and Forearm, Kael Set B Left Han
 Cohesion: 0.05
 Nodes (41): command, determinismStrategy, expectedExitCode, generatedAt, nonDeterministic, deviations, fallback, name (+33 more)
 
-### Community 176 - ".agents/skills/impeccable/reference/new-work.md"
-Cohesion: 0.05
-Nodes (33): Recommended Actions, Craft (deprecated alias), Impeccable Documenter, Input Contract, Output Contract, Workflow, Apply, Live-mode signature params (+25 more)
+### Community 176 - ".agents/skills/impeccable/SKILL.md"
+Cohesion: 0.06
+Nodes (32): Assess Adaptation Challenge, Implement & Verify, Recommended Actions, Recommended Actions, Craft (deprecated alias), Monorepo notes, Opting out of the boot check, Step 1: Run the pass (+24 more)
 
 ### Community 177 - ".claude/skills/impeccable/SKILL.md"
-Cohesion: 0.05
-Nodes (33): Recommended Actions, Craft (deprecated alias), Impeccable Documenter, Input Contract, Output Contract, Workflow, Apply, Live-mode signature params (+25 more)
+Cohesion: 0.06
+Nodes (32): Assess Adaptation Challenge, Implement & Verify, Recommended Actions, Recommended Actions, Craft (deprecated alias), Monorepo notes, Opting out of the boot check, Step 1: Run the pass (+24 more)
 
 ### Community 178 - ".agents/skills/impeccable/reference/live.md"
 Cohesion: 0.06
 Nodes (33): Apply at system scale, Audit before choosing, Choose a strategy, Contrast and perception, Live-mode signature params, Verify, Visitor mode, Step 1: Parse the request (+25 more)
-
-### Community 180 - "ResetRepository.kt"
-Cohesion: 0.21
-Nodes (4): JpaResetRepository, ResetEntity, ResetRepository, ResetRepositoryPort
 
 ### Community 182 - "architecturetestjs"
 Cohesion: 0.22
@@ -1619,16 +1652,20 @@ Cohesion: 0.06
 Nodes (33): Apply at system scale, Audit before choosing, Choose a strategy, Contrast and perception, Live-mode signature params, Verify, Visitor mode, Step 1: Parse the request (+25 more)
 
 ### Community 185 - "re"
-Cohesion: 0.18
-Nodes (22): build_report(), classify(), count_ec_items(), count_nf_items(), count_pattern(), count_rf_items(), count_unfilled_placeholders(), DimensionScore (+14 more)
+Cohesion: 0.20
+Nodes (24): build_report(), classify(), count_ec_items(), count_nf_items(), count_pattern(), count_rf_items(), count_unfilled_placeholders(), DimensionScore (+16 more)
 
-### Community 186 - "IntegrationTestBase.kt"
-Cohesion: 0.12
-Nodes (4): JpaUserRepository, ChanceTestConfiguration, ControllableChanceRoller, PostgresTestConfiguration
+### Community 186 - "Backend ADR 0004: Session tokens"
+Cohesion: 0.27
+Nodes (6): Backend ADR 0004: Session tokens, SecurityConfig (protected routes), Game ADR 0005: Persistent session, authApi, sessionManager (restore, single-flight refresh, logout), sessionStore (localStorage)
 
 ### Community 188 - "Unified Damage Design"
 Cohesion: 0.36
 Nodes (9): calculateDamage (damage.js), defenseOf(stats) tolerant reader, Unified Damage Design, EnemyStats (element, defense, critResistance), EnemyStatsResponse (defense + physicalDefense + magicalDefense), leaderStats.js attribute panel (10 lines), monsterAfterBreak (one defense), ClickerGame.showEnemyStats 'Defesa n%' (+1 more)
+
+### Community 189 - "steps"
+Cohesion: 0.36
+Nodes (8): steps, steps, id, if, name, run, uses, working-directory
 
 ### Community 190 - "Kael Sheet 1 Index 6 numbered part boxes"
 Cohesion: 0.24
@@ -1642,9 +1679,9 @@ Nodes (6): container_name, image, ports, profiles, restart, backend-green
 Cohesion: 0.20
 Nodes (10): POSTGRES_DB, POSTGRES_PASSWORD, POSTGRES_USER, container_name, environment, image, ports, restart (+2 more)
 
-### Community 193 - "Backend ADR 0004: Session tokens"
-Cohesion: 0.27
-Nodes (6): Backend ADR 0004: Session tokens, SecurityConfig (protected routes), Game ADR 0005: Persistent session, authApi, sessionManager (restore, single-flight refresh, logout), sessionStore (localStorage)
+### Community 193 - "Task Breakdown"
+Cohesion: 0.17
+Nodes (16): ghost(), pointer(), startDrag(), T13: e2e of the scroll down and of the light under a still pointer [x], T14: Unit tests of a leave and re-entry of each edge band [x], T15: Unit test of a second primary pointer during a drag [x], T16: Assert the block under the pointer in the still-pointer e2e [x], T1: Drag helper attachDragToEquip [x] (+8 more)
 
 ### Community 194 - "Game ADR 0004: Testing strategy"
 Cohesion: 0.24
@@ -1653,6 +1690,10 @@ Nodes (3): Game ADR 0004: Testing strategy, e2e fakeBackend, Game readme
 ### Community 195 - "Entrevista"
 Cohesion: 0.07
 Nodes (29): Antes de comecar, Disclaimer do profile.md, Encerramento sem mudancas, Entrevista, Modo experiente, Modo experiente, Modo experiente, Modo experiente (+21 more)
+
+### Community 196 - "backend"
+Cohesion: 0.29
+Nodes (7): if, permissions, runs-on, timeout-minutes, backend, contents, id-token
 
 ### Community 197 - "Kael combat stance art sword and tree sh"
 Cohesion: 0.20
@@ -1690,12 +1731,12 @@ Nodes (9): container_name, environment, image, ports, profiles, restart, volumes
 Cohesion: 0.22
 Nodes (9): PGADMIN_DEFAULT_EMAIL, PGADMIN_DEFAULT_PASSWORD, container_name, environment, image, ports, restart, volumes (+1 more)
 
-### Community 206 - "CrystalRepository.kt"
-Cohesion: 0.18
-Nodes (5): CrystalEntity, CrystalRepository, JpaCrystalRepository, CrystalRepositoryPort, InMemoryCrystalRepository
+### Community 206 - "DropQueueTest"
+Cohesion: 0.20
+Nodes (3): AcceptedKills, DropQueue, DropQueueTest
 
 ### Community 207 - ".claude/skills/reversa-spec-sdd/scripts/spec_scorer.py"
-Cohesion: 0.20
+Cohesion: 0.17
 Nodes (24): build_report(), classify(), count_ec_items(), count_nf_items(), count_pattern(), count_rf_items(), count_unfilled_placeholders(), DimensionScore (+16 more)
 
 ### Community 208 - "AccountResetService"
@@ -1711,48 +1752,52 @@ Cohesion: 0.22
 Nodes (10): Account Reset Design, Account Reset Release Report (Reset de conta), Account Reset Specification, Account Reset Tasks, Account Reset Validation (PASS, 16/16 mutants killed), Deploy watcher on origin/main (60 s poll), Boss Map Release Report (Mapa do capitulo), Boss Map Validation (PASS iteration 2) (+2 more)
 
 ### Community 212 - "Catálogo de Nós N8N e Mapeamento Python"
-Cohesion: 0.12
-Nodes (16): 10. Produtividade e SaaS, 11. Credenciais e autenticação, 12. Padrões arquiteturais sugeridos, 13. Tratamento de erros e retries, 14. Observabilidade, 1. Triggers (entrada do workflow), 2. HTTP e APIs, 3. Lógica e fluxo (+8 more)
+Cohesion: 0.11
+Nodes (17): 10. Produtividade e SaaS, 11. Credenciais e autenticação, 12. Padrões arquiteturais sugeridos, 13. Tratamento de erros e retries, 14. Observabilidade, 1. Triggers (entrada do workflow), 2. HTTP e APIs, 3. Lógica e fluxo (+9 more)
 
 ### Community 213 - "publishsh"
 Cohesion: 0.33
 Nodes (6): JWT_SECRET, publish_worker(), save_state(), publish.sh script, state_get(), tunnel_alive()
 
-### Community 214 - "serve"
-Cohesion: 0.33
-Nodes (9): Act on the receipt, Assemble and review, Plan and asset review, Plan, capture, serve, Act on the receipt, Assemble and review, Plan and asset review, Plan, capture, serve (+1 more)
+### Community 214 - "elementWheel.js"
+Cohesion: 0.07
+Nodes (37): arrow(), badge(), PAIR, renderElementWheel(), times(), TRIAD, BEATS, DARKNESS (+29 more)
 
-### Community 215 - "main.js"
-Cohesion: 0.19
-Nodes (8): phaser@^3.80.1, Boot, LINEUP, OVAL, config, game, ADR-0007, phaser
+### Community 215 - "Preloader"
+Cohesion: 0.12
+Nodes (10): COIN_METALS, Preloader, createScene(), HERO_IDS, Checklist de assets, Como usar, Dicas de consistência, Infinity Grove — Prompts de Assets dos Monstros (Gemini) (+2 more)
 
-### Community 216 - "AutoClickController.kt"
-Cohesion: 0.25
-Nodes (5): AutoClickController, AutoClickResponse, AutoClickStepResponse, GetAutoClickUseCase, UpgradeAutoClickUseCase
+### Community 216 - "main.js"
+Cohesion: 0.16
+Nodes (10): dependencies, axios@^1.20.0, phaser@^3.80.1, Boot, LINEUP, OVAL, config, game (+2 more)
 
 ### Community 217 - "showToast"
 Cohesion: 0.11
 Nodes (28): abandonForeignSession(), abandonSupersededGo(), applyOriginalAttrsToSvelteAnchor(), commitAcceptedSvelteComponentToDom(), componentModuleCandidates(), describeMountFailure(), detectDevServerBase(), discardOrphanedSession() (+20 more)
 
-### Community 218 - "Game ADR 0006: Wallet and drops in the g"
-Cohesion: 0.29
-Nodes (7): Game ADR 0006: Wallet and drops in the game, ClickerGame scene, walletLedger (pure ledger), Game ADR 0010: Equipment in the game, equipmentCollection service, domain/equipment attackerFor, equipmentView screen
+### Community 218 - "Campaign Chapters 6 to 15 Validation"
+Cohesion: 0.12
+Nodes (15): Campaign Chapters 6 to 15 Validation, Discrimination Sensor, Edge Cases, Fix Plans (ranked), Gap 1 - Minor: per-stage definitions of chapters 2 to 5 not pinned (Goal "chapters 1 to 5 keep their numbers"; Success Criterion "Chapters 1 to 5 answer the same definitions as before the release"), Gate Check, Owner decision (2026-11-14), Requirement Traceability Update (+7 more)
 
-### Community 219 - "scheduleAcceptCleanup"
-Cohesion: 0.31
-Nodes (11): acceptedDomAlreadyClean(), clearHandledWrapperReloadStamp(), deferredRecoverySuperseded(), ensureAcceptedDomClean(), findAcceptedRuntimeWrappers(), handledWrapperReloadKey(), reloadAfterMissingAcceptedDom(), restoreAcceptedDomFromSnapshot() (+3 more)
+### Community 219 - "env"
+Cohesion: 0.33
+Nodes (6): env, BACKEND_URL, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN, MODE, env
 
-### Community 220 - "TalentController.kt"
-Cohesion: 0.35
-Nodes (5): TalentController, TalentPointsResponse, TalentResponse, TalentsResponse, TalentRequestException
+### Community 220 - "Drag to Equip Validation"
+Cohesion: 0.12
+Nodes (15): Code Quality, Drag to Equip Validation, Fix 1 (Major): the lit slot is the slot of the piece's kind (gap 1, DRG-17), Fix 2 (Major): a stale answer after a close and a reopen (gap 2, edge case), Fix Plans (route to the user; this is round 3 of 3), Gate Check, Interactive UAT Results, Lessons (+7 more)
 
-### Community 221 - "ProgressController.kt"
-Cohesion: 0.16
-Nodes (7): ChapterResponse, DropResponse, EnemyStatsResponse, ProgressController, ProgressResponse, StageResponse, InvalidOutcomeException
+### Community 221 - "ProgressRepositoryPort"
+Cohesion: 0.07
+Nodes (11): AccountResetController, ResetResponse, AccountReset, ResetRequestException, ProgressRepositoryPort, ResetRepositoryPort, TalentRepositoryPort, AccountResetService (+3 more)
 
 ### Community 222 - "showToast"
 Cohesion: 0.11
 Nodes (28): abandonForeignSession(), abandonSupersededGo(), applyOriginalAttrsToSvelteAnchor(), commitAcceptedSvelteComponentToDom(), componentModuleCandidates(), describeMountFailure(), detectDevServerBase(), discardOrphanedSession() (+20 more)
+
+### Community 223 - "Supabase Postgres Design"
+Cohesion: 0.06
+Nodes (32): A deploy, step by step, Architecture Overview, CLAUDE.md "Deploy" section (orchestrator applies after the cutover), Cloud Run environment (not secret), Code Reuse Analysis, Cold start, Components, Connection budget (+24 more)
 
 ### Community 224 - ".agents/skills/reversa-designer/SKILL.md"
 Cohesion: 0.08
@@ -1766,6 +1811,10 @@ Nodes (8): command, container_name, image, ports, profiles, restart, volumes, pr
 Cohesion: 0.08
 Nodes (25): 10. Gerar `target_screens.md` por tela, 11. Captura de golden files (opcional), 12. Documentar deviations, 13. Resumir e devolver controle, 1. Detectar plataforma de origem, 2. Confirmar plataforma alvo, 3. Construir inventário interno de telas, 4. Selecionar modos disponíveis e trade-offs (+17 more)
 
+### Community 228 - "EquipmentServiceTest.kt"
+Cohesion: 0.08
+Nodes (24): EquipmentConflictException, EquipmentRequestException, InvalidAffixException, InvalidSellBatchException, MaxRefineException, NoAffixLeftException, NotEnoughCopperException, RefineTooLowException (+16 more)
+
 ### Community 229 - ".claude/skills/reversa-designer/SKILL.md"
 Cohesion: 0.08
 Nodes (25): 10. Modelar domínio, 11. Modelar dados, 12. Plano de migração de dados, 13. Resumir e devolver controle, 1. Ler `paradigm_decision.md`, 2. Detectar a topologia do legado, 3. Diagnosticar saúde estrutural, 4. Propor topologia moderna (+17 more)
@@ -1773,6 +1822,10 @@ Nodes (25): 10. Modelar domínio, 11. Modelar dados, 12. Plano de migração de 
 ### Community 231 - ".claude/skills/reversa-screen-translator/SKILL.md"
 Cohesion: 0.08
 Nodes (25): 10. Gerar `target_screens.md` por tela, 11. Captura de golden files (opcional), 12. Documentar deviations, 13. Resumir e devolver controle, 1. Detectar plataforma de origem, 2. Confirmar plataforma alvo, 3. Construir inventário interno de telas, 4. Selecionar modos disponíveis e trade-offs (+17 more)
+
+### Community 232 - "Code Analysis — infinity-grove"
+Cohesion: 0.13
+Nodes (14): Backend 🟢, Boot (`main.js`) 🟢, Code Analysis — infinity-grove, Composition (`composition.js`) 🟢, Game, Game 🟢, Module `auto-click`, Module `deploy` (+6 more)
 
 ### Community 233 - "uiRedesign.shots.js"
 Cohesion: 0.18
@@ -1786,21 +1839,21 @@ Nodes (10): container_name, environment, image, ports, profiles, restart, enviro
 Cohesion: 0.08
 Nodes (24): Antes de comecar, Apresentacao, `comparables`, Data de acesso, Deteccao da ferramenta de busca, Disclaimer, Encerramento sem mudancas, Entrada: tipo de pesquisa e inputs (+16 more)
 
-### Community 236 - "heroAscension.spec.js"
-Cohesion: 0.70
-Nodes (4): bare(), chapter(), health(), startAs()
+### Community 236 - "dragEquip.test.js"
+Cohesion: 0.21
+Nodes (13): attachDragToEquip(), up(), DRAG_THRESHOLD_PX, EDGE_PX, heroUnder(), SCROLL_STEP_PX, SCROLL_TICK_MS, amulet() (+5 more)
+
+### Community 237 - "Cenários de Erro e Tratamento"
+Cohesion: 0.15
+Nodes (12): Cenários de Erro e Tratamento, ERR-01: p5.js indisponível (CDN inacessível), ERR-02: Canvas não suportado pelo browser, ERR-03: Seed inválido ou ausente, ERR-04: Tamanho extremo, ERR-05: Paleta com cores inválidas, ERR-06: Contraste insuficiente, ERR-07: Padrão escolhido incompatível com estilo (+4 more)
 
 ### Community 238 - "Orina character turnaround front, side, "
 Cohesion: 0.33
 Nodes (6): Lyra Sprite (elf ranger, green leather armor, longbow, quiver), Orina Grasp Prison skill art (thorn vines rising from green rune circle), Orina Meteor Storm skill art (star meteors fired through green rune portal), Orina character turnaround (front, side, back) - elder star-robed witch with crystal staff, Orina Sprite (in-game cutout, constellation robe, witch hat, crystal staff), Orina Tempest skill art (cosmic vortex raining lightning)
 
-### Community 240 - "MainMenu"
-Cohesion: 0.22
-Nodes (6): MainMenu, createScene(), flush(), open(), sessionManager, userApi
-
 ### Community 241 - ".claude/skills/reversa-pricing-research/SKILL.md"
-Cohesion: 0.09
-Nodes (22): Antes de comecar, Apresentacao, `comparables`, Data de acesso, Deteccao da ferramenta de busca, Disclaimer, Encerramento sem mudancas, Entrada: tipo de pesquisa e inputs (+14 more)
+Cohesion: 0.08
+Nodes (24): Antes de comecar, Apresentacao, `comparables`, Data de acesso, Deteccao da ferramenta de busca, Disclaimer, Encerramento sem mudancas, Entrada: tipo de pesquisa e inputs (+16 more)
 
 ### Community 242 - "services"
 Cohesion: 0.40
@@ -1814,13 +1867,13 @@ Nodes (5): depends_on, depends_on, postgres, depends_on, condition
 Cohesion: 0.40
 Nodes (5): interval, retries, test, timeout, healthcheck
 
-### Community 245 - "Encounter"
-Cohesion: 0.07
-Nodes (14): CardConfig, CardProperties, RandomChanceRoller, CardDropper, CardDropRates, Encounter, CHAPTER_BOSS, MINIBOSS (+6 more)
+### Community 245 - ".elements"
+Cohesion: 0.13
+Nodes (8): Element, DARKNESS, FIRE, LIGHT, NATURE, WATER, ChapterOrder, ChapterOrderTest
 
 ### Community 246 - ".agents/skills/impeccable/reference/adapt.md"
-Cohesion: 0.06
-Nodes (32): Assess Adaptation Challenge, Breakpoints: Content-Driven, Content Adaptation, Desktop Adaptation (Mobile → Desktop), Detect Input Method, Not Just Screen Size, Email Adaptation (Web → Email), Implement Adaptations, Layout Adaptation Patterns (+24 more)
+Cohesion: 0.08
+Nodes (25): Assess Adaptation Challenge, Breakpoints: Content-Driven, Content Adaptation, Desktop Adaptation (Mobile → Desktop), Detect Input Method, Not Just Screen Size, Email Adaptation (Web → Email), Implement Adaptations, Layout Adaptation Patterns (+17 more)
 
 ### Community 248 - ".agents/skills/impeccable/reference/document.md"
 Cohesion: 0.08
@@ -1850,25 +1903,45 @@ Nodes (3): Break Crit Talent Icon (breaking chain with red spark), Crit Chance T
 Cohesion: 0.13
 Nodes (12): 3. Gerar `assets/js/data.js` (única fonte de dados das páginas), Invariantes do mini-site, CAPACIDADES PRINCIPAIS:, DIRETRIZES DE CÓDIGO:, Instruções de Uso, WORKFLOW DE EXECUÇÃO:, 3. Gerar `assets/js/data.js` (única fonte de dados das páginas), CAPACIDADES PRINCIPAIS: (+4 more)
 
+### Community 266 - "Cenários de Erro e Tratamento"
+Cohesion: 0.15
+Nodes (12): Cenários de Erro e Tratamento, ERR-01: p5.js indisponível (CDN inacessível), ERR-02: Canvas não suportado pelo browser, ERR-03: Seed inválido ou ausente, ERR-04: Tamanho extremo, ERR-05: Paleta com cores inválidas, ERR-06: Contraste insuficiente, ERR-07: Padrão escolhido incompatível com estilo (+4 more)
+
 ### Community 267 - "Spec: [Nome da Feature]"
 Cohesion: 0.08
 Nodes (23): 10. Integrações e Dependências, 11. Edge Cases e Tratamento de Erros, 12. Segurança e Privacidade, 13. Plano de Rollout, 14. Open Questions, 15. Decisões Tomadas (Decision Log), 1. Resumo, 2. Contexto e Motivação (+15 more)
 
-### Community 270 - "TalentDefinition"
-Cohesion: 0.16
-Nodes (12): NotEnoughTalentPointsException, TalentConflictException, TalentLevelMismatchException, TalentLockedException, TalentMaxLevelException, PlayerTalents, TalentAward, TalentCatalog (+4 more)
+### Community 268 - "PlayerEquipment"
+Cohesion: 0.09
+Nodes (18): PlayerEquipment, EquipmentService, BatchSale, EquipmentChange, EquipPieceUseCase, ListEquipmentUseCase, RefinePieceUseCase, RerollAffixUseCase (+10 more)
 
-### Community 271 - "AutoClickRepository.kt"
-Cohesion: 0.21
-Nodes (4): AutoClickEntity, AutoClickRepository, JpaAutoClickRepository, AutoClickRepositoryPort
+### Community 269 - "DropRuleRepository"
+Cohesion: 0.07
+Nodes (7): DropRuleEntity, DropRuleRepository, JpaDropRuleRepository, DropRule, ChapterSeederIT, DropRuleRepositoryIT, WalletServiceTest
+
+### Community 270 - "HeroSeederIT"
+Cohesion: 0.10
+Nodes (10): HeroEntity, HeroSkillEntity, HeroRepository, JpaHeroRepository, JpaHeroSkillRepository, Hero, Skill, HeroSeed (+2 more)
+
+### Community 271 - "scripts"
+Cohesion: 0.15
+Nodes (13): scripts, build, build:staging, deploy, dev, dev:staging, preview, test (+5 more)
+
+### Community 272 - "Game ADR 0006: Wallet and drops in the game"
+Cohesion: 0.29
+Nodes (7): Game ADR 0006: Wallet and drops in the game, ClickerGame scene, walletLedger (pure ledger), Game ADR 0010: Equipment in the game, equipmentCollection service, domain/equipment attackerFor, equipmentView screen
 
 ### Community 273 - "deployBackend (deploy/lib/backendDeploy.mjs)"
 Cohesion: 0.22
 Nodes (7): deployBackend (deploy/lib/backendDeploy.mjs), .deploy-state and .deploy.lock, nginx proxy (infinity-grove-proxy, nginx -s reload switch), publish.sh (rewritten launcher), backend-blue / backend-green slots (deploy/lib/slots.mjs), deploy/watcher.mjs tick, publishWorker (deploy/lib/workerPublish.mjs)
 
+### Community 274 - "resolveLiveInjectionAnchor"
+Cohesion: 0.16
+Nodes (19): buildSvelteExpressionTextMap(), buildSveltePropValuesFromLiveElement(), buildSveltePropValuesV2(), cloneWithoutElements(), collectTextNodes(), collectVisibleTexts(), cssEscapeIdent(), elementMatchesOriginalMarkup() (+11 more)
+
 ### Community 275 - ".claude/skills/impeccable/reference/adapt.md"
-Cohesion: 0.06
-Nodes (32): Assess Adaptation Challenge, Breakpoints: Content-Driven, Content Adaptation, Desktop Adaptation (Mobile → Desktop), Detect Input Method, Not Just Screen Size, Email Adaptation (Web → Email), Implement Adaptations, Layout Adaptation Patterns (+24 more)
+Cohesion: 0.08
+Nodes (25): Assess Adaptation Challenge, Breakpoints: Content-Driven, Content Adaptation, Desktop Adaptation (Mobile → Desktop), Detect Input Method, Not Just Screen Size, Email Adaptation (Web → Email), Implement Adaptations, Layout Adaptation Patterns (+17 more)
 
 ### Community 276 - ".claude/skills/impeccable/reference/document.md"
 Cohesion: 0.08
@@ -1894,9 +1967,13 @@ Nodes (22): Assess Onboarding Needs, Context Over Ceremony, Contextual Help, Des
 Cohesion: 0.09
 Nodes (22): `aluguel`, `aluguel`, `assinatura`, `assinatura`, Catalogo, Catalogo de modelos de venda e regras de viabilidade (versao 1.0), Como montar o motivo (`reason_pt_br`), Entradas (+14 more)
 
-### Community 284 - "IntegrationTestBase"
-Cohesion: 0.10
-Nodes (4): PieceEntity, ProgressEntity, CardsFlowIT, IntegrationTestBase
+### Community 282 - "Plano de Exploração — infinity-grove"
+Cohesion: 0.20
+Nodes (9): Agentes Independentes, Decisão de organização das specs 🗂️, Fase 1: Reconhecimento 🔍, Fase 2: Escavação 🏗️, Fase 3: Interpretação 🧠, Fase 4: Geração 📝, Fase 5: Revisão ✅, Plano de Exploração — infinity-grove (+1 more)
+
+### Community 284 - "MainMenu.test.js"
+Cohesion: 0.22
+Nodes (6): backend, createScene(), flush(), open(), sessionManager, userApi
 
 ### Community 285 - ".claude/skills/impeccable/reference/onboard.md"
 Cohesion: 0.09
@@ -2010,6 +2087,10 @@ Nodes (18): 1. Revisão por unit, 2. Revisão cruzada entre units, 3. Validaçã
 Cohesion: 0.11
 Nodes (18): 1. Behavior, not Implementation, 2. Ambiguidade = Bug Futuro, 3. Non-Goals são tão importantes quanto Goals, 4. A Spec é um Contrato Vivo, 5. LLM-Readiness, Antipadrões Comuns, Guia de Metodologia — Spec-Driven Development, O Ciclo SDD (+10 more)
 
+### Community 315 - "PlayerCards"
+Cohesion: 0.13
+Nodes (5): PlayerCards, PlayerCardsRepositoryPort, PlayerCardsRepositoryPort, HeroViewTest, PlayerCardsRepositoryPort
+
 ### Community 316 - "Agentes do Reversa — guia com analogias"
 Cohesion: 0.11
 Nodes (18): Agentes do Reversa — guia com analogias, ⛏️ Archaeologist — o escavador, 📐 Architect — o cartógrafo, 🗄️ Data Master — o geólogo, 🎨 Design System — o estilista, 🔍 Detective — o Sherlock Holmes, 🎨 Impeccable: o diretor de arte do front-end, Menu principal (+10 more)
@@ -2102,9 +2183,9 @@ Nodes (16): Alertas de consistencia, Campos recomendados no size.json, Entradas,
 Cohesion: 0.12
 Nodes (16): Antes de começar, Artefatos canônicos e opcionais, Caso `hybrid`, Como preencher seções críticas, Confiança em cada afirmação, Diretiva non-destructive, Fluxo obrigatório, Idioma e nomes de pasta (RF-10) (+8 more)
 
-### Community 341 - "Player tables (cascade with `users`)"
-Cohesion: 0.12
-Nodes (16): `card_copies`, Client-side storage (localStorage), Configuration parameters (`application.yaml`), Data Dictionary — infinity-grove, `player_auto_click` (V6), `player_cards` (lock #2, "the player lock"), `player_crystals` (V6), `player_resets` (V7) (+8 more)
+### Community 341 - "heroAscension.spec.js"
+Cohesion: 0.70
+Nodes (4): bare(), chapter(), health(), startAs()
 
 ### Community 342 - "actOnAgentTarget"
 Cohesion: 0.29
@@ -2147,8 +2228,8 @@ Cohesion: 0.12
 Nodes (16): Antes de começar, Artefatos canônicos e opcionais, Caso `hybrid`, Como preencher seções críticas, Confiança em cada afirmação, Diretiva non-destructive, Fluxo obrigatório, Idioma e nomes de pasta (RF-10) (+8 more)
 
 ### Community 352 - "backgroundFight.test.js"
-Cohesion: 0.17
-Nodes (12): BACKGROUND_MAX_MS, BACKGROUND_STEP_MS, BACKGROUND_TICK_MS, runInBackground(), startTicker(), createPage(), createWorld(), FakeWorker (+4 more)
+Cohesion: 0.23
+Nodes (8): BACKGROUND_MAX_MS, BACKGROUND_STEP_MS, BACKGROUND_TICK_MS, runInBackground(), startTicker(), createPage(), createWorld(), FakeWorker
 
 ### Community 353 - ".agents/skills/impeccable/reference/animate.md"
 Cohesion: 0.12
@@ -2173,14 +2254,6 @@ Nodes (15): description, description, format, type, type, description, type, pro
 ### Community 358 - ".agents/skills/reversa-inspector/SKILL.md"
 Cohesion: 0.12
 Nodes (15): 1. Ler `paradigm_decision.md`, 2. Definir estratégia geral em `parity_specs.md`, 2b. Incorporar paridade de telas, 3. Adaptar cobertura ao paradigma alvo, 4. Identificar fluxos críticos, 5. Reusar characterization_specs, 6. Resumir e devolver controle, Casos de borda (+7 more)
-
-### Community 359 - "implement.md reference"
-Cohesion: 0.14
-Nodes (4): kotlin-backend-dev agent (Haiku), coding-principles.md reference, implement.md reference, SPEC_DEVIATION marker
-
-### Community 360 - "AutoClickRules"
-Cohesion: 0.25
-Nodes (4): AutoClickConfig, AutoClickProperties, AutoClickRules, AutoClickStep
 
 ### Community 361 - ".claude/skills/impeccable/reference/animate.md"
 Cohesion: 0.12
@@ -2215,8 +2288,8 @@ Cohesion: 0.12
 Nodes (15): Clareza, Cobertura, Completude, Consistência, EdgeCases, Histórico de alterações, Itens por categoria, Itens reprovados, detalhe (+7 more)
 
 ### Community 369 - "Generate Report"
-Cohesion: 0.13
-Nodes (14): 1. Accessibility (A11y), 2. Performance, 3. Theming, 4. Responsive Design, 5. Implementation Integrity (CRITICAL), Audit Health Score, Detailed Findings by Severity, Diagnostic Scan (+6 more)
+Cohesion: 0.29
+Nodes (7): Audit Health Score, Detailed Findings by Severity, Executive Summary, Generate Report, Implementation Integrity Verdict, Patterns & Systemic Issues, Positive Findings
 
 ### Community 370 - ".agents/skills/reversa-forward/SKILL.md"
 Cohesion: 0.13
@@ -2231,8 +2304,8 @@ Cohesion: 0.13
 Nodes (14): 1. Sintetizar contexto, 2. Filtrar estratégias aplicáveis, 3. Avaliar e recomendar, 4. Riscos, 5. Cutover, 6. Resumir e devolver controle, Casos de borda, Inputs (+6 more)
 
 ### Community 373 - "Generate Report"
-Cohesion: 0.13
-Nodes (14): 1. Accessibility (A11y), 2. Performance, 3. Theming, 4. Responsive Design, 5. Implementation Integrity (CRITICAL), Audit Health Score, Detailed Findings by Severity, Diagnostic Scan (+6 more)
+Cohesion: 0.29
+Nodes (7): Audit Health Score, Detailed Findings by Severity, Executive Summary, Generate Report, Implementation Integrity Verdict, Patterns & Systemic Issues, Positive Findings
 
 ### Community 374 - ".claude/skills/reversa-forward/SKILL.md"
 Cohesion: 0.13
@@ -2289,6 +2362,10 @@ Nodes (13): 🟢 CONFIRMADO, Definições, Downgrade: 🟢 → 🟡, Downgrade: 
 ### Community 387 - "Fluxo de Trabalho"
 Cohesion: 0.14
 Nodes (13): 1. Receber o seed, 2. Escolher paleta, 3. Escolher padrão generativo, 4. Gerar o código, 5. Variantes de tamanho, 6. Salvar e entregar, Diretrizes de código, Diretrizes de qualidade (+5 more)
+
+### Community 388 - "ADR 0012: Production on Google Cloud Run and Supabase Postgres"
+Cohesion: 0.33
+Nodes (5): ADR 0012: Production on Google Cloud Run and Supabase Postgres, Alternatives considered, Consequences, Context, Decision
 
 ### Community 389 - "New visual work"
 Cohesion: 0.14
@@ -2439,8 +2516,8 @@ Cohesion: 0.15
 Nodes (12): Apêndice: rastreabilidade ao inventário, Especificação, Estados (apenas modo modernizado), Exemplo: Android XML → Flutter (modernizado), Exemplo: COBOL TUI → Go CLI/TUI (literal), Exemplo: HTML legado server-rendered → SPA componentizada (modernizado), Exemplo: Win32/Delphi VCL → Web SPA (modernizado), Pontos de divergência aceitos (+4 more)
 
 ### Community 427 - "validate_spec.py"
-Cohesion: 0.15
-Nodes (12): Conventional Commits 1.0.0 format, check(), main(), read_message(), _autodetect(), check(), classify_ears(), is_separator() (+4 more)
+Cohesion: 0.16
+Nodes (11): check(), main(), read_message(), _autodetect(), check(), classify_ears(), is_separator(), main() (+3 more)
 
 ### Community 428 - "Requirements: <NOME DA FEATURE>"
 Cohesion: 0.15
@@ -2614,10 +2691,6 @@ Nodes (11): Adapter Pairs, `ansi-byte-stream` (terminais textuais), `component-t
 Cohesion: 0.17
 Nodes (11): Contexto, Decisão, Decisão de Modernização de Telas, Em modo híbrido, listas explícitas (obrigatórias), Implicações para o Inspector, Implicações pendentes para a Fase 2, Modo: híbrido, Modo: literal (+3 more)
 
-### Community 473 - "Preloader"
-Cohesion: 0.12
-Nodes (10): COIN_METALS, Preloader, createScene(), HERO_IDS, Checklist de assets, Como usar, Dicas de consistência, Infinity Grove — Prompts de Assets dos Monstros (Gemini) (+2 more)
-
 ### Community 474 - "Chapter map (Caminho do Capitulo, 10 minibosses + chapter boss)"
 Cohesion: 0.29
 Nodes (7): Boss Map Specification, assets/ui/boss-map.jpg and drawn fallback trail, Chapter map (Caminho do Capitulo, 10 minibosses + chapter boss), PROMPTS_ASSETS_UI.md Gemini map prompt, Stop states defeated / current / locked, Boss Map Tasks, views/farmView.js and mapLayout.js
@@ -2722,13 +2795,9 @@ Nodes (10): Antes de começar, Detecção do padrão (antes de propor mudança),
 Cohesion: 0.18
 Nodes (10): 1. Inventário de telas, 2. Elementos de interface, 3. Fluxo de navegação, 4. Estados, 5. Mapeamento tela → unit, Antes de começar, Diretiva non-destructive, Pedido ao usuário (+2 more)
 
-### Community 500 - "BossRecord"
-Cohesion: 0.20
-Nodes (3): BossRecord, BossRecordTest, Card drops (`domain/CardDrops.kt`, `service/CardRewards.kt`) 🟢
-
-### Community 501 - "design.md reference"
-Cohesion: 0.15
-Nodes (5): design.md reference, design.md template, Handoff section format, memory.md reference, STATE Handoff snapshot (five features batch of 2026-10-21)
+### Community 501 - "package.json"
+Cohesion: 0.67
+Nodes (3): devDependencies, supabase@^3.1.0, supabase
 
 ### Community 502 - ".claude/skills/impeccable/reference/clarify.md"
 Cohesion: 0.18
@@ -2823,8 +2892,8 @@ Cohesion: 0.18
 Nodes (10): 1. Inventário de telas, 2. Elementos de interface, 3. Fluxo de navegação, 4. Estados, 5. Mapeamento tela → unit, Antes de começar, Diretiva non-destructive, Pedido ao usuário (+2 more)
 
 ### Community 526 - ".agents/skills/reversa-pricing-size/SKILL.md"
-Cohesion: 0.18
-Nodes (10): Antes de comecar, Apresentacao no chat, Artefatos esperados, Calculo, Notes, Persistencia, Principios, Recalculo (+2 more)
+Cohesion: 0.12
+Nodes (16): Antes de comecar, Apresentacao no chat, Artefatos esperados, Calculo, Doubts, Extracao das metricas, Notes, Persistencia (+8 more)
 
 ### Community 527 - "Generate Combined Critique Report"
 Cohesion: 0.20
@@ -2930,9 +2999,9 @@ Nodes (9): Decisões de Design Identificadas, Dependências, Estado Interno, Flu
 Cohesion: 0.20
 Nodes (9): Critérios de Aceitação, [Nome da Unit], Prioridade (MoSCoW), Rastreabilidade de Código, Regras de Negócio, Requisitos Funcionais, Requisitos Não Funcionais, Responsabilidades (+1 more)
 
-### Community 553 - "Drag to Equip Specification"
-Cohesion: 0.13
-Nodes (14): Assumptions & Open Questions, Drag to Equip Specification, Edge Cases, Goals, Out of Scope, P1: Cancel a drag ⭐ MVP, P1: Drop a piece on a hero to equip it ⭐ MVP, P1: See what is being dragged and where it lands ⭐ MVP (+6 more)
+### Community 553 - "Round 3 (final gate, 2026-11-16)"
+Cohesion: 0.25
+Nodes (8): Discrimination Sensor, round 3, Gate, round 3 (final gate: foreground, one suite at a time), Lessons, round 3, Report edit, Requirement Traceability Update, round 3, Round 3 (final gate, 2026-11-16), Scope of the fix commit, Summary, round 3
 
 ### Community 554 - "Generate Combined Critique Report"
 Cohesion: 0.20
@@ -3055,7 +3124,7 @@ Cohesion: 0.40
 Nodes (3): Reset errors RESET_LOCKED / RESET_CHAPTER_MISMATCH / INVALID_RESET_REQUEST, deploy/regression.mjs runSuite, API regression suite (12 checks, FALHOU / Regressao OK)
 
 ### Community 584 - "Shape"
-Cohesion: 0.22
+Cohesion: 0.25
 Nodes (8): Cadence, Confirm and stop, Phase 1: Discovery interview, Phase 2: Resolve the design direction, Phase 3: Write the brief, Round 1: purpose, people, and outcome, Round 2: material, behavior, and boundaries, Shape
 
 ### Community 585 - ".agents/skills/reversa-arbiter/SKILL.md"
@@ -3127,11 +3196,11 @@ Cohesion: 0.22
 Nodes (9): Color & materials, Components & controls, iOS platform, Layout & structure, Motion, The iOS slop test, Touch targets, Typography (+1 more)
 
 ### Community 602 - ".claude/skills/reversa-pricing-size/SKILL.md"
-Cohesion: 0.18
-Nodes (10): Antes de comecar, Apresentacao no chat, Artefatos esperados, Calculo, Notes, Persistencia, Principios, Recalculo (+2 more)
+Cohesion: 0.12
+Nodes (16): Antes de comecar, Apresentacao no chat, Artefatos esperados, Calculo, Doubts, Extracao das metricas, Notes, Persistencia (+8 more)
 
 ### Community 603 - "Shape"
-Cohesion: 0.22
+Cohesion: 0.25
 Nodes (8): Cadence, Confirm and stop, Phase 1: Discovery interview, Phase 2: Resolve the design direction, Phase 3: Write the brief, Round 1: purpose, people, and outcome, Round 2: material, behavior, and boundaries, Shape
 
 ### Community 604 - ".claude/skills/reversa-arbiter/SKILL.md"
@@ -3194,10 +3263,6 @@ Nodes (8): Checklist Rápido de Revisão, Classificação por Score, Dimensão 1
 Cohesion: 0.22
 Nodes (8): Big Bang, Branch by Abstraction, Estratégias, Migration Strategies (cópia local), Parallel Run, Pseudo-procedimento, Regras de recomendação, Strangler Fig
 
-### Community 619 - "HeroSeeder"
-Cohesion: 0.19
-Nodes (8): HeroSeeder, Catalog tables (seeded at startup, never overwritten), `chapters`, `drop_rules` (seeded by `ChapterSeeder`, 3 per chapter), `enemies`, `hero_skills`, `heroes` (seeded by `HeroSeeder`), `stages`
-
 ### Community 620 - "Android platform"
 Cohesion: 0.25
 Nodes (8): Android platform, Color & theming, Components & motion, Layout & structure, The Android slop test, Touch targets, Typography, Verifying the build
@@ -3242,9 +3307,9 @@ Nodes (7): Antes de começar, Fontes de leitura, Ganchos Pós-execução, Geraç
 Cohesion: 0.25
 Nodes (7): Lacunas Pendentes (🔴), [Nome da Unit], Tarefas de Implementação, Ordem Sugerida, Pré-requisitos, Tarefas, Tarefas de Migração de Dados (se aplicável), Tarefas de Teste
 
-### Community 632 - "AutoClickService"
-Cohesion: 0.24
-Nodes (5): autoClickUnlocked(), AutoClickService, Backend 🟢, Game 🟢, Module `auto-click`
+### Community 633 - "EquipmentController"
+Cohesion: 0.31
+Nodes (4): BatchSaleResponse, EquipmentChangeResponse, EquipmentController, EquipmentResponse
 
 ### Community 635 - "Android platform"
 Cohesion: 0.25
@@ -3253,10 +3318,6 @@ Nodes (8): Android platform, Color & theming, Components & motion, Layout & stru
 ### Community 636 - "Persona-Based Design Testing"
 Cohesion: 0.25
 Nodes (8): 1. Impatient Power User: "Alex", 2. Confused First-Timer: "Jordan", 3. Accessibility-Dependent User: "Sam", 4. Deliberate Stress Tester: "Riley", 5. Distracted Mobile User: "Casey", Persona-Based Design Testing, Project-Specific Personas, Selecting Personas
-
-### Community 637 - "Equipment UI Specification"
-Cohesion: 0.27
-Nodes (9): Equipment UI coverage (unit 96.62%, e2e 90.52%), Tela de equipamento release report, ClickerGame farm mode failures (since 9e11bf9), Equipment UI Specification, EQU-01..EQU-06, Piece hover tooltip, Equipment UI Validation, rarityFrames.test.js reduced-motion check (+1 more)
 
 ### Community 638 - "Registro de Bugs (Reversa Bugs)"
 Cohesion: 0.25
@@ -3387,8 +3448,8 @@ Cohesion: 0.29
 Nodes (6): Campos, Estrutura completa, Fases válidas, Onde NÃO escrever, Regra ao escrever, Schema — .reversa/state.json
 
 ### Community 672 - "Impeccable Asset Producer"
-Cohesion: 0.22
-Nodes (7): Core Rule, Decision Comps, Impeccable Asset Producer, Input Contract, Output Contract, Review handoff, The job
+Cohesion: 0.15
+Nodes (11): Act on the receipt, Assemble and review, Plan and asset review, Plan, capture, serve, Core Rule, Decision Comps, Impeccable Asset Producer, Input Contract (+3 more)
 
 ### Community 673 - "Diagnostic Scan"
 Cohesion: 0.33
@@ -3397,10 +3458,6 @@ Nodes (6): 1. Accessibility (VoiceOver / TalkBack), 2. Performance, 3. Appearanc
 ### Community 674 - "installation"
 Cohesion: 0.29
 Nodes (6): agents, engines, installation, installDate, lastUpdated, version
-
-### Community 675 - "tasks.md reference"
-Cohesion: 0.25
-Nodes (6): Tiered gates (Quick / Full / Build), Diagram-definition cross-check, Gate Check Commands, tasks.md reference, tasks.md template, Test Coverage Matrix
 
 ### Community 676 - "Diagnostic Scan"
 Cohesion: 0.33
@@ -3698,9 +3755,13 @@ Nodes (5): interface, display_name, short_description, policy, allow_implicit_in
 Cohesion: 0.33
 Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
 
-### Community 750 - "Extracao das metricas"
-Cohesion: 0.15
-Nodes (13): Doubts, Extracao das metricas, Plan depth, Principles touched, Requirements, Tasks, Doubts, Extracao das metricas (+5 more)
+### Community 750 - "Ato 2 — Raízes Profundas (capítulos 6 a 10)"
+Cohesion: 0.12
+Nodes (16): 16. `a2-fire-monster.png` — Salamandra de Magma, 17. `a2-water-monster.png` — Caranguejo de Gruta, 18. `a2-nature-monster.png` — Larva-Raiz, 19. `a2-light-monster.png` — Cristalito, 20. `a2-darkness-monster.png` — Sombra Rastejante, 21. `a2-fire-miniboss.png` — Golem de Carvão, 22. `a2-water-miniboss.png` — Enguia Abissal, 23. `a2-nature-miniboss.png` — Troll Fúngico (+8 more)
+
+### Community 752 - "IntegrationTestBase"
+Cohesion: 0.11
+Nodes (4): PieceEntity, ProgressEntity, CardsFlowIT, IntegrationTestBase
 
 ### Community 753 - "interface"
 Cohesion: 0.33
@@ -3995,8 +4056,8 @@ Cohesion: 0.33
 Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
 
 ### Community 826 - "Impeccable Asset Producer"
-Cohesion: 0.22
-Nodes (7): Core Rule, Decision Comps, Impeccable Asset Producer, Input Contract, Output Contract, Review handoff, The job
+Cohesion: 0.15
+Nodes (11): Act on the receipt, Assemble and review, Plan and asset review, Plan, capture, serve, Core Rule, Decision Comps, Impeccable Asset Producer, Input Contract (+3 more)
 
 ### Community 827 - "check-legacy-policy.mjs"
 Cohesion: 0.60
@@ -4006,9 +4067,9 @@ Nodes (5): deny(), globToRegex(), isValidPattern(), main(), reversaFolders()
 Cohesion: 0.33
 Nodes (5): Backend (`backend/build.gradle.kts`, Gradle 9.8.1 wrapper), Dependencies — infinity-grove, Deploy (`deploy/`), Game (`game/package.json`, npm, ES modules), Runtime images and external tools
 
-### Community 829 - "Operate mode depth (and Read notes)"
-Cohesion: 0.22
-Nodes (9): Color, Components, Layout, Motion, Operate mode depth (and Read notes), Product constraints, Product permissions, The product slop test (+1 more)
+### Community 829 - "Diagnostic Scan"
+Cohesion: 0.33
+Nodes (6): 1. Accessibility (A11y), 2. Performance, 3. Theming, 4. Responsive Design, 5. Implementation Integrity (CRITICAL), Diagnostic Scan
 
 ### Community 830 - "Reversa"
 Cohesion: 0.40
@@ -4018,9 +4079,9 @@ Nodes (4): Como usar, Comportamento ao ativar, Regra não-negociável, Reversa
 Cohesion: 0.40
 Nodes (4): interface, default_prompt, display_name, short_description
 
-### Community 832 - "Operate mode depth (and Read notes)"
-Cohesion: 0.22
-Nodes (9): Color, Components, Layout, Motion, Operate mode depth (and Read notes), Product constraints, Product permissions, The product slop test (+1 more)
+### Community 832 - ".agents/skills/impeccable/reference/bolder.md"
+Cohesion: 0.33
+Nodes (5): Before you finish, Scope is sovereign, The amplification, The skeleton test, Why it reads flat
 
 ### Community 834 - "highcharts_accessibility"
 Cohesion: 0.40
@@ -4082,13 +4143,9 @@ Nodes (4): Estrutura, Invariante do registro, Políticas, Registro de Qualidade 
 Cohesion: 0.40
 Nodes (4): interface, default_prompt, display_name, short_description
 
-### Community 849 - "UI review HTML template"
-Cohesion: 0.25
-Nodes (7): Playwright UI shots (npm run ui:shots, desktop 1280x720 + phone 390x844), ui-artist agent (art director, Sonnet), Organic look palette (forest, cream panels, terracotta, sage; Caprasimo + Figtree), Review sections: Fidelidade a spec, Capturas, Achados, Sugestoes, Console e recursos, Finding severity chips (alta, media, baixa), UI review HTML template, Verdict chip APROVADO / MUDANCAS PEDIDAS
-
-### Community 850 - "Equipment Tasks"
-Cohesion: 0.40
-Nodes (5): ADR 0008 equipment, Equipment Tasks, equipmentApi.js gateway, equipmentCollection, equipmentCollection.transferSet
+### Community 849 - "Visualize: Direction Comps & Asset Production"
+Cohesion: 0.33
+Nodes (5): After approval: the comp becomes a spec, Generate three compositional options, One approval point, Plates and provenance, Visualize: Direction Comps & Asset Production
 
 ### Community 851 - "highcharts_accessibility"
 Cohesion: 0.40
@@ -4330,61 +4387,141 @@ Nodes (3): required, type, interview
 Cohesion: 0.67
 Nodes (3): required, type, interview
 
-### Community 914 - ".agents/skills/impeccable/reference/doctor.md"
-Cohesion: 0.25
-Nodes (7): Monorepo notes, Opting out of the boot check, Step 1: Run the pass, Step 2: Act by severity, Step 3: Deprecated fields are binding, Step 4: Do not overclaim on truth drift, What this owns, and what it does not
+### Community 914 - "Diagnostic Scan"
+Cohesion: 0.33
+Nodes (6): 1. Accessibility (A11y), 2. Performance, 3. Theming, 4. Responsive Design, 5. Implementation Integrity (CRITICAL), Diagnostic Scan
 
 ### Community 924 - "Extract Flow"
 Cohesion: 0.25
 Nodes (7): Extract Flow, Step 1: Discover the Design System, Step 2: Identify Patterns, Step 3: Plan Extraction, Step 4: Extract & Enrich, Step 5: Migrate, Step 6: Document
 
-### Community 925 - "TalentService"
-Cohesion: 0.23
-Nodes (4): TalentService, ListTalentsUseCase, ResetTalentsUseCase, UpgradeTalentUseCase
-
-### Community 926 - ".claude/skills/impeccable/reference/doctor.md"
-Cohesion: 0.25
-Nodes (7): Monorepo notes, Opting out of the boot check, Step 1: Run the pass, Step 2: Act by severity, Step 3: Deprecated fields are binding, Step 4: Do not overclaim on truth drift, What this owns, and what it does not
+### Community 926 - ".claude/skills/impeccable/reference/bolder.md"
+Cohesion: 0.33
+Nodes (5): Before you finish, Scope is sovereign, The amplification, The skeleton test, Why it reads flat
 
 ### Community 927 - "Extract Flow"
 Cohesion: 0.25
 Nodes (7): Extract Flow, Step 1: Discover the Design System, Step 2: Identify Patterns, Step 3: Plan Extraction, Step 4: Extract & Enrich, Step 5: Migrate, Step 6: Document
 
+### Community 928 - "Visualize: Direction Comps & Asset Production"
+Cohesion: 0.33
+Nodes (5): After approval: the comp becomes a spec, Generate three compositional options, One approval point, Plates and provenance, Visualize: Direction Comps & Asset Production
+
 ### Community 930 - "Region map"
 Cohesion: 0.40
 Nodes (4): Containment, Painted material, Region map, What varies independently
 
-### Community 931 - "TalentBranch"
+### Community 931 - "Adaptation Strategies"
 Cohesion: 0.40
-Nodes (5): TalentBranch, BREAK, COMBO, POWER, TIME
+Nodes (5): Adaptation Strategies, Orientation & foldables, Phone → Tablet (iPad / large screens), Platform → platform (iOS ↔ Android), Web → native (porting a website or web app)
 
-### Community 932 - "changes.mjs"
-Cohesion: 0.43
-Nodes (5): changedFiles(), classify(), GAME_DIRS, GAME_FILES, isGame()
+### Community 932 - "Impeccable Documenter"
+Cohesion: 0.40
+Nodes (4): Impeccable Documenter, Input Contract, Output Contract, Workflow
 
 ### Community 933 - "Region map"
 Cohesion: 0.40
 Nodes (4): Containment, Painted material, Region map, What varies independently
 
+### Community 934 - "Adaptation Strategies"
+Cohesion: 0.40
+Nodes (5): Adaptation Strategies, Orientation & foldables, Phone → Tablet (iPad / large screens), Platform → platform (iOS ↔ Android), Web → native (porting a website or web app)
+
+### Community 935 - "Impeccable Documenter"
+Cohesion: 0.40
+Nodes (4): Impeccable Documenter, Input Contract, Output Contract, Workflow
+
+### Community 937 - "Operate"
+Cohesion: 0.50
+Nodes (3): Comps, Directions, Operate
+
+### Community 938 - "Persuade and Experience"
+Cohesion: 0.50
+Nodes (3): Comps, Directions, Persuade and Experience
+
 ### Community 939 - "clickPower.spec.js"
 Cohesion: 0.48
 Nodes (6): bare(), chapter(), dealt(), ELEMENT_OF, health(), startAs()
 
-### Community 943 - "Code search graceful degradation (ast-grep > ripgrep > grep)"
-Cohesion: 0.40
-Nodes (4): ast-grep (sg) structural search, code-analysis.md reference, grep fallback, ripgrep (rg)
+### Community 940 - "Read"
+Cohesion: 0.50
+Nodes (3): Comps, Directions, Read
 
-### Community 944 - ".agents/skills/impeccable/SKILL.md"
+### Community 941 - "Operate"
+Cohesion: 0.50
+Nodes (3): Comps, Directions, Operate
+
+### Community 942 - "Round 2 (re-verification, 2026-11-16)"
+Cohesion: 0.20
+Nodes (10): Discrimination Sensor, round 2, Fix 5 (D9, SUPA-07 AC 7 at the Postgres 16 boundary): the table count also runs on 16, Fix Plans, round 2, Gate, round 2 (foreground, one at a time), Lessons, round 2, Requirement Traceability Update, round 2, Round 2 (re-verification, 2026-11-16), Scope of the fix commits (+2 more)
+
+### Community 943 - "Persuade and Experience"
+Cohesion: 0.50
+Nodes (3): Comps, Directions, Persuade and Experience
+
+### Community 944 - "Operate mode depth (and Read notes)"
+Cohesion: 0.10
+Nodes (18): Craft floor, Refuse, Verify, Constraints, Failure modes, Flow, /impeccable hooks, Routing (+10 more)
+
+### Community 945 - "Read"
+Cohesion: 0.50
+Nodes (3): Comps, Directions, Read
+
+### Community 948 - "Operate mode depth (and Read notes)"
+Cohesion: 0.10
+Nodes (18): Craft floor, Refuse, Verify, Constraints, Failure modes, Flow, /impeccable hooks, Routing (+10 more)
+
+### Community 953 - "ChapterRepositoryPort"
+Cohesion: 0.06
+Nodes (26): ChapterSeeder, ChapterRepositoryPort, InMemoryChapterRepository, Chapter generation (`domain/Chapter.kt`, `ChapterDefinition.of(n)`) 🟢, Chapter order (`domain/ChapterOrder.kt`) 🟢, Copper drop queue (`domain/DropQueue.kt`, `DropTable.kt`) 🟢, Module `campaign`, Position state machine (`domain/Progress.kt`) 🟢 (+18 more)
+
+### Community 972 - "Equipment Tasks"
+Cohesion: 0.67
+Nodes (4): ADR 0008 equipment, Equipment Tasks, equipmentApi.js gateway, equipmentCollection
+
+### Community 973 - "Player tables (cascade with `users`)"
+Cohesion: 0.12
+Nodes (16): `card_copies`, Client-side storage (localStorage), Configuration parameters (`application.yaml`), Data Dictionary — infinity-grove, `player_auto_click` (V6), `player_cards` (lock #2, "the player lock"), `player_crystals` (V6), `player_resets` (V7) (+8 more)
+
+### Community 975 - "verifier.md"
+Cohesion: 0.50
+Nodes (3): Gate, Report back, Sensor
+
+### Community 977 - "Piece"
+Cohesion: 0.10
+Nodes (6): EquipmentRepository, JpaPieceRepository, Piece, EquipmentRepositoryPort, InMemoryEquipmentRepository, Formulas (`Piece`) 🟢
+
+### Community 978 - "SecurityProperties"
+Cohesion: 0.21
+Nodes (4): JwtAccessTokenIssuer, SecurityProperties, JwtAccessTokenIssuerTest, SecurityPropertiesTest
+
+### Community 985 - "TalentController.kt"
+Cohesion: 0.22
+Nodes (7): TalentController, TalentPointsResponse, TalentResponse, TalentsResponse, ListTalentsUseCase, ResetTalentsUseCase, UpgradeTalentUseCase
+
+### Community 986 - "scheduleAcceptCleanup"
+Cohesion: 0.31
+Nodes (11): acceptedDomAlreadyClean(), clearHandledWrapperReloadStamp(), deferredRecoverySuperseded(), ensureAcceptedDomClean(), findAcceptedRuntimeWrappers(), handledWrapperReloadKey(), reloadAfterMissingAcceptedDom(), restoreAcceptedDomFromSnapshot() (+3 more)
+
+### Community 993 - "bossReplayChapters.spec.js"
 Cohesion: 0.08
-Nodes (21): Before you finish, Scope is sovereign, The amplification, The skeleton test, Why it reads flat, Craft floor, Refuse, Verify (+13 more)
+Nodes (22): AT_CHAPTER_3, CHAPTER_2, countdownLimit(), CURRENT_STOPS, expectTimerBesidePlate(), farmAnswerRead(), hudBoxes(), nature (+14 more)
 
-### Community 948 - ".claude/skills/impeccable/SKILL.md"
-Cohesion: 0.08
-Nodes (21): Before you finish, Scope is sovereign, The amplification, The skeleton test, Why it reads flat, Craft floor, Refuse, Verify (+13 more)
+### Community 995 - "Round 5"
+Cohesion: 0.22
+Nodes (9): 1. The new test against the release, 2. Sweep of the chapters 1 to 5 definition, 3. Discrimination sensor, 4. Gate, 5. Spec-precision notes (not blocking), 6. Residuals (not gaps), 7. Requirement traceability (for the orchestrator to apply; the spec was not edited), Round 5 (+1 more)
 
-### Community 967 - "PlayerCards"
-Cohesion: 0.13
-Nodes (3): PlayerCards, PlayerCardsRepositoryPort, PlayerCardsRepositoryPort
+### Community 996 - "Spec-Anchored Acceptance Criteria"
+Cohesion: 0.25
+Nodes (8): sceneTexts(), Campaign goes on (CHAP-01, CHAP-02, CHAP-03), Chapter numbers (CHAP-04, CHAP-05), Coin drops (CHAP-09), Health without a 32-bit limit (CHAP-08), Reset reward (CHAP-06), Short format for big numbers (CHAP-07), Spec-Anchored Acceptance Criteria
+
+### Community 997 - "centre"
+Cohesion: 0.28
+Nodes (9): centre(), drag(), touchDrag(), move(), ghostOf(), swallowNextClick(), T11: e2e of pointercancel, the swallowed click and the other mouse buttons [x], T12: e2e of a second finger during a touch drag [x] (+1 more)
+
+### Community 998 - "Spec-Anchored Acceptance Criteria"
+Cohesion: 0.29
+Nodes (7): Coverage of the criteria, Edge cases, P1: Drop a piece on a hero, P1: See what is being dragged, P1: Touch, pen and the existing controls, P2: Scroll the window while dragging, Spec-Anchored Acceptance Criteria
 
 ## Ambiguous Edges - Review These
 - `L-007: Do not write log output as an AC unless assertable` → `L-036: Assert log fields with a captured appender`  [AMBIGUOUS]
@@ -4401,23 +4538,23 @@ Nodes (3): PlayerCards, PlayerCardsRepositoryPort, PlayerCardsRepositoryPort
   art/orina_grasp_prision.jpg · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **329 isolated node(s):** `CLEARED`, `FAILED`, `ADR-0007`, `JWT_SECRET`, `ARMOR_PIERCE_PCT` (+324 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 6568 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **105 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **327 isolated node(s):** `ARMOR_PIERCE_PCT`, `BOSS_DAMAGE_PCT`, `BOSS_TIME_SECONDS`, `CLICK_DAMAGE_PCT`, `CRIT_CHANCE` (+322 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 6922 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **121 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Modules identified` connect `Wallet` to `EquipmentService.kt`, `HeroController.kt`, `EquipmentRules`, `User`, `SellBatch`, `SkillCombat`, `E2E Fake Backend`, `DropQueueTest`, `TalentService`, `TalentRepositoryPort`, `talents.js`, `Rarity`, `EquipmentService`, `ProgressService`, `AutoClickController.kt`, `TalentController.kt`, `ProgressController.kt`, `FarmService.kt`, `HeroSeeder`, `Encounter`, `AutoClickService`?**
-  _High betweenness centrality (0.083) - this node is a cross-community bridge._
-- **Are the 7 inferred relationships involving `Progress` (e.g. with `.`the auto click is locked in chapter 1 and open from chapter 2 or on a completed campaign`()` and `.`a progress completed at chapter 5 opens chapter 6`()`) actually correct?**
-  _`Progress` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `CLEARED`, `FAILED`, `ADR-0007` to the rest of the system?**
-  _329 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `.agents/skills/impeccable/scripts/live-browser.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.02856298630946518 - nodes in this community are weakly interconnected._
-- **Why does `vitest` connect `vitest` to `backgroundFight.test.js`, `WalletLedger`, `ClickerGame Combat Loop`, `phaser/ClickerGame.js`, `Task Breakdown`, `talents.js`, `MainMenu`, `SkillCombat`, `packagejson`, `farmView.js`, `architecturetestjs`, `elementWheel.js`, `Preloader`, `Catálogo de Gráficos Highcharts`, `watchermjs`, `el`, `el`?**
-  _High betweenness centrality (0.043) - this node is a cross-community bridge._
+- **Why does `IntegrationTestBase` connect `IntegrationTestBase` to `WalletEntity`, `FarmControllerIT`, `PlayerCardsRepositoryIT`, `UserEntity`, `DropRuleRepository`, `HeroSeederIT`, `ProgressRepositoryIT.kt`, `ProgressControllerIT`, `EquipmentControllerIT`, `contenttype`, `HeroControllerIT`, `AuthControllerIT`, `RefreshTokenRepository.kt`, `HeroRepositoryIT`, `given`, `SecurityIT`, `AccountResetControllerIT.kt`, `SecurityConfig.kt`, `TalentControllerIT`, `LyraLeaderBonusMigrationIT`, `CoinDropMigrationIT`, `TalentPointsMigrationIT`, `SchemaConstraintsIT`, `PreviousBackendCompatibilityIT`, `WalletControllerIT`, `UserControllerIT`, `EnemyStats`, `SchemaValidationIT.kt`, `WalletRepositoryIT`, `RefreshTokenRepositoryIT`, `TestDatabaseIsolationIT`, `assertequals`, `AutoClickControllerIT`, `Piece`, `IntegrationTestBase.kt`, `SecurityProperties`, `heroAscensionshotsjs`, `Affix`, `ChapterRepositoryIT`, `DatabasePoolConfigIT`, `HealthIT.kt`, `EquipmentDropFlowIT`, `EquipmentRefineIT`, `HealthHitPointsMigrationIT`, `ProgressRepository.kt`, `InfinityGroveWsApplicationTests`?**
+  _High betweenness centrality (0.059) - this node is a cross-community bridge._
+- **Are the 3 inferred relationships involving `IntegrationTestBase` (e.g. with `Existing Components to Leverage` and `T4: Public `GET /health` with the database check and the commit [x]`) actually correct?**
+  _`IntegrationTestBase` has 3 INFERRED edges - model-reasoned connections that need verification._
+- **What connects `ARMOR_PIERCE_PCT`, `BOSS_DAMAGE_PCT`, `BOSS_TIME_SECONDS` to the rest of the system?**
+  _327 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `RefreshToken` be split into smaller, more focused modules?**
+  _Cohesion score 0.07535460992907801 - nodes in this community are weakly interconnected._
+- **Why does `mockBackend()` connect `E2E Fake Backend` to `bossReplayChapters.spec.js`, `Task Breakdown`, `uiRedesign.spec.js`, `uiRedesign.shots.js`, `dragEquip.spec.js`, `clickPower.spec.js`, `E2E Test Helpers`, `skillsAllspecjs`, `heroAscension.spec.js`, `heroAscensionshotsjs`, `bulkSell.spec.js`?**
+  _High betweenness centrality (0.031) - this node is a cross-community bridge._
 
 ### Low-confidence Hints
 _AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._
