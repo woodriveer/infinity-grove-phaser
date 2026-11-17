@@ -1429,7 +1429,7 @@ Bound changed by orchestrator ruling 2026-11-17: Cinzel's content box extends ~6
 
 ---
 
-### T19: UI re-review of the plate, the timer and the dot [ ]
+### T19: UI re-review of the plate, the timer and the dot [x]
 
 **Owner**: ui-artist
 **Goal**: Check findings #1 and #2 of the T14 review against the amended Visual Spec on new screenshots; a pass closes the review, any finding becomes a task (BRC-08, BRC-09; AD-022).
@@ -1455,8 +1455,8 @@ Bound changed by orchestrator ruling 2026-11-17: Cinzel's content box extends ~6
 **Gate**: build - `cd game && npm run ui:shots -- bossReplayChapters` exits 0
 **Done when**:
 
-- [ ] 18 PNG files (9 shots x 2 projects) are under `.specs/features/boss-replay-chapters/ui-review/`.
-- [ ] `ui-review.html` names a verdict and states, for findings #1 and #2, resolved or not with the shot that shows it.
+- [x] 18 PNG files (9 shots x 2 projects) are under `.specs/features/boss-replay-chapters/ui-review/`. (20 delivered in `f31884d`: the ui-artist added shot 10, the campaign boss timer still centred.)
+- [x] `ui-review.html` names a verdict and states, for findings #1 and #2, resolved or not with the shot that shows it.
 
 **Commit**: `docs(ui-review): re-review the chapter plate, the boss timer and the chip dot`
 
