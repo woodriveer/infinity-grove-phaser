@@ -631,6 +631,54 @@ describe('HeroUi Rever chefes', () => {
             expect(ctx.farm.chapter()).toBe(3);
             expect(ctx.farm.bosses()).toEqual(state3.bosses);
         });
+
+        it('opening another screen over Rever chefes during a chapter load drops that load', async () => {
+            const ctx = createUi();
+            let resolveChapter2;
+            setup(ctx, () => new Promise((resolve) => { resolveChapter2 = resolve; }));
+            await open(ctx, 'farm');
+            ctx.testid('farm-chapter-2').click();
+
+            await open(ctx, 'heroes');
+            resolveChapter2(state2);
+            await flush();
+
+            expect(ctx.farm.chapter()).toBe(3);
+            expect(ctx.farm.bosses()).toEqual(state3.bosses);
+            expect(ctx.farm.definitionOf(2)).toBeNull();
+
+            await open(ctx, 'farm');
+
+            expect(chipsOf(ctx).some((chip) => chip.disabled)).toBe(false);
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+            expect(ctx.testid('farm-chapter-3').getAttribute('aria-pressed')).toBe('true');
+        });
+
+        it('clicking a stop during a chapter load drops that load', async () => {
+            const ctx = createUi();
+            let resolveChapter2;
+            setup(ctx, () => new Promise((resolve) => { resolveChapter2 = resolve; }));
+            await open(ctx, 'farm');
+            ctx.testid('farm-chapter-2').click();
+
+            ctx.testid('farm-entry-miniboss-1').click();
+
+            expect(ctx.hooks.startFarm).toHaveBeenCalledWith({ kind: 'MINIBOSS', stage: 1 });
+            expect(ctx.ui.isOpen).toBe(false);
+
+            resolveChapter2(state2);
+            await flush();
+
+            expect(ctx.farm.chapter()).toBe(3);
+            expect(ctx.farm.bosses()).toEqual(state3.bosses);
+            expect(ctx.farm.definitionOf(2)).toBeNull();
+
+            await open(ctx, 'farm');
+
+            expect(chipsOf(ctx).some((chip) => chip.disabled)).toBe(false);
+            expect(title(ctx)).toBe('Caminho do Capítulo 3');
+            expect(ctx.testid('farm-chapter-3').getAttribute('aria-pressed')).toBe('true');
+        });
     });
 });
 
