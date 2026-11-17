@@ -201,9 +201,9 @@ TD-001 to TD-008 are recorded in the spec of the feature that found them (`chara
 ### TD-009
 - **Debt**: In Rever chefes, a chapter chip load still pending when the panel is closed and reopened leaves the chips disabled until the panel is reopened again, and its late answer overwrites the farm session (`bosses`, `chapter`) under the map of the current chapter. `game/src/adapters/phaser/HeroUi.js` `selectFarmChapter` (its `finally` clears `farmBusy` but skips the render once `this.view` changed); `game/src/application/farm/farmSession.js` `load`.
 - **Proposed rule**: Closing Rever chefes cancels a pending chapter load; a late answer is ignored.
-- **Fix**: one `game-dev` task: drop the stale answer (load guarded by the view, `farmBusy` reset in `close()` and `show()`), with the `HeroUi.test.js` case `closing during a chapter load and reopening leaves the chips enabled on the current chapter`.
+- **Fix**: `boss-replay-chapters` Phase 8 (BRC-10, spec P1-Choose AC 14, 15): T20 (`game-dev`) adds `cancel()` to the farm session (a generation counter: an answer of a load started before the last cancel changes nothing) and `HeroUi.dropFarmLoad()`, called by `show()` and `close()`, which resets `farmBusy` and cancels the session load when the screen left is Rever chefes; a dropped chip load's `finally` does nothing (its view is old). T21 (`test-engineer`) adds `holdFarm(chapter, { fail })` to the e2e fake backend and three scenarios in `bossReplayChapters.spec.js`.
 - **Found**: Verifier round 1 of `boss-replay-chapters`, finding F1 (`5259af2`); ruled non-blocking by the product owner at acceptance (2026-11-17)
-- **Status**: open
+- **Status**: in progress (owner, 2026-11-17, "Sim, corrija"): T20 and T21 of `.specs/features/boss-replay-chapters/tasks.md` written, not started
 
 ## Handoff
 
@@ -211,10 +211,10 @@ TD-001 to TD-008 are recorded in the spec of the feature that found them (`chara
 - **Phase / Task**: both done and accepted by the product owner on 2026-11-17. `ui-redesign`: T1 to T53, Verifier round 3 PASS (`2110a69`), ui-artist T53 APROVADO (`0101e6c`). `boss-replay-chapters`: T1 to T19, Verifier round 1 PASS (`5259af2`: 35 of 35 ACs, sensor 21 of 21 killed), ui-artist re-review APROVADO (`f31884d`); acceptance in each `tasks.md` § Acceptance
 - **Completed**: both features; `boss-replay-chapters` traceability BRC-01 to BRC-09 Verified; Verifier finding F1 logged as TD-009
 - **In-progress** (file:line): none
-- **Next step**: `gitops` releases `ui-redesign` and `boss-replay-chapters`: make sure the commits are on `origin/main` and live, `report.html` of each feature, `CHANGELOG.md`, release tag
-- **Waiting for the owner**: `ui-redesign`: the PO rulings marked `n` in its spec Assumptions table (D2, D3, findings #10 to #13, the `Click to Start!` ruling; list in its `tasks.md` § Acceptance; #10 and #12 are owner art). `boss-replay-chapters`: the F1 ruling (ship now, fix later as TD-009)
+- **Next step**: TD-009 fix, `boss-replay-chapters` Phase 8: T20 (`game-dev`), then T21 (`test-engineer`), then the `verifier` scoped to BRC-10 (release v0.3.0 of both features is cut, `4f4f9c7`)
+- **Waiting for the owner**: `ui-redesign`: the PO rulings marked `n` in its spec Assumptions table (D2, D3, findings #10 to #13, the `Click to Start!` ruling; list in its `tasks.md` § Acceptance; #10 and #12 are owner art). `boss-replay-chapters`: nothing (the owner answered the F1 ruling on 2026-11-17: "Sim, corrija", fixed by TD-009 Phase 8)
 - **Blockers**: none
-- **Next candidate work**: the TD-009 fix task (`game-dev`)
+- **Next candidate work**: after TD-009, none queued
 - **Notes for the resume**: (1) a failing e2e test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both (seen so far: `dragEquip.spec.js:550`, `:586`, `:604`, `:670`, `talents.spec.js:148` and `:111`, `auth.spec.js:113`, `clickPower.spec.js:41`, `uiRedesign.spec.js:2089`). (2) The hero detail magenta test `shows no magenta in the detail of any of the five heroes` (`game/e2e/uiRedesign.spec.js:2089`) takes about 30 s alone of its 60 s budget and timed out under 3-worker load in round 3: the next task that touches that file splits it into one test per hero or marks it `test.slow()`, without changing an asserted value (Verifier note N1, owner `test-engineer`). (3) Line numbers quoted in `tasks.md` drift: locate edits by test name or exact text
 - **Uncommitted files**: owner's, never stage them: `CLAUDE.md`, `GEMINI.md`, `graphify-out/`, `.agents/`, `.claude/skills/impeccable/`, `.claude/skills/reversa-*/`
 - **Branch**: main

@@ -26,6 +26,7 @@ The Rever chefes screen (spec `boss-map`) shows only the current chapter, becaus
 - [x] A boss of an earlier chapter fights with that chapter's health, defense, critical resistance, element and time limit, and pays that chapter's card and equipment rolls.
 - [x] The daily chapter boss limit (10) and the 5 s farm interval stay one per player across all chapters.
 - [x] No Flyway migration; a game still on the previous version keeps working against the new backend, and the new game keeps working against the previous backend.
+- [ ] Closing Rever chefes while a chapter loads never leaves the chapter buttons disabled, and the late answer of that load never changes the farm state or the map shown (TD-009).
 
 ## Out of Scope
 
@@ -65,6 +66,7 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 | UI review #2 (T14): the 6 px gold dot touches the numeral of the current chip | Every chip gets `padding-bottom: 3px` (numeral baseline from 21.5 px to 20 px below the chip's top edge, the same on every chip so the row stays aligned) and the dot moves to `bottom: 1px` (its top edge 23 px below the chip's top edge, 1 px clear of the border). The numeral and the dot are 3 px apart; the dot stays 6 x 6 px `--gold-400` | Measured in Chromium: with `bottom: 3px` the dot spans 21 to 27 px and the baseline is at 21.5 px (overlap). Moving only the current chip's numeral (the reviewer's example) would put it 2 px above its neighbours; `bottom: 0` would merge the dot into the gold border of the pressed chip | y (PO ruling, 2026-11-17) |
 | Chip row on a phone (ruling on the test-engineer's spec-precision gap) | The edge case states what the player observes: at a 390 px viewport the 15 chips stay in one row inside the scaled map and no chip passes its right edge. The row does not wrap there, and no layout task is created. `flex-wrap: wrap` stays in the Visual Spec as a guard | The HUD is one 1024 px layout scaled down to the phone (`game/public/style.css`, the comment above the 640 px query), so the panel is never narrower than the 15 chips (about 760 px of the 880 px map). A phone-only reflow would change the game for one row and break the scaled-HUD pattern every screen uses | y (PO ruling) |
 | Verifier finding F1 (round 1): closing Rever chefes while a chapter load is pending and reopening it can leave the chips disabled, and the late answer overwrites the farm session under the map of the current chapter (`HeroUi.selectFarmChapter`) | Not part of this feature; logged as TD-009 in `STATE.md` with the rule "closing Rever chefes cancels a pending chapter load; a late answer is ignored", for a fix task of `game-dev` | No AC covers a close during a load (P1-Choose AC 8, 9 cover the HUD opening and the pending state); closing and reopening the panel again recovers; the late answer can only start a fight of a reached chapter, which the backend accepts with that chapter's lower rewards | y (PO ruling at acceptance, 2026-11-17) |
+| TD-009 fix (follow-up of F1) | Fixed now under the rule "closing Rever chefes cancels a pending chapter load; a late answer is ignored" (P1-Choose AC 14, 15). Mechanism: the farm session gets `cancel()`, a generation counter that every load reads when it starts and checks when its answer arrives, so an answer of a load started before the last `cancel()` changes nothing (a failure still rejects, and changes nothing either). `HeroUi` calls it whenever it leaves Rever chefes (`close()`: the `Fechar` button, Esc, a click on a stop) or opens a screen over it (`show()`, which the scene calls after the last daily win), and resets `farmBusy` there; a dropped chapter load's `finally` does nothing, because the view counter it captured changed | Owner, 2026-11-17: "Sim, corrija". Every Rever chefes opening loads the farm state again before drawing, so dropping a pending answer never leaves the screen without data. The cancel runs only when the screen left is Rever chefes, so the scene's own reload after a refused farm win (`ClickerGame.reportFarmWin`) still lands when the player opens and closes another screen | y (owner, 2026-11-17, "Sim, corrija") |
 
 **Open questions:** none. The owner accepted every default of Q1 to Q8 on 2026-11-17 ("Aprovo os padrões", AD-024).
 
@@ -93,6 +95,8 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 11. WHEN the player clicks the pressed chapter button THEN the game SHALL send no request.  <!-- event-driven -->
 12. WHILE the map of an earlier chapter is shown the chapter boss stop SHALL show `<n> vitórias restantes hoje` with the shared daily count and be disabled at 0.  <!-- state-driven -->
 13. The gold dot of the current campaign chapter's chip SHALL sit 23 px below the chip's top edge (`bottom: 1px` inside a 2 px border of a 32 px chip), at least 2 px below the baseline of the chip's numeral, and every chip's numeral SHALL sit on the same baseline (`padding-bottom: 3px` on every chip).  <!-- ubiquitous -->
+14. WHEN the player closes Rever chefes (the `Fechar` button `hero-close`, the Esc key or a click on a stop) while a chapter request is pending, or the game opens a panel screen over it, THEN the game SHALL drop that request, and the next Rever chefes opening SHALL show the current campaign chapter with `farm-chapter-<current>` pressed and every chapter button enabled.  <!-- event-driven -->
+15. IF the answer of a dropped chapter request arrives, a success or a failure, THEN the game SHALL ignore it: the farm state (bosses, wins left, chapter, chapters and chapter definitions), the map title, the stop states, the pressed button, the enabled or disabled state of every chapter button and the error line SHALL stay as they were before it arrived.  <!-- unwanted-behavior -->
 
 **Independent Test**: With the fake backend at chapter 3 stage 4, open Rever chefes, read chips 1 to 3 with 3 pressed, click 2 and read the title `Caminho do Capítulo 2` and 11 `defeated` stops.
 
@@ -168,6 +172,11 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 - IF the player's account is reset while an earlier chapter map is open in another tab THEN the next win report SHALL answer 409 `BOSS_NOT_AVAILABLE`, and the game SHALL end the farm and reload the farm state, as today.
 - WHEN the game is shown at a 390 px viewport (phone, the 1024 px layout scaled down) THEN the 15 chapter chips SHALL stay inside the scaled map, with no chip extending past its left or right edge.
 - IF the game holds no definition of the picked chapter THEN the game SHALL not start the fight.
+- WHEN the player closes Rever chefes with `hero-close` while the chapter 2 request is pending, opens it again and the chapter 2 answer then arrives THEN the map SHALL show `Caminho do Capítulo 3` with `farm-chapter-3` pressed and chips 1 to 3 enabled, both before and after that answer, and a later click on `farm-chapter-1` SHALL keep `Caminho do Capítulo 3` shown while chapter 1 loads (TD-009).
+- IF the dropped chapter request fails after the player closed Rever chefes with Esc and opened it again THEN the reopened map SHALL show no error line and every chapter button enabled (TD-009).
+- WHEN a new chapter request starts on the reopened map before the late answer of a dropped one arrives THEN every chapter button SHALL stay disabled until the new request answers, and the map SHALL then show the newly picked chapter (TD-009).
+- WHEN the game reopens Rever chefes itself (after the last daily chapter boss win) while a chapter request is pending THEN the late answer of that request SHALL not change the map the game opened (TD-009).
+- WHEN the player opens and closes a screen other than Rever chefes while the farm state reload the game starts after a refused farm win is pending THEN that reload SHALL still update the farm state (TD-009).
 
 ---
 
@@ -203,8 +212,9 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 | BRC-07 | P2: Compatibility both ways (AC 1-3) | Tasks | Verified |
 | BRC-08 | P1: Fight - plate on two lines and timer beside it (AC 14, 15; UI review #1) | Tasks | Verified |
 | BRC-09 | P1: Choose a chapter - dot clear of the numeral (AC 13; UI review #2) | Tasks | Verified |
+| BRC-10 | P1: Choose a chapter - a pending chapter load dropped on close (AC 14, 15; TD-009) | Tasks | Pending |
 
-**Coverage:** 9 total, 9 mapped to tasks, 0 unmapped
+**Coverage:** 10 total, 10 mapped to tasks (BRC-10: T20, T21), 0 unmapped
 
 ---
 
@@ -213,3 +223,4 @@ Every ambiguity is resolved or recorded here. Rows Q1 to Q8 are product decision
 - [x] A player in chapter 3 fights miniboss 3 of chapter 2 in two clicks from the HUD (open Rever chefes, chip `2`, stop `3`).
 - [x] Every acceptance criterion above has a named unit or integration test, and every player-visible one an e2e scenario in `game/e2e/bossReplayChapters.spec.js`.
 - [x] `farm.spec.js`, `bossMap.spec.js` and the backend `FarmServiceTest` / `FarmControllerIT` cases that exist today pass unchanged.
+- [ ] TD-009: P1-Choose AC 14 and 15 and their five edge cases each have a named unit test (`HeroUi.test.js`, `farmSession.test.js`), the player-visible ones an e2e scenario in `bossReplayChapters.spec.js`, and every existing test passes unchanged.

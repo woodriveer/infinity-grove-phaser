@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/boss-replay-chapters/spec.md`
 **Design**: `.specs/features/boss-replay-chapters/design.md`
-**Status**: Approved by the owner on 2026-11-17 ("Aprovo os padrões"): every default of Q1 to Q8 accepted. T1 to T19 done (Phases 1 to 7): the T14 review asked for changes (finding #1 high, #2 low), fixed by T15 to T19 under the PO rulings of the spec Assumptions table (rows "UI review #1" and "UI review #2"). Verifier round 1 PASS (`5259af2`); accepted by the product owner on 2026-11-17 (§ Acceptance).
+**Status**: Approved by the owner on 2026-11-17 ("Aprovo os padrões"): every default of Q1 to Q8 accepted. T1 to T19 done (Phases 1 to 7): the T14 review asked for changes (finding #1 high, #2 low), fixed by T15 to T19 under the PO rulings of the spec Assumptions table (rows "UI review #1" and "UI review #2"). Verifier round 1 PASS (`5259af2`); accepted by the product owner on 2026-11-17 (§ Acceptance). Follow-up Phase 8 (TD-009, owner 2026-11-17 "Sim, corrija"): T20 (`game-dev`) and T21 (`test-engineer`) open, for BRC-10 (spec P1-Choose AC 14, 15).
 
 Rules for every task:
 
@@ -131,6 +131,12 @@ T14 → T15 → T16 → T17
 
 ```
 T17 → T18 → T19
+```
+
+### Phase 8: TD-009 (a pending chapter load dropped on close)
+
+```
+T19 → T20 → T21
 ```
 
 ---
@@ -1494,6 +1500,264 @@ Bound changed by orchestrator ruling 2026-11-17: Cinzel's content box extends ~6
 
 ---
 
+### T20: Closing Rever chefes drops a pending chapter load [ ]
+
+**Owner**: game-dev
+**Goal**: Closing Rever chefes, or opening a panel screen over it, drops a pending chapter load: the chips are enabled on the next opening and the late answer, a success or a failure, changes neither the farm session nor the panel (BRC-10; spec P1-Choose AC 14, 15 and the five TD-009 edge cases; `STATE.md` TD-009).
+**Where**: `game/src/application/farm/farmSession.js`
+**Also changes**: `game/src/adapters/phaser/HeroUi.js`, `game/src/application/farm/farmSession.test.js`, `game/src/adapters/phaser/HeroUi.test.js`
+**Read first**: `farmSession.js:1-56` (whole file); `HeroUi.js` - search `async show (screen, options = {})` (about line 151), `close ()` (about line 229) and `async selectFarmChapter (chapter)` (about line 717); `farmSession.test.js:1-14` (`state`, `beforeEach`) and `:70-72` (`D2`); `HeroUi.test.js:9` (`flush`), `:30-88` (`createUi`, `open`) and `:366-497` (`describe('choosing a chapter')`: `AT3`, `minibosses`, `ELEVEN`, `tenStages`, `state2`, `state3`, `chipsOf`, `title`, `setup`)
+**Depends on**: T19
+**Requirement**: BRC-10
+
+**Why it breaks today**: `selectFarmChapter` sets `this.farmBusy = true` and awaits `this.farm.load(chapter)`. `close()` bumps `this.view` but leaves `farmBusy` true, so the reopened map (`show('farm')` then `render_farm`) draws every chip disabled. When the chapter answer arrives, `farmSession.load` writes `bosses`, `winsLeft`, `chapter`, `chapters` and the definition even though the panel shows the current chapter, and the `finally` clears `farmBusy` without a render (the view changed), so the chips stay disabled until the panel is opened again.
+
+**Mechanism**: a generation counter in the farm session (`cancel()` bumps it; `load` drops an answer whose generation is old) plus, in `HeroUi`, a `dropFarmLoad()` called by `show()` and `close()` that resets `farmBusy` and cancels the session load when the screen being left is Rever chefes. `HeroUi`'s existing view counter (`this.view`, bumped by every `show()` and `close()`) is the token of a chip load: a `finally` whose captured view is old does nothing, so it never clears the `farmBusy` of a newer load.
+
+**Contract**:
+
+`farmSession.js` (the only changes; `bosses`, `winsLeft`, `chapter`, `chapters`, `definitionOf` and `win` stay as they are):
+
+```js
+export const createFarmSession = ({ gateway }) =>
+{
+    let bosses = [];
+    let winsLeft = null;
+    let chapter = null;
+    let chapters = [];
+    const definitions = new Map();
+    //  Bumped by cancel(): the answer of a load started before the last cancel changes nothing (TD-009)
+    let generation = 0;
+
+    return {
+        // ... bosses, winsLeft, chapter, chapters, definitionOf unchanged ...
+
+        //  Reads the farm state of `selected` (undefined: the current chapter); rejects and keeps the previous state on failure.
+        //  An answer that arrives after cancel() is ignored; a failure still rejects.
+        load: async (selected) =>
+        {
+            const started = generation;
+            const state = await (selected === undefined ? gateway.get() : gateway.get(selected));
+
+            if (started !== generation)
+            {
+                return;
+            }
+
+            bosses = state.bosses;
+            winsLeft = state.chapterBossWinsLeft;
+            chapter = Number.isInteger(state.chapter) ? state.chapter : null;
+            chapters = Array.isArray(state.chapters) ? state.chapters : [];
+
+            if (chapter !== null && state.definition)
+            {
+                definitions.set(chapter, state.definition);
+            }
+        },
+
+        //  Drops the answer of every load still pending; the state already loaded stays
+        cancel: () =>
+        {
+            generation += 1;
+        },
+
+        // ... win unchanged ...
+    };
+};
+```
+
+Also add `cancel()` to the port comment at the top of the file: after the `gateway` lines add the line `//  cancel() drops the answer of every pending load (closing Rever chefes, TD-009).`
+
+`HeroUi.js`:
+
+```js
+// show(): the first two lines become
+const { title } = SCREENS.find(({ id }) => id === screen);
+const view = ++this.view;
+
+this.dropFarmLoad();
+
+// close(): the body becomes
+if (!this.open)
+{
+    return;
+}
+
+this.view += 1;
+this.dropFarmLoad();
+this.open = false;
+this.screen = null;
+this.sellMode = null;
+this.panel.hidden = true;
+this.body.replaceChildren();
+
+// new method, right after close()
+//  Leaving Rever chefes or opening a screen over it drops a pending chapter load (TD-009): the chips are enabled again and the
+//  farm session ignores its late answer. Runs before `this.screen` changes, so it reads the screen being left.
+dropFarmLoad ()
+{
+    this.farmBusy = false;
+
+    if (this.screen === 'farm')
+    {
+        this.farm.cancel();
+    }
+}
+
+// selectFarmChapter(): the comment and the finally block become
+//  Loads another chapter of Rever chefes; the chips are disabled meanwhile and a failure keeps the map shown before.
+//  A load dropped by show() or close() changes nothing when it ends: its view is old and farmBusy may belong to a newer load.
+async selectFarmChapter (chapter)
+{
+    // ... unchanged down to the catch ...
+    finally
+    {
+        if (view === this.view)
+        {
+            this.farmBusy = false;
+
+            if (this.screen === 'farm')
+            {
+                this.render_farm();
+
+                //  After the render: render_farm clears the error line first
+                if (failed)
+                {
+                    this.setError(LOAD_FAILED);
+                }
+            }
+        }
+    }
+}
+```
+
+`render_farm`, `render_*` of the other screens, the constructor and `ClickerGame.js` do not change. No player-facing text changes.
+
+**Steps**:
+
+1. `farmSession.js`: add `let generation = 0;`, the `started` check in `load`, the `cancel` method and the port comment line.
+2. `HeroUi.js`: add `this.dropFarmLoad();` in `show()` right after `const view = ++this.view;`.
+3. `HeroUi.js`: add `this.dropFarmLoad();` in `close()` right after `this.view += 1;`.
+4. `HeroUi.js`: add the `dropFarmLoad ()` method right after `close ()`.
+5. `HeroUi.js`: replace the comment above `selectFarmChapter` and its `finally` block as above.
+6. Add the 5 `farmSession.test.js` cases in a new `describe('cancel', () => { ... })` at the end of `describe('farmSession')`.
+7. Add the 6 `HeroUi.test.js` cases at the end of `describe('choosing a chapter')` (after `a farm answer without the new fields shows no chapter buttons`).
+8. Run the gate.
+
+**Tests**: unit (jsdom)
+**Test cases** (`farmSession.test.js`, `describe('cancel')`; `gateway`, `farm` and `state` are the file's, `ApiError` is imported already):
+
+- `cancel drops the answer of a load still pending`: `let answer; gateway.get.mockReturnValueOnce(new Promise((resolve) => { answer = resolve; }));` `const pending = farm.load(2); farm.cancel();` `answer({ chapter: 2, chapters: [ 1, 2, 3 ], bosses: [ { kind: 'CHAPTER_BOSS' } ], chapterBossWinsLeft: 4, definition: { bossHealth: 2 } }); await pending;` then `farm.bosses()` equals `[]`, `farm.winsLeft()` is `null`, `farm.chapter()` is `null`, `farm.chapters()` equals `[]`, `farm.definitionOf(2)` is `null`.
+- `cancel keeps the state already loaded`: `await farm.load(); farm.cancel();` then `farm.bosses()` equals `state.bosses` and `farm.winsLeft()` is `7`.
+- `a load started after cancel keeps its answer`: `farm.cancel(); await farm.load();` then `farm.bosses()` equals `state.bosses` and `farm.winsLeft()` is `7`.
+- `cancel drops only the loads started before it`: `let answer; gateway.get.mockReturnValueOnce(new Promise((resolve) => { answer = resolve; }));` `const first = farm.load(2); farm.cancel(); await farm.load();` (the second call gets the default `state`) `answer({ chapter: 2, chapters: [ 1, 2, 3 ], bosses: [], chapterBossWinsLeft: 4, definition: { bossHealth: 2 } }); await first;` then `farm.bosses()` equals `state.bosses`, `farm.winsLeft()` is `7`, `farm.chapter()` is `null`, `farm.definitionOf(2)` is `null`.
+- `a load pending across a cancel still rejects with its failure and keeps the state`: `await farm.load(); let fail; gateway.get.mockReturnValueOnce(new Promise((_, reject) => { fail = reject; }));` `const pending = farm.load(1); farm.cancel(); fail(new ApiError('Cannot reach the server. Try again later.'));` `await expect(pending).rejects.toBeInstanceOf(ApiError);` then `farm.bosses()` equals `state.bosses` and `farm.winsLeft()` is `7`.
+
+**Test cases** (`HeroUi.test.js`, inside `describe('choosing a chapter')`; every case starts with `const ctx = createUi();`; "reopen" means `ctx.testid('hero-close').click(); await open(ctx, 'farm');`; "the chapter 2 click" means `ctx.testid('farm-chapter-2').click();` with no `flush`):
+
+- `closing during a chapter load and reopening leaves the chips enabled on the current chapter`: `let resolveChapter2; setup(ctx, () => new Promise((resolve) => { resolveChapter2 = resolve; })); await open(ctx, 'farm');` the chapter 2 click; `expect(chipsOf(ctx).every((chip) => chip.disabled)).toBe(true)`; reopen; `chipsOf(ctx).some((chip) => chip.disabled)` is `false`, `title(ctx)` is `Caminho do Capítulo 3`, `farm-chapter-3` `aria-pressed` is `true`; then `resolveChapter2(state2); await flush();` and the same three expectations hold again.
+- `a chapter answer that arrives after closing and reopening changes neither the farm session nor the map`: same setup, open, the chapter 2 click, reopen, `resolveChapter2(state2); await flush();` then `ctx.farm.chapter()` is `3`, `ctx.farm.bosses()` equals `state3.bosses`, `ctx.farm.definitionOf(2)` is `null`, `title(ctx)` is `Caminho do Capítulo 3`, `farm-chapter-3` `aria-pressed` is `true`, `farm-chapter-2` `aria-pressed` is `false`.
+- `a chapter load that fails after closing and reopening shows no error`: `let rejectChapter2; setup(ctx, () => new Promise((_, reject) => { rejectChapter2 = reject; }));` open, the chapter 2 click, reopen, `rejectChapter2(new ApiError('Cannot reach the server. Try again later.')); await flush();` then `ctx.query('.hero-error').hidden` is `true`, `ctx.query('.hero-error').textContent` is `''`, `chipsOf(ctx).some((chip) => chip.disabled)` is `false`, `title(ctx)` is `Caminho do Capítulo 3`.
+- `a late answer of a dropped chapter load leaves the chips of a newer load disabled`: inside the test `const state1 = { chapter: 1, chapters: [ 1, 2, 3 ], bosses: ELEVEN, chapterBossWinsLeft: 10, definition: { bossHealth: 10, bossTimeLimitMs: 40_000, stages: tenStages() } }; let resolveChapter1; let resolveChapter2; ctx.ui.hooks.mapPosition = () => AT3;` `ctx.farmGateway.get.mockImplementation((chapter) => { if (chapter === 2) { return new Promise((resolve) => { resolveChapter2 = resolve; }); } if (chapter === 1) { return new Promise((resolve) => { resolveChapter1 = resolve; }); } return Promise.resolve(state3); });` open, the chapter 2 click, reopen, `ctx.testid('farm-chapter-1').click();` `resolveChapter2(state2); await flush();` then `chipsOf(ctx).every((chip) => chip.disabled)` is `true` and `title(ctx)` is `Caminho do Capítulo 3`; the chapter 1 load still holds the busy flag: `const asked = ctx.farmGateway.get.mock.calls.length; ctx.ui.selectFarmChapter(2);` and `ctx.farmGateway.get.mock.calls.length` is still `asked` (a disabled button cannot be clicked in jsdom, so the method is called directly); then `resolveChapter1(state1); await flush();` and `title(ctx)` is `Caminho do Capítulo 1`, `farm-chapter-1` `aria-pressed` is `true`, `chipsOf(ctx).some((chip) => chip.disabled)` is `false`, `ctx.farm.definitionOf(2)` is `null`.
+- `the scene reopening Rever chefes during a chapter load drops that load`: `let resolveChapter2; setup(ctx, () => new Promise((resolve) => { resolveChapter2 = resolve; })); await open(ctx, 'farm');` the chapter 2 click; `await ctx.ui.show('farm', {});` then `chipsOf(ctx).some((chip) => chip.disabled)` is `false` and `title(ctx)` is `Caminho do Capítulo 3`; then `resolveChapter2(state2); await flush();` and `title(ctx)` is `Caminho do Capítulo 3` and `ctx.farm.chapter()` is `3`.
+- `closing another screen keeps a farm load the scene started`: `let resolveCurrent; ctx.ui.hooks.mapPosition = () => AT3; ctx.farmGateway.get.mockImplementation(() => new Promise((resolve) => { resolveCurrent = resolve; }));` `const pending = ctx.farm.load();` (the reload `ClickerGame.reportFarmWin` starts after a refused win) `await open(ctx, 'heroes'); ctx.testid('hero-close').click();` `resolveCurrent(state3); await pending;` then `ctx.farm.chapter()` is `3` and `ctx.farm.bosses()` equals `state3.bosses`.
+
+**Gate**: quick - `cd game && npm test`
+**Done when**:
+
+- [ ] The 5 new `farmSession.test.js` cases and the 6 new `HeroUi.test.js` cases pass.
+- [ ] Every existing case passes unchanged, among them `the chapter buttons are disabled while the chapter loads`, `a failed chapter load keeps the map and says Não foi possível carregar.` and `opening from the HUD again shows the current chapter`.
+- [ ] `git diff --stat` lists only `farmSession.js`, `farmSession.test.js`, `HeroUi.js`, `HeroUi.test.js` and `tasks.md`; `ClickerGame.js` is unchanged.
+
+**Commit**: `fix(game): drop a pending chapter load when Rever chefes closes`
+
+---
+
+### T21: e2e of closing Rever chefes during a chapter load [ ]
+
+**Owner**: test-engineer
+**Goal**: The fake backend can hold the answer of `GET /farm?chapter=n` until the test releases it, and three Playwright scenarios prove what the player sees when Rever chefes is closed during a chapter load and reopened (BRC-10; spec P1-Choose AC 14, 15 and the TD-009 edge cases "close with `hero-close`" and "fails after Esc").
+**Where**: `game/e2e/bossReplayChapters.spec.js`
+**Also changes**: `game/e2e/support/fakeBackend.js`
+**Read first**: `fakeBackend.js:220-245` (options comment, `mockBackend` signature, the first `const` lines), `:804-813` (`handler` down to the `delayMs` line), `:923-950` (the returned controls); `bossReplayChapters.spec.js:1-40` (`startGame`, `openMap`, `states`), `:324-352` (`while a chapter loads every chapter button is disabled, dimmed and shows the map shown before`: how a held answer is asserted) and the last test of the file (`the gold dot of the current chip sits under the numeral, clear of it`)
+**Depends on**: T20
+**Requirement**: BRC-10
+
+**Contract**:
+
+`fakeBackend.js`:
+
+```js
+// inside mockBackend, right after `const rolled = new Map();`
+//  GET /farm?chapter=n requests held by holdFarm(n), keyed by the query value: { released, fail }
+const farmHolds = new Map();
+
+// inside handler, right after the line `if (delayMs) { await new Promise((resolve) => setTimeout(resolve, delayMs)); }`
+//  holdFarm: a held chapter answers only once the test releases it, from the state at that moment, or 500 when it was held with fail
+const hold = method === 'GET' && path === '/farm' ? farmHolds.get(new URL(request.url()).searchParams.get('chapter')) : undefined;
+
+if (hold) {
+    await hold.released;
+
+    if (hold.fail) { return route.fulfill({ status: 500, body: '' }); }
+}
+
+// in the returned object, right after `revokeAllRefreshTokens`
+//  Holds every GET /farm?chapter=<chapter> until the returned release() runs; GET /farm without a chapter is never held
+holdFarm: (chapter, { fail = false } = {}) => {
+    let release = () => {};
+    const released = new Promise((resolve) => { release = resolve; });
+
+    farmHolds.set(String(chapter), { released, fail });
+    return () => {
+        farmHolds.delete(String(chapter));
+        release();
+    };
+}
+```
+
+Extend the comment line above `export async function mockBackend` that starts `//  Returns the recorded` so it ends: `... test controls over issued tokens, and holdFarm(chapter, { fail }) -> release() to hold the answer of GET /farm?chapter=n.` A held request is still recorded in `calls` (the push happens before the hold).
+
+`bossReplayChapters.spec.js`, a helper after `states`:
+
+```js
+//  Resolves once the game has read the answer of GET /farm?chapter=<chapter>: the response is complete, then one frame and one task pass.
+//  Call it before releasing the hold, so the response is not missed.
+const farmAnswerRead = (page, chapter) => page.waitForResponse((response) => new URL(response.url()).pathname === '/api/farm'
+    && new URL(response.url()).searchParams.get('chapter') === String(chapter))
+    .then((response) => response.finished())
+    .then(() => page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve)))));
+```
+
+The chapter 3 map's stop states (the campaign at chapter 3 stage 4), used below as `CURRENT_STOPS`: `[ 'defeated', 'defeated', 'defeated', 'current', ...Array(7).fill('locked') ]`. Declare it as a `const` next to the helper.
+
+**Steps**:
+
+1. `fakeBackend.js`: add `farmHolds`, the hold check in `handler`, the `holdFarm` control and the comment.
+2. `bossReplayChapters.spec.js`: add `farmAnswerRead` and `CURRENT_STOPS` after `states`.
+3. Add the three scenarios below at the end of `test.describe('Rever chefes: escolher capítulo')`, after `the gold dot of the current chip sits under the numeral, clear of it`. Every scenario releases its hold before it ends.
+4. Run the gate.
+
+**Tests**: e2e
+**Test cases** (`bossReplayChapters.spec.js`; every scenario starts with `const { backend } = await startGame(page);`):
+
+- `closing during a chapter load and reopening leaves the chips enabled on the current chapter`: `const releaseChapter2 = backend.holdFarm(2); await openMap(page);` click `farm-chapter-2`; `farm-chapter-2` `toBeDisabled()`; click `hero-close`; `.hero-panel` `toBeHidden()`; `await openMap(page);` then `farm-map-title` `toHaveText('Caminho do Capítulo 3')`, `farm-chapter-3` `toHaveAttribute('aria-pressed', 'true')`, `farm-chapter-1`, `farm-chapter-2` and `farm-chapter-3` each `toBeEnabled()`, `await states(page)` equals `CURRENT_STOPS`; then `const read = farmAnswerRead(page, 2); releaseChapter2(); await read;` and the three chips are each still `toBeEnabled()` and the title still `Caminho do Capítulo 3`.
+- `a chapter answer that arrives after closing and reopening does not change the shown chapter`: `const releaseChapter2 = backend.holdFarm(2); await openMap(page);` click `farm-chapter-2`; `farm-chapter-2` `toBeDisabled()`; click `hero-close`; `await openMap(page);` title `Caminho do Capítulo 3`; `const read = farmAnswerRead(page, 2); releaseChapter2(); await read;` then title `Caminho do Capítulo 3`, `farm-chapter-3` pressed, `farm-chapter-2` `toHaveAttribute('aria-pressed', 'false')`, `await states(page)` equals `CURRENT_STOPS`, `farm-chapter-1` `toBeEnabled()`. Then, the check that the farm session kept no chapter 2 state (the busy render of a new chip draws the session's chapter): `const releaseChapter1 = backend.holdFarm(1);` click `farm-chapter-1`; `farm-chapter-1` `toBeDisabled()`; title `Caminho do Capítulo 3`; `farm-chapter-3` pressed; `await states(page)` equals `CURRENT_STOPS`; `releaseChapter1();` then title `toHaveText('Caminho do Capítulo 1')`, `farm-chapter-1` pressed, `await states(page)` equals `Array(11).fill('defeated')`.
+- `a chapter load that fails after Esc closed Rever chefes shows no error on the reopened map`: `const releaseChapter1 = backend.holdFarm(1, { fail: true }); await openMap(page);` click `farm-chapter-1`; `farm-chapter-1` `toBeDisabled()`; `await page.keyboard.press('Escape');` `.hero-panel` `toBeHidden()`; `await openMap(page);` `const read = farmAnswerRead(page, 1); releaseChapter1(); await read;` then `.hero-error` `toBeHidden()`, title `Caminho do Capítulo 3`, `farm-chapter-3` pressed, `farm-chapter-1`, `-2`, `-3` each `toBeEnabled()`.
+
+**Gate**: full - `cd game && npx playwright test e2e/bossReplayChapters.spec.js e2e/farm.spec.js e2e/bossMap.spec.js`
+**Done when**:
+
+- [ ] The 3 new scenarios pass, and every other scenario of `bossReplayChapters.spec.js`, `farm.spec.js` and `bossMap.spec.js` passes unchanged (a failing test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both).
+- [ ] Each of the 3 new scenarios asserts at least one chip `toBeEnabled()` after the reopen (on the code before T20 the reopened chips stay disabled, so every one of them fails there).
+- [ ] No scenario asserts a stop position number; `git diff --stat` lists only `fakeBackend.js`, `bossReplayChapters.spec.js` and `tasks.md`.
+
+**Commit**: `test(e2e): cover closing Rever chefes during a chapter load`
+
+No `ui-artist` task: T20 adds no element, text, style or state the player has not seen; the enabled and the disabled chips were reviewed in T14 and T19. The `verifier` re-verifies scoped to BRC-10 (T20, T21), with mutants on `farmSession.load`'s generation check, `cancel`, `dropFarmLoad` and the `finally` view check.
+
+---
+
 ## If the owner changes a default
 
 | Answer | Tasks that change before execution |
@@ -1518,11 +1782,14 @@ Phase 4:  T12 -----→ T13                              test-engineer
 Phase 5:  T14                                         ui-artist
 Phase 6:  T15 -----→ T16 -----→ T17                   game-dev
 Phase 7:  T18 -----→ T19                              test-engineer, ui-artist
+Phase 8:  T20 -----→ T21                              game-dev, test-engineer
 ```
 
 14 tasks: batches by whole phases (~7 tasks each): batch 1 = Phases 1 (backend worker), batch 2 = Phases 2 and 3 (game worker, 8 tasks, one tight chain), batch 3 = Phases 4 and 5. Then the `verifier` runs.
 
 UI review fixes (T15 to T19): one game worker runs Phase 6 (3 tasks, one chain: T15 and T16 both edit `ClickerGame.js` and `style.css`, T17 edits `style.css`), then the `test-engineer` runs T18 and the `ui-artist` T19. The `verifier` re-verifies scoped to BRC-08 and BRC-09 and these five tasks, then runs the full suites for the final PASS round.
+
+TD-009 (T20, T21): the `game-dev` runs T20, then the `test-engineer` runs T21 (its author check first, `.claude/agents/test-engineer.md`). The `verifier` re-verifies scoped to BRC-10 and these two tasks, then runs the full suites for the final PASS round; then the `product-owner` accepts against P1-Choose AC 14, 15 and the TD-009 edge cases.
 
 ---
 
@@ -1549,6 +1816,8 @@ UI review fixes (T15 to T19): one game worker runs Phase 6 (3 tasks, one chain: 
 | T17: chip dot spacing | 2 CSS values | ✅ Granular |
 | T18: e2e of plate, timer, dot | 1 spec file | ✅ Granular |
 | T19: UI re-review | 1 shots file + report | ✅ Granular |
+| T20: drop a pending chapter load | 1 session method + 1 HeroUi method + 3 call sites, 2 source files | ⚠️ 2 related files, cohesive: the HeroUi call is useless without the session's `cancel` |
+| T21: e2e of the close during a load | 1 fake backend control + 1 spec file | ✅ Granular |
 
 ## Diagram-Definition Cross-Check
 
@@ -1573,6 +1842,8 @@ UI review fixes (T15 to T19): one game worker runs Phase 6 (3 tasks, one chain: 
 | T17 | T16 | T16 → T17 | ✅ Match |
 | T18 | T17 | T17 → T18 | ✅ Match |
 | T19 | T18 | T18 → T19 | ✅ Match |
+| T20 | T19 | T19 → T20 | ✅ Match |
+| T21 | T20 | T20 → T21 | ✅ Match |
 
 ## Test Co-location Validation
 
@@ -1597,3 +1868,5 @@ UI review fixes (T15 to T19): one game worker runs Phase 6 (3 tasks, one chain: 
 | T17 | Game CSS | none | none (checked in T18 and T19) | ✅ OK |
 | T18 | e2e | e2e | e2e | ✅ OK |
 | T19 | Review artefacts | none | none | ✅ OK |
+| T20 | Game application + view (HeroUi) | unit (jsdom) | unit (jsdom) | ✅ OK |
+| T21 | e2e support + e2e | e2e | e2e | ✅ OK |
