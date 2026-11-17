@@ -330,7 +330,7 @@ No request body is read. `NothingToFuseException` (409) and `HeroNotFoundExcepti
 
 ---
 
-### T4: heroesApi.fuseAll [ ]
+### T4: heroesApi.fuseAll [x]
 
 **Owner**: game-dev
 **Goal**: The HTTP adapter posts the cascade and returns `{ hero, fusions }` (BAG-35).
@@ -360,7 +360,7 @@ Add it after `fuse` and extend the comment block at the top of the file.
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 3 new cases pass; every other game unit test passes.
+- [x] The 3 new cases pass; every other game unit test passes.
 
 **Commit**: `feat(game): add the fuse-all call to the heroes API`
 

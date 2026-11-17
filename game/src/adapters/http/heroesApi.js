@@ -2,11 +2,14 @@
 //  list -> { leaderId, heroes: [ { id, name, heroClass, element, leaderBonus, portrait, chapter, owned, stars,
 //            copies: { "0": n, ..., "9": n }, skills: [ { slot, name, type, effect, cooldownSeconds, image, unlocked } ] } ] }
 //  fuse(heroId, stars) -> that hero after turning 3 cards of `stars` stars (0 to 8) into one card of the next stars.
-//  setLeader(heroId) -> { leaderId }. A 409 (NOT_ENOUGH_CARDS, HERO_NOT_OWNED) rejects with an ApiError.
+//  fuseAll(heroId) -> { hero, fusions }: every layer of the hero fused from 0 stars up to 9 in one request.
+//  setLeader(heroId) -> { leaderId }. A 409 (NOT_ENOUGH_CARDS, HERO_NOT_OWNED, NOTHING_TO_FUSE) or 404 (HERO_NOT_FOUND) rejects with an ApiError.
 export const createHeroesApi = (httpClient) => ({
     list: async () => (await httpClient.get('/heroes')).data,
 
     fuse: async (heroId, stars) => (await httpClient.post(`/heroes/${encodeURIComponent(heroId)}/fuse`, { stars })).data,
+
+    fuseAll: async (heroId) => (await httpClient.post(`/heroes/${encodeURIComponent(heroId)}/fuse-all`, {})).data,
 
     setLeader: async (heroId) => (await httpClient.put('/leader', { heroId })).data
 });

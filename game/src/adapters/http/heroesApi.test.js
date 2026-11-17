@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createHeroesApi } from './heroesApi';
+import { ApiError } from '../../application/ApiError';
 
 const hero = { id: 'kael', name: 'Kael Raizférrea', stars: 1, copies: { 0: 0, 1: 1, 2: 0, 3: 0 } };
 const heroes = { leaderId: 'kael', heroes: [ hero ] };
@@ -34,6 +35,28 @@ describe('heroesApi', () => {
         await heroesApi.fuse('a/b', 2);
 
         expect(httpClient.post).toHaveBeenCalledWith('/heroes/a%2Fb/fuse', { stars: 2 });
+    });
+
+    it('fuseAll posts an empty body to /heroes/<id>/fuse-all and resolves with hero and fusions', async () => {
+        httpClient.post.mockResolvedValue({ data: { hero: { id: 'kael', stars: 3 }, fusions: 22 } });
+
+        await expect(heroesApi.fuseAll('kael')).resolves.toEqual({ hero: { id: 'kael', stars: 3 }, fusions: 22 });
+        expect(httpClient.post).toHaveBeenCalledWith('/heroes/kael/fuse-all', {});
+    });
+
+    it('fuseAll encodes the hero id', async () => {
+        httpClient.post.mockResolvedValue({ data: { hero, fusions: 1 } });
+
+        await heroesApi.fuseAll('a b');
+
+        expect(httpClient.post).toHaveBeenCalledWith('/heroes/a%20b/fuse-all', {});
+    });
+
+    it('fuseAll rejects with the error of the client', async () => {
+        const error = new ApiError('x', { status: 409, code: 'NOTHING_TO_FUSE' });
+        httpClient.post.mockRejectedValue(error);
+
+        await expect(heroesApi.fuseAll('kael')).rejects.toBe(error);
     });
 
     it('setLeader puts the hero id to /leader and returns the response body', async () => {
