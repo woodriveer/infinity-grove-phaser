@@ -374,6 +374,26 @@ test.describe('Rever chefes: escolher capítulo', () => {
         expect(dot.slice(0, 2)).toEqual([ '6px', '6px' ]);
         expect(dot[2]).toBe('3px');
         expect(dot[3]).toBe('-3px');
+        expect(await pressed.evaluate((node) => getComputedStyle(node, '::after').borderTopLeftRadius)).toBe('50%');
+    });
+
+    test('an account reset in another tab makes the next win of an earlier chapter answer 409, the farm ends and reloads', async ({ page }) => {
+        const { backend, menu } = await startGame(page, { chances: [ 0 ] });
+        await openMap(page);
+        await page.getByTestId('farm-chapter-2').click();
+        await page.getByTestId('farm-entry-miniboss-3').click();
+        await expect(farmLabel(page)).toHaveText('Rever chefe: Miniboss 3 (Capítulo 2)');
+
+        //  The reset in another tab: the campaign is back to chapter 1, so chapter 2 is no longer reached
+        backend.progresses.set('yan', { chapter: 1, stage: 1, encounter: 'PHASE', phase: 1, completed: false });
+        const loads = backend.calls.filter((call) => call.path === '/farm').length;
+
+        await menu.canvas.click();
+
+        await expect.poll(() => farmCalls(backend).length).toBe(1);
+        await expect.poll(() => backend.calls.filter((call) => call.path === '/farm').length).toBeGreaterThan(loads);
+        await expect(farmLabel(page)).not.toHaveText('Rever chefe: Miniboss 3 (Capítulo 2)');
+        await expect(page.getByTestId('card-notice')).toBeHidden();
     });
 
     test('the chips react to hover, press and keyboard focus as the Visual Spec says', async ({ page }) => {
