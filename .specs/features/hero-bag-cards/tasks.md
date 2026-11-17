@@ -1216,7 +1216,7 @@ const piece = (id, slot, rarity, refine = 0, heroId = null) => ({ id, slot, rari
 
 ---
 
-### T14: Move the hero e2e scenarios onto the Mochila [ ]
+### T14: Move the hero e2e scenarios onto the Mochila [x]
 
 **Owner**: test-engineer
 **Goal**: The fusion scenarios of `heroes.spec.js` and `heroAscension.spec.js` reach the ladder through the Mochila and keep every asserted value whose behaviour survives (BAG-07, BAG-16, BAG-17, BAG-19, BAG-21).
@@ -1254,8 +1254,8 @@ const piece = (id, slot, rarity, refine = 0, heroId = null) => ({ id, slot, rari
 **Gate**: full - `cd game && npm test && npx playwright test e2e/heroes.spec.js e2e/heroAscension.spec.js`
 **Done when**:
 
-- [ ] Both files pass; the number of tests in each file is unchanged.
-- [ ] `grep -n "hud-fusion\|bag-entry-kael-\|bag-go-fusion\|fusion-empty\|is-selected" game/e2e/heroes.spec.js game/e2e/heroAscension.spec.js` prints nothing.
+- [x] Both files pass; the number of tests in each file is unchanged.
+- [x] `grep -n "hud-fusion\|bag-entry-kael-\|bag-go-fusion\|fusion-empty\|is-selected" game/e2e/heroes.spec.js game/e2e/heroAscension.spec.js` prints nothing.
 
 **Commit**: `test(game): run the hero fusion e2e through the Mochila`
 

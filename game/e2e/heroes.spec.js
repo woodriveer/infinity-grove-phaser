@@ -57,51 +57,47 @@ test.describe('Hero screens', () => {
         await expect(page.locator('.hero-panel')).toBeHidden();
     });
 
-    test('the bag lists the cards and leads to the fusion, which fuses three blank cards into a one star card and unlocks the first skill', async ({ page }) => {
+    test('the Mochila card opens the ladder, which fuses three blank cards into a one star card and unlocks the first skill', async ({ page }) => {
         await mockBackend(page, { users: { yan: 'secret123' }, cards: { yan: { copies: { 'kael:0': 3 } } } });
         await startGame(page);
         await expect(page.getByTestId('skill-slot-1')).toHaveAttribute('data-unlocked', 'false');
 
         await page.getByTestId('hud-bag').click();
-        await expect(page.getByTestId('bag-entry-kael-0')).toContainText('x3');
-        await page.getByTestId('bag-entry-kael-0').click();
+        await expect(page.getByTestId('bag-card-kael').locator('.bag-card-chip')).toHaveText([ '0★×3' ]);
+        await page.getByTestId('bag-card-kael').click();
 
-        await expect(page.getByTestId('bag-entry-detail')).toContainText('Para fundir: 3/3');
+        await expect(page.getByTestId('fusion-row-kael-0').locator('.fusion-copies')).toHaveText('3/3');
         await expect(page.locator('.skill-row.is-locked')).toHaveCount(3);
-
-        await page.getByTestId('bag-go-fusion').click();
-
-        await expect(page.getByTestId('fusion-row-kael-0')).toHaveClass(/is-selected/);
         await expect(page.getByTestId('fusion-button-kael-0')).toBeEnabled();
-        await expect(page.getByTestId('fusion-row-kael-1')).toHaveCount(0);
+        await expect(page.getByTestId('fusion-row-kael-1').locator('.fusion-copies')).toHaveText('0/3');
 
         await page.getByTestId('fusion-button-kael-0').click();
 
         await expect(page.getByTestId('fusion-result')).toHaveText('Nova carta: Kael Raizférrea 1★');
         await expect(page.getByTestId('fusion-row-kael-0')).toHaveCount(0);
-        await expect(page.getByTestId('fusion-empty')).toHaveText('Nenhuma fusão disponível');
+        await expect(page.getByTestId('fusion-button-kael-1')).toBeDisabled();
         await expect(page.getByTestId('skill-slot-1')).toHaveAttribute('data-unlocked', 'true');
         await expect(page.getByTestId('skill-slot-2')).toHaveAttribute('data-unlocked', 'false');
 
         await page.getByTestId('hero-close').click();
         await page.getByTestId('hud-bag').click();
 
-        await expect(page.getByTestId('bag-entry-kael-1')).toContainText('x1');
-        await expect(page.getByTestId('bag-entry-kael-0')).toHaveCount(0);
+        await expect(page.getByTestId('bag-card-kael').locator('.bag-card-chip')).toHaveText([ '1★×1' ]);
     });
 
     test('27 blank cards fuse step by step into a three star hero with every skill unlocked', async ({ page }) => {
         await mockBackend(page, { users: { yan: 'secret123' }, cards: { yan: { copies: { 'kael:0': 27 } } } });
         await startGame(page);
-        await page.getByTestId('hud-fusion').click();
+        await page.getByTestId('hud-bag').click();
+        await page.getByTestId('bag-card-kael').click();
 
         //  `copies` cards of that stars level are fused three at a time; the row counts down after each click
-        const fuseAll = async (stars, copies) => {
+        const fuseStepByStep = async (stars, copies) => {
             for (let left = copies - 3; left >= 0; left -= 3) {
                 await page.getByTestId(`fusion-button-kael-${stars}`).click();
 
-                //  a row with fewer than 3 cards left is no longer a fusion
-                if (left >= 3)
+                //  a row stays while it holds a copy; with none left it is gone
+                if (left >= 1)
                 {
                     await expect(page.getByTestId(`fusion-row-kael-${stars}`).locator('.fusion-copies')).toHaveText(`${left}/3`);
                 }
@@ -112,9 +108,9 @@ test.describe('Hero screens', () => {
             }
         };
 
-        await fuseAll(0, 27);
-        await fuseAll(1, 9);
-        await fuseAll(2, 3);
+        await fuseStepByStep(0, 27);
+        await fuseStepByStep(1, 9);
+        await fuseStepByStep(2, 3);
 
         await expect(page.getByTestId('fusion-result')).toHaveText('Nova carta: Kael Raizférrea 3★');
         await expect(page.getByTestId('skill-slot-3')).toHaveAttribute('data-unlocked', 'true');
@@ -123,16 +119,16 @@ test.describe('Hero screens', () => {
         await page.getByTestId('hero-close').click();
         await page.getByTestId('hud-bag').click();
 
-        await expect(page.getByTestId('bag-entry-kael-3')).toContainText('x1');
-        await expect(page.getByTestId('bag-entry-kael-0')).toHaveCount(0);
-        await page.getByTestId('bag-entry-kael-3').click();
-        await expect(page.getByTestId('bag-go-fusion')).toHaveCount(0);
+        await expect(page.getByTestId('bag-card-kael').locator('.bag-card-chip')).toHaveText([ '3★×1' ]);
+        await page.getByTestId('bag-card-kael').click();
+        await expect(page.getByTestId('fusion-button-kael-3')).toBeDisabled();
     });
 
     test('a failed fusion shows the Portuguese error and leaves the bag as it was', async ({ page }) => {
         const backend = await mockBackend(page, { users: { yan: 'secret123' }, cards: { yan: { copies: { 'kael:0': 3 } } } });
         await startGame(page);
-        await page.getByTestId('hud-fusion').click();
+        await page.getByTestId('hud-bag').click();
+        await page.getByTestId('bag-card-kael').click();
         await expect(page.getByTestId('fusion-button-kael-0')).toBeVisible();
 
         //  The backend lost two cards (another tab fused them) since the screen loaded
@@ -209,6 +205,6 @@ test.describe('Hero screens', () => {
 
         await page.getByTestId('hud-bag').click();
 
-        await expect(page.getByTestId('bag-entry-kael-0')).toContainText('x2');
+        await expect(page.getByTestId('bag-card-kael').locator('.bag-card-chip').first()).toHaveText('0★×2');
     });
 });

@@ -39,9 +39,11 @@ const colorOf = (locator, property) => locator.evaluate((node, name) => getCompu
 test.describe('Hero ascension', () => {
     test('three 3-star Kael cards fuse into a 4-star Kael with Corte Dimensional at level 2', async ({ page }) => {
         await startAs(page, { copies: { 'kael:3': 3 } });
-        await page.getByTestId('hud-fusion').click();
+        await page.getByTestId('hud-bag').click();
+        await page.getByTestId('bag-card-kael').click();
 
-        await expect(page.getByTestId('fusion-row-kael-3').locator('.fusion-name')).toHaveText('Kael Raizférrea 3★ → 4★');
+        await expect(page.getByTestId('fusion-row-kael-3').locator('.fusion-name')).toHaveText('3★');
+        await expect(page.getByTestId('fusion-button-kael-3')).toHaveText('3★→4★');
         await expect(page.getByTestId('fusion-row-kael-3').locator('.fusion-copies')).toHaveText('3/3');
 
         //  A reload would drop this marker: the fusion must update the screens in place
@@ -59,10 +61,11 @@ test.describe('Hero ascension', () => {
 
     test('three 8-star Kael cards fuse into a 9-star Kael with every skill at level 3', async ({ page }) => {
         await startAs(page, { copies: { 'kael:8': 3 } });
-        await page.getByTestId('hud-fusion').click();
+        await page.getByTestId('hud-bag').click();
+        await page.getByTestId('bag-card-kael').click();
 
-        await expect(page.getByTestId('fusion-row-kael-8').locator('.fusion-name')).toHaveText('Kael Raizférrea 8★ → 9★');
-        await expect(page.getByTestId('fusion-button-kael-8')).toHaveText('Fundir');
+        await expect(page.getByTestId('fusion-row-kael-8').locator('.fusion-name')).toHaveText('8★');
+        await expect(page.getByTestId('fusion-button-kael-8')).toHaveText('8★→9★');
         await page.getByTestId('fusion-button-kael-8').click();
 
         await expect(page.getByTestId('fusion-result')).toHaveText('Nova carta: Kael Raizférrea 9★ · Brado Aterrador no nível 3');
@@ -142,7 +145,8 @@ test.describe('Hero ascension', () => {
         await menu.canvas.click();
         await expect.poll(() => health(page)).toBeCloseTo(1000 - 1.4, 5);
 
-        await page.getByTestId('hud-fusion').click();
+        await page.getByTestId('hud-bag').click();
+        await page.getByTestId('bag-card-kael').click();
         await page.evaluate(() => { window.__ascensionMarker = 'kept'; });
         await page.getByTestId('fusion-button-kael-3').click();
         await expect(page.getByTestId('fusion-result')).toHaveText('Nova carta: Kael Raizférrea 4★ · Corte Dimensional no nível 2');
@@ -230,34 +234,36 @@ test.describe('Hero ascension', () => {
         await expect(page.getByTestId('hero-star-power')).toHaveText('Poder das estrelas: +10% de dano de clique');
     });
 
-    test('a 9-star bag entry cannot be fused', async ({ page }) => {
+    test('a 9-star Kael cannot be fused', async ({ page }) => {
         await startAs(page, { copies: { 'kael:9': 1 } });
         await page.getByTestId('hud-bag').click();
 
-        await expect(page.getByTestId('bag-entry-kael-9')).toContainText('Kael Raizférrea 9★');
-        await expect(page.getByTestId('bag-entry-kael-9')).toContainText('x1');
-        await page.getByTestId('bag-entry-kael-9').click();
+        await expect(page.getByTestId('bag-card-kael').locator('.bag-card-ribbon')).toHaveText('Kael Raizférrea');
+        await expect(page.getByTestId('bag-card-star-kael')).toHaveText('9★');
+        await expect(page.getByTestId('bag-card-kael').locator('.bag-card-chip')).toHaveText([ '9★×1' ]);
+        await page.getByTestId('bag-card-kael').click();
 
-        await expect(page.getByTestId('bag-entry-detail').locator('.bag-needed')).toHaveText('Estrela máxima: não pode ser fundida');
-        await expect(page.getByTestId('bag-go-fusion')).toHaveCount(0);
+        await expect(page.getByTestId('fusion-row-kael-9').locator('.fusion-max')).toHaveText('Estrela máxima: não pode ser fundida');
+        await expect(page.getByTestId('fusion-button-kael-9')).toHaveCount(0);
     });
 
-    test('a 3-star bag entry with 3 copies leads to the fusion', async ({ page }) => {
+    test('a 3-star Kael with 3 copies shows the Fundir badge and an enabled 3★→4★ button', async ({ page }) => {
         await startAs(page, { copies: { 'kael:3': 3 } });
         await page.getByTestId('hud-bag').click();
-        await page.getByTestId('bag-entry-kael-3').click();
 
-        await expect(page.getByTestId('bag-entry-detail')).toContainText('Para fundir: 3/3');
-        await page.getByTestId('bag-go-fusion').click();
+        await expect(page.getByTestId('bag-card-fuse-kael')).toHaveText('Fundir');
+        await page.getByTestId('bag-card-kael').click();
 
-        await expect(page.getByTestId('fusion-row-kael-3')).toHaveClass(/is-selected/);
+        await expect(page.getByTestId('fusion-row-kael-3').locator('.fusion-copies')).toHaveText('3/3');
+        await expect(page.getByTestId('fusion-button-kael-3')).toBeEnabled();
     });
 
     test('a 0-star fusion answers the card without a skill (ASC-07 AC3)', async ({ page }) => {
         await startAs(page, { copies: { 'kael:0': 3 } });
-        await page.getByTestId('hud-fusion').click();
+        await page.getByTestId('hud-bag').click();
+        await page.getByTestId('bag-card-kael').click();
 
-        await expect(page.getByTestId('fusion-row-kael-0').locator('.fusion-name')).toHaveText('Kael Raizférrea 0★ → 1★');
+        await expect(page.getByTestId('fusion-row-kael-0').locator('.fusion-name')).toHaveText('0★');
         await page.getByTestId('fusion-button-kael-0').click();
 
         await expect(page.getByTestId('fusion-result')).toHaveText('Nova carta: Kael Raizférrea 1★');
@@ -265,7 +271,8 @@ test.describe('Hero ascension', () => {
 
     test('a failed 4-star fusion shows the error and keeps the row', async ({ page }) => {
         const { backend } = await startAs(page, { copies: { 'kael:4': 3 } });
-        await page.getByTestId('hud-fusion').click();
+        await page.getByTestId('hud-bag').click();
+        await page.getByTestId('bag-card-kael').click();
         await expect(page.getByTestId('fusion-button-kael-4')).toBeVisible();
 
         //  The backend lost two cards (another tab fused them) since the screen loaded
