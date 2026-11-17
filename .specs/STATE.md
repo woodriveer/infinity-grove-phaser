@@ -194,6 +194,14 @@
 - **Date**: 2026-11-17
 - **Status**: active (owner approval of 2026-11-17, "Aprovo os padrões", with the product owner defaults Q1 to Q8 of the spec). Supersedes the farm scope of AD-008 ("the farm lists only the bosses of the current chapter" and "a player cannot replay the bosses of earlier chapters")
 
+### AD-025
+- **Decision**: The Mochila is the only card and fusion screen: one framed card per hero (frame by best star: wood 0 to 3, silver 4 to 6, gold 7 to 9 from `ASCENDED_FROM` and `EXALTED_FROM`), a click opens the hero's fusion ladder, and the `Fusão` HUD button and screen are removed (the rail has six buttons). "Fundir tudo" runs the whole cascade of one hero (each layer 0 to 8 fuses floor(c / 3) times and carries the result up, 9 stars never fuse) on the server in one request, `POST /heroes/{id}/fuse-all` answering `{ hero, fusions }`, in one transaction under the `player_cards` row lock; 409 `NOTHING_TO_FUSE` when no layer below 9 holds 3 copies. The game never loops over the single fusion. No Flyway migration (spec `hero-bag-cards`).
+- **Reason**: A loop of single fusions costs up to 9 841 requests for 19 683 cards and can stop halfway, leaving a bag the preview never showed; two menu entries for the same cards confuse the rail.
+- **Trade-off**: One more endpoint to keep beside `POST /heroes/{id}/fuse`; the request carries no expected counts, so a card dropped between the preview and the confirmation is fused too. The `ui-redesign` rail tests change from seven to six buttons.
+- **Scope**: `backend` hero code (`PlayerCards`, `HeroService`, `HeroController`), `game/src/adapters/phaser/HeroUi.js`, `views/bagView.js`, `views/fusionLadderView.js`, `domain/heroes/bagCards.js`
+- **Date**: 2026-11-17
+- **Status**: proposed (product owner defaults Q5 and Q8 of spec `hero-bag-cards`, awaiting the owner's approval). Conforms to AD-005 and AD-020 (fusion rule and star colours unchanged) and to the expand/contract rule of AD-016 (no migration)
+
 ## Technical Debt
 
 TD-001 to TD-008 are recorded in the spec of the feature that found them (`characters`, `unified-damage`, `supabase-postgres`). New debts are logged here.
@@ -214,7 +222,7 @@ TD-001 to TD-008 are recorded in the spec of the feature that found them (`chara
 - **Next step**: `gitops` cuts patch release v0.3.1 (TD-009 fix, BRC-10): deploy check, production check, `report.html` of the TD-009 range, `CHANGELOG.md`, tag (v0.3.0 of both features is cut, `4f4f9c7`)
 - **Waiting for the owner**: `ui-redesign`: the PO rulings marked `n` in its spec Assumptions table (D2, D3, findings #10 to #13, the `Click to Start!` ruling; list in its `tasks.md` § Acceptance; #10 and #12 are owner art). `boss-replay-chapters`: nothing (the owner answered the F1 ruling on 2026-11-17: "Sim, corrija", fixed by TD-009 Phase 8, accepted)
 - **Blockers**: none
-- **Next candidate work**: none queued
+- **Next candidate work**: `hero-bag-cards` (AD-025, `.specs/features/hero-bag-cards/`): spec, design and tasks T1 to T16 written by the product owner on 2026-11-17; waiting for the owner's approval and the answers to Q1 to Q8 of its spec before any task runs
 - **Notes for the resume**: (1) a failing e2e test is rerun alone twice with `--workers=1` and counts as a load flake only when it passes both (seen so far: `dragEquip.spec.js:550`, `:586`, `:604`, `:670`, `talents.spec.js:148` and `:111`, `auth.spec.js:113`, `clickPower.spec.js:41`, `uiRedesign.spec.js:2089`, `uiRedesign.spec.js:1529`, `dragEquip.spec.js:640`). (2) The hero detail magenta test `shows no magenta in the detail of any of the five heroes` (`game/e2e/uiRedesign.spec.js:2089`) takes about 30 s alone of its 60 s budget and timed out under 3-worker load in round 3: the next task that touches that file splits it into one test per hero or marks it `test.slow()`, without changing an asserted value (Verifier note N1, owner `test-engineer`). (3) Line numbers quoted in `tasks.md` drift: locate edits by test name or exact text
 - **Uncommitted files**: owner's, never stage them: `CLAUDE.md`, `GEMINI.md`, `graphify-out/`, `.agents/`, `.claude/skills/impeccable/`, `.claude/skills/reversa-*/`
 - **Branch**: main
