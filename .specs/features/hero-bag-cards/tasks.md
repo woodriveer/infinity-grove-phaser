@@ -588,7 +588,7 @@ Nothing else in the file changes: `.piece-gem`, `.piece-refine`, `.piece-tile` a
 
 ---
 
-### T8: Hero cards view (views/bagView.js) [ ]
+### T8: Hero cards view (views/bagView.js) [x]
 
 **Owner**: game-dev
 **Goal**: Draw one framed card per hero and the card grid, as new exports next to the old ones (not wired yet) (BAG-03 to BAG-10).
@@ -688,7 +688,7 @@ Merge the imports with the existing ones of the file (one import line per module
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 9 new cases pass; the existing `renderBag`, `renderBagEntry` and `bag cards of 4 to 9 stars` cases pass unchanged.
+- [x] The 9 new cases pass; the existing `renderBag`, `renderBagEntry` and `bag cards of 4 to 9 stars` cases pass unchanged.
 
 **Commit**: `feat(game): draw the hero cards of the Mochila`
 

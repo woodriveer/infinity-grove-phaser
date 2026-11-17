@@ -207,14 +207,14 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | -------------- | ----- | ----- | ------ |
 | BAG-01 | P1: Centered rarity gems | T7, T13, T16 | Implementing |
 | BAG-02 | P1: Centered rarity gems | T7, T13 | Implementing |
-| BAG-03 | P1: One card per hero | T8, T11, T13 | Pending |
-| BAG-04 | P1: One card per hero | T8, T10, T13 | Pending |
+| BAG-03 | P1: One card per hero | T8, T11, T13 | Implementing |
+| BAG-04 | P1: One card per hero | T8, T10, T13 | Implementing |
 | BAG-05 | P1: One card per hero | T6, T8, T10, T13 | Implementing |
-| BAG-06 | P1: One card per hero | T8, T13 | Pending |
+| BAG-06 | P1: One card per hero | T8, T13 | Implementing |
 | BAG-07 | P1: One card per hero | T6, T8, T13, T14 | Implementing |
 | BAG-08 | P1: One card per hero | T6, T8, T13 | Implementing |
-| BAG-09 | P1: One card per hero | T8, T13 | Pending |
-| BAG-10 | P1: One card per hero | T8, T11, T13 | Pending |
+| BAG-09 | P1: One card per hero | T8, T13 | Implementing |
+| BAG-10 | P1: One card per hero | T8, T11, T13 | Implementing |
 | BAG-11 | P1: One card per hero | T10, T13 | Pending |
 | BAG-12 | P1: Fusion ladder | T9, T11, T13 | Pending |
 | BAG-13 | P1: Fusion ladder | T6, T9, T13 | Implementing |
