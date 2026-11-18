@@ -630,6 +630,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md BAG-18 (hero-close not asserted), BAG-04 (badge centring) (tests)
 - last seen: 2026-11-18T15:34:05Z
 
+### L-104 - Detect a Phaser scene that is still loading its assets by the objects its init() draws, not by scene.isActive, which stays false until preload completes
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: game-version
+- evidence: game/e2e/gameVersion.spec.js:99-100 (tasks.md:375 waitForScene Preloader) (tests)
+- last seen: 2026-11-18T21:45:48Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

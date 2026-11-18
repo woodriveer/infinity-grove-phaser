@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 104,
+  "next_id": 105,
   "lessons": [
     {
       "id": "L-001",
@@ -1862,6 +1862,24 @@
       ],
       "created": "2026-11-18T15:34:05Z",
       "last_seen": "2026-11-18T15:34:05Z"
+    },
+    {
+      "id": "L-104",
+      "key": "spec_deviation::detect a phaser scene that is still loading its assets by the objects its init draws not by scene isactive which stays false until preload completes",
+      "text": "Detect a Phaser scene that is still loading its assets by the objects its init() draws, not by scene.isActive, which stays false until preload completes",
+      "signal": "spec_deviation",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "game-version"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/e2e/gameVersion.spec.js:99-100 (tasks.md:375 waitForScene Preloader) (tests)"
+      ],
+      "created": "2026-11-18T21:45:48Z",
+      "last_seen": "2026-11-18T21:45:48Z"
     }
   ]
 }
