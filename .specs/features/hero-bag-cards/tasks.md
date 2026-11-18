@@ -1710,7 +1710,7 @@ Every other assertion of that case stays.
 
 ---
 
-### T21: e2e of the review fixes [ ]
+### T21: e2e of the review fixes [x]
 
 **Owner**: test-engineer
 **Goal**: Pin in the browser the amended preview (BAG-32), the in-flight label and cursor (BAG-41, BAG-18), the hidden badge of the detail card (BAG-08) and the gem size (BAG-40).
@@ -1795,9 +1795,9 @@ expect(rowBox.x + rowBox.width).toBeLessThanOrEqual(tileBox.x + tileBox.width);
 **Gate**: full - `cd game && npm test && npx playwright test e2e/heroBagCards.spec.js`
 **Done when**:
 
-- [ ] `e2e/heroBagCards.spec.js` has 17 tests (15 + 2) and all pass.
-- [ ] `grep -n "→ 1×1★" game/e2e/heroBagCards.spec.js` prints nothing.
-- [ ] The five files of step 3 pass (flakes named as such).
+- [x] `e2e/heroBagCards.spec.js` has 17 tests (15 + 2) and all pass.
+- [x] `grep -n "→ 1×1★" game/e2e/heroBagCards.spec.js` prints nothing.
+- [x] The five files of step 3 pass (flakes named as such).
 
 **Commit**: `test(game): cover Fundindo..., the Antes/Depois preview and the gems`
 

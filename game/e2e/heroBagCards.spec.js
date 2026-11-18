@@ -134,6 +134,7 @@ test.describe('Mochila hero cards', () => {
 
         await expect(page.getByTestId('hero-back')).toBeVisible();
         await expect(page.getByTestId('bag-detail-card-kael')).toBeVisible();
+        await expect(page.getByTestId('bag-detail-card-kael').locator('.bag-card-fuse')).toBeHidden();
         await expect(page.getByTestId('skill-list').locator('.skill-row')).toHaveCount(3);
         await expect(page.getByTestId('fusion-all')).toHaveText('Fundir tudo');
         await expect(page.getByTestId('fusion-all')).toBeEnabled();
@@ -207,12 +208,53 @@ test.describe('Mochila hero cards', () => {
         await expect(page.getByTestId('fusion-button-kael-0')).toBeDisabled();
         await expect(page.getByTestId('fusion-all')).toBeDisabled();
         await expect(page.getByTestId('hero-back')).toBeEnabled();
+        await expect(page.getByTestId('fusion-button-kael-0')).toHaveText('Fundindo...');
+        await expect(page.getByTestId('fusion-all')).toHaveText('Fundir tudo');
+        await expect(page.getByTestId('bag-entry-detail')).toHaveClass(/\bis-busy\b/);
+        await expect(page.getByTestId('fusion-button-kael-0')).toHaveCSS('cursor', 'progress');
+        await expect(page.getByTestId('fusion-all')).toHaveCSS('cursor', 'progress');
 
         release();
 
         await expect(page.getByTestId('fusion-result')).toHaveText('Nova carta: Kael Raizférrea 1★');
         await expect(page.getByTestId('fusion-button-kael-0')).toBeEnabled();
         await expect(copiesText(page, 'kael', 0)).toHaveText('3/3');
+        await expect(page.getByTestId('fusion-button-kael-0')).toHaveText('0★→1★');
+        await expect(page.getByTestId('bag-entry-detail')).not.toHaveClass(/\bis-busy\b/);
+        //  1/3 left on the 1-star row: disabled for lack of copies, so the cursor is not-allowed, not progress
+        await expect(page.getByTestId('fusion-button-kael-1')).toBeDisabled();
+        await expect(page.getByTestId('fusion-button-kael-1')).toHaveCSS('cursor', 'not-allowed');
+    });
+
+    test('Fundir tudo in flight reads Fundindo... and comes back after the answer', async ({ page }) => {
+        await startWith(page, KAEL_LADDER);
+
+        let release;
+        const held = new Promise((resolve) => { release = resolve; });
+
+        await page.route('**/api/heroes/kael/fuse-all', async (route) => {
+            await held;
+            await route.fallback();
+        });
+
+        await openHero(page, 'kael');
+        await page.getByTestId('fusion-all').click();
+        await page.getByTestId('fusion-all-yes').click();
+
+        await expect(page.getByTestId('fusion-all')).toHaveText('Fundindo...');
+        await expect(page.getByTestId('fusion-all')).toBeDisabled();
+        await expect(page.getByTestId('fusion-button-kael-0')).toHaveText('0★→1★');
+        await expect(page.getByTestId('fusion-button-kael-0')).toBeDisabled();
+        await expect(page.getByTestId('bag-entry-detail')).toHaveClass(/\bis-busy\b/);
+        await expect(page.getByTestId('fusion-all')).toHaveCSS('cursor', 'progress');
+
+        release();
+
+        await expect(page.getByTestId('fusion-result')).toHaveText('22 fusões. Melhor carta: Kael Raizférrea 3★');
+        await expect(page.getByTestId('fusion-all')).toHaveText('Fundir tudo');
+        await expect(page.getByTestId('fusion-all')).toBeDisabled();
+        await expect(page.getByTestId('fusion-all')).toHaveCSS('cursor', 'not-allowed');
+        await expect(page.getByTestId('bag-entry-detail')).not.toHaveClass(/\bis-busy\b/);
     });
 
     test('a failed row fusion keeps the ladder', async ({ page }) => {
@@ -237,7 +279,20 @@ test.describe('Mochila hero cards', () => {
         await page.getByTestId('fusion-all').click();
 
         await expect(page.getByTestId('fusion-all-question')).toHaveText('Fazer 22 fusões?');
-        await expect(page.getByTestId('fusion-all-preview')).toHaveText('45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★');
+        await expect(page.getByTestId('fusion-all-before')).toHaveText('Antes: 45×0★ + 1×1★ + 2×2★');
+        await expect(page.getByTestId('fusion-all-after')).toHaveText('Depois: 1×1★ + 1×2★ + 2×3★');
+        await expect(page.getByTestId('fusion-all-preview')).not.toContainText('→');
+        await expect(page.getByTestId('fusion-all-before')).toHaveCSS('font-size', '15px');
+        await expect(page.getByTestId('fusion-all-after')).toHaveCSS('font-size', '15px');
+
+        const beforeBox = await page.getByTestId('fusion-all-before').boundingBox();
+        const afterBox = await page.getByTestId('fusion-all-after').boundingBox();
+
+        //  Two lines, Antes above Depois, neither wider than its box
+        expect(beforeBox.y + beforeBox.height).toBeLessThanOrEqual(afterBox.y + 0.5);
+        for (const id of [ 'fusion-all-before', 'fusion-all-after' ]) {
+            expect(await page.getByTestId(id).evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+        }
         await expect(page.getByTestId('fusion-button-kael-0')).toBeDisabled();
         await expect(page.getByTestId('fusion-all')).toBeDisabled();
 
@@ -345,5 +400,32 @@ test.describe('Mochila hero cards', () => {
         await page.getByTestId('bulk-sell-start').click();
         await expect(page.getByTestId('bulk-sell-bar')).toBeVisible();
         await centered('equip-piece-m1');
+    });
+
+    test('each rarity gem is a 10 px square and the gem rows fit their tiles', async ({ page }) => {
+        await startWith(page, { 'kael:0': 1 }, { equipment: [ piece('m1', 'RING', 'LEGENDARY', 2), piece('w1', 'WEAPON', 'EPIC', 0, 'kael') ] });
+        await page.getByTestId('hud-equipment').click();
+        await expect(page.getByTestId('equipment-list')).toBeVisible();
+
+        for (const [ testid, count, width ] of [ [ 'equip-piece-m1', 4, 55 ], [ 'equip-slot-kael-WEAPON', 3, 40 ] ]) {
+            const tile = page.getByTestId(testid);
+            const gems = tile.locator('.piece-gem');
+
+            await expect(gems).toHaveCount(count);
+            for (let i = 0; i < count; i++) {
+                await expect(gems.nth(i)).toHaveCSS('width', '10px');
+                await expect(gems.nth(i)).toHaveCSS('height', '10px');
+            }
+            await expect(tile.locator('.piece-gems')).toHaveCSS('column-gap', '5px');
+
+            const tileBox = await tile.boundingBox();
+            const rowBox = await tile.locator('.piece-gems').boundingBox();
+            //  The window is scaled to the viewport: the 60 px tile tells the factor
+            const scale = tileBox.width / 60;
+
+            expect(Math.abs(rowBox.width / scale - width)).toBeLessThanOrEqual(0.5);
+            expect(rowBox.x).toBeGreaterThanOrEqual(tileBox.x);
+            expect(rowBox.x + rowBox.width).toBeLessThanOrEqual(tileBox.x + tileBox.width);
+        }
     });
 });
