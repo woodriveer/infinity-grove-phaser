@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/hero-bag-cards/spec.md`
 **Design**: `.specs/features/hero-bag-cards/design.md`
-**Status**: Implemented, waiting for Verifier round 2 (2026-11-18). The owner approved the spec on 2026-11-17 (Q1 to Q8), T17 to T22 with the rulings D22 to D26 on 2026-11-18 (`214e500`) and T23 to T25 with the amended ruling D23 (spec Q9) on 2026-11-18 (`407a885`). T1 to T25 are done; the UI re-review round 3 (T25, `b8afc93`) is APROVADO. Verifier round 1 (`validation.md`, `e400084`) is FAIL with test-only gaps (17 of 20 mutants killed): Fixes 1 to 5 (survivors G3 and G9 of BAG-36, the e2e of BAG-39, `top: -5px` of BAG-01, edge case D13, spec-precision assertions) are being closed by the `test-engineer`; Fix 6 (this doc state) is done by the product owner. Verifier round 2, scoped to the gaps and fixes, runs next
+**Status**: Done and accepted by the product owner on 2026-11-18 (§ Acceptance). The owner approved the spec on 2026-11-17 with the recommended answers to Q1 to Q8 (`6286b6f`), T17 to T22 with the rulings D22 to D26 on 2026-11-18 (`214e500`) and T23 to T25 with the amended ruling D23 (spec Q9) on 2026-11-18 (`407a885`). T1 to T25 are done; the UI re-review round 3 (T25, `b8afc93`) is APROVADO. Verifier round 1 (`e400084`) was FAIL with test-only gaps (17 of 20 mutants killed); Fixes 1 to 5 were closed by the `test-engineer` (`3b0ed29`, `4737d05`, `c276ded`, `ff8584d`) and Fix 6 by the product owner (`d663c35`). Verifier round 2 (`validation.md`, `883cd02`) is PASS: 41 of 41 ACs, 9 of 9 mutants killed. Next: `gitops` release
 
 Rules for every task:
 
@@ -22,6 +22,36 @@ Rules for every task:
 - Never weaken an existing test. A test is changed or removed only where the task lists it by name, because the behaviour it pinned is changed or removed by the spec; every asserted value whose behaviour survives is kept.
 - Player-facing text is Portuguese and must match the spec character for character: `★` U+2605, `×` U+00D7, `→` U+2192, `·` U+00B7, `ã`, `õ`, `é` with their accents.
 - A failing e2e test outside the files of the task is rerun alone twice with `--workers=1`; it counts as a load flake only when it passes both times (`.specs/STATE.md` § Handoff notes).
+
+---
+
+## Acceptance (product-owner, 2026-11-18)
+
+**Verdict: ACCEPTED.** All 25 tasks are done, the Verifier round 2 gives PASS and the ui-artist re-review round 3 (T25) gives APROVADO. No new task of this feature.
+
+**Evidence read**: `validation.md` round 2 (`883cd02`, diff range `d0b9fa8..ff8584d`, fix range `e400084..ff8584d`): 41 of 41 ACs matched to the spec outcome with `file:line` evidence, 31 of 31 player-visible ACs with e2e (BAG-22 is unit only, not visible by itself), 9 of 9 edge cases, 0 spec-precision gaps open. The six round 1 gaps are closed by tests and docs only (the fix range touches no file under `backend/src/main`, `game/src` outside `*.test.js` or `game/public`). Sensor round 2: 9 mutants, 9 killed (round 1 survivors G3, G9, C5 included), 0 survived, 0 invalid, isolation ok; round 1 was 17 of 20. Backend 1013/1013, game unit 1764/1764, e2e 373/374: the 1 failure (`dragEquip.spec.js:640`) passed alone twice with `--workers=1`, a load flake on the known list of `STATE.md` Handoff, in a file the feature does not touch. No test removed or weakened in the fix range; the drop in `bagView.test.js` (12 to 9) and `fusionView.test.js` (12 to 4) follows the removal of `renderBag`, `renderBagEntry` and `renderFusion` that T11 lists (D16, D19). No Flyway migration in the range (AD-016 holds). `ui-review.html` round 3 (`b8afc93`): APROVADO, finding #9 (LEGENDARY gem tips touching) resolved at 2.27 px on desktop and phone, no new finding; finding #8 (tiny text on phones) is TD-010, out of scope by D27.
+
+**Spec goals** (`spec.md`, Goals):
+
+| Goal | Evidence (`validation.md` round 2) | Status |
+| --- | --- | --- |
+| 1. Five hero cards with no vertical scrollbar, whatever the star layers held | BAG-03, BAG-09, BAG-11 (`heroBagCards.spec.js:57`, `:123` at 1280x720, `:135` at 390x844, 5 heroes × 10 chips) | Met |
+| 2. Every fusion reachable from the Mochila; no Fusão HUD button | BAG-12 to BAG-17 (`heroBagCards.spec.js:144`, `:169`, `:184`), BAG-38 (`HeroUi.test.js:94-98`, `heroBagCards.spec.js:408`, six rail buttons, no `hud-fusion`) | Met |
+| 3. Fundir tudo: 3 clicks and 1 request, all-or-nothing on the server | BAG-23 to BAG-29 (`PlayerCardsTest.kt:231-290`, `HeroControllerIT.kt:351-456`; sensor B1 to B5 killed), BAG-35 (`heroBagCards.spec.js:322`: card, `fusion-all`, `fusion-all-yes`, `calls` length 1) | Met |
+| 4. Rarity gems centered on the top edge of every piece tile | BAG-01, BAG-40 (`heroBagCards.spec.js:417` within 1 px on bag, slot and bulk-sell tiles, `:435-436` `top: -5px`, `:457` 9 px gems and tip gap; sensor C3, C4, C5 killed) | Met |
+
+**Success criteria**: no scrollbar at 1280x720 and 390x844 with all ten layers filled (`heroBagCards.spec.js:123`, `:135`); 45/1/2 copies to 1/1/2 of 1★/2★/3★ in 3 clicks and 1 `POST /heroes/kael/fuse-all` (`heroBagCards.spec.js:322`); concurrent `fuse-all` on 3 blank copies reads one 200 (`fusions` 1), one 409 and one 1★ stored (`HeroControllerIT.kt:453-456`); gem row centered within 1 px in three tile places (`heroBagCards.spec.js:417`). All four met.
+
+**Edits made at acceptance**:
+
+1. Spec traceability BAG-01 to BAG-41 set to Verified (the Verifier set them in `validation.md` only); Goals and Success Criteria ticked.
+2. Spec Assumptions D4, D7, D10, D12 to D16 set from `n (Q<n>)` to `y (Q<n>)`: the owner accepted the spec with the recommended answers to Q1 to Q8 on 2026-11-17 (`6286b6f`); the intro and Open questions lines say so.
+3. `STATE.md`: AD-025 set from proposed to active (Q5 and Q8 confirmed in `6286b6f`); Handoff set to done and accepted, next step `gitops`.
+4. `design.md` and this file: status lines set to done and accepted; the BAG-39 note of § Requirement Coverage points to the round 2 fix `4737d05`.
+
+**Waiting for the owner's confirmation**: nothing for this feature. Q1 to Q9 and D21 to D27 are confirmed. TD-010 (tiny text on phones, D27) stays open as a candidate feature.
+
+**Next step**: `gitops` releases `hero-bag-cards`: push, deploy check (`publish.sh` running, the commit on `origin/main`), production check, `report.html`, `CHANGELOG.md`, release tag.
 
 ---
 
@@ -2099,4 +2129,4 @@ Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3
 
 ## Requirement Coverage
 
-Every BAG requirement maps to at least one task (spec § Requirement Traceability): 41 total, 41 mapped, 0 unmapped (BAG-40 and BAG-41 added by the review round). Player-visible requirements with e2e: BAG-01 to BAG-21 and BAG-31 to BAG-39 (T13, T14, T15), BAG-40 and BAG-41 and the amended BAG-08 and BAG-32 (T21), BAG-40 as amended by finding #9 (T24). Verifier round 1 found that no e2e asserts the Mochila red dot of BAG-39 (`validation.md` Fix 2, owner `test-engineer`); BAG-22 (late answers) and BAG-23 to BAG-30 (server) are unit and integration only, as in `bulk-sell` D14.
+Every BAG requirement maps to at least one task (spec § Requirement Traceability): 41 total, 41 mapped, 0 unmapped (BAG-40 and BAG-41 added by the review round). Player-visible requirements with e2e: BAG-01 to BAG-21 and BAG-31 to BAG-39 (T13, T14, T15), BAG-40 and BAG-41 and the amended BAG-08 and BAG-32 (T21), BAG-40 as amended by finding #9 (T24). Verifier round 1 found that no e2e asserts the Mochila red dot of BAG-39 (`validation.md` Fix 2, owner `test-engineer`); closed by `4737d05` (`game/e2e/heroes.spec.js` "lights the red dot"), verified in round 2. BAG-22 (late answers) and BAG-23 to BAG-30 (server) are unit and integration only, as in `bulk-sell` D14.

@@ -6,10 +6,10 @@ The Mochila lists one row per (hero, stars) pair (`bagEntries`), so a player wit
 
 ## Goals
 
-- [ ] The Mochila shows the five heroes as five cards with no vertical scrollbar in the panel, whatever the number of star layers each hero holds.
-- [ ] Every fusion a player can make is reachable from the Mochila; the HUD has no Fusão button.
-- [ ] Fusing every layer of one hero takes 3 clicks and 1 request (`Fundir tudo`, `Sim, fundir`, and the card click before them), whatever the number of copies; it is all-or-nothing on the server.
-- [ ] The rarity gems of every piece tile sit centered on the top edge of the tile.
+- [x] The Mochila shows the five heroes as five cards with no vertical scrollbar in the panel, whatever the number of star layers each hero holds.
+- [x] Every fusion a player can make is reachable from the Mochila; the HUD has no Fusão button.
+- [x] Fusing every layer of one hero takes 3 clicks and 1 request (`Fundir tudo`, `Sim, fundir`, and the card click before them), whatever the number of copies; it is all-or-nothing on the server.
+- [x] The rarity gems of every piece tile sit centered on the top edge of the tile.
 
 ## Out of Scope
 
@@ -29,26 +29,26 @@ The Mochila lists one row per (hero, stars) pair (`bagEntries`), so a player wit
 
 ## Assumptions & Open Questions
 
-Every ambiguity is resolved or recorded here. Rows marked `n` are product owner defaults that wait for the owner's approval of this spec (questions Q1 to Q8 in the hand-off).
+Every ambiguity is resolved or recorded here. Every row is confirmed: the owner accepted the spec with the recommended answers to Q1 to Q8 on 2026-11-17 (`6286b6f`) and answered Q9 on 2026-11-18 (`407a885`); the rows that read `n (Q<n>)` until acceptance read `y (Q<n>)`.
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
 | D1 Centered gems | `.piece-gems` gets `left: 50%; transform: translateX(-50%)` and keeps `top: -5px`; the refine badge, the tile size and the gem count per rarity do not change. One CSS rule covers every tile (bag, slots, bulk sell) because all use `renderPieceTile` | Approved mockup (owner, 2026-11-17) | y |
 | D2 No scrollbar | The Mochila card grid fits the panel (`.hero-window` `scrollHeight <= clientHeight`) at 1280x720 and at 390x844. The game is one 1024x768 canvas scaled to the screen, so the phone shows the same five-column grid scaled down, never the old list. The hero detail (ladder plus skills) may scroll when a hero holds many layers | Approved mockup; the canvas does not reflow on phones (`game/public/style.css:344` comment) | y |
 | D3 One card per hero | Every hero of `GET /heroes` gets one card in payload order; owned heroes are clickable, the others are disabled and grey with `Não encontrado` | Approved mockup | y |
-| D4 Card art | The card shows the standing sprite `assets/heroes/<id>_sprite.png` (the art of the Heróis catalog), not `<id>_position.jpg`: the `_position.jpg` files are three-view turnaround sheets on a magenta chroma-key background and cannot be shown as a portrait | Checked `game/public/assets/heroes/lyra_position.jpg`; `uiRedesign.spec.js` forbids magenta in hero art | n (Q1) |
+| D4 Card art | The card shows the standing sprite `assets/heroes/<id>_sprite.png` (the art of the Heróis catalog), not `<id>_position.jpg`: the `_position.jpg` files are three-view turnaround sheets on a magenta chroma-key background and cannot be shown as a portrait | Checked `game/public/assets/heroes/lyra_position.jpg`; `uiRedesign.spec.js` forbids magenta in hero art | y (Q1) |
 | D5 Frame tiers | Frame by the hero's best star (`hero.stars`): `wood` 0 to 3, `silver` 4 to 6, `gold` 7 to 9, from the existing `ASCENDED_FROM = 4` and `EXALTED_FROM = 7`. A hero not owned uses `wood` | Approved mockup; reuses the AD-020 tiers | y |
 | D6 Star badge colours | The badge keeps the AD-020 star colours (0 to 3 `--color-accent-700`, 4 to 6 purple `#7a3fa0`, 7 to 9 gold chip `#d9a521` with `#201e1d` text); only the frame around the card is silver or gold | AD-020 stays active; the frame is a new element, so no AD conflict | y |
-| D7 Chips | One chip per layer with at least one copy, ascending, text `<s>★×<c>` (× is U+00D7). Chips are separate elements with a visual gap and no `·` character between them | The mockup's `0★×45 · 1★×1 · 2★×2` reads as three chips; a separator character adds nothing to separate pills | n (Q2) |
+| D7 Chips | One chip per layer with at least one copy, ascending, text `<s>★×<c>` (× is U+00D7). Chips are separate elements with a visual gap and no `·` character between them | The mockup's `0★×45 · 1★×1 · 2★×2` reads as three chips; a separator character adds nothing to separate pills | y (Q2) |
 | D8 Unowned text | `Não encontrado` (capital N), the owner's wording, in place of the chips | Owner's mockup text; sentence case like the catalog's `Não obtido` | y |
 | D9 Fundir badge | Text `Fundir`, shown while any layer 0 to 8 holds 3 or more copies | Approved mockup | y |
-| D10 Ladder rows | One row per layer with at least one copy, ascending (0★ at the top), plus the row of the layer above the highest held layer t, with 0 copies, when t ≤ 8 and layer t holds 3 or more copies (the next fusion reaches it) | "plus the next layer when it can be reached": a row is reachable when its row button below can fuse now | n (Q4) |
+| D10 Ladder rows | One row per layer with at least one copy, ascending (0★ at the top), plus the row of the layer above the highest held layer t, with 0 copies, when t ≤ 8 and layer t holds 3 or more copies (the next fusion reaches it) | "plus the next layer when it can be reached": a row is reachable when its row button below can fuse now | y (Q4) |
 | D11 Row content | Name `<s>★`, a progress bar of `min(c, 3)/3`, the count `<c>/3` (the real count, so `45/3`) and the button `<s>★→<s+1>★` (no spaces, → is U+2192), enabled only when c ≥ 3. The 9★ row shows `Cópias: <c>` and `Estrela máxima: não pode ser fundida`, no bar and no button | Approved mockup; the 9★ text reuses the old bag detail text that `heroAscension.spec.js` pinned | y |
-| D12 Fundir tudo on the server | A new endpoint `POST /heroes/{id}/fuse-all` does the whole cascade in one transaction under the `player_cards` row lock and answers `{ hero, fusions }`. The game never loops over `POST /heroes/{id}/fuse` | No bulk endpoint exists (`HeroController.kt:96` has only `fuse`). A loop would send up to 9 841 requests for 19 683 cards and could stop halfway, leaving the bag different from the preview; one transaction is all-or-nothing | n (Q5) |
-| D13 No stale-preview check | `fuse-all` carries no expected counts: the server fuses what it holds. If a card dropped between the preview and `Sim, fundir`, the result line uses the server's `fusions` and hero | A cascade only ever turns cards into better cards, so fusing one more card never harms the player; the `fromLevel` guard of AD-011 protects spends, not this | n (Q6) |
-| D14 Cascade preview text | `Fazer <n> fusões?` (`Fazer 1 fusão?`) and two preview lines `Antes: <before>` and `Depois: <after>` (D21 replaced the single line `<before> → <after>`), each side the layers with at least one copy as `<c>×<s>★` joined by ` + `. The owner's example "45×0★ + 1×1★ + 2×2★ → 1×2★ + 2×3★" drops a copy: 45 blank make 15 1★ (16 with the one held), 16 make 5 2★ and leave 1, 7 2★ make 2 3★ and leave 1, so the preview is `45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★` (22 fusions) | Lesson L-010: every on-screen text is stated in full; the arithmetic is the rule of AD-020 applied layer by layer | n (Q7) |
-| D15 Fundir tudo result | `<n> fusões. Melhor carta: <nome> <s>★` (`1 fusão.` for one), then ` · <skill> no nível <level>` for every skill, in slot order, whose level in the answer is 2 or more and higher than before the request | Keeps the single-fusion feedback ("from 4★, the skill raised") for a cascade that can raise several skills at once | n (Q7) |
-| D16 Fusão menu entry | Removed: the HUD shows six buttons (Heróis, Mochila, Líder, Equipamento, Talentos, Rever chefes) and the `fusion` screen is deleted | Two buttons that open the same screen confuse the rail; the `Fundir` badge on the cards shows where fusions wait. The rail tests of `ui-redesign` (UIR-03) are updated to six buttons; this spec supersedes that list | n (Q8) |
+| D12 Fundir tudo on the server | A new endpoint `POST /heroes/{id}/fuse-all` does the whole cascade in one transaction under the `player_cards` row lock and answers `{ hero, fusions }`. The game never loops over `POST /heroes/{id}/fuse` | No bulk endpoint exists (`HeroController.kt:96` has only `fuse`). A loop would send up to 9 841 requests for 19 683 cards and could stop halfway, leaving the bag different from the preview; one transaction is all-or-nothing | y (Q5) |
+| D13 No stale-preview check | `fuse-all` carries no expected counts: the server fuses what it holds. If a card dropped between the preview and `Sim, fundir`, the result line uses the server's `fusions` and hero | A cascade only ever turns cards into better cards, so fusing one more card never harms the player; the `fromLevel` guard of AD-011 protects spends, not this | y (Q6) |
+| D14 Cascade preview text | `Fazer <n> fusões?` (`Fazer 1 fusão?`) and two preview lines `Antes: <before>` and `Depois: <after>` (D21 replaced the single line `<before> → <after>`), each side the layers with at least one copy as `<c>×<s>★` joined by ` + `. The owner's example "45×0★ + 1×1★ + 2×2★ → 1×2★ + 2×3★" drops a copy: 45 blank make 15 1★ (16 with the one held), 16 make 5 2★ and leave 1, 7 2★ make 2 3★ and leave 1, so the preview is `45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★` (22 fusions) | Lesson L-010: every on-screen text is stated in full; the arithmetic is the rule of AD-020 applied layer by layer | y (Q7) |
+| D15 Fundir tudo result | `<n> fusões. Melhor carta: <nome> <s>★` (`1 fusão.` for one), then ` · <skill> no nível <level>` for every skill, in slot order, whose level in the answer is 2 or more and higher than before the request | Keeps the single-fusion feedback ("from 4★, the skill raised") for a cascade that can raise several skills at once | y (Q7) |
+| D16 Fusão menu entry | Removed: the HUD shows six buttons (Heróis, Mochila, Líder, Equipamento, Talentos, Rever chefes) and the `fusion` screen is deleted | Two buttons that open the same screen confuse the rail; the `Fundir` badge on the cards shows where fusions wait. The rail tests of `ui-redesign` (UIR-03) are updated to six buttons; this spec supersedes that list | y (Q8) |
 | D17 Busy lock | While a fusion request (row or Fundir tudo) runs, every ladder button, `Fundir tudo` and the confirmation buttons are disabled; `Voltar` and `Fechar` stay enabled | The old screen had no guard (`HeroUi.js:307`), so a double click sent two requests | y |
 | D18 Failure handling | A refused or failed fusion shows `Não foi possível fundir as cartas.` and keeps the ladder as it was; the game does not reload the bag | Existing behaviour of the single fusion (`heroes.spec.js` "a failed fusion..."); `fuse-all` is all-or-nothing, so nothing changed on the server either | y |
 | D19 Testids | Stable: `hud-bag`, `bag-badge`, `bag-list`, `bag-empty`, `bag-entry-detail`, `fusion-list`, `fusion-row-<id>-<s>`, `fusion-button-<id>-<s>`, `.fusion-copies` (same `c/3` format), `fusion-result`, `skill-list`. Changed text: `fusion-button-*` reads `<s>★→<s+1>★` (was `Fundir`), `.fusion-name` reads `<s>★` (was `<nome> <s>★ → <s+1>★`). Removed: `hud-fusion`, `bag-entry-<id>-<s>`, `bag-go-fusion`, `.bag-needed`, `fusion-empty`, the `is-selected` row class. New: listed in design.md § Test ids | Keeps every e2e locator that still means the same thing | y |
@@ -63,7 +63,7 @@ Every ambiguity is resolved or recorded here. Rows marked `n` are product owner 
 | Player-facing text | Portuguese | AD-007 | y |
 | Fusion rule | 3 copies of s (0 to 8) make 1 copy of s + 1; 9★ never fuses; skill levels as AD-020 | Existing rule | y |
 
-**Open questions** (the spec is written with the recommended default of each; the owner approves or changes them before any task runs):
+**Open questions**: none. All nine were answered, Q1 to Q8 with the recommended default on 2026-11-17 (`6286b6f`) and Q9 on 2026-11-18 (`407a885`); kept below for the record.
 
 - Q1 (D4) Card art: use `<id>_sprite.png` because `<id>_position.jpg` is a turnaround sheet on magenta? Recommended: yes.
 - Q2 (D7) Chips without a `·` between them? Recommended: yes.
@@ -218,51 +218,51 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| BAG-01 | P1: Centered rarity gems | T7, T13, T16, T20, T21, T22, T23, T25 | Implementing |
-| BAG-02 | P1: Centered rarity gems | T7, T13 | Implementing |
-| BAG-03 | P1: One card per hero | T8, T11, T13 | Implementing |
-| BAG-04 | P1: One card per hero | T8, T10, T13, T17, T22 | Implementing |
-| BAG-05 | P1: One card per hero | T6, T8, T10, T13, T17, T22 | Implementing |
-| BAG-06 | P1: One card per hero | T8, T13 | Implementing |
-| BAG-07 | P1: One card per hero | T6, T8, T13, T14, T17, T22 | Implementing |
-| BAG-08 | P1: One card per hero | T6, T8, T13, T17, T21, T22 | Implementing |
-| BAG-09 | P1: One card per hero | T8, T13 | Implementing |
-| BAG-10 | P1: One card per hero | T8, T11, T13 | Implementing |
-| BAG-11 | P1: One card per hero | T10, T13, T17 | Implementing |
-| BAG-12 | P1: Fusion ladder | T9, T11, T13 | Implementing |
-| BAG-13 | P1: Fusion ladder | T6, T9, T13 | Implementing |
-| BAG-14 | P1: Fusion ladder | T6, T9, T10, T13 | Implementing |
-| BAG-15 | P1: Fusion ladder | T6, T9, T11, T13 | Implementing |
-| BAG-16 | P1: Fusion ladder | T6, T9, T13, T14 | Implementing |
-| BAG-17 | P1: Fusion ladder | T11, T13, T14, T17 | Implementing |
-| BAG-18 | P1: Fusion ladder | T9, T11, T12, T13, T18, T21 | Implementing |
-| BAG-19 | P1: Fusion ladder | T11, T13, T14 | Implementing |
-| BAG-20 | P1: Fusion ladder | T11, T13 | Implementing |
-| BAG-21 | P1: Fusion ladder | T5, T11, T12, T13, T14 | Implementing |
-| BAG-22 | P1: Fusion ladder | T11, T12 | Implementing |
-| BAG-23 | P1: Fundir tudo on the server | T1, T2, T3 | Implementing |
-| BAG-24 | P1: Fundir tudo on the server | T1, T3 | Implementing |
-| BAG-25 | P1: Fundir tudo on the server | T1, T3 | Implementing |
-| BAG-26 | P1: Fundir tudo on the server | T1, T2, T3 | Implementing |
-| BAG-27 | P1: Fundir tudo on the server | T2, T3 | Implementing |
-| BAG-28 | P1: Fundir tudo on the server | T3 | Implementing |
-| BAG-29 | P1: Fundir tudo on the server | T3 | Implementing |
-| BAG-30 | P1: Fundir tudo on the server | T3 | Implementing |
-| BAG-31 | P1: Fundir tudo on the screen | T6, T9, T12, T13 | Implementing |
-| BAG-32 | P1: Fundir tudo on the screen | T6, T9, T12, T13, T19, T21, T22 | Implementing |
-| BAG-33 | P1: Fundir tudo on the screen | T9, T12, T13 | Implementing |
-| BAG-34 | P1: Fundir tudo on the screen | T9, T12, T13 | Implementing |
-| BAG-35 | P1: Fundir tudo on the screen | T4, T5, T6, T12, T13, T17, T22 | Implementing |
-| BAG-36 | P1: Fundir tudo on the screen | T6, T12, T13 | Needs Fix |
-| BAG-37 | P1: Fundir tudo on the screen | T12, T13 | Implementing |
-| BAG-38 | P2: One way into the cards | T11, T13, T15 | Implementing |
-| BAG-39 | P2: One way into the cards | T11 | Needs Fix |
-| BAG-40 | P1: Centered rarity gems | T20, T21, T22, T23, T24, T25 | Implementing |
-| BAG-41 | P1: Fusion ladder | T18, T21, T22 | Implementing |
+| BAG-01 | P1: Centered rarity gems | T7, T13, T16, T20, T21, T22, T23, T25 | Verified |
+| BAG-02 | P1: Centered rarity gems | T7, T13 | Verified |
+| BAG-03 | P1: One card per hero | T8, T11, T13 | Verified |
+| BAG-04 | P1: One card per hero | T8, T10, T13, T17, T22 | Verified |
+| BAG-05 | P1: One card per hero | T6, T8, T10, T13, T17, T22 | Verified |
+| BAG-06 | P1: One card per hero | T8, T13 | Verified |
+| BAG-07 | P1: One card per hero | T6, T8, T13, T14, T17, T22 | Verified |
+| BAG-08 | P1: One card per hero | T6, T8, T13, T17, T21, T22 | Verified |
+| BAG-09 | P1: One card per hero | T8, T13 | Verified |
+| BAG-10 | P1: One card per hero | T8, T11, T13 | Verified |
+| BAG-11 | P1: One card per hero | T10, T13, T17 | Verified |
+| BAG-12 | P1: Fusion ladder | T9, T11, T13 | Verified |
+| BAG-13 | P1: Fusion ladder | T6, T9, T13 | Verified |
+| BAG-14 | P1: Fusion ladder | T6, T9, T10, T13 | Verified |
+| BAG-15 | P1: Fusion ladder | T6, T9, T11, T13 | Verified |
+| BAG-16 | P1: Fusion ladder | T6, T9, T13, T14 | Verified |
+| BAG-17 | P1: Fusion ladder | T11, T13, T14, T17 | Verified |
+| BAG-18 | P1: Fusion ladder | T9, T11, T12, T13, T18, T21 | Verified |
+| BAG-19 | P1: Fusion ladder | T11, T13, T14 | Verified |
+| BAG-20 | P1: Fusion ladder | T11, T13 | Verified |
+| BAG-21 | P1: Fusion ladder | T5, T11, T12, T13, T14 | Verified |
+| BAG-22 | P1: Fusion ladder | T11, T12 | Verified |
+| BAG-23 | P1: Fundir tudo on the server | T1, T2, T3 | Verified |
+| BAG-24 | P1: Fundir tudo on the server | T1, T3 | Verified |
+| BAG-25 | P1: Fundir tudo on the server | T1, T3 | Verified |
+| BAG-26 | P1: Fundir tudo on the server | T1, T2, T3 | Verified |
+| BAG-27 | P1: Fundir tudo on the server | T2, T3 | Verified |
+| BAG-28 | P1: Fundir tudo on the server | T3 | Verified |
+| BAG-29 | P1: Fundir tudo on the server | T3 | Verified |
+| BAG-30 | P1: Fundir tudo on the server | T3 | Verified |
+| BAG-31 | P1: Fundir tudo on the screen | T6, T9, T12, T13 | Verified |
+| BAG-32 | P1: Fundir tudo on the screen | T6, T9, T12, T13, T19, T21, T22 | Verified |
+| BAG-33 | P1: Fundir tudo on the screen | T9, T12, T13 | Verified |
+| BAG-34 | P1: Fundir tudo on the screen | T9, T12, T13 | Verified |
+| BAG-35 | P1: Fundir tudo on the screen | T4, T5, T6, T12, T13, T17, T22 | Verified |
+| BAG-36 | P1: Fundir tudo on the screen | T6, T12, T13 | Verified |
+| BAG-37 | P1: Fundir tudo on the screen | T12, T13 | Verified |
+| BAG-38 | P2: One way into the cards | T11, T13, T15 | Verified |
+| BAG-39 | P2: One way into the cards | T11 | Verified |
+| BAG-40 | P1: Centered rarity gems | T20, T21, T22, T23, T24, T25 | Verified |
+| BAG-41 | P1: Fusion ladder | T18, T21, T22 | Verified |
 
 **ID format:** `BAG-<NN>`
 
-**Status values** (skill vocabulary): Pending → In Design → In Tasks → Implementing → Verified; a row the Verifier fails reads Needs Fix. `Implementing` is the status of a requirement whose tasks are done and committed but not yet verified: the skill has no separate "implemented" status, so T1 to T25 being done leaves the rows at `Implementing` until a Verifier round passes them. Verifier round 1 (`validation.md`, `e400084`, FAIL with test-only gaps) set BAG-36 (Fix 1, survivors G3 and G9) and BAG-39 (Fix 2, no e2e of the red dot) to Needs Fix; it passed the other 39 rows, which move to `Verified` together with BAG-36 and BAG-39 when round 2 passes (Fix 6).
+**Status values** (skill vocabulary): Pending → In Design → In Tasks → Implementing → Verified; a row the Verifier fails reads Needs Fix. `Implementing` is the status of a requirement whose tasks are done and committed but not yet verified: the skill has no separate "implemented" status, so T1 to T25 being done leaves the rows at `Implementing` until a Verifier round passes them. Verifier round 1 (`validation.md`, `e400084`, FAIL with test-only gaps) set BAG-36 (Fix 1, survivors G3 and G9) and BAG-39 (Fix 2, no e2e of the red dot) to Needs Fix; it passed the other 39 rows. Verifier round 2 (`validation.md`, `883cd02`, PASS, sensor 9 of 9 killed) closed both; the product owner set all 41 rows to `Verified` at acceptance on 2026-11-18 (`tasks.md` § Acceptance).
 
 **Coverage:** 41 total, 41 mapped to tasks, 0 unmapped
 
@@ -270,7 +270,7 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 
 ## Success Criteria
 
-- [ ] With five heroes holding copies on all ten layers, the Mochila grid shows no scrollbar at 1280x720 and at 390x844 (e2e).
-- [ ] Turning 45/1/2 copies of 0★/1★/2★ into 1★ 1, 2★ 1, 3★ 2 takes 3 clicks and 1 `POST /heroes/kael/fuse-all` (e2e request count).
-- [ ] An integration test that sends `fuse-all` twice at once for 3 blank copies reads one 200, one 409 and one 1★ copy stored.
-- [ ] The gem row of every piece tile is centered within 1 px (e2e, three tile places).
+- [x] With five heroes holding copies on all ten layers, the Mochila grid shows no scrollbar at 1280x720 and at 390x844 (e2e).
+- [x] Turning 45/1/2 copies of 0★/1★/2★ into 1★ 1, 2★ 1, 3★ 2 takes 3 clicks and 1 `POST /heroes/kael/fuse-all` (e2e request count).
+- [x] An integration test that sends `fuse-all` twice at once for 3 blank copies reads one 200, one 409 and one 1★ copy stored.
+- [x] The gem row of every piece tile is centered within 1 px (e2e, three tile places).

@@ -1,7 +1,7 @@
 # Hero Bag Cards Design
 
 **Spec**: `.specs/features/hero-bag-cards/spec.md`
-**Status**: Approved and implemented, waiting for Verifier round 2 (2026-11-18). The owner approved it on 2026-11-17 (Q1 to Q8), the review amendments D21 to D26 on 2026-11-18 (`af9313e`, approved in `214e500`) and the amended D23 of § Rarity gems (9 px gems, 6 px gap, spec Q9; `ce0fea0`, approved in `407a885`). T1 to T25 are done; UI re-review round 3 is APROVADO (`b8afc93`). Verifier round 1 is FAIL with test-only gaps (`validation.md`, `e400084`; no design change needed); the `test-engineer` is closing gaps 1 to 5, then Verifier round 2 runs
+**Status**: Approved, implemented, verified and accepted (2026-11-18). The owner approved it on 2026-11-17 with the recommended answers to Q1 to Q8 (`6286b6f`), the review amendments D21 to D26 on 2026-11-18 (`af9313e`, approved in `214e500`) and the amended D23 of § Rarity gems (9 px gems, 6 px gap, spec Q9; `ce0fea0`, approved in `407a885`). T1 to T25 are done; UI re-review round 3 is APROVADO (`b8afc93`). Verifier round 1 was FAIL with test-only gaps (`e400084`, no design change needed); Verifier round 2 is PASS (`validation.md`, `883cd02`); accepted by the product owner (`tasks.md` § Acceptance)
 
 ---
 
