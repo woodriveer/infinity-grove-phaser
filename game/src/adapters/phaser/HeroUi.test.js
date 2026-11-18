@@ -1009,6 +1009,41 @@ describe('HeroUi Fundir tudo', () => {
         expect(ctx.testid('fusion-result').textContent).toBe('4 fusões. Melhor carta: Hero kael 5★ · Skill 1 no nível 2 · Skill 2 no nível 2');
     });
 
+    it('the result names only the skills raised above their level before the request', async () => {
+        //  4★ Kael: Skill 1 is already at level 2; three 4★ copies make one 5★, which raises Skill 2 only
+        const levelled = (levels) => skills(true, true, true).map((skill, index) => ({ ...skill, level: levels[index] }));
+        const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 4: 3 }, { stars: 4, skills: levelled([ 2, 1, 1 ]) }), hero('lyra') ] } });
+        ctx.heroesGateway.fuseAll.mockResolvedValue({ hero: hero('kael', { 5: 1 }, { stars: 5, skills: levelled([ 2, 2, 1 ]) }), fusions: 1 });
+        await openKael(ctx);
+        ctx.testid('fusion-all').click();
+
+        expect(ctx.testid('fusion-all-question').textContent).toBe('Fazer 1 fusão?');
+
+        ctx.testid('fusion-all-yes').click();
+        await flush();
+
+        expect(ctx.testid('fusion-result').textContent).toBe('1 fusão. Melhor carta: Hero kael 5★ · Skill 2 no nível 2');
+    });
+
+    it('the result line carries the numbers of the server when it fused more than the preview counted', async () => {
+        //  The preview counts 22 fusions; a card dropped in between, so the server answers 23 and a 4★ card that raised Skill 1 (D13)
+        const levelled = (levels) => skills(true, true, true).map((skill, index) => ({ ...skill, level: levels[index] }));
+        const ctx = createUi({ list: ladder() });
+        ctx.heroesGateway.fuseAll.mockResolvedValue({ hero: hero('kael', { 3: 2, 4: 1 }, { stars: 4, skills: levelled([ 2, 1, 1 ]) }), fusions: 23 });
+        await openKael(ctx);
+        ctx.testid('fusion-all').click();
+
+        expect(ctx.testid('fusion-all-question').textContent).toBe('Fazer 22 fusões?');
+
+        ctx.testid('fusion-all-yes').click();
+        await flush();
+
+        expect(ctx.testid('fusion-result').textContent).toBe('23 fusões. Melhor carta: Hero kael 4★ · Skill 1 no nível 2');
+        expect(ctx.testid('fusion-row-kael-3').querySelector('.fusion-copies').textContent).toBe('2/3');
+        expect(ctx.testid('fusion-row-kael-4').querySelector('.fusion-copies').textContent).toBe('1/3');
+        expect(ctx.testid('fusion-row-kael-0')).toBeNull();
+    });
+
     it('one fusion reads 1 fusão', async () => {
         const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 3 }), hero('lyra') ] } });
         ctx.heroesGateway.fuseAll.mockResolvedValue({ hero: hero('kael', { 1: 1 }), fusions: 1 });

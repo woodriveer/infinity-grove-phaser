@@ -154,6 +154,26 @@ describe('raisedSkills', () => {
     it('raisedSkills counts a skill unlocked straight at level 2', () => {
         expect(raisedSkills([ skill(1, 0, false) ], [ skill(1, 2) ])).toEqual([ { name: 'Skill 1', level: 2 } ]);
     });
+
+    it('raisedSkills never names a skill that was already at that level before the cascade', () => {
+        const before = [ skill(1, 2), skill(2, 1), skill(3, 1) ];
+        const after = [ skill(1, 2), skill(2, 2), skill(3, 1) ];
+
+        expect(raisedSkills(before, after)).toEqual([ { name: 'Skill 2', level: 2 } ]);
+    });
+
+    it('raisedSkills names a skill raised from level 2 to level 3 and leaves a level 3 that did not move', () => {
+        const before = [ skill(1, 3), skill(2, 2), skill(3, 1) ];
+        const after = [ skill(1, 3), skill(2, 3), skill(3, 1) ];
+
+        expect(raisedSkills(before, after)).toEqual([ { name: 'Skill 2', level: 3 } ]);
+    });
+
+    it('raisedSkills names nothing when no skill is higher than before', () => {
+        const levels = [ skill(1, 2), skill(2, 2), skill(3, 1) ];
+
+        expect(raisedSkills(levels, levels)).toEqual([]);
+    });
 });
 
 describe('fuseAllResultText', () => {
