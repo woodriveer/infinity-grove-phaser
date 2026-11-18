@@ -232,7 +232,7 @@ export const mountVersionLabel = (version) =>
 
 ---
 
-### T3: Mount the label and style it in the bottom-right corner [ ]
+### T3: Mount the label and style it in the bottom-right corner [x]
 
 **Owner**: game-dev
 **Goal**: `main.js` mounts the label before the Phaser game and `style.css` fixes it 8 px from the right and 4 px from the bottom of the viewport, small, dim and click-through (GV-01 to GV-05, GV-07, GV-09 to GV-13).

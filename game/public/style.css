@@ -3291,3 +3291,25 @@ body.piece-dragging .piece-tooltip {
     font-weight: 700;
     color: var(--color-neutral-800);
 }
+
+/* ══ Game version in the bottom-right corner of the page (spec game-version) ══ */
+/* Fixed to the viewport, outside the scaled canvas: 12 px on every screen, in the letterbox at 1280x720 and 390x844, under the battle
+   bar on a 4:3 screen. Parchment at 60 % over --wood-900 reads rgb(149 132 102), contrast 5.1:1. Clicks pass to the game. */
+.game-version {
+    position: fixed;
+    right: 8px;
+    bottom: 4px;
+    z-index: 10;
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 12px;
+    letter-spacing: 0.04em;
+    color: var(--parchment-300);
+    opacity: 0.6;
+    text-shadow: 0 1px 2px var(--wood-900);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+}

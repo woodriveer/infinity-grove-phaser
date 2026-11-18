@@ -5,6 +5,7 @@ import { MainMenu } from './adapters/phaser/MainMenu';
 import { Preloader } from './adapters/phaser/Preloader';
 import { Splash } from './adapters/phaser/Splash';
 import { runInBackground, startTicker } from './adapters/phaser/backgroundFight';
+import { mountVersionLabel } from './adapters/phaser/views/versionLabel';
 import { services } from './composition';
 import * as Phaser from 'phaser';
 
@@ -40,6 +41,10 @@ const config = {
         ClickerGame
     ]
 };
+
+//  The version in the bottom-right corner of every screen (spec game-version), in the page before the first frame of the loading bar.
+//  __GAME_VERSION__ is replaced by vite.config.js define with the version of game/package.json.
+mountVersionLabel(__GAME_VERSION__);
 
 const game = new Game(config);
 
