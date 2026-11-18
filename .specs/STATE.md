@@ -208,7 +208,7 @@
 - **Trade-off**: Between the first pushed game commit of a feature and its release commit, production shows the previous `package.json` value (`v0.0.0` for `game-version`). On a viewport with no letterbox (4:3) the label lies over the canvas strip under the battle bar.
 - **Scope**: `game/package.json`, `game/vite.config.js`, `game/src/main.js`, `game/src/adapters/phaser/views/versionLabel.js`, `game/public/style.css`, `.claude/agents/gitops.md` step 7
 - **Date**: 2026-11-18
-- **Status**: proposed (spec `game-version`, waiting for the owner's answers to Q1 to Q6). Conforms to AD-003 (the label view sits in the `phaser` adapter layer, mounted by the composition root), AD-007 (`v0.4.1` adds no language text) and AD-022 (Grove tokens)
+- **Status**: active (spec `game-version`; the owner answered yes to Q1 to Q6 on 2026-11-18). Conforms to AD-003 (the label view sits in the `phaser` adapter layer, mounted by the composition root), AD-007 (`v0.4.1` adds no language text) and AD-022 (Grove tokens)
 
 ## Technical Debt
 
@@ -230,7 +230,7 @@ TD-001 to TD-008 are recorded in the spec of the feature that found them (`chara
 
 ## Handoff
 
-- **Features**: `game-version` (AD-026 proposed, `.specs/features/game-version/`) specified, waiting for the owner's approval, ships as v0.4.1; `hero-bag-cards` (AD-025) released as v0.4.0 (`6dd4cd5`); `ui-redesign` (AD-022) and `boss-replay-chapters` (AD-024) done
+- **Features**: `game-version` (AD-026 active, `.specs/features/game-version/`) approved by the owner on 2026-11-18, in implementation (T1 to T5), ships as v0.4.1; `hero-bag-cards` (AD-025) released as v0.4.0 (`6dd4cd5`); `ui-redesign` (AD-022) and `boss-replay-chapters` (AD-024) done
 - **Phase / Task**: `game-version` spec, design and tasks T1 to T5 written on 2026-11-18 (`validate_spec.py` and `validate_tasks.py` exit 0); no task started. `hero-bag-cards` accepted by the product owner on 2026-11-18 (`tasks.md` § Acceptance). T1 to T25 done; UI review round 3 APROVADO (`b8afc93`); Verifier round 2 PASS (`validation.md`, `883cd02`): 41 of 41 ACs, 31 of 31 visible ACs with e2e, sensor 9 of 9 killed (round 1 survivors G3, G9, C5 included), backend 1013/1013, game unit 1764/1764, e2e 373/374 (the known `dragEquip.spec.js:640` flake, passed alone twice). Spec traceability BAG-01 to BAG-41 Verified; Goals and Success Criteria ticked; AD-025 active. `ui-redesign` and `boss-replay-chapters` were accepted on 2026-11-17 and released (v0.3.0, v0.3.1)
 - **Completed**: `hero-bag-cards` T1 to T25 (the owner approved the spec with the recommended answers to Q1 to Q8 in `6286b6f`, T17 to T22 and D22 to D26 in `214e500`, T23 to T25 and the amended D23 (Q9) in `407a885`), UI review round 3 APROVADO (`b8afc93`), Verifier round 1 (`e400084`) and its Fixes 1 to 6 (`3b0ed29`, `d663c35`, `4737d05`, `c276ded`, `ff8584d`), Verifier round 2 PASS (`883cd02`), product-owner acceptance; `ui-redesign`, `boss-replay-chapters` and TD-009, released as v0.3.0 and v0.3.1
 - **In-progress** (file:line): none

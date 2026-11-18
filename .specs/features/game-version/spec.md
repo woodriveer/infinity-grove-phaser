@@ -46,7 +46,7 @@ Rows marked `y` were answered by the owner on 2026-11-18 (relayed by the orchest
 | D15 Assistive technology | Plain text, no `role`, no `aria-hidden`: a screen reader reads `v0.4.1` at the end of the page | It is real information and short | n (Q4) |
 | D16 Decision record | AD-026 in `STATE.md` (proposed): the version source, the build-time constant and the label | The version source is shared by `gitops`, `vite.config.js` and the game | n (Q6) |
 
-**Open questions** (recommended default in each; answering "yes to all" confirms D4 to D16 rows marked `n`):
+**Open questions**: none. The owner answered yes to Q1 to Q6 on 2026-11-18 (D4 to D16 confirmed).
 
 - Q1 (D4) Show the text `v0.4.1` (no `Versão` word)? Recommended: yes.
 - Q2 (D5) Draw the label as one DOM element fixed to the browser window, outside the game canvas, instead of Phaser text inside each scene? Recommended: yes.
