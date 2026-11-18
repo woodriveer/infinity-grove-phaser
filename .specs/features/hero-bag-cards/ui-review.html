@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Revisão de UI · Mochila: cartas de herói</title>
+<title>Revisão de UI · Mochila: cartas de herói e escada de fusão (rodada 2)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
@@ -98,13 +98,395 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
 }
 </style>
 </head>
-<body><main><div class="brand">Infinity Grove · Revisão de UI</div>
-<section class="panel"><div class="head"><div><h1>Mochila: cartas de herói e escada de fusão</h1><div class="meta"><code>.specs/features/hero-bag-cards</code> · commits <code>T1–T15, até 8ce6bc9</code> · 2026-11-17 · local (vite dev, backend falso)</div></div><span class="chip verdict changes">ALTERAÇÕES</span></div>
-<p style="margin-top:16px">As cartas, a escada, o Fundir tudo e as gemas funcionam e seguem o desenho: sem barra de rolagem, colunas alinhadas, confirmação com prévia que cabe, trilho com seis botões e gemas centralizadas. A moldura de ouro lê-se bem como ouro; a de madeira está escura demais e a de prata é fraca. Os brilhos dourados sujam o texto dos chips. Nenhum achado bloqueia o jogo, mas pedimos correções antes de aprovar.</p>
-<div class="stats"><div class="stat"><div class="n">16</div><div class="l">telas e estados verificados</div></div><div class="stat"><div class="n">32</div><div class="l">capturas (desktop + celular)</div></div><div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div><div class="stat"><div class="n">8</div><div class="l">achados médios e baixos</div></div></div></section>
-<section class="panel"><h2>Fidelidade à spec</h2><ul class="checks"><li class="yes"><span class="mark">✓</span><span>Um card de retrato por herói, moldura de madeira, prata ou ouro conforme o nível <code>BAG-01, BAG-04</code></span></li><li class="yes"><span class="mark">✓</span><span>Melhor estrela centralizada no topo, sem corte pelo painel e com cores AD-020 (roxo ascendido, chip dourado exaltado) <code>BAG-05, BAG-06</code></span></li><li class="yes"><span class="mark">✓</span><span>Chips de cópia por camada de estrela e selo Fundir que não cobre a estrela <code>BAG-07, BAG-08</code></span></li><li class="yes"><span class="mark">✓</span><span>Cards cinza com "Não encontrado" para heróis não obtidos <code>BAG-09</code></span></li><li class="yes"><span class="mark">✓</span><span>Sem barra de rolagem na Mochila com as dez camadas de todos os heróis <code>BAG-11</code></span></li><li class="yes"><span class="mark">✓</span><span>Escada de fusão com colunas alinhadas, barra de progresso por camada e linha pronta destacada <code>BAG-14, BAG-16</code></span></li><li class="yes"><span class="mark">✓</span><span>Fundir tudo com confirmação, pergunta e prévia que cabe sem estouro <code>BAG-32, BAG-35</code></span></li><li class="yes"><span class="mark">✓</span><span>Trilho do HUD com seis botões, sem Fusão <code>BAG-38</code></span></li><li class="yes"><span class="mark">✓</span><span>Gemas de raridade centralizadas na borda superior dos três tipos de peça <code>BAG-36</code></span></li><li class="yes"><span class="mark">✓</span><span>Todo texto novo em português <code>AD-007</code></span></li><li class="no"><span class="mark">✗</span><span>Molduras de madeira, prata e ouro distintas e atraentes <code>design.md § Card frames</code> — a de madeira lê-se como preto/ferro, a de prata como cinza claro com quatro pontos verdes e só a de ouro tem ornamento claro (achados #1 e #3)</span></li><li class="no"><span class="mark">✗</span><span>Estado de hover do card <code>design.md § Card</code> — o halo é quase invisível (achado #2)</span></li><li class="no"><span class="mark">✗</span><span>Prévia antes/depois da intenção do dono <code>mockup aprovado</code> — a prévia é uma linha única sem rótulos Antes/Depois (achado #6)</span></li></ul></section>
-<section class="panel"><h2>Capturas</h2><div class="screen"><h3>Mochila: grade de cartas</h3><div class="shots"><figure><a href="ui-review/01-bag-grid-desktop.png" target="_blank"><img src="ui-review/01-bag-grid-desktop.png" alt="Grade com Kael 45/1/2, Lyra 4★, Orina 7★ e dois heróis não obtidos" loading="lazy"></a><figcaption><span class="t">Grade com Kael 45/1/2, Lyra 4★, Orina 7★ e dois heróis não obtidos</span><span class="d">Madeira, prata, ouro e cinza lado a lado. Estrela centralizada, chips, Fundir e cartas cinzas.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #3</span></span></figcaption></figure><figure><a href="ui-review/02-bag-grid-full-desktop.png" target="_blank"><img src="ui-review/02-bag-grid-full-desktop.png" alt="Todos os heróis com as dez camadas (45 cada)" loading="lazy"></a><figcaption><span class="t">Todos os heróis com as dez camadas (45 cada)</span><span class="d">Dez chips por carta, sem barra de rolagem (scrollHeight 447 = clientHeight 447).</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #1</span></span></figcaption></figure><figure><a href="ui-review/03-card-hover-desktop.png" target="_blank"><img src="ui-review/03-card-hover-desktop.png" alt="Passar o mouse no card do Kael" loading="lazy"></a><figcaption><span class="t">Passar o mouse no card do Kael</span><span class="d">O halo de hover quase não aparece sobre o pergaminho.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #2</span></span></figcaption></figure><figure><a href="ui-review/04-card-focus-desktop.png" target="_blank"><img src="ui-review/04-card-focus-desktop.png" alt="Foco por teclado no card do Kael" loading="lazy"></a><figcaption><span class="t">Foco por teclado no card do Kael</span><span class="d">Contorno ember de 3 px, bem visível.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure></div><div class="shots phone" style="margin-top:16px"><figure><a href="ui-review/01-bag-grid-phone.png" target="_blank"><img src="ui-review/01-bag-grid-phone.png" alt="Grade com Kael 45/1/2, Lyra 4★, Orina 7★ e dois heróis não obtidos" loading="lazy"></a><figcaption><span class="t">Grade com Kael 45/1/2, Lyra 4★, Orina 7★ e dois heróis não obtidos</span><span class="d">Madeira, prata, ouro e cinza lado a lado. Estrela centralizada, chips, Fundir e cartas cinzas.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #3</span></span></figcaption></figure><figure><a href="ui-review/02-bag-grid-full-phone.png" target="_blank"><img src="ui-review/02-bag-grid-full-phone.png" alt="Todos os heróis com as dez camadas (45 cada)" loading="lazy"></a><figcaption><span class="t">Todos os heróis com as dez camadas (45 cada)</span><span class="d">Dez chips por carta, sem barra de rolagem (scrollHeight 447 = clientHeight 447).</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #1</span></span></figcaption></figure><figure><a href="ui-review/03-card-hover-phone.png" target="_blank"><img src="ui-review/03-card-hover-phone.png" alt="Passar o mouse no card do Kael" loading="lazy"></a><figcaption><span class="t">Passar o mouse no card do Kael</span><span class="d">O halo de hover quase não aparece sobre o pergaminho.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #2</span></span></figcaption></figure><figure><a href="ui-review/04-card-focus-phone.png" target="_blank"><img src="ui-review/04-card-focus-phone.png" alt="Foco por teclado no card do Kael" loading="lazy"></a><figcaption><span class="t">Foco por teclado no card do Kael</span><span class="d">Contorno ember de 3 px, bem visível.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure></div></div><div class="screen"><h3>Mochila: detalhe e escada de fusão</h3><div class="shots"><figure><a href="ui-review/05-ladder-45-1-2-desktop.png" target="_blank"><img src="ui-review/05-ladder-45-1-2-desktop.png" alt="Escada do Kael 45/1/2" loading="lazy"></a><figcaption><span class="t">Escada do Kael 45/1/2</span><span class="d">Colunas alinhadas, barra por camada, linha pronta com borda dourada, botões desabilitados legíveis.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure><figure><a href="ui-review/06-ladder-ready-row-desktop.png" target="_blank"><img src="ui-review/06-ladder-ready-row-desktop.png" alt="Kael com 3 cópias em branco" loading="lazy"></a><figcaption><span class="t">Kael com 3 cópias em branco</span><span class="d">Linha 0★ pronta e linha 1★ em 0/3.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure><figure><a href="ui-review/07-ladder-9-star-desktop.png" target="_blank"><img src="ui-review/07-ladder-9-star-desktop.png" alt="Kael com 1 carta 9★" loading="lazy"></a><figcaption><span class="t">Kael com 1 carta 9★</span><span class="d">Linha máxima com aviso e Fundir tudo desabilitado. Brilhos dourados sobre o chip.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #1</span></span></figcaption></figure></div><div class="shots phone" style="margin-top:16px"><figure><a href="ui-review/05-ladder-45-1-2-phone.png" target="_blank"><img src="ui-review/05-ladder-45-1-2-phone.png" alt="Escada do Kael 45/1/2" loading="lazy"></a><figcaption><span class="t">Escada do Kael 45/1/2</span><span class="d">Colunas alinhadas, barra por camada, linha pronta com borda dourada, botões desabilitados legíveis.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure><figure><a href="ui-review/06-ladder-ready-row-phone.png" target="_blank"><img src="ui-review/06-ladder-ready-row-phone.png" alt="Kael com 3 cópias em branco" loading="lazy"></a><figcaption><span class="t">Kael com 3 cópias em branco</span><span class="d">Linha 0★ pronta e linha 1★ em 0/3.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure><figure><a href="ui-review/07-ladder-9-star-phone.png" target="_blank"><img src="ui-review/07-ladder-9-star-phone.png" alt="Kael com 1 carta 9★" loading="lazy"></a><figcaption><span class="t">Kael com 1 carta 9★</span><span class="d">Linha máxima com aviso e Fundir tudo desabilitado. Brilhos dourados sobre o chip.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #1</span></span></figcaption></figure></div></div><div class="screen"><h3>Fundir tudo</h3><div class="shots"><figure><a href="ui-review/08-fuse-all-confirm-desktop.png" target="_blank"><img src="ui-review/08-fuse-all-confirm-desktop.png" alt="Confirmação com pergunta e prévia" loading="lazy"></a><figcaption><span class="t">Confirmação com pergunta e prévia</span><span class="d">Pergunta, prévia que cabe sem estouro (630/630) e Sim, fundir / Não.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #6</span></span></figcaption></figure><figure><a href="ui-review/09-fuse-all-result-desktop.png" target="_blank"><img src="ui-review/09-fuse-all-result-desktop.png" alt="Resultado: 22 fusões" loading="lazy"></a><figcaption><span class="t">Resultado: 22 fusões</span><span class="d">Linha de resultado escura sob o Fundir tudo.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure><figure><a href="ui-review/10-fuse-all-raised-desktop.png" target="_blank"><img src="ui-review/10-fuse-all-raised-desktop.png" alt="Resultado com duas habilidades elevadas" loading="lazy"></a><figcaption><span class="t">Resultado com duas habilidades elevadas</span><span class="d">Texto longo em três linhas, com o "2" sozinho na última.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #5</span></span></figcaption></figure><figure><a href="ui-review/11-fusion-busy-desktop.png" target="_blank"><img src="ui-review/11-fusion-busy-desktop.png" alt="Fusão em andamento (requisição retida)" loading="lazy"></a><figcaption><span class="t">Fusão em andamento (requisição retida)</span><span class="d">Botões esmaecidos, igual ao estado desabilitado comum.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #4</span></span></figcaption></figure><figure><a href="ui-review/12-fusion-error-desktop.png" target="_blank"><img src="ui-review/12-fusion-error-desktop.png" alt="Erro ao fundir" loading="lazy"></a><figcaption><span class="t">Erro ao fundir</span><span class="d">Faixa terracota legível, escada intacta.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure></div><div class="shots phone" style="margin-top:16px"><figure><a href="ui-review/08-fuse-all-confirm-phone.png" target="_blank"><img src="ui-review/08-fuse-all-confirm-phone.png" alt="Confirmação com pergunta e prévia" loading="lazy"></a><figcaption><span class="t">Confirmação com pergunta e prévia</span><span class="d">Pergunta, prévia que cabe sem estouro (630/630) e Sim, fundir / Não.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #6</span></span></figcaption></figure><figure><a href="ui-review/09-fuse-all-result-phone.png" target="_blank"><img src="ui-review/09-fuse-all-result-phone.png" alt="Resultado: 22 fusões" loading="lazy"></a><figcaption><span class="t">Resultado: 22 fusões</span><span class="d">Linha de resultado escura sob o Fundir tudo.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure><figure><a href="ui-review/10-fuse-all-raised-phone.png" target="_blank"><img src="ui-review/10-fuse-all-raised-phone.png" alt="Resultado com duas habilidades elevadas" loading="lazy"></a><figcaption><span class="t">Resultado com duas habilidades elevadas</span><span class="d">Texto longo em três linhas, com o "2" sozinho na última.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #5</span></span></figcaption></figure><figure><a href="ui-review/11-fusion-busy-phone.png" target="_blank"><img src="ui-review/11-fusion-busy-phone.png" alt="Fusão em andamento (requisição retida)" loading="lazy"></a><figcaption><span class="t">Fusão em andamento (requisição retida)</span><span class="d">Botões esmaecidos, igual ao estado desabilitado comum.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #4</span></span></figcaption></figure><figure><a href="ui-review/12-fusion-error-phone.png" target="_blank"><img src="ui-review/12-fusion-error-phone.png" alt="Erro ao fundir" loading="lazy"></a><figcaption><span class="t">Erro ao fundir</span><span class="d">Faixa terracota legível, escada intacta.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure></div></div><div class="screen"><h3>HUD</h3><div class="shots"><figure><a href="ui-review/13-rail-six-desktop.png" target="_blank"><img src="ui-review/13-rail-six-desktop.png" alt="Trilho com seis botões" loading="lazy"></a><figcaption><span class="t">Trilho com seis botões</span><span class="d">Sem Fusão; botões alinhados.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure></div><div class="shots phone" style="margin-top:16px"><figure><a href="ui-review/13-rail-six-phone.png" target="_blank"><img src="ui-review/13-rail-six-phone.png" alt="Trilho com seis botões" loading="lazy"></a><figcaption><span class="t">Trilho com seis botões</span><span class="d">Sem Fusão; botões alinhados.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure></div></div><div class="screen"><h3>Equipamento: gemas de raridade</h3><div class="shots"><figure><a href="ui-review/14-gems-bag-desktop.png" target="_blank"><img src="ui-review/14-gems-bag-desktop.png" alt="Mochila de equipamentos com uma peça de cada raridade" loading="lazy"></a><figcaption><span class="t">Mochila de equipamentos com uma peça de cada raridade</span><span class="d">Gemas centralizadas na borda superior; peças vestidas também.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #7</span></span></figcaption></figure><figure><a href="ui-review/15-gems-slots-desktop.png" target="_blank"><img src="ui-review/15-gems-slots-desktop.png" alt="Mesma tela, foco nos encaixes vestidos" loading="lazy"></a><figcaption><span class="t">Mesma tela, foco nos encaixes vestidos</span><span class="d">Gemas centralizadas nos encaixes.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #7</span></span></figcaption></figure><figure><a href="ui-review/16-gems-bulk-sell-desktop.png" target="_blank"><img src="ui-review/16-gems-bulk-sell-desktop.png" alt="Modo Vender várias" loading="lazy"></a><figcaption><span class="t">Modo Vender várias</span><span class="d">Gemas mantidas centralizadas.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure></div><div class="shots phone" style="margin-top:16px"><figure><a href="ui-review/14-gems-bag-phone.png" target="_blank"><img src="ui-review/14-gems-bag-phone.png" alt="Mochila de equipamentos com uma peça de cada raridade" loading="lazy"></a><figcaption><span class="t">Mochila de equipamentos com uma peça de cada raridade</span><span class="d">Gemas centralizadas na borda superior; peças vestidas também.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #7</span></span></figcaption></figure><figure><a href="ui-review/15-gems-slots-phone.png" target="_blank"><img src="ui-review/15-gems-slots-phone.png" alt="Mesma tela, foco nos encaixes vestidos" loading="lazy"></a><figcaption><span class="t">Mesma tela, foco nos encaixes vestidos</span><span class="d">Gemas centralizadas nos encaixes.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #7</span></span></figcaption></figure><figure><a href="ui-review/16-gems-bulk-sell-phone.png" target="_blank"><img src="ui-review/16-gems-bulk-sell-phone.png" alt="Modo Vender várias" loading="lazy"></a><figcaption><span class="t">Modo Vender várias</span><span class="d">Gemas mantidas centralizadas.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure></div></div></section>
-<section class="panel"><h2>Achados</h2><article class="finding"><div><div class="top"><span class="chip sev-media">#1 · Média</span><strong>Brilhos dourados desenhados por cima dos chips e do texto</strong></div><dl><dt>Tela</dt><dd>Mochila (desktop e celular)</dd><dt>O que está errado</dt><dd>O <code>::after</code> da moldura de ouro (círculo claro de 8 px em 70% / 88%) fica acima dos filhos e cai sobre os chips "7★×45" e "9★×45"; no card 9★ do detalhe cai sobre o chip.</dd><dt>Como deveria ficar</dt><dd>Os brilhos ficam só na borda e no retrato, nunca sobre texto.</dd><dt>Correção exata</dt><dd>Em <code>.bag-card.frame-gold::after</code> trocar <code>background-position: 18% 12%, 82% 20%, 70% 88%</code> por <code>18% 8%, 82% 14%, 50% 99%</code> (terceiro ponto na borda inferior) e acrescentar <code>.bag-card-chips, .bag-card-ribbon, .bag-card-missing { position: relative; z-index: 1; }</code>.</dd><dt>Arquivo</dt><dd><code>game/public/style.css (linhas 1851-1865)</code></dd></dl></div><a href="ui-review/02-bag-grid-full-desktop.png" target="_blank"><img src="ui-review/02-bag-grid-full-desktop.png" alt="Captura do achado #1"></a></article><article class="finding"><div><div class="top"><span class="chip sev-media">#2 · Média</span><strong>Hover do card quase invisível</strong></div><dl><dt>Tela</dt><dd>Mochila (desktop)</dd><dt>O que está errado</dt><dd><code>button.bag-card:hover:not(:disabled)</code> soma um anel de 4 px <code>rgb(243 213 138 / .5)</code> sobre pergaminho; a captura 03 é praticamente igual à 01 (438 bytes de diferença em 640 KB).</dd><dt>Como deveria ficar</dt><dd>Anel opaco e visível, que diga "clicável".</dd><dt>Correção exata</dt><dd>Trocar o anel por <code>0 0 0 4px var(--gold-400)</code> e adicionar <code>filter: brightness(1.06)</code>.</dd><dt>Arquivo</dt><dd><code>game/public/style.css (linha 1697)</code></dd></dl></div><a href="ui-review/03-card-hover-desktop.png" target="_blank"><img src="ui-review/03-card-hover-desktop.png" alt="Captura do achado #2"></a></article><article class="finding"><div><div class="top"><span class="chip sev-media">#3 · Média</span><strong>Moldura de madeira escura demais; cantos de ferro sem detalhe</strong></div><dl><dt>Tela</dt><dd>Mochila e detalhe (desktop)</dd><dt>O que está errado</dt><dd>Borda <code>--wood-600</code> com anel <code>--wood-900</code> lê-se como preto; os cantos são quadrados cinza lisos de 12 px. Não lembra a madeira com cantos de ferro do desenho do dono. Prata: só quatro pontos verdes, pouca trepadeira. Ouro: boa, runas e brilhos legíveis.</dd><dt>Como deveria ficar</dt><dd>Madeira marrom quente com cantos de ferro com rebite; prata com folhas nos cantos e ao longo da borda.</dd><dt>Correção exata</dt><dd>Em <code>.bag-card.frame-wood</code> usar <code>border: 4px solid #a06a35</code> e <code>--card-shadow: 0 0 0 2px var(--wood-800), inset 0 0 0 1px #d49a5c</code>; em <code>.frame-wood::before</code> acrescentar por canto <code>radial-gradient(circle, #cfcfcf 0 1.5px, transparent 2px)</code> como rebite. Em <code>.frame-silver::before</code> acrescentar dois círculos verdes de 10 px por canto para formar a trepadeira. A arte pintada do dono fica como tarefa de acompanhamento (9-slice em <code>border-image</code>).</dd><dt>Arquivo</dt><dd><code>game/public/style.css (linhas 1793-1850)</code></dd></dl></div><a href="ui-review/01-bag-grid-desktop.png" target="_blank"><img src="ui-review/01-bag-grid-desktop.png" alt="Captura do achado #3"></a></article><article class="finding"><div><div class="top"><span class="chip sev-baixa">#4 · Baixa</span><strong>Estado em andamento sem feedback próprio</strong></div><dl><dt>Tela</dt><dd>Detalhe da escada (desktop)</dd><dt>O que está errado</dt><dd>Durante a requisição os botões ficam esmaecidos, idênticos ao desabilitado; o jogador não sabe se algo está acontecendo.</dd><dt>Como deveria ficar</dt><dd>Texto "Fundindo..." no botão clicado e cursor de progresso.</dd><dt>Correção exata</dt><dd>Com <code>fusionBusy</code> ativo, trocar o texto do botão da linha e de <code>fusion-all</code> por <code>Fundindo...</code> e aplicar <code>.bag-detail button:disabled { cursor: progress }</code>.</dd><dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/fusionLadderView.js, game/public/style.css</code></dd></dl></div><a href="ui-review/11-fusion-busy-desktop.png" target="_blank"><img src="ui-review/11-fusion-busy-desktop.png" alt="Captura do achado #4"></a></article><article class="finding"><div><div class="top"><span class="chip sev-baixa">#5 · Baixa</span><strong>Resultado longo quebra em três linhas com órfão</strong></div><dl><dt>Tela</dt><dd>Fundir tudo, habilidades elevadas (desktop)</dd><dt>O que está errado</dt><dd><code>.fusion-result</code> usa 20 px; "4 fusões. Melhor carta ... no nível 2" quebra deixando "2" sozinho na terceira linha.</dd><dt>Como deveria ficar</dt><dd>Resultado em 16 px, linhas equilibradas.</dd><dt>Correção exata</dt><dd>Adicionar <code>.bag-detail .fusion-result { font-size: 16px; line-height: 1.4; text-wrap: balance; }</code>.</dd><dt>Arquivo</dt><dd><code>game/public/style.css (após a linha 1673)</code></dd></dl></div><a href="ui-review/10-fuse-all-raised-desktop.png" target="_blank"><img src="ui-review/10-fuse-all-raised-desktop.png" alt="Captura do achado #5"></a></article><article class="finding"><div><div class="top"><span class="chip sev-baixa">#6 · Baixa</span><strong>Prévia sem rótulos antes/depois</strong></div><dl><dt>Tela</dt><dd>Fundir tudo (desktop)</dd><dt>O que está errado</dt><dd>A prévia é uma linha de 14 px com seta; o mockup do dono pede antes/depois legível.</dd><dt>Como deveria ficar</dt><dd>Duas linhas: "Antes: 45×0★ + 1×1★ + 2×2★" e "Depois: 1×1★ + 1×2★ + 2×3★".</dd><dt>Correção exata</dt><dd>Em <code>previewText</code> (ou na view) dividir em duas linhas com os prefixos <code>Antes:</code> e <code>Depois:</code> e definir <code>.fusion-all-preview { font-size: 15px }</code>.</dd><dt>Arquivo</dt><dd><code>game/src/domain/heroes/bagCards.js, game/public/style.css</code></dd></dl></div><a href="ui-review/08-fuse-all-confirm-desktop.png" target="_blank"><img src="ui-review/08-fuse-all-confirm-desktop.png" alt="Captura do achado #6"></a></article><article class="finding"><div><div class="top"><span class="chip sev-baixa">#7 · Baixa</span><strong>Gemas de raridade muito pequenas</strong></div><dl><dt>Tela</dt><dd>Equipamento (desktop)</dd><dt>O que está errado</dt><dd>As gemas medem cerca de 5 px; a raridade só se distingue pela cor da borda.</dd><dt>Como deveria ficar</dt><dd>Gemas de pelo menos 8 px.</dd><dt>Correção exata</dt><dd>Aumentar o tamanho de cada gema de <code>.piece-gems</code> em cerca de 60%, mantendo <code>left: 50%; transform: translateX(-50%)</code>.</dd><dt>Arquivo</dt><dd><code>game/public/style.css (<code>.piece-gems</code>)</code></dd></dl></div><a href="ui-review/14-gems-bag-desktop.png" target="_blank"><img src="ui-review/14-gems-bag-desktop.png" alt="Captura do achado #7"></a></article><article class="finding"><div><div class="top"><span class="chip sev-baixa">#8 · Baixa</span><strong>Texto do celular minúsculo (já existente)</strong></div><dl><dt>Tela</dt><dd>Todas as telas (celular)</dd><dt>O que está errado</dt><dd>O jogo é um canvas 1280×720 reduzido para 390 px: chips de 11 px ficam com cerca de 4 px. Vale para todas as telas, não só esta feature.</dd><dt>Como deveria ficar</dt><dd>Fora do escopo desta feature; tratar em tarefa própria (layout responsivo das janelas).</dd><dt>Correção exata</dt><dd>Nenhuma mudança nesta feature.</dd><dt>Arquivo</dt><dd><code>game/src (escala do canvas)</code></dd></dl></div><a href="ui-review/02-bag-grid-full-phone.png" target="_blank"><img src="ui-review/02-bag-grid-full-phone.png" alt="Captura do achado #8"></a></article></section>
-<section class="panel"><h2>Sugestões</h2><ul class="checks"><li><span class="mark">✦</span><span>A carta aberta no detalhe repete o selo Fundir; como a escada já mostra os botões, o selo pode sumir ali.</span></li><li><span class="mark">✦</span><span>Nas cartas com nome de uma e de duas linhas, os chips começam em alturas diferentes; reservar duas linhas de altura mínima na fita alinharia os chips entre cartas.</span></li><li><span class="mark">✦</span><span>A arte pintada do dono (madeira com cantos de ferro, prata com trepadeiras verdes, ouro com runas e brilhos) é mais rica do que CSS alcança. Com as correções #1 e #3 as molduras em CSS servem como versão 1; a arte entra depois como 9-slice em <code>border-image</code>.</span></li></ul></section>
-<section class="panel"><h2>Console e recursos</h2><p class="empty">As 24 execuções do script de capturas passaram sem falha; o script não registra o console, então 404 e erros de console não foram medidos nesta revisão.</p></section>
-<footer>Revisão do ui-artist · 2026-11-17</footer></main></body></html>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Mochila: cartas de herói e escada de fusão (rodada 2)</h1>
+                <div class="meta">
+                    <code>.specs/features/hero-bag-cards</code> · commits <code>c88b956 a 71a1b50</code> · 2026-11-18 · local (vite dev, backend falso)
+                </div>
+            </div>
+            <span class="chip verdict changes">ALTERAÇÕES</span>
+        </div>
+        <p style="margin-top:16px">Os achados #1 a #6 e as sugestões D25 e D26 estão resolvidos: molduras distintas, hover visível, brilhos fora do texto, Fundindo... no botão certo, resultado em 16 px e prévia Antes/Depois que cabe. O achado #7 ficou pela metade: as gemas têm 10 px, mas as quatro gemas lendárias se encostam, contra o critério da T20 (novo achado #9, baixo). O achado #8 segue fora do escopo (TD-010).</p>
+        <div class="stats">
+            <div class="stat"><div class="n">17</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">34</div><div class="l">capturas (desktop + celular)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">1</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Molduras de madeira (marrom quente, rebites), prata (folhas) e ouro distintas à primeira vista e em tons de cinza <code>design.md § Card frames</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Hover do card: faixa dourada opaca e card mais claro <code>design.md § Card</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Brilhos só na borda e no retrato, nunca sobre chip, fita, selo ou texto <code>design.md § Card</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Selo Fundir oculto no card do detalhe; chips alinhados entre cards (fita de duas linhas) <code>D25, D26</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Fundindo... no botão clicado e cursor de progresso <code>D23, BAG-32</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Prévia em duas linhas Antes e Depois, 15 px, sem estouro; resultado em 16 px <code>D24, BAG-35</code></span></li>
+            <li class="no"><span class="mark">✗</span><span>Gemas de raridade com 10 px e as quatro gemas lendárias sem se tocar <code>design.md § Rarity gems (T20) — as pontas das quatro gemas se encostam (achado #9)</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Todo texto novo em português <code>AD-007</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Um card por herói, estrela centralizada, chips por camada, cards cinza Não encontrado, sem rolagem, trilho de seis botões <code>BAG-01 a BAG-11, BAG-38</code></span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>Mochila: grade de cartas</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/01-bag-grid-desktop.png" target="_blank"><img src="ui-review/01-bag-grid-desktop.png" alt="Grade com Kael 45/1/2, Lyra 4★, Orina 7★ e dois heróis não obtidos" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Grade com Kael 45/1/2, Lyra 4★, Orina 7★ e dois heróis não obtidos</span>
+                        <span class="d">Madeira marrom com rebites, prata com folhas, ouro e cinza. Chips na mesma altura nos cinco cards (D26).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/02-bag-grid-full-desktop.png" target="_blank"><img src="ui-review/02-bag-grid-full-desktop.png" alt="Todos os heróis com as dez camadas (45 cada)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Todos os heróis com as dez camadas (45 cada)</span>
+                        <span class="d">Sem barra de rolagem (447 ≤ 447); brilhos só na borda e no retrato. Em uma execução os retratos preguiçosos (loading=lazy) ainda não tinham carregado; a captura foi refeita.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/03-card-hover-desktop.png" target="_blank"><img src="ui-review/03-card-hover-desktop.png" alt="Passar o mouse no card do Kael" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Passar o mouse no card do Kael</span>
+                        <span class="d">Faixa dourada opaca fora do anel escuro e card mais claro que na 01.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/04-card-focus-desktop.png" target="_blank"><img src="ui-review/04-card-focus-desktop.png" alt="Foco por teclado no card do Kael" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Foco por teclado no card do Kael</span>
+                        <span class="d">Contorno de foco visível.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/01-bag-grid-phone.png" target="_blank"><img src="ui-review/01-bag-grid-phone.png" alt="Grade com Kael 45/1/2, Lyra 4★, Orina 7★ e dois heróis não obtidos" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Grade com Kael 45/1/2, Lyra 4★, Orina 7★ e dois heróis não obtidos</span>
+                        <span class="d">Madeira marrom com rebites, prata com folhas, ouro e cinza. Chips na mesma altura nos cinco cards (D26).</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/02-bag-grid-full-phone.png" target="_blank"><img src="ui-review/02-bag-grid-full-phone.png" alt="Todos os heróis com as dez camadas (45 cada)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Todos os heróis com as dez camadas (45 cada)</span>
+                        <span class="d">Sem barra de rolagem (447 ≤ 447); brilhos só na borda e no retrato. Em uma execução os retratos preguiçosos (loading=lazy) ainda não tinham carregado; a captura foi refeita.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/03-card-hover-phone.png" target="_blank"><img src="ui-review/03-card-hover-phone.png" alt="Passar o mouse no card do Kael" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Passar o mouse no card do Kael</span>
+                        <span class="d">Faixa dourada opaca fora do anel escuro e card mais claro que na 01.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/04-card-focus-phone.png" target="_blank"><img src="ui-review/04-card-focus-phone.png" alt="Foco por teclado no card do Kael" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Foco por teclado no card do Kael</span>
+                        <span class="d">Contorno de foco visível.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Mochila: detalhe e escada de fusão</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/05-ladder-45-1-2-desktop.png" target="_blank"><img src="ui-review/05-ladder-45-1-2-desktop.png" alt="Escada do Kael 45/1/2" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Escada do Kael 45/1/2</span>
+                        <span class="d">Sem selo Fundir no card do detalhe (D25); moldura de madeira com rebites.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/06-ladder-ready-row-desktop.png" target="_blank"><img src="ui-review/06-ladder-ready-row-desktop.png" alt="Kael com 3 cópias em branco" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Kael com 3 cópias em branco</span>
+                        <span class="d">Linha 0★ pronta e linha 1★ em 0/3.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/07-ladder-9-star-desktop.png" target="_blank"><img src="ui-review/07-ladder-9-star-desktop.png" alt="Kael com 1 carta 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Kael com 1 carta 9★</span>
+                        <span class="d">Linha máxima com aviso; brilhos fora do chip.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/05-ladder-45-1-2-phone.png" target="_blank"><img src="ui-review/05-ladder-45-1-2-phone.png" alt="Escada do Kael 45/1/2" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Escada do Kael 45/1/2</span>
+                        <span class="d">Sem selo Fundir no card do detalhe (D25); moldura de madeira com rebites.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/06-ladder-ready-row-phone.png" target="_blank"><img src="ui-review/06-ladder-ready-row-phone.png" alt="Kael com 3 cópias em branco" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Kael com 3 cópias em branco</span>
+                        <span class="d">Linha 0★ pronta e linha 1★ em 0/3.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/07-ladder-9-star-phone.png" target="_blank"><img src="ui-review/07-ladder-9-star-phone.png" alt="Kael com 1 carta 9★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Kael com 1 carta 9★</span>
+                        <span class="d">Linha máxima com aviso; brilhos fora do chip.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Fundir tudo</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/08-fuse-all-confirm-desktop.png" target="_blank"><img src="ui-review/08-fuse-all-confirm-desktop.png" alt="Confirmação com Antes e Depois" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Confirmação com Antes e Depois</span>
+                        <span class="d">Duas linhas, 15 px, sem estouro (630/630 nas duas).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/09-fuse-all-result-desktop.png" target="_blank"><img src="ui-review/09-fuse-all-result-desktop.png" alt="Resultado: 22 fusões" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Resultado: 22 fusões</span>
+                        <span class="d">Linha de resultado escura sob o Fundir tudo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/10-fuse-all-raised-desktop.png" target="_blank"><img src="ui-review/10-fuse-all-raised-desktop.png" alt="Resultado com duas habilidades elevadas" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Resultado com duas habilidades elevadas</span>
+                        <span class="d">Texto em 16 px, duas linhas, sem palavra sozinha.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/11-fusion-busy-desktop.png" target="_blank"><img src="ui-review/11-fusion-busy-desktop.png" alt="Fusão em andamento: linha 0★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fusão em andamento: linha 0★</span>
+                        <span class="d">Só o botão da linha mostra Fundindo...; os demais mantêm o texto.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/17-fuse-all-busy-desktop.png" target="_blank"><img src="ui-review/17-fuse-all-busy-desktop.png" alt="Fusão em andamento: Fundir tudo" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fusão em andamento: Fundir tudo</span>
+                        <span class="d">Só o Fundir tudo mostra Fundindo...; os botões das linhas mantêm o texto.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/12-fusion-error-desktop.png" target="_blank"><img src="ui-review/12-fusion-error-desktop.png" alt="Erro ao fundir" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Erro ao fundir</span>
+                        <span class="d">Faixa terracota legível, escada intacta.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/08-fuse-all-confirm-phone.png" target="_blank"><img src="ui-review/08-fuse-all-confirm-phone.png" alt="Confirmação com Antes e Depois" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Confirmação com Antes e Depois</span>
+                        <span class="d">Duas linhas, 15 px, sem estouro (630/630 nas duas).</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/09-fuse-all-result-phone.png" target="_blank"><img src="ui-review/09-fuse-all-result-phone.png" alt="Resultado: 22 fusões" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Resultado: 22 fusões</span>
+                        <span class="d">Linha de resultado escura sob o Fundir tudo.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/10-fuse-all-raised-phone.png" target="_blank"><img src="ui-review/10-fuse-all-raised-phone.png" alt="Resultado com duas habilidades elevadas" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Resultado com duas habilidades elevadas</span>
+                        <span class="d">Texto em 16 px, duas linhas, sem palavra sozinha.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/11-fusion-busy-phone.png" target="_blank"><img src="ui-review/11-fusion-busy-phone.png" alt="Fusão em andamento: linha 0★" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fusão em andamento: linha 0★</span>
+                        <span class="d">Só o botão da linha mostra Fundindo...; os demais mantêm o texto.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/17-fuse-all-busy-phone.png" target="_blank"><img src="ui-review/17-fuse-all-busy-phone.png" alt="Fusão em andamento: Fundir tudo" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fusão em andamento: Fundir tudo</span>
+                        <span class="d">Só o Fundir tudo mostra Fundindo...; os botões das linhas mantêm o texto.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/12-fusion-error-phone.png" target="_blank"><img src="ui-review/12-fusion-error-phone.png" alt="Erro ao fundir" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Erro ao fundir</span>
+                        <span class="d">Faixa terracota legível, escada intacta.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>HUD</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/13-rail-six-desktop.png" target="_blank"><img src="ui-review/13-rail-six-desktop.png" alt="Trilho com seis botões" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Trilho com seis botões</span>
+                        <span class="d">Sem Fusão; botões alinhados.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/13-rail-six-phone.png" target="_blank"><img src="ui-review/13-rail-six-phone.png" alt="Trilho com seis botões" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Trilho com seis botões</span>
+                        <span class="d">Sem Fusão; botões alinhados.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Equipamento: gemas de raridade</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/14-gems-bag-desktop.png" target="_blank"><img src="ui-review/14-gems-bag-desktop.png" alt="Mochila de equipamentos com uma peça de cada raridade" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Mochila de equipamentos com uma peça de cada raridade</span>
+                        <span class="d">Gemas de 10 px centralizadas; as 4 gemas LENDÁRIAS encostam ponta com ponta (achado #9).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #9</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/15-gems-slots-desktop.png" target="_blank"><img src="ui-review/15-gems-slots-desktop.png" alt="Mesma tela, encaixes vestidos" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Mesma tela, encaixes vestidos</span>
+                        <span class="d">Armadura lendária com 4 gemas encostadas (achado #9).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #9</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/16-gems-bulk-sell-desktop.png" target="_blank"><img src="ui-review/16-gems-bulk-sell-desktop.png" alt="Modo Vender várias" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Modo Vender várias</span>
+                        <span class="d">Gemas centralizadas; peça lendária com gemas encostadas (achado #9).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #9</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/14-gems-bag-phone.png" target="_blank"><img src="ui-review/14-gems-bag-phone.png" alt="Mochila de equipamentos com uma peça de cada raridade" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Mochila de equipamentos com uma peça de cada raridade</span>
+                        <span class="d">Gemas de 10 px centralizadas; as 4 gemas LENDÁRIAS encostam ponta com ponta (achado #9).</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #9</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/15-gems-slots-phone.png" target="_blank"><img src="ui-review/15-gems-slots-phone.png" alt="Mesma tela, encaixes vestidos" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Mesma tela, encaixes vestidos</span>
+                        <span class="d">Armadura lendária com 4 gemas encostadas (achado #9).</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #9</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/16-gems-bulk-sell-phone.png" target="_blank"><img src="ui-review/16-gems-bulk-sell-phone.png" alt="Modo Vender várias" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Modo Vender várias</span>
+                        <span class="d">Gemas centralizadas; peça lendária com gemas encostadas (achado #9).</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #9</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#9 · Baixa</span><strong>As quatro gemas lendárias encostam ponta com ponta</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Equipamento: mochila, encaixes e Vender várias (desktop e celular), shots 14, 15 e 16</dd>
+                    <dt>Seletor</dt><dd><code>.piece-gems</code> / <code>.piece-gem</code></dd>
+                    <dt>O que está errado</dt><dd>Cada gema é um quadrado de 10 px girado 45° (diagonal de cerca de 14 px) com passo de 15 px (10 px mais gap de 5 px). A folga entre as pontas é de cerca de 1 px e as bordas escuras se fundem: as quatro gemas da peça LENDÁRIA parecem uma fileira contínua, contra o critério da T20 (não se tocam).</dd>
+                    <dt>Como deveria ficar</dt><dd>Gemas de 9 px (diagonal de cerca de 12,7 px, ainda com mais de 8 px de cor) e gap de 6 px: passo de 15 px, folga de cerca de 2,3 px e largura visual de cerca de 58 px, dentro do tile de 62 px.</dd>
+                    <dt>Correção exata</dt><dd>Em <code>.piece-gem</code> trocar <code>width: 10px; height: 10px</code> por <code>width: 9px; height: 9px</code> e em <code>.piece-gems</code> trocar <code>gap: 5px</code> por <code>gap: 6px</code>, mantendo <code>left: 50%; transform: translateX(-50%)</code>. Atualizar o teste que fixa 10 px, se houver.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css</code> (linhas 2541 a 2557)</dd>
+                </dl>
+            </div>
+            <a href="ui-review/14-gems-bag-desktop.png" target="_blank"><img src="ui-review/14-gems-bag-desktop.png" alt="Captura do achado #9"></a>
+        </article>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <p>Estado dos achados da rodada 1 e das sugestões:</p>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>Achado #1 (brilhos sobre o texto): resolvido. Shots 02 e 07 mostram os brilhos só na borda e no retrato.</span></li>
+            <li><span class="mark">✦</span><span>Achado #2 (hover): resolvido. Shot 03: faixa dourada opaca e card mais claro.</span></li>
+            <li><span class="mark">✦</span><span>Achado #3 (molduras): resolvido. Shots 01, 02 e 05: madeira marrom quente com rebite claro, prata com três folhas por canto, ouro; distintas também em cinza.</span></li>
+            <li><span class="mark">✦</span><span>Achado #4 (Fundindo...): resolvido. Shots 11 (botão da linha) e 17 (Fundir tudo); os outros botões mantêm o texto.</span></li>
+            <li><span class="mark">✦</span><span>Achado #5 (resultado): resolvido. Shot 10: 16 px, duas linhas, sem palavra sozinha.</span></li>
+            <li><span class="mark">✦</span><span>Achado #6 (Antes/Depois): resolvido. Shot 08: duas linhas de 15 px; sonda 630/630 em Antes e em Depois, nos dois tamanhos de tela.</span></li>
+            <li><span class="mark">✦</span><span>Achado #7 (gemas): parcialmente resolvido. As gemas medem 10 px, estão centralizadas e dentro do tile (shots 14 a 16), mas as quatro lendárias se tocam: novo achado #9.</span></li>
+            <li><span class="mark">✦</span><span>Achado #8 (texto pequeno no celular): fora do escopo, tratado em TD-010.</span></li>
+            <li><span class="mark">✦</span><span>Sugestão do selo Fundir no detalhe (D25): resolvida, shot 05. Sugestão dos chips na mesma altura (D26): resolvida, shots 01 e 02. A arte pintada em 9-slice continua como acompanhamento.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <p class="empty">As 26 execuções do script de capturas passaram; o script não registra o console, então 404 e erros de console não foram medidos.</p>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-18</footer>
+</main>
+</body>
+</html>

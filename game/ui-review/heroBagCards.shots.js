@@ -90,7 +90,9 @@ test('fuse all', async ({ page }, testInfo) => {
     await page.getByTestId('fusion-all').click();
     await expect(page.getByTestId('fusion-all-confirm')).toBeVisible();
     await shot(page, testInfo, '08-fuse-all-confirm');
-    console.log(`PROBE preview (${testInfo.project.name}): ${await page.getByTestId('fusion-all-preview').evaluate((n) => `${n.scrollWidth}/${n.clientWidth}`)}`);
+    const probe = (id) => page.getByTestId(id).evaluate((n) => `${n.scrollWidth}/${n.clientWidth}`);
+
+    console.log(`PROBE preview (${testInfo.project.name}): before ${await probe('fusion-all-before')} after ${await probe('fusion-all-after')}`);
     await page.getByTestId('fusion-all-yes').click();
     await expect(page.getByTestId('fusion-result')).toBeVisible();
     await page.mouse.move(0, 0);
@@ -120,8 +122,28 @@ test('busy', async ({ page }, testInfo) => {
     await openHero(page, 'kael');
     await page.getByTestId('fusion-button-kael-0').click();
     await expect(page.getByTestId('fusion-button-kael-0')).toBeDisabled();
+    await expect(page.getByTestId('fusion-button-kael-0')).toHaveText('Fundindo...');
     await page.mouse.move(0, 0);
     await shot(page, testInfo, '11-fusion-busy');
+    release();
+});
+
+test('fuse all busy', async ({ page }, testInfo) => {
+    await startWith(page, KAEL_LADDER);
+
+    let release;
+    const held = new Promise((resolve) => { release = resolve; });
+
+    await page.route('**/api/heroes/kael/fuse-all', async (route) => {
+        await held;
+        await route.fallback();
+    });
+    await openHero(page, 'kael');
+    await page.getByTestId('fusion-all').click();
+    await page.getByTestId('fusion-all-yes').click();
+    await expect(page.getByTestId('fusion-all')).toHaveText('Fundindo...');
+    await page.mouse.move(0, 0);
+    await shot(page, testInfo, '17-fuse-all-busy');
     release();
 });
 
