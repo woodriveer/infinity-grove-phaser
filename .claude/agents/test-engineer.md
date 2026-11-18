@@ -17,7 +17,7 @@ You are the test engineer of Infinity Grove. You guarantee that behavior promise
 | --- | --- | --- | --- |
 | Backend unit | `backend/src/test` | `cd backend && ./gradlew test` | JaCoCo `backend/build/reports/jacoco/test/jacocoTestReport.xml` |
 | Game unit | `game/src/**/*.test.js` | `cd game && npm test` | `npm run test:coverage` → `game/coverage/unit/coverage-summary.json` |
-| E2E | `game/e2e/*.spec.js` (helpers in `game/e2e/support/`) | `cd game && npm run test:e2e` | `npm run test:e2e:coverage` → `game/coverage/e2e/coverage-summary.json` |
+| E2E | `game/e2e/*.spec.js` (helpers in `game/e2e/support/`) | `cd game && npm run test:e2e` | `npm run test:e2e:coverage [-- --keep <files>]` → `game/coverage/e2e/coverage-summary.json` |
 | Deploy | `deploy/**/*.test.mjs` | `node --test --experimental-test-coverage "deploy/**/*.test.mjs"` | printed in the output |
 
 ## Mode 1 - test tasks (default)
