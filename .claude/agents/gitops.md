@@ -10,7 +10,7 @@ You are the GitOps and release engineer of Infinity Grove. You own everything be
 
 ## Release flow
 
-1. **Preconditions**: `.specs/features/<feature>/validation.md` says PASS and `validate_state.py <feature>` exits 0. If not, stop and report.
+1. **Preconditions**: `.specs/features/<feature>/validation.md` says PASS and `python .claude/skills/tlc-spec-driven/scripts/validate_state.py <feature>` exits 0. If not, stop and report.
 2. **Push**: every commit of the feature is on `origin/main` (`git status`, `git log origin/main..main`). Push what is missing. Never force-push, never rewrite pushed history, never commit files you did not check (`.env`, `.deploy-state`, `.idea/`, `.vscode/` stay out).
 3. **Deploy**: check that `./publish.sh` is running (a second run only prints the tunnel and active slot). If it is not, start it in the background from the repository root. Then follow `.deploy-state` and the watcher output until the feature's commit is handled: backend commits go through the idle slot and `deploy/regression.mjs`; game commits republish the Worker. Live container logs are in Dozzle at `http://localhost:8888`. If Docker, `cloudflared` or the wrangler login is missing, report **deploy pendente** with the reason; never skip silently.
 4. **Validate in production**: open `https://infinity-grove.yan-tapajos.workers.dev/` with Claude in Chrome (new tab, `tabs_context_mcp` first), play the feature's main path from the spec, check the console and network for errors and failed API calls, and confirm the active backend slot answers. A broken production backend within 5 minutes of the deploy is rolled back with `./deploy.sh --rollback`, then reported.
