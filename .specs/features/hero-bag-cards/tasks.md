@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/hero-bag-cards/spec.md`
 **Design**: `.specs/features/hero-bag-cards/design.md`
-**Status**: Approved on 2026-11-17 (the owner accepted the spec with the recommended answers to Q1 to Q8). T17 to T22 (Phases 7 and 8) were added by the product owner on 2026-11-17 from the T16 review (verdict ALTERAÇÕES, `4dc43c3`) and wait for the owner's approval with the rulings D22 to D26 of the spec
+**Status**: Approved on 2026-11-17 (the owner accepted the spec with the recommended answers to Q1 to Q8). T17 to T22 (Phases 7 and 8) were added by the product owner on 2026-11-17 from the T16 review (verdict ALTERAÇÕES, `4dc43c3`) and were approved by the owner with the rulings D22 to D26 on 2026-11-18 (`214e500`). T23 to T25 (Phase 9) were added by the product owner on 2026-11-18 from the T22 re-review (verdict ALTERAÇÕES, round 2, `d91e35f`, finding #9) and wait for the owner's approval of the amended ruling D23 (spec Q9)
 
 Rules for every task:
 
@@ -126,6 +126,16 @@ T18 → T21
 T19 → T21
 T20 → T21
 T21 → T22
+```
+
+### Phase 9: Gem spacing fix and re-review round 3 (game-dev, test-engineer, ui-artist)
+
+Run in the order T23, T24, T25: T23 makes the T21 gem test fail until T24 updates it.
+
+```
+T22 → T23
+T23 → T24
+T24 → T25
 ```
 
 ---
@@ -1803,7 +1813,7 @@ expect(rowBox.x + rowBox.width).toBeLessThanOrEqual(tileBox.x + tileBox.width);
 
 ---
 
-### T22: UI re-review of the card, ladder and gem fixes [ ]
+### T22: UI re-review of the card, ladder and gem fixes [x]
 
 **Owner**: ui-artist
 **Goal**: Check findings #1 to #7 of the T16 review and the two taken suggestions against the amended design.md on new screenshots; a pass closes the review, any new finding becomes a task (BAG-01, BAG-04, BAG-05, BAG-07, BAG-08, BAG-32, BAG-35, BAG-40, BAG-41, visual part; AD-022).
@@ -1838,18 +1848,152 @@ expect(rowBox.x + rowBox.width).toBeLessThanOrEqual(tileBox.x + tileBox.width);
 **Gate**: build - `cd game && npm run ui:shots -- heroBagCards` exits 0
 **Done when**:
 
-- [ ] 34 PNG files (17 shots x 2 projects) are under `.specs/features/hero-bag-cards/ui-review/`.
-- [ ] `ui-review.html` names a verdict and states, for findings #1 to #7, D25 and D26, resolved or not with the shot that shows it.
+- [x] 34 PNG files (17 shots x 2 projects) are under `.specs/features/hero-bag-cards/ui-review/`.
+- [x] `ui-review.html` names a verdict and states, for findings #1 to #7, D25 and D26, resolved or not with the shot that shows it.
 
 **Commit**: `docs(hero-bag-cards): ui re-review of the card, ladder and gem fixes`
+
+**Result** (round 2, commit `d91e35f`): verdict **ALTERAÇÕES**. Findings #1 to #6, D25 and D26 resolved; #7 half resolved (10 px gems, centred, inside the tiles); new finding #9 (Low, shots 14, 15, 16, desktop and phone): the 4 LEGENDARY gems touch tip to tip (0.86 px between tips, the dark borders merge); #8 out of scope (TD-010). Finding #9 became T23 to T25 and the amended D23 (spec Q9).
+
+---
+
+### T23: Space the rarity gems so the LEGENDARY tips do not touch [ ]
+
+**Owner**: game-dev
+**Goal**: Each rarity gem becomes a 9x9 px square with a 6 px gap, so two neighbouring tips stand 2.27 px apart and the 4 LEGENDARY gems stay centred inside the 60 px tile (BAG-40, BAG-01; spec D23 as amended by re-review finding #9).
+**Where**: `game/public/style.css`
+**Read first**: `style.css` rules `.piece-gems` and `.piece-gem` (about `:2541-2557`, locate them by the selector); design.md § Rarity gems; spec D23 and "Centered rarity gems" AC 3
+**Depends on**: T22
+**Requirement**: BAG-01, BAG-40
+
+**Contract**: three lines change, nothing else:
+
+- in `.piece-gems`: `gap: 5px;` becomes `gap: 6px;` (`position: absolute`, `top: -5px`, `left: 50%`, `display: flex`, `transform: translateX(-50%)`, `pointer-events: none` stay);
+- in `.piece-gem`: `width: 10px;` becomes `width: 9px;` and `height: 10px;` becomes `height: 9px;` (`background: var(--gem, #f2c94c)`, `border: 1px solid var(--color-neutral-900)`, `transform: rotate(45deg)` stay).
+
+Expected geometry (design.md § Rarity gems): row of 4 = 4×9 + 3×6 = 54 px, row of 3 = 39 px; a turned gem is 9√2 ≈ 12.73 px across; tip gap = 15 − 12.73 ≈ 2.27 px; the LEGENDARY tips span about 57.73 px, about 1.14 px inside each side of the 60 px tile.
+
+**Steps**:
+
+1. In `.piece-gems` change `gap: 5px;` to `gap: 6px;`.
+2. In `.piece-gem` change `width: 10px;` to `width: 9px;` and `height: 10px;` to `height: 9px;`.
+3. Run the gate.
+
+**Tests**: none (stylesheet; T24 updates the e2e of BAG-40; the existing centred-gems e2e of BAG-01 runs in the gate)
+**Gate**: full - `cd game && npm test && npm run build && npx playwright test e2e/heroBagCards.spec.js e2e/equipmentUi.spec.js e2e/bulkSell.spec.js --grep-invert "each rarity gem is a"` (the T21 test `each rarity gem is a 10 px square and the gem rows fit their tiles` pins 10 px and 5 px and fails from this task until T24)
+**Done when**:
+
+- [ ] `git diff --stat game/public/style.css` shows 3 insertions and 3 deletions.
+- [ ] `grep -n "width: 9px;\|height: 9px;\|gap: 6px;" game/public/style.css` prints the three changed lines inside `.piece-gems` and `.piece-gem`.
+- [ ] The gate passes, `the rarity gems sit centered on the top edge of every piece tile` included.
+
+**Commit**: `style(game): space the rarity gems so the legendary tips do not touch`
+
+---
+
+### T24: e2e of the 9 px gems and the tip gap [ ]
+
+**Owner**: test-engineer
+**Goal**: Pin in the browser the amended gem size, gap and tip spacing of BAG-40 (spec D23, finding #9), replacing the 10 px values of the T21 test.
+**Where**: `game/e2e/heroBagCards.spec.js`
+**Read first**: `game/e2e/heroBagCards.spec.js` test `each rarity gem is a 10 px square and the gem rows fit their tiles` (about `:405-428`) and its helpers `startWith`, `piece`; spec "Centered rarity gems" AC 3 and D23; design.md § Rarity gems (Geometry)
+**Depends on**: T23
+**Requirement**: BAG-40
+
+**Contract**: change one test, nothing else in the file. No unit or CSS test pins the gem size: `game/src/adapters/phaser/views/pieceTile.test.js:21` only counts the gems (`data-gems` and the number of `.piece-gem`) and stays as it is; `uiRedesign.spec.js:853-854` pin `.tag-element::before`, not gems.
+
+1. Rename the test to `each rarity gem is a 9 px square, the LEGENDARY tips do not touch and the gem rows fit their tiles`.
+2. In its table, `[ 'equip-piece-m1', 4, 55 ]` becomes `[ 'equip-piece-m1', 4, 54 ]` and `[ 'equip-slot-kael-WEAPON', 3, 40 ]` becomes `[ 'equip-slot-kael-WEAPON', 3, 39 ]`.
+3. `toHaveCSS('width', '10px')` becomes `toHaveCSS('width', '9px')`, `toHaveCSS('height', '10px')` becomes `toHaveCSS('height', '9px')`, `toHaveCSS('column-gap', '5px')` becomes `toHaveCSS('column-gap', '6px')`.
+4. Keep the three row assertions (`rowBox.width / scale` within 0.5 of `width`, `rowBox.x >= tileBox.x`, row right edge `<= tileBox.x + tileBox.width`) and add after them, inside the loop:
+
+```js
+//  Turned 45°, a 9 px gem is 9√2 ≈ 12.73 px across; on the 15 px pitch two tips stand 15 − 12.73 ≈ 2.27 px apart (D23, finding #9)
+const boxes = [];
+for (let i = 0; i < count; i++) {
+    boxes.push(await gems.nth(i).boundingBox());
+}
+
+for (const box of boxes) {
+    expect(Math.abs(box.width / scale - 12.73)).toBeLessThanOrEqual(0.5);
+}
+for (let i = 1; i < count; i++) {
+    expect((boxes[i].x - (boxes[i - 1].x + boxes[i - 1].width)) / scale).toBeGreaterThanOrEqual(2);
+}
+//  The turned tips of the end gems stay inside the tile (about 1.14 px clear on each side of the LEGENDARY tile)
+expect(boxes[0].x).toBeGreaterThanOrEqual(tileBox.x);
+expect(boxes[count - 1].x + boxes[count - 1].width).toBeLessThanOrEqual(tileBox.x + tileBox.width);
+```
+
+Expected values (spec D23): gem `width` and `height` `9px`, row `column-gap` `6px`, row width 54 px (LEGENDARY, 4 gems) and 39 px (EPIC slot, 3 gems), each turned gem 12.73 ± 0.5 px across, each tip gap at least 2 px (2.27 px), every tip inside the tile. With the T20 values (10 px, 5 px) the tip gap is 0.86 px, so this test fails on the CSS of finding #9.
+
+**Steps**:
+
+1. Make changes 1 to 4.
+2. Run the gate.
+3. Run once `cd game && npx playwright test e2e/equipmentUi.spec.js e2e/bulkSell.spec.js e2e/dragEquip.spec.js` (T23 changed the tile gems of those screens); a failure is rerun alone twice with `--workers=1` and counts as a flake only when it passes both times; report any other failure with its test name.
+
+**Tests**: e2e - `game/e2e/heroBagCards.spec.js`, test `each rarity gem is a 9 px square, the LEGENDARY tips do not touch and the gem rows fit their tiles` (input: a LEGENDARY RING `m1` in the bag and an EPIC WEAPON `w1` worn by Kael; expected values above)
+**Gate**: full - `cd game && npm test && npx playwright test e2e/heroBagCards.spec.js`
+**Done when**:
+
+- [ ] `e2e/heroBagCards.spec.js` still has 17 tests and all pass.
+- [ ] `grep -n "'10px'\|column-gap', '5px'\|10 px square" game/e2e/heroBagCards.spec.js` prints nothing.
+- [ ] `grep -n "12.73" game/e2e/heroBagCards.spec.js` prints the comment and the width assertion.
+- [ ] The three files of step 3 pass (flakes named as such).
+
+**Commit**: `test(game): pin the 9 px gems and the gap between their tips`
+
+---
+
+### T25: UI re-review round 3 of the gem spacing [ ]
+
+**Owner**: ui-artist
+**Goal**: Check finding #9 of the round 2 review on new gem screenshots against the amended design.md § Rarity gems; a pass closes the review, any new finding becomes a task (BAG-01, BAG-40, visual part; AD-022).
+**Where**: `game/ui-review/heroBagCards.shots.js`
+**Also changes**: `.specs/features/hero-bag-cards/ui-review.html`, `.specs/features/hero-bag-cards/ui-review/14-gems-bag-*.png`, `15-gems-slots-*.png`, `16-gems-bulk-sell-*.png`
+**Read first**: the round 2 `ui-review.html` (finding #9, the resolved list); `.claude/templates/ui-review.html`; `game/ui-review/heroBagCards.shots.js` test `gems` (equipment `b5` AMULET LEGENDARY in the bag, `w2` ARMOR LEGENDARY worn by Kael) and the `PROBE preview` line of test `fuse all` as the probe pattern; design.md § Rarity gems; spec D23
+**Depends on**: T24
+**Requirement**: BAG-01, BAG-40
+
+**Contract**: only test `gems` changes and only shots 14, 15 and 16 are taken again (same names, they overwrite the round 2 files), both projects of `ui-review.config.js`. In test `gems`, right after `await shot(page, testInfo, '15-gems-slots');`, add:
+
+```js
+//  Gap between the turned tips of neighbouring gems, in CSS px of the 60 px tile (D23: 2.27 expected)
+const tips = (testid) => page.getByTestId(testid).evaluate((tile) => {
+    const scale = tile.getBoundingClientRect().width / 60;
+    const boxes = [ ...tile.querySelectorAll('.piece-gem') ].map((gem) => gem.getBoundingClientRect());
+
+    return boxes.slice(1).map((box, i) => ((box.left - boxes[i].right) / scale).toFixed(2)).join(' ');
+});
+
+console.log(`PROBE gem tips (${testInfo.project.name}): bag ${await tips('equip-piece-b5')} slot ${await tips('equip-slot-kael-ARMOR')}`);
+```
+
+**Steps**:
+
+1. Add the probe; run `cd game && npm run ui:shots -- heroBagCards -g gems` (only test `gems`, 6 PNG files).
+2. Check, desktop and phone, finding #9 only:
+   - shots 14 (`b5` in the bag), 15 (`w2` in Kael's ARMOR slot), 16 (`b5` in bulk-sell selection): a gap of the tile background shows between every two LEGENDARY gems and their dark borders do not merge; each gem still reads as a coloured diamond of its rarity; every row is centred over its tile and no tip passes the tile's side;
+   - the probe prints three values from 2.17 to 2.37 for `bag` and three for `slot` on both projects (2.27 expected).
+3. Rewrite `ui-review.html` from `.claude/templates/ui-review.html` as the round 3 review: verdict (APROVADO or ALTERAÇÕES); finding #9 marked resolved or not with shots 14, 15, 16 and the probe values; findings #1 to #7, D25 and D26 carried as resolved in round 2 (`d91e35f`), not re-checked; finding #8 out of scope (TD-010); any new finding numbered from #10 with severity, selector, shot and exact fix. Shots 01 to 13 and 17 stay the round 2 files.
+
+**Tests**: none (review task; the screenshots are not tests)
+**Gate**: build - `cd game && npm run ui:shots -- heroBagCards -g gems` exits 0
+**Done when**:
+
+- [ ] The six files `14-gems-bag-*.png`, `15-gems-slots-*.png`, `16-gems-bulk-sell-*.png` change in the T25 commit and 34 PNG files are under `.specs/features/hero-bag-cards/ui-review/`.
+- [ ] `ui-review.html` names a verdict, states finding #9 resolved or not with the shot that shows it, and quotes the probe values of both projects.
+
+**Commit**: `docs(hero-bag-cards): ui re-review round 3 of the gem spacing`
 
 ---
 
 ## Phase Execution Map
 
-Phases run in sequence; tasks inside a phase run in the listed order (T1, T2, T3; T4, T5, T6; T7, T8, T9, T10; T11, T12; T13, T14, T15; T16; T17, T18, T19, T20; T21, T22).
+Phases run in sequence; tasks inside a phase run in the listed order (T1, T2, T3; T4, T5, T6; T7, T8, T9, T10; T11, T12; T13, T14, T15; T16; T17, T18, T19, T20; T21, T22; T23, T24, T25).
 
-Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3 `kotlin-backend-dev`, T4 to T6 `game-dev`); batch 2 = Phases 3 and 4 (T7 to T12, `game-dev`); batch 3 = Phases 5 and 6 (T13 to T15 `test-engineer`, then T16 `ui-artist`). Review round (added after T16): batch 4 = Phases 7 and 8 (T17 to T20 `game-dev`, then T21 `test-engineer`, then T22 `ui-artist`). After T22 the `verifier` agent (Opus, not an author of this feature) runs as the Verifier; the `test-engineer` runs its author check first.
+Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3 `kotlin-backend-dev`, T4 to T6 `game-dev`); batch 2 = Phases 3 and 4 (T7 to T12, `game-dev`); batch 3 = Phases 5 and 6 (T13 to T15 `test-engineer`, then T16 `ui-artist`). Review round (added after T16): batch 4 = Phases 7 and 8 (T17 to T20 `game-dev`, then T21 `test-engineer`, then T22 `ui-artist`). Re-review round 3 (added after T22): batch 5 = Phase 9 (T23 `game-dev`, then T24 `test-engineer`, then T25 `ui-artist`). After the last re-review passes the `verifier` agent (Opus, not an author of this feature) runs as the Verifier; the `test-engineer` runs its author check first.
 
 ---
 
@@ -1879,6 +2023,9 @@ Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3
 | T20: larger gems | 3 CSS lines | ✅ Granular |
 | T21: e2e of the fixes | 1 spec file | ✅ Granular |
 | T22: UI re-review | 1 shots file + report | ✅ Granular |
+| T23: gem spacing | 3 CSS lines | ✅ Granular |
+| T24: e2e of the gem spacing | 1 test | ✅ Granular |
+| T25: UI re-review round 3 | 1 shots test + report | ✅ Granular |
 
 ## Diagram-Definition Cross-Check
 
@@ -1906,6 +2053,9 @@ Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3
 | T20 | T16 | T16 → T20 | ✅ Match |
 | T21 | T17, T18, T19, T20 | T17 → T21, T18 → T21, T19 → T21, T20 → T21 | ✅ Match |
 | T22 | T21 | T21 → T22 | ✅ Match |
+| T23 | T22 | T22 → T23 | ✅ Match |
+| T24 | T23 | T23 → T24 | ✅ Match |
+| T25 | T24 | T24 → T25 | ✅ Match |
 
 ## Test Co-location Validation
 
@@ -1933,7 +2083,10 @@ Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3
 | T20 | Stylesheet | none | none | ✅ OK |
 | T21 | e2e | e2e | e2e | ✅ OK |
 | T22 | Review artifact | none | none | ✅ OK |
+| T23 | Stylesheet | none | none | ✅ OK |
+| T24 | e2e | e2e | e2e | ✅ OK |
+| T25 | Review artifact | none | none | ✅ OK |
 
 ## Requirement Coverage
 
-Every BAG requirement maps to at least one task (spec § Requirement Traceability): 41 total, 41 mapped, 0 unmapped (BAG-40 and BAG-41 added by the review round). Player-visible requirements with e2e: BAG-01 to BAG-21 and BAG-31 to BAG-39 (T13, T14, T15), BAG-40 and BAG-41 and the amended BAG-08 and BAG-32 (T21); BAG-22 (late answers) and BAG-23 to BAG-30 (server) are unit and integration only, as in `bulk-sell` D14.
+Every BAG requirement maps to at least one task (spec § Requirement Traceability): 41 total, 41 mapped, 0 unmapped (BAG-40 and BAG-41 added by the review round). Player-visible requirements with e2e: BAG-01 to BAG-21 and BAG-31 to BAG-39 (T13, T14, T15), BAG-40 and BAG-41 and the amended BAG-08 and BAG-32 (T21), BAG-40 as amended by finding #9 (T24); BAG-22 (late answers) and BAG-23 to BAG-30 (server) are unit and integration only, as in `bulk-sell` D14.

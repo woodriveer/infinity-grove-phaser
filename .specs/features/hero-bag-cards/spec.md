@@ -55,7 +55,7 @@ Every ambiguity is resolved or recorded here. Rows marked `n` are product owner 
 | D20 Order of the deploy | The backend tasks land first; the game calls `fuse-all` only from a later commit. If the backend is rolled back below `fuse-all`, `Fundir tudo` fails with the error line and changes nothing | AD-023 deploys every push; a game commit never depends on a backend commit after it | y |
 | D21 UI review #6: preview in two lines | The preview `fusion-all-preview` is a `div` with two lines: `p.fusion-all-before` (testid `fusion-all-before`) `Antes: <before>` and `p.fusion-all-after` (testid `fusion-all-after`) `Depois: <after>`, 15 px; the `→` line is gone. 45/1/2 copies read `Antes: 45×0★ + 1×1★ + 2×2★` and `Depois: 1×1★ + 1×2★ + 2×3★` | The owner's mockup labels the two sides; the ui-artist found the single 14 px arrow line hard to read (`ui-review.html` finding #6) | y |
 | D22 UI review #4: in-flight label | While a fusion request runs, the button that sent it reads `Fundindo...` (three ASCII dots, like `Acordando o servidor, aguarde...`): the row button for a row fusion, `fusion-all` for Fundir tudo, and only in the detail of the hero whose request runs. `bag-entry-detail` carries `is-busy` while any fusion request runs, and only then its disabled buttons show `cursor: progress`; a button disabled for lack of copies keeps `cursor: not-allowed` | Busy and disabled looked the same (finding #4). The reviewer's rule `.bag-detail button:disabled { cursor: progress }` would also put the progress cursor on a 0/3 row with no request, so the cursor is scoped to `is-busy` | y |
-| D23 UI review #7: gem size | Each `.piece-gem` is 10x10 px (border included, was 7x7) and `.piece-gems` has a 5 px gap (was 2 px): the 4 LEGENDARY gems make a 55 px row inside the 60 px tile and their turned tips do not touch | The reviewer asked for gems of at least 8 px of colour (finding #7); 10 px with its 1 px border leaves 8 px of colour, and 11 px would push the 4-gem row past the tile | y |
+| D23 UI review #7, amended by re-review #9: gem size | Each `.piece-gem` is 9x9 px (border included; 7x7 before T20, 10x10 from T20 to the #9 fix) and `.piece-gems` has a 6 px gap (2 px before T20, 5 px from T20): turned 45° a gem is 9√2 ≈ 12.73 px across, so on the 15 px pitch the tips of two gems stand 15 − 12.73 ≈ 2.27 px apart (0.86 px with 10/5). The LEGENDARY row of 4 is 4×9 + 3×6 = 54 px (the 54 px padding box of its 3 px border) and its tips span 54 + 3.73 ≈ 57.73 px, about 1.14 px clear of each side of the 60 px tile. The colour inside the 1 px border is 7x7 px, 9.9 px across the diagonal the player sees | Finding #7 (round 1) asked for at least 8 px of colour, which T20 met as 8 px on the side with 10 px gems; round 2 finding #9 showed the 4 LEGENDARY tips then touch (0.86 px) and the dark borders merge. No size keeps 8 px of side colour and a 2 px tip gap inside the tile: 10 px gems need a gap of 6.14 px or more, a 62.6 px row. 9 px gems keep 9.9 px of colour across the diagonal and lose 1 px on the side. The reviewer's 62 px tile is 60 px (`.piece-tile` `width: 60px`, `box-sizing: border-box`); the numbers here use 60 | n (Q9) |
 | D24 UI review #1, #2, #3, #5: card and result styles | Values in design.md § Card, § Card frames and § Fundir tudo: the gold sparkles move to the frame edge and the card text sits above every ornament; the hover ring is the opaque `--gold-400` plus `brightness(1.06)`; the wood frame is warm brown `#a06a35` with riveted iron corners; the silver frame gets two more vine leaves per corner; the result line of the Mochila is 16 px, balanced. Painted frame art stays out of scope | Findings #1, #2, #3, #5 of the ui-artist review (commit `4dc43c3`) with the reviewer's exact fixes | y |
 | D25 Review suggestion: no Fundir badge in the detail | The card in the hero detail hides its `Fundir` badge (`.bag-detail .bag-card-fuse { display: none }`): the ladder already shows which rows fuse. The grid cards keep it (BAG-08) | Cheap CSS-only suggestion of the review; the badge points to the ladder, which the detail already shows | y |
 | D26 Review suggestion: two-line ribbon | The name ribbon reserves two lines (`min-height: calc(2.3em + 8px)`) and centres a one-line name, so the chips of every card start at the same height | Cheap CSS-only suggestion of the review; the grid row already takes the height of the tallest card (a two-line name), so the grid does not grow (BAG-11 still holds; T17 checks it) | y |
@@ -73,6 +73,7 @@ Every ambiguity is resolved or recorded here. Rows marked `n` are product owner 
 - Q6 (D13) No stale-preview check: the server fuses what it holds at `Sim, fundir`? Recommended: yes.
 - Q7 (D14, D15) The preview and result texts, with the corrected example `45×0★ + 1×1★ + 2×2★ → 1×1★ + 1×2★ + 2×3★`? Recommended: yes.
 - Q8 (D16) Remove the Fusão HUD button instead of pointing it at the Mochila? Recommended: remove.
+- Q9 (D23, re-review finding #9, asked 2026-11-18 after Q1 to Q8 were answered) Shrink the gems to 9 px with a 6 px gap, so the LEGENDARY tips stand 2.27 px apart, accepting 7 px of colour on the side (9.9 px across the diagonal) instead of the 8 px of finding #7? Recommended: yes. T23 to T25 wait for this answer.
 
 ---
 
@@ -88,7 +89,7 @@ Every ambiguity is resolved or recorded here. Rows marked `n` are product owner 
 
 1. The game SHALL draw the gem row (`.piece-gems`) of every piece tile with `left: 50%`, `transform: translateX(-50%)` and `top: -5px`, so the horizontal center of the gem row is within 1 px of the horizontal center of the tile, for bag tiles, worn slot tiles and bag tiles in bulk-sell selection mode.  <!-- ubiquitous -->
 2. The game SHALL keep the tile at 60x60 px, the gem count per rarity (COMMON 0, UNCOMMON 1, RARE 2, EPIC 3, LEGENDARY 4, `data-gems`) and the refine badge `+<n>` at `right: 2px; bottom: 1px`.  <!-- ubiquitous -->
-3. The game SHALL draw each gem `.piece-gem` as a 10x10 px square, border included (`width: 10px; height: 10px`), turned 45°, with a 5 px gap between the gems of a row (`.piece-gems` `column-gap: 5px`), so the LEGENDARY row of 4 gems is 55 px wide and stays inside the 60 px tile (BAG-40, added by the UI review, D23).  <!-- ubiquitous -->
+3. The game SHALL draw each gem `.piece-gem` as a 9x9 px square, border included (`width: 9px; height: 9px`), turned 45°, with a 6 px gap between the gems of a row (`.piece-gems` `column-gap: 6px`), so the LEGENDARY row of 4 gems is 54 px wide, the turned tips of two neighbouring gems stand at least 2 px apart (2.27 px) and every tip stays inside the 60 px tile (BAG-40, added by the UI review, D23; amended by re-review finding #9).  <!-- ubiquitous -->
 
 **Independent Test**: Open Equipamento with a LEGENDARY piece in the bag and read the gem row centered over the tile (|center x of `.piece-gems` − center x of the tile| ≤ 1 px).
 
@@ -213,11 +214,11 @@ Every ambiguity is resolved or recorded here. Rows marked `n` are product owner 
 
 ## Requirement Traceability
 
-IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", BAG-03 to BAG-11 "One card per hero", BAG-12 to BAG-22 "Fusion ladder", BAG-23 to BAG-30 "Fundir tudo on the server", BAG-31 to BAG-37 "Fundir tudo on the screen", BAG-38 to BAG-39 "One way into the cards". The UI review round (T17 to T22, `ui-review.html` of commit `4dc43c3`) appended BAG-40 ("Centered rarity gems" AC 3) and BAG-41 ("Fusion ladder" AC 12) at the end so the earlier IDs stay stable; it amended BAG-08 (no badge in the detail, D25) and BAG-32 (two preview lines, D21).
+IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", BAG-03 to BAG-11 "One card per hero", BAG-12 to BAG-22 "Fusion ladder", BAG-23 to BAG-30 "Fundir tudo on the server", BAG-31 to BAG-37 "Fundir tudo on the screen", BAG-38 to BAG-39 "One way into the cards". The UI review round (T17 to T22, `ui-review.html` of commit `4dc43c3`) appended BAG-40 ("Centered rarity gems" AC 3) and BAG-41 ("Fusion ladder" AC 12) at the end so the earlier IDs stay stable; it amended BAG-08 (no badge in the detail, D25) and BAG-32 (two preview lines, D21). The re-review round 2 (T22, `ui-review.html` of commit `d91e35f`) amended BAG-40 (9 px gems, 6 px gap, finding #9, D23) through T23 to T25.
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| BAG-01 | P1: Centered rarity gems | T7, T13, T16, T20, T21, T22 | Implementing |
+| BAG-01 | P1: Centered rarity gems | T7, T13, T16, T20, T21, T22, T23, T25 | Implementing |
 | BAG-02 | P1: Centered rarity gems | T7, T13 | Implementing |
 | BAG-03 | P1: One card per hero | T8, T11, T13 | Implementing |
 | BAG-04 | P1: One card per hero | T8, T10, T13, T17, T22 | Implementing |
@@ -256,7 +257,7 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-37 | P1: Fundir tudo on the screen | T12, T13 | Implementing |
 | BAG-38 | P2: One way into the cards | T11, T13, T15 | Implementing |
 | BAG-39 | P2: One way into the cards | T11 | Implementing |
-| BAG-40 | P1: Centered rarity gems | T20, T21, T22 | Implementing |
+| BAG-40 | P1: Centered rarity gems | T20, T21, T22, T23, T24, T25 | Implementing |
 | BAG-41 | P1: Fusion ladder | T18, T21, T22 | Implementing |
 
 **ID format:** `BAG-<NN>`

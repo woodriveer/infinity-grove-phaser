@@ -200,8 +200,9 @@ Each frame sets `--card-frame` (used by the badge border) and draws its ornament
 
 ### Rarity gems (`.piece-gems`, `.piece-gem`)
 
-- Row: `position: absolute; top: -5px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px` (computed `column-gap: 5px`; T7 centred it; T20 widened the gap from 2 px, D23).
-- Gem: `width: 10px; height: 10px` (was 7 px), border `1px solid var(--color-neutral-900)`, `transform: rotate(45deg)`, colour `var(--gem)`; the LEGENDARY row of 4 is 55 px wide inside the 60 px tile.
+- Row: `position: absolute; top: -5px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px` (computed `column-gap: 6px`; T7 centred it; T20 widened the gap from 2 px to 5 px; T23 to 6 px, re-review finding #9, D23).
+- Gem: `width: 9px; height: 9px` (7 px before T20, 10 px from T20 to T23), border `1px solid var(--color-neutral-900)`, `transform: rotate(45deg)`, colour `var(--gem)` (7x7 px inside the border, 9.9 px across the diagonal).
+- Geometry (every tile is 60x60 px, `box-sizing: border-box`): a turned gem is 9√2 ≈ 12.73 px across; pitch 9 + 6 = 15 px, so two neighbouring tips stand 15 − 12.73 ≈ 2.27 px apart. Layout width of a row: 1 gem 9 px, 2 gems 24 px, 3 gems 39 px, 4 gems 54 px. The LEGENDARY tile has a 3 px border, so its padding box is 54 px wide and the row fills it exactly; the tips overhang the row by (12.73 − 9) / 2 ≈ 1.86 px on each side, a visual width of about 57.73 px that ends about 1.14 px inside each side of the tile.
 
 ### HUD
 
