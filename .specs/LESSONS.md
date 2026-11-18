@@ -606,6 +606,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md round 2 G2 (TD-009 EC3, EC4) (tasks)
 - last seen: 2026-11-17T13:08:29Z
 
+### L-100 - Test a higher-than-before rule with a starting value already at or above the threshold, so the comparison with the old value decides the outcome
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: hero-bag-cards
+- evidence: validation.md G3, G9 (BAG-36, game/src/domain/heroes/bagCards.js raisedSkills) (game)
+- last seen: 2026-11-18T15:34:05Z
+
+### L-101 - Assert the exact CSS value an acceptance criterion names, not only a looser geometric consequence of it
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game-e2e` · harmful: 0
+- features: hero-bag-cards
+- evidence: validation.md C5 (BAG-01, game/e2e/heroBagCards.spec.js:380) (game-e2e)
+- last seen: 2026-11-18T15:34:05Z
+
+### L-102 - Give every player-visible acceptance criterion an e2e assertion, even when it only keeps behaviour that predates the feature
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `game-e2e` · harmful: 0
+- features: hero-bag-cards
+- evidence: validation.md BAG-39 (no e2e asserts bag-badge) (game-e2e)
+- last seen: 2026-11-18T15:34:05Z
+
+### L-103 - When a criterion names several controls or positions, assert each one, not only the first
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: hero-bag-cards
+- evidence: validation.md BAG-18 (hero-close not asserted), BAG-04 (badge centring) (tests)
+- last seen: 2026-11-18T15:34:05Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

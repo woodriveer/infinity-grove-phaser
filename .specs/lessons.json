@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 100,
+  "next_id": 104,
   "lessons": [
     {
       "id": "L-001",
@@ -1790,6 +1790,78 @@
       ],
       "created": "2026-11-17T13:08:29Z",
       "last_seen": "2026-11-17T13:08:29Z"
+    },
+    {
+      "id": "L-100",
+      "key": "surviving_mutant::test a higher than before rule with a starting value already at or above the threshold so the comparison with the old value decides the outcome",
+      "text": "Test a higher-than-before rule with a starting value already at or above the threshold, so the comparison with the old value decides the outcome",
+      "signal": "surviving_mutant",
+      "scope": "game",
+      "status": "candidate",
+      "features": [
+        "hero-bag-cards"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md G3, G9 (BAG-36, game/src/domain/heroes/bagCards.js raisedSkills) (game)"
+      ],
+      "created": "2026-11-18T15:34:05Z",
+      "last_seen": "2026-11-18T15:34:05Z"
+    },
+    {
+      "id": "L-101",
+      "key": "surviving_mutant::assert the exact css value an acceptance criterion names not only a looser geometric consequence of it",
+      "text": "Assert the exact CSS value an acceptance criterion names, not only a looser geometric consequence of it",
+      "signal": "surviving_mutant",
+      "scope": "game-e2e",
+      "status": "candidate",
+      "features": [
+        "hero-bag-cards"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md C5 (BAG-01, game/e2e/heroBagCards.spec.js:380) (game-e2e)"
+      ],
+      "created": "2026-11-18T15:34:05Z",
+      "last_seen": "2026-11-18T15:34:05Z"
+    },
+    {
+      "id": "L-102",
+      "key": "ac_gap::give every player visible acceptance criterion an e2e assertion even when it only keeps behaviour that predates the feature",
+      "text": "Give every player-visible acceptance criterion an e2e assertion, even when it only keeps behaviour that predates the feature",
+      "signal": "ac_gap",
+      "scope": "game-e2e",
+      "status": "candidate",
+      "features": [
+        "hero-bag-cards"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md BAG-39 (no e2e asserts bag-badge) (game-e2e)"
+      ],
+      "created": "2026-11-18T15:34:05Z",
+      "last_seen": "2026-11-18T15:34:05Z"
+    },
+    {
+      "id": "L-103",
+      "key": "spec_precision_gap::when a criterion names several controls or positions assert each one not only the first",
+      "text": "When a criterion names several controls or positions, assert each one, not only the first",
+      "signal": "spec_precision_gap",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "hero-bag-cards"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md BAG-18 (hero-close not asserted), BAG-04 (badge centring) (tests)"
+      ],
+      "created": "2026-11-18T15:34:05Z",
+      "last_seen": "2026-11-18T15:34:05Z"
     }
   ]
 }
