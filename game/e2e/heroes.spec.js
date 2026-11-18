@@ -207,4 +207,31 @@ test.describe('Hero screens', () => {
 
         await expect(page.getByTestId('bag-card-kael').locator('.bag-card-chip').first()).toHaveText('0★×2');
     });
+
+    //  hero-bag-cards BAG-39: the red dot on Mochila is lit by a dropped card while the Mochila is closed and cleared when it opens
+    test('a card dropped while the Mochila is closed lights the red dot on Mochila until the bag opens', async ({ page }) => {
+        await mockBackend(page, {
+            users: { yan: 'secret123' },
+            definition: SMALL_CHAPTER,
+            progress: { yan: { stage: 1, encounter: 'MINIBOSS', phase: 1 } },
+            chances: [ 0 ]
+        });
+        const menu = await startGame(page);
+        const sceneHealth = () => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').monster?.health);
+        await expect.poll(sceneHealth).toBe(2);
+
+        await expect(page.getByTestId('bag-badge')).toBeHidden();
+
+        await menu.canvas.click();
+        await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').tick());
+
+        await expect(page.getByTestId('card-notice')).toHaveText('Carta: Kael Raizférrea');
+        await expect(page.getByTestId('bag-badge')).toBeVisible();
+        await expect(page.getByTestId('hud-bag').getByTestId('bag-badge')).toBeVisible();
+
+        await page.getByTestId('hud-bag').click();
+        await expect(page.getByTestId('bag-list')).toBeVisible();
+
+        await expect(page.getByTestId('bag-badge')).toBeHidden();
+    });
 });
