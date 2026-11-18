@@ -132,7 +132,7 @@ IDs follow the order of the criteria: GV-01 to GV-06 "Version on every screen", 
 | GV-04 | P1: Version on every screen | T3, T4 | In Tasks |
 | GV-05 | P1: Version on every screen | T3, T4 | In Tasks |
 | GV-06 | P1: Version on every screen | T2, T4 | In Tasks |
-| GV-07 | P1: Version from the build | T1, T3, T4 | In Tasks |
+| GV-07 | P1: Version from the build | T1, T3, T4 | Implementing |
 | GV-08 | P1: Version from the build | T2 | In Tasks |
 | GV-09 | P1: Discreet and out of the way | T3, T4, T5 | In Tasks |
 | GV-10 | P1: Discreet and out of the way | T3, T4, T5 | In Tasks |

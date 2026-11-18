@@ -79,7 +79,7 @@ T4 → T5
 
 ## Task Breakdown
 
-### T1: Define `__GAME_VERSION__` from package.json in the Vite config [ ]
+### T1: Define `__GAME_VERSION__` from package.json in the Vite config [x]
 
 **Owner**: game-dev
 **Goal**: The dev server and every build replace `__GAME_VERSION__` with the JSON string of the `version` of `game/package.json` (GV-07).
