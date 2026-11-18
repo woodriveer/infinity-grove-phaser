@@ -138,7 +138,7 @@ export default defineConfig(({ mode }) => {
 
 ---
 
-### T2: Version label view (views/versionLabel.js) [ ]
+### T2: Version label view (views/versionLabel.js) [x]
 
 **Owner**: game-dev
 **Goal**: The text rule `v<version>` and the single DOM label `div.game-version` (GV-01, GV-06, GV-08).
