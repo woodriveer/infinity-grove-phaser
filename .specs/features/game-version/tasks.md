@@ -302,7 +302,7 @@ mountVersionLabel(__GAME_VERSION__);
 
 ---
 
-### T4: e2e of the version label [ ]
+### T4: e2e of the version label [x]
 
 **Owner**: test-engineer
 **Goal**: One Playwright scenario per player-visible criterion: the label on the loading bar, the splash, the login form and the battle, its corner and size at 1280x720 and 390x844, its style, and a click through it at 1024x768 (GV-01 to GV-07, GV-09 to GV-13).
@@ -389,8 +389,8 @@ const startGame = async (page) => {
 **Gate**: full - `cd game && npx playwright test e2e/gameVersion.spec.js`
 **Done when**:
 
-- [ ] The 7 scenarios pass, and pass again twice with `--workers=1`.
-- [ ] No literal `0.0.0` or `0.4.1` appears in `game/e2e/gameVersion.spec.js`.
+- [x] The 7 scenarios pass, and pass again twice with `--workers=1`.
+- [x] No literal `0.0.0` or `0.4.1` appears in `game/e2e/gameVersion.spec.js`.
 
 **Commit**: `test(game): e2e of the game version label`
 
