@@ -253,14 +253,16 @@ IDs follow the order of the criteria: BAG-01 to BAG-02 "Centered rarity gems", B
 | BAG-33 | P1: Fundir tudo on the screen | T9, T12, T13 | Implementing |
 | BAG-34 | P1: Fundir tudo on the screen | T9, T12, T13 | Implementing |
 | BAG-35 | P1: Fundir tudo on the screen | T4, T5, T6, T12, T13, T17, T22 | Implementing |
-| BAG-36 | P1: Fundir tudo on the screen | T6, T12, T13 | Implementing |
+| BAG-36 | P1: Fundir tudo on the screen | T6, T12, T13 | Needs Fix |
 | BAG-37 | P1: Fundir tudo on the screen | T12, T13 | Implementing |
 | BAG-38 | P2: One way into the cards | T11, T13, T15 | Implementing |
-| BAG-39 | P2: One way into the cards | T11 | Implementing |
+| BAG-39 | P2: One way into the cards | T11 | Needs Fix |
 | BAG-40 | P1: Centered rarity gems | T20, T21, T22, T23, T24, T25 | Implementing |
 | BAG-41 | P1: Fusion ladder | T18, T21, T22 | Implementing |
 
 **ID format:** `BAG-<NN>`
+
+**Status values** (skill vocabulary): Pending → In Design → In Tasks → Implementing → Verified; a row the Verifier fails reads Needs Fix. `Implementing` is the status of a requirement whose tasks are done and committed but not yet verified: the skill has no separate "implemented" status, so T1 to T25 being done leaves the rows at `Implementing` until a Verifier round passes them. Verifier round 1 (`validation.md`, `e400084`, FAIL with test-only gaps) set BAG-36 (Fix 1, survivors G3 and G9) and BAG-39 (Fix 2, no e2e of the red dot) to Needs Fix; it passed the other 39 rows, which move to `Verified` together with BAG-36 and BAG-39 when round 2 passes (Fix 6).
 
 **Coverage:** 41 total, 41 mapped to tasks, 0 unmapped
 

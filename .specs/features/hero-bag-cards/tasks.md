@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/hero-bag-cards/spec.md`
 **Design**: `.specs/features/hero-bag-cards/design.md`
-**Status**: Approved on 2026-11-17 (the owner accepted the spec with the recommended answers to Q1 to Q8). T17 to T22 (Phases 7 and 8) were added by the product owner on 2026-11-17 from the T16 review (verdict ALTERAÇÕES, `4dc43c3`) and were approved by the owner with the rulings D22 to D26 on 2026-11-18 (`214e500`). T23 to T25 (Phase 9) were added by the product owner on 2026-11-18 from the T22 re-review (verdict ALTERAÇÕES, round 2, `d91e35f`, finding #9) and wait for the owner's approval of the amended ruling D23 (spec Q9)
+**Status**: Implemented, waiting for Verifier round 2 (2026-11-18). The owner approved the spec on 2026-11-17 (Q1 to Q8), T17 to T22 with the rulings D22 to D26 on 2026-11-18 (`214e500`) and T23 to T25 with the amended ruling D23 (spec Q9) on 2026-11-18 (`407a885`). T1 to T25 are done; the UI re-review round 3 (T25, `b8afc93`) is APROVADO. Verifier round 1 (`validation.md`, `e400084`) is FAIL with test-only gaps (17 of 20 mutants killed): Fixes 1 to 5 (survivors G3 and G9 of BAG-36, the e2e of BAG-39, `top: -5px` of BAG-01, edge case D13, spec-precision assertions) are being closed by the `test-engineer`; Fix 6 (this doc state) is done by the product owner. Verifier round 2, scoped to the gaps and fixes, runs next
 
 Rules for every task:
 
@@ -1500,11 +1500,13 @@ button.bag-card:hover:not(:disabled) {
 **Gate**: full - `cd game && npm test && npm run build && npx playwright test e2e/heroBagCards.spec.js`
 **Done when**:
 
-- [ ] `git diff game/public/style.css` changes only the rules of edits 1 to 9 (`.bag-card`, `button.bag-card:hover:not(:disabled)`, `.bag-card-ribbon`, the two new z-index rules, `.bag-card.frame-wood`, `.bag-card.frame-wood::before`, `.bag-card.frame-silver::before`, `.bag-card.frame-gold::after`, the two new `.bag-detail` rules).
-- [ ] `git diff game/public/style.css | grep "^+" | grep -n "transition\|animation"` prints nothing.
-- [ ] `npm test` and `npm run build` pass; the 15 tests of `e2e/heroBagCards.spec.js` pass.
+- [x] `git diff game/public/style.css` changes only the rules of edits 1 to 9 (`.bag-card`, `button.bag-card:hover:not(:disabled)`, `.bag-card-ribbon`, the two new z-index rules, `.bag-card.frame-wood`, `.bag-card.frame-wood::before`, `.bag-card.frame-silver::before`, `.bag-card.frame-gold::after`, the two new `.bag-detail` rules).
+- [x] `git diff game/public/style.css | grep "^+" | grep -n "transition\|animation"` prints nothing.
+- [x] `npm test` and `npm run build` pass; the 15 tests of `e2e/heroBagCards.spec.js` pass.
 
 **Commit**: `style(game): fix the card frames, hover, sparkles and result line`
+
+Result (`c88b956`): `game/public/style.css` changes only the rules of edits 1 to 9, and its added lines hold no `transition` and no `animation`. The test boxes are backed by the Verifier round 1 full suites (`validation.md` § Gate Check: game unit 1759/1759, `heroBagCards.spec.js` 17/17, the 15 cases of T13 plus the 2 of T21).
 
 ---
 
@@ -1587,10 +1589,12 @@ The global `button:disabled { cursor: not-allowed; }` (about `style.css:203`) is
 **Gate**: quick - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 10 new cases pass (4 in `fusionLadderView.test.js`, 6 in `HeroUi.test.js`); every other game unit test passes unchanged.
-- [ ] `grep -n "Fundindo..." game/src/adapters/phaser/views/fusionLadderView.js` prints exactly one line (the constant).
+- [x] The 10 new cases pass (4 in `fusionLadderView.test.js`, 6 in `HeroUi.test.js`); every other game unit test passes unchanged.
+- [x] `grep -n "Fundindo..." game/src/adapters/phaser/views/fusionLadderView.js` prints exactly one line (the constant).
 
 **Commit**: `feat(game): show Fundindo... on the fusion button in flight`
+
+Result (`aff5ae4`): 10 new cases, 4 in `fusionLadderView.test.js` (`pending stars puts Fundindo... on that row button only`, `pending all puts Fundindo... on Fundir tudo only`, `busy marks the detail is-busy`, `busy without pending keeps every label`) and 6 in `HeroUi.test.js`; `fusionLadderView.js:8` `const BUSY_TEXT = 'Fundindo...';` is the only match. All pass in the Verifier round 1 (`validation.md` § Gate Check, game unit 1759/1759).
 
 ---
 
@@ -1683,10 +1687,12 @@ Every other assertion of that case stays.
 **Gate**: quick - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 3 `previewLines` cases and the two changed cases pass; every other game unit test passes.
-- [ ] `grep -rn "previewText\|→ 1×1★" game/src` prints nothing.
+- [x] The 3 `previewLines` cases and the two changed cases pass; every other game unit test passes.
+- [x] `grep -rn "previewText\|→ 1×1★" game/src` prints nothing.
 
 **Commit**: `feat(game): split the Fundir tudo preview into Antes and Depois lines`
+
+Result (`8f96842`): `describe('previewText')` became `describe('previewLines')` with the 3 cases of the contract (45/1/2, 3 blank copies, 8★ and 9★ copies); the grep for `previewText` and `→ 1×1★` in `game/src` prints nothing at `8f96842` and at the current `main`. All pass in the Verifier round 1 (game unit 1759/1759).
 
 ---
 
@@ -1713,10 +1719,12 @@ Every other assertion of that case stays.
 **Gate**: full - `cd game && npm test && npm run build && npx playwright test e2e/heroBagCards.spec.js e2e/equipmentUi.spec.js e2e/bulkSell.spec.js --grep-invert "Fundir tudo previews the cascade"` (that one test expects the old arrow preview and fails from T19 until T21)
 **Done when**:
 
-- [ ] `git diff --stat game/public/style.css` shows 3 insertions and 3 deletions.
-- [ ] The gate passes, `the rarity gems sit centered on the top edge of every piece tile` included.
+- [x] `git diff --stat game/public/style.css` shows 3 insertions and 3 deletions.
+- [x] The gate passes, `the rarity gems sit centered on the top edge of every piece tile` included.
 
 **Commit**: `style(game): enlarge the rarity gems of the item tiles`
+
+Result (`30e7844`): `game/public/style.css` 3 insertions, 3 deletions (`gap: 2px` to `5px`, `width` and `height` `7px` to `10px`). T23 (`23ce6aa`) later set the gems to 9 px with a 6 px gap (amended D23, Q9); `the rarity gems sit centered on the top edge of every piece tile` passes in the Verifier round 1 e2e run.
 
 ---
 
@@ -1946,7 +1954,7 @@ Expected values (spec D23): gem `width` and `height` `9px`, row `column-gap` `6p
 
 ---
 
-### T25: UI re-review round 3 of the gem spacing [ ]
+### T25: UI re-review round 3 of the gem spacing [x]
 
 **Owner**: ui-artist
 **Goal**: Check finding #9 of the round 2 review on new gem screenshots against the amended design.md § Rarity gems; a pass closes the review, any new finding becomes a task (BAG-01, BAG-40, visual part; AD-022).
@@ -1982,10 +1990,12 @@ console.log(`PROBE gem tips (${testInfo.project.name}): bag ${await tips('equip-
 **Gate**: build - `cd game && npm run ui:shots -- heroBagCards -g gems` exits 0
 **Done when**:
 
-- [ ] The six files `14-gems-bag-*.png`, `15-gems-slots-*.png`, `16-gems-bulk-sell-*.png` change in the T25 commit and 34 PNG files are under `.specs/features/hero-bag-cards/ui-review/`.
-- [ ] `ui-review.html` names a verdict, states finding #9 resolved or not with the shot that shows it, and quotes the probe values of both projects.
+- [x] The six files `14-gems-bag-*.png`, `15-gems-slots-*.png`, `16-gems-bulk-sell-*.png` change in the T25 commit and 34 PNG files are under `.specs/features/hero-bag-cards/ui-review/`.
+- [x] `ui-review.html` names a verdict, states finding #9 resolved or not with the shot that shows it, and quotes the probe values of both projects.
 
 **Commit**: `docs(hero-bag-cards): ui re-review round 3 of the gem spacing`
+
+Result (`b8afc93`): APROVADO. The six gem PNGs (`14-gems-bag-*`, `15-gems-slots-*`, `16-gems-bulk-sell-*`) change in the commit and 34 PNG files are under `ui-review/`. Finding #9 is resolved with shots 14, 15 and 16: the probe reads `2,27 2,27 2,27` for the bag and for the slot on desktop and phone (accepted range 2.17 to 2.37). No new finding; #1 to #7, D25 and D26 carried as resolved from round 2 (`d91e35f`); #8 stays out of scope (TD-010).
 
 ---
 
@@ -2089,4 +2099,4 @@ Packing for workers (~7 tasks, whole phases): batch 1 = Phases 1 and 2 (T1 to T3
 
 ## Requirement Coverage
 
-Every BAG requirement maps to at least one task (spec § Requirement Traceability): 41 total, 41 mapped, 0 unmapped (BAG-40 and BAG-41 added by the review round). Player-visible requirements with e2e: BAG-01 to BAG-21 and BAG-31 to BAG-39 (T13, T14, T15), BAG-40 and BAG-41 and the amended BAG-08 and BAG-32 (T21), BAG-40 as amended by finding #9 (T24); BAG-22 (late answers) and BAG-23 to BAG-30 (server) are unit and integration only, as in `bulk-sell` D14.
+Every BAG requirement maps to at least one task (spec § Requirement Traceability): 41 total, 41 mapped, 0 unmapped (BAG-40 and BAG-41 added by the review round). Player-visible requirements with e2e: BAG-01 to BAG-21 and BAG-31 to BAG-39 (T13, T14, T15), BAG-40 and BAG-41 and the amended BAG-08 and BAG-32 (T21), BAG-40 as amended by finding #9 (T24). Verifier round 1 found that no e2e asserts the Mochila red dot of BAG-39 (`validation.md` Fix 2, owner `test-engineer`); BAG-22 (late answers) and BAG-23 to BAG-30 (server) are unit and integration only, as in `bulk-sell` D14.
