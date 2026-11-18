@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Versão do jogo na tela</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+</style>
+</head>
+<body>
+<main>
+<h1>Versão do jogo na tela</h1>
+<p class="sub">Feature <code>game-version</code> · release <code>v0.4.1</code> · commits <code>24c53fc..081a3ff</code> (7 commits: spec <code>afde02e</code>, aprovação <code>469342c</code>, T1 a T5) · verificação em <code>081a3ff</code> · 18/11/2026</p>
+
+<p><span class="verdict">Verifier: PASS</span> &nbsp;13 de 13 critérios (GV-01 a GV-13) cobertos · sensor 11 mutantes, 11 mortos, 0 sobreviventes · aceite do product-owner em <code>eb39450</code></p>
+
+<h2>Resumo</h2>
+<div class="cards">
+    <div class="card"><div class="n">+69 / −0</div><div class="l">código de produção (3 arquivos, todos no jogo; backend 0)</div></div>
+    <div class="card"><div class="n">+306 / −0</div><div class="l">código de teste (3 arquivos)</div></div>
+    <div class="card"><div class="n">17 + 7</div><div class="l">testes novos: unitários (14 + 3) e e2e</div></div>
+    <div class="card"><div class="n">12 de 12</div><div class="l">critérios visíveis ao jogador com e2e</div></div>
+</div>
+
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Parte</th><th>Arquivo</th><th>Adicionadas</th><th>Removidas</th></tr>
+<tr><td>Jogo</td><td><code>game/src/adapters/phaser/views/versionLabel.js</code></td><td class="num">42</td><td class="num">0</td></tr>
+<tr><td>Jogo</td><td><code>game/src/main.js</code></td><td class="num">5</td><td class="num">0</td></tr>
+<tr><td>Jogo (CSS)</td><td><code>game/public/style.css</code></td><td class="num">22</td><td class="num">0</td></tr>
+<tr><td>Backend</td><td>nenhum arquivo em <code>backend/src/main</code></td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><strong>Total</strong></td><td>3 arquivos</td><td class="num">69</td><td class="num">0</td></tr>
+</table></div>
+<p class="sub">Fora da definição de produção: <code>game/vite.config.js</code> (+9 / −0, configuração de build que define <code>__GAME_VERSION__</code>) e <code>game/ui-review/gameVersion.shots.js</code> (+57, script de capturas). O bump de <code>game/package.json</code> para <code>0.4.1</code> entra no commit da release, fora deste intervalo.</p>
+
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th>Arquivo</th><th>Adicionadas</th><th>Removidas</th><th>Testes novos</th><th>Total após a execução</th></tr>
+<tr><td>Backend</td><td>nenhum</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1013 de 1013</td></tr>
+<tr><td>Jogo unitário</td><td><code>versionLabel.test.js</code>, <code>viteConfig.test.js</code></td><td class="num">113</td><td class="num">0</td><td class="num">17</td><td class="num">1781 de 1781</td></tr>
+<tr><td>e2e</td><td><code>game/e2e/gameVersion.spec.js</code></td><td class="num">193</td><td class="num">0</td><td class="num">7</td><td class="num">377 de 381 (4 falhas de carga, abaixo)</td></tr>
+</table></div>
+
+<h2>Cobertura de testes unitários</h2>
+<p class="sub">Da última execução completa do Verifier em <code>081a3ff</code>. Depois dela só mudaram documentos (<code>git diff --name-only 081a3ff..HEAD</code> lista apenas <code>.specs/</code>, <code>CLAUDE.md</code> e <code>.claude/agents/*.md</code>) e o bump de versão da release, então os resumos foram reaproveitados e nenhuma suíte foi rodada de novo.</p>
+<div class="scroll"><table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Backend inteiro (JaCoCo)</td><td class="num">99,06% (2837 de 2864)</td><td class="num">93,18% (875 de 939)</td></tr>
+<tr><td>Jogo inteiro (Vitest, v8)</td><td class="num">98,43% (2953 de 3000)</td><td class="num">95,56% (1400 de 1465)</td></tr>
+<tr><td>Jogo: <code>versionLabel.js</code> (arquivo novo)</td><td class="num">100% (16 de 16)</td><td class="num">100% (8 de 8)</td></tr>
+<tr><td>Jogo: <code>main.js</code> (arquivo alterado)</td><td class="num">0% (0 de 10)</td><td class="num">0% (0 de 2)</td></tr>
+<tr><td>Backend: arquivos da feature</td><td class="num na">não medido</td><td class="num na">não medido</td></tr>
+</table></div>
+<p class="sub">Backend dos arquivos da feature: a feature não toca o backend. <code>main.js</code> é o ponto de entrada e nenhum teste unitário o importa; o e2e o cobre (100%). <code>vite.config.js</code> não entra no resumo do Vitest (só <code>src/**</code>); a constante é conferida por <code>viteConfig.test.js</code>.</p>
+
+<h2>Cobertura e2e</h2>
+<div class="scroll"><table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Jogo inteiro (Playwright, istanbul)</td><td class="num">92,70% (2782 de 3001)</td><td class="num">77,16% (909 de 1178)</td></tr>
+<tr><td><code>main.js</code></td><td class="num">100% (10 de 10)</td><td class="num">100% (1 de 1)</td></tr>
+<tr><td><code>versionLabel.js</code></td><td class="num">75% (12 de 16)</td><td class="num">40% (2 de 5)</td></tr>
+</table></div>
+<p class="sub">O número e2e é um limite inferior: uma página recarregada dentro do teste perde o que contou antes. As linhas de <code>versionLabel.js</code> que o e2e não pisa são as dos valores inválidos (versão vazia ou nula), cobertas pelo teste unitário (100%).</p>
+
+<h2>Cenários e2e da feature</h2>
+<div class="scroll"><table>
+<tr><th>Cenário</th><th>Resultado</th></tr>
+<tr><td>mostra a versão na tela de carregamento</td><td class="ok">passou</td></tr>
+<tr><td>mostra a versão na abertura (splash)</td><td class="ok">passou</td></tr>
+<tr><td>mostra a versão no login, à direita do canvas</td><td class="ok">passou</td></tr>
+<tr><td>mostra a versão na batalha, à direita do canvas</td><td class="ok">passou</td></tr>
+<tr><td>desenha a versão pequena, esmaecida e sem capturar clique, no estilo do Grove</td><td class="ok">passou</td></tr>
+<tr><td>mostra a versão abaixo do canvas no celular (390x844) e em 1024x768</td><td class="ok">passou</td></tr>
+<tr><td>deixa o clique no rótulo passar para o jogo</td><td class="ok">passou</td></tr>
+</table></div>
+
+<h2>Falhas que não vêm da feature</h2>
+<p>4 dos 381 e2e falharam na execução completa. Cada um passou sozinho, duas vezes, com <code>--workers=1</code>, e nenhum toca o rótulo: <code>dragEquip.spec.js:586</code> e <code>:640</code> (já na lista de flakes conhecidos), <code>skills.spec.js:49</code> e <code>wake.spec.js:56</code> (novos na lista). Causa: carga da máquina com 10 partes de e2e em paralelo.</p>
+
+<h2>Deploy</h2>
+<p>Só o jogo muda: nenhum arquivo de <code>backend/**</code>, então não há troca de slot nem migração. O commit da release republica o Worker pelo watcher.</p>
+</main>
+</body>
+</html>

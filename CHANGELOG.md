@@ -3,6 +3,14 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.4.1] - 2026-11-18
+
+Versão do jogo na tela (`game-version`).
+
+### Adicionado
+
+- Um rótulo discreto no canto inferior direito da janela mostra a versão do jogo (por exemplo `v0.4.1`) na tela de carregamento, na abertura, no login e na batalha. Ele não cobre botões nem textos, não aceita cliques e fica fora da área do jogo, também no celular.
+
 ## [0.4.0] - 2026-11-18
 
 Mochila com cartas de herói e **Fundir tudo** (`hero-bag-cards`).
