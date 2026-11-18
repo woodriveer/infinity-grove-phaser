@@ -3,6 +3,21 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.4.0] - 2026-11-18
+
+Mochila com cartas de herói e **Fundir tudo** (`hero-bag-cards`).
+
+### Adicionado
+
+- A **Mochila** mostra uma carta por herói, com moldura de madeira, prata ou ouro conforme a melhor estrela, selo **Fundir** quando há fusão possível e fichas com as camadas que você tem. Heróis ainda não encontrados aparecem em cinza.
+- Ao abrir uma carta, a escada de fusão mostra cada camada com a barra de progresso e o botão da fusão, e o botão **Fundir tudo** funde todas as camadas de uma vez, com prévia do antes e do depois e a lista das habilidades que subiram.
+- Tela inicial animada no lugar da tela preta de clique para começar.
+
+### Alterado
+
+- A fusão de heróis saiu do trilho lateral e passou para a Mochila; o trilho agora tem seis botões.
+- As gemas de raridade das peças ficam centradas na borda superior e maiores, com as pontas das lendárias sem se tocar.
+
 ## [0.3.1] - 2026-11-17
 
 Correção em **Rever chefes** (`boss-replay-chapters`).

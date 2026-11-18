@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório de release - hero-bag-cards (v0.4.0)</title>
+<style>body{font-family:system-ui,sans-serif;max-width:60rem;margin:2rem auto;padding:0 1rem;color:#222}table{border-collapse:collapse;width:100%;margin:.5rem 0 1.5rem}td,th{border:1px solid #ccc;padding:.35rem .6rem;text-align:left}th{background:#f1ece0}.ok{color:#1a7f37;font-weight:700}code{background:#f4f4f4;padding:0 .2rem}</style></head><body>
+<h1>hero-bag-cards - v0.4.0</h1>
+<p>Mochila com cartas de herói, escada de fusão, <strong>Fundir tudo</strong> (<code>POST /heroes/{id}/fuse-all</code>), seis botões no trilho e gemas de raridade centradas.</p>
+
+<h2>Veredito</h2>
+<p><span class="ok">PASS</span> (Verifier, rodada 2 de 3, <code>883cd02</code>), aceite do product-owner em <code>54cb62c</code>, revisão de UI rodada 3 APROVADO (<code>b8afc93</code>).</p>
+<ul>
+<li>Faixa de commits: <code>d0b9fa8..54cb62c</code> (44 commits). Ela inclui o commit <code>4ce1835</code> (splash animado no lugar da tela preta), vindo de outro trabalho e intercalado na faixa; seus números estão somados abaixo.</li>
+<li>Sensor (mutantes): rodada 1 matou 17 de 20 (3 sobreviveram: G3, G9, C5); rodada 2 matou os 3 sobreviventes e 6 mutantes novos, 9 de 9 mortos.</li>
+<li>Rodada 2 rodou as suítes completas em <code>ff8584d</code>: backend 1013/1013, unidade do jogo 1764/1764, e2e 373/374 (falha conhecida <code>dragEquip.spec.js:640</code>, passou isolada).</li>
+</ul>
+
+<h2>Código de produção (<code>git diff --numstat d0b9fa8..54cb62c</code>)</h2>
+<table><tr><th>Parte</th><th>Linhas adicionadas</th><th>Removidas</th><th>Arquivos</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td>79</td><td>1</td><td>6</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes + <code>game/public/*.css</code>)</td><td>1033</td><td>123</td><td>13</td></tr></table>
+<p>Specs, testes e assets não contam. Os 4 arquivos de <code>game/ui-review/*.shots.js</code> (220 adicionadas, 20 removidas) são ferramenta de revisão e ficam fora.</p>
+
+<h2>Código de teste</h2>
+<table><tr><th>Suíte</th><th>Linhas +/-</th><th>Arquivos</th><th>Testes adicionados*</th><th>Total após a execução</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td>255 / 0</td><td>4</td><td>22</td><td>1013 (0 falhas)</td></tr>
+<tr><td>Unidade do jogo</td><td>1316 / 189</td><td>10</td><td>118</td><td>1764 em 78 arquivos (0 falhas)</td></tr>
+<tr><td>e2e (<code>game/e2e</code>)</td><td>736 / 83</td><td>9</td><td>30</td><td>374 (369 na execução com cobertura + 5 reexecutadas isoladas, todas passaram)</td></tr></table>
+<p>*Contagem de linhas adicionadas com <code>@Test</code>, <code>it(</code> ou <code>test(</code> no diff da faixa; inclui testes do splash.</p>
+
+<h2>Cobertura dos testes de unidade</h2>
+<table><tr><th>Escopo</th><th>Linhas</th><th>Branches</th></tr>
+<tr><td>Backend inteiro (JaCoCo)</td><td>99,05% (2837 de 2864)</td><td>93,18% (875 de 939)</td></tr>
+<tr><td>Jogo inteiro (Vitest v8)</td><td>98,45% (2937/2983)</td><td>95,53% (1392/1457)</td></tr></table>
+<p>Arquivos que a feature mudou:</p>
+<table><tr><th>Arquivo</th><th>Linhas</th><th>Branches</th></tr>
+<tr><td>HeroService.kt</td><td>100% (34/34)</td><td>100% (6/6)</td></tr>
+<tr><td>PlayerCards.kt</td><td>100% (51/51)</td><td>100% (40/40)</td></tr>
+<tr><td>HeroController.kt</td><td>100% (67/67)</td><td>92,9% (13/14)</td></tr>
+<tr><td>heroesApi.js, heroCollection.js, bagCards.js, bagView.js, fusionLadderView.js, fusionView.js, Boot.js, Splash.js, splashPlan.js</td><td>100%</td><td>100%</td></tr>
+<tr><td>HeroUi.js</td><td>96,04%</td><td>85,79%</td></tr>
+<tr><td>Preloader.js</td><td>66,66%</td><td>100%</td></tr>
+<tr><td>main.js</td><td>0% (ponto de entrada, coberto só pelo e2e)</td><td>0%</td></tr></table>
+<p>HeroExceptions.kt, HeroView.kt e HeroUseCase.kt foram alterados e não foram abertos um a um; entram no total do backend.</p>
+
+<h2>Cobertura e2e (Playwright, istanbul)</h2>
+<p>Linhas do código do jogo exercitadas: <strong>92,82%</strong> (2770 de 2984); branches 77,49% (909/1173). É um limite inferior: página recarregada em teste perde o que contou antes.</p>
+<table><tr><th>Arquivo</th><th>Linhas</th><th>Branches</th></tr>
+<tr><td>HeroUi.js</td><td>91,82%</td><td>72,72%</td></tr><tr><td>bagView.js</td><td>96%</td><td>88,23%</td></tr>
+<tr><td>fusionLadderView.js</td><td>100%</td><td>79,16%</td></tr><tr><td>fusionView.js</td><td>100%</td><td>71,42%</td></tr>
+<tr><td>bagCards.js</td><td>100%</td><td>86,36%</td></tr><tr><td>heroCollection.js, heroesApi.js</td><td>100%</td><td>100%</td></tr></table>
+
+<h2>Cenários e2e da feature (<code>game/e2e/heroBagCards.spec.js</code>, 19 testes, todos passaram)</h2>
+<ol>
+<li>uma carta com moldura por herói, melhor estrela, fichas e selo Fundir</li><li>carta não obtida não abre nada</li>
+<li>sem barra de rolagem no computador com tudo preenchido</li><li>sem barra de rolagem no celular</li>
+<li>carta abre a escada com as camadas e a próxima alcançável</li><li>linha de 9 estrelas não funde</li>
+<li>botão de linha funde uma vez e escada e cartas acompanham</li><li>fusão em andamento desativa a escada e mantém Voltar</li>
+<li>Fundir tudo em andamento mostra Fundindo...</li><li>falha na fusão de linha mantém a escada</li>
+<li>Fundir tudo mostra a prévia da cascata e Não não envia nada</li><li>Sim, fundir funde tudo em um pedido</li>
+<li>Fundir tudo nomeia as skills subidas</li><li>só as skills acima do nível anterior ao pedido</li>
+<li>linha de resultado traz os números do servidor</li><li>Fundir tudo com falha não muda nada</li>
+<li>trilho com seis botões e sem Fusão</li><li>gemas centradas na borda superior das peças</li><li>gema de 9 px, pontas LENDÁRIAS sem tocar</li></ol>
+
+<h2>Testes que falham sem relação com a feature</h2>
+<p>Na execução e2e com cobertura (1,4 h, máquina carregada) falharam 5 testes: <code>dragEquip.spec.js:586</code>, <code>dragEquip.spec.js:640</code>, <code>skills.spec.js:49</code>, <code>uiRedesign.spec.js:1338</code> e <code>wake.spec.js:56</code> (esperava menos de 15 s e levou 18,8 s). Todos são temporização sob carga e nenhum toca a Mochila. Reexecutados juntos com <code>--workers=1</code>: 5 de 5 passaram. A rodada 2 do Verifier já tinha visto <code>dragEquip.spec.js:640</code> passar isolado duas vezes.</p>
+
+<h2>Deploy e produção</h2>
+<ul><li>Backend ativo: slot blue, imagem <code>ff8584d</code> (inclui <code>fuse-all</code>); o watcher registrou <code>54cb62c</code> como tratado. Sem migração Flyway.</li>
+<li>Site <code>https://infinity-grove.yan-tapajos.workers.dev/</code> no ar enquanto <code>publish.sh</code> roda. Verificação no Chrome: seis botões no trilho, Mochila com cinco cartas (selo Fundir, fichas de camada, moldura por estrela), escada de fusão e botão Fundir tudo na carta; requisições da API 200 e console sem erros. Fundir tudo não foi executado em produção para não alterar dados da conta de teste.</li></ul>
+</body></html>
