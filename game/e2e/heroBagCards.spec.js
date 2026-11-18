@@ -67,6 +67,19 @@ test.describe('Mochila hero cards', () => {
 
         await expect(kael).toHaveAttribute('data-frame', 'wood');
         await expect(page.getByTestId('bag-card-star-kael')).toHaveText('2★');
+
+        //  BAG-04: the star badge is centred on the top edge of the card, horizontally and vertically
+        const cardBox = await kael.boundingBox();
+        const badgeBox = await page.getByTestId('bag-card-star-kael').boundingBox();
+
+        expect(Math.abs((badgeBox.x + badgeBox.width / 2) - (cardBox.x + cardBox.width / 2))).toBeLessThanOrEqual(1);
+        expect(badgeBox.y).toBeLessThan(cardBox.y);
+        expect(badgeBox.y + badgeBox.height).toBeGreaterThan(cardBox.y);
+        //  The badge is 24 px high and sits at `top: -12px` of the padding box, so its centre lies on the inner line of the 4 px card border: within 5 px of the card edge
+        const badgeScale = badgeBox.height / 24;
+
+        expect(Math.abs((badgeBox.y + badgeBox.height / 2) - cardBox.y)).toBeLessThanOrEqual(5 * badgeScale);
+
         await expect(chips(page, 'kael')).toHaveText([ '0★×45', '1★×1', '2★×2' ]);
         await expect(page.getByTestId('bag-card-fuse-kael')).toHaveText('Fundir');
         await expect(kael.locator('.bag-card-ribbon')).toHaveText('Kael Raizférrea');
@@ -208,6 +221,7 @@ test.describe('Mochila hero cards', () => {
         await expect(page.getByTestId('fusion-button-kael-0')).toBeDisabled();
         await expect(page.getByTestId('fusion-all')).toBeDisabled();
         await expect(page.getByTestId('hero-back')).toBeEnabled();
+        await expect(page.getByTestId('hero-close')).toBeEnabled();
         await expect(page.getByTestId('fusion-button-kael-0')).toHaveText('Fundindo...');
         await expect(page.getByTestId('fusion-all')).toHaveText('Fundir tudo');
         await expect(page.getByTestId('bag-entry-detail')).toHaveClass(/\bis-busy\b/);
@@ -243,6 +257,8 @@ test.describe('Mochila hero cards', () => {
 
         await expect(page.getByTestId('fusion-all')).toHaveText('Fundindo...');
         await expect(page.getByTestId('fusion-all')).toBeDisabled();
+        await expect(page.getByTestId('hero-back')).toBeEnabled();
+        await expect(page.getByTestId('hero-close')).toBeEnabled();
         await expect(page.getByTestId('fusion-button-kael-0')).toHaveText('0★→1★');
         await expect(page.getByTestId('fusion-button-kael-0')).toBeDisabled();
         await expect(page.getByTestId('bag-entry-detail')).toHaveClass(/\bis-busy\b/);
@@ -343,6 +359,38 @@ test.describe('Mochila hero cards', () => {
         await expect(page.getByTestId('bag-card-kael')).toHaveAttribute('data-frame', 'silver');
     });
 
+    test('Fundir tudo names only the skills raised above their level before the request', async ({ page }) => {
+        //  4★ Kael: Corte Dimensional is already at level 2; three 4★ copies make a 5★ that raises Investida do Baluarte only
+        await startWith(page, { 'kael:4': 3 });
+        await openHero(page, 'kael');
+        await page.getByTestId('fusion-all').click();
+
+        await expect(page.getByTestId('fusion-all-question')).toHaveText('Fazer 1 fusão?');
+
+        await page.getByTestId('fusion-all-yes').click();
+
+        await expect(page.getByTestId('fusion-result')).toHaveText('1 fusão. Melhor carta: Kael Raizférrea 5★ · Investida do Baluarte no nível 2');
+    });
+
+    test('the result line carries the server numbers when a card dropped after the preview', async ({ page }) => {
+        const backend = await startWith(page, KAEL_LADDER);
+
+        await openHero(page, 'kael');
+        await page.getByTestId('fusion-all').click();
+
+        await expect(page.getByTestId('fusion-all-question')).toHaveText('Fazer 22 fusões?');
+
+        //  Three blank cards drop between the preview and Sim, fundir: the server fuses 48 blanks, not 45 (D13)
+        backend.cardsOf('yan').copies['kael:0'] += 3;
+        await page.getByTestId('fusion-all-yes').click();
+
+        await expect(page.getByTestId('fusion-result')).toHaveText('23 fusões. Melhor carta: Kael Raizférrea 3★');
+        await expect(copiesText(page, 'kael', 1)).toHaveText('2/3');
+        await expect(copiesText(page, 'kael', 2)).toHaveText('1/3');
+        await expect(copiesText(page, 'kael', 3)).toHaveText('2/3');
+        await expect(page.getByTestId('fusion-row-kael-0')).toHaveCount(0);
+    });
+
     test('a failed Fundir tudo changes nothing', async ({ page }) => {
         await startWith(page, KAEL_LADDER);
         await page.route('**/api/heroes/kael/fuse-all', (route) => route.fulfill({ status: 500, json: { detail: 'down' } }));
@@ -382,6 +430,10 @@ test.describe('Mochila hero cards', () => {
 
         await centered('equip-piece-m1');
         await centered('equip-slot-kael-WEAPON');
+
+        //  BAG-01: the gem row sits 5 px above the padding box of the tile, on the bag tile and on the slot
+        await expect(page.getByTestId('equip-piece-m1').locator('.piece-gems')).toHaveCSS('top', '-5px');
+        await expect(page.getByTestId('equip-slot-kael-WEAPON').locator('.piece-gems')).toHaveCSS('top', '-5px');
 
         await expect(page.getByTestId('equip-piece-m1')).toHaveAttribute('data-gems', '4');
         await expect(page.getByTestId('equip-piece-m1').locator('.piece-refine')).toHaveText('+2');
