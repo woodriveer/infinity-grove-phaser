@@ -1,4 +1,4 @@
-//  What a commit range touches: the backend (any backend/** file) and the game (the paths publish.sh fingerprints, tests left out)
+//  What a commit range touches: the backend (any backend/** file except the test sources in backend/src/test/**) and the game (the paths publish.sh fingerprints, tests left out)
 const GAME_DIRS = ['game/src/', 'game/public/', 'game/worker/'];
 const GAME_FILES = [
     'game/index.html',
@@ -11,11 +11,15 @@ const GAME_FILES = [
     'game/.env.production'
 ];
 
+const BACKEND_TEST_DIR = 'backend/src/test/';
+
+const isBackend = (file) => file.startsWith('backend/') && !file.startsWith(BACKEND_TEST_DIR);
+
 const isGame = (file) =>
     !file.endsWith('.test.js') && (GAME_FILES.includes(file) || GAME_DIRS.some((dir) => file.startsWith(dir)));
 
 export const classify = (files) => ({
-    backend: files.some((file) => file.startsWith('backend/')),
+    backend: files.some(isBackend),
     game: files.some(isGame)
 });
 

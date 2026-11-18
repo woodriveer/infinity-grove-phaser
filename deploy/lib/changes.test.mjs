@@ -40,6 +40,41 @@ test('game tests, e2e files and the readme are neither', () =>
     assert.deepEqual(classify(['README.md']), { backend: false, game: false });
 });
 
+test('backend tests alone are not backend', () =>
+{
+    assert.deepEqual(classify(['backend/src/test/kotlin/AppTest.kt']), { backend: false, game: false });
+    assert.deepEqual(classify(['backend/src/test/resources/application-test.yml']), { backend: false, game: false });
+    assert.deepEqual(
+        classify(['backend/src/test/kotlin/A.kt', 'backend/src/test/kotlin/B.kt']),
+        { backend: false, game: false }
+    );
+});
+
+test('backend main code, build files and migrations are backend', () =>
+{
+    const paths = [
+        'backend/src/main/kotlin/App.kt',
+        'backend/src/main/resources/db/migration/V1__x.sql',
+        'backend/build.gradle.kts',
+        'backend/settings.gradle.kts',
+        'backend/gradle/wrapper/gradle-wrapper.properties',
+        'backend/Dockerfile'
+    ];
+
+    for (const path of paths)
+    {
+        assert.deepEqual(classify([path]), { backend: true, game: false }, path);
+    }
+});
+
+test('backend tests mixed with backend main code are backend', () =>
+{
+    assert.deepEqual(
+        classify(['backend/src/test/kotlin/AppTest.kt', 'backend/src/main/kotlin/App.kt']),
+        { backend: true, game: false }
+    );
+});
+
 test('a mixed list is both', () =>
 {
     assert.deepEqual(classify(['README.md', 'backend/build.gradle.kts', 'game/src/a.js']), { backend: true, game: true });
