@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Versão do jogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Versão do jogo</h1>
+                <div class="meta">
+                    <code>.specs/features/game-version</code> · commits <code>f1e820a..0cf9f4f</code> · 2026-11-18 · servidor local (npm run dev), backend simulado
+                </div>
+            </div>
+            <span class="chip verdict ok">APROVADO</span>
+        </div>
+        <p style="margin-top:16px">O rótulo <code>div.game-version</code> aparece em todas as telas (carregamento, abertura, login, batalha e Mochila) no canto inferior direito da janela, a 8 px da direita e 4 px de baixo, fora do canvas, em uma única linha, pergaminho a 60 % de opacidade e mais apagado que qualquer texto do HUD. Em 1280×720 fica na faixa direita, em 390×844 na faixa inferior e em 1024×768 na faixa sob a barra de batalha, sem tocar o anel da barra nem o botão Farm boss. Nenhum achado. Em desenvolvimento lê <code>v0.0.0</code> (a versão 0.4.1 entra no commit de release); avaliei o visual, não o número.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">6</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">11</div><div class="l">capturas (desktop + celular)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>O rótulo lê <code>v&lt;versão&gt;</code> no canto inferior direito em todas as telas <code>GV-01..GV-05, GV-09</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Em 1280×720 fica na faixa direita; em 390×844, na faixa inferior; nunca sobre o canvas <code>GV-10, GV-11</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Em 1024×768 fica sob a barra de batalha, com folga visível acima, sem tocar o anel nem o botão Farm boss <code>GV-09</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Figtree 600 de 12 px, pergaminho do tema Grove a 60 %, sombra suave, uma linha, sem corte <code>GV-12</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Mais apagado que todo texto do HUD e ainda legível (desktop e celular) <code>GV-12</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Não cobre nem bloqueia a Mochila aberta; texto não é inglês nem traduzível (é um número de versão) <code>GV-13, AD-007</code></span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>Carregamento</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/01-loading-desktop.png" target="_blank"><img src="ui-review/01-loading-desktop.png" alt="Carregamento" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Carregamento</span>
+                        <span class="d">Barra de carregamento (background.png retido); rótulo no canto, sobre o fundo escuro.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/01-loading-phone.png" target="_blank"><img src="ui-review/01-loading-phone.png" alt="Carregamento" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Carregamento</span>
+                        <span class="d">Rótulo na faixa inferior, abaixo da barra; legível.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Abertura</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/02-splash-desktop.png" target="_blank"><img src="ui-review/02-splash-desktop.png" alt="Abertura" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Abertura</span>
+                        <span class="d">Splash com a árvore; rótulo discreto no canto inferior direito.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/02-splash-phone.png" target="_blank"><img src="ui-review/02-splash-phone.png" alt="Abertura" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Abertura</span>
+                        <span class="d">Splash em tela estreita; rótulo na faixa inferior.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Login</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/03-login-desktop.png" target="_blank"><img src="ui-review/03-login-desktop.png" alt="Login" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Login</span>
+                        <span class="d">Formulário de login; rótulo fora do canvas, na faixa direita.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/03-login-phone.png" target="_blank"><img src="ui-review/03-login-phone.png" alt="Login" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Login</span>
+                        <span class="d">Login em celular; rótulo na faixa inferior, fora do canvas.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Batalha</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/04-battle-desktop.png" target="_blank"><img src="ui-review/04-battle-desktop.png" alt="Batalha" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Batalha</span>
+                        <span class="d">Batalha; rótulo na faixa direita, longe do HUD.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/04-battle-phone.png" target="_blank"><img src="ui-review/04-battle-phone.png" alt="Batalha" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Batalha</span>
+                        <span class="d">Batalha em celular; rótulo na faixa inferior, sem tocar a barra de batalha.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Batalha com a Mochila aberta</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/05-battle-bag-desktop.png" target="_blank"><img src="ui-review/05-battle-bag-desktop.png" alt="Batalha com a Mochila aberta" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Batalha com a Mochila aberta</span>
+                        <span class="d">Mochila aberta; o rótulo continua visível e não cobre nada.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/05-battle-bag-phone.png" target="_blank"><img src="ui-review/05-battle-bag-phone.png" alt="Batalha com a Mochila aberta" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Batalha com a Mochila aberta</span>
+                        <span class="d">Mochila em celular; rótulo na faixa inferior.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Batalha em 4:3 (1024×768)</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/06-battle-4x3-desktop.png" target="_blank"><img src="ui-review/06-battle-4x3-desktop.png" alt="Batalha em 4:3" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Batalha em 4:3</span>
+                        <span class="d">Sem faixas laterais: o rótulo fica na faixa sob a barra de batalha, com folga de uns 5 px acima e sem tocar o anel nem o Farm boss.</span>
+                        <span class="tags"><span class="chip vp">Janela 1024×768</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <p class="empty">Nenhum achado.</p>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>Em 1024×768 o rótulo fica sobre a arte clara da floresta; a leitura é boa, mas é a situação de menor contraste. Se o jogador reclamar, subir a opacidade de 0,6 para 0,7 em <code>.game-version</code> (<code>game/public/style.css</code>) mantém a hierarquia.</span></li>
+            <li><span class="mark">✦</span><span>No celular (390×844) o rótulo de 12 px fica maior que o texto do HUD, que é reduzido junto com o canvas. Segue a spec (tamanho fixo), mas vale reavaliar se aparecer reclamação de ruído visual.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <ul class="checks"><li><span class="mark">✓</span><span>Nenhum 404, erro de página ou erro de console. Só aparece o aviso do driver do Chrome <code>GPU stall due to ReadPixels</code>, causado pela captura de tela, não pelo jogo.</span></li></ul>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-18</footer>
+</main>
+</body>
+</html>
