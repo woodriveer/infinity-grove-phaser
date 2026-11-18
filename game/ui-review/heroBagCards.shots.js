@@ -176,6 +176,16 @@ test('gems', async ({ page }, testInfo) => {
     await page.mouse.move(0, 0);
     await shot(page, testInfo, '14-gems-bag');
     await shot(page, testInfo, '15-gems-slots');
+
+    //  Gap between the turned tips of neighbouring gems, in CSS px of the 60 px tile (D23: 2.27 expected)
+    const tips = (testid) => page.getByTestId(testid).evaluate((tile) => {
+        const scale = tile.getBoundingClientRect().width / 60;
+        const boxes = [ ...tile.querySelectorAll('.piece-gem') ].map((gem) => gem.getBoundingClientRect());
+
+        return boxes.slice(1).map((box, i) => ((box.left - boxes[i].right) / scale).toFixed(2)).join(' ');
+    });
+
+    console.log(`PROBE gem tips (${testInfo.project.name}): bag ${await tips('equip-piece-b5')} slot ${await tips('equip-slot-kael-ARMOR')}`);
     await page.getByTestId('bulk-sell-start').click();
     await expect(page.getByTestId('bulk-sell-bar')).toBeVisible();
     await shot(page, testInfo, '16-gems-bulk-sell');

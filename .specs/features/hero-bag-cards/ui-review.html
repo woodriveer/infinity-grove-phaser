@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Revisão de UI · Mochila: cartas de herói e escada de fusão (rodada 2)</title>
+<title>Revisão de UI · Mochila: cartas de herói e escada de fusão (rodada 3)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
@@ -105,19 +105,19 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
     <section class="panel">
         <div class="head">
             <div>
-                <h1>Mochila: cartas de herói e escada de fusão (rodada 2)</h1>
+                <h1>Mochila: cartas de herói e escada de fusão (rodada 3)</h1>
                 <div class="meta">
-                    <code>.specs/features/hero-bag-cards</code> · commits <code>c88b956 a 71a1b50</code> · 2026-11-18 · local (vite dev, backend falso)
+                    <code>.specs/features/hero-bag-cards</code> · commits <code>d91e35f a 76f2dd6</code> · 2026-11-18 · local (vite dev, backend falso)
                 </div>
             </div>
-            <span class="chip verdict changes">ALTERAÇÕES</span>
+            <span class="chip verdict ok">APROVADO</span>
         </div>
-        <p style="margin-top:16px">Os achados #1 a #6 e as sugestões D25 e D26 estão resolvidos: molduras distintas, hover visível, brilhos fora do texto, Fundindo... no botão certo, resultado em 16 px e prévia Antes/Depois que cabe. O achado #7 ficou pela metade: as gemas têm 10 px, mas as quatro gemas lendárias se encostam, contra o critério da T20 (novo achado #9, baixo). O achado #8 segue fora do escopo (TD-010).</p>
+        <p style="margin-top:16px">Rodada 3, só o achado #9. Com as gemas de 9 px e gap de 6 px (D23, Q9, T23 e T24), as quatro gemas da peça LENDÁRIA têm folga de fundo do tile entre as pontas: a sonda mede 2,27 px entre todas as gemas vizinhas, na mochila e no encaixe, em desktop e celular. As bordas escuras não se fundem, cada gema segue um losango colorido, as fileiras estão centradas e nenhuma ponta passa da lateral do tile. Achado #9 resolvido; nenhum achado novo. Os achados #1 a #7 e as sugestões D25 e D26 seguem resolvidos desde a rodada 2 (<code>d91e35f</code>) e não foram revistos; o #8 segue fora do escopo (TD-010).</p>
         <div class="stats">
-            <div class="stat"><div class="n">17</div><div class="l">telas e estados verificados</div></div>
-            <div class="stat"><div class="n">34</div><div class="l">capturas (desktop + celular)</div></div>
+            <div class="stat"><div class="n">3</div><div class="l">estados verificados nesta rodada (14 a 16)</div></div>
+            <div class="stat"><div class="n">6</div><div class="l">capturas novas (desktop + celular); 01 a 13 e 17 são da rodada 2</div></div>
             <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
-            <div class="stat"><div class="n">1</div><div class="l">achados médios e baixos</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados médios e baixos</div></div>
         </div>
     </section>
 
@@ -130,7 +130,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
             <li class="yes"><span class="mark">✓</span><span>Selo Fundir oculto no card do detalhe; chips alinhados entre cards (fita de duas linhas) <code>D25, D26</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Fundindo... no botão clicado e cursor de progresso <code>D23, BAG-32</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Prévia em duas linhas Antes e Depois, 15 px, sem estouro; resultado em 16 px <code>D24, BAG-35</code></span></li>
-            <li class="no"><span class="mark">✗</span><span>Gemas de raridade com 10 px e as quatro gemas lendárias sem se tocar <code>design.md § Rarity gems (T20) — as pontas das quatro gemas se encostam (achado #9)</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Gemas de raridade de 9 px com gap de 6 px; as quatro gemas lendárias sem se tocar (folga medida de 2,27 px) <code>design.md § Rarity gems, D23, Q9</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Todo texto novo em português <code>AD-007</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Um card por herói, estrela centralizada, chips por camada, cards cinza Não encontrado, sem rolagem, trilho de seis botões <code>BAG-01 a BAG-11, BAG-38</code></span></li>
         </ul>
@@ -397,24 +397,24 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <a href="ui-review/14-gems-bag-desktop.png" target="_blank"><img src="ui-review/14-gems-bag-desktop.png" alt="Mochila de equipamentos com uma peça de cada raridade" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Mochila de equipamentos com uma peça de cada raridade</span>
-                        <span class="d">Gemas de 10 px centralizadas; as 4 gemas LENDÁRIAS encostam ponta com ponta (achado #9).</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #9</span></span>
+                        <span class="d">Gemas de 9 px centralizadas; as 4 gemas LENDÁRIAS com folga entre as pontas (sonda 2,27 px).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/15-gems-slots-desktop.png" target="_blank"><img src="ui-review/15-gems-slots-desktop.png" alt="Mesma tela, encaixes vestidos" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Mesma tela, encaixes vestidos</span>
-                        <span class="d">Armadura lendária com 4 gemas encostadas (achado #9).</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #9</span></span>
+                        <span class="d">Armadura lendária de Kael com 4 gemas separadas (sonda 2,27 px).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/16-gems-bulk-sell-desktop.png" target="_blank"><img src="ui-review/16-gems-bulk-sell-desktop.png" alt="Modo Vender várias" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Modo Vender várias</span>
-                        <span class="d">Gemas centralizadas; peça lendária com gemas encostadas (achado #9).</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #9</span></span>
+                        <span class="d">Gemas centralizadas; peça lendária com gemas separadas (sonda 2,27 px).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
             </div>
@@ -423,24 +423,24 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <a href="ui-review/14-gems-bag-phone.png" target="_blank"><img src="ui-review/14-gems-bag-phone.png" alt="Mochila de equipamentos com uma peça de cada raridade" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Mochila de equipamentos com uma peça de cada raridade</span>
-                        <span class="d">Gemas de 10 px centralizadas; as 4 gemas LENDÁRIAS encostam ponta com ponta (achado #9).</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #9</span></span>
+                        <span class="d">Gemas de 9 px centralizadas; as 4 gemas LENDÁRIAS com folga entre as pontas (sonda 2,27 px).</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/15-gems-slots-phone.png" target="_blank"><img src="ui-review/15-gems-slots-phone.png" alt="Mesma tela, encaixes vestidos" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Mesma tela, encaixes vestidos</span>
-                        <span class="d">Armadura lendária com 4 gemas encostadas (achado #9).</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #9</span></span>
+                        <span class="d">Armadura lendária de Kael com 4 gemas separadas (sonda 2,27 px).</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/16-gems-bulk-sell-phone.png" target="_blank"><img src="ui-review/16-gems-bulk-sell-phone.png" alt="Modo Vender várias" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Modo Vender várias</span>
-                        <span class="d">Gemas centralizadas; peça lendária com gemas encostadas (achado #9).</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #9</span></span>
+                        <span class="d">Gemas centralizadas; peça lendária com gemas separadas (sonda 2,27 px).</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
             </div>
@@ -449,25 +449,12 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
 
     <section class="panel">
         <h2>Achados</h2>
-        <article class="finding">
-            <div>
-                <div class="top"><span class="chip sev-baixa">#9 · Baixa</span><strong>As quatro gemas lendárias encostam ponta com ponta</strong></div>
-                <dl>
-                    <dt>Tela</dt><dd>Equipamento: mochila, encaixes e Vender várias (desktop e celular), shots 14, 15 e 16</dd>
-                    <dt>Seletor</dt><dd><code>.piece-gems</code> / <code>.piece-gem</code></dd>
-                    <dt>O que está errado</dt><dd>Cada gema é um quadrado de 10 px girado 45° (diagonal de cerca de 14 px) com passo de 15 px (10 px mais gap de 5 px). A folga entre as pontas é de cerca de 1 px e as bordas escuras se fundem: as quatro gemas da peça LENDÁRIA parecem uma fileira contínua, contra o critério da T20 (não se tocam).</dd>
-                    <dt>Como deveria ficar</dt><dd>Gemas de 9 px (diagonal de cerca de 12,7 px, ainda com mais de 8 px de cor) e gap de 6 px: passo de 15 px, folga de cerca de 2,3 px e largura visual de cerca de 58 px, dentro do tile de 62 px.</dd>
-                    <dt>Correção exata</dt><dd>Em <code>.piece-gem</code> trocar <code>width: 10px; height: 10px</code> por <code>width: 9px; height: 9px</code> e em <code>.piece-gems</code> trocar <code>gap: 5px</code> por <code>gap: 6px</code>, mantendo <code>left: 50%; transform: translateX(-50%)</code>. Atualizar o teste que fixa 10 px, se houver.</dd>
-                    <dt>Arquivo</dt><dd><code>game/public/style.css</code> (linhas 2541 a 2557)</dd>
-                </dl>
-            </div>
-            <a href="ui-review/14-gems-bag-desktop.png" target="_blank"><img src="ui-review/14-gems-bag-desktop.png" alt="Captura do achado #9"></a>
-        </article>
+        <p class="empty">Nenhum achado novo. O achado #9 (gemas lendárias encostadas) está resolvido: sonda de pontas (CSS px do tile de 60 px) em desktop e celular, mochila 2,27 2,27 2,27 e encaixe 2,27 2,27 2,27 (esperado 2,27; faixa aceita 2,17 a 2,37). Shots 14, 15 e 16.</p>
     </section>
 
     <section class="panel">
         <h2>Sugestões</h2>
-        <p>Estado dos achados da rodada 1 e das sugestões:</p>
+        <p>Estado dos achados (#1 a #7 e D25 e D26 carregados da rodada 2, não revistos; #9 revisto na rodada 3):</p>
         <ul class="checks">
             <li><span class="mark">✦</span><span>Achado #1 (brilhos sobre o texto): resolvido. Shots 02 e 07 mostram os brilhos só na borda e no retrato.</span></li>
             <li><span class="mark">✦</span><span>Achado #2 (hover): resolvido. Shot 03: faixa dourada opaca e card mais claro.</span></li>
@@ -475,7 +462,8 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
             <li><span class="mark">✦</span><span>Achado #4 (Fundindo...): resolvido. Shots 11 (botão da linha) e 17 (Fundir tudo); os outros botões mantêm o texto.</span></li>
             <li><span class="mark">✦</span><span>Achado #5 (resultado): resolvido. Shot 10: 16 px, duas linhas, sem palavra sozinha.</span></li>
             <li><span class="mark">✦</span><span>Achado #6 (Antes/Depois): resolvido. Shot 08: duas linhas de 15 px; sonda 630/630 em Antes e em Depois, nos dois tamanhos de tela.</span></li>
-            <li><span class="mark">✦</span><span>Achado #7 (gemas): parcialmente resolvido. As gemas medem 10 px, estão centralizadas e dentro do tile (shots 14 a 16), mas as quatro lendárias se tocam: novo achado #9.</span></li>
+            <li><span class="mark">✦</span><span>Achado #7 (gemas): resolvido. Gemas de 9 px, centralizadas e dentro do tile (shots 14 a 16).</span></li>
+            <li><span class="mark">✦</span><span>Achado #9 (gemas lendárias encostadas): resolvido na rodada 3, folga de 2,27 px medida (shots 14, 15 e 16).</span></li>
             <li><span class="mark">✦</span><span>Achado #8 (texto pequeno no celular): fora do escopo, tratado em TD-010.</span></li>
             <li><span class="mark">✦</span><span>Sugestão do selo Fundir no detalhe (D25): resolvida, shot 05. Sugestão dos chips na mesma altura (D26): resolvida, shots 01 e 02. A arte pintada em 9-slice continua como acompanhamento.</span></li>
         </ul>
