@@ -1857,7 +1857,7 @@ expect(rowBox.x + rowBox.width).toBeLessThanOrEqual(tileBox.x + tileBox.width);
 
 ---
 
-### T23: Space the rarity gems so the LEGENDARY tips do not touch [ ]
+### T23: Space the rarity gems so the LEGENDARY tips do not touch [x]
 
 **Owner**: game-dev
 **Goal**: Each rarity gem becomes a 9x9 px square with a 6 px gap, so two neighbouring tips stand 2.27 px apart and the 4 LEGENDARY gems stay centred inside the 60 px tile (BAG-40, BAG-01; spec D23 as amended by re-review finding #9).
@@ -1883,9 +1883,9 @@ Expected geometry (design.md § Rarity gems): row of 4 = 4×9 + 3×6 = 54 px, ro
 **Gate**: full - `cd game && npm test && npm run build && npx playwright test e2e/heroBagCards.spec.js e2e/equipmentUi.spec.js e2e/bulkSell.spec.js --grep-invert "each rarity gem is a"` (the T21 test `each rarity gem is a 10 px square and the gem rows fit their tiles` pins 10 px and 5 px and fails from this task until T24)
 **Done when**:
 
-- [ ] `git diff --stat game/public/style.css` shows 3 insertions and 3 deletions.
-- [ ] `grep -n "width: 9px;\|height: 9px;\|gap: 6px;" game/public/style.css` prints the three changed lines inside `.piece-gems` and `.piece-gem`.
-- [ ] The gate passes, `the rarity gems sit centered on the top edge of every piece tile` included.
+- [x] `git diff --stat game/public/style.css` shows 3 insertions and 3 deletions.
+- [x] `grep -n "width: 9px;\|height: 9px;\|gap: 6px;" game/public/style.css` prints the three changed lines inside `.piece-gems` and `.piece-gem`.
+- [x] The gate passes, `the rarity gems sit centered on the top edge of every piece tile` included.
 
 **Commit**: `style(game): space the rarity gems so the legendary tips do not touch`
 
