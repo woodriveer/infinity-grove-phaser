@@ -402,21 +402,21 @@ test.describe('Mochila hero cards', () => {
         await centered('equip-piece-m1');
     });
 
-    test('each rarity gem is a 10 px square and the gem rows fit their tiles', async ({ page }) => {
+    test('each rarity gem is a 9 px square, the LEGENDARY tips do not touch and the gem rows fit their tiles', async ({ page }) => {
         await startWith(page, { 'kael:0': 1 }, { equipment: [ piece('m1', 'RING', 'LEGENDARY', 2), piece('w1', 'WEAPON', 'EPIC', 0, 'kael') ] });
         await page.getByTestId('hud-equipment').click();
         await expect(page.getByTestId('equipment-list')).toBeVisible();
 
-        for (const [ testid, count, width ] of [ [ 'equip-piece-m1', 4, 55 ], [ 'equip-slot-kael-WEAPON', 3, 40 ] ]) {
+        for (const [ testid, count, width ] of [ [ 'equip-piece-m1', 4, 54 ], [ 'equip-slot-kael-WEAPON', 3, 39 ] ]) {
             const tile = page.getByTestId(testid);
             const gems = tile.locator('.piece-gem');
 
             await expect(gems).toHaveCount(count);
             for (let i = 0; i < count; i++) {
-                await expect(gems.nth(i)).toHaveCSS('width', '10px');
-                await expect(gems.nth(i)).toHaveCSS('height', '10px');
+                await expect(gems.nth(i)).toHaveCSS('width', '9px');
+                await expect(gems.nth(i)).toHaveCSS('height', '9px');
             }
-            await expect(tile.locator('.piece-gems')).toHaveCSS('column-gap', '5px');
+            await expect(tile.locator('.piece-gems')).toHaveCSS('column-gap', '6px');
 
             const tileBox = await tile.boundingBox();
             const rowBox = await tile.locator('.piece-gems').boundingBox();
@@ -426,6 +426,22 @@ test.describe('Mochila hero cards', () => {
             expect(Math.abs(rowBox.width / scale - width)).toBeLessThanOrEqual(0.5);
             expect(rowBox.x).toBeGreaterThanOrEqual(tileBox.x);
             expect(rowBox.x + rowBox.width).toBeLessThanOrEqual(tileBox.x + tileBox.width);
+
+            //  Turned 45°, a 9 px gem is 9√2 ≈ 12.73 px across; on the 15 px pitch two tips stand 15 − 12.73 ≈ 2.27 px apart (D23, finding #9)
+            const boxes = [];
+            for (let i = 0; i < count; i++) {
+                boxes.push(await gems.nth(i).boundingBox());
+            }
+
+            for (const box of boxes) {
+                expect(Math.abs(box.width / scale - 12.73)).toBeLessThanOrEqual(0.5);
+            }
+            for (let i = 1; i < count; i++) {
+                expect((boxes[i].x - (boxes[i - 1].x + boxes[i - 1].width)) / scale).toBeGreaterThanOrEqual(2);
+            }
+            //  The turned tips of the end gems stay inside the tile (about 1.14 px clear on each side of the LEGENDARY tile)
+            expect(boxes[0].x).toBeGreaterThanOrEqual(tileBox.x);
+            expect(boxes[count - 1].x + boxes[count - 1].width).toBeLessThanOrEqual(tileBox.x + tileBox.width);
         }
     });
 });

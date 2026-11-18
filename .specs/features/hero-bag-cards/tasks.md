@@ -1891,7 +1891,7 @@ Expected geometry (design.md § Rarity gems): row of 4 = 4×9 + 3×6 = 54 px, ro
 
 ---
 
-### T24: e2e of the 9 px gems and the tip gap [ ]
+### T24: e2e of the 9 px gems and the tip gap [x]
 
 **Owner**: test-engineer
 **Goal**: Pin in the browser the amended gem size, gap and tip spacing of BAG-40 (spec D23, finding #9), replacing the 10 px values of the T21 test.
@@ -1937,10 +1937,10 @@ Expected values (spec D23): gem `width` and `height` `9px`, row `column-gap` `6p
 **Gate**: full - `cd game && npm test && npx playwright test e2e/heroBagCards.spec.js`
 **Done when**:
 
-- [ ] `e2e/heroBagCards.spec.js` still has 17 tests and all pass.
-- [ ] `grep -n "'10px'\|column-gap', '5px'\|10 px square" game/e2e/heroBagCards.spec.js` prints nothing.
-- [ ] `grep -n "12.73" game/e2e/heroBagCards.spec.js` prints the comment and the width assertion.
-- [ ] The three files of step 3 pass (flakes named as such).
+- [x] `e2e/heroBagCards.spec.js` still has 17 tests and all pass.
+- [x] `grep -n "'10px'\|column-gap', '5px'\|10 px square" game/e2e/heroBagCards.spec.js` prints nothing.
+- [x] `grep -n "12.73" game/e2e/heroBagCards.spec.js` prints the comment and the width assertion.
+- [x] The three files of step 3 pass (flakes named as such).
 
 **Commit**: `test(game): pin the 9 px gems and the gap between their tips`
 
