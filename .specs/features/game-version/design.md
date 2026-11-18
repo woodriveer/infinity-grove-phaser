@@ -1,7 +1,7 @@
 # Game Version Label Design
 
 **Spec**: `.specs/features/game-version/spec.md`
-**Status**: Draft, waiting for the owner's approval of the spec rulings Q1 to Q6 (2026-11-18)
+**Status**: Done and accepted by the product owner on 2026-11-18 (`tasks.md` § Acceptance); the owner approved Q1 to Q6 on 2026-11-18 (`469342c`)
 
 ---
 

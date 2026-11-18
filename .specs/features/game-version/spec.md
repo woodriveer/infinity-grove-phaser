@@ -6,9 +6,9 @@ Nothing on screen tells which build of the game a player or a screenshot shows. 
 
 ## Goals
 
-- [ ] Every screen of the game (loading bar, splash, login, battle) shows the version of the build in the bottom-right corner of the browser window.
-- [ ] The version shown is the `version` of `game/package.json` in the commit the build was made from, with no manual step besides the `gitops` bump.
-- [ ] The label covers no control and no game text on a 1280x720 screen and on a 390x844 phone, and never takes a click.
+- [x] Every screen of the game (loading bar, splash, login, battle) shows the version of the build in the bottom-right corner of the browser window.
+- [x] The version shown is the `version` of `game/package.json` in the commit the build was made from, with no manual step besides the `gitops` bump.
+- [x] The label covers no control and no game text on a 1280x720 screen and on a 390x844 phone, and never takes a click.
 
 ## Out of Scope
 
@@ -25,26 +25,26 @@ Nothing on screen tells which build of the game a player or a screenshot shows. 
 
 ## Assumptions & Open Questions
 
-Rows marked `y` were answered by the owner on 2026-11-18 (relayed by the orchestrator). Rows marked `n (Q<n>)` are product-owner rulings waiting for the owner's approval; each has a question below with the recommended default.
+Rows marked `y` were answered by the owner on 2026-11-18 (relayed by the orchestrator). Rows marked `y (Q<n>)` were product-owner rulings; the owner approved each with the recommended default of its question below on 2026-11-18 (`469342c`).
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
 | D1 Corner | Bottom right | Owner's answer | y |
 | D2 Screens | Every screen of the page: the loading bar (Preloader), the splash, the start screen (login form, welcome, path choice) and the battle (ClickerGame) with any panel open. The e2e names four of them: loading, splash, login form, battle | Owner's answer ("splash/abertura, login and the game itself, so any screenshot shows the version"); the loading bar comes before the splash, so a screenshot of it carries the version too (L-031: one test per named screen) | y |
 | D3 Source | `game/package.json` `version`, read by `vite.config.js` when the dev server starts or `vite build` runs, and handed to the game as the Vite `define` constant `__GAME_VERSION__` (a JSON string). A built Worker shows the version of the commit it was built from | Owner's answer; the Worker is built from the commit tree (CLAUDE.md § Deploy) | y |
-| D4 Text | `v` followed by the version with surrounding whitespace removed: `v0.4.1`. No word before it (`Versão`), no build suffix | Short, the form of the release tags (`v0.4.0`) and of `CHANGELOG.md`; language-neutral, so AD-007 adds no Portuguese text | n (Q1) |
-| D5 Rendering | One plain DOM element `div.game-version` with `data-testid="game-version"`, appended to `document.body` by `main.js` before `new Game(config)`, `position: fixed` to the viewport. Not Phaser text and not inside the Phaser DOM container: those scale with the 1024x768 canvas (0.38 at 390 px wide, TD-010), so the label would read at about 5 px on a phone, and they belong to one scene, so the label would have to be redrawn by every scene | One element covers every scene with no scene code; outside the scaled canvas the label keeps 12 CSS px on every screen | n (Q2) |
-| D6 Position | Right edge 8 px and bottom edge 4 px from the viewport's right and bottom edges. At 1280x720 the canvas is 960x720 at x 160 to 1120 (FIT), so the label lies in the right letterbox; at 390x844 the canvas is 390x292.5 at y 275.75 to 568.25, so it lies in the bottom letterbox. On a viewport with no letterbox (4:3, such as 1024x768) it lies over the canvas in the strip below the battle bar (`.battle-bar` ends with its 2 px ring at scene y 750; the label spans scene y 752 to 764 at scale 1) | The viewport corner is the corner the player sees; the letterbox is the one place on both review sizes where it covers nothing | n (Q3) |
-| D7 Style | Figtree 600, 12 px, line height 12 px, letter spacing 0.04em (0.48 px), colour `--parchment-300` `#e6d0a2` at opacity 0.6, text shadow `0 1px 2px var(--wood-900)`, no background, no border, `white-space: nowrap`, `z-index: 10` | Grove theme body font and parchment colour (AD-022). Over the `--wood-900` `#1c120c` letterbox the label blends to `rgb(149, 132, 102)`, contrast 5.1:1 (WCAG AA for small text is 4.5:1) while staying dimmer than every HUD text; the shadow keeps it legible over the forest art on a 4:3 screen | n (Q4) |
-| D8 Stacking | `z-index: 10`: above the canvas and the Phaser DOM container (no z-index), below the drag copy of an equipment tile (`.piece-drag-ghost`, `z-index: 1000`) | The label must show over the canvas on a 4:3 screen; a dragged tile must still pass over it | n (Q4) |
-| D9 No pointer | `pointer-events: none` and `user-select: none`: a click on the label reaches the canvas under it | The brief asks for a label that is not clickable; on a 4:3 screen it lies over the canvas and must not swallow a click | n (Q4) |
-| D10 Dev server | The dev server shows the package.json value of the working tree as it is (`v0.0.0` until the release commit, then `v0.4.1`), with no `-dev` suffix | Same code path as the build; e2e tests read `game/package.json`, so they hold before and after the bump | n (Q5) |
+| D4 Text | `v` followed by the version with surrounding whitespace removed: `v0.4.1`. No word before it (`Versão`), no build suffix | Short, the form of the release tags (`v0.4.0`) and of `CHANGELOG.md`; language-neutral, so AD-007 adds no Portuguese text | y (Q1) |
+| D5 Rendering | One plain DOM element `div.game-version` with `data-testid="game-version"`, appended to `document.body` by `main.js` before `new Game(config)`, `position: fixed` to the viewport. Not Phaser text and not inside the Phaser DOM container: those scale with the 1024x768 canvas (0.38 at 390 px wide, TD-010), so the label would read at about 5 px on a phone, and they belong to one scene, so the label would have to be redrawn by every scene | One element covers every scene with no scene code; outside the scaled canvas the label keeps 12 CSS px on every screen | y (Q2) |
+| D6 Position | Right edge 8 px and bottom edge 4 px from the viewport's right and bottom edges. At 1280x720 the canvas is 960x720 at x 160 to 1120 (FIT), so the label lies in the right letterbox; at 390x844 the canvas is 390x292.5 at y 275.75 to 568.25, so it lies in the bottom letterbox. On a viewport with no letterbox (4:3, such as 1024x768) it lies over the canvas in the strip below the battle bar (`.battle-bar` ends with its 2 px ring at scene y 750; the label spans scene y 752 to 764 at scale 1) | The viewport corner is the corner the player sees; the letterbox is the one place on both review sizes where it covers nothing | y (Q3) |
+| D7 Style | Figtree 600, 12 px, line height 12 px, letter spacing 0.04em (0.48 px), colour `--parchment-300` `#e6d0a2` at opacity 0.6, text shadow `0 1px 2px var(--wood-900)`, no background, no border, `white-space: nowrap`, `z-index: 10` | Grove theme body font and parchment colour (AD-022). Over the `--wood-900` `#1c120c` letterbox the label blends to `rgb(149, 132, 102)`, contrast 5.1:1 (WCAG AA for small text is 4.5:1) while staying dimmer than every HUD text; the shadow keeps it legible over the forest art on a 4:3 screen | y (Q4) |
+| D8 Stacking | `z-index: 10`: above the canvas and the Phaser DOM container (no z-index), below the drag copy of an equipment tile (`.piece-drag-ghost`, `z-index: 1000`) | The label must show over the canvas on a 4:3 screen; a dragged tile must still pass over it | y (Q4) |
+| D9 No pointer | `pointer-events: none` and `user-select: none`: a click on the label reaches the canvas under it | The brief asks for a label that is not clickable; on a 4:3 screen it lies over the canvas and must not swallow a click | y (Q4) |
+| D10 Dev server | The dev server shows the package.json value of the working tree as it is (`v0.0.0` until the release commit, then `v0.4.1`), with no `-dev` suffix | Same code path as the build; e2e tests read `game/package.json`, so they hold before and after the bump | y (Q5) |
 | D11 Version bump | `gitops` sets `"version": "0.4.1"` in the release commit `docs(release): v0.4.1 game-version`; no task of this feature edits `game/package.json` | Owner's answer; `.claude/agents/gitops.md` step 7 | y |
-| D12 Production before the release | Every pushed game commit of this feature republishes the Worker (CI paths `game/src/**`, `game/public/**`, `game/vite.config.js`), so production shows `v0.0.0` from the first of them until the release commit sets `0.4.1` | Accepting the window keeps the version owned by `gitops` alone (D11); the window lasts until the release, at most the review and verification of this feature | n (Q6) |
-| D13 Missing version | IF `__GAME_VERSION__` is not a string, or is empty or only whitespace, THEN no label is added (never `v` alone or `vundefined`) | A broken `package.json` must not print a wrong version; the game still runs | n (Q5) |
-| D14 One label | Mounting the label again (a second call of `mountVersionLabel`) rewrites the text of the existing label; the page never holds two | Guards a duplicated mount call | n (Q5) |
-| D15 Assistive technology | Plain text, no `role`, no `aria-hidden`: a screen reader reads `v0.4.1` at the end of the page | It is real information and short | n (Q4) |
-| D16 Decision record | AD-026 in `STATE.md` (proposed): the version source, the build-time constant and the label | The version source is shared by `gitops`, `vite.config.js` and the game | n (Q6) |
+| D12 Production before the release | Every pushed game commit of this feature republishes the Worker (CI paths `game/src/**`, `game/public/**`, `game/vite.config.js`), so production shows `v0.0.0` from the first of them until the release commit sets `0.4.1` | Accepting the window keeps the version owned by `gitops` alone (D11); the window lasts until the release, at most the review and verification of this feature | y (Q6) |
+| D13 Missing version | IF `__GAME_VERSION__` is not a string, or is empty or only whitespace, THEN no label is added (never `v` alone or `vundefined`) | A broken `package.json` must not print a wrong version; the game still runs | y (Q5) |
+| D14 One label | Mounting the label again (a second call of `mountVersionLabel`) rewrites the text of the existing label; the page never holds two | Guards a duplicated mount call | y (Q5) |
+| D15 Assistive technology | Plain text, no `role`, no `aria-hidden`: a screen reader reads `v0.4.1` at the end of the page | It is real information and short | y (Q4) |
+| D16 Decision record | AD-026 in `STATE.md` (proposed): the version source, the build-time constant and the label | The version source is shared by `gitops`, `vite.config.js` and the game | y (Q6) |
 
 **Open questions**: none. The owner answered yes to Q1 to Q6 on 2026-11-18 (D4 to D16 confirmed).
 
@@ -126,19 +126,19 @@ IDs follow the order of the criteria: GV-01 to GV-06 "Version on every screen", 
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| GV-01 | P1: Version on every screen | T2, T3, T4 | Implementing |
-| GV-02 | P1: Version on every screen | T3, T4 | Implementing |
-| GV-03 | P1: Version on every screen | T3, T4 | Implementing |
-| GV-04 | P1: Version on every screen | T3, T4 | Implementing |
-| GV-05 | P1: Version on every screen | T3, T4 | Implementing |
-| GV-06 | P1: Version on every screen | T2, T4 | Implementing |
-| GV-07 | P1: Version from the build | T1, T3, T4 | Implementing |
-| GV-08 | P1: Version from the build | T2 | Implementing |
-| GV-09 | P1: Discreet and out of the way | T3, T4, T5 | Implementing |
-| GV-10 | P1: Discreet and out of the way | T3, T4, T5 | Implementing |
-| GV-11 | P1: Discreet and out of the way | T3, T4, T5 | Implementing |
-| GV-12 | P1: Discreet and out of the way | T3, T4, T5 | Implementing |
-| GV-13 | P1: Discreet and out of the way | T3, T4 | Implementing |
+| GV-01 | P1: Version on every screen | T2, T3, T4 | Verified |
+| GV-02 | P1: Version on every screen | T3, T4 | Verified |
+| GV-03 | P1: Version on every screen | T3, T4 | Verified |
+| GV-04 | P1: Version on every screen | T3, T4 | Verified |
+| GV-05 | P1: Version on every screen | T3, T4 | Verified |
+| GV-06 | P1: Version on every screen | T2, T4 | Verified |
+| GV-07 | P1: Version from the build | T1, T3, T4 | Verified |
+| GV-08 | P1: Version from the build | T2 | Verified |
+| GV-09 | P1: Discreet and out of the way | T3, T4, T5 | Verified |
+| GV-10 | P1: Discreet and out of the way | T3, T4, T5 | Verified |
+| GV-11 | P1: Discreet and out of the way | T3, T4, T5 | Verified |
+| GV-12 | P1: Discreet and out of the way | T3, T4, T5 | Verified |
+| GV-13 | P1: Discreet and out of the way | T3, T4 | Verified |
 
 **ID format:** `GV-<NN>`
 
@@ -150,6 +150,6 @@ IDs follow the order of the criteria: GV-01 to GV-06 "Version on every screen", 
 
 ## Success Criteria
 
-- [ ] A screenshot of the loading bar, the splash, the login form and the battle at 1280x720 and at 390x844 shows `v<version>` in the bottom-right corner (e2e and `ui-review/` shots).
-- [ ] After the release commit, `https://infinity-grove.yan-tapajos.workers.dev/` shows `v0.4.1` (checked by `gitops` in production).
-- [ ] At 1024x768 a click on the label skips the splash (e2e).
+- [x] A screenshot of the loading bar, the splash, the login form and the battle at 1280x720 and at 390x844 shows `v<version>` in the bottom-right corner (e2e and `ui-review/` shots).
+- [ ] After the release commit, `https://infinity-grove.yan-tapajos.workers.dev/` shows `v0.4.1` (checked by `gitops` in production). Open until the `gitops` release: the version bump is the release commit (D11).
+- [x] At 1024x768 a click on the label skips the splash (e2e).

@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/game-version/spec.md`
 **Design**: `.specs/features/game-version/design.md`
-**Status**: Draft, waiting for the owner's approval of the spec rulings Q1 to Q6 (2026-11-18). Ships as patch release `v0.4.1`.
+**Status**: Done and accepted by the product owner on 2026-11-18 (§ Acceptance). The owner approved the spec rulings Q1 to Q6 and T1 to T5 on 2026-11-18 (`469342c`). T1 to T5 are done (`f1e820a`, `9fac504`, `8fafe1a`, `0cf9f4f`, `081a3ff`); the UI review (T5) is APROVADO; Verifier round 1 (`validation.md`, `582354a`) is PASS: 13 of 13 ACs, 11 of 11 mutants killed. Next: the `gitops` release `v0.4.1`.
 
 Rules for every task:
 
@@ -25,6 +25,36 @@ Rules for every task:
 - Code style of `game/src`: 4-space indent, braces on their own line for functions with a body (see `game/src/adapters/phaser/views/stageLabel.js`), `//  ` comments with two spaces.
 
 After T5: the `verifier` agent runs (round 1 with the full suites, `.claude/agents/verifier.md`), the product owner accepts or rejects, then `gitops` releases `v0.4.1` (version bump in `game/package.json`, `report.html`, `CHANGELOG.md`, tag) and checks that production shows `v0.4.1`.
+
+---
+
+## Acceptance (product-owner, 2026-11-18)
+
+**Verdict: ACCEPTED.** All 5 tasks are done, Verifier round 1 gives PASS and the ui-artist review (T5) gives APROVADO with 0 findings. No new task of this feature.
+
+**Evidence read**: `validation.md` round 1 (`582354a`, diff range `24c53fc..081a3ff`): 13 of 13 ACs matched to the spec outcome with `file:line` evidence, 4 of 4 unit-level ACs with unit tests, 12 of 12 player-visible ACs with e2e (GV-08 shows nothing on screen by definition), 4 of 4 edge cases, 0 spec-precision gaps. Sensor: 11 mutants over the four production files, 11 killed, 0 survived, 0 invalid, isolation ok. Backend 1013/1013, game unit 1781/1781 (+17), e2e 377/381 (+7): the 4 failures (`dragEquip.spec.js:586`, `:640`, `skills.spec.js:49`, `wake.spec.js:56`) each passed alone twice with `--workers=1`, none reads the label, so they are load flakes (the last two added to the known list in `STATE.md` Handoff). `npm run build` exits 0 and the bundle mounts the label before `new Game`. No test removed or weakened; `game/package.json` still reads `0.0.0` (D11); no backend change, no Flyway migration (AD-016 not triggered). `ui-review.html` (`081a3ff`): APROVADO, 11 shots (6 desktop, 5 phone), 0 findings. I checked `06-battle-4x3-desktop.png` myself: the label sits under the battle bar, clear of its ring and of `Farm boss`.
+
+**Spec goals** (`spec.md`, Goals):
+
+| Goal | Evidence (`validation.md` round 1) | Status |
+| --- | --- | --- |
+| 1. The version in the bottom-right corner of every screen (loading bar, splash, login, battle) | GV-02 to GV-05 (`gameVersion.spec.js:88`, `:108`, `:116`, `:127`), GV-06 one label on each (`:22`), GV-09 corner 8/4 px ±1 at three viewports (`:30-31`); shots 01 to 05 desktop and phone | Met |
+| 2. The version is `game/package.json` `version` of the build's commit, no manual step besides the `gitops` bump | GV-07 (`viteConfig.test.js:12`, `:18`, both modes; mutants C1, C2, M1 killed), every e2e `toHaveText(LABEL)` with `LABEL` read from `package.json`; GV-08 blank version adds no label (`versionLabel.test.js:19-36`, `:68-81`) | Met |
+| 3. Covers no control or game text at 1280x720 and 390x844, never takes a click | GV-10 right of the canvas (`:124`, `:134`), GV-11 below the canvas and 12 px tall (`:156`, `:157`), GV-12 computed style (`:70-84`), GV-13 click through at 1024x768 skips the splash (`:179-191`; mutant S1 killed) | Met |
+
+**Success criteria**: screenshots of the four screens at 1280x720 and 390x844 show `v<version>` in the corner (e2e and `ui-review/` shots 01 to 05); a click on the label at 1024x768 skips the splash before 1650 ms (`gameVersion.spec.js:188-190`). Both met. The production check (`v0.4.1` on the Worker) belongs to the `gitops` release, whose commit makes the version bump (D11); it stays open until then.
+
+**Edits made at acceptance** (Verifier Fix 1, docs only):
+
+1. Spec traceability GV-01 to GV-13 set to Verified; Goals and the two met Success Criteria ticked.
+2. Spec Assumptions D4 to D10 and D12 to D16 set from `n (Q<n>)` to `y (Q<n>)`: the owner answered yes to Q1 to Q6 on 2026-11-18 (`469342c`).
+3. This file: status line set to done and accepted; T5 heading and the Done-when boxes of T1, T2, T3 and T5 ticked; T4's Preloader wait recorded as an accepted deviation.
+4. `design.md` status line set to done and accepted.
+5. `STATE.md`: Handoff set to done and accepted, next step `gitops`; `skills.spec.js:49` and `wake.spec.js:56` added to the known load flakes.
+
+**Waiting for the owner's confirmation**: nothing for this feature. Q1 to Q6 are confirmed.
+
+**Next step**: `gitops` releases `v0.4.1`: the release commit sets `game/package.json` `version` to `0.4.1`, push, deploy check (`publish.sh` running, the commit on `origin/main`), production check (`v0.4.1` in the corner of `https://infinity-grove.yan-tapajos.workers.dev/`), `report.html`, `CHANGELOG.md`, release tag. The coverage summaries in `coverage/` ran at `081a3ff`; whether the version bump reuses them is the `gitops` call (`validation.md` § Summary).
 
 ---
 
@@ -130,9 +160,9 @@ export default defineConfig(({ mode }) => {
 **Gate**: build - `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 3 new cases pass and every earlier unit test passes unchanged.
-- [ ] `npm run build` exits 0.
-- [ ] `game/package.json` is unchanged (`git diff --quiet game/package.json` exits 0).
+- [x] The 3 new cases pass and every earlier unit test passes unchanged.
+- [x] `npm run build` exits 0.
+- [x] `game/package.json` is unchanged (`git diff --quiet game/package.json` exits 0).
 
 **Commit**: `feat(game): define the game version from package.json at build time`
 
@@ -226,7 +256,7 @@ export const mountVersionLabel = (version) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 14 new cases pass and every earlier unit test passes unchanged (`src/architecture.test.js` included: the file imports only `./dom`).
+- [x] The 14 new cases pass and every earlier unit test passes unchanged (`src/architecture.test.js` included: the file imports only `./dom`).
 
 **Commit**: `feat(game): add the version label view`
 
@@ -293,10 +323,10 @@ mountVersionLabel(__GAME_VERSION__);
 **Gate**: full - `cd game && npm test && npm run build && npx playwright test e2e/splash.spec.js e2e/auth.spec.js`
 **Done when**:
 
-- [ ] `npm test` passes unchanged, `npm run build` exits 0, and every test of `e2e/splash.spec.js` and `e2e/auth.spec.js` passes.
-- [ ] `grep -c "mountVersionLabel(__GAME_VERSION__);" game/src/main.js` prints 1 and the line comes before `const game = new Game(config);`.
-- [ ] `grep -c "^\.game-version {" game/public/style.css` prints 1.
-- [ ] `game/package.json` is unchanged.
+- [x] `npm test` passes unchanged, `npm run build` exits 0, and every test of `e2e/splash.spec.js` and `e2e/auth.spec.js` passes.
+- [x] `grep -c "mountVersionLabel(__GAME_VERSION__);" game/src/main.js` prints 1 and the line comes before `const game = new Game(config);`.
+- [x] `grep -c "^\.game-version {" game/public/style.css` prints 1.
+- [x] `game/package.json` is unchanged.
 
 **Commit**: `feat(game): show the game version in the bottom-right corner`
 
@@ -392,11 +422,13 @@ const startGame = async (page) => {
 - [x] The 7 scenarios pass, and pass again twice with `--workers=1`.
 - [x] No literal `0.0.0` or `0.4.1` appears in `game/e2e/gameVersion.spec.js`.
 
+**Deviation (accepted at acceptance, 2026-11-18)**: the loading scenario does not call `waitForScene(page, 'Preloader')` as the first test case above says. It waits for the Preloader's drawn bar instead (`game/e2e/gameVersion.spec.js:100`, `scene.getScene('Preloader').children.list.length > 0`), because a scene that is still loading is never active: while `preload()` waits for the held `background.png`, `isActive('Preloader')` stays false. The bar is drawn in `Preloader.init()`, so the wait proves the loading screen shows (`validation.md` § Code Quality).
+
 **Commit**: `test(game): e2e of the game version label`
 
 ---
 
-### T5: UI review of the version label [ ]
+### T5: UI review of the version label [x]
 
 **Owner**: ui-artist
 **Goal**: Check the label on every screen at 1280x720, 390x844 and 1024x768 against design.md § Visual Spec and write the review (GV-09, GV-10, GV-11, GV-12, visual part).
@@ -426,8 +458,8 @@ const startGame = async (page) => {
 **Gate**: `test -s .specs/features/game-version/ui-review.html && cd game && npm run ui:shots -- gameVersion`
 **Done when**:
 
-- [ ] `ui-review.html` exists with a verdict, 5 screenshots for the phone project and 6 for the desktop project, and the checks of step 3.
-- [ ] Each finding names a selector and an exact fix.
+- [x] `ui-review.html` exists with a verdict, 5 screenshots for the phone project and 6 for the desktop project, and the checks of step 3.
+- [x] Each finding names a selector and an exact fix.
 
 **Commit**: `docs(game-version): ui review of the version label`
 
