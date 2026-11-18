@@ -441,16 +441,18 @@ class HeroControllerIT : IntegrationTestBase() {
 
         val calls =
             (1..2).map {
-                pool.submit<Int> {
+                pool.submit<Response> {
                     start.await(5, TimeUnit.SECONDS)
-                    fuseAll(token, "kael").statusCode()
+                    fuseAll(token, "kael")
                 }
             }
         start.countDown()
-        val statuses = calls.map { it.get(15, TimeUnit.SECONDS) }.sorted()
+        val answers = calls.map { it.get(15, TimeUnit.SECONDS) }.sortedBy { it.statusCode() }
         pool.shutdown()
 
-        assertEquals(listOf(200, 409), statuses)
+        assertEquals(listOf(200, 409), answers.map { it.statusCode() })
+        assertEquals(1, answers.first().jsonPath().getInt("fusions"))
+        assertEquals(1, answers.first().jsonPath().getInt("hero.stars"))
         assertEquals(mapOf(1 to 1), jpaCardCopyRepository.findAllByUsername("yan").associate { it.stars to it.copies })
     }
 }
