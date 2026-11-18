@@ -9,3 +9,5 @@ __pycache__/
 backups/
 # short-lived credential file of google-github-actions/auth (Deploy workflow)
 gha-creds-*.json
+# coverage summaries the Verifier leaves for the release report (.claude/agents/verifier.md)
+.specs/features/*/coverage/

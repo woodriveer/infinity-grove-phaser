@@ -13,7 +13,7 @@
   - **e2e coverage**: the line percentage of game code that the Playwright suite exercises (istanbul instrumentation), and the feature's e2e scenarios with pass/fail;
   - failing tests that are not caused by the feature, and why.
 - Coverage commands: backend `cd backend && ./gradlew test` (JaCoCo, `build/reports/jacoco/test/jacocoTestReport.xml`); game unit `cd game && npm run test:coverage` (`coverage/unit/coverage-summary.json`); e2e `cd game && npm run test:e2e:coverage` (`coverage/e2e/coverage-summary.json`); deploy `node --test --experimental-test-coverage "deploy/**/*.test.mjs"` (printed in the run output). The e2e number is a lower bound: a page reloaded inside a test loses what it counted before the reload.
-- Every number comes from a command run for that report. If a coverage tool is not configured, write `não medido` with the reason. Never estimate a number.
+- Every number comes from a command run for that report, or for coverage from the Verifier's final full run when only docs changed after it (`.claude/agents/gitops.md`). If a coverage tool is not configured, write `não medido` with the reason. Never estimate a number.
 
 # Deploy
 
@@ -35,8 +35,8 @@ The main session is the orchestrator; the agents live in `.claude/agents/`. For 
 1. `product-owner` (Opus, high) writes spec, design and fully detailed tasks with `tlc-spec-driven`; the user approves them.
 2. Each task goes to its owner: `kotlin-backend-dev` (Sonnet, high) for `backend/` and the deploy scripts (`deploy/`, `publish.sh`, `deploy.sh`, `start.sh`), `game-dev` (Sonnet, high) for `game/`, `test-engineer` (Sonnet, high) for test tasks.
 3. `ui-artist` reviews every change the player can see and writes `ui-review.html` from `.claude/templates/ui-review.html`, with Playwright screenshots of every changed screen (`npm run ui:shots` in `game/`); findings become tasks.
-4. The `verifier` agent (Opus) runs as the Verifier; it must not have authored the feature. The `test-engineer` runs its author check first (`.claude/agents/test-engineer.md`). Re-verification rounds are scoped to the gaps and fixes; the full suites run in round 1 and in the final PASS round (`.claude/agents/verifier.md`). Mutants run with `node scripts/sensor.mjs`.
-   - Coverage percentages are measured once, by `gitops` for `report.html`; the Verifier does not run coverage commands.
+4. The `verifier` agent (Opus) runs as the Verifier; it must not have authored the feature. The `test-engineer` runs its author check first (`.claude/agents/test-engineer.md`). Re-verification rounds are scoped to the gaps and fixes; the full suites run in round 1, and the final PASS round runs the full e2e suite again only when production code changed since the last full run (`.claude/agents/verifier.md`). Mutants run with `node scripts/sensor.mjs`.
+   - The Verifier's full runs use the coverage commands, and `gitops` reads the summaries it leaves in `.specs/features/<feature>/coverage/` instead of running the suites again. Only `gitops` turns them into percentages, in `report.html`.
    - No agent leaves a test suite running in the background or runs two suites at once in the same checkout.
    - Work of different features that touches different files (for example test-only fixes) runs in parallel, each agent in its own worktree (`isolation: "worktree"`); each rebases on `origin/main` before it pushes (`git pull --rebase origin main && git push origin HEAD:main`).
 5. `product-owner` accepts or rejects against the spec.
