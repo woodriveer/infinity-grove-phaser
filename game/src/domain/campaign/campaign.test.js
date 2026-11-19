@@ -143,7 +143,7 @@ describe('Campaign encounter', () => {
         });
 
         it('a payload without stats means fire, no defense, no resistance', () => {
-            expect(at(1, PHASE).encounter().stats).toEqual({ element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 });
+            expect(at(1, PHASE).encounter().stats).toEqual({ element: 'FIRE', defense: 0, critResistance: 0 });
             expect(at(1, MINIBOSS).encounter().stats).toEqual(DEFAULT_STATS);
             expect(at(3, CHAPTER_BOSS).encounter().stats).toEqual(DEFAULT_STATS);
         });

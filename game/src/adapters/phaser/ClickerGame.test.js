@@ -2008,12 +2008,34 @@ describe('ClickerGame elements', () => {
         expect(water.scene.monster.health).toBe(water.scene.monster.maxHealth - 2);
     });
 
-    it('applies the physical defense of the monster', async () => {
+    it('applies the defense of the monster: physicalDefense 50 of an old payload', async () => {
         const ctx = await createScene({ start: withStats(stats('FIRE', 50, 10)) });
 
         ctx.click();
 
         expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 0.5);
+    });
+
+    it('applies the defense of a new payload: defense 50 takes half of a click', async () => {
+        const ctx = await createScene({ start: withStats({ element: 'FIRE', defense: 50, physicalDefense: 50, magicalDefense: 50, critResistance: 0 }) });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 0.5);
+    });
+
+    it('shows defense over physicalDefense when a payload has both: Defesa 40%', async () => {
+        const ctx = await createScene({ start: withStats({ element: 'WATER', defense: 40, physicalDefense: 70, magicalDefense: 70, critResistance: 12 }) });
+
+        expect(enemyText(ctx)).toBe('Water  Defesa 40%  Crit res 12%');
+    });
+
+    it('shows Defesa 50% for an old payload with physicalDefense 50 and magicalDefense 10', async () => {
+        const ctx = await createScene({ start: withStats({ element: 'DARKNESS', physicalDefense: 50, magicalDefense: 10, critResistance: 100 }) });
+
+        expect(enemyText(ctx)).toBe('Darkness  Defesa 50%  Crit res 100%');
+        expect(enemyText(ctx)).not.toContain('Physical def');
+        expect(enemyText(ctx)).not.toContain('Magical def');
     });
 
     it('doubles the damage on a critical click and draws that number bigger and orange', async () => {
@@ -2070,42 +2092,42 @@ describe('ClickerGame elements', () => {
         expect(ctx.fill.width).toBe(0);
     });
 
-    it('shows the element and the three values of the monster on screen', async () => {
+    it('shows the element, the defense and the critical resistance of the monster on screen', async () => {
         const ctx = await createScene({ start: withStats(stats('WATER', 11, 22, 33)) });
 
-        expect(enemyText(ctx)).toBe('Water  Physical def 11%  Magical def 22%  Crit res 33%');
+        expect(enemyText(ctx)).toBe('Water  Defesa 11%  Crit res 33%');
     });
 
     it('shows the miniboss attributes when the miniboss spawns', async () => {
         const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT', 1, 2, 3)), encounter: 'MINIBOSS' } });
 
-        expect(enemyText(ctx)).toBe('Light  Physical def 1%  Magical def 2%  Crit res 3%');
+        expect(enemyText(ctx)).toBe('Light  Defesa 1%  Crit res 3%');
     });
 
     it('shows the chapter boss attributes', async () => {
         const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
 
-        expect(enemyText(ctx)).toBe('Darkness  Physical def 30%  Magical def 30%  Crit res 30%');
+        expect(enemyText(ctx)).toBe('Darkness  Defesa 30%  Crit res 30%');
     });
 
     it('shows fire with no defense for a payload without stats', async () => {
         const ctx = await createScene();
 
-        expect(enemyText(ctx)).toBe('Fire  Physical def 0%  Magical def 0%  Crit res 0%');
+        expect(enemyText(ctx)).toBe('Fire  Defesa 0%  Crit res 0%');
     });
 
-    it('marks the element chip with data-element and each defense chip with data-stat', async () => {
+    it('marks the element chip with data-element and the defense and crit chips with data-stat', async () => {
         const ctx = await createScene({ start: withStats(stats('WATER', 11, 22, 33)) });
 
         expect(ctx.hud('.enemy-stats .tag-element').getAttribute('data-element')).toBe('WATER');
         expect([ ...ctx.hud('.enemy-stats').querySelectorAll('[data-stat]') ].map((tag) => [ tag.getAttribute('data-stat'), tag.textContent ]))
-            .toEqual([ [ 'physical', 'Physical def 11%' ], [ 'magical', 'Magical def 22%' ], [ 'crit', 'Crit res 33%' ] ]);
+            .toEqual([ [ 'defense', 'Defesa 11%' ], [ 'crit', 'Crit res 33%' ] ]);
     });
 
-    it('keeps the enemy line text exactly as before', async () => {
+    it('keeps the element chip and the one-defense line on a chapter boss', async () => {
         const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
 
-        expect(enemyText(ctx)).toBe('Darkness  Physical def 30%  Magical def 30%  Crit res 30%');
+        expect(enemyText(ctx)).toBe('Darkness  Defesa 30%  Crit res 30%');
         expect(ctx.hud('.enemy-stats .tag-element').getAttribute('data-element')).toBe('DARKNESS');
     });
 
@@ -2117,7 +2139,7 @@ describe('ClickerGame elements', () => {
 
         fade(ctx).onComplete();
         ctx.timers.at(-1).callback();
-        expect(enemyText(ctx)).toBe('Nature  Physical def 0%  Magical def 0%  Crit res 0%');
+        expect(enemyText(ctx)).toBe('Nature  Defesa 0%  Crit res 0%');
     });
 
     it('clears the attributes when the boss runs out of time', async () => {
@@ -2215,7 +2237,7 @@ describe('ClickerGame elements', () => {
         fade(ctx).onComplete();
         ctx.timers.at(-1).callback();
 
-        expect(enemyText(ctx)).toBe('Light  Physical def 4%  Magical def 5%  Crit res 6%');
+        expect(enemyText(ctx)).toBe('Light  Defesa 4%  Crit res 6%');
     });
 });
 
@@ -3506,7 +3528,7 @@ describe('ClickerGame talents in combat', () => {
         expect(ctx.scene.monster.health).toBeCloseTo(1000 - 2.3, 10);
     });
 
-    it('lowers the physical defense by 5 points with PHYSICAL_BREAK 5: a click against defense 20 deals 0.85, not 0.8', async () => {
+    it('lowers the defense by 5 points with PHYSICAL_BREAK 5: a click against defense 20 deals 0.85, not 0.8', async () => {
         const ctx = await createScene({ start: bigMonsters(fire(20)), talents: tree({ PHYSICAL_BREAK: 5 }) });
 
         ctx.click();
@@ -3514,12 +3536,12 @@ describe('ClickerGame talents in combat', () => {
         expect(ctx.scene.monster.health).toBeCloseTo(1000 - 0.85, 10);
     });
 
-    it('shows the lowered defenses on the enemy tags and keeps the stats of the monster itself', async () => {
-        const ctx = await createScene({ start: bigMonsters(fire(20, 20, 20)), talents: tree({ PHYSICAL_BREAK: 5, MAGICAL_BREAK: 3, CRIT_RESIST_BREAK: 8 }) });
+    it('shows the lowered defense on the enemy chips and keeps the stats of the monster itself', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire(20, 20, 20)), talents: tree({ PHYSICAL_BREAK: 5, CRIT_RESIST_BREAK: 8 }) });
 
-        expect(ctx.hud('.enemy-stats').textContent).toContain('Physical def 15%');
-        expect(ctx.hud('.enemy-stats').textContent).toContain('Magical def 17%');
+        expect(ctx.hud('.enemy-stats').textContent).toContain('Defesa 15%');
         expect(ctx.hud('.enemy-stats').textContent).toContain('Crit res 12%');
+        expect(ctx.hud('.enemy-stats').textContent).not.toContain('Magical def');
         expect(ctx.scene.monster.stats.physicalDefense).toBe(20);
     });
 
@@ -3671,7 +3693,7 @@ describe('ClickerGame talents in combat', () => {
         talentGateway.upgrade.mockResolvedValue({ talents: tree({ PHYSICAL_BREAK: 1 }), points: { earned: 1, spent: 1, available: 0 } });
         await ctx.scene.talents.upgrade('PHYSICAL_BREAK', 0);
 
-        expect(ctx.hud('.enemy-stats').textContent).toContain('Physical def 19%');
+        expect(ctx.hud('.enemy-stats').textContent).toContain('Defesa 19%');
     });
 });
 

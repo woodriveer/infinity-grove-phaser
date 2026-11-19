@@ -8,7 +8,7 @@ export const MONSTER_MAX_HEALTH = 10;
 export const defenseOf = (stats) => stats.defense ?? stats.physicalDefense ?? 0;
 
 //  A monster without attributes: fire, no defense, no critical resistance
-export const DEFAULT_STATS = { element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 };
+export const DEFAULT_STATS = { element: 'FIRE', defense: 0, critResistance: 0 };
 
 //  "HP 10/30": the health left rounded UP to one decimal (a living monster never reads HP 0) over the maximum; from 1 000 the short format
 export const healthText = ({ health, maxHealth }) =>

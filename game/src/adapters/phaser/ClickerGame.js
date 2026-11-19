@@ -8,7 +8,7 @@ import { formatDamage } from '../../domain/combat/damage';
 import { weaknessOf } from '../../domain/combat/elements';
 import { leaderAttacker } from '../../domain/combat/leaderAttacker';
 import { bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/equipment';
-import { healthText, Monster } from '../../domain/combat/monster';
+import { defenseOf, healthText, Monster } from '../../domain/combat/monster';
 import { clickHits } from '../../domain/heroes/leaderBonus';
 import { ELEMENT_LABELS } from '../../domain/heroes/heroes';
 import { SkillCombat } from '../../domain/skills/skillCombat';
@@ -782,15 +782,16 @@ export class ClickerGame extends Scene
         }
     }
 
-    //  "Water  Physical def 10%  Magical def 10%  Crit res 12%", one chip each; the double spaces are hidden between the chips. data-element and
-    //  data-stat give each chip its dot or icon (spec ui-redesign UIR-07)
-    showEnemyStats ({ element, physicalDefense, magicalDefense, critResistance })
+    //  "Water  Defesa 10%  Crit res 12%", one chip each; the double spaces are hidden between the chips. data-element and data-stat give each
+    //  chip its dot or icon (spec ui-redesign UIR-07); the one defense is read by defenseOf (spec unified-damage)
+    showEnemyStats (stats)
     {
+        const { element, critResistance } = stats;
         const name = element.charAt(0) + element.slice(1).toLowerCase();
-        const stats = [ [ 'physical', `Physical def ${physicalDefense}%` ], [ 'magical', `Magical def ${magicalDefense}%` ], [ 'crit', `Crit res ${critResistance}%` ] ];
+        const chips = [ [ 'defense', `Defesa ${defenseOf(stats)}%` ], [ 'crit', `Crit res ${critResistance}%` ] ];
         const tags = [
             el('span', 'tag tag-element', name, { 'data-element': element }),
-            ...stats.map(([ stat, text ]) => el('span', 'tag', text, { 'data-stat': stat }))
+            ...chips.map(([ stat, text ]) => el('span', 'tag', text, { 'data-stat': stat }))
         ];
 
         this.enemyStats.replaceChildren(...tags.flatMap((tag, index) => (index ? [ el('span', 'gap', '  '), tag ] : [ tag ])));

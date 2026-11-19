@@ -119,7 +119,7 @@ describe('Monster', () => {
 
         expect(new Monster(10, 1, stats).stats).toBe(stats);
         expect(new Monster().stats).toEqual(DEFAULT_STATS);
-        expect(DEFAULT_STATS).toEqual({ element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 });
+        expect(DEFAULT_STATS).toEqual({ element: 'FIRE', defense: 0, critResistance: 0 });
     });
 
     it('keeps its stats when it respawns', () => {

@@ -6,8 +6,8 @@
 //  { chapter, stage, encounter, phase, completed,
 //    definition: { bossHealth, bossTimeLimitMs, boss, bossDropRuleId,
 //                  stages: [{ number, phasesPerStage, monsterHealth, minibossHealth, minibossTimeLimitMs, monster, miniboss, monsterDropRuleId, minibossDropRuleId }] } }
-//  where boss, monster and miniboss are { element, physicalDefense, magicalDefense, critResistance }; a payload
-//  without them (an older backend) means DEFAULT_STATS. The drop rule ids name the wallet queue a kill takes its copper from
+//  where boss, monster and miniboss are { element, defense, critResistance } (an older backend sends physicalDefense and magicalDefense
+//  instead of defense, read by defenseOf); a payload without them means DEFAULT_STATS. The drop rule ids name the wallet queue a kill takes its copper from
 import { DEFAULT_STATS } from '../combat/monster';
 import { bossLabel } from '../heroes/heroes';
 

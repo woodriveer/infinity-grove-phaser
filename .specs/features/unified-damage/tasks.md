@@ -456,7 +456,7 @@ const defense = defenseOf(defender) * (1 - Math.min(100, attacker.armorPierce ??
 
 ---
 
-### T5: Show one Defesa chip on the enemy line [ ]
+### T5: Show one Defesa chip on the enemy line [x]
 
 **Owner**: game-dev
 **Goal**: The enemy line shows `<Element>  Defesa <n>%  Crit res <n>%` with the chip `data-stat="defense"`, and a monster without stats is `{ element: 'FIRE', defense: 0, critResistance: 0 }` (UDMG-06).
@@ -545,9 +545,9 @@ The chips keep the class `tag` and the `.enemy-stats .tag` rule.
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] `grep -rn "Physical def\|Magical def" game/src` finds nothing.
-- [ ] `grep -n 'data-stat="physical"\|data-stat="magical"' game/public/style.css` finds nothing and `grep -c 'data-stat="defense"' game/public/style.css` prints 1.
-- [ ] The edited and new tests pass; the whole Vitest suite passes.
+- [x] `grep -rn "Physical def\|Magical def" game/src` finds nothing.
+- [x] `grep -n 'data-stat="physical"\|data-stat="magical"' game/public/style.css` finds nothing and `grep -c 'data-stat="defense"' game/public/style.css` prints 1.
+- [x] The edited and new tests pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): show one Defesa chip on the enemy line`
 
