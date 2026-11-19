@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equipe de heróis</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+:root[data-theme="dark"] { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Equipe de heróis (hero-team)</h1>
+<p class="sub">Relatório de release v0.6.0 &middot; faixa de commits <code>0248def..3e8ff62</code> (93 arquivos, 2026-11-19)</p>
+<p><span class="verdict">PASS</span> &nbsp;O Verifier aprovou na rodada 2 de 3 (<code>validation.md</code>, <code>9b542bc</code>; a rodada 1 reprovou em <code>9af93fe</code>) e o product-owner aceitou contra a spec (<code>3e8ff62</code>).</p>
+
+<h2>Resumo do Verifier</h2>
+<div class="cards">
+<div class="card"><div class="n">39</div><div class="l">mutantes (sensor): 35 na rodada 1, 4 na rodada 2</div></div>
+<div class="card"><div class="n">38</div><div class="l">mortos</div></div>
+<div class="card"><div class="n">1</div><div class="l">sobreviveu na rodada 1 (G24), morto na rodada 2</div></div>
+<div class="card"><div class="n">97/98</div><div class="l">critérios de aceite cobertos com valores da spec</div></div>
+</div>
+<ul>
+<li>Rodada 1 (<code>c5847a8</code>): 34 de 35 mutantes mortos. G24 (regra do quadro em que Prisão de Espinhos ou Bênção terminam) sobreviveu, e quatro critérios estavam cobertos só em parte (dano único 9, Aliados lutam 8, Passivas 2 e 4). O cenário <code>heroTeam.spec.js:347</code> falhou sob carga por uma corrida do próprio teste.</li>
+<li>Rodada 2 (<code>06316ef</code>): só commits de teste. G24 morto por dois testes novos (2,5 e 2,6 no quadro final), mais 3 mutantes novos (N2 a N4), todos mortos; o controle C0 sobreviveu, como deve.</li>
+<li>Lacuna de precisão da spec, entregue ao product-owner: o exemplo E3 omite a Erosão Arcana de Orina (o código segue a Tabela de Passivas: 105,6 com Lyra, 137,28 com Orina). Não bloqueia o veredito.</li>
+</ul>
+
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Parte</th><th>Linhas adicionadas</th><th>Linhas removidas</th><th>Arquivos</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>, inclui a migração V12)</td><td class="num">465</td><td class="num">9</td><td class="num">13</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem <code>*.test.js</code>, mais <code>game/public/*.css</code>)</td><td class="num">1033</td><td class="num">40</td><td class="num">13</td></tr>
+<tr><td><b>Total</b></td><td class="num">1498</td><td class="num">49</td><td class="num">26</td></tr>
+</table></div>
+<p>Fonte: <code>git diff --numstat 0248def..3e8ff62</code>. Specs, testes, o ADR 0013, o roteiro de capturas <code>game/ui-review/heroTeam.shots.js</code> e o README não contam como produção. Nenhum arquivo de <code>deploy/</code> mudou.</p>
+
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th>Linhas +</th><th>Linhas -</th><th>Arquivos</th><th>Testes antes &rarr; depois</th><th>Adicionados</th><th>Total após a execução</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td class="num">1301</td><td class="num">7</td><td class="num">8</td><td class="num">1043 &rarr; 1149</td><td class="num">+106</td><td class="num">1149 (0 falhas)</td></tr>
+<tr><td>Unitário do jogo (<code>game/src/**/*.test.js</code>)</td><td class="num">2124</td><td class="num">8</td><td class="num">12</td><td class="num">1813 &rarr; 2015</td><td class="num">+202</td><td class="num">2015 (0 falhas)</td></tr>
+<tr><td>e2e (<code>game/e2e</code>)</td><td class="num">2102</td><td class="num">4</td><td class="num">7</td><td class="num">392 &rarr; 484</td><td class="num">+92</td><td class="num">484 (482 passaram na execução completa da rodada 1, 2 falhas alheias ou já corrigidas; os 6 arquivos da feature foram repetidos na rodada 2)</td></tr>
+</table></div>
+<p>Totais e contagens do <code>validation.md</code>: backend e unitário da rodada 2 final (<code>06316ef</code>); e2e da execução completa de 14 shards da rodada 1 (<code>c5847a8</code>), pois depois dela nenhum código de produção mudou (<code>git diff --name-only c5847a8..06316ef</code> lista só <code>.specs/</code> e três arquivos de teste). Nenhum teste foi removido na faixa.</p>
+<p>Suíte do deploy (<code>node --test --experimental-test-coverage</code>, executada para este relatório): 289 testes, 287 passaram, 2 falharam (ver abaixo). <code>deploy/</code> não mudou na faixa.</p>
+
+<h2>Cobertura dos testes unitários</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Backend (JaCoCo)</td><td>projeto inteiro</td><td class="num">99,01% (3004/3034)</td><td class="num">93,26% (941/1009)</td></tr>
+<tr><td>Backend (JaCoCo)</td><td>9 dos 12 arquivos Kotlin que a feature mudou (os outros 3 são interfaces e exceções sem linhas medidas)</td><td class="num">99,08% (324/327)</td><td class="num">93,27% (97/104)</td></tr>
+<tr><td>Jogo (Vitest, v8)</td><td>projeto inteiro</td><td class="num">98,54% (3318/3367)</td><td class="num">95,35% (1602/1680)</td></tr>
+<tr><td>Jogo (Vitest, v8)</td><td>12 arquivos <code>.js</code> que a feature mudou</td><td class="num">98,05% (1460/1489)</td><td class="num">92,30% (719/779)</td></tr>
+<tr><td>Deploy (node:test)</td><td><code>deploy/</code> inteiro</td><td class="num">96,15%</td><td class="num">95,46%</td></tr>
+</table></div>
+<p>Backend e jogo vêm dos resumos que o Verifier copiou para <code>coverage/</code> após a rodada 2 final (<code>06316ef</code>); depois dele só mudaram documentos. O deploy foi medido agora. A migração SQL V12 não entra no JaCoCo; é exercitada pelos testes de integração do backend e por <code>PreviousBackendCompatibilityIT</code>.</p>
+
+<h2>Cobertura e2e</h2>
+<div class="scroll"><table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Código do jogo inteiro (istanbul)</td><td class="num">93,43% (3147/3368)</td><td class="num">78,97% (1074/1360)</td></tr>
+<tr><td>12 arquivos que a feature mudou</td><td class="num">94,22% (1403/1489)</td><td class="num">79,15% (486/614)</td></tr>
+</table></div>
+<p>Dados brutos dos 14 shards da rodada 1 (484 arquivos, um por teste) com os seis arquivos <code>heroTeam*.spec.js</code> repetidos em <code>06316ef</code>. É um limite inferior: uma página recarregada dentro de um teste perde o que já contou.</p>
+
+<h2>Cenários e2e da feature (92)</h2>
+<div class="scroll"><table>
+<tr><th>Arquivo</th><th>Tema</th><th>Cenários</th><th>Resultado na rodada 2</th></tr>
+<tr><td><code>heroTeam.spec.js</code></td><td>Botão e tela Equipe, cartões de vaga, compra de vaga, lista de heróis disponíveis</td><td class="num">20</td><td class="ok">20 passaram (o <code>:347</code>, que falhou na rodada 1, passou com 3 workers)</td></tr>
+<tr><td><code>heroTeamEditing.spec.js</code></td><td>Escolher, remover, tornar líder, ocupado, erros</td><td class="num">13</td><td class="ok">13 passaram</td></tr>
+<tr><td><code>heroTeamCombat.spec.js</code></td><td>Golpes dos aliados: ritmo, valores E1 a E15, morte por aliado, combo, pausa</td><td class="num">24</td><td><span class="ok">23 passaram</span>; <span class="na">1 falhou sob carga</span> (<code>:324</code>, passa sozinho)</td></tr>
+<tr><td><code>heroTeamField.spec.js</code></td><td>Aliados no campo e números de dano</td><td class="num">13</td><td class="ok">13 passaram</td></tr>
+<tr><td><code>heroTeamPassives.spec.js</code></td><td>Passivas de Kael, Lyra, Orina, Vex e Seraphine</td><td class="num">13</td><td class="ok">13 passaram</td></tr>
+<tr><td><code>heroTeamStyle.spec.js</code></td><td>Estilo computado da tela Equipe</td><td class="num">9</td><td class="ok">9 passaram</td></tr>
+</table></div>
+
+<h2>Falhas que a feature não causou</h2>
+<div class="scroll"><table>
+<tr><th>Teste</th><th>Motivo</th></tr>
+<tr><td><code>game/e2e/wake.spec.js:56</code></td><td>Asserção de tempo (mensagem de servidor fora do ar em menos de 15 s, levou 28,7 s) sob carga de 3 workers; passa sozinho. Flaky conhecido; o código de wake não está na faixa.</td></tr>
+<tr><td><code>game/e2e/heroTeamCombat.spec.js:324</code></td><td>Poll em tempo real de 5 s (<code>expect.poll</code> em <code>:340</code>) sob carga; passa sozinho (13,1 s) e passou na execução completa da rodada 1. Fragilidade do teste (TD-012), seguimento não bloqueante para o test-engineer.</td></tr>
+<tr><td><code>deploy/regression.test.mjs:385</code> e <code>:412</code></td><td>O CLI termina com o código 3221226505 (0xC0000409, falha nativa do Windows com Node v23.11.0) em vez de 0 ou 1. Falham igual com o arquivo isolado; <code>deploy/</code> não mudou na faixa.</td></tr>
+</table></div>
+
+<h2>Deploy e produção</h2>
+<ul>
+<li>Backend: slot <code>green</code> ativo (imagem <code>infinity-grove-backend:70d77e0</code>, no ar há cerca de 9 h). O Flyway valida 12 migrações e o esquema está na versão 12 (V12 <code>hero_team</code>); o Tomcat subiu. O <code>publish.sh</code> e o watcher estavam rodando e o watcher registrou <code>9b542bc</code> como tratado. A saída do watcher (onde aparece a regressão da troca) não ficou acessível a este agente e o contêiner da regressão já foi removido; o watcher só troca o slot depois que a regressão passa. Para ter um resultado observado, a suíte <code>deploy/regression.mjs</code> foi executada agora contra o proxy (<code>localhost:8080</code>, slot ativo): <b>Regressão OK, 12 verificações em 3,0 s</b>. O commit <code>3e8ff62</code> só muda documentos e será apenas registrado.</li>
+<li>Jogo: o Worker em <code>https://infinity-grove.yan-tapajos.workers.dev/</code> serve o pacote <code>index-DkD7Utbv.js</code>, que contém os textos &ldquo;Equipe&rdquo; e &ldquo;Heróis disponíveis&rdquo; e a rota <code>team/slots</code>. O rótulo de versão no canto mostra <code>v0.5.0</code>; ele passa a <code>v0.6.0</code> com o commit de release, que o watcher publica.</li>
+<li>Verificação em produção (Chrome): a página carrega a tela de título e a árvore sem erros de console; os recursos e as imagens dos cinco heróis respondem 200. As rotas <code>GET /actuator/health</code>, <code>GET /team</code> e <code>PUT /team</code> pelo túnel respondem 401 sem token (rotas vivas e protegidas).</li>
+<li>Limite da verificação: não há credenciais da conta de teste nesta sessão, então não foi possível chegar ao capítulo 5 para ver o botão Equipe, a compra de vaga e os aliados no campo. Esses caminhos estão cobertos pelos e2e e pelos testes de integração do backend. A compra de vagas gasta moedas e não foi tentada.</li>
+<li>O site fica no ar somente enquanto o <code>publish.sh</code> roda.</li>
+</ul>
+</main>
+</body>
+</html>

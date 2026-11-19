@@ -3,6 +3,24 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.6.0] - 2026-11-19
+
+Equipe de heróis (`hero-team`): do capítulo 5 em diante, seus heróis lutam ao seu lado.
+
+### Adicionado
+
+- Botão **Equipe** no menu lateral e tela **Equipe**: o líder mais até 4 aliados, escolhidos entre os heróis que você já tem. Escolha, troque, remova um aliado ou torne-o líder.
+- Aliados golpeiam sozinhos uma vez por segundo, com o elemento do líder. O dano deles cresce com as estrelas e o equipamento de cada herói, e aparece como um número azul no campo de batalha.
+- Os aliados aparecem no campo ao lado do líder e atacam a cada golpe.
+- Quatro vagas de aliado, compradas com ouro (1, 2, 3 e 4 de ouro). Cada vaga é liberada ao vencer o chefe dos capítulos 5, 6, 7 e 8.
+- Cada herói traz uma passiva enquanto luta como aliado: **Guarda do Baluarte** (Kael, +5 s no tempo dos chefes), **Olho do Falcão** (Lyra, +10 de chance de crítico), **Erosão Arcana** (Orina, -15 de defesa dos inimigos), **Lâminas Sombrias** (Vex, -15 de resistência a crítico dos inimigos) e **Graça da Aurora** (Seraphine, +25% de dano da equipe).
+- O painel de atributos do Equipamento e a linha do inimigo já contam as passivas ativas.
+
+### Alterado
+
+- Trocar de líder coloca o líder anterior no lugar do novo líder dentro da equipe.
+- Quem ainda não chegou ao capítulo 5 joga exatamente como antes.
+
 ## [0.5.0] - 2026-11-19
 
 Dano unificado (`unified-damage`): um só tipo de dano e uma só defesa.
@@ -131,6 +149,7 @@ Primeira versão marcada. Traz a venda de equipamentos em lote (`bulk-sell`).
 - Os blocos dos heróis não se mexem mais quando o modo de seleção abre.
 - Os contornos das peças marcadas ficam separados uns dos outros no modo de seleção.
 
+[0.6.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.6.0
 [0.5.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.5.0
 [0.3.1]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.3.1
 [0.3.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.3.0
