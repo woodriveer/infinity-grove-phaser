@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 108,
+  "next_id": 109,
   "lessons": [
     {
       "id": "L-001",
@@ -1934,6 +1934,24 @@
       ],
       "created": "2026-11-19T06:20:45Z",
       "last_seen": "2026-11-19T06:20:45Z"
+    },
+    {
+      "id": "L-108",
+      "key": "spec_precision_gap::when a spec gives an end instant rule for one strike kind state it for every strike kind that can land at that instant delayed casts included",
+      "text": "When a spec gives an end-instant rule for one strike kind, state it for every strike kind that can land at that instant, delayed casts included.",
+      "signal": "spec_precision_gap",
+      "scope": "game/src/domain/skills",
+      "status": "candidate",
+      "features": [
+        "unified-damage"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md:283 (end-second rule names ticks only; skillCombat.test.js:617 aimed shot at Prisão's end second) (game/src/domain/skills)"
+      ],
+      "created": "2026-11-19T06:35:49Z",
+      "last_seen": "2026-11-19T06:35:49Z"
     }
   ]
 }

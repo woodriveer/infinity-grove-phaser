@@ -2,17 +2,77 @@
 
 **Date**: 2026-11-19
 **Spec**: `.specs/features/unified-damage/spec.md`
-**Diff range**: `8ed5284..24c2a07` (backend 0929ac8 2dbae23 fbf19a0; game a456c2e 226ba9a 5b4d065 40e08e3 7b2eaa7 f6a9c71 39247cb; docs e770a55; e2e 0608fdc f8f0cd1; ui review c2181c7; author check 24c2a07)
-**Verifier**: independent sub-agent (author ≠ verifier), round 1 of 3
-**Full run**: `24c2a07` (backend, game unit, e2e and deploy suites, all with the coverage commands)
-**Coverage summaries**: `.specs/features/unified-damage/coverage/` (`jacocoTestReport.xml`, `unit-coverage-summary.json`, `e2e-coverage-summary.json`), all from the full run at `24c2a07`. The folder is git-ignored (`.gitignore:13`), so it is not committed.
+**Diff range**: `8ed5284..c7cf3a4` (backend 0929ac8 2dbae23 fbf19a0; game a456c2e 226ba9a 5b4d065 40e08e3 7b2eaa7 f6a9c71 39247cb; docs e770a55; e2e 0608fdc f8f0cd1; ui review c2181c7; author check 24c2a07; round 1 report 1ebc493; Fix 1 c7cf3a4)
+**Verifier**: independent sub-agent (author ≠ verifier), round 2 of 3
+**Full run**: `c7cf3a4` for the backend suite (round 2 final gate) and the game unit suite (round 2); `24c2a07` for the e2e and deploy suites (round 1)
+**Coverage summaries**: `.specs/features/unified-damage/coverage/` (`jacocoTestReport.xml`, `unit-coverage-summary.json`, `e2e-coverage-summary.json`), copied after the round 2 final gate at `c7cf3a4`. JaCoCo and unit come from the round 2 runs at `c7cf3a4`. e2e is the round 1 full run at `24c2a07` plus `unifiedDamage.spec.js` rerun at `c7cf3a4` with `--keep`; no production code changed between the two. The folder is git-ignored (`.gitignore:13`), so it is not committed.
 
-**Verdict**: FAIL
-**Result**: FAIL
+**Verdict**: PASS
+**Result**: PASS
 
-One gap: the aimed shot (and any forced critical) under Prisão de Espinhos or Bênção da Grande Árvore is pinned by no test. Two sensor mutants that take those effects off forced-critical strikes survive (M19, M20). Every other AC has `file:line` evidence, and 17 of the 18 first-pass mutants were killed. The survivor of that pass, M10, is equivalent.
+Round 2 closes the one gap of round 1. Two new tests land Tiro Preciso's cast hit under Prisão de Espinhos (75) and under Bênção da Grande Árvore (78). M19 and M20 are now killed, and so are three new mutants on the aimed-shot path. The round 1 report follows the round 2 section unchanged; only this header and the summary at the end were rewritten.
 
 ---
+
+## Round 2 (re-verification of Fix 1)
+
+Scope per `.claude/agents/verifier.md`: the round 1 gap, the diff of the fix commit, M19 and M20 plus new mutants on the code the fix's tests reach, the game unit suite and `unifiedDamage.spec.js`. Then the final gate.
+
+### Fix commit diff
+
+`git diff --name-only 24c2a07..c7cf3a4` lists `game/src/domain/skills/skillCombat.test.js` (+27 lines, two tests), `.specs/features/unified-damage/validation.md`, `.specs/LESSONS.md` and `.specs/lessons.json`. No production code, no build or config file and no e2e spec changed since the full run at `24c2a07`.
+
+### Fix 1: the aimed shot under Prisão and Bênção
+
+| AC | Spec-defined outcome | `file:line` + assertion | Result |
+| -- | -------------------- | ----------------------- | ------ |
+| P1-3 (aimed shot under Prisão) | Base 1, Tiro Preciso 3000 % (`hero-skills` spec, Lyra 2), forced critical ×2, defense 0, same element, P = 1 + 25 × 1 / 100: 30 × 2 × 1.25 = **75**, critical | `game/src/domain/skills/skillCombat.test.js:624` `advance(1999)` → `[]`; `:625` `advance(1)` → `toEqual([ { damage: 75, critical: true } ])` | ✅ PASS |
+| P1-5 (aimed shot under Bênção) | the same shot, B = 1 + 30 × 1 / 100: 30 × 2 × 1.3 = **78**, critical | `skillCombat.test.js:636` `advance(1999)` → `[]`; `:640` `hits[0].critical` `toBe(true)`; `:641` `toBeCloseTo(78, 10)` | ✅ PASS |
+
+Both tests drive `SkillCombat` across heroes (Orina or Seraphine first, then Lyra), as the round 1 fix task asked. The values come from the spec's Damage Rules (`spec.md:61-70`), not from the code.
+
+**⚠️ Spec-precision note (non-blocking, owner `product-owner`).** Prisão lasts 2 s at every level, and so does the Tiro Preciso cast, so the Prisão test lands the shot at the very second Prisão ends. The spec states the end-second rule for ticks only (`spec.md:283`: "the tick at the end second still gets the effect"). The test applies the same rule to the aimed shot. That matches AC P1-3 ("every ... aimed shot") and the `hero-skills` convention, and M23 shows the test pins it. The Bênção test lands at 2 s of 15 s, well inside the effect, so P1-5 does not depend on the rule. A one-line spec edit ("an aimed shot that lands at the end second still gets the effect") would remove the inference. Not a fix task.
+
+### Discrimination Sensor, round 2
+
+Run with `node scripts/sensor.mjs` in the main checkout (no other agent testing). M19 and M20 are the round 1 survivors with the same fault. M21 to M23 are new, on `landCast` in `skillCombat.js`, the path the new tests reach. Every mutant uses the narrowest command, `npx vitest run src/domain/skills/skillCombat.test.js` (round 1 ran M19 and M20 on the whole `src/domain/skills` folder). A second run of the same five mutants sent each vitest output to a log, to check every kill is a real test failure. Each log shows `Tests  1 failed | 86 passed (87)`, and the failed test is the one named below.
+
+| Mutant | File | Note | Outcome |
+| --- | --- | --- | --- |
+| M19 | `game/src/domain/skills/skillDamage.js` | Prisão skips forced-critical strikes (the aimed shot, AC P1-3) | killed (`lands 75 under Prisão de Espinhos level 1 ...`) |
+| M20 | `game/src/domain/skills/skillDamage.js` | Bênção skips forced-critical strikes (the aimed shot, AC P1-5) | killed (`lands 78 under Bênção da Grande Árvore level 1 ...`) |
+| M21 | `game/src/domain/skills/skillCombat.js` | landCast ignores the monster's effects (no Prisão on the aimed shot) | killed (`lands 75 under Prisão ...`) |
+| M22 | `game/src/domain/skills/skillCombat.js` | landCast ignores the player's effects (no Bênção on the aimed shot) | killed (`lands 78 under Bênção ...`) |
+| M23 | `game/src/domain/skills/skillCombat.js` | a monster effect that ends at the second the cast ends is gone before the shot lands | killed (`lands 75 under Prisão ...`) |
+
+**Result**: 5 mutants, 5 killed, 0 survived, 0 invalid; isolation ok (`git status --porcelain` matched the baseline on both runs).
+
+Across both rounds: 23 mutants, 22 killed (M19 and M20 in round 2), 1 survived (M10, equivalent, see round 1).
+
+### Gate, round 2
+
+| Suite | Command | Result |
+| ----- | ------- | ------ |
+| Game unit | `cd game && npm run test:coverage` | 80 files, 1813 tests, 1813 passed (round 1: 1811, +2 from Fix 1) |
+| e2e, feature spec | `cd game && npm run test:e2e:coverage -- --keep e2e/unifiedDamage.spec.js` | 11 passed, 0 failed |
+| Backend (final gate) | `cd backend && ./gradlew cleanTest test` | 1043 tests, 0 failed, 0 skipped (BUILD SUCCESSFUL, JaCoCo written) |
+
+The full e2e suite was not run again. `git diff --name-only 24c2a07..HEAD` lists no file under `backend/src/main`, no `game/src` file other than `*.test.js`, nothing under `game/public` and no build or config file, and no e2e spec changed. The rest of the e2e suite stands on the round 1 full run at `24c2a07` (392 tests, 389 passed, 3 failed, none caused by the feature, listed below). The deploy suite was not run again because `deploy/` is untouched in the range.
+
+Round 2 failures: none.
+
+### Traceability, round 2
+
+| Requirement | Previous Status | New Status |
+| ----------- | --------------- | ---------- |
+| UDMG-02 | ❌ Needs Fix (aimed shot under Prisão) | ✅ Verified |
+| UDMG-03 | ❌ Needs Fix (aimed shot under Bênção) | ✅ Verified |
+
+The orchestrator updates the statuses in `spec.md`, because the Verifier writes only `validation.md`.
+
+---
+
+## Round 1 report
 
 ## Task Completion
 
@@ -213,12 +273,12 @@ Run with `node scripts/sensor.mjs` in the main checkout (no other agent testing)
 
 ## Summary
 
-**Overall**: ❌ Not Ready (round 1 of 3). One minor test-only gap.
+**Overall**: ✅ Ready (round 2 of 3).
 
-**Spec-anchored check**: 35/37 ACs fully matched to the spec outcome, 2 partly (aimed shot); 0 spec-precision gaps.
-**Sensor**: 20 mutants, 17 killed, 3 survived (M10 equivalent, M19 and M20 real).
-**Gate**: backend 1043/1043, game unit 1811/1811, e2e 389/392, deploy 287/289. Every failure is outside the feature, with evidence above.
+**Spec-anchored check**: 37/37 ACs matched to the spec outcome. One non-blocking spec-precision note: the aimed shot at Prisão's end second is inferred from the tick rule at `spec.md:283`.
+**Sensor**: round 2, 5 mutants, 5 killed. Both rounds, 23 mutants, 22 killed, 1 survived (M10, equivalent).
+**Gate**: round 2, game unit 1813/1813, `unifiedDamage.spec.js` 11/11, backend 1043/1043 (final gate). Round 1, e2e 389/392 and deploy 287/289; every failure is outside the feature, with evidence above.
 
-**What works**: one defense from the database to the screen, with the legacy fields kept for the previous Worker; Prisão and Bênção on clicks, hits and ticks; Brado and the break talent on the one defense; the 27-talent catalog, the tolerant load and the V11 refund; the texts, the panel and the README.
+**What works**: one defense from the database to the screen, with the legacy fields kept for the previous Worker; Prisão and Bênção on clicks, hits, the aimed shot and ticks; Brado and the break talent on the one defense; the 27-talent catalog, the tolerant load and the V11 refund; the texts, the panel and the README.
 
-**Next steps**: Fix 1 (`test-engineer`), then round 2: M19, M20 plus 1 to 3 new mutants on the new tests' targets, the game unit suite and `unifiedDamage.spec.js`. Then the final gate with the full backend suite. The full e2e suite runs again only if production code changes.
+**Next steps**: `product-owner` acceptance, optionally with the one-line spec edit for the aimed shot at the end second. Then `gitops` pushes, deploys and writes `report.html` from the coverage summaries above.

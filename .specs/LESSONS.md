@@ -654,6 +654,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: spec.md Success Criteria 2 (campaign.js:9, damage.js:10) (specs)
 - last seen: 2026-11-19T06:20:45Z
 
+### L-108 - When a spec gives an end-instant rule for one strike kind, state it for every strike kind that can land at that instant, delayed casts included.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `game/src/domain/skills` · harmful: 0
+- features: unified-damage
+- evidence: spec.md:283 (end-second rule names ticks only; skillCombat.test.js:617 aimed shot at Prisão's end second) (game/src/domain/skills)
+- last seen: 2026-11-19T06:35:49Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
