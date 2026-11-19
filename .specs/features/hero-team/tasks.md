@@ -1730,7 +1730,7 @@ No sprite calls `setInteractive`, so the canvas `pointerdown` handler still gets
 
 ---
 
-### T17: Render the Equipe screen [ ]
+### T17: Render the Equipe screen [x]
 
 **Owner**: game-dev
 **Goal**: A pure DOM view renders the Equipe screen of the spec layout from a model, and a model builder computes every text from the domain (TEAM-09, TEAM-10, TEAM-13).
@@ -1872,7 +1872,7 @@ Test fixtures: heroes `{ id, name, stars, owned: true, leaderBonus: 'Bonus' }` f
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 27 cases pass and the whole Vitest suite passes; the CSS block is at the end of `style.css`.
+- [x] The 27 cases pass and the whole Vitest suite passes; the CSS block is at the end of `style.css`.
 
 **Commit**: `feat(game): render the Equipe screen`
 
