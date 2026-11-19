@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/hero-team/spec.md`
 **Design**: `.specs/features/hero-team/design.md`
-**Status**: Draft (2026-11-19). Waiting for the owner's approval and the answers to Q45 and Q46. Written against `main` at `7de3208`; line numbers below were read that day.
+**Status**: Approved by the owner (2026-11-19), with Q45 and Q46 answered as the recommended defaults; no task changes. Written against `main` at `7de3208`; line numbers below were read that day.
 
 Rules for every task:
 
@@ -28,7 +28,7 @@ Rules for every task:
 
 ## Owner Questions (open)
 
-Q45 and Q46 of the spec are open. The tasks use the recommended defaults. A different answer changes only these tasks:
+Q45 and Q46 were answered on 2026-11-19 with the recommended defaults below, so the tasks stand as written. Kept for traceability:
 
 | Question | Default used | Tasks that change with another answer |
 | --- | --- | --- |
