@@ -2362,7 +2362,7 @@ let teamFailure = null;
 
 ---
 
-### T24: Cover the ally hits in the browser [ ]
+### T24: Cover the ally hits in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: e2e scenarios prove the ally rhythm, the one damage, the effects, the kill, the gates and the light-blue number on the real scene (TEAM-05, TEAM-06, TEAM-07, TEAM-08).
@@ -2414,7 +2414,7 @@ let teamFailure = null;
 **Gate**: full - `cd game && npx playwright test e2e/heroTeamCombat.spec.js` then `cd game && npm test && npx playwright test`
 **Done when**:
 
-- [ ] The 22 scenarios pass; the whole Playwright suite passes.
+- [x] The 22 scenarios pass; the whole Playwright suite passes.
 
 **Commit**: `test(game): cover the ally hits`
 
