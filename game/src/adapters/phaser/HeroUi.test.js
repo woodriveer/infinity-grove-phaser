@@ -2577,3 +2577,190 @@ describe('HeroUi Equipe', () => {
         expect(ctx.testid('stat-critChance').textContent).toBe('Chance de crítico: 20%');
     });
 });
+
+describe('HeroUi Equipe editing', () => {
+    const NULLS = [ null, null, null, null ];
+    //  The Equipe screen of `team` is open: chapter 5, Kael leads, every hero owned
+    const editing = async (team, extra = {}) =>
+    {
+        const ctx = createUi({ list: ownedCatalog(team), position: CHAPTER_5, ...extra });
+
+        await ctx.heroes.load();
+        await open(ctx, 'team');
+
+        return ctx;
+    };
+    const click = async (ctx, id) =>
+    {
+        ctx.testid(id).click();
+        await flush();
+    };
+    const selectedSlots = (ctx) => [ 1, 2, 3, 4 ].filter((slot) => ctx.testid(`team-slot-${slot}`).getAttribute('data-selected') === 'true');
+    const buttons = (ctx) => [ ...ctx.testid('team-screen').querySelectorAll('button') ];
+    const answer = (team, leaderId = 'kael') => ({ leaderId, team });
+    const TWO_SLOTS = { openSlots: 2, boughtSlots: 2 };
+
+    it('a click on a filled ally card selects it', async () => {
+        const ctx = await editing(teamOf());
+
+        await click(ctx, 'team-slot-1');
+
+        expect(ctx.testid('team-slot-1').getAttribute('data-selected')).toBe('true');
+        expect(ctx.testid('team-remove').disabled).toBe(false);
+        expect(ctx.testid('team-make-leader').disabled).toBe(false);
+    });
+
+    it('a click on an empty bought card selects it and keeps the actions disabled', async () => {
+        const ctx = await editing(teamOf({ ...TWO_SLOTS }));
+
+        await click(ctx, 'team-slot-2');
+
+        expect(selectedSlots(ctx)).toEqual([ 2 ]);
+        expect(ctx.testid('team-remove').disabled).toBe(true);
+        expect(ctx.testid('team-make-leader').disabled).toBe(true);
+    });
+
+    it('a click on another card moves the selection', async () => {
+        const ctx = await editing(teamOf({ ...TWO_SLOTS }));
+
+        await click(ctx, 'team-slot-1');
+        await click(ctx, 'team-slot-2');
+
+        expect(selectedSlots(ctx)).toEqual([ 2 ]);
+    });
+
+    it('a click on an available hero fills the selected slot and sends PUT /team', async () => {
+        const ctx = await editing(teamOf({ ...TWO_SLOTS, allies: NULLS }));
+
+        ctx.heroesGateway.setTeam.mockResolvedValue(answer(teamOf({ ...TWO_SLOTS, allies: [ null, 'orina', null, null ] })));
+        await click(ctx, 'team-slot-2');
+        await click(ctx, 'team-available-orina');
+
+        expect(ctx.heroesGateway.setTeam).toHaveBeenCalledWith([ null, 'orina', null, null ]);
+        expect(ctx.testid('team-slot-2').getAttribute('data-state')).toBe('filled');
+        expect(ctx.testid('team-slot-2').querySelector('.team-name').textContent).toBe('Hero orina');
+        expect(selectedSlots(ctx)).toEqual([ 2 ]);
+    });
+
+    it('a click on an available hero replaces the hero of the selected filled slot', async () => {
+        const ctx = await editing(teamOf());
+
+        ctx.heroesGateway.setTeam.mockResolvedValue(answer(teamOf({ allies: [ 'orina', null, null, null ] })));
+        await click(ctx, 'team-slot-1');
+        await click(ctx, 'team-available-orina');
+
+        expect(ctx.heroesGateway.setTeam).toHaveBeenCalledWith([ 'orina', null, null, null ]);
+    });
+
+    it('with no selection an available hero goes to the first empty bought slot', async () => {
+        const ctx = await editing(teamOf({ ...TWO_SLOTS }));
+
+        ctx.heroesGateway.setTeam.mockResolvedValue(answer(teamOf({ ...TWO_SLOTS, allies: [ 'lyra', 'orina', null, null ] })));
+        await click(ctx, 'team-available-orina');
+
+        expect(ctx.heroesGateway.setTeam).toHaveBeenCalledWith([ 'lyra', 'orina', null, null ]);
+    });
+
+    it('with every bought slot full and none selected the available heroes are disabled', async () => {
+        const ctx = await editing(teamOf());
+
+        expect(ctx.testid('team-available-orina').disabled).toBe(true);
+
+        await click(ctx, 'team-available-orina');
+
+        expect(ctx.heroesGateway.setTeam).not.toHaveBeenCalled();
+    });
+
+    it('Remover empties the selected slot and keeps it selected', async () => {
+        const ctx = await editing(teamOf());
+
+        ctx.heroesGateway.setTeam.mockResolvedValue(answer(teamOf({ allies: NULLS })));
+        await click(ctx, 'team-slot-1');
+        await click(ctx, 'team-remove');
+
+        expect(ctx.heroesGateway.setTeam).toHaveBeenCalledWith([ null, null, null, null ]);
+        expect(ctx.testid('team-slot-1').getAttribute('data-state')).toBe('empty');
+        expect(ctx.testid('team-slot-1').getAttribute('data-selected')).toBe('true');
+    });
+
+    it('Tornar líder sends PUT /leader and shows the swapped team', async () => {
+        const ctx = await editing(teamOf());
+
+        ctx.heroesGateway.setLeader.mockResolvedValue(answer(teamOf({ allies: [ 'kael', null, null, null ] }), 'lyra'));
+        await click(ctx, 'team-slot-1');
+        await click(ctx, 'team-make-leader');
+
+        expect(ctx.heroesGateway.setLeader).toHaveBeenCalledWith('lyra');
+        expect(ctx.testid('team-slot-0').querySelector('.team-name').textContent).toBe('Hero lyra');
+        expect(ctx.testid('team-slot-1').querySelector('.team-name').textContent).toBe('Hero kael');
+        expect(selectedSlots(ctx)).toEqual([]);
+    });
+
+    it('while a save runs every card, entry and action is disabled and Fechar is enabled', async () => {
+        const ctx = await editing(teamOf({ ...TWO_SLOTS }));
+
+        ctx.heroesGateway.setTeam.mockReturnValue(new Promise(() => {}));
+        await click(ctx, 'team-available-orina');
+
+        expect(buttons(ctx).length).toBeGreaterThan(0);
+        expect(buttons(ctx).every((button) => button.disabled)).toBe(true);
+        expect(ctx.testid('hero-close').disabled).toBe(false);
+    });
+
+    it('a failed save shows Não foi possível salvar a equipe. and reloads the heroes', async () => {
+        const ctx = await editing(teamOf({ ...TWO_SLOTS }));
+        const loads = ctx.heroesGateway.list.mock.calls.length;
+
+        ctx.heroesGateway.setTeam.mockRejectedValue(new ApiError('down', { status: 409, code: 'TEAM_SLOT_NOT_BOUGHT' }));
+        await click(ctx, 'team-available-orina');
+
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível salvar a equipe.');
+        expect(ctx.query('.hero-error').hidden).toBe(false);
+        expect(ctx.heroesGateway.list.mock.calls).toHaveLength(loads + 1);
+        expect(ctx.testid('team-available-orina').disabled).toBe(false);
+        expect(ctx.testid('team-slot-1').disabled).toBe(false);
+    });
+
+    it('a failed leader change shows Não foi possível salvar a equipe.', async () => {
+        const ctx = await editing(teamOf());
+
+        ctx.heroesGateway.setLeader.mockRejectedValue(new ApiError('down', { status: 409 }));
+        await click(ctx, 'team-slot-1');
+        await click(ctx, 'team-make-leader');
+
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível salvar a equipe.');
+    });
+
+    it('closing Equipe during a save keeps the answer and reopens with the stored team and every control enabled', async () => {
+        const ctx = await editing(teamOf({ openSlots: 3, boughtSlots: 3, allies: [ 'lyra', null, null, null ] }));
+        let finish;
+        const stored = teamOf({ openSlots: 3, boughtSlots: 3, allies: [ 'lyra', 'orina', null, null ] });
+
+        ctx.heroesGateway.setTeam.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+        await click(ctx, 'team-available-orina');
+        ctx.ui.close();
+        ctx.heroesGateway.list.mockImplementation(() => Promise.resolve(ownedCatalog(stored)));
+        finish(answer(stored));
+        await flush();
+        await ctx.ui.show('team');
+
+        expect(ctx.testid('team-slot-2').querySelector('.team-name').textContent).toBe('Hero orina');
+        expect(ctx.testid('team-slot-3').disabled).toBe(false);
+        expect(ctx.testid('team-available-seraphine').disabled).toBe(false);
+        expect(ctx.testid('team-available-vex').disabled).toBe(false);
+    });
+
+    it('opening another screen during a save renders nothing for the answer', async () => {
+        const ctx = await editing(teamOf({ ...TWO_SLOTS }));
+        let finish;
+
+        ctx.heroesGateway.setTeam.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+        await click(ctx, 'team-available-orina');
+        await ctx.ui.show('heroes');
+        finish(answer(teamOf({ ...TWO_SLOTS, allies: [ 'lyra', 'orina', null, null ] })));
+        await flush();
+
+        expect(ctx.testid('team-screen')).toBeNull();
+        expect(ctx.testid('hero-grid')).not.toBeNull();
+    });
+});

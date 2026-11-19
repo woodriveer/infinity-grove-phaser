@@ -3,7 +3,7 @@ import { bagPieces, selectedInBag, sellNotice as sellNoticeText, toggleRarity, t
 import { dropLabel, wornBy } from '../../domain/equipment/equipment';
 import { leaderStats } from '../../domain/equipment/leaderStats';
 import { raisedSkills } from '../../domain/heroes/bagCards';
-import { activePassives } from '../../domain/heroes/team';
+import { activePassives, slotStates } from '../../domain/heroes/team';
 import { raisedSkillSlot, skillLevelOf } from '../../domain/skills/skillLevel';
 import { renderBagCards } from './views/bagView';
 import { renderCatalog, renderHeroDetail } from './views/catalogView';
@@ -54,6 +54,7 @@ const DEFAULT_POSITION = { chapter: 1, stage: 1, kind: 'PHASE', stageCount: 10, 
 const LOAD_FAILED = 'Não foi possível carregar.';
 const FUSE_FAILED = 'Não foi possível fundir as cartas.';
 const LEADER_FAILED = 'Não foi possível trocar o líder.';
+const TEAM_FAILED = 'Não foi possível salvar a equipe.';
 const EQUIPMENT_FAILED = 'Não foi possível concluir a ação.';
 const TALENT_FAILED = 'Não foi possível melhorar o talento.';
 const TALENT_RESET_FAILED = 'Não foi possível reiniciar os talentos.';
@@ -545,20 +546,104 @@ export class HeroUi
         }));
     }
 
-    //  The editing of the team arrives with the next tasks
-    selectTeamSlot ()
+    //  A click on an ally card: a filled or empty bought slot becomes the selected one; a buyable slot asks to buy it; any other card does
+    //  nothing (its button is disabled)
+    selectTeamSlot (slot)
     {
+        const { state } = slotStates(this.heroes.team())[slot - 1];
+
+        if (state === 'filled' || state === 'empty')
+        {
+            this.teamSelected = slot;
+            this.render_team();
+        }
+        else if (state === 'buyable')
+        {
+            this.askTeamSlot(slot);
+        }
     }
 
-    pickTeamHero ()
+    //  The hero goes to the selected bought slot, else to the first empty bought slot; nothing happens without such a slot
+    async pickTeamHero (heroId)
     {
+        const team = this.heroes.team();
+        const states = slotStates(team);
+        const selectedState = this.teamSelected ? states[this.teamSelected - 1].state : null;
+        const target = selectedState === 'filled' || selectedState === 'empty' ? this.teamSelected : states.find(({ state }) => state === 'empty')?.slot;
+
+        if (!target)
+        {
+            return;
+        }
+
+        const allies = [ ...team.allies ];
+
+        allies[target - 1] = heroId;
+        await this.saveTeam(allies, target);
     }
 
-    removeTeamHero ()
+    //  The selected filled slot is emptied and stays selected
+    async removeTeamHero ()
     {
+        const allies = [ ...this.heroes.team().allies ];
+
+        allies[this.teamSelected - 1] = null;
+        await this.saveTeam(allies, this.teamSelected);
     }
 
-    makeTeamLeader ()
+    //  The hero of the selected slot becomes the leader; the backend puts the old leader in that slot
+    async makeTeamLeader ()
+    {
+        const heroId = this.heroes.team().allies[this.teamSelected - 1];
+
+        await this.runTeam(() => this.heroes.setLeader(heroId), null);
+    }
+
+    //  PUT /team with `allies`; `selected` is the slot selected after the answer
+    saveTeam (allies, selected)
+    {
+        return this.runTeam(() => this.heroes.setTeam(allies), selected);
+    }
+
+    //  One team request: the body is disabled while it runs; an answer for a screen left in the meantime renders nothing (L-096)
+    async runTeam (request, selected, failure = TEAM_FAILED)
+    {
+        const view = this.view;
+
+        this.teamBusy = true;
+        this.setError('');
+        this.render_team();
+
+        try
+        {
+            await request();
+
+            if (view === this.view)
+            {
+                this.teamSelected = selected;
+            }
+        }
+        catch
+        {
+            if (view === this.view)
+            {
+                this.setError(failure);
+            }
+
+            await this.heroes.load().catch(() => {});
+        }
+        finally
+        {
+            if (view === this.view)
+            {
+                this.teamBusy = false;
+                this.render_team();
+            }
+        }
+    }
+
+    //  The purchase of an ally slot arrives with the next task
+    askTeamSlot ()
     {
     }
 

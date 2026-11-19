@@ -1992,7 +1992,7 @@ Update the class comment: seven HUD buttons at most, the Equipe screen. `createU
 
 ---
 
-### T19: Edit the team in the Equipe screen [ ]
+### T19: Edit the team in the Equipe screen [x]
 
 **Owner**: game-dev
 **Goal**: The player selects slots, places, replaces and removes allies and makes an ally the leader, with every control disabled while a request runs and the failure text and reload of the spec (TEAM-13).
@@ -2115,7 +2115,7 @@ async runTeam (request, selected, failure = TEAM_FAILED)
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 14 cases pass and the whole Vitest suite passes.
+- [x] The 14 cases pass and the whole Vitest suite passes.
 
 **Commit**: `feat(game): edit the team in the Equipe screen`
 
