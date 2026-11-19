@@ -678,6 +678,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: game/e2e/heroTeam.spec.js:347 (game-e2e)
 - last seen: 2026-11-19T16:52:18Z
 
+### L-112 - Read a state the live loop keeps changing (a monster the allies kill again a second after it respawns) with the loop asleep and stepped by hand, not with a real-time poll
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `game-e2e` · harmful: 0
+- features: hero-team
+- evidence: game/e2e/heroTeamCombat.spec.js:340 (game-e2e)
+- last seen: 2026-11-19T17:33:58Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

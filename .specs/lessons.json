@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 112,
+  "next_id": 113,
   "lessons": [
     {
       "id": "L-001",
@@ -2008,6 +2008,24 @@
       ],
       "created": "2026-11-19T16:52:18Z",
       "last_seen": "2026-11-19T16:52:18Z"
+    },
+    {
+      "id": "L-112",
+      "key": "gate_fail::read a state the live loop keeps changing a monster the allies kill again a second after it respawns with the loop asleep and stepped by hand not with a real time poll",
+      "text": "Read a state the live loop keeps changing (a monster the allies kill again a second after it respawns) with the loop asleep and stepped by hand, not with a real-time poll",
+      "signal": "gate_fail",
+      "scope": "game-e2e",
+      "status": "candidate",
+      "features": [
+        "hero-team"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/e2e/heroTeamCombat.spec.js:340 (game-e2e)"
+      ],
+      "created": "2026-11-19T17:33:58Z",
+      "last_seen": "2026-11-19T17:33:58Z"
     }
   ]
 }

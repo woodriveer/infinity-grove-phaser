@@ -2,13 +2,144 @@
 
 **Date**: 2026-11-19
 **Spec**: `.specs/features/hero-team/spec.md` (approved 2026-11-19, Q45 and Q46 at the recommended defaults)
-**Diff range**: `0248def..c5847a8` (backend T1 to T6 `7ac77ba..845bd5a`; game T7 to T20 `a9d2c0a..1c796b7`; e2e T21 to T26 `7d97a29..f7c59df`, `72842bb`, `5179a69`; UI review `7542f7b`; UI fixes T28 `5e72889`, T29 `671f452`, T30 `7435d25`; UI review round 2 `a9eb31b`; author check `ae14d63`, `33c55f6`, `c5847a8`)
-**Verifier**: independent sub-agent (author ≠ verifier), round 1 of 3
-**Full run**: `c5847a8` for all four suites (backend, game unit, e2e in 14 shards, deploy)
-**Coverage summaries**: `.specs/features/hero-team/coverage/` (`jacocoTestReport.xml`, `unit-coverage-summary.json`, `e2e-coverage-summary.json`), copied from the round 1 full runs at `c5847a8`. JaCoCo was copied before the backend mutants ran, because `test --tests` rewrites `backend/build/reports/jacoco`; use the copy, not the build folder. The e2e summary merges all 14 shards (484 raw files, one per test). The folder is git-ignored (`.gitignore:13`) and not committed.
+**Diff range**: `0248def..06316ef` (backend T1 to T6 `7ac77ba..845bd5a`; game T7 to T20 `a9d2c0a..1c796b7`; e2e T21 to T26 `7d97a29..f7c59df`, `72842bb`, `5179a69`; UI review `7542f7b`; UI fixes T28 `5e72889`, T29 `671f452`, T30 `7435d25`; UI review round 2 `a9eb31b`; author check `ae14d63`, `33c55f6`, `c5847a8`; round 1 report `9af93fe`; round 1 fixes `5680c42`, `06316ef`)
+**Verifier**: independent sub-agent (author ≠ verifier), round 2 of 3 (round 1 FAIL at `9af93fe`)
+**Full run**: `06316ef` for the round 2 final gate (backend full suite, game unit full suite, the six `heroTeam*.spec.js` files with `--keep`). The full e2e suite (14 shards) and the deploy suite ran at `c5847a8` in round 1. Production code has not changed since: `git diff --name-only c5847a8..06316ef` lists only `.specs/` files, `game/e2e/heroTeam.spec.js`, `ClickerGame.test.js` and `skillCombat.test.js`.
+**Coverage summaries**: `.specs/features/hero-team/coverage/` (`jacocoTestReport.xml`, `unit-coverage-summary.json`, `e2e-coverage-summary.json`), copied after the round 2 final gate at `06316ef`. JaCoCo comes from `./gradlew cleanTest test`, and no Gradle command ran after it. The unit summary comes from `npm run test:coverage`. The e2e summary is the round 1 raw data of all 14 shards (`c5847a8`, 484 raw files, one per test), with the six feature spec files rerun at `06316ef` with `--keep`, so it still has 484 raw files. The folder is git-ignored (`.gitignore:13`) and not committed.
 
-**Verdict**: FAIL
-**Result**: FAIL
+**Verdict**: PASS
+**Result**: PASS
+
+Round 2 closes gaps 1 to 3 with test-only commits. The frame-end rule now has a test, and the round 1 survivor G24 is killed (2 failed of 457). Each of the four partial ACs now has a test for every trigger it lists, and each test is killed by a new mutant aimed at that trigger (N2 to N4; 4 of 4 mutants killed). `heroTeam.spec.js:347` passed under 3 workers. The final gate passed: backend 1149/1149, game unit 2015/2015, and the feature's e2e files 91 of 92. The one e2e failure is a 5 s poll timeout of `heroTeamCombat.spec.js:324`. That file is unchanged since round 1, the test passed in round 1's full run, and it passes when run alone. verifier.md lists such a test under the failures not caused by the feature; it is recorded below with its likely cause in the test, as a non-blocking follow-up. Gap 4 (the E3 wording and the two T27 boxes) belongs to the product owner. It is handed to acceptance and does not block the verdict (see Round 2 § Gap 4).
+
+---
+
+## Round 2 (re-verification at `06316ef`)
+
+Scope, per `.claude/agents/verifier.md`: the round 1 gaps, the diff of the fix commits, the round 1 survivor plus new mutants on the code the fixes test, the game unit suite, the feature's own e2e spec files, and the final gate.
+
+### Fix commits
+
+| Commit | Files | What changed |
+| --- | --- | --- |
+| `5680c42` | `game/src/adapters/phaser/ClickerGame.test.js` (+102), `game/src/domain/skills/skillCombat.test.js` (+12 -1) | Adds a new describe block `the frame where an effect ends, and every trigger of the ally ACs` (`ClickerGame.test.js:5401`) with six scene tests and rewrites the E14 domain test (`skillCombat.test.js:1078`) |
+| `06316ef` | `game/e2e/heroTeam.spec.js` (+5) | `:354` waits for the purchase dialog, and `:358` sleeps the Phaser loop before `team-buy-confirm` |
+
+No assertion was removed or weakened. The old E14 line (`land(combat(), monsterWith(), ally())`) is replaced by a stronger one, and `heroTeam.spec.js:347` keeps every asserted value. No production file is in the range (`git diff --name-only c5847a8..06316ef`).
+
+### Round 1 gaps
+
+| Gap | Owner | Evidence at `06316ef` | Status |
+| --- | --- | --- | --- |
+| 1. Frame-end rule (edge case, mutant G24) | test-engineer | `ClickerGame.test.js:5410`: Orina leads, Prisão de Espinhos (level 1, 2000 ms) runs, and the second ally tick lands in the frame that uses up the 2000 ms. `expect(allyTexts(ctx).map(t => t.text)).toEqual(['2.5', '2.5'])`, health `1000 - 5`, then `'2'` on the next tick (E7: 2.5). `:5427`: Seraphine leads, Bênção da Grande Árvore runs, and the 15th tick lands in the frame that ends the 15000 ms. `allyTexts(ctx).at(-1).text` is `'2.6'`, health `1000 - 15 x 2.6`, then `'2'` (E8: 2.6). G24 is killed by both tests (sensor below) | ✅ Closed |
+| 2a. Allies fight AC 8, fusion half | test-engineer | `ClickerGame.test.js:5444`: Lyra at 1 star ticks `'4'` (health 996); after `heroes.fuse('lyra', 1)` answers 2 stars, the next tick is `'6'` (health 990). These are the ×4 and ×6 star multipliers of the Ally Damage table, read again on the next hit | ✅ Closed |
+| 2b. One damage AC 9 (E14), power talents half | test-engineer | `ClickerGame.test.js:5459`: the leader has `CLICK_DAMAGE` 20 and `CRIT_CHANCE` 20. The click deals 1.2, so the talents are live, and the ally tick at roll 0 is `['2']` (E14: 2, never critical). The stars half is still `heroTeamCombat.spec.js:228` (round 1). `skillCombat.test.js:1078` now uses the strong leader: Corte Dimensional 24 vs 21 (`expect.closeTo`), and an ally hit after the strong cast is 2. This shows that the cast's state does not reach the ally; the scene test is what proves that the talents do not | ✅ Closed |
+| 2c. Passives AC 2, skill-hit half (Lyra) | test-engineer | `ClickerGame.test.js:5473`: Kael at 1 star casts Corte Dimensional (1500 % of a 1.1 click = 16.5) at roll 0.15. With Lyra as an ally the hit is critical, health `1000 - 33`; without her it is not, health `1000 - 16.5`. The 10 % base plus Lyra's +10 is the AC's +10 | ✅ Closed |
+| 2d. Passives AC 4, skill-hit half (Vex) | test-engineer | `ClickerGame.test.js:5487`: the monster has critical resistance 30, and the roll is 0.08. With Vex the skill hit is critical (33); without him it is not (16.5). The -15 value itself stays pinned by the enemy line `Crit res 15%` (`heroTeamPassives.spec.js:178`, round 1) | ✅ Closed |
+| 3. Re-render race of `heroTeam.spec.js:347` | test-engineer | `:358` sleeps the loop before the purchase, so the 400 ms and 3000 ms timers cannot rebuild the panel. It passed in part A under the default 3 workers (`ok 15 … heroTeam.spec.js:347:5 … (48.8s)`) | ✅ Closed |
+| 4. E3 wording (`spec.md:109`, `:374`) and the T27 Done-when boxes (`tasks.md:2548-2549`) | product-owner | Unchanged: E3 still reads Orina 3 stars → 105.6, and both boxes are still `[ ]` | ⚠️ Handed to acceptance (see below) |
+
+**Gap 4.** verifier.md has no rule for gaps owned by the product owner. validate.md says a spec-precision gap must be flagged and never passed in silence, and its report template has a "⚠️ Spec-precision gaps flagged" status. E3 is flagged here and stays flagged. It does not block the verdict, because no test is missing and no behaviour is wrong. The tests assert the value that follows from the Passive Table and Q45, which is the spec's intent: Lyra with E3's pieces deals 105.6 (`heroTeamCombat.spec.js:239`), and Orina deals 137.28 with her own Erosão Arcana (`:251`). The product owner should reword E3 and Allies fight AC 4 at acceptance (Lyra → 105.6, or Orina → 137.28) and tick the two T27 boxes, whose condition `ui-review.html` round 2 already met (`a9eb31b`).
+
+### Updated AC rows (all other rows as in round 1)
+
+| AC | Spec-defined outcome | `file:line` + assertion | Result |
+| --- | --- | --- | --- |
+| One damage 9 (E14) | leader stars and power talents leave the ally hit at 2 | stars: e2e `heroTeamCombat.spec.js:228` (tick 2 under a 3-star Kael); talents: `ClickerGame.test.js:5459` `toEqual(['2'])` with `CLICK_DAMAGE` 20 and `CRIT_CHANCE` 20 at roll 0, click 1.2 | ✅ PASS |
+| Allies fight 4 (E3) | spec: Orina 3 stars → 105.6 | as in round 1 (`skillCombat.test.js:993` 105.6; e2e `heroTeamCombat.spec.js:239` 105.6, `:251` 137.28) | ⚠️ Spec-precision gap, handed to the product owner |
+| Allies fight 8 | fusion or equipment: new values on the next hit | fusion: `ClickerGame.test.js:5444` `'4'` → `'6'`, health 996 → 990; equipment: `ClickerGame.test.js:5301`, e2e `heroTeamCombat.spec.js:303` | ✅ PASS |
+| Passives 2 (Lyra) | +10 critical chance on the leader's clicks and skill hits | clicks: e2e `heroTeamPassives.spec.js:136`, `ClickerGame.test.js:5363`; skill hits: `ClickerGame.test.js:5473` 33 with Lyra and 16.5 without at roll 0.15 | ✅ PASS |
+| Passives 4 (Vex) | -15 critical resistance on the leader's hits, floor 0 | clicks and enemy line: e2e `heroTeamPassives.spec.js:178`, `ClickerGame.test.js:5357`; skill hits: `ClickerGame.test.js:5487` 33 with Vex and 16.5 without at resistance 30 and roll 0.08 | ✅ PASS |
+| Edge case: ally hit in the frame where Prisão or Bênção ends still gets the effect | 2.5 (E7) and 2.6 (E8) in the ending frame | `ClickerGame.test.js:5410`, `:5427` | ✅ PASS |
+
+**Status**: 97 of 98 ACs covered with spec values, plus every listed edge case. Allies fight AC 4 is covered too, but its E3 example carries a flagged spec-precision gap for the product owner. Every visible AC has an e2e scenario (round 1 map). The new tests are scene-level unit tests for behaviour that round 1 already showed on screen in e2e: the ally number, the passives, the field.
+
+### Discrimination sensor (round 2)
+
+Mutants written to the scratchpad (`ht-r2/mutants.json`) and run with `node scripts/sensor.mjs` in the main checkout. No Vitest or Playwright process was running, and only idle Gradle and Kotlin daemons were up. Each mutant ran the whole `ClickerGame.test.js` with `npx vitest run src/adapters/phaser/ClickerGame.test.js`, the narrowest single file that holds the new tests, with no `-t` filter. A control with an unchanged replacement runs first. Table printed by the script:
+
+| Mutant | File | Note | Outcome |
+| --- | --- | --- | --- |
+| C0 | `game/src/adapters/phaser/ClickerGame.js` | control: no change | survived |
+| G24 | `game/src/adapters/phaser/ClickerGame.js` | round 1 survivor: allies strike after the skills advance | killed |
+| N2 | `game/src/domain/skills/skillCombat.js` | Passives AC 4: a skill hit meets the raw stats (Vex ignored) | killed |
+| N3 | `game/src/adapters/phaser/ClickerGame.js` | One damage AC 9: the leader power talents add to the ally factor | killed |
+| N4 | `game/src/application/heroes/heroCollection.js` | Allies fight AC 8: a fusion keeps the old stars | killed |
+
+Script line: `5 mutants, 4 killed, 1 survived, 0 invalid; isolation ok`. The one survivor is the control C0, which must survive. **Sensor outcome: 4 of 4 mutants killed.**
+
+Kill evidence from the logs:
+
+- C0: `Tests 457 passed (457)`, so the command passes when nothing is mutated.
+- G24 (`allyFrame` moved after `skills.advance` in `ClickerGame.update`): 2 failed of 457, `an ally tick in the frame where Prisão de Espinhos ends…` (`:5410`) and `…Bênção da Grande Árvore ends…` (`:5427`). In round 1 it survived every case of this file.
+- N2 (the `use` hits of `SkillCombat` read `monster.stats` instead of `statsOf(monster)`): 1 failed of 457, `Vex as an ally takes 15 points off the critical resistance 30 a skill hit meets…` (`:5487`). The test catches the skill path alone; clicks and ticks keep `statsOf`.
+- N3 (`allyFactor + leaderAttacker().baseDamage - 1` in `allyAttackers`): 3 failed of 457, among them `power talents of the leader … leave the ally tick at 2` (`:5459`).
+- N4 (`heroCollection.fuse` stores the answer with the old stars): 3 failed of 457, among them `an ally that fuses to more stars hits with the new multiplier on the next tick` (`:5444`).
+
+The new Lyra skill-hit test (`:5473`) has no mutant of mine. The author's mutant M3 (the skill attacker built without passives, in `scratchpad/fix/mutants.json`) covers it, and the author reports it killed. That is author evidence, so it is not counted above; the C0 run shows the test passes without a mutant.
+
+**Sensor depth**: lightweight, aimed at the code the new tests cover.
+
+### Gate (round 2 and final gate, at `06316ef`, one suite at a time, in the foreground or waited for)
+
+| Suite | Command | Result |
+| --- | --- | --- |
+| Game unit | `cd game && npm run test:coverage` | 84 files, 2015 tests, 2015 passed (round 1: 2009; +6 from `5680c42`, none removed) |
+| e2e, feature files, part A | `npm run test:e2e:coverage -- --keep e2e/heroTeam.spec.js e2e/heroTeamEditing.spec.js` | 33 passed (6.9 min), `heroTeam.spec.js:347` among them |
+| e2e, feature files, part B | `npm run test:e2e:coverage -- --keep e2e/heroTeamCombat.spec.js e2e/heroTeamStyle.spec.js` | 32 passed, 1 failed (`heroTeamCombat.spec.js:324`, see below) |
+| e2e, feature files, part C | `npm run test:e2e:coverage -- --keep e2e/heroTeamField.spec.js e2e/heroTeamPassives.spec.js` | 26 passed (3.2 min) |
+| e2e, rerun alone | `npx playwright test e2e/heroTeamCombat.spec.js:324 --workers=1` | 1 passed (13.1 s) |
+| Backend (final gate) | `cd backend && ./gradlew cleanTest test` | BUILD SUCCESSFUL; 1149 tests in 96 classes, 0 failures, 0 errors, 0 skipped (from `build/test-results/test/*.xml`); JaCoCo written |
+
+The full e2e suite was not rerun. verifier.md asks for that only when production code changed since the last full run, and `git diff --name-only c5847a8..06316ef` lists no file under `backend/src/main`, `game/src` (other than `*.test.js`), `game/public`, or a build or config file. The only e2e file changed since then is `heroTeam.spec.js`, which part A ran. For the other suites, the round 1 full run at `c5847a8` stands: 484 e2e tests, 482 passed, the 2 failures explained in round 1; deploy 287/289, the known Windows crash code. The deploy suite was not rerun, because `deploy/` is not in the range.
+
+### Failures not caused by the feature (round 2)
+
+| Test | Evidence |
+| --- | --- |
+| `game/e2e/heroTeamCombat.spec.js:324` (an ally killing the monster drops its coins and the next monster appears) | Part B under 3 workers: `expect.poll(... s.monster.health).toBe(10)` at `:340` timed out after 5000 ms (`Received: false`). It passes alone (`--workers=1`, 1 passed, 13.1 s), it passed in round 1's full run at `c5847a8`, and the file has not changed since `c5847a8`. Per verifier.md it is listed here. The assertions before the poll passed: the tick of 20, the kill and `Copper: 3`. Likely cause, in the test: after `wake` (`:337`) the loop runs in real time. Lyra's 20 kills every new monster of 10 HP 1000 ms after it appears (the ally clock restarts per monster, `allyCombat.test.js:50`), so the poll samples a state that exists only part of each kill and respawn cycle. A suggested non-blocking hardening for the test-engineer: sleep the loop once the respawned monster is read, or assert the respawn with `advance` while the loop sleeps, as `:330` already does |
+
+### Code quality of the fix commits
+
+| Check | Status |
+| --- | --- |
+| Tests only, no production change | ✅ |
+| Every new test maps to an AC or edge case | ✅ edge case frame-end (`:5410`, `:5427`), Allies fight 8 (`:5444`), One damage 9 (`:5459`, `skillCombat.test.js:1078`), Passives 2 (`:5473`), Passives 4 (`:5487`) |
+| Asserted values are spec values | ✅ 2.5 (E7), 2.6 (E8), 2 (E1/E14), ×4 and ×6 (star multipliers), +10 crit chance and -15 crit resistance shown as critical or not at fixed rolls |
+| Matches the patterns of the file | ✅ reuses `open`, `allyTexts`, `heroEntry`, `atChapter` and the fixed `dice` of the `ClickerGame hero team` describe |
+
+### Requirement traceability (round 2)
+
+| Requirement | Round 1 | Round 2 |
+| --- | --- | --- |
+| TEAM-01 to TEAM-04 | ✅ Verified | ✅ Verified |
+| TEAM-05 | ❌ Needs Fix | ✅ Verified (`ClickerGame.test.js:5459`) |
+| TEAM-06 | ❌ Needs Fix | ✅ Verified (`ClickerGame.test.js:5444`); E3 wording handed to the product owner |
+| TEAM-07 | ❌ Needs Fix | ✅ Verified (`ClickerGame.test.js:5410`, `:5427`) |
+| TEAM-08 | ✅ Verified | ✅ Verified |
+| TEAM-09 | ❌ Needs Fix | ✅ Verified (`heroTeam.spec.js:347` passed under 3 workers) |
+| TEAM-10 | ✅ Verified | ✅ Verified |
+| TEAM-11 | ❌ Needs Fix | ✅ Verified (`ClickerGame.test.js:5473`, `:5487`) |
+| TEAM-12, TEAM-13 | ✅ Verified | ✅ Verified |
+
+The orchestrator updates the statuses in `spec.md`, because the Verifier writes only `validation.md`.
+
+### Lessons (round 2)
+
+One candidate recorded with `lessons.py add`: L-112 (`gate_fail`, `game/e2e/heroTeamCombat.spec.js:340`). It says to read a state that the live loop keeps changing while the loop sleeps and is stepped by hand, not with a real-time poll. The round 1 signals are already L-098, L-109, L-110 (E3, still open) and L-111.
+
+### Summary (round 2)
+
+**Overall**: ✅ Ready, with one spec-precision gap (E3) handed to the product owner at acceptance
+**Spec-anchored check**: 97/98 ACs and every edge case matched to spec values; 1 spec-precision gap flagged (E3)
+**Sensor**: 4/4 mutants killed (G24 from round 1 plus N2 to N4); control survived as expected
+**Gate at `06316ef`**: backend 1149/1149, game unit 2015/2015, feature e2e 91/92 (`heroTeamCombat.spec.js:324` timed out under load, passes alone, not caused by the feature); full e2e and deploy from round 1 at `c5847a8`
+
+---
+
+# Round 1 report (at `c5847a8`, verdict FAIL)
+
+The round 1 text below is kept as it was written, except that its sensor outcome lines no longer use the `Result` label (`validate_state.py` reads every `Result` line). Its gaps are closed above.
 
 The feature works as the spec intends. Every backend criterion is pinned by an integration test, and 34 of 35 mutants were killed. The verdict is FAIL because the tests leave gaps. One mutant survived: a spec edge case has no test (the frame-end rule, G24). Three ACs are covered for only part of what they list (AC One damage 9, Allies fight 8, Passives 2 and 4). A feature e2e scenario (`heroTeam.spec.js:347`) fails under load because of a race in the test. Every gap is a test-only fix plus one spec wording fix, and no production code has to change.
 
@@ -238,7 +369,7 @@ The mutants (table printed by the script):
 | B8 | `backend/src/main/resources/db/migration/V12__hero_team.sql` | team row not deleted with the user | killed |
 | B9 | `backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/HeroService.kt` | GET /heroes ignores the stored team | killed |
 
-**Result**: 35 mutants, 34 killed, 1 survived, 0 invalid; isolation ok
+Script line (round 1): 35 mutants, 34 killed, 1 survived, 0 invalid; isolation ok
 
 Kill evidence from the logs (failed test, run total):
 
@@ -252,7 +383,7 @@ Kill evidence from the logs (failed test, run total):
 
 **G24 is not equivalent.** If the allies strike after `skills.advance`, an ally tick that lands in the frame where Prisão de Espinhos or Bênção da Grande Árvore ends loses the effect. The spec's edge case ("WHEN an ally hit lands in the frame where Prisão de Espinhos or Bênção da Grande Árvore ends THEN it SHALL still get the effect") and the design's frame order (`design.md:334`) forbid that. No test pins it (Fix 1).
 
-**Sensor depth**: P0-full for the purchase path (data integrity of gold: B1, B5 to B7 and the order mutants) plus lightweight on the rest. **Result**: 34/35 killed, ❌ FAIL (G24).
+**Sensor depth**: P0-full for the purchase path (data integrity of gold: B1, B5 to B7 and the order mutants) plus lightweight on the rest. Round 1 sensor outcome: 34/35 killed, ❌ FAIL (G24).
 
 ---
 
