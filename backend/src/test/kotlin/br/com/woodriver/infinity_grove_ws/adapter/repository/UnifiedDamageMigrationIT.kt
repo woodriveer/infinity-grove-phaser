@@ -207,6 +207,24 @@ class UnifiedDamageMigrationIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `every one of the nine texts tuned in the database survives`() {
+        texts.forEachIndexed { index, row -> write(row, "Tuned $index") }
+
+        migrate()
+
+        assertEquals(texts.indices.map { "Tuned $it" }, texts.map(::read))
+    }
+
+    @Test
+    fun `a text equal to the new one is left as it is`() {
+        texts.forEach { write(it, it.new) }
+
+        migrate()
+
+        assertEquals(texts.map { it.new }, texts.map(::read))
+    }
+
+    @Test
     fun `a new database seeds the new texts`() {
         assertEquals("+20% de dano total.", jdbc.queryForObject("select leader_bonus from heroes where id = 'orina'", String::class.java))
         assertEquals(

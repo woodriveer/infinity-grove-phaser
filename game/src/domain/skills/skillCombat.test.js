@@ -51,6 +51,22 @@ describe('using a skill', () => {
         expect(use(combat(), monsterOf(), 'vex', 3).hits).toEqual([ { damage: 6, critical: false } ]);
     });
 
+    it('meets the one defense of an older payload with every Orina hit: physicalDefense 50 and magicalDefense 10 make Chuva de Meteoros 12.5 (E2)', () => {
+        const monster = monsterOf(1000, stats('FIRE', 50, 10));
+
+        expect(use(combat(), monster, 'orina', 3).hits).toEqual([ { damage: 12.5, critical: false } ]);
+    });
+
+    it('lands Luz Divina of a Seraphine 3 star (base 1.4) as 14.56 under her Bênção level 1: 8 x 1.4 x 1.3 (E9)', () => {
+        const skills = combat();
+        const monster = monsterOf();
+        const attacker = { ...PLAYER, baseDamage: 1.4 };
+
+        use(skills, monster, 'seraphine', 1, { attacker });
+
+        expect(use(skills, monster, 'seraphine', 2, { attacker }).hits[0].damage).toBeCloseTo(14.56, 9);
+    });
+
     it('lands Investida do Baluarte as 4 and Luz Divina as 8, 1.5 times more on a darkness monster', () => {
         expect(use(combat(), monsterOf(), 'kael', 2).hits[0].damage).toBe(4);
         expect(use(combat(), monsterOf(), 'seraphine', 2).hits[0].damage).toBe(8);

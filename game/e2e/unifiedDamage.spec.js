@@ -21,13 +21,14 @@ const chapter = (monster) => ({
     } ]
 });
 
-const startAs = async (page, heroId, { monster, encounter = 'PHASE', roll, talents } = {}) => {
+const startAs = async (page, heroId, { monster, encounter = 'PHASE', roll, talents, talentPoints } = {}) => {
     await mockBackend(page, {
         users: { yan: 'secret123' },
         definition: chapter(monster ?? bare(ELEMENT_OF[heroId])),
         cards: { yan: { leader: heroId, copies: { [`${heroId}:3`]: 1 } } },
         progress: { yan: { stage: 1, encounter, phase: 1 } },
-        ...(talents && { talents: { yan: talents } })
+        ...(talents && { talents: { yan: talents } }),
+        ...(talentPoints && { talentPoints: { yan: talentPoints } })
     });
 
     const menu = await openMainMenu(page, roll === undefined ? {} : { random: roll });
@@ -129,6 +130,66 @@ test.describe('Unified damage', () => {
         await use(page, 3);
 
         await expect.poll(() => dealt(page)).toBeCloseTo(25 * STAR * 0.85, 5);
+    });
+
+    test('the enemy line is one centred row of three dark chips: element, Defesa with the brown shield, Crit res with the red target', async ({ page }) => {
+        await startAs(page, 'orina', { monster: enemy('WATER', 11, 33) });
+
+        const chips = page.locator('.enemy-stats .tag');
+
+        await expect(chips).toHaveCount(3);
+        await expect(chips.nth(0)).toHaveAttribute('data-element', 'WATER');
+        await expect(chips.nth(0)).toHaveText('Water');
+        await expect(chips.nth(1)).toHaveAttribute('data-stat', 'defense');
+        await expect(chips.nth(1)).toHaveText('Defesa 11%');
+        await expect(chips.nth(2)).toHaveAttribute('data-stat', 'crit');
+        await expect(chips.nth(2)).toHaveText('Crit res 33%');
+        await expect(page.locator('.enemy-stats [data-stat="physical"], .enemy-stats [data-stat="magical"]')).toHaveCount(0);
+
+        await expect(page.locator('.enemy-stats')).toHaveCSS('display', 'flex');
+        await expect(page.locator('.enemy-stats')).toHaveCSS('justify-content', 'center');
+        await expect(page.locator('.enemy-stats')).toHaveCSS('column-gap', '6px');
+
+        for (let at = 0; at < 3; at += 1)
+        {
+            await expect(chips.nth(at)).toHaveCSS('background-color', 'rgba(28, 18, 12, 0.85)');
+            await expect(chips.nth(at)).toHaveCSS('border-top-width', '1px');
+            await expect(chips.nth(at)).toHaveCSS('border-top-style', 'solid');
+            await expect(chips.nth(at)).toHaveCSS('border-top-color', 'rgb(176, 122, 58)');
+            await expect(chips.nth(at)).toHaveCSS('color', 'rgb(244, 230, 200)');
+            await expect(chips.nth(at)).toHaveCSS('font-size', '11px');
+            await expect(chips.nth(at)).toHaveCSS('padding-top', '3px');
+            await expect(chips.nth(at)).toHaveCSS('padding-bottom', '3px');
+            await expect(chips.nth(at)).toHaveCSS('padding-left', '8px');
+            await expect(chips.nth(at)).toHaveCSS('padding-right', '8px');
+        }
+
+        const icon = (stat) => page.locator(`.enemy-stats [data-stat="${stat}"]`)
+            .evaluate((node) => {
+                const style = getComputedStyle(node, '::before');
+
+                return { color: style.backgroundColor, width: style.width, height: style.height };
+            });
+
+        expect(await icon('defense')).toEqual({ color: 'rgb(176, 122, 58)', width: '12px', height: '12px' });
+        expect(await icon('crit')).toEqual({ color: 'rgb(214, 69, 65)', width: '12px', height: '12px' });
+    });
+
+    test('upgrading PHYSICAL_BREAK from 5 to 6 turns Defesa 15% into 14% on the same monster, and the next click meets it: 1.4 x 0.86', async ({ page }) => {
+        await startAs(page, 'orina', { monster: enemy('WATER', 20), talents: { PHYSICAL_BREAK: 5 }, talentPoints: 1 });
+
+        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 15%  Crit res 0%');
+
+        await page.getByTestId('hud-talents').click();
+        await page.getByTestId('talent-upgrade-PHYSICAL_BREAK').click();
+        await expect(page.getByTestId('talent-level-PHYSICAL_BREAK')).toHaveText('Nível 6/10');
+        await page.getByTestId('hero-close').click();
+
+        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 14%  Crit res 0%');
+
+        await click(page);
+
+        await expect.poll(() => dealt(page)).toBeCloseTo(STAR * 0.86, 5);
     });
 
     test('the Talentos screen has one Quebra de defesa per grade and no magical break', async ({ page }) => {

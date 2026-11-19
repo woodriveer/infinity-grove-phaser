@@ -55,6 +55,10 @@ describe('buffs', () => {
         expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, buffs: [ 'ventos', 'bencao' ], debuffs: [] }).damage).toBeCloseTo(2.275, 10);
     });
 
+    it('makes a Base 1 click under Bênção level 1 alone 1.625: 1.25 x 1.3 (E10)', () => {
+        expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, buffs: [ 'bencao' ], debuffs: [] }).damage).toBeCloseTo(1.625, 10);
+    });
+
     it('multiplies every skill hit by 1.3 under Bênção and gives it no click bonus', () => {
         const base = { attacker: PLAYER, percent: 100, defender: enemy(), random: never, buffs: [ 'bencao' ], debuffs: [] };
 
