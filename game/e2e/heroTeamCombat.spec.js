@@ -421,4 +421,22 @@ test.describe('Hero team: ally hits', () => {
         expect(before - await health(page)).toBeCloseTo(2, 5);
         expect(await lastAllyText(page)).toBe('2');
     });
+
+    test('a farm fight of chapter 3 while the campaign stands at chapter 7 has the allies hit too', async ({ page }) => {
+        await startTeam(page, { chapter: 7, cleared: [ 5, 6 ], team: LYRA_IN_SLOT_1, stop: false });
+
+        await page.getByTestId('hud-farm').click();
+        await page.getByTestId('farm-chapter-3').click();
+        await expect(page.getByTestId('farm-chapter-3')).toHaveAttribute('aria-pressed', 'true');
+        await page.getByTestId('farm-entry-miniboss-1').click();
+        await expect(page.locator('.stage-hud')).toHaveText('Rever chefe: Miniboss 1 (Capítulo 3)');
+        await freeze(page);
+
+        const before = await health(page);
+
+        await advance(page, 1_000);
+
+        expect(before - await health(page)).toBeCloseTo(2, 5);
+        expect(await lastAllyText(page)).toBe('2');
+    });
 });

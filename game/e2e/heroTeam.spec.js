@@ -433,4 +433,24 @@ test.describe('Hero team: Equipe screen', () => {
         await expect(slot(page, 1).locator('.team-dps-line')).toHaveText('Dano: 12.5K/s');
         await expect(page.getByTestId('team-dps')).toHaveText('Dano da equipe: 12.5K/s');
     });
+
+    test('winning the chapter 6 boss opens slot 2 for purchase without a reload', async ({ page }) => {
+        await startTeam(page, {
+            chapter: 6, encounter: 'CHAPTER_BOSS', cleared: [ 5 ], copper: 20_000, lastChapter: 7, definition: bossOfOneHealth,
+            team: { boughtSlots: 1, allies: [ null, null, null, null ] }
+        });
+        await openTeam(page);
+
+        await expect(slot(page, 2)).toHaveAttribute('data-state', 'locked');
+        await expect(slot(page, 2).locator('.team-lock-text')).toHaveText('Chefe do capítulo 6');
+        await page.getByRole('button', { name: 'Fechar' }).click();
+        await page.evaluate(() => { window.__sameDocument = true; });
+        await page.locator('#game-container canvas').click();
+        await expect(page.getByTestId('chapter-hud')).toHaveText('Capítulo 7');
+        await openTeam(page);
+
+        await expect(slot(page, 2)).toHaveAttribute('data-state', 'buyable');
+        await expect(slot(page, 2).locator('.team-price')).toHaveText('2');
+        expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
+    });
 });

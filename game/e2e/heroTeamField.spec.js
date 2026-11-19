@@ -35,15 +35,16 @@ const freeze = (page) => page.evaluate(() => {
 });
 const wake = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.wake());
 
-const startTeam = async (page, { chapter: campaignChapter = 5, cleared = [ 5 ], team, leader = 'kael', stop = true } = {}) => {
+const startTeam = async (page, { chapter: campaignChapter = 5, cleared = [ 5 ], team, leader = 'kael', stop = true, encounter = 'PHASE', definition, lastChapter } = {}) => {
     const copies = Object.fromEntries(HERO_IDS.map((id) => [ `${id}:0`, 1 ]));
 
     await mockBackend(page, {
         users: { yan: 'secret123' },
-        definition: chapter(monsterOf('FIRE')),
+        definition: definition ?? chapter(monsterOf('FIRE')),
         cards: { yan: { leader, cleared, copies } },
-        progress: { yan: { chapter: campaignChapter, stage: 1, encounter: 'PHASE', phase: 1 } },
-        team: team ? { yan: team } : {}
+        progress: { yan: { chapter: campaignChapter, stage: 1, encounter, phase: 1 } },
+        team: team ? { yan: team } : {},
+        ...(lastChapter && { lastChapter })
     });
     await page.addInitScript(() => localStorage.setItem('infinity-grove.auto-click', 'off'));
 
@@ -176,6 +177,37 @@ test.describe('Hero team: allies on the field', () => {
 
         expect(Math.max(...trace)).toBeCloseTo(204, 5);
         expect(trace.at(-1)).toBe(180);
+    });
+
+    test('the attack motion is one yoyo tween of 100 ms each way', async ({ page }) => {
+        await startTeam(page, { team: LYRA_IN_SLOT_1 });
+        await advance(page, 1_000);
+
+        //  The loop is stopped, so the tween the tick made is still at its start
+        const tweens = await scene(page, '(s) => s.tweens.getTweens().filter((t) => t.targets[0].texture?.key === "hero_lyra").map((t) => ({ duration: t.data[0].duration, yoyo: t.data[0].yoyo }))');
+
+        expect(tweens).toEqual([ { duration: 100, yoyo: true } ]);
+    });
+
+    test('the allies appear at the next encounter once the campaign reaches chapter 5', async ({ page }) => {
+        const boss = monsterOf('FIRE');
+        const bossOfOneHealth = {
+            bossHealth: 1, bossTimeLimitMs: 60_000, boss, bossDropRuleId: 3,
+            stages: [ { number: 1, phasesPerStage: 5, monsterHealth: 1000, minibossHealth: 1000, minibossTimeLimitMs: 60_000, monster: boss, miniboss: boss, monsterDropRuleId: 1, minibossDropRuleId: 2 } ]
+        };
+
+        await startTeam(page, { chapter: 4, encounter: 'CHAPTER_BOSS', team: LYRA_IN_SLOT_1, definition: bossOfOneHealth, lastChapter: 6, stop: false });
+
+        //  Chapter 4: the team is inactive and the leader stands where it always stood
+        expect(await sprites(page)).toEqual([]);
+        near((await leaderSprite(page)).y, 612);
+
+        await page.locator('#game-container canvas').click();
+        await expect(page.getByTestId('chapter-hud')).toHaveText('Capítulo 5');
+        await expect.poll(async () => (await sprites(page)).length).toBe(1);
+
+        at((await sprites(page))[0], 'hero_lyra', 180, 460, 0.4);
+        at(await leaderSprite(page), 'hero_kael', 320, 600, 0.5);
     });
 
     test('Remover on both allies brings the leader back to (230, 612) at 320 px high', async ({ page }) => {
