@@ -2,7 +2,9 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.adapter.repository.CardCopyEntity
+import br.com.woodriver.infinity_grove_ws.adapter.repository.ProgressEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.TeamRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.WalletEntity
 import br.com.woodriver.infinity_grove_ws.domain.CopyKey
 import br.com.woodriver.infinity_grove_ws.domain.Team
 import io.restassured.RestAssured.given
@@ -10,6 +12,7 @@ import io.restassured.http.ContentType
 import io.restassured.response.Response
 import org.hamcrest.Matchers.equalTo
 import org.springframework.beans.factory.annotation.Autowired
+import java.util.concurrent.Callable
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -58,6 +61,23 @@ class TeamControllerIT : IntegrationTestBase() {
         n: Int,
         username: String = "yan",
     ) = teamRepository.save(username, Team(n))
+
+    private fun funded(
+        copper: Long,
+        username: String = "yan",
+    ) = jpaWalletRepository.save(WalletEntity(username, copper))
+
+    private fun copper(username: String = "yan") = jpaWalletRepository.findById(username).get().copper
+
+    private fun buy(
+        token: String,
+        fromSlots: Any?,
+    ): Response =
+        given()
+            .header("Authorization", token)
+            .contentType(ContentType.JSON)
+            .body(mapOf("fromSlots" to fromSlots))
+            .post("/team/slots")
 
     private fun put(
         token: String,
@@ -295,5 +315,216 @@ class TeamControllerIT : IntegrationTestBase() {
             .then()
             .statusCode(200)
             .body("team.allies", equalTo(listOf(null, null, null, null)))
+    }
+
+    @Test
+    fun `POST team slots buys slot 1 for 1 ouro and answers the team and the wallet`() {
+        val token = register()
+        cleared("5")
+        funded(15_000)
+
+        buy(token, 0)
+            .then()
+            .statusCode(200)
+            .body("team.boughtSlots", equalTo(1))
+            .body("team.openSlots", equalTo(1))
+            .body("team.allies", equalTo(listOf(null, null, null, null)))
+            .body("wallet.gold", equalTo(0))
+            .body("wallet.silver", equalTo(50))
+            .body("wallet.copper", equalTo(0))
+
+        assertEquals(5_000L, copper())
+    }
+
+    @Test
+    fun `a second POST team slots with the same fromSlots answers 409 TEAM_SLOT_MISMATCH with the stored team`() {
+        val token = register()
+        cleared("5")
+        funded(15_000)
+        buy(token, 0).then().statusCode(200)
+
+        buy(token, 0)
+            .then()
+            .statusCode(409)
+            .body("code", equalTo("TEAM_SLOT_MISMATCH"))
+            .body("team.boughtSlots", equalTo(1))
+            .body("team.openSlots", equalTo(1))
+            .body("team.unlocked", equalTo(true))
+
+        assertEquals(5_000L, copper())
+    }
+
+    @Test
+    fun `POST team slots with every open slot bought answers 409 TEAM_SLOT_LOCKED`() {
+        val token = register()
+        cleared("5")
+        bought(1)
+        funded(50_000)
+
+        buy(token, 1).then().statusCode(409).body("code", equalTo("TEAM_SLOT_LOCKED"))
+
+        assertEquals(50_000L, copper())
+    }
+
+    @Test
+    fun `POST team slots before the chapter 5 boss answers 409 TEAM_SLOT_LOCKED`() {
+        val token = register()
+        funded(50_000)
+
+        buy(token, 0).then().statusCode(409).body("code", equalTo("TEAM_SLOT_LOCKED"))
+    }
+
+    @Test
+    fun `POST team slots with 4 bought slots answers 409 TEAM_SLOTS_MAX`() {
+        val token = register()
+        cleared("5,6,7,8")
+        bought(4)
+
+        buy(token, 4).then().statusCode(409).body("code", equalTo("TEAM_SLOTS_MAX"))
+    }
+
+    @Test
+    fun `POST team slots without enough copper answers 409 NOT_ENOUGH_COPPER and changes nothing`() {
+        val token = register()
+        cleared("5")
+        funded(9_999)
+
+        buy(token, 0).then().statusCode(409).body("code", equalTo("NOT_ENOUGH_COPPER"))
+
+        assertEquals(9_999L, copper())
+        assertEquals(Team(), teamRepository.find("yan"))
+    }
+
+    @Test
+    fun `POST team slots without fromSlots answers 400 INVALID_TEAM_SLOT_REQUEST`() {
+        val token = register()
+
+        given()
+            .header("Authorization", token)
+            .contentType(ContentType.JSON)
+            .body("{}")
+            .post("/team/slots")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo("INVALID_TEAM_SLOT_REQUEST"))
+    }
+
+    @Test
+    fun `POST team slots with a string fromSlots answers 400 INVALID_TEAM_SLOT_REQUEST`() {
+        val token = register()
+
+        buy(token, "0").then().statusCode(400).body("code", equalTo("INVALID_TEAM_SLOT_REQUEST"))
+    }
+
+    @Test
+    fun `POST team slots with a decimal fromSlots answers 400 INVALID_TEAM_SLOT_REQUEST`() {
+        val token = register()
+
+        buy(token, 0.5).then().statusCode(400).body("code", equalTo("INVALID_TEAM_SLOT_REQUEST"))
+    }
+
+    @Test
+    fun `POST team slots with a negative fromSlots answers 400 INVALID_TEAM_SLOT_REQUEST`() {
+        val token = register()
+
+        buy(token, -1).then().statusCode(400).body("code", equalTo("INVALID_TEAM_SLOT_REQUEST"))
+    }
+
+    @Test
+    fun `POST team slots checks TEAM_SLOT_MISMATCH before TEAM_SLOTS_MAX`() {
+        val token = register()
+        bought(4)
+
+        buy(token, 3).then().statusCode(409).body("code", equalTo("TEAM_SLOT_MISMATCH"))
+    }
+
+    @Test
+    fun `POST team slots checks TEAM_SLOTS_MAX before TEAM_SLOT_LOCKED`() {
+        val token = register()
+        cleared("5")
+        bought(4)
+
+        buy(token, 4).then().statusCode(409).body("code", equalTo("TEAM_SLOTS_MAX"))
+    }
+
+    @Test
+    fun `POST team slots checks TEAM_SLOT_LOCKED before NOT_ENOUGH_COPPER`() {
+        val token = register()
+        funded(0)
+
+        buy(token, 0).then().statusCode(409).body("code", equalTo("TEAM_SLOT_LOCKED"))
+    }
+
+    @Test
+    fun `two POST team slots with the same fromSlots at once buy one slot and charge once`() {
+        val token = register()
+        cleared("5")
+        funded(30_000)
+        val pool = Executors.newFixedThreadPool(2)
+
+        val answers =
+            try {
+                List(2) { Callable { buy(token, 0).let { it.statusCode() to it.path<String>("code") } } }
+                    .map(pool::submit)
+                    .map { it.get(15, TimeUnit.SECONDS) }
+            } finally {
+                pool.shutdown()
+            }
+
+        assertEquals(listOf(200 to null, 409 to "TEAM_SLOT_MISMATCH"), answers.sortedBy { it.first })
+        assertEquals(20_000L, copper())
+        assertEquals(1, teamRepository.find("yan").boughtSlots)
+    }
+
+    @Test
+    fun `POST team slots answers 401 without a token`() {
+        given()
+            .contentType(ContentType.JSON)
+            .body("""{"fromSlots":0}""")
+            .post("/team/slots")
+            .then()
+            .statusCode(401)
+    }
+
+    @Test
+    fun `a purchase changes only the buyer's team and wallet`() {
+        register("yan", "FIRE")
+        val ana = register("ana", "FIRE")
+        cleared("5", "ana")
+        funded(15_000, "ana")
+        funded(15_000)
+
+        buy(ana, 0).then().statusCode(200)
+
+        assertEquals(Team(), teamRepository.find("yan"))
+        assertEquals(15_000L, copper())
+        assertEquals(Team(1), teamRepository.find("ana"))
+        assertEquals(5_000L, copper("ana"))
+    }
+
+    @Test
+    fun `bought slots survive an account reset`() {
+        val token = register()
+        cleared("5,6")
+        jpaProgressRepository.save(ProgressEntity("yan", 6, 1, "PHASE", 1, false))
+        funded(30_000)
+        buy(token, 0).then().statusCode(200)
+        buy(token, 1).then().statusCode(200)
+
+        given()
+            .header("Authorization", token)
+            .contentType(ContentType.JSON)
+            .body("""{"fromChapter":6}""")
+            .post("/account/reset")
+            .then()
+            .statusCode(200)
+
+        given()
+            .header("Authorization", token)
+            .get("/heroes")
+            .then()
+            .statusCode(200)
+            .body("team.boughtSlots", equalTo(2))
+            .body("team.openSlots", equalTo(2))
     }
 }

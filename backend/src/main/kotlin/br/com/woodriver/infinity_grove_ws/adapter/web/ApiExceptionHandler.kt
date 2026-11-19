@@ -21,6 +21,7 @@ import br.com.woodriver.infinity_grove_ws.domain.ResetRequestException
 import br.com.woodriver.infinity_grove_ws.domain.TalentConflictException
 import br.com.woodriver.infinity_grove_ws.domain.TalentNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.TalentRequestException
+import br.com.woodriver.infinity_grove_ws.domain.TeamSlotMismatchException
 import br.com.woodriver.infinity_grove_ws.domain.UserAlreadyExistsException
 import br.com.woodriver.infinity_grove_ws.domain.UserForbiddenException
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
@@ -67,6 +68,11 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(HeroNotFoundException::class)
     fun heroNotFound(e: HeroNotFoundException) = problem(HttpStatus.NOT_FOUND, e)
+
+    /** The body carries the stored team so the game can realign without another request. */
+    @ExceptionHandler(TeamSlotMismatchException::class)
+    fun teamSlotMismatch(e: TeamSlotMismatchException) =
+        problem(HttpStatus.CONFLICT, e).apply { setProperty("team", TeamResponse.from(e.current)) }
 
     @ExceptionHandler(HeroConflictException::class)
     fun heroConflict(e: HeroConflictException) = problem(HttpStatus.CONFLICT, e)

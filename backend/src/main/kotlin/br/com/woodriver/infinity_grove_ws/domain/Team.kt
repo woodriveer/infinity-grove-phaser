@@ -142,3 +142,9 @@ data class LeaderChange(
     val leaderId: String,
     val team: TeamView,
 )
+
+/** A bought slot: the team after it and the wallet after the price. */
+data class SlotPurchase(
+    val team: TeamView,
+    val wallet: Wallet,
+)

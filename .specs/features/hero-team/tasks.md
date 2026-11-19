@@ -719,7 +719,7 @@ Answers: 200 `{ "leaderId": string, "team": team payload }`; 400 `INVALID_TEAM`;
 
 ---
 
-### T5: Buy an ally slot with `POST /team/slots` [ ]
+### T5: Buy an ally slot with `POST /team/slots` [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: A player buys the next open slot for its price, once per click, with every refusal in its order and the stored team in the 409 mismatch body (TEAM-02, TEAM-04 AC 22).
@@ -830,8 +830,10 @@ Answers: 200 `{ "team": team payload, "wallet": { "gold", "silver", "copper" } }
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] `POST /team/slots` answers every case above and the mismatch body carries `team`.
-- [ ] The 5 new `TeamServiceTest` and 17 new `TeamControllerIT` cases pass; the whole backend suite passes.
+- [x] `POST /team/slots` answers every case above and the mismatch body carries `team`.
+- [x] The 5 new `TeamServiceTest` and 17 new `TeamControllerIT` cases pass; the whole backend suite passes.
+
+**Note (T5)**: `SaveTeamUseCase.kt` (T4) was renamed with `git mv` to `TeamUseCase.kt` and `BuyTeamSlotUseCase` was added to it, as the contract says.
 
 **Commit**: `feat(backend): buy ally slots with POST /team/slots`
 
