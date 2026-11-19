@@ -839,7 +839,7 @@ Answers: 200 `{ "team": team payload, "wallet": { "gold", "silver", "copper" } }
 
 ---
 
-### T6: Document the hero team in the backend ADR and the briefing [ ]
+### T6: Document the hero team in the backend ADR and the briefing [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Record the team storage, routes and locks as backend ADR 0013 and add the team to the game briefing (AD-018).
@@ -866,8 +866,8 @@ Answers: 200 `{ "team": team payload, "wallet": { "gold", "silver", "copper" } }
 **Gate**: build - `cd backend && ./gradlew build`
 **Done when**:
 
-- [ ] `backend/docs/adr/0013-hero-team.md` exists with the four sections.
-- [ ] `README.md` holds the two bullets exactly; `cd backend && ./gradlew build` passes.
+- [x] `backend/docs/adr/0013-hero-team.md` exists with the four sections.
+- [x] `README.md` holds the two bullets exactly; `cd backend && ./gradlew build` passes.
 
 **Commit**: `docs: record the hero team storage and routes`
 

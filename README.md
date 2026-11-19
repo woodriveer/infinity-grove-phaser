@@ -44,6 +44,8 @@ novos guardiões.
 - Novos personagens aumentam o dano total e adicionam novas habilidades à barra
   do jogador.
 - Cada habilidade tem **tempo de recarga** e é ativada manualmente.
+- A partir do capítulo 5 o jogador monta uma **equipe**: o líder mais até 4 aliados, em vagas compradas com ouro (1, 2, 3 e 4 ouro), abertas pelos chefes dos capítulos 5 a 8.
+- Cada aliado ataca sozinho uma vez por segundo com o mesmo dano de todos os golpes e traz uma passiva enquanto está na equipe.
 
 ## Atributos de combate
 
