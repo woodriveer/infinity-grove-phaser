@@ -122,6 +122,7 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
     });
 
     const rectangles = [];
+    const triangles = [];
     const images = [];
     const sprites = [];
     const doms = [];
@@ -152,16 +153,27 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
             rect.setSize = (w, h) => { rect.width = w; rect.height = h; return rect; };
             rect.alpha = 1;
             rect.setAlpha = (a) => { rect.alpha = a; return rect; };
+            rect.setDepth = (d) => { rect.depth = d; return rect; };
+            rect.destroy = vi.fn();
             rectangles.push(rect);
             return rect;
         }),
         text: vi.fn((x, y, text, style) => {
             const obj = { x, y, text, style, alpha: 1, destroy: vi.fn() };
 
-            obj.setOrigin = () => obj;
+            obj.setOrigin = (ox, oy) => { obj.originX = ox; obj.originY = oy; return obj; };
             obj.setDepth = () => obj;
             texts.push(obj);
             return obj;
+        }),
+        triangle: vi.fn((x, y, x1, y1, x2, y2, x3, y3, color) => {
+            const tri = { x, y, points: [ x1, y1, x2, y2, x3, y3 ], color, alpha: 1, destroy: vi.fn() };
+
+            tri.setDepth = (d) => { tri.depth = d; return tri; };
+            tri.setPosition = (px, py) => { tri.x = px; tri.y = py; return tri; };
+            tri.setAlpha = (a) => { tri.alpha = a; return tri; };
+            triangles.push(tri);
+            return tri;
         }),
         sprite: vi.fn((x, y, key) => {
             const sprite = { x, y, key, anim: null, destroy: vi.fn() };
@@ -212,7 +224,7 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
     const hud = (selector) => doms.map((d) => d.node.querySelector(selector)).find(Boolean);
     const walletElement = () => doms.find((d) => d.node.querySelector('.wallet'));
 
-    return { scene, images, rectangles, texts, tweens, timers, loops, eventHandlers, sprites, doms, click, monster, fill, back, byColor, walletText, walletElement, hud, control, handlers, dice };
+    return { scene, images, rectangles, triangles, texts, tweens, timers, loops, eventHandlers, sprites, doms, click, monster, fill, back, byColor, walletText, walletElement, hud, control, handlers, dice };
 };
 
 describe('ClickerGame scene', () => {
@@ -5657,5 +5669,258 @@ describe('ClickerGame hero team formation', () => {
         ctx.handlers.pointerdown({ x: 180, y: 400 });
 
         expect(ctx.scene.monster.health).toBe(9);
+    });
+});
+
+describe('ClickerGame miniboss adds', () => {
+    const ADD = { health: 30, defenseBuff: 30 };
+    //  Stage 1 of chapter 11: phase monsters of defense 0, a miniboss of defense 49 and its adds
+    const addsDefinition = ({ adds = [ ADD, ADD ], miniboss = { element: 'FIRE', defense: 49, critResistance: 0 }, minibossHealth = 100 } = {}) => ({
+        ...definition,
+        stages: definition.stages.map((stage) => (stage.number === 1
+            ? { ...stage, minibossHealth, miniboss, monster: { element: 'FIRE', defense: 0, critResistance: 0 }, adds }
+            : stage))
+    });
+    const addsStart = (options) => ({ ...progress(1, 'MINIBOSS', 1), chapter: 11, definition: addsDefinition(options) });
+    const addsScene = (options, extra = {}) => createScene({ start: addsStart(options), talents: [], autoClickOn: false, ...extra });
+    const killAdd = (ctx, slot) => {
+        const { monster } = ctx.scene.fight.adds[slot - 1];
+
+        monster.hit(monster.health);
+        ctx.scene.afterDamage();
+    };
+    const onMiniboss = { x: 670, y: 440 };
+    const partsOf = (ctx) => [ ...ctx.scene.addParts.values() ].flatMap((parts) => Object.values(parts));
+    const enemyLine = (ctx) => ctx.hud('.enemy-stats').textContent;
+    const chip = (ctx) => ctx.hud('.target-chip').textContent;
+
+    it('a miniboss with two adds draws two add bodies of 110 x 125 at (480, 360) and (480, 540)', async () => {
+        const ctx = await addsScene();
+        const bodies = ctx.byColor(0xf5ead8);
+
+        expect(bodies).toHaveLength(3);
+        expect(bodies.slice(1).map(({ x, y, width, height }) => ({ x, y, width, height }))).toEqual([
+            { x: 480, y: 360, width: 110, height: 125 },
+            { x: 480, y: 540, width: 110, height: 125 }
+        ]);
+    });
+
+    it('each add has a 100 x 8 bar with its top-left at (430, 279.5) and (430, 459.5)', async () => {
+        const ctx = await addsScene();
+
+        [ ctx.byColor(0x2a1410), ctx.byColor(0xc0392b) ].forEach((bars) =>
+        {
+            expect(bars.slice(1).map(({ originX, originY, x, y, width, height }) => ({ originX, originY, x, y, width, height }))).toEqual([
+                { originX: 0, originY: 0, x: 430, y: 279.5, width: 100, height: 8 },
+                { originX: 0, originY: 0, x: 430, y: 459.5, width: 100, height: 8 }
+            ]);
+        });
+    });
+
+    it('each add shows +30 de defesa at (480, 276.5) and (480, 456.5) in Figtree 700 12 px white with a dark outline', async () => {
+        const ctx = await addsScene();
+
+        expect(ctx.texts.map(({ text, x, y, originX, originY, style }) => ({ text, x, y, originX, originY, style }))).toEqual([ 276.5, 456.5 ].map((y) => ({
+            text: '+30 de defesa', x: 480, y, originX: 0.5, originY: 1,
+            style: { fontFamily: 'Figtree', fontStyle: '700', fontSize: 12, color: '#ffffff', stroke: '#2a1408', strokeThickness: 3 }
+        })));
+    });
+
+    it('the add monsters have 30 health and no drop rule', async () => {
+        const { scene } = await addsScene();
+
+        expect(scene.fight.adds.map(({ name, monster }) => [ name, monster.maxHealth, monster.dropRuleId ])).toEqual([ [ 'Lacaio 1', 30, null ], [ 'Lacaio 2', 30, null ] ]);
+    });
+
+    it('a phase monster, a miniboss without adds and the chapter boss draw no add', async () => {
+        for (const start of [ progress(1, 'PHASE', 1), progress(1, 'MINIBOSS', 1), progress(10, 'CHAPTER_BOSS', 1) ])
+        {
+            const ctx = await createScene({ start, talents: [], autoClickOn: false });
+
+            expect(ctx.byColor(0xf5ead8)).toHaveLength(1);
+            expect(ctx.rectangles).toHaveLength(3);
+            expect(ctx.triangles).toHaveLength(0);
+            expect(chip(ctx)).toBe('');
+        }
+    });
+
+    it('the enemy line of the guarded miniboss reads Defesa 90%', async () => {
+        const ctx = await addsScene();
+
+        expect(enemyLine(ctx)).toBe('Fire  Defesa 90%  Crit res 0%');
+    });
+
+    it('a click on the guarded miniboss deals 0.1, then 0.21 after one add died and 0.51 after both', async () => {
+        const ctx = await addsScene();
+
+        ctx.click(onMiniboss);
+        expect(ctx.scene.monster.health).toBeCloseTo(99.9, 9);
+
+        killAdd(ctx, 1);
+        ctx.click(onMiniboss);
+        expect(ctx.scene.monster.health).toBeCloseTo(99.69, 9);
+
+        killAdd(ctx, 2);
+        ctx.click(onMiniboss);
+        expect(ctx.scene.monster.health).toBeCloseTo(99.18, 9);
+    });
+
+    it('an add death changes the enemy line to Defesa 79%', async () => {
+        const ctx = await addsScene();
+
+        killAdd(ctx, 1);
+
+        expect(enemyLine(ctx)).toBe('Fire  Defesa 79%  Crit res 0%');
+    });
+
+    it('an add death fades its body, bar, fill and text over 500 ms and destroys them', async () => {
+        const ctx = await addsScene();
+        const { body, back, fill, label } = ctx.scene.addParts.get(1);
+
+        killAdd(ctx, 1);
+
+        const tween = ctx.tweens.at(-1);
+
+        expect(tween.targets).toEqual([ body, back, fill, label ]);
+        expect([ tween.alpha, tween.duration ]).toEqual([ 0, 500 ]);
+
+        tween.onComplete();
+
+        [ body, back, fill, label ].forEach((part) => expect(part.destroy).toHaveBeenCalledTimes(1));
+        expect(ctx.scene.addParts.has(1)).toBe(false);
+        expect(ctx.scene.addParts.has(2)).toBe(true);
+    });
+
+    it('an add death drops no coin and sends no report', async () => {
+        const ctx = await addsScene({}, { wallet: walletResponse() });
+        const sprites = ctx.sprites.length;
+
+        killAdd(ctx, 1);
+        await flush();
+
+        expect(ctx.sprites).toHaveLength(sprites);
+        expect(campaignGateway.report).not.toHaveBeenCalled();
+    });
+
+    it('the target chip reads Alvo: Miniboss · HP 100/100 and follows its HP', async () => {
+        const ctx = await addsScene();
+
+        expect(chip(ctx)).toBe('Alvo: Miniboss · HP 100/100');
+
+        ctx.click(onMiniboss);
+
+        expect(chip(ctx)).toBe('Alvo: Miniboss · HP 99.9/100');
+    });
+
+    it('the marker is a gold 16 x 10 triangle with its tip at (670, 275), depth 0.9', async () => {
+        const { triangles } = await addsScene();
+
+        expect(triangles).toHaveLength(1);
+        expect(triangles[0]).toMatchObject({ color: 0xffd24a, points: [ 0, 0, 16, 0, 8, 10 ], x: 670, y: 270, depth: 0.9 });
+    });
+
+    it('the marker and the chip stay on the miniboss after both adds died', async () => {
+        const ctx = await addsScene();
+
+        killAdd(ctx, 1);
+        killAdd(ctx, 2);
+
+        expect([ ctx.triangles[0].x, ctx.triangles[0].y ]).toEqual([ 670, 270 ]);
+        expect(ctx.triangles[0].destroy).not.toHaveBeenCalled();
+        expect(chip(ctx)).toBe('Alvo: Miniboss · HP 100/100');
+    });
+
+    it('the add bars follow the add health', async () => {
+        const ctx = await addsScene();
+
+        ctx.scene.fight.adds[0].monster.hit(15);
+        ctx.scene.updateHealthBar();
+
+        expect(ctx.byColor(0xc0392b)[1].width).toBe(50);
+    });
+
+    it("the miniboss's death fades the living adds before the miniboss and wins once", async () => {
+        const ctx = await addsScene({ minibossHealth: 0.1 });
+        const parts = [ ...partsOf(ctx), ctx.scene.marker ];
+
+        ctx.click(onMiniboss);
+        await flush();
+
+        const addTween = ctx.tweens.findIndex((tween) => Array.isArray(tween.targets) && parts.every((part) => tween.targets.includes(part)));
+        const minibossTween = ctx.tweens.findIndex((tween) => tween.targets === ctx.scene.monsterParts);
+
+        expect(addTween).toBeGreaterThanOrEqual(0);
+        expect(addTween).toBeLessThan(minibossTween);
+        expect(campaignGateway.report).toHaveBeenCalledTimes(1);
+        expect(campaignGateway.report.mock.calls[0][1]).toBe('CLEARED');
+
+        ctx.tweens[addTween].onComplete();
+
+        parts.forEach((part) => expect(part.destroy).toHaveBeenCalledTimes(1));
+    });
+
+    it('the countdown removes every add at once and reports FAILED', async () => {
+        const ctx = await addsScene();
+        const parts = [ ...partsOf(ctx), ctx.scene.marker ];
+
+        ctx.scene.update(0, 30000);
+
+        parts.forEach((part) => expect(part.destroy).toHaveBeenCalledTimes(1));
+        expect(chip(ctx)).toBe('');
+        expect(ctx.scene.fight).toBeNull();
+
+        await ctx.loops[0].callback();
+        await flush();
+
+        expect(campaignGateway.report).toHaveBeenCalledTimes(1);
+        expect(campaignGateway.report.mock.calls[0][1]).toBe('FAILED');
+    });
+
+    it('leaving the fight from the pause menu removes every add at once', async () => {
+        const ctx = await addsScene();
+        const parts = [ ...partsOf(ctx), ctx.scene.marker ];
+
+        ctx.scene.pauseFight();
+        ctx.scene.leaveFight();
+
+        parts.forEach((part) => expect(part.destroy).toHaveBeenCalledTimes(1));
+        expect(ctx.scene.fight).toBeNull();
+    });
+
+    it('a realignment removes the old adds at once and draws the new adds', async () => {
+        const ctx = await addsScene();
+        const old = Object.values(ctx.scene.addParts.get(1));
+
+        ctx.scene.realign(ctx.scene.session.encounter());
+
+        old.forEach((part) => expect(part.destroy).toHaveBeenCalledTimes(1));
+        expect(ctx.byColor(0xf5ead8)).toHaveLength(5);
+        expect(ctx.scene.fight.adds).toHaveLength(2);
+    });
+
+    it('a farm fight of the chapter 11 miniboss draws its adds', async () => {
+        const ctx = await addsScene();
+
+        ctx.scene.startFarm({ kind: 'MINIBOSS', stage: 1 });
+
+        expect(ctx.scene.fight.adds).toHaveLength(2);
+        expect(ctx.byColor(0xf5ead8).slice(-2).map(({ x, y }) => [ x, y ])).toEqual([ [ 480, 360 ], [ 480, 540 ] ]);
+    });
+
+    it('a stage with an invalid add spawns only the valid one', async () => {
+        const ctx = await addsScene({ adds: [ { health: 0, defenseBuff: 30 }, ADD ] });
+
+        expect(ctx.scene.fight.adds).toHaveLength(1);
+        expect(ctx.scene.fight.adds[0].name).toBe('Lacaio 1');
+        expect([ ctx.byColor(0xf5ead8)[1].x, ctx.byColor(0xf5ead8)[1].y ]).toEqual([ 480, 360 ]);
+    });
+
+    it('a hit on an add meets its own defense, not the guard', async () => {
+        const { scene } = await addsScene();
+        const add = scene.fight.adds[0].monster;
+        const result = scene.skills.click({ attacker: scene.leaderAttacker(), monster: add, main: scene.monster, boss: true });
+
+        expect(result.damage).toBeCloseTo(1, 9);
+        expect(add.health).toBeCloseTo(29, 9);
     });
 });

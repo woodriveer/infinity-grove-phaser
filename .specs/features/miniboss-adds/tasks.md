@@ -855,7 +855,7 @@ The domain cases use `PLAYER` (FIRE, base 1, critical 10 %, multiplier 2) and FI
 
 ---
 
-### T10: Spawn the adds and guard the miniboss in the combat scene [ ]
+### T10: Spawn the adds and guard the miniboss in the combat scene [x]
 
 **Owner**: game-dev
 **Goal**: The scene builds a `Fight` per encounter, draws the adds, the marker and the target chip at the places of the Fight Layout, makes every hit meet the guarded defense, fades a dead add and removes every add when the fight ends (ADDS-02, ADDS-03, ADDS-05, ADDS-08, spec Adds AC 3 to 6, 8, 9, Target AC 7 to 9, Fight end AC 1 to 4, 6).
@@ -1067,7 +1067,7 @@ Fixtures (top of the new describe): `const ADD = { health: 30, defenseBuff: 30 }
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 21 cases pass, every existing `ClickerGame` case passes unchanged, and the whole Vitest suite passes.
+- [x] The 21 cases pass, every existing `ClickerGame` case passes unchanged, and the whole Vitest suite passes.
 
 **Commit**: `feat(game): spawn the miniboss adds and guard the miniboss`
 

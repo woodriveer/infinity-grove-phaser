@@ -8,6 +8,7 @@ import { AllyCombat } from '../../domain/combat/allyCombat';
 import { Combo, comboText } from '../../domain/combat/combo';
 import { formatDamage } from '../../domain/combat/damage';
 import { weaknessOf } from '../../domain/combat/elements';
+import { Fight } from '../../domain/combat/fight';
 import { leaderAttacker } from '../../domain/combat/leaderAttacker';
 import { bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/equipment';
 import { defenseOf, healthText, Monster } from '../../domain/combat/monster';
@@ -43,6 +44,18 @@ const MONSTER = { x: 670, y: 440, width: 220, height: 250, color: 0xf5ead8, fill
 const HEALTH_BAR = { width: 240, height: 16, gap: 18, backColor: 0x2a1410, fillColor: 0xc0392b };
 const DAMAGE_TEXT = { rise: 40, duration: 800 };
 const DEATH = { fadeDuration: 500, respawnDelay: 1000 };
+//  The adds of a miniboss (spec miniboss-adds, Q38): half the miniboss size, in a column between the formation (x 410 or less) and the
+//  miniboss (x 560 or more); each with a small health bar 10 px above it and its buff above the bar
+const ADD_SIZE = { width: 110, height: 125 };
+const ADD_BOXES = { 1: { x: 480, y: 360 }, 2: { x: 480, y: 540 } };
+const ADD_BAR = { width: 100, height: 8, gap: 10 };
+const ADD_BUFF_FONT = { fontFamily: 'Figtree', fontStyle: '700', fontSize: 12, color: '#ffffff', stroke: '#2a1408', strokeThickness: 3 };
+const ADD_BUFF_GAP = 3;
+//  The gold triangle over the target (Q25): its tip 6 px above the miniboss's bar, or 21 px above an add's bar (clear of the buff text);
+//  drawn under the damage numbers
+const TARGET_MARKER = { width: 16, height: 10, color: 0xffd24a, depth: 0.9, gap: 6, addGap: 21 };
+//  The light-blue ally number on an add stands right of its centre
+const ADD_ALLY_TEXT_OFFSET = 40;
 const LOGO = { x: 82, y: 44, width: 136 };
 //  The wallet pill sits in the top-right corner; coins fly to its centre
 const WALLET = { x: 890, y: 44 };
@@ -90,7 +103,7 @@ const MONSTER_HP_HTML = `<div class="hud-box hud-monster-hp"><div class="monster
 const STAGE_HUD_HTML = '<div class="hud-box hud-stage"><div class="stage-hud"></div></div>';
 const BOSS_TIMER_HTML = '<div class="hud-box hud-timer"><div class="boss-timer"></div></div>';
 //  The weak element chip sits above the enemy line in the same click-through box (spec ui-redesign UIR-08)
-const ENEMY_STATS_HTML = '<div class="hud-box hud-enemy"><div class="weak-chip" data-testid="weak-chip"></div><div class="enemy-stats"></div></div>';
+const ENEMY_STATS_HTML = '<div class="hud-box hud-enemy"><div class="target-chip" data-testid="target-chip"></div><div class="weak-chip" data-testid="weak-chip"></div><div class="enemy-stats"></div></div>';
 const EFFECTS_HTML = '<div class="hud-box hud-effects"><div class="effect-tags"></div></div>';
 const STAGE_MESSAGE_HTML = '<div class="hud-box hud-message"><div class="stage-message"></div></div>';
 //  The round farm button at the right end of the bar, right of the auto click button
@@ -139,12 +152,15 @@ export class ClickerGame extends Scene
         this.wallet = services.createWalletSync();
         this.session = services.createCampaignSession();
         this.monster = null;
+        this.fight = null;
+        this.addParts = new Map();
+        this.marker = null;
         this.countdown = null;
         this.generation = 0;
         this.coinsFlying = 0;
         this.random = services.random ?? Math.random;
         //  The break talents lower the stats of the monster at the moment of every hit, so an upgrade counts from the next click
-        this.skills = new SkillCombat({ random: this.random, statsOf: (monster) => monsterAfterBreak(monster.stats, this.talents.talents(), this.passives()) });
+        this.skills = new SkillCombat({ random: this.random, statsOf: (monster) => monsterAfterBreak(this.statsFor(monster), this.talents.talents(), this.passives()) });
         this.allies = new AllyCombat();
         this.encounterChapter = null;
         this.combo = new Combo();
@@ -189,6 +205,8 @@ export class ClickerGame extends Scene
         const barX = MONSTER.x - HEALTH_BAR.width / 2;
         const barY = MONSTER.y - MONSTER.height / 2 - HEALTH_BAR.gap - HEALTH_BAR.height;
 
+        this.healthBarTop = barY;
+
         const back = this.add.rectangle(barX, barY, HEALTH_BAR.width, HEALTH_BAR.height, HEALTH_BAR.backColor).setOrigin(0, 0);
         this.healthFill = this.add.rectangle(barX, barY, HEALTH_BAR.width, HEALTH_BAR.height, HEALTH_BAR.fillColor).setOrigin(0, 0);
         this.monsterParts = [ body, back, this.healthFill ];
@@ -216,6 +234,7 @@ export class ClickerGame extends Scene
         this.bossTimer = this.createHtml(BOSS_TIMER, BOSS_TIMER_HTML, '.boss-timer');
         this.enemyStats = this.createHtml(ENEMY_STATS, ENEMY_STATS_HTML, '.enemy-stats');
         this.weakChip = this.enemyStats.parentElement.querySelector('.weak-chip');
+        this.targetChip = this.enemyStats.parentElement.querySelector('.target-chip');
         this.effectTags = this.createHtml(EFFECTS, EFFECTS_HTML, '.effect-tags');
         this.stageMessage = this.createHtml(STAGE_MESSAGE, STAGE_MESSAGE_HTML, '.stage-message');
         this.createControls();
@@ -823,13 +842,15 @@ export class ClickerGame extends Scene
         //  A new encounter replaces any message, the completion of the previous chapter included
         this.stageMessage.textContent = '';
         this.monster = new Monster(encounter.health, encounter.dropRuleId, encounter.stats);
+        this.clearAdds();
+        this.fight = new Fight(this.monster, encounter.adds ?? []);
+        this.showAdds();
         this.updateHealthBar();
         this.monsterParts.forEach((part) => part.setAlpha(1));
         renderStageLabel(this.stageHud, encounter.label);
         this.chapterHud.textContent = `Capítulo ${this.session.chapter}`;
         this.showAutoClick();
-        this.monsterStats = encounter.stats;
-        this.showEnemyStats(monsterAfterBreak(encounter.stats, this.talents.talents(), this.passives()));
+        this.refreshEnemyStats();
 
         if (encounter.timeLimitMs)
         {
@@ -841,13 +862,176 @@ export class ClickerGame extends Scene
         }
     }
 
-    //  The tags follow the break talents: the defenses the monster has now
+    //  The tags follow the break talents and the guard of the adds: the defenses the target has now
     refreshEnemyStats ()
     {
-        if (this.monster && !this.monster.dead && this.monsterStats)
+        if (this.monster && !this.monster.dead && this.fight)
         {
-            this.showEnemyStats(monsterAfterBreak(this.monsterStats, this.talents.talents(), this.passives()));
+            this.showEnemyStats(monsterAfterBreak(this.fight.statsOf(this.currentTarget()), this.talents.talents(), this.passives()));
+            this.showTargetChip();
         }
+    }
+
+    //  The stats a hit on `monster` meets before the breaks: the guarded defense of the main of an adds fight (spec miniboss-adds)
+    statsFor (monster)
+    {
+        return this.fight ? this.fight.statsOf(monster) : monster.stats;
+    }
+
+    //  The monster the auto click and the allies hit: the target of the fight, the one monster otherwise
+    currentTarget ()
+    {
+        return this.fight?.target ?? this.monster;
+    }
+
+    livingAddMonsters ()
+    {
+        return this.fight ? this.fight.livingAddMonsters() : [];
+    }
+
+    addBarTop (slot)
+    {
+        return ADD_BOXES[slot].y - ADD_SIZE.height / 2 - ADD_BAR.gap - ADD_BAR.height;
+    }
+
+    //  The body, bar, fill and buff text of every add, and the marker over the main; nothing for a fight without adds
+    showAdds ()
+    {
+        this.fight.adds.forEach((add) =>
+        {
+            const box = ADD_BOXES[add.slot];
+            const barTop = this.addBarTop(add.slot);
+            const barX = box.x - ADD_BAR.width / 2;
+            const body = this.add.rectangle(box.x, box.y, ADD_SIZE.width, ADD_SIZE.height, MONSTER.color, MONSTER.fillAlpha);
+            const back = this.add.rectangle(barX, barTop, ADD_BAR.width, ADD_BAR.height, HEALTH_BAR.backColor).setOrigin(0, 0);
+            const fill = this.add.rectangle(barX, barTop, ADD_BAR.width, ADD_BAR.height, HEALTH_BAR.fillColor).setOrigin(0, 0);
+            const label = this.add.text(box.x, barTop - ADD_BUFF_GAP, `+${add.defenseBuff} de defesa`, ADD_BUFF_FONT).setOrigin(0.5, 1);
+
+            this.addParts.set(add.slot, { body, back, fill, label });
+        });
+
+        if (this.fight.hasAdds)
+        {
+            this.marker = this.add.triangle(0, 0, 0, 0, TARGET_MARKER.width, 0, TARGET_MARKER.width / 2, TARGET_MARKER.height, TARGET_MARKER.color)
+                .setDepth(TARGET_MARKER.depth);
+            this.placeMarker();
+        }
+    }
+
+    //  The marker stands over the target: a Phaser triangle is centred on its 16 x 10 box, so its centre is 5 px above the tip
+    placeMarker ()
+    {
+        if (!this.marker)
+        {
+            return;
+        }
+
+        const add = this.fight.addOf(this.currentTarget());
+        const tipX = add ? ADD_BOXES[add.slot].x : MONSTER.x;
+        const tipY = add ? this.addBarTop(add.slot) - TARGET_MARKER.addGap : this.healthBarTop - TARGET_MARKER.gap;
+
+        this.marker.setPosition(tipX, tipY - TARGET_MARKER.height / 2);
+    }
+
+    //  Every add part and the marker go at once (a new encounter, a timeout, the chapter end)
+    clearAdds ()
+    {
+        for (const parts of this.addParts.values())
+        {
+            for (const part of Object.values(parts))
+            {
+                this.tweens.killTweensOf(part);
+                part.destroy();
+            }
+        }
+
+        this.addParts.clear();
+
+        if (this.marker)
+        {
+            this.tweens.killTweensOf(this.marker);
+            this.marker.destroy();
+            this.marker = null;
+        }
+
+        this.fight = null;
+        this.targetChip.textContent = '';
+    }
+
+    //  The adds still standing fade out with the dead miniboss, then go (500 ms); nothing for a fight without adds
+    fadeOutAdds ()
+    {
+        const parts = [ ...this.addParts.values() ].flatMap(({ body, back, fill, label }) => [ body, back, fill, label ]);
+
+        if (this.marker)
+        {
+            parts.push(this.marker);
+        }
+
+        this.addParts.clear();
+        this.marker = null;
+
+        if (parts.length === 0)
+        {
+            return;
+        }
+
+        this.tweens.add({ targets: parts, alpha: 0, duration: DEATH.fadeDuration, onComplete: () => parts.forEach((part) => part.destroy()) });
+    }
+
+    //  An add that died since the last hit fades out (500 ms) and goes; the marker and the enemy line follow the new target and defense
+    settleAdds ()
+    {
+        if (!this.fight || !this.monster || this.monster.dead)
+        {
+            return;
+        }
+
+        let died = false;
+
+        this.fight.adds.forEach((add) =>
+        {
+            const parts = this.addParts.get(add.slot);
+
+            if (!add.monster.dead || !parts)
+            {
+                return;
+            }
+
+            this.addParts.delete(add.slot);
+            died = true;
+
+            const list = [ parts.body, parts.back, parts.fill, parts.label ];
+
+            this.tweens.add({ targets: list, alpha: 0, duration: DEATH.fadeDuration, onComplete: () => list.forEach((part) => part.destroy()) });
+        });
+
+        if (died)
+        {
+            this.placeMarker();
+            this.refreshEnemyStats();
+        }
+    }
+
+    updateAddBars ()
+    {
+        for (const add of this.fight?.adds ?? [])
+        {
+            const parts = this.addParts.get(add.slot);
+
+            if (parts)
+            {
+                parts.fill.setSize(ADD_BAR.width * add.monster.health / add.monster.maxHealth, ADD_BAR.height);
+            }
+        }
+    }
+
+    //  "Alvo: Lacaio 1 · HP 2M/2M" while an adds fight runs; empty otherwise (spec miniboss-adds, Q49)
+    showTargetChip ()
+    {
+        const target = this.currentTarget();
+
+        this.targetChip.textContent = this.fight?.hasAdds && target ? `Alvo: ${this.fight.nameOf(target)} · ${healthText(target)}` : '';
     }
 
     //  "Water  Defesa 10%  Crit res 12%", one chip each; the double spaces are hidden between the chips. data-element and data-stat give each
@@ -875,11 +1059,13 @@ export class ClickerGame extends Scene
     {
         this.enemyStats.textContent = '';
         this.weakChip.textContent = '';
+        this.targetChip.textContent = '';
     }
 
     completeChapter ()
     {
         this.monster = null;
+        this.clearAdds();
         this.clearEnemyStats();
         this.monsterParts.forEach((part) => part.setAlpha(0));
         this.stageHud.textContent = '';
@@ -1126,6 +1312,7 @@ export class ClickerGame extends Scene
     {
         this.hideCountdown();
         this.monster = null;
+        this.clearAdds();
         this.clearEnemyStats();
         this.monsterParts.forEach((part) => part.setAlpha(0));
 
@@ -1301,6 +1488,9 @@ export class ClickerGame extends Scene
         {
             this.clearEnemyStats();
 
+            //  The adds still standing fade out with the miniboss; their tween goes first, so the miniboss fade stays the last one
+            this.fadeOutAdds();
+
             //  A farm fight drops no coins: kills are only reported for the campaign
             if (!this.farmBoss)
             {
@@ -1308,7 +1498,10 @@ export class ClickerGame extends Scene
             }
 
             this.fadeOutMonster(this.clearEncounter());
+            return;
         }
+
+        this.settleAdds();
     }
 
     //  A farm fight reports a farm win and leaves the campaign alone; any other win moves the campaign on
@@ -1510,6 +1703,8 @@ export class ClickerGame extends Scene
     {
         this.healthFill.setSize(HEALTH_BAR.width * this.monster.health / this.monster.maxHealth, HEALTH_BAR.height);
         this.monsterHp.textContent = healthText(this.monster);
+        this.updateAddBars();
+        this.showTargetChip();
     }
 
     //  The monster fades; `next` is the encounter that follows it (null when the chapter is over)

@@ -550,6 +550,25 @@ button:disabled {
     display: none;
 }
 
+/* "Alvo: Lacaio 1 · HP 2M/2M": the target of a miniboss fight with adds, first row of the enemy box (spec miniboss-adds, Q49) */
+.target-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: pre;
+    color: var(--parchment-100);
+    border-radius: 999px;
+    background: var(--chip-bg);
+    border: 1px solid var(--gold-400);
+}
+
+.target-chip:empty {
+    display: none;
+}
+
 .hud-effects {
     width: 640px;
     height: 40px;
