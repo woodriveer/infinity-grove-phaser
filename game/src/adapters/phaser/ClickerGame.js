@@ -547,7 +547,9 @@ export class ClickerGame extends Scene
 
         for (let click = 0; click < clicks && !this.monster.dead; click++)
         {
-            this.strike(MONSTER.x);
+            const target = this.currentTarget();
+
+            this.strike(this.centreXOf(target), target);
         }
     }
 
@@ -1231,15 +1233,31 @@ export class ClickerGame extends Scene
     {
         const monster = this.monster && !this.monster.dead ? this.monster : null;
         const boss = this.countdown !== null;
+        const landed = [];
         const { ticks } = this.allies.advance(delta, {
             monster,
             allies: this.allyAttackers(),
-            hit: (attacker, target) => this.skills.allyHit({ attacker, monster: target, boss }).damage
-        });
+            //  Each ally hit asks for the target right before it lands (hero-team seam, spec miniboss-adds)
+            target: () => this.currentTarget(),
+            hit: (attacker, target) =>
+            {
+                const { damage } = this.skills.allyHit({ attacker, monster: target, main: this.monster, boss });
 
-        ticks.forEach(({ damage, slots }) =>
+                landed.push({ target, damage });
+
+                return damage;
+            }
+        });
+        let next = 0;
+
+        ticks.forEach(({ slots }) =>
         {
-            this.showDamage(formatDamage(damage), MONSTER.x + ALLY_TEXT_OFFSET, false, ALLY_TEXT);
+            //  One number per monster the tick hit, with the sum of its hits there, in the order the monsters were first hit
+            const sums = new Map();
+
+            landed.slice(next, next + slots.length).forEach(({ target, damage }) => sums.set(target, (sums.get(target) ?? 0) + damage));
+            next += slots.length;
+            sums.forEach((damage, target) => this.showDamage(formatDamage(damage), this.allyNumberXOf(target), false, ALLY_TEXT, this.numberYOf(target)));
             this.onAllyTick(slots);
         });
 
@@ -1439,11 +1457,76 @@ export class ClickerGame extends Scene
             return;
         }
 
-        this.strike(this.damageTextX(pointer));
+        const add = this.addAt(pointer);
+
+        if (add)
+        {
+            this.chooseTarget(add.monster);
+            this.strike(pointer.x, add.monster);
+            return;
+        }
+
+        if (this.onMiniboss(pointer))
+        {
+            this.chooseTarget(this.monster);
+            this.strike(pointer.x, this.monster);
+            return;
+        }
+
+        //  A click on no monster hits the target (spec miniboss-adds, Q51)
+        const target = this.currentTarget();
+
+        this.strike(this.centreXOf(target), target);
     }
 
-    //  One click on the living monster, by hand or by the auto click, with its number at `x`
-    strike (x)
+    //  The living add whose body holds the pointer, or null
+    addAt (pointer)
+    {
+        return this.fight?.livingAdds().find(({ slot }) =>
+            Math.abs(pointer.x - ADD_BOXES[slot].x) <= ADD_SIZE.width / 2 && Math.abs(pointer.y - ADD_BOXES[slot].y) <= ADD_SIZE.height / 2) ?? null;
+    }
+
+    onMiniboss (pointer)
+    {
+        return Math.abs(pointer.x - MONSTER.x) <= MONSTER.width / 2 && Math.abs(pointer.y - MONSTER.y) <= MONSTER.height / 2;
+    }
+
+    //  Makes `monster` the target; the marker and the enemy line follow only when the target changed
+    chooseTarget (monster)
+    {
+        const before = this.currentTarget();
+
+        if (this.fight?.choose(monster) && monster !== before)
+        {
+            this.placeMarker();
+            this.refreshEnemyStats();
+        }
+    }
+
+    //  Where the numbers of a hit on `monster` stand (spec miniboss-adds, Fight Layout)
+    centreXOf (monster)
+    {
+        const add = this.fight?.addOf(monster);
+
+        return add ? ADD_BOXES[add.slot].x : MONSTER.x;
+    }
+
+    numberYOf (monster)
+    {
+        const add = this.fight?.addOf(monster);
+
+        return add ? ADD_BOXES[add.slot].y : this.damageTextY;
+    }
+
+    allyNumberXOf (monster)
+    {
+        const add = this.fight?.addOf(monster);
+
+        return add ? ADD_BOXES[add.slot].x + ADD_ALLY_TEXT_OFFSET : MONSTER.x + ALLY_TEXT_OFFSET;
+    }
+
+    //  One click on a living monster of the fight (the target unless told otherwise), by hand or by the auto click, with its number at `x`
+    strike (x, monster = this.currentTarget())
     {
         //  A countdown means the monster is a boss. One click is one step of the combo; the double click of Lyra lands two critical hits that
         //  share its bonus, and the second does not land when the first one kills.
@@ -1452,13 +1535,13 @@ export class ClickerGame extends Scene
         const multiplier = 1 + this.combo.click() / 100;
         const hits = clickHits(this.heroes.leader()?.id, this.random);
 
-        for (let hit = 0; hit < hits && !this.monster.dead; hit++)
+        for (let hit = 0; hit < hits && !monster.dead; hit++)
         {
             const { damage, critical } = this.skills.click({
-                attacker: this.leaderAttacker(), monster: this.monster, boss: this.countdown !== null, multiplier, forceCritical: hits === 2
+                attacker: this.leaderAttacker(), monster, main: this.monster, boss: this.countdown !== null, multiplier, forceCritical: hits === 2
             });
 
-            this.showDamage(formatDamage(damage), x + hit * DOUBLE_HIT_OFFSET, critical);
+            this.showDamage(formatDamage(damage), x + hit * DOUBLE_HIT_OFFSET, critical, null, this.numberYOf(monster));
         }
 
         this.showCombo();
@@ -1735,11 +1818,11 @@ export class ClickerGame extends Scene
     }
 
     //  A critical hit is bigger and orange, a normal one gold; `style` gives another look (the light-blue number of an ally tick)
-    showDamage (damage, x, critical = false, style = null)
+    showDamage (damage, x, critical = false, style = null, y = this.damageTextY)
     {
         const textStyle = { ...DAMAGE_FONT, ...(style ?? (critical ? CRITICAL_TEXT : NORMAL_TEXT)) };
 
-        const text = this.add.text(x, this.damageTextY, damage, textStyle).setOrigin(0.5, 1).setDepth(1);
+        const text = this.add.text(x, y, damage, textStyle).setOrigin(0.5, 1).setDepth(1);
 
         this.tweens.add({
             targets: text,

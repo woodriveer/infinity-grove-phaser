@@ -5672,28 +5672,28 @@ describe('ClickerGame hero team formation', () => {
     });
 });
 
+const ADD = { health: 30, defenseBuff: 30 };
+//  Stage 1 of chapter 11: phase monsters of defense 0, a miniboss of defense 49 and its adds
+const addsDefinition = ({ adds = [ ADD, ADD ], miniboss = { element: 'FIRE', defense: 49, critResistance: 0 }, minibossHealth = 100 } = {}) => ({
+    ...definition,
+    stages: definition.stages.map((stage) => (stage.number === 1
+        ? { ...stage, minibossHealth, miniboss, monster: { element: 'FIRE', defense: 0, critResistance: 0 }, adds }
+        : stage))
+});
+const addsStart = (options) => ({ ...progress(1, 'MINIBOSS', 1), chapter: 11, definition: addsDefinition(options) });
+const addsScene = (options, extra = {}) => createScene({ start: addsStart(options), talents: [], autoClickOn: false, ...extra });
+const killAdd = (ctx, slot) => {
+    const { monster } = ctx.scene.fight.adds[slot - 1];
+
+    monster.hit(monster.health);
+    ctx.scene.afterDamage();
+};
+const onMiniboss = { x: 670, y: 440 };
+const partsOf = (ctx) => [ ...ctx.scene.addParts.values() ].flatMap((parts) => Object.values(parts));
+const enemyLine = (ctx) => ctx.hud('.enemy-stats').textContent;
+const chip = (ctx) => ctx.hud('.target-chip').textContent;
+
 describe('ClickerGame miniboss adds', () => {
-    const ADD = { health: 30, defenseBuff: 30 };
-    //  Stage 1 of chapter 11: phase monsters of defense 0, a miniboss of defense 49 and its adds
-    const addsDefinition = ({ adds = [ ADD, ADD ], miniboss = { element: 'FIRE', defense: 49, critResistance: 0 }, minibossHealth = 100 } = {}) => ({
-        ...definition,
-        stages: definition.stages.map((stage) => (stage.number === 1
-            ? { ...stage, minibossHealth, miniboss, monster: { element: 'FIRE', defense: 0, critResistance: 0 }, adds }
-            : stage))
-    });
-    const addsStart = (options) => ({ ...progress(1, 'MINIBOSS', 1), chapter: 11, definition: addsDefinition(options) });
-    const addsScene = (options, extra = {}) => createScene({ start: addsStart(options), talents: [], autoClickOn: false, ...extra });
-    const killAdd = (ctx, slot) => {
-        const { monster } = ctx.scene.fight.adds[slot - 1];
-
-        monster.hit(monster.health);
-        ctx.scene.afterDamage();
-    };
-    const onMiniboss = { x: 670, y: 440 };
-    const partsOf = (ctx) => [ ...ctx.scene.addParts.values() ].flatMap((parts) => Object.values(parts));
-    const enemyLine = (ctx) => ctx.hud('.enemy-stats').textContent;
-    const chip = (ctx) => ctx.hud('.target-chip').textContent;
-
     it('a miniboss with two adds draws two add bodies of 110 x 125 at (480, 360) and (480, 540)', async () => {
         const ctx = await addsScene();
         const bodies = ctx.byColor(0xf5ead8);
@@ -5922,5 +5922,225 @@ describe('ClickerGame miniboss adds', () => {
 
         expect(result.damage).toBeCloseTo(1, 9);
         expect(add.health).toBeCloseTo(29, 9);
+    });
+});
+
+describe('ClickerGame miniboss target', () => {
+    const lacaio1 = { x: 480, y: 360 };
+    const lacaio2 = { x: 480, y: 540 };
+    const allyScene = (allies, options = {}, extra = {}) => addsScene(options, { heroes: teamHeroes(allies), ...extra });
+    const lastText = (ctx) => ctx.texts.at(-1);
+    const healthOf = (ctx, slot) => ctx.scene.fight.adds[slot - 1].monster.health;
+
+    it('a click on Lacaio 1 hits it for 1 and makes it the target', async () => {
+        const ctx = await addsScene();
+
+        ctx.click(lacaio1);
+
+        expect(healthOf(ctx, 1)).toBeCloseTo(29, 9);
+        expect(ctx.scene.fight.target).toBe(ctx.scene.fight.adds[0].monster);
+        expect(chip(ctx)).toBe('Alvo: Lacaio 1 · HP 29/30');
+        expect(enemyLine(ctx)).toBe('Fire  Defesa 0%  Crit res 0%');
+    });
+
+    it('a click on an add shows its number where it landed, at y 360', async () => {
+        const ctx = await addsScene();
+
+        ctx.click({ x: 500, y: 380 });
+
+        expect([ lastText(ctx).text, lastText(ctx).x, lastText(ctx).y ]).toEqual([ '1', 500, 360 ]);
+    });
+
+    it('a click on Lacaio 2 shows its number at y 540 and makes it the target', async () => {
+        const ctx = await addsScene();
+
+        ctx.click(lacaio2);
+
+        expect([ lastText(ctx).text, lastText(ctx).x, lastText(ctx).y ]).toEqual([ '1', 480, 540 ]);
+        expect(ctx.scene.fight.target).toBe(ctx.scene.fight.adds[1].monster);
+        expect(chip(ctx)).toBe('Alvo: Lacaio 2 · HP 29/30');
+    });
+
+    it('the marker moves over Lacaio 1 and Lacaio 2', async () => {
+        const ctx = await addsScene();
+
+        ctx.click(lacaio1);
+        expect([ ctx.triangles[0].x, ctx.triangles[0].y ]).toEqual([ 480, 253.5 ]);
+
+        ctx.click(lacaio2);
+        expect([ ctx.triangles[0].x, ctx.triangles[0].y ]).toEqual([ 480, 433.5 ]);
+    });
+
+    it('a click on the miniboss makes it the target again', async () => {
+        const ctx = await addsScene();
+
+        ctx.click(lacaio1);
+        ctx.click(onMiniboss);
+
+        expect(ctx.scene.fight.target).toBe(ctx.scene.monster);
+        expect([ ctx.triangles[0].x, ctx.triangles[0].y ]).toEqual([ 670, 270 ]);
+        expect(ctx.scene.monster.health).toBeCloseTo(99.9, 9);
+    });
+
+    it('a click on the target again keeps it', async () => {
+        const ctx = await addsScene();
+
+        ctx.click(lacaio1);
+        ctx.click(lacaio1);
+
+        expect(ctx.scene.fight.target).toBe(ctx.scene.fight.adds[0].monster);
+        expect(healthOf(ctx, 1)).toBeCloseTo(28, 9);
+    });
+
+    it("a click on no monster hits the target with its number at the target's centre x", async () => {
+        const ctx = await addsScene();
+
+        ctx.click(lacaio1);
+        ctx.click({ x: 100, y: 100 });
+
+        expect(healthOf(ctx, 1)).toBeCloseTo(28, 9);
+        expect([ lastText(ctx).x, lastText(ctx).y ]).toEqual([ 480, 360 ]);
+    });
+
+    it('a click where a dead add stood hits the target', async () => {
+        const ctx = await addsScene();
+
+        killAdd(ctx, 1);
+        ctx.click(lacaio1);
+
+        expect(ctx.scene.monster.health).toBeCloseTo(99.79, 9);
+        expect(healthOf(ctx, 2)).toBe(30);
+    });
+
+    it('the target goes back to the miniboss when the target add dies', async () => {
+        const ctx = await addsScene();
+
+        ctx.click(lacaio1);
+        killAdd(ctx, 1);
+
+        expect(ctx.scene.fight.target).toBe(ctx.scene.monster);
+        expect([ ctx.triangles[0].x, ctx.triangles[0].y ]).toEqual([ 670, 270 ]);
+        expect(chip(ctx)).toBe('Alvo: Miniboss · HP 100/100');
+    });
+
+    it('the auto click hits the target add at its centre x', async () => {
+        const ctx = await addsScene({}, { autoClickOn: true });
+
+        ctx.click(lacaio1);
+        expect(healthOf(ctx, 1)).toBeCloseTo(29, 9);
+
+        ctx.scene.update(0, 500);
+
+        expect(healthOf(ctx, 1)).toBeCloseTo(28, 9);
+        expect([ lastText(ctx).x, lastText(ctx).y ]).toEqual([ 480, 360 ]);
+    });
+
+    it('an auto click burst that kills the target add moves on to the miniboss', async () => {
+        const ctx = await addsScene({ adds: [ { health: 2, defenseBuff: 30 }, ADD ] }, { autoClickOn: true });
+
+        ctx.click(lacaio1);
+        expect(healthOf(ctx, 1)).toBeCloseTo(1, 9);
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.fight.adds[0].monster.dead).toBe(true);
+        expect(ctx.scene.monster.health).toBeCloseTo(99.79, 9);
+        expect(ctx.scene.fight.target).toBe(ctx.scene.monster);
+    });
+
+    it('a click on an add counts one step of the combo', async () => {
+        const ctx = await addsScene({}, { talents: [ COMBO_MAXED ] });
+
+        ctx.click(lacaio1);
+        expect(ctx.scene.combo.streak).toBe(1);
+        expect(ctx.hud('.combo-hud').textContent).toBe('Combo x1 · +1%');
+
+        ctx.click(onMiniboss);
+        expect(ctx.hud('.combo-hud').textContent).toBe('Combo x2 · +2%');
+    });
+
+    it("Lyra's double critical click lands both hits on the clicked add", async () => {
+        const ctx = await addsScene({}, { heroes: { leaderId: 'lyra', heroes: [ heroEntry('lyra', { 0: 1 }) ] } });
+
+        ctx.dice.value = 0;
+        ctx.click({ x: 500, y: 380 });
+
+        expect(healthOf(ctx, 1)).toBeCloseTo(26, 9);
+        expect(ctx.texts.slice(-2).map(({ text, x, y, style }) => [ text, x, y, style.color ])).toEqual([
+            [ '2', 500, 360, '#ff8a1f' ],
+            [ '2', 536, 360, '#ff8a1f' ]
+        ]);
+    });
+
+    it('an ally meets the guarded miniboss: Lyra deals 0.2 at x 740', async () => {
+        const ctx = await allyScene([ 'lyra', null, null, null ]);
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.monster.health).toBeCloseTo(99.8, 9);
+        expect([ lastText(ctx).text, lastText(ctx).x, lastText(ctx).y, lastText(ctx).style.color ]).toEqual([ '0.2', 740, 273, '#7fd4ff' ]);
+    });
+
+    it('an ally hits the target add for 2 with its number at (520, 360)', async () => {
+        const ctx = await allyScene([ 'lyra', null, null, null ]);
+
+        ctx.click(lacaio1);
+        expect(healthOf(ctx, 1)).toBeCloseTo(29, 9);
+
+        ctx.scene.update(0, 1000);
+
+        expect(healthOf(ctx, 1)).toBeCloseTo(27, 9);
+        expect([ lastText(ctx).text, lastText(ctx).x, lastText(ctx).y, lastText(ctx).style.color ]).toEqual([ '2', 520, 360, '#7fd4ff' ]);
+    });
+
+    it('an ally tick that kills the target add lands its later hits on the miniboss with one number each', async () => {
+        //  Vex, not Orina: Orina's passive takes 15 points off the defense, which would change the 0.4 of the miniboss tick
+        const ctx = await allyScene([ 'lyra', 'vex', null, null ], { adds: [ { health: 2, defenseBuff: 30 }, ADD ] });
+
+        ctx.click(lacaio1);
+        expect(healthOf(ctx, 1)).toBeCloseTo(1, 9);
+
+        const before = ctx.texts.length;
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.fight.adds[0].monster.dead).toBe(true);
+        expect(ctx.scene.monster.health).toBeCloseTo(99.58, 9);
+        expect(ctx.texts.slice(before).map(({ text, x, y, style }) => [ text, x, y, style.color ])).toEqual([
+            [ '2', 520, 360, '#7fd4ff' ],
+            [ '0.4', 740, 273, '#7fd4ff' ]
+        ]);
+    });
+
+    it('the ally clock does not restart when the target changes', async () => {
+        const ctx = await allyScene([ 'lyra', null, null, null ]);
+
+        ctx.scene.update(0, 600);
+        ctx.click(lacaio1);
+        expect(healthOf(ctx, 1)).toBeCloseTo(29, 9);
+
+        ctx.scene.update(0, 400);
+
+        expect(healthOf(ctx, 1)).toBeCloseTo(27, 9);
+    });
+
+    it('no target change and no hit while the pause menu is open', async () => {
+        const ctx = await addsScene();
+
+        ctx.scene.pauseFight();
+        ctx.click(lacaio1);
+
+        expect(healthOf(ctx, 1)).toBe(30);
+        expect(ctx.scene.fight.target).toBe(ctx.scene.monster);
+    });
+
+    it('no target change and no hit while a hero screen is open', async () => {
+        const ctx = await addsScene();
+
+        await ctx.scene.heroUi.show('heroes');
+        ctx.click(lacaio1);
+
+        expect(healthOf(ctx, 1)).toBe(30);
+        expect(ctx.scene.fight.target).toBe(ctx.scene.monster);
     });
 });

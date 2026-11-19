@@ -1073,7 +1073,7 @@ Fixtures (top of the new describe): `const ADD = { health: 30, defenseBuff: 30 }
 
 ---
 
-### T11: Let the player pick the target [ ]
+### T11: Let the player pick the target [x]
 
 **Owner**: game-dev
 **Goal**: A click on a monster hits it and makes it the target, a click on no monster hits the target, the auto click and the allies hit the target, and the numbers stand at the monster they landed on (ADDS-04, ADDS-05, spec Target AC 1 to 7, 10, 11, Edge Cases).
@@ -1192,7 +1192,7 @@ allyNumberXOf (monster) { const add = this.fight?.addOf(monster); return add ? A
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 19 cases pass, every existing `ClickerGame` case passes unchanged (the hero-team ally cases included), and the whole Vitest suite passes.
+- [x] The 19 cases pass, every existing `ClickerGame` case passes unchanged (the hero-team ally cases included), and the whole Vitest suite passes.
 
 **Commit**: `feat(game): let the player pick the target of a miniboss fight`
 
