@@ -476,7 +476,7 @@ export const addsOf = (stage) =>
 
 ---
 
-### T6: Keep the monsters and the target of one fight [ ]
+### T6: Keep the monsters and the target of one fight [x]
 
 **Owner**: game-dev
 **Goal**: A pure `Fight` holds the main monster, its adds as `Monster`s, the target and the guarded defense of the main (ADDS-03, ADDS-04, spec Adds AC 4 to 6, Target AC 1, 2, 6).
@@ -599,7 +599,7 @@ export class Fight
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 23 cases pass and the whole Vitest suite passes.
+- [x] The 23 cases pass and the whole Vitest suite passes.
 
 **Commit**: `feat(game): keep the monsters and the target of a fight`
 
