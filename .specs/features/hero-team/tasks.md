@@ -2267,7 +2267,7 @@ let teamFailure = null;
 
 ---
 
-### T22: Cover the Equipe screen and the slot purchase in the browser [ ]
+### T22: Cover the Equipe screen and the slot purchase in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: A new e2e file proves every visible criterion of the Equipe screen layout, the HUD button and the purchase dialog on the real game against the fake backend (TEAM-09, TEAM-10).
@@ -2313,7 +2313,7 @@ let teamFailure = null;
 **Gate**: full - `cd game && npx playwright test e2e/heroTeam.spec.js` then `cd game && npm test && npx playwright test`
 **Done when**:
 
-- [ ] The 16 scenarios pass; the whole Playwright suite passes (failures on the load-flake list of `STATE.md` rerun alone twice with `--workers=1` and are reported).
+- [x] The 16 scenarios pass; the whole Playwright suite passes (failures on the load-flake list of `STATE.md` rerun alone twice with `--workers=1` and are reported).
 
 **Commit**: `test(game): cover the Equipe screen and the slot purchase`
 
