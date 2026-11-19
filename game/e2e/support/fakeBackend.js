@@ -28,15 +28,15 @@ const SEED_ELEMENTS = [ 'FIRE', 'WATER', 'NATURE', 'LIGHT', 'DARKNESS' ];
 const seededDefinition = () => ({
     bossHealth: 300,
     bossTimeLimitMs: 60_000,
-    boss: { element: 'DARKNESS', physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
+    boss: { element: 'DARKNESS', defense: 30, physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
     bossDropRuleId: 3,
     stages: Array.from({ length: 10 }, (_, i) => {
         const element = SEED_ELEMENTS[i % SEED_ELEMENTS.length];
 
         return {
             number: i + 1, phasesPerStage: 5, monsterHealth: 10 + i, minibossHealth: 5 * (10 + i), minibossTimeLimitMs: 30_000,
-            monster: { element, physicalDefense: 0, magicalDefense: 0, critResistance: 0 },
-            miniboss: { element, physicalDefense: 11 + i, magicalDefense: 11 + i, critResistance: 12 + 2 * i },
+            monster: { element, defense: 0, physicalDefense: 0, magicalDefense: 0, critResistance: 0 },
+            miniboss: { element, defense: 11 + i, physicalDefense: 11 + i, magicalDefense: 11 + i, critResistance: 12 + 2 * i },
             monsterDropRuleId: 1,
             minibossDropRuleId: 2
         };
@@ -78,24 +78,24 @@ const afterOutcome = (progress, outcome, definition, lastChapter) => {
 //  Hero cards contract (HeroController, FarmController, the drops of ProgressController): the five README heroes, a bag per player,
 //  the chapter order that follows the starting element, the 1 % and 10 % drops and the daily chapter boss limit.
 //  Cards have 0 to 9 stars; 3 cards of the same hero and stars (0 to 8) fuse into 1 card of the next stars (hero-ascension).
-const skill = (slot, name, type, cooldownSeconds, image) => ({ slot, name, type, effect: `Efeito de ${name}`, cooldownSeconds, image });
+const skill = (slot, name, type, cooldownSeconds, image, effect = `Efeito de ${name}`) => ({ slot, name, type, effect, cooldownSeconds, image });
 
 const HEROES = [
     {
         id: 'kael', name: 'Kael Raizférrea', heroClass: 'Guerreiro', element: 'FIRE', leaderBonus: '+25% de dano contra chefes.', portrait: 'kael_position',
-        skills: [ skill(1, 'Corte Dimensional', 'Ataque', 20, 'kael_dimensional_cut'), skill(2, 'Investida do Baluarte', 'Controle', 25, 'kael_charge'), skill(3, 'Brado Aterrador', 'Debuff', 30, 'kael_screen') ]
+        skills: [ skill(1, 'Corte Dimensional', 'Ataque', 20, 'kael_dimensional_cut', 'Um golpe que rasga o próprio espaço, causando 1500% de dano a todos os inimigos e ignorando 30% da defesa.'), skill(2, 'Investida do Baluarte', 'Controle', 25, 'kael_charge'), skill(3, 'Brado Aterrador', 'Debuff', 30, 'kael_screen', 'Um grito de guerra que causa Medo: inimigos perdem 30 pontos de defesa por 10s.') ]
     },
     {
         id: 'lyra', name: 'Lyra Folhaveloz', heroClass: 'Arqueira', element: 'NATURE', leaderBonus: '30% de chance de executar um clique duplo crítico.', portrait: 'lyra_position',
-        skills: [ skill(1, 'Flecha Dupla', 'Ataque', 8, 'lyra_double_shot'), skill(2, 'Tiro Preciso', 'Ataque (conjuração)', 30, 'lyra_focused_shot'), skill(3, 'Ventos Ligeiros', 'Buff de grupo', 40, 'lyra_rapid_wind') ]
+        skills: [ skill(1, 'Flecha Dupla', 'Ataque', 8, 'lyra_double_shot', 'Dispara duas flechas, cada uma causando 300% de dano.'), skill(2, 'Tiro Preciso', 'Ataque (conjuração)', 30, 'lyra_focused_shot'), skill(3, 'Ventos Ligeiros', 'Buff de grupo', 40, 'lyra_rapid_wind') ]
     },
     {
-        id: 'orina', name: 'Orina Brumaestrela', heroClass: 'Maga', element: 'WATER', leaderBonus: '+20% de Poder Arcano para todo o grupo.', portrait: 'orina_position',
-        skills: [ skill(1, 'Prisão de Espinhos', 'Controle / debuff', 18, 'orina_grasp_prision'), skill(2, 'Tempestade Arcana', 'Ataque contínuo', 35, 'orina_tempest'), skill(3, 'Chuva de Meteoros', 'Ataque', 45, 'orina_meteor_storm') ]
+        id: 'orina', name: 'Orina Brumaestrela', heroClass: 'Maga', element: 'WATER', leaderBonus: '+20% de dano total.', portrait: 'orina_position',
+        skills: [ skill(1, 'Prisão de Espinhos', 'Controle / debuff', 18, 'orina_grasp_prision', 'Vinhas de espinhos prendem os inimigos por 2s; enquanto presos, recebem +25% de dano.'), skill(2, 'Tempestade Arcana', 'Ataque contínuo', 35, 'orina_tempest', 'Raios caem por 6s, causando 200% de dano por segundo a todos os inimigos.'), skill(3, 'Chuva de Meteoros', 'Ataque', 45, 'orina_meteor_storm', 'Uma chuva de estrelas causa 2500% de dano em área.') ]
     },
     {
         id: 'seraphine', name: 'Seraphine Aurora', heroClass: 'Clériga', element: 'LIGHT', leaderBonus: '+15% de Seiva obtida.', portrait: 'seraphine_position',
-        skills: [ skill(1, 'Bênção da Grande Árvore', 'Buff de grupo', 30, 'seraphine_blessing'), skill(2, 'Luz Divina', 'Ataque', 25, 'seraphine_holy_light'), skill(3, 'Carrilhão da Aurora', 'Buff de grupo', 45, 'seraphine_bell_ringing') ]
+        skills: [ skill(1, 'Bênção da Grande Árvore', 'Buff de grupo', 30, 'seraphine_blessing', 'Por 15s, todos os aliados ganham +20% de Precisão, +30% de dano e +25% de velocidade de ataque.'), skill(2, 'Luz Divina', 'Ataque', 25, 'seraphine_holy_light', 'Um pilar de luz atinge todos os inimigos, causando 800% de dano (+50% contra criaturas do Submundo).'), skill(3, 'Carrilhão da Aurora', 'Buff de grupo', 45, 'seraphine_bell_ringing') ]
     },
     {
         id: 'vex', name: 'Vex Sombraespinho', heroClass: 'Assassino', element: 'DARKNESS', leaderBonus: '+30% de dano contra inimigos sob efeitos de dano contínuo.', portrait: 'vex_position',
@@ -184,11 +184,11 @@ const pieceView = (piece) => ({
     sellPrice: Math.floor(100 * RARITY[piece.rarity].index * (2 + piece.refine) / 2)
 });
 
-//  Talent contract (TalentController): the 10 talents of the backend catalog in 3 grades, level 0 to 10, a level costs its grade in talent points; the first clear of a
+//  Talent contract (TalentController): the 9 talents of the backend catalog in 3 grades, level 0 to 10, a level costs its grade in talent points; the first clear of a
 //  phase pays nothing, of a miniboss 2 and of a chapter boss 5; POST /talents/reset takes every level back
 const TALENT_CATALOG = [
     [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 3 ],
-    [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa física', 'points', 1 ], [ 'MAGICAL_BREAK', 'BREAK', 'Quebra de defesa mágica', 'points', 1 ],
+    [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa', 'points', 1 ],
     [ 'CRIT_RESIST_BREAK', 'BREAK', 'Quebra de resistência a crítico', 'points', 1 ],
     [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique (%)', '%', 5 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ],
     [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ], [ 'CLICK_FLAT_DAMAGE', 'POWER', 'Dano direto de clique', 'dmg', 2 ]

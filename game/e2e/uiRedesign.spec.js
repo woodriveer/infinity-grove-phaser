@@ -841,10 +841,10 @@ test.describe('Grove theme', () => {
         await expectStyle(page.locator('.boss-timer'), { display: 'none' });
     });
 
-    test('draws the enemy chips with a dot and three icons, text unchanged', async ({ page }) => {
+    test('draws the enemy chips with a dot and two icons: the defense shield and the crit target', async ({ page }) => {
         await startAs(page, { monster: bare('NATURE', 10, 20, 30) });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Nature  Physical def 10%  Magical def 20%  Crit res 30%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Nature  Defesa 10%  Crit res 30%');
         await expectStyle(page.locator('.enemy-stats'), { 'background-color': 'rgba(0, 0, 0, 0)' });
         //  UIR-07 AC18: a dark chip with a 1 px solid bronze border
         await expectStyle(page.locator('.tag-element'), { 'background-color': 'rgba(28, 18, 12, 0.85)', 'border-top-width': '1px', 'border-top-style': 'solid', 'border-top-color': 'rgb(176, 122, 58)' });
@@ -852,13 +852,13 @@ test.describe('Grove theme', () => {
         expect((await css(page.locator('.tag-element'), [ 'background-color' ], '::before'))['background-color']).toBe('rgb(79, 154, 60)');
         expect((await css(page.locator('.tag-element'), [ 'width' ], '::before')).width).toBe('10px');
         expect((await css(page.locator('.tag-element'), [ 'height' ], '::before')).height).toBe('10px');
-        expect((await css(page.locator('[data-stat="physical"]'), [ 'background-color' ], '::before'))['background-color']).toBe('rgb(176, 122, 58)');
-        expect((await css(page.locator('[data-stat="physical"]'), [ 'width' ], '::before')).width).toBe('12px');
-        expect((await css(page.locator('[data-stat="magical"]'), [ 'background-color' ], '::before'))['background-color']).toBe('rgb(63, 143, 209)');
+        expect((await css(page.locator('[data-stat="defense"]'), [ 'background-color' ], '::before'))['background-color']).toBe('rgb(176, 122, 58)');
+        expect((await css(page.locator('[data-stat="defense"]'), [ 'width' ], '::before')).width).toBe('12px');
         expect((await css(page.locator('[data-stat="crit"]'), [ 'background-color' ], '::before'))['background-color']).toBe('rgb(214, 69, 65)');
-        //  UIR-07 AC17: the magical and the crit icons are 12 px too
-        expect((await css(page.locator('[data-stat="magical"]'), [ 'width' ], '::before')).width).toBe('12px');
+        //  UIR-07 AC17: the crit icon is 12 px too
         expect((await css(page.locator('[data-stat="crit"]'), [ 'width' ], '::before')).width).toBe('12px');
+
+        await expect(page.locator('.enemy-stats [data-stat="physical"], .enemy-stats [data-stat="magical"]')).toHaveCount(0);
 
         for (const tag of await page.locator('.enemy-stats .tag').all())
         {

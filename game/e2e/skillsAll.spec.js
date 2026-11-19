@@ -88,7 +88,7 @@ test.describe('Hero skills: every skill on the real scene', () => {
             expect(await dealt(page)).toBeCloseTo(4 * STAR, 5);
         });
 
-        test('Brado Aterrador lowers the physical defense by 30 points for 10 s: a click goes from 0.5 to 0.8 (x 1.4) and back', async ({ page }) => {
+        test('Brado Aterrador lowers the defense by 30 points for 10 s: a click goes from 0.5 to 0.8 (x 1.4) and back', async ({ page }) => {
             await startAs(page, 'kael', { monster: ARMORED });
 
             await click(page);
@@ -144,7 +144,7 @@ test.describe('Hero skills: every skill on the real scene', () => {
     });
 
     test.describe('Orina', () => {
-        test('Prisão de Espinhos raises the magical damage by 25 % for 2 s and roots the boss countdown', async ({ page }) => {
+        test('Prisão de Espinhos raises the damage by 25 % for 2 s and roots the boss countdown', async ({ page }) => {
             await startAs(page, 'orina', { encounter: 'MINIBOSS' });
 
             expect(await elapsedAfter(page, 1, [ 1500, 500, 1000 ])).toEqual([ 0, 0, 1000 ]);
@@ -156,7 +156,7 @@ test.describe('Hero skills: every skill on the real scene', () => {
             expect(await dealtAfter(page, 2, [ 1000, 5000, 1000 ])).toEqual([ 0, 2.8, 16.8, 16.8 ]);
         });
 
-        test('Chuva de Meteoros deals 2500 % magical: 25 x 1.4', async ({ page }) => {
+        test('Chuva de Meteoros deals 2500 %: 25 x 1.4', async ({ page }) => {
             await startAs(page, 'orina');
 
             await use(page, 3);
@@ -166,7 +166,7 @@ test.describe('Hero skills: every skill on the real scene', () => {
     });
 
     test.describe('Seraphine', () => {
-        test('Bênção da Grande Árvore adds 30 % physical and 25 % click damage for 15 s: a click does 1.4 x 1.25 x 1.3 = 2.275', async ({ page }) => {
+        test('Bênção da Grande Árvore multiplies every damage by 1.3 and adds 25 % click damage for 15 s: a click does 1.4 x 1.25 x 1.3 = 2.275', async ({ page }) => {
             await startAs(page, 'seraphine');
 
             await use(page, 1);
@@ -178,7 +178,7 @@ test.describe('Hero skills: every skill on the real scene', () => {
             await expect.poll(() => dealt(page)).toBeCloseTo(STAR * 1.25 * 1.3 + STAR, 5);
         });
 
-        test('Luz Divina deals 800 % magical: 8 x 1.4', async ({ page }) => {
+        test('Luz Divina deals 800 %: 8 x 1.4', async ({ page }) => {
             await startAs(page, 'seraphine');
             await use(page, 2);
             await expect.poll(() => dealt(page)).toBeCloseTo(8 * STAR, 5);

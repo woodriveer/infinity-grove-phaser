@@ -2,7 +2,7 @@ import { expect, test } from './support/coverage';
 import { mockBackend } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
-//  Fire monsters (a fire click is neutral) of 1000 health with physical defense 20, and a miniboss that takes 30 s
+//  Fire monsters (a fire click is neutral) of 1000 health with defense 20, and a miniboss that takes 30 s
 const ARMORED = { element: 'FIRE', physicalDefense: 20, magicalDefense: 0, critResistance: 0 };
 const CHAPTER = {
     bossHealth: 1000,
@@ -30,10 +30,10 @@ const health = (page) => page.evaluate(() => window.__PHASER_GAME__.scene.getSce
 const dealt = async (page) => 1000 - await health(page);
 
 test.describe('Talents in combat', () => {
-    test('PHYSICAL_BREAK 5 lowers the defense of the monster: a click deals 0.85 instead of 0.8', async ({ page }) => {
+    test('PHYSICAL_BREAK 5 lowers the one defense of the monster: a click deals 0.85 instead of 0.8', async ({ page }) => {
         const menu = await startGame(page, { talents: { yan: { PHYSICAL_BREAK: 5 } } });
 
-        await expect(page.locator('.enemy-stats')).toContainText('Physical def 15%');
+        await expect(page.locator('.enemy-stats')).toContainText('Defesa 15%');
         await menu.canvas.click();
 
         expect(await dealt(page)).toBeCloseTo(0.85, 5);
@@ -42,7 +42,7 @@ test.describe('Talents in combat', () => {
     test('without talents the same click deals 0.8', async ({ page }) => {
         const menu = await startGame(page);
 
-        await expect(page.locator('.enemy-stats')).toContainText('Physical def 20%');
+        await expect(page.locator('.enemy-stats')).toContainText('Defesa 20%');
         await menu.canvas.click();
 
         expect(await dealt(page)).toBeCloseTo(0.8, 5);

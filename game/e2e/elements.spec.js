@@ -4,6 +4,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
 //  One stage whose phase monsters are nature (the fire player deals double) and whose miniboss is darkness with
 //  defense 50: health is large enough that a few clicks never kill, so the damage can be read after each click.
+//  The enemies use the payload of the backend before unified-damage on purpose: the game reads physicalDefense as the defense (TD-002).
 const ELEMENTS_CHAPTER = {
     bossHealth: 100,
     bossTimeLimitMs: 60_000,
@@ -30,11 +31,11 @@ const startGame = async (page, options) => {
 const monsterHealth = (page) => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').monster?.health);
 
 test.describe('Elements', () => {
-    test('shows the element and defenses of the monster, and a fire click deals double to nature', async ({ page }) => {
+    test('shows the element and the defense of the monster, and a fire click deals double to nature', async ({ page }) => {
         await mockBackend(page, { users: { yan: 'secret123' }, definition: ELEMENTS_CHAPTER });
         const menu = await startGame(page);
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Nature  Physical def 0%  Magical def 0%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Nature  Defesa 0%  Crit res 0%');
         await expect.poll(() => monsterHealth(page)).toBe(20);
 
         await menu.canvas.click();
@@ -59,7 +60,7 @@ test.describe('Elements', () => {
         });
         const menu = await startGame(page, { random: 0 });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Darkness  Physical def 50%  Magical def 10%  Crit res 100%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Darkness  Defesa 50%  Crit res 100%');
         await expect.poll(() => monsterHealth(page)).toBe(100);
 
         await menu.canvas.click();
