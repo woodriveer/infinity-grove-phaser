@@ -2,47 +2,47 @@ import { describe, expect, it } from 'vitest';
 import { PLAYER } from '../combat/damage';
 import { clickDamage, hitDamage, tickDamage } from './skillDamage';
 
-const enemy = (element = 'FIRE', physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element, physicalDefense, magicalDefense, critResistance });
+const enemy = (element = 'FIRE', defense = 0, critResistance = 0) => ({ element, defense, critResistance });
 const never = () => 0.99;
 const always = () => 0;
 const none = { buffs: [], debuffs: [] };
 
 describe('hitDamage', () => {
-    it('deals 9.75 with Corte Dimensional (1500 %, pierce 30) on base 1 against physical defense 50', () => {
-        expect(hitDamage({ attacker: PLAYER, percent: 1500, damageType: 'PHYSICAL', armorPierce: 30, defender: enemy('FIRE', 50), random: never, ...none }))
+    it('deals 9.75 with Corte Dimensional (1500 %, pierce 30) on base 1 against defense 50', () => {
+        expect(hitDamage({ attacker: PLAYER, percent: 1500, armorPierce: 30, defender: enemy('FIRE', 50), random: never, ...none }))
             .toEqual({ damage: 9.75, critical: false });
     });
 
     it('adds the skill pierce to the pierce of the attacker, at most 100', () => {
         const attacker = { ...PLAYER, armorPierce: 80 };
 
-        expect(hitDamage({ attacker, percent: 100, damageType: 'PHYSICAL', armorPierce: 30, defender: enemy('FIRE', 50), random: never, ...none }).damage).toBe(1);
+        expect(hitDamage({ attacker, percent: 100, armorPierce: 30, defender: enemy('FIRE', 50), random: never, ...none }).damage).toBe(1);
     });
 
     it('meets the one defense with every hit: 2500 % against physicalDefense 90 deals 2.5', () => {
-        expect(hitDamage({ attacker: PLAYER, percent: 2500, damageType: 'MAGICAL', defender: enemy('FIRE', 90, 20), random: never, ...none }).damage).toBeCloseTo(2.5, 10);
+        expect(hitDamage({ attacker: PLAYER, percent: 2500, defender: enemy('FIRE', 90), random: never, ...none }).damage).toBeCloseTo(2.5, 10);
     });
 
     it('deals 1.5 times more with vsDarkness against a darkness monster, and the same against another element', () => {
-        const base = { attacker: PLAYER, percent: 800, damageType: 'MAGICAL', vsDarkness: 1.5, random: never, ...none };
+        const base = { attacker: PLAYER, percent: 800, vsDarkness: 1.5, random: never, ...none };
 
         expect(hitDamage({ ...base, defender: enemy('FIRE') }).damage).toBe(8);
         expect(hitDamage({ ...base, defender: enemy('DARKNESS') }).damage).toBeCloseTo(8 * 0.9 * 1.5, 10);
     });
 
     it('rolls the critical per hit and doubles a critical', () => {
-        expect(hitDamage({ attacker: PLAYER, percent: 300, damageType: 'PHYSICAL', defender: enemy(), random: always, ...none })).toEqual({ damage: 6, critical: true });
+        expect(hitDamage({ attacker: PLAYER, percent: 300, defender: enemy(), random: always, ...none })).toEqual({ damage: 6, critical: true });
     });
 
     it('forces a critical of 3000 % against critical resistance 100', () => {
-        expect(hitDamage({ attacker: PLAYER, percent: 3000, damageType: 'PHYSICAL', forceCritical: true, defender: enemy('FIRE', 0, 0, 100), random: never, ...none }))
+        expect(hitDamage({ attacker: PLAYER, percent: 3000, forceCritical: true, defender: enemy('FIRE', 0, 100), random: never, ...none }))
             .toEqual({ damage: 60, critical: true });
     });
 
     it('applies the boss damage of the attacker on a boss', () => {
         const attacker = { ...PLAYER, bossDamage: 50 };
 
-        expect(hitDamage({ attacker, percent: 400, damageType: 'PHYSICAL', defender: enemy(), random: never, boss: true, ...none }).damage).toBe(6);
+        expect(hitDamage({ attacker, percent: 400, defender: enemy(), random: never, boss: true, ...none }).damage).toBe(6);
     });
 });
 
@@ -51,15 +51,19 @@ describe('buffs', () => {
         expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, buffs: [ 'ventos' ], debuffs: [] }).damage).toBe(1.5);
     });
 
-    it('adds the click bonuses of Ventos and Bênção and multiplies the physical bonus: 1 x 1.75 x 1.3 = 2.275', () => {
+    it('adds the click bonuses of Ventos and Bênção and multiplies by the Bênção bonus: 1 x 1.75 x 1.3 = 2.275', () => {
         expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, buffs: [ 'ventos', 'bencao' ], debuffs: [] }).damage).toBeCloseTo(2.275, 10);
     });
 
-    it('multiplies physical hits by 1.3 under Bênção but not magical ones, and gives them no click bonus', () => {
+    it('multiplies every skill hit by 1.3 under Bênção and gives it no click bonus', () => {
         const base = { attacker: PLAYER, percent: 100, defender: enemy(), random: never, buffs: [ 'bencao' ], debuffs: [] };
 
-        expect(hitDamage({ ...base, damageType: 'PHYSICAL' }).damage).toBeCloseTo(1.3, 10);
-        expect(hitDamage({ ...base, damageType: 'MAGICAL' }).damage).toBe(1);
+        expect(hitDamage(base).damage).toBeCloseTo(1.3, 10);
+        expect(hitDamage({ ...base, percent: 800, vsDarkness: 1.5 }).damage).toBeCloseTo(10.4, 10);
+    });
+
+    it('multiplies a 200 % tick by 1.3 under Bênção: 2.6', () => {
+        expect(tickDamage({ attacker: PLAYER, percent: 200, defender: enemy(), buffs: [ 'bencao' ], debuffs: [] })).toBeCloseTo(2.6, 10);
     });
 
     it('adds 15 critical points under Fumaça: a roll of 20 crits at 25 % and not at 10 %', () => {
@@ -78,8 +82,8 @@ describe('buffs', () => {
     it('caps 95 + 15 at 100 before the critical resistance: against resistance 50 a roll of 52 does not crit', () => {
         const attacker = { ...PLAYER, critChance: 95 };
 
-        expect(clickDamage({ attacker, defender: enemy('FIRE', 0, 0, 50), random: () => 0.52, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(false);
-        expect(clickDamage({ attacker, defender: enemy('FIRE', 0, 0, 50), random: () => 0.49, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(true);
+        expect(clickDamage({ attacker, defender: enemy('FIRE', 0, 50), random: () => 0.52, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(false);
+        expect(clickDamage({ attacker, defender: enemy('FIRE', 0, 50), random: () => 0.49, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(true);
     });
 });
 
@@ -97,7 +101,7 @@ describe('click multiplier and forced critical', () => {
     });
 
     it('makes the click critical whatever the roll and the critical resistance', () => {
-        expect(clickDamage({ attacker: PLAYER, defender: enemy('FIRE', 0, 0, 100), random: never, ...none, forceCritical: true })).toEqual({ damage: 2, critical: true });
+        expect(clickDamage({ attacker: PLAYER, defender: enemy('FIRE', 0, 100), random: never, ...none, forceCritical: true })).toEqual({ damage: 2, critical: true });
     });
 
     it('does not roll the dice for a forced critical', () => {
@@ -114,22 +118,31 @@ describe('click multiplier and forced critical', () => {
 });
 
 describe('debuffs', () => {
-    it('lowers the physical defense by 30 points under Brado, never below 0', () => {
+    it('lowers the defense by 30 points under Brado, never below 0', () => {
         const brado = { buffs: [], debuffs: [ 'brado' ] };
 
         expect(clickDamage({ attacker: PLAYER, defender: enemy('FIRE', 50), random: never, ...brado }).damage).toBe(0.8);
         expect(clickDamage({ attacker: PLAYER, defender: enemy('FIRE', 10), random: never, ...brado }).damage).toBe(1);
     });
 
-    it('lowers the one defense under Brado for every hit: defense 50 hit at 100 % deals 0.8', () => {
-        expect(hitDamage({ attacker: PLAYER, percent: 100, damageType: 'MAGICAL', defender: enemy('FIRE', 50, 0), random: never, buffs: [], debuffs: [ 'brado' ] }).damage).toBe(0.8);
+    it('lowers the defense under Brado for a skill hit too: Chuva de Meteoros on defense 50 deals 20', () => {
+        expect(hitDamage({ attacker: PLAYER, percent: 2500, defender: enemy('FIRE', 50), random: never, buffs: [], debuffs: [ 'brado' ] }).damage).toBe(20);
     });
 
-    it('multiplies magical damage by 1.25 under Prisão and leaves physical alone', () => {
+    it('multiplies every strike by 1.25 under Prisão', () => {
         const base = { attacker: PLAYER, percent: 100, defender: enemy(), random: never, buffs: [], debuffs: [ 'prisao' ] };
 
-        expect(hitDamage({ ...base, damageType: 'MAGICAL' }).damage).toBe(1.25);
-        expect(hitDamage({ ...base, damageType: 'PHYSICAL' }).damage).toBe(1);
+        expect(hitDamage(base).damage).toBe(1.25);
+        expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, buffs: [], debuffs: [ 'prisao' ] }).damage).toBe(1.25);
+        expect(tickDamage({ attacker: PLAYER, percent: 200, defender: enemy(), buffs: [], debuffs: [ 'prisao' ] })).toBe(2.5);
+    });
+
+    it('multiplies a Base 1.4 click by 1.25 under Prisão: 1.75', () => {
+        expect(clickDamage({ attacker: { ...PLAYER, baseDamage: 1.4 }, defender: enemy(), random: never, buffs: [], debuffs: [ 'prisao' ] }).damage).toBeCloseTo(1.75, 10);
+    });
+
+    it('Prisão and Bênção together make a click 2.03125', () => {
+        expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, buffs: [ 'bencao' ], debuffs: [ 'prisao' ] }).damage).toBeCloseTo(2.03125, 10);
     });
 });
 
@@ -146,42 +159,46 @@ describe('effect factors', () => {
             .toBeCloseTo(1.625, 9);
     });
 
-    it('Ventos at 1.25 and Bênção at 1.5 add 62.5 and 37.5 and multiply physical by 1.45: 2.9', () => {
+    it('Ventos at 1.25 and Bênção at 1.5 add 62.5 and 37.5 and multiply by 1.45: 2.9', () => {
         expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, buffs: [ 'ventos', 'bencao' ], debuffs: [], factors: { ventos: 1.25, bencao: 1.5 } }).damage)
             .toBeCloseTo(2.9, 9);
     });
 
-    it('Bênção at factor 1.5 multiplies a physical hit by 1.45 and leaves a magical hit alone', () => {
+    it('Bênção at factor 1.5 multiplies every hit by 1.45', () => {
         const base = { attacker: PLAYER, percent: 100, defender: enemy(), random: never, buffs: [ 'bencao' ], debuffs: [], factors: { bencao: 1.5 } };
 
-        expect(hitDamage({ ...base, damageType: 'PHYSICAL' }).damage).toBeCloseTo(1.45, 9);
-        expect(hitDamage({ ...base, damageType: 'MAGICAL' }).damage).toBe(1);
+        expect(hitDamage(base).damage).toBeCloseTo(1.45, 9);
+        expect(hitDamage({ ...base, percent: 800, vsDarkness: 1.5, defender: enemy('DARKNESS') }).damage).toBeCloseTo(15.66, 9);
+    });
+
+    it('Bênção at factor 1.5 makes a click 1.99375', () => {
+        expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, buffs: [ 'bencao' ], debuffs: [], factors: { bencao: 1.5 } }).damage).toBeCloseTo(1.99375, 9);
     });
 
     it('Fumaça at factor 1.5 adds 22.5 critical points: a roll of 0.32 crits and 0.33 does not', () => {
-        const base = { attacker: PLAYER, percent: 100, damageType: 'PHYSICAL', defender: enemy(), buffs: [ 'fumaca' ], debuffs: [], factors: { fumaca: 1.5 } };
+        const base = { attacker: PLAYER, percent: 100, defender: enemy(), buffs: [ 'fumaca' ], debuffs: [], factors: { fumaca: 1.5 } };
 
         expect(hitDamage({ ...base, random: () => 0.32 })).toEqual({ damage: 2, critical: true });
         expect(hitDamage({ ...base, random: () => 0.33 })).toEqual({ damage: 1, critical: false });
         expect(hitDamage({ ...base, factors: { fumaca: 1 }, random: () => 0.32 }).critical).toBe(false);
     });
 
-    it('Brado at factor 1.5 removes 45 physical defense, never below 0', () => {
-        const brado = { attacker: PLAYER, percent: 100, damageType: 'PHYSICAL', buffs: [], debuffs: [ 'brado' ], random: never, factors: { brado: 1.5 } };
+    it('Brado at factor 1.5 removes 45 defense, never below 0', () => {
+        const brado = { attacker: PLAYER, percent: 100, buffs: [], debuffs: [ 'brado' ], random: never, factors: { brado: 1.5 } };
 
         expect(hitDamage({ ...brado, defender: enemy('FIRE', 50) }).damage).toBeCloseTo(0.95, 9);
         expect(hitDamage({ ...brado, defender: enemy('FIRE', 40) }).damage).toBe(1);
     });
 
-    it('Prisão at factor 1.25 multiplies magical damage by 1.3125', () => {
+    it('Prisão at factor 1.25 multiplies every strike by 1.3125', () => {
         const base = { attacker: PLAYER, percent: 100, defender: enemy(), random: never, buffs: [], debuffs: [ 'prisao' ], factors: { prisao: 1.25 } };
 
-        expect(hitDamage({ ...base, damageType: 'MAGICAL' }).damage).toBeCloseTo(1.3125, 9);
-        expect(hitDamage({ ...base, damageType: 'PHYSICAL' }).damage).toBe(1);
+        expect(hitDamage(base).damage).toBeCloseTo(1.3125, 9);
+        expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: never, buffs: [], debuffs: [ 'prisao' ], factors: { prisao: 1.25 } }).damage).toBeCloseTo(1.3125, 9);
     });
 
-    it('a tick reads the factor of Bênção at the tick: 100 % physical at factor 1.5 is 1.45', () => {
-        expect(tickDamage({ attacker: PLAYER, percent: 100, damageType: 'PHYSICAL', buffs: [ 'bencao' ], debuffs: [], defender: enemy(), factors: { bencao: 1.5 } }))
+    it('a tick reads the factor of Bênção at the tick: 100 % at factor 1.5 is 1.45', () => {
+        expect(tickDamage({ attacker: PLAYER, percent: 100, buffs: [ 'bencao' ], debuffs: [], defender: enemy(), factors: { bencao: 1.5 } }))
             .toBeCloseTo(1.45, 9);
     });
 });
@@ -190,11 +207,12 @@ describe('tickDamage', () => {
     it('is percent of the base damage and never critical, whatever the attacker chance', () => {
         const attacker = { ...PLAYER, critChance: 100 };
 
-        expect(tickDamage({ attacker, percent: 200, damageType: 'MAGICAL', defender: enemy(), ...none })).toBe(2);
+        expect(tickDamage({ attacker, percent: 200, defender: enemy(), ...none })).toBe(2);
     });
 
     it('follows the defense, Bênção and Prisão at the tick', () => {
-        expect(tickDamage({ attacker: PLAYER, percent: 100, damageType: 'PHYSICAL', defender: enemy('FIRE', 50), buffs: [ 'bencao' ], debuffs: [ 'brado' ] })).toBeCloseTo(0.8 * 1.3, 10);
-        expect(tickDamage({ attacker: PLAYER, percent: 100, damageType: 'MAGICAL', defender: enemy(), buffs: [], debuffs: [ 'prisao' ] })).toBe(1.25);
+        expect(tickDamage({ attacker: PLAYER, percent: 100, defender: enemy('FIRE', 50), buffs: [ 'bencao' ], debuffs: [ 'brado' ] })).toBeCloseTo(0.8 * 1.3, 10);
+        expect(tickDamage({ attacker: PLAYER, percent: 100, defender: enemy(), buffs: [], debuffs: [ 'prisao' ] })).toBe(1.25);
+        expect(tickDamage({ attacker: PLAYER, percent: 100, defender: enemy(), buffs: [ 'bencao' ], debuffs: [ 'prisao' ] })).toBeCloseTo(1.625, 10);
     });
 });

@@ -517,6 +517,52 @@ describe('damage over time', () => {
         expect(skills.advance(1000, { monster }).hits[0].damage).toBe(1);
     });
 
+    it('follows Bênção at the tick for a Tempestade Arcana tick too: 2.6 at the second it ends, then 2', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'seraphine', 1);
+        skills.advance(14000, { monster });
+        use(skills, monster, 'orina', 2);
+
+        expect(skills.advance(1000, { monster }).hits[0].damage).toBeCloseTo(2.6, 10);
+        expect(skills.advance(1000, { monster }).hits[0].damage).toBe(2);
+    });
+
+    it('follows Prisão at the tick: Tempestade Arcana ticks 2.5 at 1 s and at 2 s, when Prisão ends, then 2', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'orina', 1);
+        use(skills, monster, 'orina', 2);
+
+        expect(skills.advance(1000, { monster }).hits[0].damage).toBe(2.5);
+        expect(skills.advance(1000, { monster }).hits[0].damage).toBe(2.5);
+        expect(skills.advance(1000, { monster }).hits[0].damage).toBe(2);
+    });
+
+    it('ends Bênção after 15 s: Luz Divina deals 10.4 under it and 8 after', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'seraphine', 1);
+        expect(use(skills, monster, 'seraphine', 2).hits[0].damage).toBeCloseTo(10.4, 10);
+
+        skills.advance(25000, { monster });
+        expect(use(skills, monster, 'seraphine', 2).hits[0].damage).toBe(8);
+    });
+
+    it('ends Prisão after 2 s: a click deals 1.25 under it and 1 after', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'orina', 1);
+        expect(skills.click({ attacker: PLAYER, monster, boss: false }).damage).toBe(1.25);
+
+        skills.advance(2000, { monster });
+        expect(skills.click({ attacker: PLAYER, monster, boss: false }).damage).toBe(1);
+    });
+
     it('applies the boss damage of the attacker to a tick on a boss', () => {
         const skills = combat();
         const monster = monsterOf();

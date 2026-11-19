@@ -553,7 +553,7 @@ The chips keep the class `tag` and the `.enemy-stats .tag` rule.
 
 ---
 
-### T6: Make Prisão and Bênção raise every damage and Brado lower the one defense [ ]
+### T6: Make Prisão and Bênção raise every damage and Brado lower the one defense [x]
 
 **Owner**: game-dev
 **Goal**: `strike` multiplies every click, hit, aimed shot and tick by the Bênção and Prisão factors (with the level factor `f` they were cast with), Brado writes `defense`, and the damage functions take no `damageType` (UDMG-02, UDMG-03, UDMG-04).
@@ -648,8 +648,8 @@ The existing skill-level tests of `describe('skill levels')` keep their values: 
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] `grep -n "PHYSICAL\|MAGICAL\|damageType\|physicalDefense" game/src/domain/skills/skillDamage.js game/src/domain/skills/skillDamage.test.js` finds nothing.
-- [ ] The edited and new tests pass; the whole Vitest suite passes.
+- [x] `grep -n "PHYSICAL\|MAGICAL\|damageType\|physicalDefense" game/src/domain/skills/skillDamage.js game/src/domain/skills/skillDamage.test.js` finds nothing.
+- [x] The edited and new tests pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): let Prisão and Bênção raise every damage`
 
