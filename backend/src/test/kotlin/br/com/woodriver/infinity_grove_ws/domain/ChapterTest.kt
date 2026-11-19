@@ -434,4 +434,83 @@ class ChapterTest {
             }
         }
     }
+
+    @Test
+    fun `an add with health 0 is rejected`() {
+        val e = assertFailsWith<IllegalArgumentException> { StageAdd(0, 30) }
+
+        assertEquals("add health 0 must be at least 1", e.message)
+    }
+
+    @Test
+    fun `an add with health 1 is accepted`() {
+        assertEquals(1L, StageAdd(1, 30).health)
+    }
+
+    @Test
+    fun `an add buff of -1 or 91 is rejected and 0 and 90 are accepted`() {
+        assertFailsWith<IllegalArgumentException> { StageAdd(5, -1) }
+        val e = assertFailsWith<IllegalArgumentException> { StageAdd(5, 91) }
+
+        assertEquals("add defense-buff 91 must be between 0 and 90", e.message)
+        assertEquals(0, StageAdd(5, 0).defenseBuff)
+        assertEquals(90, StageAdd(5, 90).defenseBuff)
+    }
+
+    @Test
+    fun `a stage with 3 adds is rejected and names the stage`() {
+        val e =
+            assertFailsWith<IllegalArgumentException> {
+                StageDefinition(1, 5, 10, 50, 30_000, adds = List(3) { StageAdd(1, 0) })
+            }
+
+        assertEquals("Stage 1: at most 2 adds, got 3", e.message)
+        assertEquals(2, StageDefinition(1, 5, 10, 50, 30_000, adds = List(2) { StageAdd(1, 0) }).adds.size)
+    }
+
+    @Test
+    fun `a stage without adds has an empty list`() {
+        assertEquals(emptyList(), stage().adds)
+    }
+
+    @Test
+    fun `chapters 1 to 10 seed no adds`() {
+        (1..10).forEach { c ->
+            ChapterDefinition.of(c).stages.forEach { stage ->
+                assertEquals(emptyList(), stage.adds, "chapter $c stage ${stage.number}")
+            }
+        }
+    }
+
+    @Test
+    fun `chapter 11 seeds two adds of 30 with 3 times the phase monster health on every stage`() {
+        val chapter = ChapterDefinition.of(11)
+
+        assertEquals(listOf(StageAdd(1_966_080, 30), StageAdd(1_966_080, 30)), chapter.stage(1).adds)
+        assertEquals(listOf(StageAdd(3_735_552, 30), StageAdd(3_735_552, 30)), chapter.stage(10).adds)
+        chapter.stages.forEach { stage ->
+            assertEquals(List(2) { StageAdd(3 * stage.monsterHealth, 30) }, stage.adds, "stage ${stage.number}")
+        }
+    }
+
+    @Test
+    fun `chapters 12 to 15 seed buffs of 35, 40, 45 and 50`() {
+        mapOf(12 to 35, 13 to 40, 14 to 45, 15 to 50).forEach { (c, buff) ->
+            ChapterDefinition.of(c).stages.forEach { stage ->
+                assertEquals(List(2) { StageAdd(3 * stage.monsterHealth, buff) }, stage.adds, "chapter $c stage ${stage.number}")
+            }
+        }
+    }
+
+    @Test
+    fun `chapter 15 stage 1 seeds adds of 31457280 health`() {
+        assertEquals(listOf(StageAdd(31_457_280, 50), StageAdd(31_457_280, 50)), ChapterDefinition.of(15).stage(1).adds)
+    }
+
+    @Test
+    fun `addsOf of a chapter outside 11 to 15 is empty`() {
+        assertEquals(emptyList(), ChapterDefinition.addsOf(10, 100))
+        assertEquals(emptyList(), ChapterDefinition.addsOf(16, 100))
+        assertEquals(emptyList(), ChapterDefinition.addsOf(1, 100))
+    }
 }

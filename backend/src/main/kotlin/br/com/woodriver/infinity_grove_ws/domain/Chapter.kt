@@ -22,6 +22,19 @@ data class EnemyStats(
     }
 }
 
+/** One add of a miniboss (spec miniboss-adds): its health and the points it adds to the miniboss's defense while it lives. */
+data class StageAdd(
+    val health: Long,
+    val defenseBuff: Int,
+) {
+    init {
+        require(health >= 1) { "add health $health must be at least 1" }
+        require(defenseBuff in 0..EnemyStats.MAX_DEFENSE) {
+            "add defense-buff $defenseBuff must be between 0 and ${EnemyStats.MAX_DEFENSE}"
+        }
+    }
+}
+
 /** The numbers of one stage: its phase monsters, its miniboss, the miniboss time limit and the drop rule each one pays. */
 data class StageDefinition(
     val number: Int,
@@ -33,6 +46,7 @@ data class StageDefinition(
     val miniboss: EnemyStats = EnemyStats.DEFAULT,
     val monsterDropRuleId: Int = 1,
     val minibossDropRuleId: Int = 1,
+    val adds: List<StageAdd> = emptyList(),
 ) {
     init {
         require(number >= 1) { "Stage number $number must be at least 1" }
@@ -40,6 +54,11 @@ data class StageDefinition(
         require(monsterHealth >= 1) { "Stage $number: monster-health $monsterHealth must be at least 1" }
         require(minibossHealth >= 1) { "Stage $number: miniboss-health $minibossHealth must be at least 1" }
         require(minibossTimeLimitMs >= 1) { "Stage $number: miniboss-time-limit-ms $minibossTimeLimitMs must be at least 1" }
+        require(adds.size <= MAX_ADDS) { "Stage $number: at most $MAX_ADDS adds, got ${adds.size}" }
+    }
+
+    companion object {
+        const val MAX_ADDS = 2
     }
 }
 
@@ -92,6 +111,18 @@ data class ChapterDefinition(
         private const val LAST_DOUBLED_COIN_CHAPTER = 8
         private const val COIN_FACTOR_STEP = 32
         private const val KILL_INTERVAL_MS = 1500L
+        private const val ADDS_PER_MINIBOSS = 2
+        private const val ADD_HEALTH_FACTOR = 3
+
+        /** The buff of each add by chapter (spec miniboss-adds, Add Table); chapters not listed have no adds. */
+        private val ADD_BUFFS = mapOf(11 to 30, 12 to 35, 13 to 40, 14 to 45, 15 to 50)
+
+        /** The adds of a stage of chapter [number] whose phase monster has [monsterHealth]: two of 3 times that health from chapter 11 to 15. */
+        fun addsOf(
+            number: Int,
+            monsterHealth: Long,
+        ): List<StageAdd> =
+            ADD_BUFFS[number]?.let { buff -> List(ADDS_PER_MINIBOSS) { StageAdd(monsterHealth * ADD_HEALTH_FACTOR, buff) } } ?: emptyList()
 
         /**
          * The three drop rules seeded for chapter [number]: the phase monster (id 3c-2), the miniboss (3c-1) and the chapter boss
@@ -175,6 +206,7 @@ data class ChapterDefinition(
                             miniboss = EnemyStats(element, defense, critResistance),
                             monsterDropRuleId = monsterRuleId(number),
                             minibossDropRuleId = minibossRuleId(number),
+                            adds = addsOf(number, monsterHealth),
                         )
                     },
                 boss =

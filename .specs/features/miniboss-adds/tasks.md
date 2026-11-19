@@ -104,7 +104,7 @@ T15 → T16
 
 ## Task Breakdown
 
-### T1: Seed the adds of the chapter 11 to 15 minibosses [ ]
+### T1: Seed the adds of the chapter 11 to 15 minibosses [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The chapter domain carries 0 to 2 adds per stage and seeds 2 adds with the Add Table buff and 3 times the phase monster health on every stage of chapters 11 to 15 (ADDS-01, spec Adds AC 2).
@@ -173,7 +173,9 @@ data class StageAdd(
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 10 cases pass and every existing backend test passes.
+- [x] The 10 cases pass and every existing backend test passes.
+
+**Note (T1 done)**: `ChapterSeederIT` `application start seeds chapters 1 to 15` compared the stored chapter with `ChapterDefinition.of(n)`, which now carries adds that nothing stores until T2. In T1 the test compares against `of(n)` with the adds removed (helper `withoutAdds`); T2 restores the plain `assertEquals(ChapterDefinition.of(it), repository.findByNumber(it))`.
 
 **Commit**: `feat(backend): seed the adds of the chapter 11 to 15 minibosses`
 

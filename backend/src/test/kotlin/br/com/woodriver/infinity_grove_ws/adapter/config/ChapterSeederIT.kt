@@ -44,6 +44,8 @@ class ChapterSeederIT : IntegrationTestBase() {
         if (jpaChapterRepository.existsById(number)) jpaChapterRepository.deleteById(number)
     }
 
+    private fun ChapterDefinition.withoutAdds() = copy(stages = stages.map { it.copy(adds = emptyList()) })
+
     @Test
     fun `application start leaves chapter 1 with the seed values`() {
         assertEquals(ChapterDefinition.first(), repository.findByNumber(1))
@@ -61,7 +63,8 @@ class ChapterSeederIT : IntegrationTestBase() {
 
     @Test
     fun `application start seeds chapters 1 to 15`() {
-        (1..15).forEach { assertEquals(ChapterDefinition.of(it), repository.findByNumber(it)) }
+        // T1 only: the adds are not stored yet (T2 adds stage_adds and restores the plain comparison)
+        (1..15).forEach { assertEquals(ChapterDefinition.of(it).withoutAdds(), repository.findByNumber(it)) }
         assertEquals(524_288_000L, repository.findByNumber(15)!!.bossHealth)
         assertEquals(3_112_960L, repository.findByNumber(10)!!.stage(10).minibossHealth)
         val rules = dropRules.findAll()
