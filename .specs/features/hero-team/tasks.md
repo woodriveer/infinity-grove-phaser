@@ -2464,7 +2464,7 @@ let teamFailure = null;
 
 ---
 
-### T26: Cover the allies on the field in the browser [ ]
+### T26: Cover the allies on the field in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: e2e scenarios prove the formation positions and sizes, the attack motion, the redraws and the click-through on the real scene (TEAM-12).
@@ -2503,7 +2503,7 @@ let teamFailure = null;
 **Gate**: full - `cd game && npx playwright test e2e/heroTeamField.spec.js` then `cd game && npm test && npx playwright test`
 **Done when**:
 
-- [ ] The 10 scenarios pass; the whole Playwright suite passes.
+- [x] The 10 scenarios pass; the whole Playwright suite passes.
 
 **Commit**: `test(game): cover the allies on the field`
 
