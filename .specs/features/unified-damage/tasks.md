@@ -913,7 +913,7 @@ const adopt = (tree) =>
 
 ---
 
-### T12: Cover the unified damage in the browser [ ]
+### T12: Cover the unified damage in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: A new e2e file proves every player-visible criterion of the feature on the real scene against the fake backend (UDMG-01 to UDMG-04, UDMG-06, UDMG-09 to UDMG-11).
@@ -973,7 +973,7 @@ const strikeNow = (page) => page.evaluate(() => {
 **Gate**: full - `cd game && npx playwright test e2e/unifiedDamage.spec.js` then `cd game && npm test && npx playwright test`
 **Done when**:
 
-- [ ] The 9 scenarios pass; the whole Playwright suite passes.
+- [x] The 9 scenarios pass; the whole Playwright suite passes. (390 tests, 388 passed; the 2 failures are not caused by the task: `dragEquip.spec.js:586` fails the same way on the unedited fake backend, `splash.spec.js:77` is flaky and passed on a rerun.)
 
 **Commit**: `test(game): cover the unified damage in the browser`
 
