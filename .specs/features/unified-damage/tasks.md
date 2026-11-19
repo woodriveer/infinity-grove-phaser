@@ -979,7 +979,7 @@ const strikeNow = (page) => page.evaluate(() => {
 
 ---
 
-### T13: Rewrite the design doc and the art prompts for one damage [ ]
+### T13: Rewrite the design doc and the art prompts for one damage [x]
 
 **Owner**: game-dev
 **Goal**: `README.md` describes one damage and one defense with the new skill texts, and `PROMPTS_ASSETS_UI.md` retires the magical break icon (UDMG-12).
@@ -1015,8 +1015,8 @@ const strikeNow = (page) => page.evaluate(() => {
 **Gate**: build - `grep -n -E "dano mágico|dano físico|Poder Arcano|resistência física|resistência mágica|de Força" README.md` prints nothing, then `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The grep prints nothing.
-- [ ] `README.md` contains `**Bônus de líder:** +20% de dano total.` and `- **Defesa:** reduz todo o dano recebido (cliques e habilidades)`.
+- [x] The grep prints nothing.
+- [x] `README.md` contains `**Bônus de líder:** +20% de dano total.` and `- **Defesa:** reduz todo o dano recebido (cliques e habilidades)`.
 
 **Commit**: `docs: describe one damage and one defense`
 

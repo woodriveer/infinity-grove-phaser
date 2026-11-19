@@ -47,12 +47,12 @@ novos guardiões.
 
 ## Atributos de combate
 
-**Heróis:** Força (dano físico), Poder Arcano (dano mágico), Velocidade de
-Ataque, Precisão, Chance de Crítico, Resistência.
+**Heróis:** Dano, Velocidade de Ataque, Precisão, Chance de Crítico,
+Resistência. Existe um único tipo de dano.
 
 **Inimigos:**
 - **Evasão:** chance de esquivar dos ataques (reduzida por Precisão)
-- **Resistência física / mágica:** reduz o dano recebido de cada tipo
+- **Defesa:** reduz todo o dano recebido (cliques e habilidades)
 - **Fúria (chefes):** o timer do chefe (30s). Quando acaba, o jogador volta uma
   onda. Efeitos de controle (atordoar, prender) pausam a Fúria.
 - **Interrupção (chefes):** chefes podem interromper habilidades de conjuração
@@ -72,9 +72,9 @@ cristalizado na seiva ancestral. Especialista em ataque e controle.
 
 | Habilidade | Tipo | Efeito | Recarga |
 |---|---|---|---|
-| **Corte Dimensional** | Ataque | Um golpe que rasga o próprio espaço, causando 1500% de dano físico a todos os inimigos e ignorando 30% da resistência física. | 20s |
+| **Corte Dimensional** | Ataque | Um golpe que rasga o próprio espaço, causando 1500% de dano a todos os inimigos e ignorando 30% da defesa. | 20s |
 | **Investida do Baluarte** | Controle | Kael avança com o escudo, causa 400% de dano e atordoa os inimigos por 3s (pausa a Fúria dos chefes). | 25s |
-| **Brado Aterrador** | Debuff | Um grito de guerra que causa Medo: inimigos perdem 30% de resistência física por 10s. | 30s |
+| **Brado Aterrador** | Debuff | Um grito de guerra que causa Medo: inimigos perdem 30 pontos de defesa por 10s. | 30s |
 
 ### Lyra Folhaveloz — Arqueira
 Batedora élfica que caça nas copas da floresta; dizem que suas flechas seguem o
@@ -83,20 +83,20 @@ vento. Especialista em dano rápido e preciso.
 
 | Habilidade | Tipo | Efeito | Recarga |
 |---|---|---|---|
-| **Flecha Dupla** | Ataque | Dispara duas flechas, cada uma causando 300% de dano físico. | 8s |
+| **Flecha Dupla** | Ataque | Dispara duas flechas, cada uma causando 300% de dano. | 8s |
 | **Tiro Preciso** | Ataque (conjuração) | Concentra a mira por 2s e dispara uma flecha com crítico garantido de 3000% de dano. Se Lyra for interrompida, a habilidade é perdida. | 30s |
 | **Ventos Ligeiros** | Buff de grupo | Lyra e todos os aliados ganham +50% de velocidade de ataque por 12s. | 40s |
 
 ### Orina Brumaestrela — Maga
 Estudiosa das estrelas que caem sobre a floresta; canaliza a magia bruta que
-corre pelos galhos da Grande Árvore. Especialista em dano mágico em área.
-**Bônus de líder:** +20% de Poder Arcano para todo o grupo.
+corre pelos galhos da Grande Árvore. Especialista em dano em área.
+**Bônus de líder:** +20% de dano total.
 
 | Habilidade | Tipo | Efeito | Recarga |
 |---|---|---|---|
-| **Prisão de Espinhos** | Controle / debuff | Vinhas mágicas prendem os inimigos por 2s; enquanto presos, recebem +25% de dano mágico. | 18s |
-| **Tempestade Arcana** | Ataque contínuo | Raios caem por 6s, causando 200% de dano mágico por segundo a todos os inimigos. | 35s |
-| **Chuva de Meteoros** | Ataque | Uma chuva de estrelas causa 2500% de dano mágico em área. | 45s |
+| **Prisão de Espinhos** | Controle / debuff | Vinhas de espinhos prendem os inimigos por 2s; enquanto presos, recebem +25% de dano. | 18s |
+| **Tempestade Arcana** | Ataque contínuo | Raios caem por 6s, causando 200% de dano por segundo a todos os inimigos. | 35s |
+| **Chuva de Meteoros** | Ataque | Uma chuva de estrelas causa 2500% de dano em área. | 45s |
 
 ### Seraphine Aurora — Clériga
 Sacerdotisa que ouve a voz da Grande Árvore; sua luz é o veneno natural das
@@ -105,8 +105,8 @@ criaturas do Submundo. Especialista em suporte e buffs.
 
 | Habilidade | Tipo | Efeito | Recarga |
 |---|---|---|---|
-| **Bênção da Grande Árvore** | Buff de grupo | Por 15s, todos os aliados ganham +20% de Precisão, +30% de Força e +25% de velocidade de ataque. | 30s |
-| **Luz Divina** | Ataque | Um pilar de luz atinge todos os inimigos, causando 800% de dano mágico (+50% contra criaturas do Submundo). | 25s |
+| **Bênção da Grande Árvore** | Buff de grupo | Por 15s, todos os aliados ganham +20% de Precisão, +30% de dano e +25% de velocidade de ataque. | 30s |
+| **Luz Divina** | Ataque | Um pilar de luz atinge todos os inimigos, causando 800% de dano (+50% contra criaturas do Submundo). | 25s |
 | **Carrilhão da Aurora** | Buff de grupo | O badalar de um sino sagrado aumenta a Resistência dos aliados em 40% e os torna imunes a efeitos negativos por 10s. | 45s |
 
 ### Vex Sombraespinho — Assassino
@@ -121,7 +121,7 @@ eles mesmos. Especialista em dano contínuo e precisão.
 | **Golpe Sangrento** | Ataque + dano contínuo | Causa 600% de dano e aplica Sangramento: 150% de dano por segundo durante 6s. | 20s |
 
 ## Sinergias entre habilidades
-- **Medo + dano físico:** Brado Aterrador antes de Corte Dimensional, Flecha
+- **Medo + dano:** Brado Aterrador antes de Corte Dimensional, Flecha
   Dupla ou Golpe Sangrento.
 - **Atordoar + conjuração:** Investida do Baluarte ou Prisão de Espinhos
   garantem que o Tiro Preciso não seja interrompido.
@@ -135,10 +135,8 @@ eles mesmos. Especialista em dano contínuo e precisão.
   aplicados pelos chefes.
 
 ## Inimigos e camada estratégica
-- **Blindados:** alta resistência física (fracos contra Maga e Clériga).
+- **Blindados:** alta defesa (fracos contra Brado Aterrador e Quebra de defesa).
 - **Ágeis:** alta evasão (fracos contra Bomba de Fumaça e Bênção).
-- **Conjuradores:** alta resistência mágica (fracos contra Guerreiro e
-  Arqueira).
 - **Chefes:** muita vida, Fúria, interrupções e debuffs (exigem controle e
   combos).
 

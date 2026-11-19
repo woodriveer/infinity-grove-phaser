@@ -176,14 +176,15 @@ around it, looks more grand than a small hourglass.
 
 ### Ramo Quebra de defesa
 
-#### 3.3 Quebra da defesa física — `talent-break-physical.png`
+#### 3.3 Quebra de defesa — `talent-break-physical.png`
 ```
 [ESTILO DOS ÍCONES]
 OBJECT: a cracked round iron shield split in the middle by a glowing ember-red
 fracture, small metal shards flying off, red-orange glow in the crack.
 ```
 
-#### 3.4 Quebra da defesa mágica — `talent-break-magical.png`
+#### 3.4 (retirado) Quebra da defesa mágica — `talent-break-magical.png`
+Não gerar: o talento saiu do jogo com unified-damage (AD-021).
 ```
 [ESTILO DOS ÍCONES]
 OBJECT: a shattering translucent magic barrier in the shape of a hexagonal rune
@@ -279,8 +280,7 @@ same icon, still centered and inside the safe margin.
 |---|---|---|---|
 | Tempo do miniboss (3.1) | `talent-miniboss-time-g2.png` | `talent-miniboss-time-g3.png` | G2: areia com brilho mais forte; G3: chifres dourados na tampa |
 | Tempo do chefe (3.2) | `talent-boss-time-g2.png` | `talent-boss-time-g3.png` | G2: coroa de prata; G3: coroa dourada com gemas e areia que flutua |
-| Quebra física (3.3) | `talent-break-physical-g2.png` | `talent-break-physical-g3.png` | G2: rachadura maior, escudo de aço; G3: escudo dourado partido em 2 metades com luz saindo |
-| Quebra mágica (3.4) | `talent-break-magical-g2.png` | `talent-break-magical-g3.png` | G2: runa extra e mais cacos; G3: barreira dupla se estilhaçando com núcleo brilhante |
+| Quebra de defesa (3.3) | `talent-break-physical-g2.png` | `talent-break-physical-g3.png` | G2: rachadura maior, escudo de aço; G3: escudo dourado partido em 2 metades com luz saindo |
 | Quebra de crítico (3.5) | `talent-break-crit-g2.png` | `talent-break-crit-g3.png` | G2: elo de aço com faísca maior; G3: elo dourado explodindo em estrela |
 | Dano de clique (3.6) | `talent-click-damage-g2.png` | `talent-click-damage-g3.png` | G2: luva de aço e 2 anéis de onda; G3: luva dourada e 3 anéis de onda com raios |
 | Chance de crítico (3.7) | `talent-crit-chance-g2.png` | `talent-crit-chance-g3.png` | G2: mira com 2 estrelas; G3: mira dourada com asas de folhas |
