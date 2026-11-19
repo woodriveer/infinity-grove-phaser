@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dano unificado</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+:root[data-theme="dark"] { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+ul { padding-left: 20px; }
+</style>
+<h1>Dano unificado (unified-damage)</h1>
+<p class="sub">Relatório de release v0.5.0 &middot; faixa de commits <code>8ed5284..d944140</code> (19 commits) &middot; 2026-11-19</p>
+<p><span class="verdict">PASS</span> &nbsp;O Verifier aprovou na rodada 2 de 3 (<code>validation.md</code>, <code>8b2e609</code>) e o product-owner aceitou contra a spec (<code>d944140</code>).</p>
+
+<h2>Resumo do Verifier</h2>
+<div class="cards">
+<div class="card"><div class="n">23</div><div class="l">mutantes (sensor)</div></div>
+<div class="card"><div class="n">22</div><div class="l">mortos</div></div>
+<div class="card"><div class="n">1</div><div class="l">sobreviveu (M10, equivalente)</div></div>
+<div class="card"><div class="n">37</div><div class="l">critérios de aceite, todos cobertos</div></div>
+</div>
+<ul>
+<li>Rodada 1: 18 mutantes, 16 mortos; M10 equivalente e M19/M20 sobreviveram (tiro mirado sob Prisão de Espinhos e Bênção da Grande Árvore sem teste).</li>
+<li>Rodada 2: dois testes novos em <code>skillCombat.test.js</code> (75 sob Prisão, 78 sob Bênção); M19 e M20 mortos, mais 3 mutantes novos (M21 a M23) mortos.</li>
+<li>M10 é equivalente: os dois chamadores passam por <code>monsterAfterBreak</code>, que sempre grava <code>defense</code>.</li>
+</ul>
+
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Parte</th><th>Linhas adicionadas</th><th>Linhas removidas</th><th>Arquivos</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>, inclui a migração V11)</td><td class="num">99</td><td class="num">31</td><td class="num">8</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem <code>*.test.js</code>, mais <code>game/public/*.css</code>)</td><td class="num">65</td><td class="num">66</td><td class="num">11</td></tr>
+<tr><td><b>Total</b></td><td class="num">164</td><td class="num">97</td><td class="num">19</td></tr>
+</table></div>
+<p>Fonte: <code>git diff --numstat 8ed5284..d944140</code>. Specs, testes, imagens e o roteiro de capturas <code>game/ui-review/unifiedDamage.shots.js</code> não contam como produção.</p>
+
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th>Linhas +</th><th>Linhas -</th><th>Arquivos</th><th>Testes antes &rarr; depois</th><th>Adicionados</th><th>Total após a execução</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td class="num">581</td><td class="num">101</td><td class="num">14</td><td class="num">1013 &rarr; 1043</td><td class="num">+30</td><td class="num">1043 (0 falhas)</td></tr>
+<tr><td>Unitário do jogo (<code>game/src/**/*.test.js</code>)</td><td class="num">356</td><td class="num">135</td><td class="num">13</td><td class="num">1712 &rarr; 1744</td><td class="num">+32</td><td class="num">1813 (0 falhas)</td></tr>
+<tr><td>e2e (<code>game/e2e</code>)</td><td class="num">273</td><td class="num">30</td><td class="num">6</td><td class="num">374 &rarr; 385</td><td class="num">+11</td><td class="num">392 (389 passaram, 3 falhas alheias)</td></tr>
+</table></div>
+<p>Testes antes e depois são contagens estáticas de declarações (<code>@Test</code>, <code>it(</code>/<code>test(</code>) em <code>8ed5284</code> e <code>d944140</code>. O total do unitário vem da execução do Verifier em <code>c7cf3a4</code>, que expande testes parametrizados; o do e2e vem da execução completa em <code>24c2a07</code>. Os testes que fixavam a divisão física/mágica foram renomeados para o novo comportamento, não apagados.</p>
+<p>Suíte do deploy (<code>node --test --experimental-test-coverage</code>, executada para este relatório): 289 testes, 287 passaram, 2 falharam (ver abaixo). <code>deploy/</code> não mudou na faixa.</p>
+
+<h2>Cobertura dos testes unitários</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Backend (JaCoCo)</td><td>projeto inteiro</td><td class="num">99,02% (2839/2867)</td><td class="num">93,14% (869/933)</td></tr>
+<tr><td>Backend (JaCoCo)</td><td>7 arquivos Kotlin que a feature mudou</td><td class="num">98,35% (597/607)</td><td class="num">90,06% (145/161)</td></tr>
+<tr><td>Jogo (Vitest, v8)</td><td>projeto inteiro</td><td class="num">98,43% (2953/3000)</td><td class="num">95,55% (1397/1462)</td></tr>
+<tr><td>Jogo (Vitest, v8)</td><td>10 arquivos que a feature mudou</td><td class="num">98,56% (819/831)</td><td class="num">95,28% (464/487)</td></tr>
+<tr><td>Deploy (node:test)</td><td><code>deploy/</code> inteiro</td><td class="num">96,15%</td><td class="num">95,46%</td></tr>
+</table></div>
+<p>Backend e unitário do jogo vêm dos resumos da execução do Verifier em <code>c7cf3a4</code> (<code>coverage/</code>); depois dele só mudaram documentos. O deploy foi medido agora. A migração SQL não entra no JaCoCo; ela é exercitada por <code>UnifiedDamageMigrationIT</code>.</p>
+
+<h2>Cobertura e2e</h2>
+<div class="scroll"><table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Jogo inteiro</td><td class="num">92,70% (2782/3001)</td><td class="num">77,10% (906/1175)</td></tr>
+<tr><td>10 arquivos de produção que a feature mudou</td><td class="num">92,54% (769/831)</td><td class="num">75,83% (298/393)</td></tr>
+</table></div>
+<p>Execução completa em <code>24c2a07</code> mais <code>unifiedDamage.spec.js</code> reexecutado em <code>c7cf3a4</code> com <code>--keep</code>; nenhum código de produção mudou entre os dois. O número é um limite inferior: uma página recarregada dentro de um teste perde o que contou antes do recarregamento.</p>
+
+<h2>Cenários e2e da feature (<code>game/e2e/unifiedDamage.spec.js</code>)</h2>
+<p><span class="ok">11 de 11 passaram.</span> Cobrem a ficha única de Defesa na linha do inimigo (e o payload antigo 50/10), Prisão de Espinhos sobre um clique, Bênção da Grande Árvore sobre uma habilidade, a quebra de defesa (15% e depois 14% na mesma criatura), a coluna Quebra de defesa em Talentos sem os talentos mágicos, o painel de atributos com 10 linhas e o bônus de líder de Orina em texto.</p>
+
+<h2>Falhas que a feature não causou</h2>
+<div class="scroll"><table>
+<tr><th>Teste</th><th>Motivo</th></tr>
+<tr><td><code>game/e2e/dragEquip.spec.js:586</code></td><td>Falha igual em <code>8ed5284</code> (jogo antes da feature): scrollTop 124 contra 0. Passa sozinho em <code>24c2a07</code>.</td></tr>
+<tr><td><code>game/e2e/splash.spec.js:25</code></td><td>Instável sob carga; passou sozinho duas vezes. O código da splash não está na faixa.</td></tr>
+<tr><td><code>game/e2e/wake.spec.js:56</code></td><td>Asserção de tempo (28 s contra 15 s) sob carga; passa sozinho. O código de wake não está na faixa.</td></tr>
+<tr><td><code>deploy/regression.test.mjs:385</code> e <code>:412</code></td><td>O processo filho sai com o código nativo do Windows 0xC0000409 depois de imprimir o resultado. <code>deploy/</code>, <code>publish.sh</code> e <code>deploy.sh</code> não mudaram na faixa; repetiu nesta execução.</td></tr>
+</table></div>
+
+<h2>Deploy e produção</h2>
+<ul>
+<li>Backend: slot <code>blue</code> ativo, commit <code>e770a55</code>. Flyway aplicou a V11 &ldquo;unified damage&rdquo; (schema 10 &rarr; 11), o Tomcat subiu e a suíte de regressão liberou a troca.</li>
+<li>Jogo: o watcher registrou <code>d944140</code> como tratado (<code>.deploy-state</code>) e o Worker responde.</li>
+<li>Verificação em produção (Chrome, <code>https://infinity-grove.yan-tapajos.workers.dev/</code>): uma única ficha <code>Defesa 0%</code> na linha do inimigo; coluna Talentos com <code>Quebra de defesa</code> (Graus 1 e 2, &minus;10 e &minus;20 pontos), sem talentos mágicos; texto de Orina sem tipo de dano (Prisão de Espinhos: &ldquo;recebem +25% de dano&rdquo;). Sem erros de console durante a navegação (o rastreio de console e de rede começou depois do carregamento inicial).</li>
+<li>Limite da verificação: a Quebra de defesa em combate não foi exercitada em produção (a criatura do capítulo 12 estava com 0% de defesa); ela é coberta pelos e2e.</li>
+</ul>
+</main>
+</body>
+</html>

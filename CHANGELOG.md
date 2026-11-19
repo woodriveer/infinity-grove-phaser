@@ -3,6 +3,27 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.5.0] - 2026-11-19
+
+Dano unificado (`unified-damage`): um só tipo de dano e uma só defesa.
+
+### Adicionado
+
+- A linha do inimigo mostra uma única ficha **Defesa** no lugar de "Defesa física" e "Defesa mágica".
+
+### Alterado
+
+- Todo golpe (clique, habilidade, tiro mirado e dano por tempo) enfrenta a mesma defesa do inimigo e recebe os mesmos bônus.
+- **Prisão de Espinhos** agora aumenta todo o dano que o inimigo recebe em 25% (cresce com o nível da habilidade); um clique de Orina sob a Prisão causa 25% a mais.
+- **Bênção da Grande Árvore** multiplica todo o dano por 1,3 enquanto dura, inclusive as habilidades de Orina e Seraphine; o bônus de +25% no clique continua.
+- Os talentos de quebra de defesa viraram um só talento, **Quebra de defesa**, em cada grau (27 talentos no total).
+- O bônus de líder de Orina passou a dizer "+20% de dano total." (ainda sem efeito no jogo, marcado como "em breve").
+- Textos de dano não falam mais em físico, mágico, "Poder Arcano" ou "Força".
+
+### Removido
+
+- Os talentos de quebra de defesa mágica. Os pontos de talento gastos neles voltam para você.
+
 ## [0.4.1] - 2026-11-18
 
 Versão do jogo na tela (`game-version`).
@@ -110,6 +131,7 @@ Primeira versão marcada. Traz a venda de equipamentos em lote (`bulk-sell`).
 - Os blocos dos heróis não se mexem mais quando o modo de seleção abre.
 - Os contornos das peças marcadas ficam separados uns dos outros no modo de seleção.
 
+[0.5.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.5.0
 [0.3.1]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.3.1
 [0.3.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.3.0
 [0.2.0]: https://github.com/woodriveer/infinity-grove-phaser/releases/tag/v0.2.0
