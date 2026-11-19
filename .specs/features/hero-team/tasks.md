@@ -987,7 +987,7 @@ Rules of `normalizeTeam`: valid when the payload is an object; `unlocked` is a b
 
 ---
 
-### T8: Build the attacker of an ally [ ]
+### T8: Build the attacker of an ally [x]
 
 **Owner**: game-dev
 **Goal**: One pure function gives the attacker of an ally hit and its shown damage per second from its stars, its pieces, the leader's element and the team factor (TEAM-06 AC 2 to 6, TEAM-09 AC 22).
@@ -1053,7 +1053,7 @@ Piece fixtures: weapon `{ id: 'w', slot: 'WEAPON', clickDamage: 10, affixes: [] 
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 9 cases pass and the whole Vitest suite passes.
+- [x] The 9 cases pass and the whole Vitest suite passes.
 
 **Commit**: `feat(game): build the attacker of an ally`
 
