@@ -192,7 +192,7 @@ Owner decisions Q36 (attack formation) and Q37 (attack motion). The leader stand
 | Leader, while at least one ally is drawn | 180 x 240 px | (320, 600) | 0.5 |
 | Ally slot 1 (upper inner) | 90 x 120 px | (180, 460) | 0.4 |
 | Ally slot 2 (lower inner) | 90 x 120 px | (180, 605) | 0.4 |
-| Ally slot 3 (upper outer) | 90 x 120 px | (75, 450) | 0.3 |
+| Ally slot 3 (upper outer) | 90 x 120 px | (75, 462) | 0.3 |
 | Ally slot 4 (lower outer) | 90 x 120 px | (75, 615) | 0.3 |
 | Leader, while no ally is drawn | unchanged: 320 px high | unchanged: (230, 612) | 0.5 |
 
@@ -200,8 +200,8 @@ Sprite sizes from the textures: in an ally box Kael 90 x 83.7 (scale 0.3), Lyra 
 
 Worst-case boxes, checked against the screen of `7de3208`:
 
-- Leader box: x 230 to 410, y 360 to 600. Ally slot 1: x 135 to 225, y 340 to 460. Slot 2: x 135 to 225, y 485 to 605. Slot 3: x 30 to 120, y 330 to 450. Slot 4: x 30 to 120, y 495 to 615.
-- No standing box overlaps another box, the element wheel (bottom y 327), the chapter plate and effect tags (bottom y 116), the battle bar (top y 624), the monster (x 560 or more) or the `miniboss-adds` column (x 425 or more).
+- Leader box: x 230 to 410, y 360 to 600. Ally slot 1: x 135 to 225, y 340 to 460. Slot 2: x 135 to 225, y 485 to 605. Slot 3: x 30 to 120, y 342 to 462. Slot 4: x 30 to 120, y 495 to 615.
+- No standing box overlaps another box, the element wheel (bottom y 327, and the highest ally box, slot 3, starts 15 px under it, UI review of `hero-team`), the chapter plate and effect tags (bottom y 116), the battle bar (top y 624), the monster (x 560 or more) or the `miniboss-adds` column (x 425 or more).
 
 Motion and gates:
 
@@ -474,7 +474,7 @@ Rows `Q1` to `Q13` carry the owner's answers of 2026-10-30, rows `Q26` to `Q37` 
 
 **Acceptance Criteria**:
 
-1. WHILE the team is active and the heroes are loaded, the game SHALL draw every hero of a bought, filled ally slot with its sprite `hero_<id>` fitted in a 90 x 120 px box, origin (0.5, 1), at (180, 460), (180, 605), (75, 450) or (75, 615) for slots 1 to 4, at depth 0.4 for slots 1 and 2 and 0.3 for slots 3 and 4.  <!-- state-driven -->
+1. WHILE the team is active and the heroes are loaded, the game SHALL draw every hero of a bought, filled ally slot with its sprite `hero_<id>` fitted in a 90 x 120 px box, origin (0.5, 1), at (180, 460), (180, 605), (75, 462) or (75, 615) for slots 1 to 4, at depth 0.4 for slots 1 and 2 and 0.3 for slots 3 and 4.  <!-- state-driven -->
 2. WHILE at least one ally is drawn the game SHALL draw the leader fitted in a 180 x 240 px box at (320, 600) at depth 0.5, and WHILE no ally is drawn it SHALL draw the leader 320 px high at (230, 612) as today.  <!-- state-driven -->
 3. WHEN Kael is drawn in an ally slot THEN his sprite SHALL measure 90 x 83.7 px (scale 0.3), and WHEN Lyra is drawn there THEN 40.8 x 120 px (scale 0.4).  <!-- event-driven -->
 4. WHEN Kael is the leader in the formation THEN his sprite SHALL measure 180 x 167.4 px (scale 0.6), and WHEN Lyra is THEN 81.6 x 240 px (scale 0.8).  <!-- event-driven -->

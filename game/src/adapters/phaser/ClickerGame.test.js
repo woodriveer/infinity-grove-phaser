@@ -5454,13 +5454,13 @@ describe('ClickerGame hero team formation', () => {
         expect(ctx.scene.character.scale).toBeCloseTo(0.8, 9);
     });
 
-    it('allies stand at (180, 460), (180, 605), (75, 450) and (75, 615) at depths 0.4, 0.4, 0.3 and 0.3', async () => {
+    it('allies stand at (180, 460), (180, 605), (75, 462) and (75, 615) at depths 0.4, 0.4, 0.3 and 0.3', async () => {
         const ctx = await open([ 'lyra', 'orina', 'seraphine', 'vex' ]);
 
         expect(alliesOf(ctx).map(({ key, x, y, depth, originX, originY }) => ({ key, x, y, depth, originX, originY }))).toEqual([
             { key: 'hero_lyra', x: 180, y: 460, depth: 0.4, originX: 0.5, originY: 1 },
             { key: 'hero_orina', x: 180, y: 605, depth: 0.4, originX: 0.5, originY: 1 },
-            { key: 'hero_seraphine', x: 75, y: 450, depth: 0.3, originX: 0.5, originY: 1 },
+            { key: 'hero_seraphine', x: 75, y: 462, depth: 0.3, originX: 0.5, originY: 1 },
             { key: 'hero_vex', x: 75, y: 615, depth: 0.3, originX: 0.5, originY: 1 }
         ]);
     });

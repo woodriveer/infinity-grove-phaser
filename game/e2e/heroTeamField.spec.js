@@ -93,14 +93,32 @@ test.describe('Hero team: allies on the field', () => {
         at(await leaderSprite(page), 'hero_kael', 320, 600, 0.5);
     });
 
-    test('slots 3 and 4 stand at (75, 450) and (75, 615) at depth 0.3', async ({ page }) => {
+    test('slots 3 and 4 stand at (75, 462) and (75, 615) at depth 0.3', async ({ page }) => {
         await startTeam(page, { cleared: [ 5, 6, 7, 8 ], team: FOUR_ALLIES });
 
         const drawn = await sprites(page);
 
         expect(drawn.map(({ slot }) => slot)).toEqual([ 1, 2, 3, 4 ]);
-        at(drawn[2], 'hero_seraphine', 75, 450, 0.3);
+        at(drawn[2], 'hero_seraphine', 75, 462, 0.3);
         at(drawn[3], 'hero_vex', 75, 615, 0.3);
+    });
+
+    test('the highest ally stands at least 12 px under the Elementos panel, and no ally box overlaps another', async ({ page }) => {
+        await startTeam(page, { cleared: [ 5, 6, 7, 8 ], team: FOUR_ALLIES });
+
+        const canvas = await page.locator('#game-container canvas').boundingBox();
+        const wheel = await page.locator('.hud-wheel').boundingBox();
+        const wheelBottom = (wheel.y + wheel.height - canvas.y) / (canvas.width / 1024);
+        const drawn = await sprites(page);
+        const boxes = drawn.map(({ x, y, width, height }) => ({ left: x - width / 2, right: x + width / 2, top: y - height, bottom: y }));
+
+        expect(Math.min(...boxes.map(({ top }) => top)) - wheelBottom).toBeGreaterThanOrEqual(12);
+
+        boxes.forEach((box, index) => boxes.slice(index + 1).forEach((other) => {
+            const apart = box.right <= other.left || other.right <= box.left || box.bottom <= other.top || other.bottom <= box.top;
+
+            expect(apart).toBe(true);
+        }));
     });
 
     test('Kael in an ally box measures 90 x 83.7 and Lyra 40.8 x 120', async ({ page }) => {

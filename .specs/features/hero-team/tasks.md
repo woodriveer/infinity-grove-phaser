@@ -2578,7 +2578,7 @@ Checks per screen: every size, color, border style, opacity and text of the spec
 
 ---
 
-### T30: Give the top ally of the formation room under the element wheel [ ]
+### T30: Give the top ally of the formation room under the element wheel [x]
 
 **Owner**: game-dev
 **Goal**: At least 12 px between the highest ally sprite and the bottom of the Elementos panel (finding #3).
@@ -2586,7 +2586,7 @@ Checks per screen: every size, color, border style, opacity and text of the spec
 **Contract**: The ally 3 sprite top is at least 12 px under the Elementos panel, with no overlap of the other sprites or the battle bar.
 **Tests**: update the formation position tests.
 **Gate**: `cd game && npm test && npx playwright test heroTeamField`
-**Done when**: [ ] `09-field-formation` shows the gap.
+**Done when**: [x] `09-field-formation` shows the gap.
 **Commit**: `fix(game): move the top ally off the element wheel`
 
 ---

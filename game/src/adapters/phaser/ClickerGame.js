@@ -32,7 +32,7 @@ const FORMATION_LEADER = { x: 320, y: 600, width: 180, height: 240, depth: 0.5 }
 const FORMATION = {
     1: { x: 180, y: 460, width: 90, height: 120, depth: 0.4 },
     2: { x: 180, y: 605, width: 90, height: 120, depth: 0.4 },
-    3: { x: 75, y: 450, width: 90, height: 120, depth: 0.3 },
+    3: { x: 75, y: 462, width: 90, height: 120, depth: 0.3 },
     4: { x: 75, y: 615, width: 90, height: 120, depth: 0.3 }
 };
 const ALLY_MOVE = { distance: 24, duration: 100 };
