@@ -63,6 +63,16 @@ const sceneBox = async (page, locator) => {
 
 const near = (actual, expected) => expect(Math.abs(actual - expected)).toBeLessThanOrEqual(1);
 
+//  Moves the clock of the scene (its delayed calls) by `ms`
+const tick = (page, ms) => page.evaluate((delta) => {
+    const clock = window.__PHASER_GAME__.scene.getScene('ClickerGame').time;
+
+    //  The clock takes a new delayed call into its active list in preUpdate, the way a frame of the loop does
+    clock.preUpdate();
+    clock.update(clock.now, delta);
+    clock.preUpdate();
+}, ms);
+
 const slot = (page, index) => page.getByTestId(`team-slot-${index}`);
 
 test.describe('Hero team: Equipe screen', () => {
@@ -214,20 +224,27 @@ test.describe('Hero team: Equipe screen', () => {
         await openTeam(page);
         await slot(page, 1).click();
 
-        const bought = Date.now();
-
+        //  The loop is stopped, so the 400 ms of the flash and the 3000 ms of the notice (timers of the scene clock) move only with `tick`
+        await page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
         await page.getByTestId('team-buy-confirm').click();
 
         await expect.poll(() => handle.calls.filter((call) => call.path === '/team/slots').map((call) => call.body)).toEqual([ { fromSlots: 0 } ]);
 
         await expect(slot(page, 1)).toHaveAttribute('data-flash', 'true');
         await expect(slot(page, 1)).toHaveCSS('background-color', 'rgb(243, 213, 138)');
-        await expect(slot(page, 1)).not.toHaveAttribute('data-flash', 'true', { timeout: 1_000 });
-
         await expect(page.getByTestId('team-notice')).toHaveText('Vaga de aliado comprada!');
         await expect(page.getByTestId('team-notice')).toBeVisible();
-        await expect(page.getByTestId('team-notice')).toBeHidden({ timeout: 4_000 });
-        expect(Date.now() - bought).toBeGreaterThanOrEqual(2_900);
+
+        await tick(page, 399);
+        await expect(slot(page, 1)).toHaveAttribute('data-flash', 'true');
+        await tick(page, 1);
+        await expect(slot(page, 1)).not.toHaveAttribute('data-flash', 'true');
+
+        //  The notice stays up to 3000 ms after the purchase
+        await tick(page, 2_599);
+        await expect(page.getByTestId('team-notice')).toBeVisible();
+        await tick(page, 1);
+        await expect(page.getByTestId('team-notice')).toBeHidden();
 
         await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 0 Copper: 0');
         await expect(slot(page, 1)).toHaveAttribute('data-state', 'empty');
@@ -269,6 +286,9 @@ test.describe('Hero team: Equipe screen', () => {
     });
 
     test('Heróis disponíveis lists the owned heroes outside the team, or says all are in it', async ({ page, browser }) => {
+        //  Two games boot in this scenario
+        test.setTimeout(120_000);
+
         await startTeam(page, { cleared: [ 5 ], copper: 10_000 });
         await openTeam(page);
         await slot(page, 1).click();
@@ -311,6 +331,9 @@ test.describe('Hero team: Equipe screen', () => {
     });
 
     test('below chapter 5 the panel says A equipe luta a partir do capítulo 5.', async ({ page, browser }) => {
+        //  Two games boot in this scenario
+        test.setTimeout(120_000);
+
         await startTeam(page, { chapter: 3, cleared: [ 5 ] });
         await openTeam(page);
 
