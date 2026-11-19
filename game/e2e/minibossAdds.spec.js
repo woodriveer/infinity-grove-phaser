@@ -81,6 +81,14 @@ const hitAt = (page, x, y, times = 1) => page.evaluate(([ px, py, n ]) => {
         s.hitMonster({ x: px, y: py });
     }
 }, [ x, y, times ]);
+//  What is still on the canvas of the adds: the 110 px bodies, the buff texts and the marker
+const leftovers = (page) => scene(page, `(s) => ({
+    bodies: s.children.list.filter((o) => o.type === 'Rectangle' && o.fillColor === 0xf5ead8 && o.width === 110).length,
+    bars: s.children.list.filter((o) => o.type === 'Rectangle' && o.height === 8 && [ 0x2a1410, 0xc0392b ].includes(o.fillColor)).length,
+    labels: s.children.list.filter((o) => o.type === 'Text' && o.text.endsWith(' de defesa')).length,
+    markers: s.children.list.filter((o) => o.type === 'Triangle').length
+})`);
+const NOTHING_LEFT = { bodies: 0, bars: 0, labels: 0, markers: 0 };
 const outcomeCalls = (backend) => backend.calls.filter((call) => call.path === '/progress/outcome');
 
 //  The add bodies are 110 x 125 rectangles; a click in their middle lands on them
@@ -209,6 +217,8 @@ test.describe('Miniboss adds', () => {
 
         expect(after.drawn).toBe(0);
         expect(after.marker).toBeNull();
+        //  The adds still alive fade out with the miniboss (500 ms) and leave nothing on the canvas
+        await expect.poll(() => leftovers(page)).toEqual(NOTHING_LEFT);
         expect(outcomeCalls(backend)).toHaveLength(1);
     });
 
@@ -241,6 +251,7 @@ test.describe('Miniboss adds', () => {
         expect(after.drawn).toBe(0);
         expect(after.marker).toBeNull();
         await expect(page.getByTestId('target-chip')).toBeHidden();
+        expect(await leftovers(page)).toEqual(NOTHING_LEFT);
     });
 
     test('leaving from the pause menu removes the adds and reports FAILED', async ({ page }) => {
