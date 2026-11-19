@@ -162,4 +162,14 @@ class AccountResetServiceTest {
         assertEquals(mapOf("CLICK_DAMAGE" to 2), talents.findAll("yan"))
         assertEquals(4, talents.earnedPoints("yan"))
     }
+
+    @Test
+    fun `a reset deletes a stored magical break row with the other levels`() {
+        player()
+        talents.save("yan", "MAGICAL_BREAK", 5)
+
+        service.reset("yan", 3)
+
+        assertEquals(emptyMap(), talents.findAll("yan"))
+    }
 }

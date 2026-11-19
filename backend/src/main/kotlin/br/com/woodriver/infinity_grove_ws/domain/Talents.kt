@@ -58,16 +58,15 @@ data class TalentDefinition(
 }
 
 /**
- * The 10 talents of the four branches (Tempo, Quebra de defesa, Poder do clique and Combo, the cap of the combo bonus) in 3 grades each:
- * the 10 of grade 1, then the 10 of grade 2, then the 10 of grade 3.
+ * The 9 talents of the four branches (Tempo, Quebra de defesa, Poder do clique and Combo, the cap of the combo bonus) in 3 grades each:
+ * the 9 of grade 1, then the 9 of grade 2, then the 9 of grade 3. The magical defense break left the tree with unified-damage (AD-021).
  */
 object TalentCatalog {
     private val grade1 =
         listOf(
             TalentDefinition("MINIBOSS_TIME", TalentBranch.TIME, "Tempo do miniboss", "s", 2),
             TalentDefinition("BOSS_TIME", TalentBranch.TIME, "Tempo do chefe do capítulo", "s", 3),
-            TalentDefinition("PHYSICAL_BREAK", TalentBranch.BREAK, "Quebra de defesa física", "points", 1),
-            TalentDefinition("MAGICAL_BREAK", TalentBranch.BREAK, "Quebra de defesa mágica", "points", 1),
+            TalentDefinition("PHYSICAL_BREAK", TalentBranch.BREAK, "Quebra de defesa", "points", 1),
             TalentDefinition("CRIT_RESIST_BREAK", TalentBranch.BREAK, "Quebra de resistência a crítico", "points", 1),
             TalentDefinition("CLICK_DAMAGE", TalentBranch.POWER, "Dano de clique (%)", "%", 5),
             TalentDefinition("CRIT_CHANCE", TalentBranch.POWER, "Chance de crítico", "points", 1),
@@ -224,7 +223,23 @@ data class PlayerTalents(
         return TalentUpgrade(copy(levels = levels + (definition.id to stored + 1)), cost)
     }
 
-    private companion object {
+    companion object {
         private val logger = LoggerFactory.getLogger(PlayerTalents::class.java)
+
+        /**
+         * The levels [stored] for [username] as the catalog knows them: a row whose id is not in the catalog (a row of the retired magical
+         * defense break that the previous backend wrote after unified-damage, or any other) is left out and logged, so its points count as available.
+         */
+        fun fromStored(
+            username: String,
+            stored: Map<String, Int>,
+            earned: Int,
+        ): PlayerTalents {
+            val (known, unknown) = stored.entries.partition { (id, _) -> TalentCatalog.all.any { it.id == id } }
+            unknown.forEach { (id, level) ->
+                logger.warn("Ignoring talent outside the catalog username={} talent={} level={}", username, id, level)
+            }
+            return PlayerTalents(username, known.associate { it.key to it.value }, earned)
+        }
     }
 }

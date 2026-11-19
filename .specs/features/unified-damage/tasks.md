@@ -223,7 +223,7 @@ JSON of one enemy in `GET /progress` and `GET /farm`: `{ "element": "DARKNESS", 
 
 ---
 
-### T2: Shrink the talent tree to 9 talents per grade and load stored levels tolerantly [ ]
+### T2: Shrink the talent tree to 9 talents per grade and load stored levels tolerantly [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Remove `MAGICAL_BREAK` from the catalog, label `PHYSICAL_BREAK` `Quebra de defesa`, and make the backend ignore stored rows whose id is not in the catalog (UDMG-07).
@@ -323,8 +323,8 @@ private fun load(username: String) =
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] `grep -rn "MAGICAL_BREAK" backend/src/main` finds nothing.
-- [ ] Every test case above passes and the whole backend suite passes.
+- [x] `grep -rn "MAGICAL_BREAK" backend/src/main` finds nothing.
+- [x] Every test case above passes and the whole backend suite passes.
 
 **Commit**: `feat(backend): merge the defense break talents into Quebra de defesa`
 

@@ -15,6 +15,7 @@ import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class TalentServiceTest {
@@ -188,5 +189,46 @@ class TalentServiceTest {
         service.upgrade("yan", "COMBO", 0)
 
         assertEquals(4, talents.levels.getValue("yan" to "CRIT_CHANCE"))
+    }
+
+    @Test
+    fun `list leaves out a stored magical break and its points come back`() {
+        player(20)
+        talents.levels["yan" to "PHYSICAL_BREAK"] = 3
+        talents.levels["yan" to "MAGICAL_BREAK"] = 5
+
+        val tree = service.list("yan")
+
+        assertEquals(3, tree.level("PHYSICAL_BREAK"))
+        assertFalse(tree.levels.containsKey("MAGICAL_BREAK"))
+        assertEquals(TalentPoints(20, 3), tree.points(rules))
+    }
+
+    @Test
+    fun `an upgrade works for a player who still has a magical break row`() {
+        player(1)
+        talents.levels["yan" to "MAGICAL_BREAK"] = 5
+
+        assertEquals(1, service.upgrade("yan", "CLICK_DAMAGE", 0).level("CLICK_DAMAGE"))
+        assertEquals(1, talents.levels["yan" to "CLICK_DAMAGE"])
+    }
+
+    @Test
+    fun `an upgrade of the magical break is not found and stores nothing`() {
+        player(5)
+
+        assertFailsWith<TalentNotFoundException> { service.upgrade("yan", "MAGICAL_BREAK", 0) }
+        assertFalse(talents.levels.containsKey("yan" to "MAGICAL_BREAK"))
+    }
+
+    @Test
+    fun `reset deletes a stored magical break row with the others`() {
+        player(10)
+        talents.levels["yan" to "MAGICAL_BREAK"] = 5
+        talents.levels["yan" to "CLICK_DAMAGE"] = 2
+
+        service.reset("yan")
+
+        assertTrue(talents.levels.keys.none { it.first == "yan" })
     }
 }

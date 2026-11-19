@@ -64,12 +64,12 @@ class TalentControllerIT : IntegrationTestBase() {
             .then()
 
     @Test
-    fun `a new player gets the 30 talents of 3 grades at level 0 with a next cost of 1, 2 and 3 points and no points`() {
+    fun `a new player gets the 27 talents of 3 grades at level 0 with a next cost of 1, 2 and 3 points and no points`() {
         asUser()
             .get("/talents")
             .then()
             .statusCode(200)
-            .body("talents.size()", equalTo(30))
+            .body("talents.size()", equalTo(27))
             .body(
                 "talents.id.findAll { !it.contains('_G') }",
                 equalTo(
@@ -77,7 +77,6 @@ class TalentControllerIT : IntegrationTestBase() {
                         "MINIBOSS_TIME",
                         "BOSS_TIME",
                         "PHYSICAL_BREAK",
-                        "MAGICAL_BREAK",
                         "CRIT_RESIST_BREAK",
                         "CLICK_DAMAGE",
                         "CRIT_CHANCE",
@@ -90,27 +89,27 @@ class TalentControllerIT : IntegrationTestBase() {
                 "talents.branch",
                 equalTo(
                     List(3) {
-                        listOf("TIME", "TIME", "BREAK", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO", "POWER")
+                        listOf("TIME", "TIME", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO", "POWER")
                     }.flatten(),
                 ),
-            ).body("talents.level", equalTo(List(30) { 0 }))
-            .body("talents.value", equalTo(List(30) { 0 }))
-            .body("talents.nextCost", equalTo(List(10) { 1 } + List(10) { 2 } + List(10) { 3 }))
-            .body("talents.maxLevel", equalTo(List(30) { 10 }))
-            .body("talents.grade", equalTo(List(10) { 1 } + List(10) { 2 } + List(10) { 3 }))
-            .body("talents.unlocked", equalTo(List(10) { true } + List(20) { false }))
-            .body("talents[18].id", equalTo("COMBO_G2"))
-            .body("talents[18].baseId", equalTo("COMBO"))
-            .body("talents[18].perLevel", equalTo(10))
-            .body("talents[5].label", equalTo("Dano de clique (%)"))
-            .body("talents[5].unit", equalTo("%"))
-            .body("talents[5].perLevel", equalTo(5))
-            .body("talents[8].label", equalTo("Limite de dano do combo"))
-            .body("talents[8].unit", equalTo("%"))
-            .body("talents[8].perLevel", equalTo(5))
-            .body("talents[9].label", equalTo("Dano direto de clique"))
-            .body("talents[9].unit", equalTo("dmg"))
-            .body("talents[9].perLevel", equalTo(2))
+            ).body("talents.level", equalTo(List(27) { 0 }))
+            .body("talents.value", equalTo(List(27) { 0 }))
+            .body("talents.nextCost", equalTo(List(9) { 1 } + List(9) { 2 } + List(9) { 3 }))
+            .body("talents.maxLevel", equalTo(List(27) { 10 }))
+            .body("talents.grade", equalTo(List(9) { 1 } + List(9) { 2 } + List(9) { 3 }))
+            .body("talents.unlocked", equalTo(List(9) { true } + List(18) { false }))
+            .body("talents[16].id", equalTo("COMBO_G2"))
+            .body("talents[16].baseId", equalTo("COMBO"))
+            .body("talents[16].perLevel", equalTo(10))
+            .body("talents[4].label", equalTo("Dano de clique (%)"))
+            .body("talents[4].unit", equalTo("%"))
+            .body("talents[4].perLevel", equalTo(5))
+            .body("talents[7].label", equalTo("Limite de dano do combo"))
+            .body("talents[7].unit", equalTo("%"))
+            .body("talents[7].perLevel", equalTo(5))
+            .body("talents[8].label", equalTo("Dano direto de clique"))
+            .body("talents[8].unit", equalTo("dmg"))
+            .body("talents[8].perLevel", equalTo(2))
             .body("points.earned", equalTo(0))
             .body("points.spent", equalTo(0))
             .body("points.available", equalTo(0))
@@ -126,7 +125,7 @@ class TalentControllerIT : IntegrationTestBase() {
             .post("/talents/reset")
             .then()
             .statusCode(200)
-            .body("talents.level", equalTo(List(30) { 0 }))
+            .body("talents.level", equalTo(List(27) { 0 }))
             .body("points.earned", equalTo(3))
             .body("points.spent", equalTo(0))
             .body("points.available", equalTo(3))
@@ -142,12 +141,68 @@ class TalentControllerIT : IntegrationTestBase() {
 
         upgrade("COMBO_G2", 0)
             .statusCode(200)
-            .body("talents[18].level", equalTo(1))
-            .body("talents[18].value", equalTo(10))
-            .body("talents[18].unlocked", equalTo(true))
-            .body("talents[28].unlocked", equalTo(false))
+            .body("talents[16].level", equalTo(1))
+            .body("talents[16].value", equalTo(10))
+            .body("talents[16].unlocked", equalTo(true))
+            .body("talents[25].unlocked", equalTo(false))
             .body("points.spent", equalTo(12))
             .body("points.available", equalTo(18))
+    }
+
+    @Test
+    fun `the defense break is labelled Quebra de defesa in each grade`() {
+        asUser()
+            .get("/talents")
+            .then()
+            .statusCode(200)
+            .body("talents[2].id", equalTo("PHYSICAL_BREAK"))
+            .body("talents[2].label", equalTo("Quebra de defesa"))
+            .body("talents[11].id", equalTo("PHYSICAL_BREAK_G2"))
+            .body("talents[11].label", equalTo("Quebra de defesa"))
+            .body("talents[11].perLevel", equalTo(2))
+            .body("talents[20].id", equalTo("PHYSICAL_BREAK_G3"))
+            .body("talents[20].label", equalTo("Quebra de defesa"))
+            .body("talents[20].perLevel", equalTo(3))
+    }
+
+    @Test
+    fun `a magical break upgrade is 404 TALENT_NOT_FOUND`() {
+        earned(5)
+
+        listOf("MAGICAL_BREAK", "MAGICAL_BREAK_G2", "MAGICAL_BREAK_G3").forEach {
+            upgrade(it, 0).statusCode(404).body("code", equalTo("TALENT_NOT_FOUND"))
+        }
+        assertEquals(0, level("MAGICAL_BREAK"))
+    }
+
+    @Test
+    fun `a stored magical break row is ignored and its points are available`() {
+        earned(20)
+        talentRepository.save("yan", "PHYSICAL_BREAK", 3)
+        talentRepository.save("yan", "MAGICAL_BREAK", 5)
+
+        asUser()
+            .get("/talents")
+            .then()
+            .statusCode(200)
+            .body("talents.size()", equalTo(27))
+            .body("points.earned", equalTo(20))
+            .body("points.spent", equalTo(3))
+            .body("points.available", equalTo(17))
+    }
+
+    @Test
+    fun `POST reset deletes a stored magical break row`() {
+        earned(3)
+        talentRepository.save("yan", "MAGICAL_BREAK", 5)
+
+        asUser()
+            .post("/talents/reset")
+            .then()
+            .statusCode(200)
+            .body("points.available", equalTo(3))
+
+        assertEquals(0, level("MAGICAL_BREAK"))
     }
 
     @Test
@@ -161,9 +216,9 @@ class TalentControllerIT : IntegrationTestBase() {
 
         upgrade("COMBO", 0)
             .statusCode(200)
-            .body("talents[8].level", equalTo(1))
-            .body("talents[8].value", equalTo(5))
-            .body("talents[8].nextCost", equalTo(1))
+            .body("talents[7].level", equalTo(1))
+            .body("talents[7].value", equalTo(5))
+            .body("talents[7].nextCost", equalTo(1))
             .body("points.earned", equalTo(3))
             .body("points.spent", equalTo(1))
             .body("points.available", equalTo(2))
@@ -190,7 +245,7 @@ class TalentControllerIT : IntegrationTestBase() {
         upgrade(
             "COMBO",
             1,
-        ).statusCode(200).body("talents[8].level", equalTo(2)).body("talents[8].value", equalTo(10)).body("points.available", equalTo(0))
+        ).statusCode(200).body("talents[7].level", equalTo(2)).body("talents[7].value", equalTo(10)).body("points.available", equalTo(0))
     }
 
     @Test
@@ -202,8 +257,8 @@ class TalentControllerIT : IntegrationTestBase() {
             .get("/talents")
             .then()
             .statusCode(200)
-            .body("talents[8].value", equalTo(50))
-            .body("talents[8].nextCost", nullValue())
+            .body("talents[7].value", equalTo(50))
+            .body("talents[7].nextCost", nullValue())
     }
 
     @Test
@@ -238,8 +293,8 @@ class TalentControllerIT : IntegrationTestBase() {
             ).then()
             .statusCode(
                 200,
-            ).body("talents[5].nextCost", nullValue())
-            .body("talents[5].value", equalTo(50))
+            ).body("talents[4].nextCost", nullValue())
+            .body("talents[4].value", equalTo(50))
             .body("points.available", equalTo(10))
     }
 

@@ -4,6 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class TalentsTest {
     private val rules = TalentRules()
@@ -11,13 +12,12 @@ class TalentsTest {
     private val combo = TalentCatalog.find("COMBO")
 
     @Test
-    fun `the catalog has the 10 talents of the four branches with the values of the spec`() {
+    fun `the catalog has the 9 talents of the four branches with the values of the spec`() {
         assertEquals(
             listOf(
                 Triple("MINIBOSS_TIME", TalentBranch.TIME, 2),
                 Triple("BOSS_TIME", TalentBranch.TIME, 3),
                 Triple("PHYSICAL_BREAK", TalentBranch.BREAK, 1),
-                Triple("MAGICAL_BREAK", TalentBranch.BREAK, 1),
                 Triple("CRIT_RESIST_BREAK", TalentBranch.BREAK, 1),
                 Triple("CLICK_DAMAGE", TalentBranch.POWER, 5),
                 Triple("CRIT_CHANCE", TalentBranch.POWER, 1),
@@ -27,13 +27,13 @@ class TalentsTest {
             ),
             TalentCatalog.all.filter { it.grade == 1 }.map { Triple(it.id, it.branch, it.perLevel) },
         )
-        assertEquals(List(30) { 10 }, TalentCatalog.all.map { it.maxLevel })
+        assertEquals(List(27) { 10 }, TalentCatalog.all.map { it.maxLevel })
     }
 
     @Test
     fun `units are seconds, points or percent`() {
         assertEquals(
-            listOf("s", "s", "points", "points", "points", "%", "points", "%", "%", "dmg"),
+            listOf("s", "s", "points", "points", "%", "points", "%", "%", "dmg"),
             TalentCatalog.all.filter { it.grade == 1 }.map { it.unit },
         )
     }
@@ -57,8 +57,8 @@ class TalentsTest {
     }
 
     @Test
-    fun `the catalog has 3 grades of the 10 talents, grade N giving N times the value of grade 1`() {
-        assertEquals(30, TalentCatalog.all.size)
+    fun `the catalog has 3 grades of the 9 talents, grade N giving N times the value of grade 1`() {
+        assertEquals(27, TalentCatalog.all.size)
         assertEquals(listOf(1, 2, 3), TalentCatalog.all.filter { it.baseId == "COMBO" }.map { it.grade })
         assertEquals(listOf("COMBO", "COMBO_G2", "COMBO_G3"), TalentCatalog.all.filter { it.baseId == "COMBO" }.map { it.id })
         assertEquals(listOf(50, 100, 150), listOf("COMBO", "COMBO_G2", "COMBO_G3").map { TalentCatalog.find(it).valueAt(10) })
@@ -149,8 +149,8 @@ class TalentsTest {
     fun `a new player has level 0 and 0 points and every next cost is 1`() {
         val talents = PlayerTalents("yan")
 
-        assertEquals(List(30) { 0 }, TalentCatalog.all.map { talents.level(it.id) })
-        assertEquals(List(10) { 1 } + List(10) { 2 } + List(10) { 3 }, TalentCatalog.all.map { talents.nextCost(it, rules) })
+        assertEquals(List(27) { 0 }, TalentCatalog.all.map { talents.level(it.id) })
+        assertEquals(List(9) { 1 } + List(9) { 2 } + List(9) { 3 }, TalentCatalog.all.map { talents.nextCost(it, rules) })
         assertEquals(TalentPoints(0, 0), talents.points(rules))
         assertEquals(0, talents.points(rules).available)
     }
@@ -243,8 +243,52 @@ class TalentsTest {
     @Test
     fun `stored levels must be in the catalog and between 1 and 10 and the earned points not negative`() {
         assertFailsWith<IllegalArgumentException> { PlayerTalents("yan", mapOf("NOPE" to 1)) }
+        assertFailsWith<IllegalArgumentException> { PlayerTalents("yan", mapOf("MAGICAL_BREAK" to 1)) }
         assertFailsWith<IllegalArgumentException> { PlayerTalents("yan", mapOf("CLICK_DAMAGE" to 0)) }
         assertFailsWith<IllegalArgumentException> { PlayerTalents("yan", mapOf("CLICK_DAMAGE" to 11)) }
         assertFailsWith<IllegalArgumentException> { PlayerTalents("yan", earned = -1) }
+    }
+
+    @Test
+    fun `the defense break is one talent labelled Quebra de defesa in each grade`() {
+        val grades = listOf("PHYSICAL_BREAK", "PHYSICAL_BREAK_G2", "PHYSICAL_BREAK_G3").map(TalentCatalog::find)
+
+        assertEquals(List(3) { "Quebra de defesa" }, grades.map { it.label })
+        assertEquals(List(3) { TalentBranch.BREAK }, grades.map { it.branch })
+        assertEquals(List(3) { "points" }, grades.map { it.unit })
+        assertEquals(listOf(1, 2, 3), grades.map { it.perLevel })
+    }
+
+    @Test
+    fun `the magical defense break is not in the catalog`() {
+        assertFailsWith<TalentNotFoundException> { TalentCatalog.find("MAGICAL_BREAK") }
+        assertFailsWith<TalentNotFoundException> { TalentCatalog.find("MAGICAL_BREAK_G2") }
+        assertFailsWith<TalentNotFoundException> { TalentCatalog.find("MAGICAL_BREAK_G3") }
+        assertTrue(TalentCatalog.all.none { it.id.startsWith("MAGICAL") })
+    }
+
+    @Test
+    fun `fromStored leaves out a level outside the catalog and spends no point on it`() {
+        val talents = PlayerTalents.fromStored("yan", mapOf("PHYSICAL_BREAK" to 3, "MAGICAL_BREAK" to 5), 20)
+
+        assertEquals(mapOf("PHYSICAL_BREAK" to 3), talents.levels)
+        assertEquals(TalentPoints(20, 3), talents.points(rules))
+        assertEquals(17, talents.points(rules).available)
+    }
+
+    @Test
+    fun `fromStored leaves out every grade of the magical break`() {
+        val talents = PlayerTalents.fromStored("yan", mapOf("MAGICAL_BREAK" to 10, "MAGICAL_BREAK_G2" to 3, "CLICK_DAMAGE" to 2), 30)
+
+        assertEquals(mapOf("CLICK_DAMAGE" to 2), talents.levels)
+        assertEquals(28, talents.points(rules).available)
+    }
+
+    @Test
+    fun `fromStored keeps every catalog level`() {
+        assertEquals(
+            PlayerTalents("yan", mapOf("COMBO" to 10, "COMBO_G2" to 4), 30),
+            PlayerTalents.fromStored("yan", mapOf("COMBO" to 10, "COMBO_G2" to 4), 30),
+        )
     }
 }

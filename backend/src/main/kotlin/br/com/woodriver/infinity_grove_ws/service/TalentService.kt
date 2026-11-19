@@ -69,7 +69,7 @@ class TalentService(
     }
 
     private fun load(username: String) =
-        PlayerTalents(username, talentRepository.findAll(username), talentRepository.earnedPoints(username))
+        PlayerTalents.fromStored(username, talentRepository.findAll(username), talentRepository.earnedPoints(username))
 
     private fun requireUser(username: String) {
         if (!userRepository.existsByUsername(username)) {
