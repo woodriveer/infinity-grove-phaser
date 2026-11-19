@@ -225,4 +225,25 @@ test.describe('Hero team: editing', () => {
         await expect(slot(page, 1)).toBeEnabled();
         await expect(pick(page, 'orina')).toBeEnabled();
     });
+
+    test('each ally card shows the name and the text of its passive, and the available list its passive name', async ({ page }) => {
+        await startTeam(page, {
+            cleared: [ 5, 6, 7, 8 ], leader: 'lyra', team: { boughtSlots: 4, allies: [ 'kael', 'orina', 'vex', null ] }
+        });
+        await openTeam(page);
+
+        await expect(slot(page, 1).locator('.team-passive')).toHaveText('Guarda do Baluarte: +5 s no tempo dos chefes');
+        await expect(slot(page, 2).locator('.team-passive')).toHaveText('Erosão Arcana: -15 de defesa dos inimigos');
+        await expect(slot(page, 3).locator('.team-passive')).toHaveText('Lâminas Sombrias: -15 de resistência a crítico dos inimigos');
+        await expect(pick(page, 'seraphine').locator('.team-hero-passive')).toHaveText('Graça da Aurora');
+
+        //  Seraphine joins: x1.25 on every ally hit, 2 x 1.25 = 2.5 for a 0 star ally
+        await slot(page, 4).click();
+        await pick(page, 'seraphine').click();
+
+        await expect(slot(page, 4).locator('.team-passive')).toHaveText('Graça da Aurora: +25% de dano da equipe');
+        await expect(slot(page, 4).locator('.team-dps-line')).toHaveText('Dano: 2.5/s');
+        await expect(slot(page, 1).locator('.team-dps-line')).toHaveText('Dano: 2.5/s');
+        await expect(page.getByTestId('team-dps')).toHaveText('Dano da equipe: 10/s');
+    });
 });
