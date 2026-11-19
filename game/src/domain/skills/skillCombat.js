@@ -21,7 +21,7 @@ export class SkillCombat
         this.buffs = [];
         //  Effects on the monster: same shape; they belong to `this.target` and end with it
         this.debuffs = [];
-        //  Damage over time on the monster: { id, label, percent, damageType, attacker, stacks, maxStacks, remainingMs, untilTickMs, seq }
+        //  Damage over time on the monster: { id, label, percent, attacker, stacks, maxStacks, remainingMs, untilTickMs, seq }
         this.dots = [];
         //  The aimed shot being cast: { key, remainingMs, skill, attacker, boss }; it belongs to `this.target`
         this.cast = null;
@@ -83,7 +83,7 @@ export class SkillCombat
         else
         {
             this.dots.push({
-                id, label: skill.label, percent, damageType: skill.damageType, attacker, stacks: 1, maxStacks, remainingMs: ms, untilTickMs: TICK_MS, seq: this.sequence++, ...owner
+                id, label: skill.label, percent, attacker, stacks: 1, maxStacks, remainingMs: ms, untilTickMs: TICK_MS, seq: this.sequence++, ...owner
             });
         }
     }
@@ -190,7 +190,7 @@ export class SkillCombat
             }
 
             const result = hitDamage({
-                attacker, percent: percent * factor, armorPierce, damageType: skill.damageType, vsDarkness: skill.vsDarkness,
+                attacker, percent: percent * factor, armorPierce, vsDarkness: skill.vsDarkness,
                 buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), random: this.random, boss,
                 factors: this.factors()
             });
@@ -300,7 +300,7 @@ export class SkillCombat
     {
         const { skill, attacker } = this.cast;
         const result = hitDamage({
-            attacker, percent: skill.cast.hit.percent * this.cast.factor, damageType: skill.damageType, forceCritical: true,
+            attacker, percent: skill.cast.hit.percent * this.cast.factor, forceCritical: true,
             buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), random: this.random, boss,
             factors: this.factors()
         });
@@ -315,7 +315,7 @@ export class SkillCombat
     tickHit (dot, monster, boss)
     {
         const damage = tickDamage({
-            attacker: dot.attacker, percent: dot.percent * dot.stacks, damageType: dot.damageType,
+            attacker: dot.attacker, percent: dot.percent * dot.stacks,
             buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), boss, factors: this.factors()
         });
 

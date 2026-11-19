@@ -82,11 +82,11 @@ describe('attackerFor', () => {
         expect(attacker.bossDamage).toBe(7);
     });
 
-    it('keeps the element and damage type of the base attacker', () => {
+    it('keeps the element of the base attacker and adds no damage type', () => {
         const attacker = attackerFor({ ...PLAYER, element: 'WATER' }, [ weapon(3) ]);
 
         expect(attacker.element).toBe('WATER');
-        expect(attacker.damageType).toBe('PHYSICAL');
+        expect(attacker).not.toHaveProperty('damageType');
     });
 
     it('does not change the base attacker', () => {

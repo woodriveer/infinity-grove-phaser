@@ -6,8 +6,8 @@ const never = () => 0.99;
 const always = () => 0;
 
 describe('the player', () => {
-    it('is a fire, physical attacker with 1 base damage, 10 % critical chance and a double critical', () => {
-        expect(PLAYER).toEqual({ element: 'FIRE', damageType: 'PHYSICAL', baseDamage: 1, critChance: 10, critMultiplier: 2 });
+    it('is a fire attacker with 1 base damage, 10 % critical chance and a double critical', () => {
+        expect(PLAYER).toEqual({ element: 'FIRE', baseDamage: 1, critChance: 10, critMultiplier: 2 });
     });
 });
 

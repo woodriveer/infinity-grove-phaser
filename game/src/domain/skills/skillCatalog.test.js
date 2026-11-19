@@ -14,23 +14,19 @@ describe('skillCatalog', () => {
         expect([ 1, 2, 3 ].map((slot) => skillOf(heroId, slot).cooldownMs / 1000)).toEqual(seconds);
     });
 
-    it('pins the damage type of every skill: Kael, Lyra and Vex physical, Orina and Seraphine magical', () => {
-        const types = (heroId) => [ 1, 2, 3 ].map((slot) => skillOf(heroId, slot).damageType);
-
-        expect(types('kael')).toEqual([ 'PHYSICAL', 'PHYSICAL', 'PHYSICAL' ]);
-        expect(types('lyra')).toEqual([ 'PHYSICAL', 'PHYSICAL', 'PHYSICAL' ]);
-        expect(types('orina')).toEqual([ 'MAGICAL', 'MAGICAL', 'MAGICAL' ]);
-        expect(types('seraphine')).toEqual([ 'MAGICAL', 'MAGICAL', 'MAGICAL' ]);
-        expect(types('vex')).toEqual([ 'PHYSICAL', 'PHYSICAL', 'PHYSICAL' ]);
+    it('gives no skill a damage type (spec unified-damage)', () => {
+        [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ].forEach((heroId) => {
+            [ 1, 2, 3 ].forEach((slot) => expect(skillOf(heroId, slot)).not.toHaveProperty('damageType'));
+        });
     });
 
     it('pins the instant hits of the table', () => {
-        expect(skillOf('kael', 1)).toMatchObject({ damageType: 'PHYSICAL', hits: [ { percent: 1500, armorPierce: 30 } ] });
-        expect(skillOf('kael', 2)).toMatchObject({ damageType: 'PHYSICAL', hits: [ { percent: 400 } ], stunMs: 3000 });
+        expect(skillOf('kael', 1)).toMatchObject({ hits: [ { percent: 1500, armorPierce: 30 } ] });
+        expect(skillOf('kael', 2)).toMatchObject({ hits: [ { percent: 400 } ], stunMs: 3000 });
         expect(skillOf('lyra', 1).hits).toEqual([ { percent: 300 }, { percent: 300 } ]);
-        expect(skillOf('orina', 3)).toMatchObject({ damageType: 'MAGICAL', hits: [ { percent: 2500 } ] });
-        expect(skillOf('seraphine', 2)).toMatchObject({ damageType: 'MAGICAL', hits: [ { percent: 800 } ], vsDarkness: 1.5 });
-        expect(skillOf('vex', 3)).toMatchObject({ damageType: 'PHYSICAL', hits: [ { percent: 600 } ] });
+        expect(skillOf('orina', 3)).toMatchObject({ hits: [ { percent: 2500 } ] });
+        expect(skillOf('seraphine', 2)).toMatchObject({ hits: [ { percent: 800 } ], vsDarkness: 1.5 });
+        expect(skillOf('vex', 3)).toMatchObject({ hits: [ { percent: 600 } ] });
     });
 
     it('pins the timed effects of the table', () => {

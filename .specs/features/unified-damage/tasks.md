@@ -715,7 +715,7 @@ export const monsterAfterBreak = (stats, talents) => ({
 
 ---
 
-### T8: Remove the damage type from the skills and the attacker [ ]
+### T8: Remove the damage type from the skills and the attacker [x]
 
 **Owner**: game-dev
 **Goal**: Delete `damageType` from the skill catalog, `SkillCombat` and `PLAYER`, and the `PHYSICAL` / `MAGICAL` exports (UDMG-01).
@@ -754,8 +754,8 @@ export const monsterAfterBreak = (stats, talents) => ({
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The grep of step 3 finds nothing outside the listed hits.
-- [ ] The edited tests pass; the whole Vitest suite passes; `cd game && npm run build` succeeds.
+- [x] The grep of step 3 finds nothing outside the listed hits.
+- [x] The edited tests pass; the whole Vitest suite passes; `cd game && npm run build` succeeds.
 
 **Commit**: `refactor(game): remove the damage type from skills and attacker`
 

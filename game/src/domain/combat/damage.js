@@ -2,12 +2,9 @@ import { elementMultiplier, FIRE } from './elements';
 import { defenseOf } from './monster';
 import { formatShort } from './numberFormat';
 
-export const PHYSICAL = 'PHYSICAL';
-export const MAGICAL = 'MAGICAL';
-
-//  The attacker until characters exist: a fire, physical clicker with a 10 % chance of a double-damage critical hit.
+//  The attacker until characters exist: a fire clicker with a 10 % chance of a double-damage critical hit.
 //  Chances and defenses are percentages.
-export const PLAYER = { element: FIRE, damageType: PHYSICAL, baseDamage: 1, critChance: 10, critMultiplier: 2 };
+export const PLAYER = { element: FIRE, baseDamage: 1, critChance: 10, critMultiplier: 2 };
 
 //  What a click deals to `defender` ({ element, defense, critResistance }; `defenseOf` also reads an older payload). Every hit meets the
 //  same defense: an attacker's `damageType` is ignored (spec unified-damage).

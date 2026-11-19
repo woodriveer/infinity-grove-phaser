@@ -148,7 +148,7 @@ describe('break talents', () => {
     const withBreak = (levels, random = never) => new SkillCombat({ random, statsOf: (monster) => monsterAfterBreak(monster.stats, breaks(levels)) });
     const base100 = { ...PLAYER, baseDamage: 100 };
 
-    it('lets a Base 100 click against physical defense 20 deal 85 under PHYSICAL_BREAK 5 and 80 without it', () => {
+    it('lets a Base 100 click against defense 20 deal 85 under PHYSICAL_BREAK 5 and 80 without it', () => {
         const broken = monsterOf(1000, stats('FIRE', 20));
         const plain = monsterOf(1000, stats('FIRE', 20));
 
@@ -284,7 +284,7 @@ describe('timed effects', () => {
         expect(skills.click({ attacker: PLAYER, monster, boss: false }).damage).toBeCloseTo(2.275, 10);
     });
 
-    it('lowers the physical defense by 30 points for 10 s with Brado Aterrador', () => {
+    it('lowers the defense by 30 points for 10 s with Brado Aterrador', () => {
         const skills = combat();
         const monster = monsterOf(1000, stats('FIRE', 50));
 
@@ -295,7 +295,7 @@ describe('timed effects', () => {
         expect(skills.click({ attacker: PLAYER, monster, boss: false }).damage).toBe(0.5);
     });
 
-    it('adds 25 % magical damage for 2 s with Prisão de Espinhos', () => {
+    it('adds 25 % damage for 2 s with Prisão de Espinhos', () => {
         const skills = combat();
         const monster = monsterOf();
 
@@ -392,7 +392,7 @@ describe('damage over time', () => {
         return ticks;
     };
 
-    it('lands 6 magical ticks of 2 with Tempestade Arcana, the first 1 s after the cast, then stops', () => {
+    it('lands 6 ticks of 2 with Tempestade Arcana, the first 1 s after the cast, then stops', () => {
         const skills = combat();
         const monster = monsterOf();
 
@@ -725,7 +725,7 @@ describe('skill levels', () => {
         expect(hitsOf(combat(), monsterOf(), 'kael', 1, { level: 3 })).toEqual([ { damage: 22.5, critical: false } ]);
     });
 
-    it('Corte Dimensional keeps its +30 armor pierce at level 2: 12.1875 against physical defense 50', () => {
+    it('Corte Dimensional keeps its +30 armor pierce at level 2: 12.1875 against defense 50', () => {
         const [ hit ] = hitsOf(combat(), monsterOf(1000, stats('FIRE', 50)), 'kael', 1, { level: 2 });
 
         expect(hit.damage).toBeCloseTo(12.1875, 9);
@@ -838,7 +838,7 @@ describe('skill levels', () => {
         expect(clickOf(miss, other).critical).toBe(false);
     });
 
-    it('Brado Aterrador at level 3 removes 45 physical defense: a click on defense 50 deals 0.95, and 0.8 at level 1', () => {
+    it('Brado Aterrador at level 3 removes 45 defense: a click on defense 50 deals 0.95, and 0.8 at level 1', () => {
         const high = combat();
         const highMonster = monsterOf(1000, stats('FIRE', 50));
 
