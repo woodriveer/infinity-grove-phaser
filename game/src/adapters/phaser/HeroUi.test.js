@@ -2764,3 +2764,139 @@ describe('HeroUi Equipe editing', () => {
         expect(ctx.testid('hero-grid')).not.toBeNull();
     });
 });
+
+describe('HeroUi Equipe purchase', () => {
+    const NO_ALLIES = [ null, null, null, null ];
+    const FIRST_OPEN = { openSlots: 1, boughtSlots: 0, allies: NO_ALLIES };
+    //  The Equipe screen is open on a team with slot 1 open and nothing bought, a wallet of 10 000 copper
+    const shopping = async (team = teamOf(FIRST_OPEN), wallet = 10000) =>
+    {
+        const ctx = createUi({ list: ownedCatalog(team), position: CHAPTER_5, wallet });
+
+        await ctx.heroes.load();
+        await open(ctx, 'team');
+
+        return ctx;
+    };
+    const click = async (ctx, id) =>
+    {
+        ctx.testid(id).click();
+        await flush();
+    };
+    const bought = (overrides = {}) => ({ team: teamOf({ ...FIRST_OPEN, boughtSlots: 1, ...overrides }), wallet: { gold: 0, silver: 0, copper: 0 } });
+    const timerOf = (ctx, delay) => ctx.timers.find((timer) => timer.delay === delay);
+
+    it('a click on the buyable slot asks Comprar a vaga 1 por 1 ouro? and sends nothing', async () => {
+        const ctx = await shopping();
+
+        await click(ctx, 'team-slot-1');
+
+        expect(ctx.testid('team-buy-question').textContent).toBe('Comprar a vaga 1 por 1 ouro?');
+        expect(ctx.heroesGateway.buySlot).not.toHaveBeenCalled();
+    });
+
+    it('Cancelar closes the dialog and sends nothing', async () => {
+        const ctx = await shopping();
+
+        await click(ctx, 'team-slot-1');
+        await click(ctx, 'team-buy-cancel');
+
+        expect(ctx.testid('team-buy-dialog')).toBeNull();
+        expect(ctx.heroesGateway.buySlot).not.toHaveBeenCalled();
+    });
+
+    it('with 9999 copper Comprar is disabled next to Moedas insuficientes', async () => {
+        const ctx = await shopping(teamOf(FIRST_OPEN), 9999);
+
+        await click(ctx, 'team-slot-1');
+
+        expect(ctx.testid('team-buy-confirm').disabled).toBe(true);
+        expect(ctx.testid('team-screen').querySelector('.team-buy-short').textContent).toBe('Moedas insuficientes');
+    });
+
+    it('Comprar sends fromSlots 0 and disables Comprar and Cancelar until the answer', async () => {
+        const ctx = await shopping();
+
+        ctx.heroesGateway.buySlot.mockReturnValue(new Promise(() => {}));
+        await click(ctx, 'team-slot-1');
+        await click(ctx, 'team-buy-confirm');
+
+        expect(ctx.heroesGateway.buySlot).toHaveBeenCalledWith(0);
+        expect(ctx.testid('team-buy-confirm').disabled).toBe(true);
+        expect(ctx.testid('team-buy-cancel').disabled).toBe(true);
+    });
+
+    it('a purchase closes the dialog, flashes the slot, shows the notice and selects the new empty slot', async () => {
+        const ctx = await shopping();
+
+        ctx.heroesGateway.buySlot.mockResolvedValue(bought());
+        await click(ctx, 'team-slot-1');
+        await click(ctx, 'team-buy-confirm');
+
+        expect(ctx.testid('team-buy-dialog')).toBeNull();
+        expect(ctx.testid('team-slot-1').getAttribute('data-state')).toBe('empty');
+        expect(ctx.testid('team-slot-1').getAttribute('data-selected')).toBe('true');
+        expect(ctx.testid('team-slot-1').getAttribute('data-flash')).toBe('true');
+        expect(ctx.testid('team-notice').textContent).toBe('Vaga de aliado comprada!');
+        expect(ctx.testid('team-notice').hidden).toBe(false);
+    });
+
+    it('the flash ends after 400 ms and the notice after 3000 ms', async () => {
+        const ctx = await shopping();
+
+        ctx.heroesGateway.buySlot.mockResolvedValue(bought());
+        await click(ctx, 'team-slot-1');
+        await click(ctx, 'team-buy-confirm');
+
+        timerOf(ctx, 400).callback();
+
+        expect(ctx.testid('team-slot-1').hasAttribute('data-flash')).toBe(false);
+        expect(ctx.testid('team-notice').hidden).toBe(false);
+
+        timerOf(ctx, 3000).callback();
+
+        expect(ctx.testid('team-notice').hidden).toBe(true);
+    });
+
+    it('a purchase of slot 2 sends fromSlots 1', async () => {
+        const ctx = await shopping(teamOf({ openSlots: 2, boughtSlots: 1 }), 20000);
+
+        ctx.heroesGateway.buySlot.mockResolvedValue(bought({ openSlots: 2, boughtSlots: 2, allies: [ 'lyra', null, null, null ] }));
+        await click(ctx, 'team-slot-2');
+        await click(ctx, 'team-buy-confirm');
+
+        expect(ctx.heroesGateway.buySlot).toHaveBeenCalledWith(1);
+    });
+
+    it('a failed purchase closes the dialog, shows Não foi possível comprar a vaga. and reloads the heroes', async () => {
+        const ctx = await shopping();
+        const loads = ctx.heroesGateway.list.mock.calls.length;
+
+        ctx.heroesGateway.buySlot.mockRejectedValue(new ApiError('mismatch', { status: 409, code: 'TEAM_SLOT_MISMATCH' }));
+        await click(ctx, 'team-slot-1');
+        await click(ctx, 'team-buy-confirm');
+
+        expect(ctx.testid('team-buy-dialog')).toBeNull();
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível comprar a vaga.');
+        expect(ctx.heroesGateway.list.mock.calls).toHaveLength(loads + 1);
+        expect(ctx.testid('team-slot-1').disabled).toBe(false);
+    });
+
+    it('closing Equipe during a purchase keeps the bought slot and shows no notice on reopening', async () => {
+        const ctx = await shopping();
+        let finish;
+
+        ctx.heroesGateway.buySlot.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+        await click(ctx, 'team-slot-1');
+        await click(ctx, 'team-buy-confirm');
+        ctx.ui.close();
+        ctx.heroesGateway.list.mockImplementation(() => Promise.resolve(ownedCatalog(bought().team)));
+        finish(bought());
+        await flush();
+        await ctx.ui.show('team');
+
+        expect(ctx.testid('team-slot-1').getAttribute('data-state')).toBe('empty');
+        expect(ctx.testid('team-notice').hidden).toBe(true);
+        expect(ctx.testid('team-buy-dialog')).toBeNull();
+    });
+});

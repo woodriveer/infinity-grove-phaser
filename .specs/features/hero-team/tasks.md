@@ -2121,7 +2121,7 @@ async runTeam (request, selected, failure = TEAM_FAILED)
 
 ---
 
-### T20: Buy an ally slot in the Equipe screen [ ]
+### T20: Buy an ally slot in the Equipe screen [x]
 
 **Owner**: game-dev
 **Goal**: A click on the buyable slot asks to confirm; `Comprar` buys it once, flashes the slot, shows the notice and the new wallet and selects the new slot; `Cancelar` sends nothing; a failure says so and reloads (TEAM-10).
@@ -2192,7 +2192,7 @@ async confirmTeamSlot ()
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 9 cases pass and the whole Vitest suite passes.
+- [x] The 9 cases pass and the whole Vitest suite passes.
 
 **Commit**: `feat(game): buy ally slots in the Equipe screen`
 

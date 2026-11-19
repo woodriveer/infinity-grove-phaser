@@ -25,6 +25,7 @@ const LEADER = { x: 154, y: 686 };
 const SKILL_BAR = { x: 550, y: 686 };
 const NOTICE = { x: 512, y: 120 };
 const NOTICE_MS = 3000;
+const FLASH_MS = 400;
 
 //  Lucide icons at stroke 2.75, one per hero button
 const icon = (paths) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
@@ -55,6 +56,8 @@ const LOAD_FAILED = 'Não foi possível carregar.';
 const FUSE_FAILED = 'Não foi possível fundir as cartas.';
 const LEADER_FAILED = 'Não foi possível trocar o líder.';
 const TEAM_FAILED = 'Não foi possível salvar a equipe.';
+const SLOT_FAILED = 'Não foi possível comprar a vaga.';
+const SLOT_BOUGHT = 'Vaga de aliado comprada!';
 const EQUIPMENT_FAILED = 'Não foi possível concluir a ação.';
 const TALENT_FAILED = 'Não foi possível melhorar o talento.';
 const TALENT_RESET_FAILED = 'Não foi possível reiniciar os talentos.';
@@ -642,17 +645,77 @@ export class HeroUi
         }
     }
 
-    //  The purchase of an ally slot arrives with the next task
-    askTeamSlot ()
+    //  The purchase dialog of a buyable slot shows under the slot row; nothing is sent yet
+    askTeamSlot (slot)
     {
-    }
-
-    confirmTeamSlot ()
-    {
+        this.teamAsking = slot;
+        this.render_team();
     }
 
     cancelTeamSlot ()
     {
+        this.teamAsking = null;
+        this.render_team();
+    }
+
+    //  POST /team/slots from the bought count the screen shows; on success the new slot flashes 400 ms, the notice shows 3 s and the slot
+    //  is selected; the wallet reaches the HUD through heroes.onWallet (ClickerGame). A stale count answers 409 and is a failure here.
+    async confirmTeamSlot ()
+    {
+        const slot = this.teamAsking;
+        const fromSlots = this.heroes.team().boughtSlots;
+        const view = this.view;
+
+        this.teamBusy = true;
+        this.setError('');
+        this.render_team();
+
+        try
+        {
+            await this.heroes.buySlot(fromSlots);
+
+            if (view === this.view)
+            {
+                this.teamAsking = null;
+                this.teamSelected = slot;
+                this.teamFlash = slot;
+                this.teamNotice = SLOT_BOUGHT;
+                this.scene.time.delayedCall(FLASH_MS, () =>
+                {
+                    if (view === this.view && this.teamFlash === slot)
+                    {
+                        this.teamFlash = null;
+                        this.render_team();
+                    }
+                });
+                this.scene.time.delayedCall(NOTICE_MS, () =>
+                {
+                    if (view === this.view && this.teamNotice === SLOT_BOUGHT)
+                    {
+                        this.teamNotice = null;
+                        this.render_team();
+                    }
+                });
+            }
+        }
+        catch
+        {
+            if (view === this.view)
+            {
+                this.teamAsking = null;
+                this.setError(SLOT_FAILED);
+            }
+
+            await this.heroes.load().catch(() => {});
+        }
+        finally
+        {
+            if (view === this.view)
+            {
+                this.teamBusy = false;
+                this.render_team();
+            }
+        }
     }
 
     //  The attributes of the leader with the pieces it wears now, or null without a leader
