@@ -382,7 +382,7 @@ JSON of chapter 11 stage 1: `"adds": [ { "health": 1966080, "defenseBuff": 30 },
 
 ---
 
-### T4: Record the miniboss adds in ADR 0014 [ ]
+### T4: Record the miniboss adds in ADR 0014 [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The backend ADRs record where the adds live, how they are seeded and that the server never sees an add (ADDS-01).
@@ -408,7 +408,7 @@ JSON of chapter 11 stage 1: `"adds": [ { "health": 1966080, "defenseBuff": 30 },
 **Gate**: build - `cd backend && ./gradlew ktlintCheck test` (unchanged)
 **Done when**:
 
-- [ ] The file holds the five parts above and names `V13__miniboss_adds.sql`, `stage_adds` and the five buffs.
+- [x] The file holds the five parts above and names `V13__miniboss_adds.sql`, `stage_adds` and the five buffs.
 
 **Commit**: `docs(backend): record the miniboss adds storage`
 
