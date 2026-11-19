@@ -119,7 +119,7 @@ T26 → T27
 
 ## Task Breakdown
 
-### T1: Add the `Team` domain value [ ]
+### T1: Add the `Team` domain value [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Add the team of one player (bought slots, four ally entries) with the rules of a purchase, a save and a leader change, its view and its exceptions (TEAM-01, TEAM-02, TEAM-03, TEAM-04).
@@ -329,8 +329,8 @@ The numbered comments are the body to write, in that order; keep the KDoc.
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] `Team.kt` and `TeamExceptions.kt` exist with the contract above.
-- [ ] The 34 cases of `TeamTest.kt` pass and the whole backend suite passes.
+- [x] `Team.kt` and `TeamExceptions.kt` exist with the contract above.
+- [x] The 34 cases of `TeamTest.kt` pass and the whole backend suite passes.
 
 **Commit**: `feat(backend): add the hero team domain`
 
