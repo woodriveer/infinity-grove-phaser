@@ -66,6 +66,28 @@ class StageAddsMigrationIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `the migration pays each chapter its buff on both slots of every stage, 3 times the phase monster health each`() {
+        jdbc.update("delete from stage_adds")
+
+        migrate()
+
+        val buffs =
+            jdbc
+                .queryForList(
+                    "select s.chapter, a.defense_buff, count(*) as rows, count(distinct a.slot) as slots " +
+                        "from stage_adds a join stages s on s.id = a.stage_id group by s.chapter, a.defense_buff order by s.chapter",
+                ).map { Triple(it["chapter"], it["defense_buff"], listOf(it["rows"], it["slots"])) }
+        assertEquals(
+            listOf(11 to 30, 12 to 35, 13 to 40, 14 to 45, 15 to 50).map { (chapter, buff) -> Triple(chapter, buff, listOf(20L, 2L)) },
+            buffs,
+        )
+        assertEquals(
+            0,
+            count("select count(*) from stage_adds a join stages s on s.id = a.stage_id where a.hit_points <> 3 * s.monster_hit_points"),
+        )
+    }
+
+    @Test
     fun `the migration gives no add to chapters 1 to 10`() {
         jdbc.update("delete from stage_adds")
 
