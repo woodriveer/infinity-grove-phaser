@@ -1878,7 +1878,7 @@ Test fixtures: heroes `{ id, name, stars, owned: true, leaderBonus: 'Bonus' }` f
 
 ---
 
-### T18: Open the Equipe screen from the HUD [ ]
+### T18: Open the Equipe screen from the HUD [x]
 
 **Owner**: game-dev
 **Goal**: The HUD gains the `Equipe` button while the team is unlocked; it opens the Equipe screen with the stored team; the attribute panel counts the passives (TEAM-09, TEAM-11 AC 9).
@@ -1986,7 +1986,7 @@ Update the class comment: seven HUD buttons at most, the Equipe screen. `createU
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 8 cases pass, every existing `HeroUi` case passes (the rail stays six buttons for them), and the whole Vitest suite passes.
+- [x] The 8 cases pass, every existing `HeroUi` case passes (the rail stays six buttons for them), and the whole Vitest suite passes.
 
 **Commit**: `feat(game): open the Equipe screen from the HUD`
 

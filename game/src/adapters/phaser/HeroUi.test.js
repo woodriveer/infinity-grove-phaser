@@ -29,7 +29,7 @@ const catalog = () => ({
 
 const farmState = () => ({ bosses: [ { kind: 'MINIBOSS', stage: 1 }, { kind: 'CHAPTER_BOSS' } ], chapterBossWinsLeft: 10 });
 
-const createUi = ({ list = catalog(), farmGet = farmState(), equipmentList = { capacity: 100, pieces: [] }, wallet = 1_000_000, skillState, talentList = { talents: [] } } = {}) => {
+const createUi = ({ list = catalog(), farmGet = farmState(), equipmentList = { capacity: 100, pieces: [] }, wallet = 1_000_000, skillState, talentList = { talents: [] }, position = null } = {}) => {
     const talentGateway = {
         list: vi.fn(() => (talentList instanceof Error ? Promise.reject(talentList) : Promise.resolve(talentList))),
         upgrade: vi.fn()
@@ -38,7 +38,9 @@ const createUi = ({ list = catalog(), farmGet = farmState(), equipmentList = { c
         list: vi.fn(() => (list instanceof Error ? Promise.reject(list) : Promise.resolve(list))),
         fuse: vi.fn(),
         fuseAll: vi.fn(),
-        setLeader: vi.fn()
+        setLeader: vi.fn(),
+        setTeam: vi.fn(),
+        buySlot: vi.fn()
     };
     const equipmentGateway = {
         list: vi.fn(() => (equipmentList instanceof Error ? Promise.reject(equipmentList) : Promise.resolve(equipmentList))),
@@ -70,7 +72,7 @@ const createUi = ({ list = catalog(), farmGet = farmState(), equipmentList = { c
         },
         time: { delayedCall: vi.fn((delay, callback) => { timers.push({ delay, callback }); }) }
     };
-    const hooks = { startFarm: vi.fn(), walletCopper: vi.fn(() => wallet), useSkill: vi.fn(), skillState };
+    const hooks = { startFarm: vi.fn(), walletCopper: vi.fn(() => wallet), useSkill: vi.fn(), skillState, ...(position ? { mapPosition: () => position } : {}) };
     const heroes = createHeroCollection({ gateway: heroesGateway });
     const farm = createFarmSession({ gateway: farmGateway });
     const equipment = createEquipmentCollection({ gateway: equipmentGateway });
@@ -2477,5 +2479,101 @@ describe('HeroUi drag to equip', () => {
 
         expect(ctx.equipmentGateway.equip.mock.calls).toEqual([ [ 'a1', 'lyra' ] ]);
         expect(ctx.testid('piece-worn').textContent).toBe('Equipado em Hero lyra');
+    });
+});
+
+const TEAM_PRICES = [ 10000, 20000, 30000, 40000 ];
+const teamOf = (overrides = {}) => ({ unlocked: true, openSlots: 1, boughtSlots: 1, slotPrices: TEAM_PRICES, allies: [ 'lyra', null, null, null ], ...overrides });
+//  Every hero owned, Kael leading, and the given team
+const ownedCatalog = (team) => ({ leaderId: 'kael', heroes: [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ].map((id) => hero(id, { 0: 1 })), team });
+const CHAPTER_5 = { chapter: 5, stage: 1, kind: 'PHASE', stageCount: 10, completed: false };
+const railIds = (ctx) => [ ...ctx.query('.hero-hud').querySelectorAll('button') ].map((button) => button.getAttribute('data-testid'));
+
+describe('HeroUi Equipe', () => {
+    it('the rail has six buttons and no Equipe button while the team is locked', async () => {
+        const ctx = createUi();
+
+        await ctx.heroes.load();
+
+        expect(railIds(ctx)).toHaveLength(6);
+        expect(ctx.testid('hud-team')).toBeNull();
+    });
+
+    it('the Equipe button appears right after Líder once the team is unlocked', async () => {
+        const ctx = createUi({ list: ownedCatalog(teamOf()) });
+
+        await ctx.heroes.load();
+
+        expect(railIds(ctx)).toEqual([ 'hud-heroes', 'hud-bag', 'hud-leader', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm' ]);
+        expect(ctx.testid('hud-team').textContent).toBe('Equipe');
+        expect(ctx.testid('hud-team').querySelectorAll('svg path')).toHaveLength(8);
+    });
+
+    it('the Equipe button leaves the rail when a load answers a locked team', async () => {
+        const ctx = createUi({ list: ownedCatalog(teamOf()) });
+
+        await ctx.heroes.load();
+        expect(ctx.testid('hud-team')).not.toBeNull();
+
+        ctx.heroesGateway.list.mockImplementation(() => Promise.resolve(catalog()));
+        await ctx.heroes.load();
+
+        expect(ctx.testid('hud-team')).toBeNull();
+        expect(railIds(ctx)).toHaveLength(6);
+    });
+
+    it('the Equipe button opens the Equipe panel', async () => {
+        const ctx = createUi({ list: ownedCatalog(teamOf()) });
+
+        await ctx.heroes.load();
+        await open(ctx, 'team');
+
+        expect(ctx.query('.hero-title').textContent).toBe('Equipe');
+        expect(ctx.testid('team-screen')).not.toBeNull();
+        [ 0, 1, 2, 3, 4 ].forEach((slot) => expect(ctx.testid(`team-slot-${slot}`)).not.toBeNull());
+    });
+
+    it('opening Equipe reads the heroes and the equipment again', async () => {
+        const ctx = createUi({ list: ownedCatalog(teamOf()) });
+
+        await ctx.heroes.load();
+
+        const heroCalls = ctx.heroesGateway.list.mock.calls.length;
+        const equipmentCalls = ctx.equipmentGateway.list.mock.calls.length;
+
+        await open(ctx, 'team');
+
+        expect(ctx.heroesGateway.list.mock.calls).toHaveLength(heroCalls + 1);
+        expect(ctx.equipmentGateway.list.mock.calls).toHaveLength(equipmentCalls + 1);
+    });
+
+    it('a failed Equipe load shows Não foi possível carregar.', async () => {
+        const ctx = createUi({ list: ownedCatalog(teamOf()) });
+
+        await ctx.heroes.load();
+        ctx.heroesGateway.list.mockImplementation(() => Promise.reject(new ApiError('down')));
+        await open(ctx, 'team');
+
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível carregar.');
+        expect(ctx.query('.hero-error').hidden).toBe(false);
+    });
+
+    it('the Equipe screen says the team fights from chapter 5 below chapter 5', async () => {
+        const ctx = createUi({ list: ownedCatalog(teamOf()), position: { ...CHAPTER_5, chapter: 3 } });
+
+        await ctx.heroes.load();
+        await open(ctx, 'team');
+
+        expect(ctx.testid('team-status').hidden).toBe(false);
+        expect(ctx.testid('team-status').textContent).toBe('A equipe luta a partir do capítulo 5.');
+    });
+
+    it('the attribute panel counts Lyra\'s passive', async () => {
+        const ctx = createUi({ list: ownedCatalog(teamOf()), position: CHAPTER_5 });
+
+        await ctx.heroes.load();
+        await open(ctx, 'equipment');
+
+        expect(ctx.testid('stat-critChance').textContent).toBe('Chance de crítico: 20%');
     });
 });

@@ -3,6 +3,7 @@ import { bagPieces, selectedInBag, sellNotice as sellNoticeText, toggleRarity, t
 import { dropLabel, wornBy } from '../../domain/equipment/equipment';
 import { leaderStats } from '../../domain/equipment/leaderStats';
 import { raisedSkills } from '../../domain/heroes/bagCards';
+import { activePassives } from '../../domain/heroes/team';
 import { raisedSkillSlot, skillLevelOf } from '../../domain/skills/skillLevel';
 import { renderBagCards } from './views/bagView';
 import { renderCatalog, renderHeroDetail } from './views/catalogView';
@@ -13,6 +14,7 @@ import { renderBagHero, renderFuseAllResult } from './views/fusionLadderView';
 import { renderFusionResult } from './views/fusionView';
 import { renderLeaderPicker } from './views/leaderView';
 import { refreshSkillBar, renderLeaderCard, renderSkillBar } from './views/skillBar';
+import { renderTeam, teamModel } from './views/teamView';
 import { renderTalents, renderTalentsUnavailable } from './views/talentsView';
 
 const HUD = { x: 956, y: 370 };
@@ -32,6 +34,7 @@ const ICONS = {
     leader: icon('<path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path><path d="M5 21h14"></path>'),
     equipment: icon('<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>'),
     talents: icon('<path d="M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3"></path><path d="M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4"></path><path d="M5 21h14"></path>'),
+    team: icon('<path d="M14.5 17.5 3 6V3h3l11.5 11.5"></path><path d="m13 19 6-6"></path><path d="m16 16 4 4"></path><path d="m19 21 2-2"></path><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"></path><path d="m5 14 4 4"></path><path d="m7 17-3 3"></path><path d="m3 19 2 2"></path>'),
     farm: icon('<path d="M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z"></path><circle cx="15" cy="12" r="1"></circle><circle cx="9" cy="12" r="1"></circle>')
 };
 
@@ -39,6 +42,7 @@ const SCREENS = [
     { id: 'heroes', label: 'Heróis', title: 'Heróis' },
     { id: 'bag', label: 'Mochila', title: 'Mochila' },
     { id: 'leader', label: 'Líder', title: 'Líder' },
+    { id: 'team', label: 'Equipe', title: 'Equipe' },
     { id: 'equipment', label: 'Equipamento', title: 'Equipamento' },
     { id: 'talents', label: 'Talentos', title: 'Talentos' },
     { id: 'farm', label: 'Rever chefes', title: 'Rever chefes' }
@@ -61,7 +65,10 @@ const NOT_ENOUGH_TALENT_POINTS = 'Pontos de talento insuficientes';
 const BADGED = [ 'bag', 'equipment', 'talents' ];
 const MAX_BADGE_COUNT = 9;
 const badgeHtml = (id) => `<span class="hud-badge" data-testid="${id}-badge" hidden></span>`;
-const HUD_HTML = `<div class="hero-hud">${SCREENS.map(({ id, label }) => `<button type="button" data-testid="hud-${id}">${ICONS[id]}${label}${BADGED.includes(id) ? badgeHtml(id) : ''}</button>`).join('')}</div>`;
+const buttonHtml = ({ id, label }) => `<button type="button" data-testid="hud-${id}">${ICONS[id]}${label}${BADGED.includes(id) ? badgeHtml(id) : ''}</button>`;
+//  The Equipe button joins the rail only while the team is unlocked (refreshTeamButton), so the rail keeps six buttons for the others
+const RAIL = SCREENS.filter(({ id }) => id !== 'team');
+const HUD_HTML = `<div class="hero-hud">${RAIL.map(buttonHtml).join('')}</div>`;
 
 const PANEL_HTML = '<div class="hero-panel" hidden><div class="hero-window">'
     + '<div class="hero-header"><span class="hero-title"></span><span>'
@@ -73,8 +80,8 @@ const BAR_HTML = '<div class="skill-bar-host"></div>';
 const LEADER_HTML = '<div class="leader-host"></div>';
 const NOTICE_HTML = '<div class="hud-box hud-notice"><div class="card-notice" data-testid="card-notice" hidden></div></div>';
 
-//  The hero screens on top of the combat scene: six HUD buttons, one panel that shows the screen that was opened (Heróis, Mochila,
-//  Líder, Equipamento, Talentos, Rever chefes), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
+//  The hero screens on top of the combat scene: seven HUD buttons at most (the Equipe button only while the team is unlocked), one panel
+//  that shows the screen that was opened (Heróis, Mochila, Líder, Equipe, Equipamento, Talentos, Rever chefes), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
 //  It is plain DOM placed with scene.add.dom.
 //  Collaborators: heroes (heroCollection), equipment (equipmentCollection), talents (talentCollection), farm (farmSession) and the scene hooks
 //    walletCopper() -> the copper the player holds, to disable what costs more;
@@ -103,8 +110,16 @@ export class HeroUi
         this.view = 0;
         this.noticeId = 0;
         this.farmBusy = false;
+        //  The Equipe screen: the selected ally slot, a request running, the slot of the purchase question, the notice and the slot to flash
+        this.teamSelected = null;
+        this.teamBusy = false;
+        this.teamAsking = null;
+        this.teamNotice = null;
+        this.teamFlash = null;
 
-        const hud = this.createDom(HUD, HUD_HTML);
+        this.hudElement = scene.add.dom(HUD.x, HUD.y).createFromHTML(HUD_HTML);
+
+        const hud = this.hudElement.node;
 
         this.bagBadge = hud.querySelector('[data-testid="bag-badge"]');
         this.equipmentBadge = hud.querySelector('[data-testid="equipment-badge"]');
@@ -112,7 +127,13 @@ export class HeroUi
         this.talents.onChange?.(() => this.refreshTalentsBadge());
         this.screen = null;
 
-        SCREENS.forEach(({ id }) => hud.querySelector(`[data-testid="hud-${id}"]`).addEventListener('click', () => this.show(id)));
+        RAIL.forEach(({ id }) => hud.querySelector(`[data-testid="hud-${id}"]`).addEventListener('click', () => this.show(id)));
+
+        const holder = document.createElement('div');
+
+        holder.innerHTML = buttonHtml(SCREENS.find(({ id }) => id === 'team'));
+        this.teamButton = holder.firstElementChild;
+        this.teamButton.addEventListener('click', () => this.show('team'));
 
         //  Above the HUD buttons, which are added first
         this.panelElement = scene.add.dom(PANEL.x, PANEL.y).createFromHTML(PANEL_HTML).setDepth(1);
@@ -130,8 +151,31 @@ export class HeroUi
         this.notice = this.createDom(NOTICE, NOTICE_HTML, false).querySelector('.card-notice');
         this.leaderHost = this.createDom(LEADER, LEADER_HTML, false).querySelector('.leader-host');
 
-        heroes.onChange(() => this.updateSkillBar());
+        heroes.onChange(() =>
+        {
+            this.updateSkillBar();
+            this.refreshTeamButton();
+        });
         this.updateSkillBar();
+        this.refreshTeamButton();
+    }
+
+    //  The Equipe button is in the rail right after Líder while the team is unlocked, and absent otherwise (the rail keeps six buttons)
+    refreshTeamButton ()
+    {
+        const unlocked = this.heroes.team().unlocked;
+        const inRail = this.teamButton.parentNode !== null;
+
+        if (unlocked && !inRail)
+        {
+            this.hudElement.node.querySelector('[data-testid="hud-leader"]').after(this.teamButton);
+            this.hudElement.updateSize?.();
+        }
+        else if (!unlocked && inRail)
+        {
+            this.teamButton.remove();
+            this.hudElement.updateSize?.();
+        }
     }
 
     //  An element placed on the scene; the node returned holds the html. Click-through unless it is a control.
@@ -171,6 +215,11 @@ export class HeroUi
         this.sellMode = null;
         this.bagHeroId = null;
         this.fuseAllAsking = false;
+        this.teamSelected = null;
+        this.teamBusy = false;
+        this.teamAsking = null;
+        this.teamNotice = null;
+        this.teamFlash = null;
         this.title.textContent = title;
         this.setError('');
 
@@ -192,7 +241,7 @@ export class HeroUi
             {
                 await this.farm.load(options.chapter);
             }
-            else if (screen === 'equipment')
+            else if (screen === 'equipment' || screen === 'team')
             {
                 await Promise.all([ this.heroes.load(), this.equipment.load() ]);
             }
@@ -471,12 +520,71 @@ export class HeroUi
         }
     }
 
+    //  The Equipe screen of the stored team
+    render_team ()
+    {
+        this.body.replaceChildren(renderTeam(teamModel({
+            team: this.heroes.team(),
+            heroes: this.heroes.heroes(),
+            leaderId: this.heroes.leaderId(),
+            pieces: this.equipment.pieces(),
+            position: this.hooks.mapPosition?.() ?? DEFAULT_POSITION,
+            selected: this.teamSelected,
+            busy: this.teamBusy,
+            asking: this.teamAsking,
+            notice: this.teamNotice,
+            flashSlot: this.teamFlash,
+            walletCopper: this.hooks.walletCopper()
+        }), {
+            onSlot: (slot) => this.selectTeamSlot(slot),
+            onPick: (heroId) => this.pickTeamHero(heroId),
+            onRemove: () => this.removeTeamHero(),
+            onMakeLeader: () => this.makeTeamLeader(),
+            onConfirmBuy: () => this.confirmTeamSlot(),
+            onCancelBuy: () => this.cancelTeamSlot()
+        }));
+    }
+
+    //  The editing of the team arrives with the next tasks
+    selectTeamSlot ()
+    {
+    }
+
+    pickTeamHero ()
+    {
+    }
+
+    removeTeamHero ()
+    {
+    }
+
+    makeTeamLeader ()
+    {
+    }
+
+    confirmTeamSlot ()
+    {
+    }
+
+    cancelTeamSlot ()
+    {
+    }
+
     //  The attributes of the leader with the pieces it wears now, or null without a leader
     leaderStatsFor ()
     {
         const leader = this.heroes.leader();
 
-        return leader ? { name: leader.name, lines: leaderStats({ leader, pieces: wornBy(this.equipment.pieces(), leader.id), talents: this.talents.talents() }) } : null;
+        if (!leader)
+        {
+            return null;
+        }
+
+        const passives = activePassives({
+            team: this.heroes.team(), heroes: this.heroes.heroes(), leaderId: this.heroes.leaderId(), position: this.hooks.mapPosition?.() ?? DEFAULT_POSITION
+        });
+
+        return { name: leader.name, lines: leaderStats({ leader, pieces: wornBy(this.equipment.pieces(), leader.id), talents: this.talents.talents(), passives }) };
     }
 
     //  The attributes of the leader, the slots of every hero and the bag, or one piece with its actions (`selected` is a piece id)
