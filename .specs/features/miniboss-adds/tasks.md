@@ -1260,7 +1260,7 @@ Fixtures: a 3-star leader has every skill unlocked at level 1 and a click base o
 
 ---
 
-### T13: Cover the adds, the guard and the end of the fight in the browser [ ]
+### T13: Cover the adds, the guard and the end of the fight in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: e2e scenarios pin the spawn, the guarded defense, add deaths, the win, the countdown, the farm, the reload and fights without adds (ADDS-02, ADDS-03, ADDS-08; spec Adds AC 3 to 6, 8 to 10, Fight end AC 1 to 6, Edge Cases).
@@ -1314,7 +1314,7 @@ const outcomeCalls = (backend) => backend.calls.filter((call) => call.path === '
 **Gate**: full - `cd game && npm test && npx playwright test e2e/minibossAdds.spec.js`
 **Done when**:
 
-- [ ] The 13 scenarios pass twice in a row, and `npx playwright test e2e/stages.spec.js e2e/farm.spec.js e2e/heroTeamCombat.spec.js` passes.
+- [x] The 13 scenarios pass twice in a row, and `npx playwright test e2e/stages.spec.js e2e/farm.spec.js e2e/heroTeamCombat.spec.js` passes.
 
 **Commit**: `test(game): cover the miniboss adds in the browser`
 
