@@ -106,4 +106,51 @@ class HeroSeedTest {
         assertTrue(heroes.all { it.leaderBonus.isNotBlank() })
         assertTrue(heroes.flatMap { it.skills }.all { it.type.isNotBlank() && it.effect.isNotBlank() })
     }
+
+    @Test
+    fun `no hero text names a damage type`() {
+        val texts = heroes.flatMap { hero -> listOf(hero.leaderBonus) + hero.skills.map { it.effect } }.map { it.lowercase() }
+
+        listOf("mágic", "físic", "poder arcano", "de força").forEach { word ->
+            assertTrue(texts.none { it.contains(word) }, "a hero text still contains \"$word\"")
+        }
+    }
+
+    @Test
+    fun `Orina leads with +20% de dano total`() {
+        assertEquals("+20% de dano total.", heroes.first { it.id == "orina" }.leaderBonus)
+    }
+
+    @Test
+    fun `the eight skill texts of unified-damage`() {
+        fun effect(
+            hero: String,
+            slot: Int,
+        ) = heroes
+            .first { it.id == hero }
+            .skills
+            .first { it.slot == slot }
+            .effect
+
+        assertEquals(
+            "Um golpe que rasga o próprio espaço, causando 1500% de dano a todos os inimigos e ignorando 30% da defesa.",
+            effect("kael", 1),
+        )
+        assertEquals("Um grito de guerra que causa Medo: inimigos perdem 30 pontos de defesa por 10s.", effect("kael", 3))
+        assertEquals("Dispara duas flechas, cada uma causando 300% de dano.", effect("lyra", 1))
+        assertEquals(
+            "Vinhas de espinhos prendem os inimigos por 2s; enquanto presos, recebem +25% de dano.",
+            effect("orina", 1),
+        )
+        assertEquals("Raios caem por 6s, causando 200% de dano por segundo a todos os inimigos.", effect("orina", 2))
+        assertEquals("Uma chuva de estrelas causa 2500% de dano em área.", effect("orina", 3))
+        assertEquals(
+            "Por 15s, todos os aliados ganham +20% de Precisão, +30% de dano e +25% de velocidade de ataque.",
+            effect("seraphine", 1),
+        )
+        assertEquals(
+            "Um pilar de luz atinge todos os inimigos, causando 800% de dano (+50% contra criaturas do Submundo).",
+            effect("seraphine", 2),
+        )
+    }
 }

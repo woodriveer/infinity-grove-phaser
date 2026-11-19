@@ -330,7 +330,7 @@ private fun load(username: String) =
 
 ---
 
-### T3: Remove the magical break levels and rewrite the hero texts [ ]
+### T3: Remove the magical break levels and rewrite the hero texts [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Add `V11__unified_damage.sql` (delete `MAGICAL_BREAK*` levels, guarded text updates) and put the same new texts in `HeroSeed` (UDMG-08, UDMG-10).
@@ -374,8 +374,10 @@ private fun load(username: String) =
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] `grep -rn -i -E "mágic|físic|Poder Arcano|de Força" backend/src/main` finds only the `and leader_bonus = '...'` / `and effect = '...'` guard lines of `V11__unified_damage.sql`.
-- [ ] Every test case above passes and the whole backend suite passes (`SchemaValidationIT` included).
+- [x] `grep -rn -i -E "mágic|físic|Poder Arcano|de Força" backend/src/main` finds only the `and leader_bonus = '...'` / `and effect = '...'` guard lines of `V11__unified_damage.sql`.
+- [x] Every test case above passes and the whole backend suite passes (`SchemaValidationIT` included).
+
+**Note (orchestrator ruling)**: `PreviousBackendCompatibilityIT` also changed in this commit: `PREVIOUS_LAST_VERSION` 9 to 10 and the test renamed "... its validation ignores V11", because the previous release is now the V10-era backend and V11 is the one future migration.
 
 **Commit**: `feat(backend): drop the magical break levels and the damage type texts`
 

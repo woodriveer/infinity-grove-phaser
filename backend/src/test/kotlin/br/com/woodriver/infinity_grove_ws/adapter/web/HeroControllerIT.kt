@@ -455,4 +455,23 @@ class HeroControllerIT : IntegrationTestBase() {
         assertEquals(1, answers.first().jsonPath().getInt("hero.stars"))
         assertEquals(mapOf(1 to 1), jpaCardCopyRepository.findAllByUsername("yan").associate { it.stars to it.copies })
     }
+
+    @Test
+    fun `GET heroes answers Orina without damage types`() {
+        val token = register(element = "WATER")
+
+        asUser(token)
+            .get("/heroes")
+            .then()
+            .statusCode(200)
+            .body("heroes[2].id", equalTo("orina"))
+            .body("heroes[2].leaderBonus", equalTo("+20% de dano total."))
+            .body(
+                "heroes[2].skills[0].effect",
+                equalTo("Vinhas de espinhos prendem os inimigos por 2s; enquanto presos, recebem +25% de dano."),
+            ).body(
+                "heroes[2].skills[1].effect",
+                equalTo("Raios caem por 6s, causando 200% de dano por segundo a todos os inimigos."),
+            ).body("heroes[2].skills[2].effect", equalTo("Uma chuva de estrelas causa 2500% de dano em área."))
+    }
 }
