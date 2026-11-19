@@ -139,6 +139,52 @@ test.describe('Miniboss adds', () => {
         expect(after.drawn).toBe(1);
     });
 
+    test('each add bar shrinks with its own health and the big bar stays that of the miniboss', async ({ page }) => {
+        await startAdds(page);
+
+        const widths = () => scene(page, '(s) => ({ add1: s.addParts.get(1)?.fill.width, add2: s.addParts.get(2)?.fill.width, big: s.healthFill.width })');
+
+        expect(await widths()).toEqual({ add1: 100, add2: 100, big: 240 });
+
+        await hitAt(page, ...LACAIO_1, 15);
+
+        expect(await widths()).toEqual({ add1: 50, add2: 100, big: 240 });
+        await expect(page.getByTestId('target-chip')).toHaveText('Alvo: Lacaio 1 · HP 15/30');
+        await expect(page.getByTestId('monster-hp')).toHaveText('HP 100/100');
+
+        await hitAt(page, ...LACAIO_2, 3);
+
+        expect(await widths()).toEqual({ add1: 50, add2: 90, big: 240 });
+        await expect(page.getByTestId('target-chip')).toHaveText('Alvo: Lacaio 2 · HP 27/30');
+    });
+
+    test('the marker and the target chip stay on the miniboss after both adds died', async ({ page }) => {
+        await startAdds(page);
+
+        await hitAt(page, ...LACAIO_1, 30);
+        await hitAt(page, ...LACAIO_2, 30);
+
+        expect(await state(page)).toMatchObject({ adds: [ 0, 0 ], target: 'Miniboss', marker: [ 670, 270 ] });
+        await expect(page.getByTestId('target-chip')).toHaveText('Alvo: Miniboss · HP 100/100');
+        await expect(page.getByTestId('target-chip')).toBeVisible();
+
+        await hitAt(page, ...MINIBOSS);
+
+        await expect(page.getByTestId('target-chip')).toHaveText('Alvo: Miniboss · HP 99.5/100');
+        expect((await state(page)).marker).toEqual([ 670, 270 ]);
+    });
+
+    test('a hero screen blocks the click: no hit and no target change', async ({ page }) => {
+        await startAdds(page);
+
+        await page.getByTestId('hud-bag').click();
+        await expect(page.getByTestId('bag-list')).toBeVisible();
+        await hitAt(page, ...LACAIO_1);
+        await hitAt(page, ...MINIBOSS);
+
+        expect(await state(page)).toMatchObject({ adds: [ 30, 30 ], main: 100, target: 'Miniboss' });
+    });
+
     test('an add death drops no coin and sends no report', async ({ page }) => {
         const backend = await startAdds(page);
 
@@ -271,6 +317,7 @@ test.describe('Miniboss adds', () => {
         await startAdds(page, { definition: addsChapter({ defense: 61, adds: [ fifty, fifty ] }) });
 
         await expect(page.locator('.enemy-stats')).toContainText('Defesa 90%');
+        expect(await scene(page, '(s) => s.children.list.filter((o) => o.type === "Text" && o.text === "+50 de defesa").length')).toBe(2);
 
         await hitAt(page, ...LACAIO_1, 30);
 

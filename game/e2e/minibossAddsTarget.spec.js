@@ -278,6 +278,19 @@ test.describe('Miniboss target', () => {
         //  The gold marker is drawn under the damage numbers, over the miniboss at the start
         expect(await scene(page, '(s) => ({ color: s.marker.fillColor, depth: s.marker.depth, width: s.marker.getBounds().width, height: s.marker.getBounds().height })'))
             .toEqual({ color: 0xffd24a, depth: 0.9, width: 16, height: 10 });
+
+        //  It points down: the two top corners 16 px apart, the tip 10 px below them, at (670, 275) over the miniboss's bar (top y 281)
+        const tip = () => scene(page, '(s) => { const g = s.marker.geom; const b = s.marker.getBounds(); return { points: [ g.x1, g.y1, g.x2, g.y2, g.x3, g.y3 ], centerX: b.centerX, tipY: b.bottom }; }');
+
+        expect(await tip()).toEqual({ points: [ 0, 0, 16, 0, 8, 10 ], centerX: 670, tipY: 275 });
+
+        await hitAt(page, ...LACAIO_1);
+
+        expect(await tip()).toMatchObject({ centerX: 480, tipY: 258.5 });
+
+        await hitAt(page, ...LACAIO_2);
+
+        expect(await tip()).toMatchObject({ centerX: 480, tipY: 438.5 });
     });
 
     test('the target chip is a gold-bordered 12 px chip and no enemy box row touches Lacaio 2', async ({ page }) => {
