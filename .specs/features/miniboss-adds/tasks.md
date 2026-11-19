@@ -410,7 +410,7 @@ JSON of chapter 11 stage 1: `"adds": [ { "health": 1966080, "defenseBuff": 30 },
 
 ---
 
-### T5: Read the adds of a stage [ ]
+### T5: Read the adds of a stage [x]
 
 **Owner**: game-dev
 **Goal**: A pure function turns the `adds` of a stage of the payload into at most 2 valid adds with the stage's phase monster stats (ADDS-02, spec Adds AC 9, 10).
@@ -470,7 +470,7 @@ export const addsOf = (stage) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 10 cases pass and the whole Vitest suite passes.
+- [x] The 10 cases pass and the whole Vitest suite passes.
 
 **Commit**: `feat(game): read the adds of a stage`
 
