@@ -867,7 +867,7 @@ Answers: 200 `{ "team": team payload, "wallet": { "gold", "silver", "copper" } }
 
 ---
 
-### T7: Add the team rules of the game [ ]
+### T7: Add the team rules of the game [x]
 
 **Owner**: game-dev
 **Goal**: One pure module reads the team payload and answers when the team is active, who fights, which passives apply, the state of every slot and the available heroes (TEAM-07 AC 13, TEAM-09, TEAM-11 AC 6, 7).
@@ -980,8 +980,8 @@ Rules of `normalizeTeam`: valid when the payload is an object; `unlocked` is a b
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] `team.js` exports every name of the contract.
-- [ ] The 34 cases of `team.test.js` pass and the whole Vitest suite passes.
+- [x] `team.js` exports every name of the contract.
+- [x] The 34 cases of `team.test.js` pass and the whole Vitest suite passes.
 
 **Commit**: `feat(game): add the team rules`
 
