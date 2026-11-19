@@ -26,12 +26,12 @@ Re-checked against `main` at `8543fb5` (2026-11-19), after `campaign-chapters`, 
 
 ## Goals
 
-- [ ] Every hit (click, skill hit, aimed shot, damage tick) meets the same enemy defense and the same modifiers; no code path picks a defense or a bonus by damage type.
-- [ ] Prisão de Espinhos raises every damage the monster takes by 25 % (x f), so an Orina click under Prisão deals 1.25 times more.
-- [ ] Bênção da Grande Árvore multiplies every damage by 1.3 (x f) while it runs, skill hits of Orina and Seraphine included; its +25 % click bonus stays.
-- [ ] The enemy shows one `Defesa <n>%` chip, and the backend answers one `defense` per enemy (progress and farm) while it keeps the old two fields for the previous game.
-- [ ] The talent tree has one `Quebra de defesa` talent in each grade (9 talents per grade, 27 in total); every `MAGICAL_BREAK*` level is removed and its talent points come back.
-- [ ] No player-visible text says "mágico/mágica", "físico/física", "Poder Arcano" or "Força" about damage; Orina's leader bonus reads `+20% de dano total.`.
+- [x] Every hit (click, skill hit, aimed shot, damage tick) meets the same enemy defense and the same modifiers; no code path picks a defense or a bonus by damage type.
+- [x] Prisão de Espinhos raises every damage the monster takes by 25 % (x f), so an Orina click under Prisão deals 1.25 times more.
+- [x] Bênção da Grande Árvore multiplies every damage by 1.3 (x f) while it runs, skill hits of Orina and Seraphine included; its +25 % click bonus stays.
+- [x] The enemy shows one `Defesa <n>%` chip, and the backend answers one `defense` per enemy (progress and farm) while it keeps the old two fields for the previous game.
+- [x] The talent tree has one `Quebra de defesa` talent in each grade (9 talents per grade, 27 in total); every `MAGICAL_BREAK*` level is removed and its talent points come back.
+- [x] No player-visible text says "mágico/mágica", "físico/física", "Poder Arcano" or "Força" about damage; Orina's leader bonus reads `+20% de dano total.`.
 
 ## Out of Scope
 
@@ -281,6 +281,7 @@ Rows marked `y` are owner decisions: decisions 1 to 3 of 2026-10-31 and the answ
 - WHEN Prisão de Espinhos ends (2 s at every level) THEN the next click SHALL deal the damage without P (E4 then 1.4).
 - WHEN Bênção da Grande Árvore ends (15 s) THEN the next skill hit SHALL deal the damage without B (Luz Divina 10.4 then 8 on Base 1).
 - WHEN a damage tick lands at the second Prisão or Bênção ends THEN it SHALL follow the rule of `hero-skills` for ticks (the tick at the end second still gets the effect), now for every tick: Tempestade Arcana under Prisão level 1 ticks 2.5 at 1 s and 2 s, then 2; under a Bênção cast 14 s earlier it ticks 2.6, then 2.
+- WHEN Tiro Preciso's aimed shot lands at the second Prisão or Bênção ends THEN it SHALL get the effect, by the same end-second rule as ticks: Prisão level 1 and the Tiro Preciso cast both last 2 s, so a shot started with Prisão on Base 1, same element, defense 0, lands 30 x 2 (critical) x 1.25 = 75 (L-108).
 - WHEN `PHYSICAL_BREAK` is larger than the defense THEN the defense SHALL be 0, never negative (defense 10, break 15: full damage).
 - IF a payload carries both `defense` 40 and `physicalDefense` 70 THEN the game SHALL use 40.
 - WHEN a player who never bought `MAGICAL_BREAK*` is migrated THEN their points and levels SHALL stay the same.
@@ -292,27 +293,27 @@ Rows marked `y` are owner decisions: decisions 1 to 3 of 2026-10-31 and the answ
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| UDMG-01 | P1: One damage in combat - AC 1, 2, 10 (one defense in the formula, no damage type) | Tasks | Pending |
-| UDMG-02 | P1: One damage in combat - AC 3, 4, 9 (Prisão on every strike) | Tasks | Pending |
-| UDMG-03 | P1: One damage in combat - AC 5, 6 (Bênção on every strike) | Tasks | Pending |
-| UDMG-04 | P1: One damage in combat - AC 7, 8 (Brado and the break talent on the single defense) | Tasks | Pending |
-| UDMG-05 | P1: One enemy defense - AC 1 to 4 (backend model, persistence, API expand for progress and farm) | Tasks | Pending |
-| UDMG-06 | P1: One enemy defense - AC 5 to 10 (game chip, tolerant read, chip art) | Tasks | Pending |
-| UDMG-07 | P1: One defense break talent - AC 1 to 3, 7 (catalog of 27, tolerant load) | Tasks | Pending |
-| UDMG-08 | P1: One defense break talent - AC 4 to 6 (migration and refund) | Tasks | Pending |
-| UDMG-09 | P1: One defense break talent - AC 8, 9 (game drops the retired talent, Talentos screen) | Tasks | Pending |
-| UDMG-10 | P1: Texts without damage types - AC 1 to 5 (hero texts: seed, migration, screens) | Tasks | Pending |
-| UDMG-11 | P1: Texts without damage types - AC 6, 7 (attribute panel) | Tasks | Pending |
-| UDMG-12 | P1: Texts without damage types - AC 8 (README) | Tasks | Pending |
+| UDMG-01 | P1: One damage in combat - AC 1, 2, 10 (one defense in the formula, no damage type) | Tasks | Verified |
+| UDMG-02 | P1: One damage in combat - AC 3, 4, 9 (Prisão on every strike) | Tasks | Verified |
+| UDMG-03 | P1: One damage in combat - AC 5, 6 (Bênção on every strike) | Tasks | Verified |
+| UDMG-04 | P1: One damage in combat - AC 7, 8 (Brado and the break talent on the single defense) | Tasks | Verified |
+| UDMG-05 | P1: One enemy defense - AC 1 to 4 (backend model, persistence, API expand for progress and farm) | Tasks | Verified |
+| UDMG-06 | P1: One enemy defense - AC 5 to 10 (game chip, tolerant read, chip art) | Tasks | Verified |
+| UDMG-07 | P1: One defense break talent - AC 1 to 3, 7 (catalog of 27, tolerant load) | Tasks | Verified |
+| UDMG-08 | P1: One defense break talent - AC 4 to 6 (migration and refund) | Tasks | Verified |
+| UDMG-09 | P1: One defense break talent - AC 8, 9 (game drops the retired talent, Talentos screen) | Tasks | Verified |
+| UDMG-10 | P1: Texts without damage types - AC 1 to 5 (hero texts: seed, migration, screens) | Tasks | Verified |
+| UDMG-11 | P1: Texts without damage types - AC 6, 7 (attribute panel) | Tasks | Verified |
+| UDMG-12 | P1: Texts without damage types - AC 8 (README) | Tasks | Verified |
 
-**Coverage:** 12 total, 12 mapped to tasks, 0 unmapped
+**Coverage:** 12 total, 12 mapped to tasks, 0 unmapped; 12 Verified (Verifier round 2 PASS, `validation.md` at `8b2e609`; UDMG-02 and UDMG-03 closed by Fix 1, `c7cf3a4`)
 
 ---
 
 ## Success Criteria
 
-- [ ] `git grep -n -i -E "mágic|físic|Poder Arcano|de Força"` over `backend/src/main` and `game/src` finds only the `and effect = '<old text>'` / `and leader_bonus = '<old text>'` guard lines of `V11__unified_damage.sql` (skill name `Tempestade Arcana` matches none of them).
-- [ ] `git grep -n -E "MAGICAL|magicalDefense|damageType"` over `game/src` (tests excluded) finds only `RETIRED_TALENT_IDS` and the `defenseOf` comment of TD-002.
-- [ ] Unit tests pin E1 to E19, the Talent Refund rows and the 27-talent catalog; an integration test runs the migration on a seeded database.
-- [ ] e2e scenarios cover the enemy chip, Prisão on a click, Bênção on a skill hit, the Talentos column, the attribute panel and Orina's leader bonus.
-- [ ] Every existing backend, unit and e2e suite passes; the only edited tests are those that pinned the split, renamed after the new behaviour (L-054).
+- [x] `git grep -n -i -E "mágic|físic|Poder Arcano|de Força"` over `backend/src/main` and `game/src` finds only the `and effect = '<old text>'` / `and leader_bonus = '<old text>'` guard lines of `V11__unified_damage.sql` (skill name `Tempestade Arcana` matches none of them).
+- [x] `git grep -n -E "MAGICAL|magicalDefense|damageType"` over `game/src` (tests excluded) finds only the `RETIRED_TALENT_IDS` constant (`talentCollection.js`) and `//` comment lines that name the old payload or the ignored field (`monster.js` `defenseOf` of TD-002, the payload shape of `campaign.js`, the ignored `damageType` of `damage.js`); no code line reads `magicalDefense` or `damageType`.
+- [x] Unit tests pin E1 to E19, the Talent Refund rows and the 27-talent catalog; an integration test runs the migration on a seeded database.
+- [x] e2e scenarios cover the enemy chip, Prisão on a click, Bênção on a skill hit, the Talentos column, the attribute panel and Orina's leader bonus.
+- [x] Every existing backend, unit and e2e suite passes; the only edited tests are those that pinned the split, renamed after the new behaviour (L-054).

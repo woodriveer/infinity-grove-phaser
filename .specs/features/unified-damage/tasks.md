@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/unified-damage/spec.md`
 **Design**: `.specs/features/unified-damage/design.md`
-**Status**: Approved by the owner on 2026-11-19 (Q1 points only, Q2 one damage everywhere). Refreshed against `main` at `8543fb5`; line numbers below were read that day.
+**Status**: Approved by the owner on 2026-11-19 (Q1 points only, Q2 one damage everywhere). Refreshed against `main` at `8543fb5`; line numbers below were read that day. T1 to T14 done; `ui-review.html` APROVADO (`c2181c7`); Verifier round 1 one gap (aimed shot under Prisão and Bênção), closed by Fix 1 (`c7cf3a4`); Verifier round 2 PASS (`8b2e609`); accepted by the product owner on 2026-11-19 (§ Acceptance).
 
 Rules for every task:
 
@@ -22,6 +22,46 @@ Rules for every task:
 - **If a test that the task does not name fails, STOP and report its file, name and failure. Do not edit it.** Known exception: from T5 to T10 the e2e scenarios that read `Physical def`, `Magical def` or the `physical` / `magical` chips fail; T11 rewrites them, and T5 to T10 gate on Vitest only.
 - Decimal expectations use `toBeCloseTo(value, 9)` (Vitest) unless the task gives another precision; Kotlin uses exact integers here.
 - Words used below: **old payload** = an enemy object with `physicalDefense` and `magicalDefense` and no `defense` (the backend before this feature); **new payload** = an enemy object with `defense`, `physicalDefense` and `magicalDefense`, all equal.
+
+---
+
+## Acceptance (product-owner, 2026-11-19)
+
+**Verdict: ACCEPTED.** T1 to T14 are done, the Verifier round 2 gives PASS and the ui-artist review gives APROVADO with 0 findings. No new task of this feature.
+
+**Evidence read**: `validation.md` round 2 (`8b2e609`, diff range `8ed5284..c7cf3a4`): 37 of 37 ACs matched to the spec outcome with `file:line` evidence, 10 of 10 player-visible ACs with an e2e scenario (`game/e2e/unifiedDamage.spec.js`, 11 scenarios), 7 of 7 edge cases. The round 1 gap (Tiro Preciso's cast hit under Prisão and Bênção, M19 and M20 surviving) is closed by Fix 1 (`c7cf3a4`, `skillCombat.test.js` "lands 75 under Prisão de Espinhos level 1" and "lands 78 under Bênção da Grande Árvore level 1"). Sensor over both rounds: 23 mutants, 22 killed, 1 survived (M10, equivalent: both callers of `showEnemyStats` pass `monsterAfterBreak(...)`, which always writes `defense`), 0 invalid, isolation ok. Backend 1043/1043 and game unit 1813/1813 at `c7cf3a4`; e2e 389/392 and deploy 287/289 at `24c2a07` (no production code changed after it). Failures not caused by the feature: `dragEquip.spec.js:586` (fails the same way at `8ed5284`, before the feature) and `wake.spec.js:56`, both already on the load-flake list; `splash.spec.js:25` passed alone twice with `--workers=1` at acceptance (17.4 s, 14.7 s), so it joins the list; `deploy/regression.test.mjs:385` and `:412` exit with the native Windows code 0xC0000409 and `deploy/` is untouched in the range. Migration `V11__unified_damage.sql` changes no schema (expand/contract, AD-016): it deletes the `MAGICAL_BREAK*` rows and rewrites hero texts guarded by the old text (`UnifiedDamageMigrationIT`). `ui-review.html` (`c2181c7`): APROVADO, 6 screens, 16 shots, 0 findings, 5 suggestions (ruled below).
+
+**Spec goals** (`spec.md`, Goals):
+
+| Goal | Evidence (`validation.md`) | Status |
+| --- | --- | --- |
+| 1. Every hit meets the same defense and modifiers; no path picks a defense or a bonus by damage type | P1 combat AC 1, 2, 10 (`damage.test.js:35`, `skillCombat.test.js:54`, e2e `unifiedDamage.spec.js:92`); the aimed shot by Fix 1; Success Criterion 2 grep finds no code line reading `magicalDefense` or `damageType` | Met |
+| 2. Prisão raises every damage by 25 % (x f); an Orina click under Prisão deals 1.25 times more | AC 3, 4, 9 (E3, E4, E5, E6, E7, E17, E19; aimed shot 75 at `skillCombat.test.js:624-625`; e2e `unifiedDamage.spec.js:73-80`); sensor M1, M3, M19, M21, M23 killed | Met |
+| 3. Bênção multiplies every damage by 1.3 (x f), Orina and Seraphine skill hits included; +25 % click bonus stays | AC 5, 6 (E8 to E12, E18; aimed shot 78 at `skillCombat.test.js:636-641`; e2e `unifiedDamage.spec.js:89`); sensor M2, M20, M22 killed | Met |
+| 4. One `Defesa <n>%` chip; the backend answers one `defense` (progress and farm) and keeps the two old fields | enemy AC 1 to 10 (`ProgressControllerIT.kt:119-131`, `:228-230`, `FarmControllerIT.kt:302-304`, `ChapterRepositoryIT.kt:179`, e2e `unifiedDamage.spec.js:143-188`); sensor M4, M5, M11, M14, M15, M18 killed | Met |
+| 5. One `Quebra de defesa` per grade (27 talents); every `MAGICAL_BREAK*` level removed and its points back | talents AC 1 to 9 (`TalentControllerIT.kt`, `UnifiedDamageMigrationIT.kt:120-187`, `talentCollection.test.js:134-160`, e2e `unifiedDamage.spec.js:201-208`); sensor M9, M13, M16 killed | Met |
+| 6. No player-visible text speaks of a damage type; Orina's bonus reads `+20% de dano total.` | texts AC 1 to 8 (`HeroSeedTest.kt:111-151`, `UnifiedDamageMigrationIT.kt:190-210`, e2e `unifiedDamage.spec.js:217-234`, README grep empty); Success Criterion 1 grep finds only the nine V11 guard lines; sensor M12, M17 killed | Met |
+
+**Success criteria**: all five met. Criterion 2 was reworded at acceptance: its grep also hits two explanatory comments (`game/src/domain/campaign/campaign.js:9`, `game/src/domain/combat/damage.js:10`) that the old wording did not name; no code reads those fields, so the wording was wrong, not the code.
+
+**Rulings on the ui-review suggestions** (recorded, nothing built here):
+
+| # | Suggestion | Ruling |
+| --- | --- | --- |
+| 1 | Talentos shots show only Grau 1 and part of Grau 2 (the modal scrolls) | Review process, not product: the next review of Talentos adds a shot scrolled to Grau 3. No backlog item |
+| 2 | Enemy line chip `Water` (and `Crit res`) in English beside `Defesa` and the Portuguese Elementos panel | Already inside TD-001 (`characters` spec: "the enemy line"). No new debt; the `STATE.md` Handoff names the enemy line as the first slice of the next TD-001 translation task, since this feature put a Portuguese chip between two English ones |
+| 3 | Attribute panel: with 10 lines in rows of 3, `Quebra de resistência a crítico` sits alone in row 4, apart from `Quebra de defesa` | Backlog item **TD-011** in `STATE.md` (open, low): keep the two break lines side by side. Not a gap of this spec, whose AC 6 fixes only the order |
+| 4 | On a phone the enemy chips render at about 6 px of text height | Existing canvas scaling, already TD-010. No new item |
+| 5 | Talentos phone shot: the Poder do clique and Combo icons had not loaded | Not caused by the feature and not reproduced; the next review of Talentos checks that the icons load before the shot. No backlog item |
+
+**Edits made at acceptance**:
+
+1. `spec.md`: Goals and Success Criteria ticked; UDMG-01 to UDMG-12 set to Verified (UDMG-02 and UDMG-03 closed by Fix 1); Success Criterion 2 reworded to name the comment lines; edge case added: the aimed shot that lands at the second Prisão or Bênção ends still gets the effect, by the same rule as ticks (Verifier spec-precision note, L-108).
+2. `STATE.md`: AD-021 status set to built and accepted; TD-011 added; `splash.spec.js:25` added to the load-flake list; Handoff set to the `gitops` release.
+
+**Waiting for the owner's confirmation**: the ruling on suggestion 3 (TD-011, low priority) and the TD-001 note. Nothing blocks the release.
+
+**Next step**: `gitops` releases `unified-damage`: push, deploy check (the backend runs `V11__unified_damage.sql` at boot; the game reads `defense ?? physicalDefense ?? 0`, so either deploy order works, design "Deploy order"), production check (enemy line `Defesa <n>%`, Talentos with 27 cards), `report.html` from `.specs/features/unified-damage/coverage/`, `CHANGELOG.md`, tag.
 
 ---
 
