@@ -19,7 +19,6 @@ export const leaderStats = ({ leader, pieces = [], talents = null }) =>
 
     return [
         { id: 'element', text: `Elemento: ${ELEMENT_LABELS[leader.element]}` },
-        { id: 'damageType', text: 'Tipo de dano: Físico' },
         { id: 'clickDamage', text: `Dano de clique: ${attacker.baseDamage.toFixed(1)}` },
         { id: 'critChance', text: `Chance de crítico: ${one(attacker.critChance)}%` },
         { id: 'critDamage', text: `Dano crítico: x${two(attacker.critMultiplier)}` },
@@ -27,8 +26,7 @@ export const leaderStats = ({ leader, pieces = [], talents = null }) =>
         { id: 'bossDamage', text: `Dano em chefes: ${one(attacker.bossDamage ?? 0)}%` },
         { id: 'minibossTime', text: `Tempo extra de miniboss: ${one(equipmentSeconds + talentValue(talents, 'MINIBOSS_TIME'))}s` },
         { id: 'bossTime', text: `Tempo extra de chefe: ${one(equipmentSeconds + talentValue(talents, 'BOSS_TIME'))}s` },
-        { id: 'breakPhysical', text: `Quebra de defesa física: ${talentValue(talents, 'PHYSICAL_BREAK')}` },
-        { id: 'breakMagical', text: `Quebra de defesa mágica: ${talentValue(talents, 'MAGICAL_BREAK')}` },
+        { id: 'breakDefense', text: `Quebra de defesa: ${talentValue(talents, 'PHYSICAL_BREAK')}` },
         { id: 'breakCrit', text: `Quebra de resistência a crítico: ${talentValue(talents, 'CRIT_RESIST_BREAK')}` }
     ];
 };

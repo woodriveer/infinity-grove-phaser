@@ -11,8 +11,8 @@ const lines = (input) => Object.fromEntries(leaderStats(input).map(({ id, text }
 describe('leaderStats', () => {
     it('gives the lines in the order of the spec', () => {
         expect(leaderStats({ leader: kael() }).map(({ id }) => id)).toEqual([
-            'element', 'damageType', 'clickDamage', 'critChance', 'critDamage', 'armorPierce', 'bossDamage', 'minibossTime', 'bossTime',
-            'breakPhysical', 'breakMagical', 'breakCrit'
+            'element', 'clickDamage', 'critChance', 'critDamage', 'armorPierce', 'bossDamage', 'minibossTime', 'bossTime',
+            'breakDefense', 'breakCrit'
         ]);
     });
 
@@ -20,7 +20,7 @@ describe('leaderStats', () => {
         const kaelLines = lines({ leader: kael() });
 
         expect(kaelLines.element).toBe('Elemento: Fogo');
-        expect(kaelLines.damageType).toBe('Tipo de dano: Físico');
+        expect(kaelLines.damageType).toBeUndefined();
         expect(kaelLines.clickDamage).toBe('Dano de clique: 1.0');
         expect(kaelLines.critChance).toBe('Chance de crítico: 10%');
         expect(kaelLines.critDamage).toBe('Dano crítico: x2');
@@ -81,20 +81,25 @@ describe('leaderStats', () => {
         expect(result.bossTime).toBe('Tempo extra de chefe: 12s');
     });
 
-    it('reads the three break talents', () => {
-        const result = lines({ leader: kael(), talents: talents({ PHYSICAL_BREAK: 3, MAGICAL_BREAK: 4, CRIT_RESIST_BREAK: 8 }) });
+    it('reads the two break talents', () => {
+        const result = lines({ leader: kael(), talents: talents({ PHYSICAL_BREAK: 3, CRIT_RESIST_BREAK: 8 }) });
 
-        expect(result.breakPhysical).toBe('Quebra de defesa física: 3');
-        expect(result.breakMagical).toBe('Quebra de defesa mágica: 4');
+        expect(result.breakDefense).toBe('Quebra de defesa: 3');
         expect(result.breakCrit).toBe('Quebra de resistência a crítico: 8');
+        expect(result.breakPhysical).toBeUndefined();
+        expect(result.breakMagical).toBeUndefined();
+    });
+
+    it('ignores a MAGICAL_BREAK entry of an older talent list', () => {
+        const result = lines({ leader: kael(), talents: talents({ MAGICAL_BREAK: 4 }) });
+
+        expect(result.breakDefense).toBe('Quebra de defesa: 0');
     });
 
     it('reads 0 for every break without talents', () => {
         const result = lines({ leader: kael() });
 
-        expect([ result.breakPhysical, result.breakMagical, result.breakCrit ]).toEqual([
-            'Quebra de defesa física: 0', 'Quebra de defesa mágica: 0', 'Quebra de resistência a crítico: 0'
-        ]);
+        expect([ result.breakDefense, result.breakCrit ]).toEqual([ 'Quebra de defesa: 0', 'Quebra de resistência a crítico: 0' ]);
     });
 
     it('does not read the pieces of another hero: only the pieces it is given count', () => {

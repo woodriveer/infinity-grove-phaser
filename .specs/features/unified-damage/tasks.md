@@ -761,7 +761,7 @@ export const monsterAfterBreak = (stats, talents) => ({
 
 ---
 
-### T9: Show one Quebra de defesa line and no damage type on the attribute panel [ ]
+### T9: Show one Quebra de defesa line and no damage type on the attribute panel [x]
 
 **Owner**: game-dev
 **Goal**: `leaderStats` answers 10 lines: no `damageType`, one `breakDefense` line `Quebra de defesa: <n>` (UDMG-11).
@@ -809,8 +809,8 @@ The view renders each line as `.stat-line` with test id `stat-<id>` (`equipmentV
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] `grep -rn "Tipo de dano\|defesa física\|defesa mágica" game/src` finds only the two test fixtures that T10 rewrites (`talentsView.test.js:6`, `HeroUi.test.js:1222`).
-- [ ] The edited and new tests pass; the whole Vitest suite passes.
+- [x] `grep -rn "Tipo de dano\|defesa física\|defesa mágica" game/src` finds only the two test fixtures that T10 rewrites (`talentsView.test.js:6`, `HeroUi.test.js:1222`).
+- [x] The edited and new tests pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): show one Quebra de defesa line on the attribute panel`
 

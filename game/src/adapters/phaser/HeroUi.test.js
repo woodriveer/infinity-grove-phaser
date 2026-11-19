@@ -1452,7 +1452,7 @@ describe('HeroUi leader attributes', () => {
 
         expect(stat(ctx, 'critChance')).toBe('Chance de crítico: 14%');
         expect(stat(ctx, 'minibossTime')).toBe('Tempo extra de miniboss: 4s');
-        expect(stat(ctx, 'breakPhysical')).toBe('Quebra de defesa física: 3');
+        expect(stat(ctx, 'breakDefense')).toBe('Quebra de defesa: 3');
     });
 
     it('shows no panel while there is no leader', async () => {
