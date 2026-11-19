@@ -351,6 +351,11 @@ test.describe('Hero team: Equipe screen', () => {
         await startTeam(page, { cleared: [ 5 ], copper: 10_000 });
         await openTeam(page);
         await slot(page, 1).click();
+        await expect(page.getByTestId('team-buy-dialog')).toBeVisible();
+
+        //  The 400 ms flash and the 3000 ms notice are timers of the scene clock that rebuild the panel: with the loop asleep they never
+        //  replace the nodes measured below
+        await page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
         await page.getByTestId('team-buy-confirm').click();
         await expect(slot(page, 1)).toHaveAttribute('data-state', 'empty');
 
