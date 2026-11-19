@@ -1198,7 +1198,7 @@ Place it right after `click`. Test fixture: `const leader = leaderAttacker({ lea
 
 ---
 
-### T11: Add the one-second clock of the allies [ ]
+### T11: Add the one-second clock of the allies [x]
 
 **Owner**: game-dev
 **Goal**: `AllyCombat` lands the ally ticks every 1000 ms of fight time in slot order, stops a tick at a kill and restarts for every new monster, with a `target` seam for `miniboss-adds` (TEAM-07).
@@ -1273,7 +1273,7 @@ Test helpers: `const hitter = (base) => ({ baseDamage: base })`; `const hit = vi
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 12 cases pass and the whole Vitest suite passes.
+- [x] The 12 cases pass and the whole Vitest suite passes.
 
 **Commit**: `feat(game): add the one-second clock of the allies`
 
