@@ -1075,11 +1075,22 @@ describe('allyHit', () => {
         expect(land(skills, monster, ally(0, pieces))).toBeCloseTo(2, 9);
     });
 
-    it('E14: a 3 star leader with CLICK_DAMAGE 20 leaves an ally hit at 2', () => {
+    it('E14: a 3 star leader with CLICK_DAMAGE 20 casts Corte Dimensional for 24, not 21, and an ally hit after it still deals 2', () => {
         const strong = leaderAttacker({ leader: { element: 'FIRE', stars: 3 }, talents: [ { id: 'CLICK_DAMAGE', value: 20 } ] });
+        //  The skill of the leader on a fresh monster: the skills (with their running effects) and the monster come back with its damage
+        const cast = (attacker) =>
+        {
+            const skills = combat();
+            const monster = monsterWith();
+
+            return { skills, monster, damage: skills.use({ heroId: 'kael', slot: 1, unlocked: true, level: 1, attacker, monster, boss: false }).hits[0].damage };
+        };
+        const plain = cast(leader);
+        const boosted = cast(strong);
 
         expect(strong.baseDamage).toBeGreaterThan(leader.baseDamage);
-        expect(land(combat(), monsterWith(), ally())).toBeCloseTo(2, 9);
+        expect([ plain.damage, boosted.damage ]).toEqual([ expect.closeTo(21, 9), expect.closeTo(24, 9) ]);
+        expect(land(boosted.skills, boosted.monster, ally())).toBeCloseTo(2, 9);
     });
 
     it('E15: the leader\'s element decides: FIRE deals 4 and WATER deals 1 to a NATURE monster', () => {

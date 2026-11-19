@@ -5397,6 +5397,108 @@ describe('ClickerGame hero team', () => {
         expect(label(ctx)).toBe('Stage 1/10  Phase 1/5');
         expect(heroesGateway.list).toHaveBeenCalledTimes(2);
     });
+
+    describe('the frame where an effect ends, and every trigger of the ally ACs (spec hero-team)', () => {
+        const key = (ctx, name) => ctx.handlers[`keydown-${name}`]();
+        //  A chapter 5 monster of 1000 HP with the given stats: nothing dies and the exact sums can be read from the health
+        const bigMonster = (monster = { element: 'FIRE', defense: 0, critResistance: 0 }) => ({
+            ...atChapter(5),
+            definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000, monster })) }
+        });
+        const tree = (values) => Object.entries(values).map(([ id, value ]) => ({ id, perLevel: 1, maxLevel: 50, level: value, value, nextCost: 300 }));
+
+        it('an ally tick in the frame where Prisão de Espinhos ends still gets +25 %: 2.5 at 2000 ms, 2 after it', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { heroOptions: { leaderId: 'orina', stars: { orina: 1 } }, start: bigMonster() });
+
+            key(ctx, 'ONE');
+            ctx.scene.update(0, 1000);
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 2.5, 9);
+
+            //  The second tick lands in the very frame that uses up the 2000 ms of Prisão
+            ctx.scene.update(0, 1000);
+            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '2.5', '2.5' ]);
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 5, 9);
+
+            ctx.scene.update(0, 1000);
+            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '2.5', '2.5', '2' ]);
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 7, 9);
+        });
+
+        it('an ally tick in the frame where Bênção da Grande Árvore ends still gets +30 %: 2.6 at 15000 ms, 2 after it', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { heroOptions: { leaderId: 'seraphine', stars: { seraphine: 1 } }, start: bigMonster() });
+
+            key(ctx, 'ONE');
+            ctx.scene.update(0, 14000);
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 14 * 2.6, 9);
+
+            //  The 15th tick lands in the very frame that uses up the 15000 ms of Bênção
+            ctx.scene.update(0, 1000);
+            expect(allyTexts(ctx).at(-1).text).toBe('2.6');
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 15 * 2.6, 9);
+
+            ctx.scene.update(0, 1000);
+            expect(allyTexts(ctx).at(-1).text).toBe('2');
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 15 * 2.6 - 2, 9);
+        });
+
+        it('an ally that fuses to more stars hits with the new multiplier on the next tick: 4, then 6', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { heroOptions: { stars: { lyra: 1 } }, start: bigMonster() });
+
+            ctx.scene.update(0, 1000);
+            expect(allyTexts(ctx).at(-1).text).toBe('4');
+            expect(ctx.scene.monster.health).toBe(996);
+
+            heroesGateway.fuse.mockResolvedValue(heroEntry('lyra', { 0: 1 }, 2));
+            await ctx.scene.heroes.fuse('lyra', 1);
+            ctx.scene.update(0, 1000);
+
+            expect(allyTexts(ctx).at(-1).text).toBe('6');
+            expect(ctx.scene.monster.health).toBe(990);
+        });
+
+        it('power talents of the leader (CLICK_DAMAGE 20, CRIT_CHANCE 20) reach the click but leave the ally tick at 2', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { start: bigMonster(), talents: tree({ CLICK_DAMAGE: 20, CRIT_CHANCE: 20 }) });
+
+            ctx.click();
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 1.2, 9);
+
+            ctx.dice.value = 0;
+            ctx.scene.update(0, 1000);
+
+            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '2' ]);
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 1.2 - 2, 9);
+        });
+
+        //  Kael at 1 star: Corte Dimensional is 1500 % of a click of 1.1, 16.5, and 33 when critical (10 % base, 20 % with Lyra)
+        it('Lyra as an ally adds 10 critical chance to a skill hit of the leader: a roll of 15 crits (33), not without her (16.5)', async () => {
+            const withLyra = await open([ 'lyra', null, null, null ], { heroOptions: { stars: { kael: 1 } }, start: bigMonster() });
+
+            withLyra.dice.value = 0.15;
+            key(withLyra, 'ONE');
+            expect(withLyra.scene.monster.health).toBeCloseTo(1000 - 33, 9);
+
+            const without = await open([ null, null, null, null ], { heroOptions: { stars: { kael: 1 } }, start: bigMonster() });
+
+            without.dice.value = 0.15;
+            key(without, 'ONE');
+            expect(without.scene.monster.health).toBeCloseTo(1000 - 16.5, 9);
+        });
+
+        it('Vex as an ally takes 15 points off the critical resistance 30 a skill hit meets: a roll of 8 crits (33), not without him (16.5)', async () => {
+            const monster = { element: 'FIRE', defense: 0, critResistance: 30 };
+            const withVex = await open([ 'vex', null, null, null ], { heroOptions: { stars: { kael: 1 } }, start: bigMonster(monster) });
+
+            withVex.dice.value = 0.08;
+            key(withVex, 'ONE');
+            expect(withVex.scene.monster.health).toBeCloseTo(1000 - 33, 9);
+
+            const without = await open([ null, null, null, null ], { heroOptions: { stars: { kael: 1 } }, start: bigMonster(monster) });
+
+            without.dice.value = 0.08;
+            key(without, 'ONE');
+            expect(without.scene.monster.health).toBeCloseTo(1000 - 16.5, 9);
+        });
+    });
 });
 
 describe('ClickerGame hero team formation', () => {
