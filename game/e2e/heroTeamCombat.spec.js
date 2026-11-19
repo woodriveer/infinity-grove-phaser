@@ -114,8 +114,8 @@ test.describe('Hero team: ally hits', () => {
     test('after a reset to chapter 1 a monster takes no damage from allies for 3 s', async ({ page }) => {
         await startTeam(page, { chapter: 6, cleared: [ 5 ], team: LYRA_IN_SLOT_1, stop: false });
 
-        //  The team is active at chapter 6: a tick lands in real time
-        await expect.poll(() => allyTexts(page).then((texts) => texts.length)).toBeGreaterThan(0);
+        //  The team is active at chapter 6: a tick lands in real time and takes health from the monster
+        await expect.poll(() => health(page), { timeout: 20_000 }).toBeLessThan(1000);
 
         await page.getByTestId('auto-click-button').click();
         await expect(page.getByTestId('auto-click-popover')).toBeVisible();

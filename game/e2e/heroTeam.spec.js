@@ -55,6 +55,9 @@ const openTeam = async (page) => {
 //  The box of a DOM element in scene px (the scene is 1024 px wide)
 const sceneBox = async (page, locator) => {
     const canvas = await page.locator('#game-container canvas').boundingBox();
+
+    await locator.waitFor({ state: 'visible' });
+
     const box = await locator.boundingBox();
     const scale = canvas.width / 1024;
 
