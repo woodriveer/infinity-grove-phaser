@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/miniboss-adds/spec.md`
 **Design**: `.specs/features/miniboss-adds/design.md`
-**Status**: Draft (2026-11-19), waiting for the owner's approval and the answers to Q47 to Q52. Written on the recommended defaults against `main` at `3e8ff62`; line numbers below were read that day.
+**Status**: Approved by the owner (2026-11-19), with Q47 to Q52 answered as the recommended defaults; no task changes. Written on the recommended defaults against `main` at `3e8ff62`; line numbers below were read that day.
 
 Rules for every task:
 
@@ -28,7 +28,7 @@ Rules for every task:
 
 ## Owner Questions (open)
 
-Design and tasks follow the recommended defaults of spec Q47 to Q52. Another answer changes these tasks:
+The owner confirmed the recommended defaults of spec Q47 to Q52 on 2026-11-19, so the tasks stand as written. Kept for traceability:
 
 | Question | Default used | Tasks that change with another answer |
 | --- | --- | --- |
