@@ -614,6 +614,33 @@ describe('the aimed shot', () => {
         expect(skills.advance(2000, { monster, boss: true }).hits).toEqual([ { damage: 90, critical: true } ]);
     });
 
+    it('lands 75 under Prisão de Espinhos level 1 (30 x 2 critical x 1.25), which still runs at the 2 s the cast ends', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'orina', 1);
+        use(skills, monster, 'lyra', 2);
+
+        expect(skills.advance(1999, { monster }).hits).toEqual([]);
+        expect(skills.advance(1, { monster }).hits).toEqual([ { damage: 75, critical: true } ]);
+    });
+
+    it('lands 78 under Bênção da Grande Árvore level 1 (30 x 2 critical x 1.3)', () => {
+        const skills = combat();
+        const monster = monsterOf();
+
+        use(skills, monster, 'seraphine', 1);
+        use(skills, monster, 'lyra', 2);
+
+        expect(skills.advance(1999, { monster }).hits).toEqual([]);
+
+        const { hits } = skills.advance(1, { monster });
+
+        expect(hits).toHaveLength(1);
+        expect(hits[0].critical).toBe(true);
+        expect(hits[0].damage).toBeCloseTo(78, 10);
+    });
+
     it('is lost when the monster dies before the cast ends, and the cooldown keeps running', () => {
         const skills = combat();
         const monster = monsterOf(5);
