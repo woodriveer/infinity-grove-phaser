@@ -1128,18 +1128,15 @@ export class ClickerGame extends Scene
         const allyTicks = this.allyFrame(delta);
         //  The stop of Stun and Root is read before the skills use it up with this frame
         const countdownMs = this.skills.countdownMs(delta);
-        const { hits } = this.skills.advance(delta, { monster: this.monster, boss: this.countdown !== null });
+        const { hits, targets } = this.skills.advance(delta, { monster: this.monster, adds: this.livingAddMonsters(), boss: this.countdown !== null });
 
-        hits.forEach(({ damage, critical }) => this.showDamage(formatDamage(damage), MONSTER.x, critical));
+        hits.forEach(({ damage, critical }, index) =>
+            this.showDamage(formatDamage(damage), this.centreXOf(targets[index]), critical, null, this.numberYOf(targets[index])));
 
-        //  A tick that does not kill still moves the health bar and the HP text; one that kills runs the kill path
-        if (alive && this.monster.dead)
+        //  Any damage settles the dead adds and the health bars; a dead main runs the kill path once
+        if (alive && (this.monster.dead || hits.length > 0 || allyTicks > 0))
         {
             this.afterDamage();
-        }
-        else if (alive && (hits.length > 0 || allyTicks > 0))
-        {
-            this.updateHealthBar();
         }
 
         this.refreshSkillUi();
@@ -1163,7 +1160,7 @@ export class ClickerGame extends Scene
     {
         this.heroUi.refreshSkills();
 
-        const effects = this.skills.effectsWithOwner();
+        const effects = this.skills.effectsWithOwner(this.currentTarget());
         const key = effects.map(({ label }) => label).join('|');
 
         //  Same effects: only the seconds change, in place, so a tooltip open on a tag stays open
@@ -1300,6 +1297,7 @@ export class ClickerGame extends Scene
             level: skillLevelOf(skill),
             attacker: this.leaderAttacker(),
             monster: this.monster,
+            adds: this.livingAddMonsters(),
             boss: this.countdown !== null
         });
 
@@ -1308,7 +1306,8 @@ export class ClickerGame extends Scene
             return;
         }
 
-        result.hits.forEach(({ damage, critical }) => this.showDamage(formatDamage(damage), MONSTER.x, critical));
+        result.hits.forEach(({ damage, critical }, index) =>
+            this.showDamage(formatDamage(damage), this.centreXOf(result.targets[index]), critical, null, this.numberYOf(result.targets[index])));
 
         if (result.countdown.extendMs > 0 && this.countdown)
         {
@@ -1316,13 +1315,8 @@ export class ClickerGame extends Scene
             this.showCountdown();
         }
 
-        this.updateHealthBar();
         this.refreshSkillUi();
-
-        if (this.monster.dead)
-        {
-            this.afterDamage();
-        }
+        this.afterDamage();
     }
 
     //  The boss survived its time limit: it leaves, and the stage's last phase comes back after the respawn delay

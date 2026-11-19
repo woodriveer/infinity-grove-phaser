@@ -6144,3 +6144,145 @@ describe('ClickerGame miniboss target', () => {
         expect(ctx.scene.fight.target).toBe(ctx.scene.monster);
     });
 });
+
+describe('ClickerGame miniboss skills', () => {
+    //  A 3-star leader has every skill unlocked at level 1 and a click base of 1.4 (+40 %); every heroEntry is FIRE like the monsters
+    const leader3 = (id) => ({ leaderId: id, heroes: [ heroEntry(id, { 3: 1 }, 3) ] });
+    const BIG = { health: 100, defenseBuff: 30 };
+    const GUARDED = { miniboss: { element: 'FIRE', defense: 50, critResistance: 0 }, adds: [ BIG, BIG ] };
+    const skillScene = (id, options = GUARDED) => addsScene(options, { heroes: leader3(id) });
+    const numbers = (ctx, from) => ctx.texts.slice(from).map(({ text, x, y }) => [ text, x, y ]);
+
+    it('Chuva de Meteoros shows 35 on each add and 3.5 on the guarded miniboss', async () => {
+        const ctx = await skillScene('orina');
+
+        ctx.scene.useSkill(3);
+
+        expect(numbers(ctx, -3)).toEqual([ [ '35', 480, 360 ], [ '35', 480, 540 ], [ '3.5', 670, 273 ] ]);
+        expect(ctx.scene.monster.health).toBeCloseTo(96.5, 9);
+    });
+
+    it('Chuva kills both adds of 30 first and meets the miniboss at defense 50 for 17.5', async () => {
+        const ctx = await skillScene('orina', { ...GUARDED, adds: [ ADD, ADD ] });
+        const parts = partsOf(ctx);
+
+        ctx.scene.useSkill(3);
+
+        expect(numbers(ctx, -3)).toEqual([ [ '35', 480, 360 ], [ '35', 480, 540 ], [ '17.5', 670, 273 ] ]);
+        expect(ctx.scene.monster.health).toBeCloseTo(82.5, 9);
+
+        ctx.tweens.filter((tween) => Array.isArray(tween.targets) && tween.targets.some((target) => parts.includes(target))).forEach((tween) => tween.onComplete());
+
+        parts.forEach((part) => expect(part.destroy).toHaveBeenCalledTimes(1));
+    });
+
+    it('a skill that kills both adds and the miniboss wins once', async () => {
+        const ctx = await skillScene('orina', { ...GUARDED, adds: [ ADD, ADD ], minibossHealth: 10 });
+
+        ctx.scene.useSkill(3);
+        await flush();
+
+        expect(ctx.scene.monster.dead).toBe(true);
+        expect(campaignGateway.report).toHaveBeenCalledTimes(1);
+        expect(campaignGateway.report.mock.calls[0][1]).toBe('CLEARED');
+    });
+
+    it('Flecha Dupla shows six numbers: 4.2 twice on each add and 0.4 twice on the miniboss', async () => {
+        const ctx = await skillScene('lyra');
+
+        ctx.scene.useSkill(1);
+
+        expect(numbers(ctx, -6)).toEqual([
+            [ '4.2', 480, 360 ], [ '4.2', 480, 360 ], [ '4.2', 480, 540 ], [ '4.2', 480, 540 ], [ '0.4', 670, 273 ], [ '0.4', 670, 273 ]
+        ]);
+        expect(ctx.dice.value).toBe(0.99);
+    });
+
+    it('Tempestade Arcana ticks show one number per monster each second', async () => {
+        const ctx = await skillScene('orina');
+
+        ctx.scene.useSkill(2);
+
+        const before = ctx.texts.length;
+
+        ctx.scene.update(0, 1000);
+
+        expect(numbers(ctx, before)).toEqual([ [ '2.8', 480, 360 ], [ '2.8', 480, 540 ], [ '0.3', 670, 273 ] ]);
+    });
+
+    it('a tick that kills the last adds lowers the miniboss defense in the same frame', async () => {
+        const dying = { health: 2, defenseBuff: 30 };
+        const ctx = await skillScene('orina', { ...GUARDED, adds: [ dying, dying ] });
+
+        ctx.scene.useSkill(2);
+
+        const before = ctx.texts.length;
+
+        ctx.scene.update(0, 1000);
+
+        expect(numbers(ctx, before)).toEqual([ [ '2.8', 480, 360 ], [ '2.8', 480, 540 ], [ '1.4', 670, 273 ] ]);
+        expect(ctx.scene.fight.adds.map((add) => add.monster.dead)).toEqual([ true, true ]);
+        expect(enemyLine(ctx)).toBe('Fire  Defesa 50%  Crit res 0%');
+    });
+
+    it('Bomba de Veneno ticks on every monster', async () => {
+        const ctx = await skillScene('vex');
+
+        ctx.scene.useSkill(1);
+
+        const before = ctx.texts.length;
+
+        ctx.scene.update(0, 1000);
+
+        expect(numbers(ctx, before)).toEqual([ [ '1.4', 480, 360 ], [ '1.4', 480, 540 ], [ '0.1', 670, 273 ] ]);
+    });
+
+    it('Tiro Preciso lands a critical on every monster at the end of its cast', async () => {
+        const far = { health: 200, defenseBuff: 30 };
+        const ctx = await skillScene('lyra', { ...GUARDED, adds: [ far, far ] });
+
+        ctx.scene.useSkill(2);
+
+        const before = ctx.texts.length;
+
+        ctx.scene.update(0, 2000);
+
+        expect(numbers(ctx, before)).toEqual([ [ '105', 480, 360 ], [ '105', 480, 540 ], [ '10.5', 670, 273 ] ]);
+        expect(ctx.texts.slice(before).map((text) => text.style.color)).toEqual([ '#ff8a1f', '#ff8a1f', '#ff8a1f' ]);
+    });
+
+    it('Brado Aterrador on every monster shows in the tags of the target add', async () => {
+        const ctx = await skillScene('kael');
+
+        ctx.scene.useSkill(3);
+        ctx.click({ x: 480, y: 360 });
+        ctx.scene.update(0, 16);
+
+        expect(ctx.hud('.effect-tags').textContent).toContain('Brado Aterrador');
+
+        ctx.click(onMiniboss);
+
+        expect(ctx.scene.monster.health).toBeCloseTo(100 - 0.56, 9);
+    });
+
+    it('the effect tags read the effects of the target', async () => {
+        const ctx = await skillScene('kael');
+        const spy = vi.spyOn(ctx.scene.skills, 'effectsWithOwner');
+
+        ctx.click({ x: 480, y: 360 });
+        ctx.scene.update(0, 16);
+
+        expect(spy.mock.calls.at(-1)[0]).toBe(ctx.scene.fight.adds[0].monster);
+    });
+
+    it('a skill in a fight without adds shows its one number at x 670 as before', async () => {
+        const ctx = await createScene({ start: progress(1, 'MINIBOSS', 1), heroes: leader3('orina'), talents: [], autoClickOn: false });
+        const before = ctx.texts.length;
+
+        ctx.scene.useSkill(3);
+
+        expect(numbers(ctx, before)).toHaveLength(1);
+        expect(ctx.texts.at(-1).x).toBe(670);
+        expect(ctx.texts.at(-1).y).toBe(273);
+    });
+});

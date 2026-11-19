@@ -1198,7 +1198,7 @@ allyNumberXOf (monster) { const add = this.fight?.addOf(monster); return add ? A
 
 ---
 
-### T12: Land the skills and their ticks on every monster in the scene [ ]
+### T12: Land the skills and their ticks on every monster in the scene [x]
 
 **Owner**: game-dev
 **Goal**: The scene passes the living adds to every skill use and every skill frame, shows each number at the monster it landed on, settles add deaths after skills and ticks, and shows the target's effects in the tags (ADDS-06, ADDS-07, spec Damage skills AC 1 to 10, Edge Cases).
@@ -1254,7 +1254,7 @@ Fixtures: a 3-star leader has every skill unlocked at level 1 and a click base o
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 11 cases pass, every existing `ClickerGame` case passes unchanged, and the whole Vitest suite passes.
+- [x] The 11 cases pass, every existing `ClickerGame` case passes unchanged, and the whole Vitest suite passes.
 
 **Commit**: `feat(game): land the skills on every monster of a miniboss fight`
 
