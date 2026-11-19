@@ -73,3 +73,43 @@ describe('heroesApi', () => {
         await expect(heroesApi.fuse('kael', 0)).rejects.toThrow('not enough cards');
     });
 });
+
+describe('heroesApi team routes', () => {
+    const httpClient = { get: vi.fn(), post: vi.fn(), put: vi.fn() };
+    const heroesApi = createHeroesApi(httpClient);
+
+    beforeEach(() => {
+        httpClient.post.mockReset();
+        httpClient.put.mockReset();
+    });
+
+    it('setTeam puts the allies to /team and returns the body', async () => {
+        const data = { leaderId: 'kael', team: { unlocked: true, openSlots: 1, boughtSlots: 1, allies: [ 'lyra', null, null, null ] } };
+        httpClient.put.mockResolvedValue({ data });
+
+        await expect(heroesApi.setTeam([ 'lyra', null, null, null ])).resolves.toEqual(data);
+        expect(httpClient.put).toHaveBeenCalledWith('/team', { allies: [ 'lyra', null, null, null ] });
+    });
+
+    it('buySlot posts fromSlots to /team/slots and returns the body', async () => {
+        const data = { team: { unlocked: true, openSlots: 1, boughtSlots: 1 }, wallet: { gold: 0, silver: 50, copper: 0 } };
+        httpClient.post.mockResolvedValue({ data });
+
+        await expect(heroesApi.buySlot(0)).resolves.toEqual(data);
+        expect(httpClient.post).toHaveBeenCalledWith('/team/slots', { fromSlots: 0 });
+    });
+
+    it('setTeam rejects with the error of the client', async () => {
+        const error = new ApiError('x', { status: 409, code: 'TEAM_LOCKED' });
+        httpClient.put.mockRejectedValue(error);
+
+        await expect(heroesApi.setTeam([ null, null, null, null ])).rejects.toBe(error);
+    });
+
+    it('buySlot rejects with the error of the client', async () => {
+        const error = new ApiError('x', { status: 409, code: 'TEAM_SLOT_MISMATCH' });
+        httpClient.post.mockRejectedValue(error);
+
+        await expect(heroesApi.buySlot(0)).rejects.toBe(error);
+    });
+});

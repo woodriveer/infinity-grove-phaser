@@ -1331,7 +1331,7 @@ export const leaderStats = ({ leader, pieces = [], talents = null, passives = NO
 
 ---
 
-### T13: Call the team routes from the game [ ]
+### T13: Call the team routes from the game [x]
 
 **Owner**: game-dev
 **Goal**: The heroes gateway saves the allies (`PUT /team`) and buys a slot (`POST /team/slots`) (TEAM-09, TEAM-10, TEAM-13).
@@ -1370,7 +1370,7 @@ buySlot: async (fromSlots) => (await httpClient.post('/team/slots', { fromSlots 
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 4 cases pass and the whole Vitest suite passes.
+- [x] The 4 cases pass and the whole Vitest suite passes.
 
 **Commit**: `feat(game): call the team routes`
 
