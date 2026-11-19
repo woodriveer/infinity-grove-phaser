@@ -41,12 +41,12 @@ class EnemyRepository(
     @Transactional
     fun idOf(stats: EnemyStats): Long {
         val element = stats.element.name
-        jpaEnemyRepository.insertIfAbsent(element, stats.physicalDefense, stats.magicalDefense, stats.critResistance)
+        jpaEnemyRepository.insertIfAbsent(element, stats.defense, stats.defense, stats.critResistance)
         val row =
             jpaEnemyRepository.findByElementAndPhysicalDefenseAndMagicalDefenseAndCritResistance(
                 element,
-                stats.physicalDefense,
-                stats.magicalDefense,
+                stats.defense,
+                stats.defense,
                 stats.critResistance,
             )
         return checkNotNull(row?.id) { "Enemy $stats was inserted but cannot be read back" }

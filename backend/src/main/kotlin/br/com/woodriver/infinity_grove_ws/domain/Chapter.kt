@@ -2,16 +2,14 @@ package br.com.woodriver.infinity_grove_ws.domain
 
 enum class Element { FIRE, WATER, NATURE, LIGHT, DARKNESS }
 
-/** What the player's damage meets in one encounter: its element, two defenses and its resistance to critical hits (percent). */
+/** What the player's damage meets in one encounter: its element, its one defense and its resistance to critical hits (percent). */
 data class EnemyStats(
     val element: Element,
-    val physicalDefense: Int,
-    val magicalDefense: Int,
+    val defense: Int,
     val critResistance: Int,
 ) {
     init {
-        require(physicalDefense in 0..MAX_DEFENSE) { "physical-defense $physicalDefense must be between 0 and $MAX_DEFENSE" }
-        require(magicalDefense in 0..MAX_DEFENSE) { "magical-defense $magicalDefense must be between 0 and $MAX_DEFENSE" }
+        require(defense in 0..MAX_DEFENSE) { "defense $defense must be between 0 and $MAX_DEFENSE" }
         require(critResistance in 0..MAX_CRIT_RESISTANCE) { "crit-resistance $critResistance must be between 0 and $MAX_CRIT_RESISTANCE" }
     }
 
@@ -20,7 +18,7 @@ data class EnemyStats(
         const val MAX_CRIT_RESISTANCE = 100
 
         /** What a row created before enemy attributes existed means. */
-        val DEFAULT = EnemyStats(Element.FIRE, 0, 0, 0)
+        val DEFAULT = EnemyStats(Element.FIRE, 0, 0)
     }
 }
 
@@ -173,8 +171,8 @@ data class ChapterDefinition(
                             monsterHealth = monsterHealth,
                             minibossHealth = monsterHealth * MINIBOSS_HEALTH_FACTOR,
                             minibossTimeLimitMs = MINIBOSS_TIME_LIMIT_MS,
-                            monster = EnemyStats(element, 0, 0, 0),
-                            miniboss = EnemyStats(element, defense, defense, critResistance),
+                            monster = EnemyStats(element, 0, 0),
+                            miniboss = EnemyStats(element, defense, critResistance),
                             monsterDropRuleId = monsterRuleId(number),
                             minibossDropRuleId = minibossRuleId(number),
                         )
@@ -182,7 +180,6 @@ data class ChapterDefinition(
                 boss =
                     EnemyStats(
                         Element.entries[(number + 3) % Element.entries.size],
-                        minOf(BOSS_DEFENSE + defenseBonus, MAX_SEEDED_DEFENSE),
                         minOf(BOSS_DEFENSE + defenseBonus, MAX_SEEDED_DEFENSE),
                         minOf(BOSS_CRIT_RESISTANCE + defenseBonus, MAX_SEEDED_CRIT_RESISTANCE),
                     ),

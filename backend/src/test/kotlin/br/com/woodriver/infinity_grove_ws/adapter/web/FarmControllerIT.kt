@@ -299,7 +299,9 @@ class FarmControllerIT : IntegrationTestBase() {
             .body("definition.bossHealth", equalTo(8000))
             .body("definition.stages[0].minibossHealth", equalTo(800))
             .body("definition.boss.element", equalTo("FIRE"))
+            .body("definition.boss.defense", equalTo(35))
             .body("definition.boss.physicalDefense", equalTo(35))
+            .body("definition.boss.magicalDefense", equalTo(35))
             .body("chapterBossWinsLeft", equalTo(10))
     }
 

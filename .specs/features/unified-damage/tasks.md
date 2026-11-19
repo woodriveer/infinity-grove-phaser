@@ -95,7 +95,7 @@ T13 → T14
 
 ## Task Breakdown
 
-### T1: Give each enemy one defense in the backend [ ]
+### T1: Give each enemy one defense in the backend [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Replace the two defenses of `EnemyStats` by one `defense`, read it from `physical_defense`, write it to both columns and answer it in the progress and farm APIs next to the two old fields (UDMG-05).
@@ -216,8 +216,8 @@ JSON of one enemy in `GET /progress` and `GET /farm`: `{ "element": "DARKNESS", 
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] `grep -rn "magicalDefense\|physicalDefense" backend/src/main` lists only `ChapterEntities.kt` (the two entity columns and `toDomain`), `EnemyRepository.kt` (finder name and native SQL parameters) and `ProgressController.kt` (the two response fields and `from`).
-- [ ] Every test case above passes and the whole backend suite passes.
+- [x] `grep -rn "magicalDefense\|physicalDefense" backend/src/main` lists only `ChapterEntities.kt` (the two entity columns and `toDomain`), `EnemyRepository.kt` (finder name and native SQL parameters) and `ProgressController.kt` (the two response fields and `from`).
+- [x] Every test case above passes and the whole backend suite passes.
 
 **Commit**: `feat(backend): answer one defense per enemy`
 

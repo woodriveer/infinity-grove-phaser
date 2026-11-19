@@ -122,7 +122,7 @@ class ChapterTest {
             assertEquals(it, chapter.number)
             assertTrue(chapter.bossHealth > before.bossHealth)
             assertTrue(chapter.stage(1).monsterHealth > before.stage(1).monsterHealth)
-            assertTrue(chapter.boss.physicalDefense > before.boss.physicalDefense)
+            assertTrue(chapter.boss.defense > before.boss.defense)
         }
     }
 
@@ -155,11 +155,9 @@ class ChapterTest {
 
         assertEquals(16_384_000L, chapter.bossHealth)
         assertEquals(3_112_960L, chapter.stage(10).minibossHealth)
-        assertEquals(65, chapter.boss.physicalDefense)
-        assertEquals(65, chapter.boss.magicalDefense)
+        assertEquals(65, chapter.boss.defense)
         assertEquals(65, chapter.boss.critResistance)
-        assertEquals(55, miniboss.physicalDefense)
-        assertEquals(55, miniboss.magicalDefense)
+        assertEquals(55, miniboss.defense)
         assertEquals(65, miniboss.critResistance)
     }
 
@@ -167,7 +165,7 @@ class ChapterTest {
     fun `chapter 12 caps the boss critical resistance at 70`() {
         val boss = ChapterDefinition.of(12).boss
 
-        assertEquals(71, boss.physicalDefense)
+        assertEquals(71, boss.defense)
         assertEquals(70, boss.critResistance)
     }
 
@@ -177,12 +175,11 @@ class ChapterTest {
         val miniboss = chapter.stage(10).miniboss
 
         assertEquals(524_288_000L, chapter.bossHealth)
-        assertEquals(80, chapter.boss.physicalDefense)
-        assertEquals(80, chapter.boss.magicalDefense)
+        assertEquals(80, chapter.boss.defense)
         assertEquals(70, chapter.boss.critResistance)
         assertEquals(19_922_944L, chapter.stage(10).monsterHealth)
         assertEquals(99_614_720L, chapter.stage(10).minibossHealth)
-        assertEquals(70, miniboss.physicalDefense)
+        assertEquals(70, miniboss.defense)
         assertEquals(70, miniboss.critResistance)
     }
 
@@ -192,8 +189,7 @@ class ChapterTest {
             val chapter = ChapterDefinition.of(c)
 
             chapter.stages.forEach { stage ->
-                assertEquals(0, stage.monster.physicalDefense, "chapter $c stage ${stage.number}")
-                assertEquals(0, stage.monster.magicalDefense, "chapter $c stage ${stage.number}")
+                assertEquals(0, stage.monster.defense, "chapter $c stage ${stage.number}")
                 assertEquals(0, stage.monster.critResistance, "chapter $c stage ${stage.number}")
                 assertEquals(30_000L, stage.minibossTimeLimitMs, "chapter $c stage ${stage.number}")
             }
@@ -209,9 +205,9 @@ class ChapterTest {
         assertEquals(2000L, first.bossHealth)
         assertEquals(40L, first.stage(1).monsterHealth)
         assertEquals(512_000L, fifth.bossHealth)
-        assertEquals(50, fifth.boss.physicalDefense)
+        assertEquals(50, fifth.boss.defense)
         assertEquals(50, fifth.boss.critResistance)
-        assertEquals(40, fifth.stage(10).miniboss.physicalDefense)
+        assertEquals(40, fifth.stage(10).miniboss.defense)
         assertEquals(50, fifth.stage(10).miniboss.critResistance)
     }
 
@@ -351,11 +347,9 @@ class ChapterTest {
         assertEquals(row.phaseHealthStage1, chapter.stage(1).monsterHealth, "chapter $c phase health stage 1")
         assertEquals(row.phaseHealthStage10, chapter.stage(10).monsterHealth, "chapter $c phase health stage 10")
         assertEquals(row.minibossHealthStage10, chapter.stage(10).minibossHealth, "chapter $c miniboss health stage 10")
-        assertEquals(row.bossDefenses, chapter.boss.physicalDefense, "chapter $c boss physical defense")
-        assertEquals(row.bossDefenses, chapter.boss.magicalDefense, "chapter $c boss magical defense")
+        assertEquals(row.bossDefenses, chapter.boss.defense, "chapter $c boss defense")
         assertEquals(row.bossCritResistance, chapter.boss.critResistance, "chapter $c boss crit resistance")
-        assertEquals(row.minibossDefensesStage10, miniboss.physicalDefense, "chapter $c miniboss physical defense stage 10")
-        assertEquals(row.minibossDefensesStage10, miniboss.magicalDefense, "chapter $c miniboss magical defense stage 10")
+        assertEquals(row.minibossDefensesStage10, miniboss.defense, "chapter $c miniboss defense stage 10")
         assertEquals(row.minibossCritResistanceStage10, miniboss.critResistance, "chapter $c miniboss crit resistance stage 10")
     }
 
@@ -397,9 +391,8 @@ class ChapterTest {
             val phaseHealth = (40L + 4L * (n - 1)) * factor
             assertEquals(phaseHealth, stage.monsterHealth, "$label phase monster health")
             assertEquals(5L * phaseHealth, stage.minibossHealth, "$label miniboss health")
-            // miniboss defenses min(10 + n + bonus, 80), critical resistance min(10 + 2n + bonus, 70)
-            assertEquals(minOf(10 + n + bonus, 80), stage.miniboss.physicalDefense, "$label miniboss physical defense")
-            assertEquals(minOf(10 + n + bonus, 80), stage.miniboss.magicalDefense, "$label miniboss magical defense")
+            // miniboss defense min(10 + n + bonus, 80), critical resistance min(10 + 2n + bonus, 70)
+            assertEquals(minOf(10 + n + bonus, 80), stage.miniboss.defense, "$label miniboss defense")
             assertEquals(minOf(10 + 2 * n + bonus, 70), stage.miniboss.critResistance, "$label miniboss crit resistance")
             // elements cycle by stage number and shift by one per chapter (campaign-chapters Q16 keeps the rotating formula)
             val element = elements[(n - 1 + c - 1) % elements.size]

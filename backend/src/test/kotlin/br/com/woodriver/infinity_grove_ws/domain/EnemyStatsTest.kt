@@ -6,31 +6,25 @@ import kotlin.test.assertFailsWith
 
 class EnemyStatsTest {
     private fun stats(
-        physical: Int = 0,
-        magical: Int = 0,
+        defense: Int = 0,
         crit: Int = 0,
-    ) = EnemyStats(Element.WATER, physical, magical, crit)
+    ) = EnemyStats(Element.WATER, defense, crit)
 
     @Test
     fun `accepts the ends of the ranges`() {
-        assertEquals(90, stats(physical = 90, magical = 90, crit = 100).physicalDefense)
+        assertEquals(90, stats(defense = 90, crit = 100).defense)
+        assertEquals(0, stats(defense = 0).defense)
         assertEquals(0, stats().critResistance)
     }
 
     @Test
-    fun `rejects a physical defense above 90`() {
-        assertFailsWith<IllegalArgumentException> { stats(physical = 91) }
-    }
-
-    @Test
-    fun `rejects a magical defense above 90`() {
-        assertFailsWith<IllegalArgumentException> { stats(magical = 91) }
+    fun `rejects a defense above 90`() {
+        assertFailsWith<IllegalArgumentException> { stats(defense = 91) }
     }
 
     @Test
     fun `rejects a negative defense`() {
-        assertFailsWith<IllegalArgumentException> { stats(physical = -1) }
-        assertFailsWith<IllegalArgumentException> { stats(magical = -1) }
+        assertFailsWith<IllegalArgumentException> { stats(defense = -1) }
     }
 
     @Test
@@ -41,7 +35,7 @@ class EnemyStatsTest {
 
     @Test
     fun `the default is fire with no defense and no resistance`() {
-        assertEquals(EnemyStats(Element.FIRE, 0, 0, 0), EnemyStats.DEFAULT)
+        assertEquals(EnemyStats(Element.FIRE, 0, 0), EnemyStats.DEFAULT)
     }
 
     @Test
@@ -59,20 +53,19 @@ class EnemyStatsTest {
         val stages = ChapterDefinition.first().stages
 
         assertEquals(stages.map { it.monster.element }, stages.map { it.miniboss.element })
-        assertEquals((11..20).toList(), stages.map { it.miniboss.physicalDefense })
-        assertEquals((11..20).toList(), stages.map { it.miniboss.magicalDefense })
+        assertEquals((11..20).toList(), stages.map { it.miniboss.defense })
         assertEquals((12..30 step 2).toList(), stages.map { it.miniboss.critResistance })
     }
 
     @Test
     fun `the seeded phase monsters have no defense and no resistance`() {
         ChapterDefinition.first().stages.forEach {
-            assertEquals(Triple(0, 0, 0), Triple(it.monster.physicalDefense, it.monster.magicalDefense, it.monster.critResistance))
+            assertEquals(Pair(0, 0), Pair(it.monster.defense, it.monster.critResistance))
         }
     }
 
     @Test
     fun `the seeded chapter boss is darkness with defense 30 and resistance 30`() {
-        assertEquals(EnemyStats(Element.DARKNESS, 30, 30, 30), ChapterDefinition.first().boss)
+        assertEquals(EnemyStats(Element.DARKNESS, 30, 30), ChapterDefinition.first().boss)
     }
 }

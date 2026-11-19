@@ -17,8 +17,8 @@ class EnemyRepositoryIT : IntegrationTestBase() {
     @Autowired
     private lateinit var jdbc: JdbcTemplate
 
-    // the seeded enemies are shared with other integration tests; no seed reaches a physical defense of 81 (the chapter 15 boss has 80), so these rows are ours
-    private val stats = EnemyStats(Element.WATER, 81, 82, 97)
+    // the seeded enemies are shared with other integration tests; no seed reaches a defense of 81 (the chapter 15 boss has 80), so these rows are ours
+    private val stats = EnemyStats(Element.WATER, 81, 97)
 
     @AfterTest
     fun removeTestEnemies() {
@@ -30,8 +30,8 @@ class EnemyRepositoryIT : IntegrationTestBase() {
             "select count(*) from enemies where element = ? and physical_defense = ? and magical_defense = ? and crit_resistance = ?",
             Int::class.java,
             stats.element.name,
-            stats.physicalDefense,
-            stats.magicalDefense,
+            stats.defense,
+            stats.defense,
             stats.critResistance,
         )
 
@@ -50,8 +50,7 @@ class EnemyRepositoryIT : IntegrationTestBase() {
         val variants =
             listOf(
                 stats.copy(element = Element.FIRE),
-                stats.copy(physicalDefense = 83),
-                stats.copy(magicalDefense = 84),
+                stats.copy(defense = 83),
                 stats.copy(critResistance = 98),
             )
 
@@ -60,5 +59,15 @@ class EnemyRepositoryIT : IntegrationTestBase() {
         ids.forEach { assertNotEquals(id, it) }
         assertEquals(variants.size, ids.toSet().size)
         variants.forEach { assertEquals(1, rowsWith(it)) }
+    }
+
+    @Test
+    fun `the defense is stored in both columns`() {
+        val id = repository.idOf(stats)
+
+        val row = jdbc.queryForMap("select physical_defense, magical_defense from enemies where id = ?", id)
+
+        assertEquals(81, row["physical_defense"])
+        assertEquals(81, row["magical_defense"])
     }
 }

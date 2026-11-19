@@ -37,8 +37,8 @@ class EnemyEntity(
     @Column(nullable = false)
     var critResistance: Int,
 ) {
-    /** An element name outside the five fails the load instead of dealing a wrong multiplier. */
-    fun toDomain() = EnemyStats(Element.valueOf(element), physicalDefense, magicalDefense, critResistance)
+    /** An element name outside the five fails the load instead of dealing a wrong multiplier. The one defense is `physical_defense` (TD-002). */
+    fun toDomain() = EnemyStats(Element.valueOf(element), physicalDefense, critResistance)
 }
 
 /** Looks up an enemy the stage or chapter points at; a dangling id fails the load. */

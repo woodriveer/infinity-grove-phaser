@@ -43,13 +43,13 @@ class ChapterRepositoryIT : IntegrationTestBase() {
                     monsterHealth = 20L + it,
                     minibossHealth = 100L + it,
                     minibossTimeLimitMs = 31_000L + it,
-                    monster = EnemyStats(Element.WATER, it, it + 1, it + 2),
-                    miniboss = EnemyStats(Element.LIGHT, 20 + it, 30 + it, 40 + it),
+                    monster = EnemyStats(Element.WATER, it, it + 2),
+                    miniboss = EnemyStats(Element.LIGHT, 20 + it, 40 + it),
                     monsterDropRuleId = 2,
                     minibossDropRuleId = 3,
                 )
             },
-        boss = EnemyStats(Element.DARKNESS, 55, 66, 77),
+        boss = EnemyStats(Element.DARKNESS, 55, 77),
         bossDropRuleId = 4,
     )
 
@@ -146,7 +146,7 @@ class ChapterRepositoryIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `rows written by SQL read the enemies and drop rules they point at`() {
+    fun `rows written by SQL read the enemies and drop rules they point at, with physical_defense as the defense`() {
         val boss =
             jdbc.queryForObject(
                 "insert into enemies (element, physical_defense, magical_defense, crit_resistance) values ('NATURE', 85, 86, 87) returning id",
@@ -176,12 +176,26 @@ class ChapterRepositoryIT : IntegrationTestBase() {
 
         val read = repository.findByNumber(number)!!
 
-        assertEquals(EnemyStats(Element.NATURE, 85, 86, 87), read.boss)
-        assertEquals(EnemyStats(Element.LIGHT, 88, 89, 90), read.stage(1).monster)
-        assertEquals(EnemyStats(Element.NATURE, 85, 86, 87), read.stage(1).miniboss)
+        assertEquals(EnemyStats(Element.NATURE, 85, 87), read.boss)
+        assertEquals(EnemyStats(Element.LIGHT, 88, 90), read.stage(1).monster)
+        assertEquals(EnemyStats(Element.NATURE, 85, 87), read.stage(1).miniboss)
         assertEquals(3, read.bossDropRuleId)
         assertEquals(1, read.stage(1).monsterDropRuleId)
         assertEquals(2, read.stage(1).minibossDropRuleId)
+    }
+
+    @Test
+    fun `a saved chapter writes each defense to both columns`() {
+        repository.save(chapter())
+
+        val boss =
+            jdbc.queryForMap(
+                "select e.physical_defense, e.magical_defense from enemies e join chapters c on c.boss_enemy_id = e.id where c.number = ?",
+                number,
+            )
+
+        assertEquals(55, boss["physical_defense"])
+        assertEquals(55, boss["magical_defense"])
     }
 
     @Test
