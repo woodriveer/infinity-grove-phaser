@@ -607,7 +607,7 @@ export class Fight
 
 ---
 
-### T7: Carry the adds on every encounter [ ]
+### T7: Carry the adds on every encounter [x]
 
 **Owner**: game-dev
 **Goal**: Every encounter of the campaign and the farm carries `adds`: the stage's adds for a miniboss, `[]` for anything else (ADDS-02, ADDS-08, spec Adds AC 3, 9, Fight end AC 4).
@@ -647,7 +647,7 @@ import { addsOf } from '../combat/adds';
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 5 new cases pass, the five named tests pass with `adds: []` as their only change, and the whole Vitest suite passes.
+- [x] The 5 new cases pass, the five named tests pass with `adds: []` as their only change, and the whole Vitest suite passes.
 
 **Commit**: `feat(game): carry the adds on every encounter`
 

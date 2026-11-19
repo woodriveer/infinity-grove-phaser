@@ -92,7 +92,7 @@ describe('Campaign transitions (same table as the backend)', () => {
 describe('Campaign encounter', () => {
     it('a phase monster has the health of its stage, no time limit and the Stage/Phase label', () => {
         expect(at(2, PHASE, 3).encounter()).toEqual({
-            kind: PHASE, stage: 2, phase: 3, health: 11, stats: DEFAULT_STATS, dropRuleId: 12, timeLimitMs: null, label: 'Stage 2/3  Phase 3/3'
+            kind: PHASE, stage: 2, phase: 3, health: 11, stats: DEFAULT_STATS, dropRuleId: 12, timeLimitMs: null, label: 'Stage 2/3  Phase 3/3', adds: []
         });
     });
 
@@ -197,7 +197,8 @@ describe('Campaign farm encounters', () => {
             stats: { element: 'WATER', physicalDefense: 11, magicalDefense: 12, critResistance: 13 },
             dropRuleId: null,
             timeLimitMs: 31000,
-            label: 'Rever chefe: Miniboss 2'
+            label: 'Rever chefe: Miniboss 2',
+            adds: []
         });
     });
 
@@ -210,7 +211,8 @@ describe('Campaign farm encounters', () => {
             stats: { element: 'DARKNESS', physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
             dropRuleId: null,
             timeLimitMs: 60000,
-            label: 'Rever chefe: Chefe do capítulo'
+            label: 'Rever chefe: Chefe do capítulo',
+            adds: []
         });
     });
 
@@ -262,7 +264,8 @@ describe('farm labels and farm fights of any chapter definition', () => {
             stats: S3,
             dropRuleId: null,
             timeLimitMs: 45_000,
-            label: 'Rever chefe: Miniboss 3 (Capítulo 2)'
+            label: 'Rever chefe: Miniboss 3 (Capítulo 2)',
+            adds: []
         });
     });
 
@@ -275,7 +278,8 @@ describe('farm labels and farm fights of any chapter definition', () => {
             stats: SB,
             dropRuleId: null,
             timeLimitMs: 50_000,
-            label: 'Rever chefe: Chefe do capítulo (Capítulo 2)'
+            label: 'Rever chefe: Chefe do capítulo (Capítulo 2)',
+            adds: []
         });
     });
 
@@ -287,5 +291,35 @@ describe('farm labels and farm fights of any chapter definition', () => {
         const withoutStats = { bossHealth: D2.bossHealth, bossTimeLimitMs: D2.bossTimeLimitMs, stages: D2.stages };
 
         expect(farmEncounterOf(withoutStats, { kind: CHAPTER_BOSS }).stats).toEqual(DEFAULT_STATS);
+    });
+});
+
+describe('Campaign adds (spec miniboss-adds)', () => {
+    const WATER = { element: 'WATER', defense: 0, critResistance: 0 };
+    const ADD = { health: 30, defenseBuff: 30 };
+    const withAdds = { ...definition, stages: definition.stages.map((stage) => (stage.number === 1 ? { ...stage, monster: WATER, adds: [ ADD, ADD ] } : stage)) };
+    const at11 = (stage, encounter) => Campaign.fromProgress({ chapter: 11, stage, encounter, phase: 1, completed: false, definition: withAdds });
+    const TWO = [ { health: 30, defenseBuff: 30, stats: WATER }, { health: 30, defenseBuff: 30, stats: WATER } ];
+
+    it('a miniboss carries the adds of its stage with the phase monster stats', () => {
+        expect(at11(1, MINIBOSS).encounter().adds).toEqual(TWO);
+    });
+
+    it('a miniboss of a stage without adds carries an empty list', () => {
+        expect(at11(2, MINIBOSS).encounter().adds).toEqual([]);
+    });
+
+    it('a phase monster and the chapter boss carry no adds even when the stage has some', () => {
+        expect(at11(1, PHASE).encounter().adds).toEqual([]);
+        expect(at11(1, CHAPTER_BOSS).encounter().adds).toEqual([]);
+    });
+
+    it('a farmed miniboss carries the adds of its stage', () => {
+        expect(at11(1, MINIBOSS).farmEncounter({ kind: MINIBOSS, stage: 1 }).adds).toEqual(TWO);
+        expect(farmEncounterOf(withAdds, { kind: MINIBOSS, stage: 1, chapter: 11 }).adds).toEqual(TWO);
+    });
+
+    it('a farmed chapter boss carries no adds', () => {
+        expect(farmEncounterOf(withAdds, { kind: CHAPTER_BOSS }).adds).toEqual([]);
     });
 });

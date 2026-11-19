@@ -7,7 +7,9 @@
 //    definition: { bossHealth, bossTimeLimitMs, boss, bossDropRuleId,
 //                  stages: [{ number, phasesPerStage, monsterHealth, minibossHealth, minibossTimeLimitMs, monster, miniboss, monsterDropRuleId, minibossDropRuleId }] } }
 //  where boss, monster and miniboss are { element, defense, critResistance } (an older backend sends physicalDefense and magicalDefense
-//  instead of defense, read by defenseOf); a payload without them means DEFAULT_STATS. The drop rule ids name the wallet queue a kill takes its copper from
+//  instead of defense, read by defenseOf); a payload without them means DEFAULT_STATS. The drop rule ids name the wallet queue a kill takes its copper from,
+//  and each stage may carry adds: [{ health, defenseBuff }] (spec miniboss-adds)
+import { addsOf } from '../combat/adds';
 import { DEFAULT_STATS } from '../combat/monster';
 import { bossLabel } from '../heroes/heroes';
 
@@ -29,6 +31,7 @@ export const farmEncounterOf = (definition, boss) =>
     let health;
     let stats;
     let timeLimitMs;
+    let adds = [];
 
     if (kind === MINIBOSS)
     {
@@ -41,6 +44,7 @@ export const farmEncounterOf = (definition, boss) =>
 
         ({ minibossHealth: health, minibossTimeLimitMs: timeLimitMs } = stageDefinition);
         stats = stageDefinition.miniboss ?? DEFAULT_STATS;
+        adds = addsOf(stageDefinition);
     }
     else if (kind === CHAPTER_BOSS)
     {
@@ -52,7 +56,7 @@ export const farmEncounterOf = (definition, boss) =>
         throw new Error(`Unknown boss: ${kind}`);
     }
 
-    return { kind: FARM, boss, phase: 1, health, stats, dropRuleId: null, timeLimitMs, label: farmLabel(boss) };
+    return { kind: FARM, boss, phase: 1, health, stats, dropRuleId: null, timeLimitMs, label: farmLabel(boss), adds };
 };
 
 export class Campaign
@@ -108,7 +112,8 @@ export class Campaign
                 stats: stage.monster ?? DEFAULT_STATS,
                 dropRuleId: stage.monsterDropRuleId ?? null,
                 timeLimitMs: null,
-                label: `Stage ${this.stage}/${this.stageCount}  Phase ${this.phase}/${stage.phasesPerStage}`
+                label: `Stage ${this.stage}/${this.stageCount}  Phase ${this.phase}/${stage.phasesPerStage}`,
+                adds: []
             };
         }
 
@@ -122,7 +127,8 @@ export class Campaign
                 stats: stage.miniboss ?? DEFAULT_STATS,
                 dropRuleId: stage.minibossDropRuleId ?? null,
                 timeLimitMs: stage.minibossTimeLimitMs,
-                label: `Stage ${this.stage}/${this.stageCount}  Miniboss`
+                label: `Stage ${this.stage}/${this.stageCount}  Miniboss`,
+                adds: addsOf(stage)
             };
         }
 
@@ -134,7 +140,8 @@ export class Campaign
             stats: this.definition.boss ?? DEFAULT_STATS,
             dropRuleId: this.definition.bossDropRuleId ?? null,
             timeLimitMs: this.definition.bossTimeLimitMs,
-            label: 'Chapter Boss'
+            label: 'Chapter Boss',
+            adds: []
         };
     }
 
