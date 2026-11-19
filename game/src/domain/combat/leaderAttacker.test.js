@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { leaderAttacker } from './leaderAttacker';
 import { PLAYER } from './damage';
+import { NO_PASSIVES } from '../heroes/team';
 
 const piece = (affixes, extra = {}) => ({ id: 'p', slot: 'RING', rarity: 'COMMON', refine: 0, affixes, sellPrice: 1, heroId: 'kael', ...extra });
 const affix = (type, value) => ({ type, value });
@@ -100,5 +101,34 @@ describe('leaderAttacker', () => {
 
         expect(attacker.baseDamage).toBe(1);
         expect(attacker.critChance).toBe(10);
+    });
+});
+
+describe('leaderAttacker with the team passives', () => {
+    it('Lyra\'s passive adds 10 points of critical chance: a 0 star Kael reads 20', () => {
+        const attacker = leaderAttacker({ leader: { element: 'FIRE', stars: 0 }, passives: { ...NO_PASSIVES, critChance: 10 } });
+
+        expect(attacker.critChance).toBe(20);
+    });
+
+    it('the passive critical chance caps at 100', () => {
+        const attacker = leaderAttacker({
+            leader: { element: 'FIRE', stars: 0 }, pieces: [ piece([ affix('CRIT_CHANCE', 95) ]) ], passives: { ...NO_PASSIVES, critChance: 10 }
+        });
+
+        expect(attacker.critChance).toBe(100);
+    });
+
+    it('the passive changes nothing else', () => {
+        const attacker = leaderAttacker({ leader: { element: 'FIRE', stars: 0 }, passives: { ...NO_PASSIVES, critChance: 10 } });
+
+        expect(attacker.baseDamage).toBe(1);
+        expect(attacker.critMultiplier).toBe(2);
+    });
+
+    it('without passives the attacker is the one of before', () => {
+        const leader = { element: 'FIRE', stars: 3 };
+
+        expect(leaderAttacker({ leader })).toEqual(leaderAttacker({ leader, passives: NO_PASSIVES }));
     });
 });

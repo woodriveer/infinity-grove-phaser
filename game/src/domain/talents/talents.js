@@ -20,12 +20,13 @@ export const talentAttackerBonus = (talents) => ({
     critDamagePct: talentValue(talents, 'CRIT_DAMAGE')
 });
 
-//  The stats of a monster after the break talents: points off the one defense (PHYSICAL_BREAK, all grades) and off the critical resistance
-//  (CRIT_RESIST_BREAK), none below 0. Every other field is kept as received.
-export const monsterAfterBreak = (stats, talents) => ({
+//  The stats of a monster after the break talents and the team passives: points off the one defense (PHYSICAL_BREAK, all grades, and the
+//  Erosão Arcana of Orina, `passives.defenseBreak`) and off the critical resistance (CRIT_RESIST_BREAK and the Lâminas Sombrias of Vex,
+//  `passives.critResistBreak`), none below 0. Every other field is kept as received.
+export const monsterAfterBreak = (stats, talents, passives = {}) => ({
     ...stats,
-    defense: Math.max(0, defenseOf(stats) - talentValue(talents, 'PHYSICAL_BREAK')),
-    critResistance: Math.max(0, stats.critResistance - talentValue(talents, 'CRIT_RESIST_BREAK'))
+    defense: Math.max(0, defenseOf(stats) - talentValue(talents, 'PHYSICAL_BREAK') - (passives.defenseBreak ?? 0)),
+    critResistance: Math.max(0, stats.critResistance - talentValue(talents, 'CRIT_RESIST_BREAK') - (passives.critResistBreak ?? 0))
 });
 
 //  The milliseconds the time talents add to the limit of an encounter: a miniboss gets MINIBOSS_TIME, the chapter boss BOSS_TIME, and a

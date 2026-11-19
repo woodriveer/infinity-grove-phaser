@@ -1059,7 +1059,7 @@ Piece fixtures: weapon `{ id: 'w', slot: 'WEAPON', clickDamage: 10, affixes: [] 
 
 ---
 
-### T9: Thread the passives into the leader attacker and the monster stats [ ]
+### T9: Thread the passives into the leader attacker and the monster stats [x]
 
 **Owner**: game-dev
 **Goal**: Lyra's passive raises the leader's critical chance; Orina's lowers the defense and Vex's the critical resistance every hit meets (TEAM-11 AC 2, 3, 4).
@@ -1122,7 +1122,7 @@ Update the comment above `monsterAfterBreak` to name the passives.
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 10 new cases and every existing case of both files pass; the whole Vitest suite passes.
+- [x] The 10 new cases and every existing case of both files pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): apply the team passives to the leader and the monster`
 

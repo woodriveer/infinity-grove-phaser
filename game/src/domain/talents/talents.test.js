@@ -192,3 +192,32 @@ describe('talentIconName and the branch titles', () => {
         expect(BRANCH_TITLES).toEqual({ TIME: 'Tempo', BREAK: 'Quebra de defesa', POWER: 'Poder do clique', COMBO: 'Combo' });
     });
 });
+
+describe('monsterAfterBreak with the team passives', () => {
+    it('Orina\'s passive lowers the defense by 15 after the break talent: 40 with PHYSICAL_BREAK 5 reads 20', () => {
+        expect(monsterAfterBreak(monster(40, 0), tree({ PHYSICAL_BREAK: 5 }), { defenseBreak: 15 })).toEqual(monster(20, 0));
+    });
+
+    it('Orina\'s passive on defense 10 reads 0', () => {
+        expect(monsterAfterBreak(monster(10, 0), null, { defenseBreak: 15 })).toEqual(monster(0, 0));
+    });
+
+    it('Vex\'s passive lowers the critical resistance by 15: 30 reads 15', () => {
+        expect(monsterAfterBreak(monster(10, 30), null, { critResistBreak: 15 })).toEqual(monster(10, 15));
+    });
+
+    it('Vex\'s passive with CRIT_RESIST_BREAK 3 on critical resistance 10 reads 0', () => {
+        expect(monsterAfterBreak(monster(10, 10), tree({ CRIT_RESIST_BREAK: 3 }), { critResistBreak: 15 })).toEqual(monster(10, 0));
+    });
+
+    it('an old payload with physicalDefense 50 and Orina\'s passive reads defense 35', () => {
+        expect(monsterAfterBreak({ element: 'FIRE', physicalDefense: 50, magicalDefense: 50, critResistance: 0 }, null, { defenseBreak: 15 }).defense)
+            .toBe(35);
+    });
+
+    it('no passives argument keeps the result of before', () => {
+        const stats = monster(40, 30);
+
+        expect(monsterAfterBreak(stats, tree({ PHYSICAL_BREAK: 5 }))).toEqual(monsterAfterBreak(stats, tree({ PHYSICAL_BREAK: 5 }), {}));
+    });
+});
