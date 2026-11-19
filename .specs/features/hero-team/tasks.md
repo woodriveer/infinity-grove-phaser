@@ -1376,7 +1376,7 @@ buySlot: async (fromSlots) => (await httpClient.post('/team/slots', { fromSlots 
 
 ---
 
-### T14: Keep the team in the hero collection [ ]
+### T14: Keep the team in the hero collection [x]
 
 **Owner**: game-dev
 **Goal**: The hero collection holds the team payload, saves allies, buys slots, takes the team of a leader change and hands the purchase wallet to listeners (TEAM-09, TEAM-10, TEAM-13).
@@ -1449,7 +1449,7 @@ Update the port comment at the top with `setTeam(allies)` and `buySlot(fromSlots
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 9 new cases and every existing case pass; the whole Vitest suite passes.
+- [x] The 9 new cases and every existing case pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): keep the team in the hero collection`
 

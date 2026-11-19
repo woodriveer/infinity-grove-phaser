@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createHeroCollection } from './heroCollection';
 import { ApiError } from '../ApiError';
+import { LOCKED_TEAM } from '../../domain/heroes/team';
 
 const hero = (id, copies = {}, extra = {}) => ({
     id, name: `Hero ${id}`, owned: Object.values(copies).some((n) => n > 0), stars: 0, copies: { 0: 0, 1: 0, 2: 0, 3: 0, ...copies }, ...extra
@@ -150,5 +151,118 @@ describe('heroCollection', () => {
             expect(gateway.list).toHaveBeenCalledTimes(1);
             expect(changes).toHaveBeenCalledTimes(1);
         });
+    });
+});
+
+describe('heroCollection team', () => {
+    const PRICES = [ 10000, 20000, 30000, 40000 ];
+    const teamOf = (overrides = {}) => ({ unlocked: true, openSlots: 1, boughtSlots: 1, slotPrices: PRICES, allies: [ 'lyra', null, null, null ], ...overrides });
+    let gateway;
+    let collection;
+    let changes;
+
+    beforeEach(() => {
+        gateway = {
+            list: vi.fn().mockResolvedValue({ ...payload(), team: teamOf() }),
+            fuse: vi.fn(), fuseAll: vi.fn(), setLeader: vi.fn(), setTeam: vi.fn(), buySlot: vi.fn()
+        };
+        collection = createHeroCollection({ gateway });
+        changes = vi.fn();
+        collection.onChange(changes);
+    });
+
+    it('team is the locked team before the load', () => {
+        expect(collection.team()).toEqual(LOCKED_TEAM);
+    });
+
+    it('load stores the team of the payload', async () => {
+        await collection.load();
+
+        expect(collection.team()).toEqual(teamOf());
+    });
+
+    it('load of a payload without team gives the locked team', async () => {
+        gateway.list.mockResolvedValue(payload());
+
+        await collection.load();
+
+        expect(collection.team()).toEqual(LOCKED_TEAM);
+    });
+
+    it('setTeam stores the leader and the team of the answer and fires onChange once', async () => {
+        await collection.load();
+        changes.mockClear();
+        const answer = { leaderId: 'kael', team: teamOf({ openSlots: 2, boughtSlots: 2, allies: [ 'lyra', 'orina', null, null ] }) };
+        gateway.setTeam.mockResolvedValue(answer);
+
+        await expect(collection.setTeam([ 'lyra', 'orina', null, null ])).resolves.toEqual(answer.team);
+
+        expect(gateway.setTeam).toHaveBeenCalledWith([ 'lyra', 'orina', null, null ]);
+        expect(collection.team()).toEqual(answer.team);
+        expect(collection.leaderId()).toBe('kael');
+        expect(changes).toHaveBeenCalledTimes(1);
+    });
+
+    it('setTeam that fails keeps the team and fires nothing', async () => {
+        await collection.load();
+        changes.mockClear();
+        gateway.setTeam.mockRejectedValue(new ApiError('Locked', { status: 409, code: 'TEAM_LOCKED' }));
+
+        await expect(collection.setTeam([ null, null, null, null ])).rejects.toBeInstanceOf(ApiError);
+
+        expect(collection.team()).toEqual(teamOf());
+        expect(changes).not.toHaveBeenCalled();
+    });
+
+    it('buySlot stores the team, hands the wallet to the wallet listeners, fires onChange and resolves with team and wallet', async () => {
+        await collection.load();
+        changes.mockClear();
+        const wallet = { gold: 0, silver: 50, copper: 0 };
+        const bought = teamOf({ openSlots: 2, boughtSlots: 2, allies: [ 'lyra', null, null, null ] });
+        const walletListener = vi.fn();
+        collection.onWallet(walletListener);
+        gateway.buySlot.mockResolvedValue({ team: bought, wallet });
+
+        await expect(collection.buySlot(1)).resolves.toEqual({ team: bought, wallet });
+
+        expect(gateway.buySlot).toHaveBeenCalledWith(1);
+        expect(collection.team()).toEqual(bought);
+        expect(walletListener).toHaveBeenCalledWith(wallet);
+        expect(changes).toHaveBeenCalledTimes(1);
+    });
+
+    it('buySlot that fails keeps the team and fires no listener', async () => {
+        await collection.load();
+        changes.mockClear();
+        const walletListener = vi.fn();
+        collection.onWallet(walletListener);
+        gateway.buySlot.mockRejectedValue(new ApiError('Not enough copper', { status: 409, code: 'NOT_ENOUGH_COPPER' }));
+
+        await expect(collection.buySlot(1)).rejects.toBeInstanceOf(ApiError);
+
+        expect(collection.team()).toEqual(teamOf());
+        expect(walletListener).not.toHaveBeenCalled();
+        expect(changes).not.toHaveBeenCalled();
+    });
+
+    it('setLeader stores the team of the answer', async () => {
+        await collection.load();
+        const swapped = teamOf({ allies: [ 'kael', null, null, null ] });
+        gateway.setLeader.mockResolvedValue({ leaderId: 'lyra', team: swapped });
+
+        await collection.setLeader('lyra');
+
+        expect(collection.leaderId()).toBe('lyra');
+        expect(collection.team()).toEqual(swapped);
+    });
+
+    it('setLeader of an answer without team keeps the team', async () => {
+        await collection.load();
+        gateway.setLeader.mockResolvedValue({ leaderId: 'lyra' });
+
+        await collection.setLeader('lyra');
+
+        expect(collection.leaderId()).toBe('lyra');
+        expect(collection.team()).toEqual(teamOf());
     });
 });
