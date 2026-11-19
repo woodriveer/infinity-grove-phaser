@@ -2420,7 +2420,7 @@ let teamFailure = null;
 
 ---
 
-### T25: Cover the ally passives in the browser [ ]
+### T25: Cover the ally passives in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: e2e scenarios prove each passive on the real scene and screens (TEAM-11).
@@ -2458,7 +2458,7 @@ let teamFailure = null;
 **Gate**: full - `cd game && npx playwright test e2e/heroTeamPassives.spec.js` then `cd game && npm test && npx playwright test`
 **Done when**:
 
-- [ ] The 13 scenarios pass; the whole Playwright suite passes.
+- [x] The 13 scenarios pass; the whole Playwright suite passes.
 
 **Commit**: `test(game): cover the ally passives`
 
