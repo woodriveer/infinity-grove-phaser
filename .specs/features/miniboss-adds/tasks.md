@@ -1416,7 +1416,7 @@ const numbers = (page) => scene(page, '(s) => s.children.list.filter((o) => o.ty
 
 ---
 
-### T16: Review the miniboss fight screens [ ]
+### T16: Review the miniboss fight screens [x]
 
 **Owner**: ui-artist
 **Goal**: Check every changed screen against spec § Fight Layout and § Player-Facing Texts and record the verdict in `ui-review.html` (ADDS-05).

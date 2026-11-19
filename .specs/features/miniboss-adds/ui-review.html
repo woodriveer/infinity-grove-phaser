@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Lacaios e alvo do miniboss</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Lacaios e alvo do miniboss</h1>
+                <div class="meta">
+                    <code>.specs/features/miniboss-adds</code> · commits <code>até 08bc377</code> · 2026-11-19 · desenvolvimento local (fake backend)
+                </div>
+            </div>
+            <span class="chip verdict ok">APROVADO</span>
+        </div>
+        <p style="margin-top:16px">As sete telas de luta batem com o Fight Layout: lacaios fora da formação e do miniboss, marcador dourado, chip de alvo legível, defesa guardada na linha do inimigo e números no monstro atingido. O chip de alvo sobrepõe cerca de 16 px da base do corpo do miniboss (hoje um retângulo provisório translúcido); lê bem e não bloqueia, e fica como sugestão para o PO decidir quando houver arte final.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">7</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">14</div><div class="l">capturas (desktop + celular)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Corpos dos lacaios 110×125 em (480, 360) e (480, 540), coluna x 425–535, sem tocar a formação (x ≤ 410), o miniboss (x ≥ 560), nem a barra de batalha <code>Fight Layout</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Barra de vida pequena de cada lacaio acima do corpo e texto "+30 de defesa" branco com contorno, legível sobre a floresta; marcador, barra e texto não se sobrepõem <code>Fight Layout</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Marcador dourado #ffd24a sobre o alvo, sob os números de dano; segue o clique em Lacaio 1, Lacaio 2 e volta ao miniboss quando o lacaio morre <code>Fight Layout, ADDS-05</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Chip "Alvo: &lt;nome&gt; · HP x/y" como primeira linha da caixa do inimigo, fundo escuro, borda dourada, texto legível, em português <code>Player-Facing Texts, Q49</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Linha do inimigo mostra a defesa guardada (Defesa 90%, 79% com um lacaio morto, 0% no lacaio) e a barra grande continua a do miniboss <code>Q25, Q49</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Números de dano no monstro atingido (clique, habilidade, aliado em azul claro x 520) <code>Fight Layout</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Luta sem lacaios (capítulo 1) sem lacaio, marcador nem chip: igual à de antes <code>ADDS-01 AC 9</code></span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>S1 · Início da luta com lacaios</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/01-adds-fight-start-desktop.png" target="_blank"><img src="ui-review/01-adds-fight-start-desktop.png" alt="S1 · Início da luta com lacaios" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S1 · Início da luta com lacaios</span>
+                        <span class="d">Capítulo 11, miniboss e dois lacaios. Marcador sobre o miniboss, chip "Alvo: Miniboss · HP 100/100", linha "Defesa 90%".</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok · sugestão 1</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/01-adds-fight-start-phone.png" target="_blank"><img src="ui-review/01-adds-fight-start-phone.png" alt="S1 · Início da luta com lacaios (celular)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S1 · Início da luta com lacaios (celular)</span>
+                        <span class="d">Capítulo 11, miniboss e dois lacaios. Marcador sobre o miniboss, chip "Alvo: Miniboss · HP 100/100", linha "Defesa 90%". Celular julgado só contra TD-010.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>S2 · Alvo: Lacaio 1</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/02-adds-target-lacaio-1-desktop.png" target="_blank"><img src="ui-review/02-adds-target-lacaio-1-desktop.png" alt="S2 · Alvo: Lacaio 1" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S2 · Alvo: Lacaio 1</span>
+                        <span class="d">Marcador dourado sobre o Lacaio 1, barra parcialmente vazia, chip "Alvo: Lacaio 1 · HP 29/30", "Defesa 0%", número de clique no corpo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok · sugestão 1</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/02-adds-target-lacaio-1-phone.png" target="_blank"><img src="ui-review/02-adds-target-lacaio-1-phone.png" alt="S2 · Alvo: Lacaio 1 (celular)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S2 · Alvo: Lacaio 1 (celular)</span>
+                        <span class="d">Marcador dourado sobre o Lacaio 1, barra parcialmente vazia, chip "Alvo: Lacaio 1 · HP 29/30", "Defesa 0%", número de clique no corpo. Celular julgado só contra TD-010.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>S3 · Alvo: Lacaio 2</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/03-adds-target-lacaio-2-desktop.png" target="_blank"><img src="ui-review/03-adds-target-lacaio-2-desktop.png" alt="S3 · Alvo: Lacaio 2" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S3 · Alvo: Lacaio 2</span>
+                        <span class="d">Marcador sobre o Lacaio 2, chip "Alvo: Lacaio 2 · HP 29/30", "Defesa 0%".</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok · sugestão 1</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/03-adds-target-lacaio-2-phone.png" target="_blank"><img src="ui-review/03-adds-target-lacaio-2-phone.png" alt="S3 · Alvo: Lacaio 2 (celular)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S3 · Alvo: Lacaio 2 (celular)</span>
+                        <span class="d">Marcador sobre o Lacaio 2, chip "Alvo: Lacaio 2 · HP 29/30", "Defesa 0%". Celular julgado só contra TD-010.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>S4 · Lacaio 1 morto</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/04-adds-one-dead-desktop.png" target="_blank"><img src="ui-review/04-adds-one-dead-desktop.png" alt="S4 · Lacaio 1 morto" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S4 · Lacaio 1 morto</span>
+                        <span class="d">Lacaio 1 sumiu, alvo volta ao miniboss, "Defesa 79%", a barra grande mostra o miniboss.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok · sugestão 1</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/04-adds-one-dead-phone.png" target="_blank"><img src="ui-review/04-adds-one-dead-phone.png" alt="S4 · Lacaio 1 morto (celular)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S4 · Lacaio 1 morto (celular)</span>
+                        <span class="d">Lacaio 1 sumiu, alvo volta ao miniboss, "Defesa 79%", a barra grande mostra o miniboss. Celular julgado só contra TD-010.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>S5 · Números de habilidade</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/05-adds-skill-numbers-desktop.png" target="_blank"><img src="ui-review/05-adds-skill-numbers-desktop.png" alt="S5 · Números de habilidade" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S5 · Números de habilidade</span>
+                        <span class="d">Chuva de Meteoros: 35 em cada lacaio e 3.5 no miniboss, cada número no seu monstro, marcador sob o 3.5.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok · sugestão 1</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/05-adds-skill-numbers-phone.png" target="_blank"><img src="ui-review/05-adds-skill-numbers-phone.png" alt="S5 · Números de habilidade (celular)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S5 · Números de habilidade (celular)</span>
+                        <span class="d">Chuva de Meteoros: 35 em cada lacaio e 3.5 no miniboss, cada número no seu monstro, marcador sob o 3.5. Celular julgado só contra TD-010.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>S6 · Com equipe de quatro aliados</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/06-adds-with-team-desktop.png" target="_blank"><img src="ui-review/06-adds-with-team-desktop.png" alt="S6 · Com equipe de quatro aliados" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S6 · Com equipe de quatro aliados</span>
+                        <span class="d">Formação à esquerda (x até 410) ao lado da coluna de lacaios; número azul do aliado sobre o Lacaio 1, o alvo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok · sugestão 1</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/06-adds-with-team-phone.png" target="_blank"><img src="ui-review/06-adds-with-team-phone.png" alt="S6 · Com equipe de quatro aliados (celular)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S6 · Com equipe de quatro aliados (celular)</span>
+                        <span class="d">Formação à esquerda (x até 410) ao lado da coluna de lacaios; número azul do aliado sobre o Lacaio 1, o alvo. Celular julgado só contra TD-010.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>S7 · Miniboss sem lacaios (capítulo 1)</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/07-no-adds-desktop.png" target="_blank"><img src="ui-review/07-no-adds-desktop.png" alt="S7 · Miniboss sem lacaios (capítulo 1)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S7 · Miniboss sem lacaios (capítulo 1)</span>
+                        <span class="d">Sem lacaio, sem marcador, sem chip de alvo: luta como antes.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/07-no-adds-phone.png" target="_blank"><img src="ui-review/07-no-adds-phone.png" alt="S7 · Miniboss sem lacaios (capítulo 1) (celular)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">S7 · Miniboss sem lacaios (capítulo 1) (celular)</span>
+                        <span class="d">Sem lacaio, sem marcador, sem chip de alvo: luta como antes. Celular julgado só contra TD-010.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <p class="empty">Nenhum achado.</p>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span><strong>Sugestão 1 · chip de alvo sobre a base do miniboss.</strong> Medido no navegador (desktop): o chip ocupa y 512–533 px na tela e o corpo do miniboss termina perto de y 528, uma sobreposição de uns 16 px (cerca de 18,5 px na cena) em 250 px de corpo. O chip é opaco e escuro com borda dourada, então o texto lê bem; o corpo é só um retângulo translúcido, então nenhuma arte é coberta hoje. Entre o miniboss e a barra de batalha (y 624) há 59 px e as três linhas pedem 65 px ou mais, então não cabe sem sobrepor. Dentro da spec não há correção sem mexer em medidas; se a arte final do miniboss tiver pés ou detalhe na base, o PO decide entre subir o corpo do miniboss uns 20 px ou reduzir as linhas da caixa. Não bloqueia.</span></li>
+            <li><span class="mark">✦</span><span>A ponta do marcador (y 258,5) fica a uns 4 px do texto "+30 de defesa" do lacaio; não se tocam, mas está apertado. Se o texto crescer, subir o marcador 2 a 4 px.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <p class="empty">Nenhum recurso faltando: todas as imagens do DOM estavam carregadas (naturalWidth &gt; 0) antes de cada captura. O console do navegador não foi lido nas capturas do Playwright.</p>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-19</footer>
+</main>
+</body>
+</html>
