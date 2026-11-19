@@ -3,6 +3,10 @@
 //    gateway  { list(), upgrade(talentId, fromLevel), reset() }  the backend /talents calls.
 //             list and upgrade resolve with { talents: [ { id, level, value, nextCost, ... } ], points: { earned, spent, available } }.
 //             Each rejects with an ApiError.
+
+//  Talents the backend of before unified-damage still answers; they left the catalog and are dropped on read (spec unified-damage, TD-002)
+export const RETIRED_TALENT_IDS = [ 'MAGICAL_BREAK', 'MAGICAL_BREAK_G2', 'MAGICAL_BREAK_G3' ];
+
 export const createTalentCollection = ({ gateway }) =>
 {
     let talents = [];
@@ -13,7 +17,7 @@ export const createTalentCollection = ({ gateway }) =>
 
     const adopt = (tree) =>
     {
-        talents = tree.talents;
+        talents = tree.talents.filter((talent) => !RETIRED_TALENT_IDS.includes(talent.id));
         points = tree.points ?? points;
         loaded = true;
         listeners.forEach((listener) => listener());

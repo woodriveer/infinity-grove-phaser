@@ -816,7 +816,7 @@ The view renders each line as `.stat-line` with test id `stat-<id>` (`equipmentV
 
 ---
 
-### T10: Drop the retired magical break from any talent list the game receives [ ]
+### T10: Drop the retired magical break from any talent list the game receives [x]
 
 **Owner**: game-dev
 **Goal**: `talentCollection` removes `MAGICAL_BREAK`, `MAGICAL_BREAK_G2` and `MAGICAL_BREAK_G3` from every list it adopts, so the Talentos screen and every effect ignore them (UDMG-09).
@@ -861,8 +861,8 @@ const adopt = (tree) =>
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] `grep -rn "defesa física\|defesa mágica" game/src` finds nothing.
-- [ ] The new tests pass; the whole Vitest suite passes.
+- [x] `grep -rn "defesa física\|defesa mágica" game/src` finds nothing.
+- [x] The new tests pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): drop the retired magical break from talent lists`
 

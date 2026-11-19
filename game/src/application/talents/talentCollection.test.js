@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '../ApiError';
-import { createTalentCollection } from './talentCollection';
+import { createTalentCollection, RETIRED_TALENT_IDS } from './talentCollection';
 
 const talent = (id, level = 0, extra = {}) => ({ id, level, value: level * 3, nextCost: 1, ...extra });
 const points = (earned, spent) => ({ earned, spent, available: earned - spent });
@@ -127,6 +127,46 @@ describe('talentCollection', () => {
             expect(gateway.list).toHaveBeenCalledTimes(1);
             expect(collection.levelOf('CLICK_DAMAGE')).toBe(0);
             expect(collection.points().available).toBe(2);
+        });
+    });
+
+    describe('retired talents', () => {
+        it('drops the magical break of every grade from a loaded list', async () => {
+            gateway.list.mockResolvedValue({
+                talents: [ talent('PHYSICAL_BREAK', 2), talent('MAGICAL_BREAK', 5), talent('MAGICAL_BREAK_G2', 1), talent('MAGICAL_BREAK_G3'), talent('CLICK_DAMAGE') ],
+                points: points(9, 9)
+            });
+
+            await collection.load();
+
+            expect(collection.talents().map((t) => t.id)).toEqual([ 'PHYSICAL_BREAK', 'CLICK_DAMAGE' ]);
+            expect(collection.levelOf('MAGICAL_BREAK')).toBe(0);
+        });
+
+        it('drops it from the list an upgrade answers', async () => {
+            gateway.upgrade.mockResolvedValue({ talents: [ talent('CLICK_DAMAGE', 1), talent('MAGICAL_BREAK', 5) ], points: points(9, 6) });
+
+            await collection.upgrade('CLICK_DAMAGE', 0);
+
+            expect(collection.talents().map((t) => t.id)).toEqual([ 'CLICK_DAMAGE' ]);
+        });
+
+        it('drops it from the list a reset answers', async () => {
+            gateway.reset.mockResolvedValue({ talents: [ talent('MAGICAL_BREAK'), talent('COMBO') ], points: points(9, 0) });
+
+            await collection.reset();
+
+            expect(collection.talents().map((t) => t.id)).toEqual([ 'COMBO' ]);
+        });
+
+        it('keeps a list without retired talents as it came', async () => {
+            await collection.load();
+
+            expect(collection.talents()).toEqual([ talent('CLICK_DAMAGE'), talent('CRIT_CHANCE', 4) ]);
+        });
+
+        it('lists the three retired ids', () => {
+            expect(RETIRED_TALENT_IDS).toEqual([ 'MAGICAL_BREAK', 'MAGICAL_BREAK_G2', 'MAGICAL_BREAK_G3' ]);
         });
     });
 });
