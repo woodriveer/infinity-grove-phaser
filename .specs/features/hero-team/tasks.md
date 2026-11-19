@@ -1624,7 +1624,7 @@ const atChapter = (chapter, ...args) => ({ ...progress(...args), chapter });
 
 ---
 
-### T16: Draw the allies in the attack formation [ ]
+### T16: Draw the allies in the attack formation [x]
 
 **Owner**: game-dev
 **Goal**: The scene draws the leader at the tip of the formation and every fighting ally behind it, fitted in its box, moves each ally on its hit and redraws on every team or chapter change (TEAM-12).
@@ -1724,7 +1724,7 @@ No sprite calls `setInteractive`, so the canvas `pointerdown` handler still gets
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 14 cases pass, every existing `ClickerGame` case passes, and the whole Vitest suite passes.
+- [x] The 14 cases pass, every existing `ClickerGame` case passes, and the whole Vitest suite passes.
 
 **Commit**: `feat(game): draw the allies in the attack formation`
 

@@ -27,6 +27,17 @@ import { renderStageLabel } from './views/stageLabel';
 
 //  The leader hero stands on the ground line of the monster; y is its feet
 const CHARACTER = { x: 230, y: 612, height: 320 };
+//  The attack formation (spec hero-team, Q36): fit boxes, bottom centres (origin 0.5, 1) and depths
+const FORMATION_LEADER = { x: 320, y: 600, width: 180, height: 240, depth: 0.5 };
+const FORMATION = {
+    1: { x: 180, y: 460, width: 90, height: 120, depth: 0.4 },
+    2: { x: 180, y: 605, width: 90, height: 120, depth: 0.4 },
+    3: { x: 75, y: 450, width: 90, height: 120, depth: 0.3 },
+    4: { x: 75, y: 615, width: 90, height: 120, depth: 0.3 }
+};
+const ALLY_MOVE = { distance: 24, duration: 100 };
+//  Scaled to fit the box and keep the aspect ratio
+const fitScale = (image, box) => Math.min(box.width / image.width, box.height / image.height);
 //  The monster is a translucent cream placeholder until its art arrives
 const MONSTER = { x: 670, y: 440, width: 220, height: 250, color: 0xf5ead8, fillAlpha: 0.35 };
 const HEALTH_BAR = { width: 240, height: 16, gap: 18, backColor: 0x2a1410, fillColor: 0xc0392b };
@@ -171,6 +182,7 @@ export class ClickerGame extends Scene
         logo.setScale(LOGO.width / logo.width);
 
         this.character = null;
+        this.allySprites = new Map();
         const body = this.add.rectangle(MONSTER.x, MONSTER.y, MONSTER.width, MONSTER.height, MONSTER.color, MONSTER.fillAlpha);
 
         //  The bar is centred above the monster's head
@@ -562,7 +574,8 @@ export class ClickerGame extends Scene
         this.loadTalents();
     }
 
-    //  The sprite of the leader hero replaces itself when the leader changes; nothing shows until the heroes load
+    //  The leader and the fighting allies. With no ally drawn the leader stands as before (CHARACTER); with at least one, at the tip of the
+    //  formation with the allies behind it. Nothing shows until the heroes load.
     showCharacter ()
     {
         const leader = this.heroes.leader();
@@ -583,7 +596,38 @@ export class ClickerGame extends Scene
             this.character = this.add.image(CHARACTER.x, CHARACTER.y, key).setOrigin(0.5, 1);
         }
 
-        this.character.setScale(CHARACTER.height / this.character.height);
+        this.character.setDepth(FORMATION_LEADER.depth);
+
+        const allies = this.fightingAllies();
+
+        if (allies.length === 0)
+        {
+            this.character.x = CHARACTER.x;
+            this.character.y = CHARACTER.y;
+            this.character.setScale(CHARACTER.height / this.character.height);
+        }
+        else
+        {
+            this.character.x = FORMATION_LEADER.x;
+            this.character.y = FORMATION_LEADER.y;
+            this.character.setScale(fitScale(this.character, FORMATION_LEADER));
+        }
+
+        this.allySprites.forEach((sprite) =>
+        {
+            this.tweens.killTweensOf(sprite);
+            sprite.destroy();
+        });
+        this.allySprites.clear();
+
+        allies.forEach(({ slot, hero }) =>
+        {
+            const box = FORMATION[slot];
+            const sprite = this.add.image(box.x, box.y, `hero_${hero.id}`).setOrigin(0.5, 1).setDepth(box.depth);
+
+            sprite.setScale(fitScale(sprite, box));
+            this.allySprites.set(slot, sprite);
+        });
     }
 
     async loadHeroes ()
@@ -1016,9 +1060,22 @@ export class ClickerGame extends Scene
         return ticks.length;
     }
 
-    //  The sprites of the slots that landed move (the formation fills it in); nothing to do here yet
-    onAllyTick ()
+    //  The sprites of the slots that landed step 24 px toward the monster and back, 100 ms each way
+    onAllyTick (slots)
     {
+        slots.forEach((slot) =>
+        {
+            const sprite = this.allySprites.get(slot);
+
+            if (!sprite)
+            {
+                return;
+            }
+
+            this.tweens.killTweensOf(sprite);
+            sprite.x = FORMATION[slot].x;
+            this.tweens.add({ targets: sprite, x: FORMATION[slot].x + ALLY_MOVE.distance, duration: ALLY_MOVE.duration, yoyo: true });
+        });
     }
 
     //  The leader uses the skill of `slot` (a click on its slot or the key 1, 2 or 3) on the monster on screen. A countdown means a boss.

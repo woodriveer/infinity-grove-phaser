@@ -89,7 +89,7 @@ const AUTO_CLICK_LEVEL_0 = { level: 0, maxLevel: 4, intervalMs: 500, crystals: 0
 
 const COMBO_MAXED = { id: 'COMBO', branch: 'COMBO', perLevel: 5, maxLevel: 10, level: 10, value: 50, nextCost: null };
 
-const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] }, talents = [ COMBO_MAXED ], autoClick = AUTO_CLICK_LEVEL_0, autoClickOn = true } = {}) => {
+const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] }, talents = [ COMBO_MAXED ], autoClick = AUTO_CLICK_LEVEL_0, autoClickOn = true, textures = {} } = {}) => {
     dice.value = 0.99;
     autoClickPreference.on = autoClickOn;
     autoClickPreference.stored = [];
@@ -135,11 +135,13 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
     const scene = new ClickerGame();
     scene.add = {
         image: vi.fn((x, y, key) => {
-            const image = { x, y, key, height: 400, scale: 1 };
+            const size = (texture) => textures[texture] ?? { width: 100, height: 400 };
+            const image = { x, y, key, ...size(key), scale: 1, destroy: vi.fn() };
 
-            image.setOrigin = () => image;
-            image.setTexture = (texture) => { image.key = texture; return image; };
+            image.setOrigin = (ox, oy) => { image.originX = ox; image.originY = oy; return image; };
+            image.setTexture = (texture) => { image.key = texture; Object.assign(image, size(texture)); return image; };
             image.setScale = (value) => { image.scale = value; return image; };
+            image.setDepth = (depth) => { image.depth = depth; return image; };
             images.push(image);
             return image;
         }),
@@ -5394,5 +5396,164 @@ describe('ClickerGame hero team', () => {
 
         expect(label(ctx)).toBe('Stage 1/10  Phase 1/5');
         expect(heroesGateway.list).toHaveBeenCalledTimes(2);
+    });
+});
+
+describe('ClickerGame hero team formation', () => {
+    const TEXTURES = {
+        hero_kael: { width: 300, height: 279 }, hero_lyra: { width: 102, height: 300 }, hero_orina: { width: 125, height: 300 },
+        hero_seraphine: { width: 118, height: 300 }, hero_vex: { width: 108, height: 300 }
+    };
+    const killAll = (ctx) => {
+        while (ctx.scene.monster && !ctx.scene.monster.dead)
+        {
+            ctx.click();
+        }
+    };
+    //  The fade ends, then the respawn delay: the next encounter appears
+    const advance = (ctx) => {
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+    };
+    //  Chapter 5, every hero owned, the auto click off and no talent: only the allies and the clicks of the test touch the monster
+    const open = async (allies, { heroOptions = {}, start = atChapter(5), heroes = teamHeroes(allies, heroOptions), ...extra } = {}) =>
+    {
+        const ctx = await createScene({ start, heroes, talents: [], autoClickOn: false, textures: TEXTURES, ...extra });
+
+        await flush();
+
+        return ctx;
+    };
+    //  The hero images that stand now: a redraw destroys the old ones, which stay in the list of the fake
+    const standing = (ctx) => ctx.images.filter((image) => image.key.startsWith('hero_') && image.destroy.mock.calls.length === 0);
+    const alliesOf = (ctx) => standing(ctx).filter((image) => image !== ctx.scene.character);
+    const sprite = (ctx, key) => alliesOf(ctx).find((image) => image.key === key);
+    const boughtOnly = (allies, boughtSlots, heroOptions = {}) => ({ ...teamHeroes(allies, heroOptions), team: teamPayload(allies, { boughtSlots }) });
+
+    it('with no ally the leader stands at (230, 612), 320 px high', async () => {
+        const ctx = await open([ null, null, null, null ]);
+        const leader = ctx.scene.character;
+
+        expect([ leader.x, leader.y ]).toEqual([ 230, 612 ]);
+        expect(leader.scale * leader.height).toBeCloseTo(320, 9);
+    });
+
+    it('with Lyra in slot 1 the leader moves to (320, 600) fitted in 180 x 240', async () => {
+        const ctx = await open([ 'lyra', null, null, null ]);
+        const leader = ctx.scene.character;
+
+        expect([ leader.x, leader.y ]).toEqual([ 320, 600 ]);
+        expect(leader.scale).toBeCloseTo(0.6, 9);
+        expect(leader.depth).toBe(0.5);
+    });
+
+    it('Lyra as leader in the formation is fitted at scale 0.8', async () => {
+        const ctx = await open([ 'kael', null, null, null ], { heroOptions: { leaderId: 'lyra' } });
+
+        expect(ctx.scene.character.key).toBe('hero_lyra');
+        expect(ctx.scene.character.scale).toBeCloseTo(0.8, 9);
+    });
+
+    it('allies stand at (180, 460), (180, 605), (75, 450) and (75, 615) at depths 0.4, 0.4, 0.3 and 0.3', async () => {
+        const ctx = await open([ 'lyra', 'orina', 'seraphine', 'vex' ]);
+
+        expect(alliesOf(ctx).map(({ key, x, y, depth, originX, originY }) => ({ key, x, y, depth, originX, originY }))).toEqual([
+            { key: 'hero_lyra', x: 180, y: 460, depth: 0.4, originX: 0.5, originY: 1 },
+            { key: 'hero_orina', x: 180, y: 605, depth: 0.4, originX: 0.5, originY: 1 },
+            { key: 'hero_seraphine', x: 75, y: 450, depth: 0.3, originX: 0.5, originY: 1 },
+            { key: 'hero_vex', x: 75, y: 615, depth: 0.3, originX: 0.5, originY: 1 }
+        ]);
+    });
+
+    it('Kael in an ally box is scaled 0.3 and Lyra 0.4', async () => {
+        const ctx = await open([ 'kael', 'lyra', null, null ], { heroOptions: { leaderId: 'orina' } });
+        const kael = sprite(ctx, 'hero_kael');
+        const lyra = sprite(ctx, 'hero_lyra');
+
+        expect([ kael.scale, lyra.scale ]).toEqual([ expect.closeTo(0.3, 9), expect.closeTo(0.4, 9) ]);
+        expect([ kael.scale * kael.width, kael.scale * kael.height ]).toEqual([ expect.closeTo(90, 9), expect.closeTo(83.7, 9) ]);
+        expect([ lyra.scale * lyra.width, lyra.scale * lyra.height ]).toEqual([ expect.closeTo(40.8, 9), expect.closeTo(120, 9) ]);
+    });
+
+    it('an empty or unbought slot draws no sprite', async () => {
+        const ctx = await open([ 'lyra', null, null, null ], { heroes: boughtOnly([ 'lyra', null, null, null ], 2) });
+
+        expect(alliesOf(ctx).map(({ key }) => key)).toEqual([ 'hero_lyra' ]);
+    });
+
+    it('no ally is drawn below chapter 5', async () => {
+        const ctx = await open([ 'lyra', null, null, null ], { start: atChapter(4) });
+
+        expect(alliesOf(ctx)).toHaveLength(0);
+        expect([ ctx.scene.character.x, ctx.scene.character.y ]).toEqual([ 230, 612 ]);
+    });
+
+    it('no ally is drawn before the heroes load', async () => {
+        const ctx = await open([ 'lyra', null, null, null ], { heroes: new Error('offline') });
+
+        expect(ctx.images.some((image) => image.key.startsWith('hero_'))).toBe(false);
+    });
+
+    it('a team change redraws the allies and the leader', async () => {
+        const ctx = await open([ 'lyra', null, null, null ]);
+        const lyra = sprite(ctx, 'hero_lyra');
+
+        heroesGateway.setTeam.mockResolvedValue({ leaderId: 'kael', team: teamPayload([ null, null, null, null ]) });
+        await ctx.scene.heroes.setTeam([ null, null, null, null ]);
+
+        expect(lyra.destroy).toHaveBeenCalled();
+        expect(alliesOf(ctx)).toHaveLength(0);
+        expect([ ctx.scene.character.x, ctx.scene.character.y ]).toEqual([ 230, 612 ]);
+    });
+
+    it('a leader change redraws the formation', async () => {
+        const ctx = await open([ 'lyra', null, null, null ]);
+
+        heroesGateway.setLeader.mockResolvedValue({ leaderId: 'lyra', team: teamPayload([ 'kael', null, null, null ]) });
+        await ctx.scene.heroes.setLeader('lyra');
+
+        expect(ctx.scene.character.key).toBe('hero_lyra');
+        expect(alliesOf(ctx).map(({ key, x, y }) => ({ key, x, y }))).toEqual([ { key: 'hero_kael', x: 180, y: 460 } ]);
+    });
+
+    it('a chapter change redraws at the next encounter', async () => {
+        const ctx = await open([ 'lyra', null, null, null ], { start: atChapter(4, 10, 'CHAPTER_BOSS', 1) });
+
+        expect(alliesOf(ctx)).toHaveLength(0);
+
+        campaignGateway.report.mockResolvedValue(atChapter(5, 1, 'PHASE', 1));
+        killAll(ctx);
+        advance(ctx);
+        await flush();
+
+        expect(alliesOf(ctx).map(({ key, x, y }) => ({ key, x, y }))).toEqual([ { key: 'hero_lyra', x: 180, y: 460 } ]);
+    });
+
+    it('each ally hit moves its sprite 24 px right and back in 100 ms each way', async () => {
+        const ctx = await open([ 'lyra', null, null, null ]);
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.tweens.find((tween) => tween.targets === sprite(ctx, 'hero_lyra'))).toMatchObject({ x: 204, duration: 100, yoyo: true });
+    });
+
+    it('a kill moves only the slots that landed', async () => {
+        const ctx = await open([ 'lyra', 'orina', null, null ], { heroOptions: { stars: { lyra: 9 } } });
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.monster.dead).toBe(true);
+        expect(ctx.tweens.filter((tween) => tween.targets === sprite(ctx, 'hero_lyra'))).toHaveLength(1);
+        expect(ctx.tweens.filter((tween) => tween.targets === sprite(ctx, 'hero_orina'))).toHaveLength(0);
+    });
+
+    it('no ally sprite takes input', async () => {
+        const ctx = await open([ 'lyra', 'orina', null, null ]);
+
+        alliesOf(ctx).forEach((image) => expect(image.setInteractive).toBeUndefined());
+
+        ctx.handlers.pointerdown({ x: 180, y: 400 });
+
+        expect(ctx.scene.monster.health).toBe(9);
     });
 });
