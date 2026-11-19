@@ -336,7 +336,7 @@ The numbered comments are the body to write, in that order; keep the KDoc.
 
 ---
 
-### T2: Store the team in `player_team` [ ]
+### T2: Store the team in `player_team` [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Create the table `player_team` with an expand-only migration and the repository that reads and writes one team per player (TEAM-01, TEAM-04 AC 24, AC 25).
@@ -448,8 +448,10 @@ Plus the renamed `PreviousBackendCompatibilityIT` test must pass with `PREVIOUS_
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] `V12__hero_team.sql` creates only `player_team` (no `alter`, no `drop`).
-- [ ] The 9 cases of `TeamRepositoryIT.kt` and every case of `PreviousBackendCompatibilityIT.kt` pass; the whole backend suite passes.
+- [x] `V12__hero_team.sql` creates only `player_team` (no `alter`, no `drop`).
+- [x] The 9 cases of `TeamRepositoryIT.kt` and every case of `PreviousBackendCompatibilityIT.kt` pass; the whole backend suite passes.
+
+**Note (T2)**: the port file is `<main>/port/TeamRepositoryPort.kt`, not `TeamPorts.kt`. ktlint (`standard:filename`) refuses a file whose only declaration is one interface with another name, and `TeamRepositoryPort` is the only declaration of that file (the use cases of T3 to T5 live in `TeamUseCase.kt`). The content is the contract above.
 
 **Commit**: `feat(backend): store the hero team in player_team`
 

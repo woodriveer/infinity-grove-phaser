@@ -8,6 +8,7 @@ import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
+import br.com.woodriver.infinity_grove_ws.domain.Team
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import br.com.woodriver.infinity_grove_ws.port.AccessToken
@@ -28,6 +29,7 @@ import br.com.woodriver.infinity_grove_ws.port.RefreshTokenRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenSecretPort
 import br.com.woodriver.infinity_grove_ws.port.ResetRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.TalentRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.TeamRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.WalletRepositoryPort
 import java.time.Clock
@@ -322,5 +324,18 @@ class InMemoryResetRepository : ResetRepositoryPort {
         resets: Int,
     ) {
         counts[username] = resets
+    }
+}
+
+class InMemoryTeamRepository : TeamRepositoryPort {
+    val teams = linkedMapOf<String, Team>()
+
+    override fun find(username: String) = teams[username] ?: Team()
+
+    override fun save(
+        username: String,
+        team: Team,
+    ) {
+        teams[username] = team
     }
 }
