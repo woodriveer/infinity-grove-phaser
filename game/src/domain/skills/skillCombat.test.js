@@ -1127,3 +1127,101 @@ describe('allyHit', () => {
         expect(monster.dead).toBe(true);
     });
 });
+
+describe('effects per monster', () => {
+    const main = () => monsterOf(1000, stats('FIRE', 40));
+    const other = () => monsterOf(100, stats('FIRE', 40));
+    const click = (skills, monster, mainMonster) => skills.click({ attacker: PLAYER, monster, ...(mainMonster ? { main: mainMonster } : {}), boss: false });
+
+    it('a click on another monster of the fight keeps the debuffs of the main', () => {
+        const skills = combat();
+        const boss = main();
+
+        use(skills, boss, 'kael', 3);
+        click(skills, other(), boss);
+
+        expect(skills.effects()).toEqual([ { label: 'Brado Aterrador', seconds: 10 } ]);
+    });
+
+    it("a click on another monster meets that monster's own debuffs", () => {
+        const skills = combat();
+        const boss = main();
+
+        use(skills, boss, 'kael', 3);
+
+        expect(click(skills, other(), boss).damage).toBeCloseTo(0.6, 9);
+        expect(click(skills, boss, boss).damage).toBeCloseTo(0.9, 9);
+    });
+
+    it('an ally hit on another monster keeps the effects of the main', () => {
+        const skills = combat();
+        const boss = main();
+
+        use(skills, boss, 'kael', 3);
+
+        const hit = skills.allyHit({ attacker: PLAYER, monster: other(), main: boss, boss: false });
+
+        expect(hit.damage).toBeCloseTo(0.6, 9);
+        expect(skills.effects().map((effect) => effect.label)).toEqual([ 'Brado Aterrador' ]);
+    });
+
+    it('a click on a monster of another fight ends every effect on the old one', () => {
+        const skills = combat();
+
+        use(skills, main(), 'kael', 3);
+        click(skills, other());
+
+        expect(skills.effects()).toEqual([]);
+    });
+
+    it("effectsWithOwner of a monster without effects shows only the player's buffs", () => {
+        const skills = combat();
+        const boss = main();
+
+        use(skills, boss, 'lyra', 3);
+        use(skills, boss, 'kael', 3);
+
+        expect(skills.effectsWithOwner(other()).map((effect) => effect.label)).toEqual([ 'Ventos Ligeiros' ]);
+        expect(skills.effectsWithOwner(boss).map((effect) => effect.label)).toEqual([ 'Ventos Ligeiros', 'Brado Aterrador' ]);
+    });
+
+    it('the Stun of the main survives a click on another monster', () => {
+        const skills = combat();
+        const boss = main();
+
+        use(skills, boss, 'kael', 2, { boss: true });
+        click(skills, other(), boss);
+
+        expect(skills.countdownMs(1000)).toBe(0);
+    });
+
+    it('the aimed shot keeps flying while the player clicks another monster', () => {
+        const skills = combat();
+        const boss = main();
+
+        use(skills, boss, 'lyra', 2);
+        click(skills, other(), boss);
+
+        const { hits, targets } = skills.advance(2000, { monster: boss });
+
+        expect(hits).toEqual([ { damage: 36, critical: true } ]);
+        expect(targets).toEqual([ boss ]);
+    });
+
+    it('use returns the monster each hit landed on', () => {
+        const skills = combat();
+        const boss = main();
+
+        expect(use(skills, boss, 'kael', 1).targets).toEqual([ boss ]);
+        expect(use(skills, boss, 'kael', 1)).toEqual({ used: false, hits: [], targets: [], countdown: { extendMs: 0 } });
+    });
+
+    it('advance returns the monster each tick landed on', () => {
+        const skills = combat();
+        const boss = main();
+
+        use(skills, boss, 'orina', 2);
+
+        expect(skills.advance(1000, { monster: boss }).targets).toEqual([ boss ]);
+    });
+});

@@ -653,7 +653,7 @@ import { addsOf } from '../combat/adds';
 
 ---
 
-### T8: Keep the skill effects of each monster apart [ ]
+### T8: Keep the skill effects of each monster apart [x]
 
 **Owner**: game-dev
 **Goal**: `SkillCombat` keeps debuffs and damage over time per monster and follows the main monster of the fight, so a hit on an add never ends the miniboss's effects, the aimed shot or the Stun/Root stop (ADDS-07, spec Damage skills AC 8, 10).
@@ -781,7 +781,7 @@ allyHit ({ attacker, monster, main = monster, boss }) { /* ... */ }
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 9 cases pass, every existing `skillCombat.test.js` case passes unchanged, and the whole Vitest suite passes.
+- [x] The 9 cases pass, every existing `skillCombat.test.js` case passes unchanged, and the whole Vitest suite passes.
 
 **Commit**: `feat(game): keep the skill effects of each monster apart`
 
