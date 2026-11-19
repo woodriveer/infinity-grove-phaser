@@ -14,7 +14,7 @@ This is one of three features split from the owner's request of 2026-10-30 (see 
 | --- | --- | --- | --- | --- |
 | 1 | `campaign-chapters` | `.specs/features/campaign-chapters/spec.md` | Chapters 6 to 15, health x2 per chapter, 64-bit health, reset reward growing with the chapter, K/M/B number format, coin drops raised | Shipped (AD-019) |
 | - | `unified-damage` | `.specs/features/unified-damage/spec.md` | One damage, one enemy `defense` | Shipped as v0.5.0 (AD-021) |
-| 2 | `hero-team` | this file | Team active from chapter 5, slots bought with gold (opened by the chapter 5 to 8 bosses), ally hits with the one damage, ally passives, the Equipe screen, allies on the field | This revision |
+| 2 | `hero-team` | this file | Team active from chapter 5, slots bought with gold (opened by the chapter 5 to 8 bosses), ally hits with the one damage, ally passives, the Equipe screen, allies on the field | Built and accepted (2026-11-19) |
 | 3 | `miniboss-adds` | `.specs/features/miniboss-adds/spec.md` | From chapter 11, minibosses come with adds that raise the miniboss defense; target choice; damage skills hit every enemy | Not started; allies hit the target it defines (see Consistency With `miniboss-adds`) |
 
 ## Facts From the Code (not decisions)
@@ -41,11 +41,11 @@ Re-checked on `main` at `7de3208` (2026-11-19).
 
 ## Goals
 
-- [ ] A player who has won the chapter 5 boss can buy up to 4 ally slots with gold, each opened by the first win of the chapter 5, 6, 7 or 8 boss, and fill them with owned heroes. The server stores all of it.
-- [ ] While the campaign is at chapter 5 or later, every ally hits the monster once per second with the one damage of AD-021: Ally Damage formula, the leader's element, the monster's one `defense`.
-- [ ] Each of the five heroes has a passive that applies while it is a fighting ally (Passive Table).
-- [ ] The allies stand on the field and visibly attack on each hit.
-- [ ] A player who has never won the chapter 5 boss, or whose campaign is below chapter 5, plays exactly as today.
+- [x] A player who has won the chapter 5 boss can buy up to 4 ally slots with gold, each opened by the first win of the chapter 5, 6, 7 or 8 boss, and fill them with owned heroes. The server stores all of it.
+- [x] While the campaign is at chapter 5 or later, every ally hits the monster once per second with the one damage of AD-021: Ally Damage formula, the leader's element, the monster's one `defense`.
+- [x] Each of the five heroes has a passive that applies while it is a fighting ally (Passive Table).
+- [x] The allies stand on the field and visibly attack on each hit.
+- [x] A player who has never won the chapter 5 boss, or whose campaign is below chapter 5, plays exactly as today.
 
 ## Out of Scope
 
@@ -106,7 +106,7 @@ Worked examples (the leader is Kael, FIRE, unless a row says otherwise; level fa
 | --- | --- | --- |
 | E1 | Lyra 0 stars, no pieces, FIRE monster with defense 0 | 1 x 2 x 1.0 = **2** |
 | E2 | Lyra 0 stars, no pieces, FIRE monster with defense 50 | 2 x 0.5 = **1** |
-| E3 | Orina 3 stars, weapon 10 click damage at +0, ring +20 % click damage, NATURE monster with defense 50 | 13.2 x 8 x 2.0 x 0.5 = **105.6** |
+| E3 | Lyra 3 stars, weapon 10 click damage at +0, ring +20 % click damage, NATURE monster with defense 50; then the same stars and pieces on Orina, whose own Erosão Arcana lowers the defense to 35 (Passive Table, Q45) | Lyra: 13.2 x 8 x 2.0 x 0.5 = **105.6**; Orina: 13.2 x 8 x 2.0 x 0.65 = **137.28** |
 | E4 | Lyra 0 stars wearing an amulet of +20 % boss damage, FIRE miniboss with defense 10 | 2 x 0.9 x 1.2 = **2.16** |
 | E5 | Lyra 0 stars and Seraphine 0 stars, FIRE monster with defense 0 | 2.5 + 2.5 = **5** per tick |
 | E6 | Vex 0 stars wearing a ring of 50 % armor pierce, FIRE monster with defense 40 | defense 20: 2 x 0.8 = **1.6** |
@@ -273,7 +273,7 @@ Rows `Q1` to `Q13` carry the owner's answers of 2026-10-30, rows `Q26` to `Q37` 
 | **Q33** Team resistance values | Removed: there is no team resistance (Q7) | AD-021 | superseded by Q7 |
 | **Q34** What applies to ally damage (rewritten 2026-11-19) | See Q46 | The 2026-10-31 default listed what the TEAM type ignored; with one damage the list changes | replaced by Q46 |
 | **Q35** Adds and ally hits (rewritten 2026-11-19) | The add buff of `miniboss-adds` raises the miniboss's one defense, and ally hits meet it like every strike; the team is no longer a counter to adds | Follows from owner answer Q2 (one damage everywhere); `miniboss-adds` revises its spec when picked up | y |
-| **Q36** Ally art and place | Attack formation (Allies on the Field). Sprites are `assets/heroes/<id>_sprite.png`; `kael_rig.*` is not used | Owner answer 2026-10-31; positions re-checked on `7de3208` against the HUD of `ui-redesign` | y |
+| **Q36** Ally art and place | Attack formation (Allies on the Field). Sprites are `assets/heroes/<id>_sprite.png`; `kael_rig.*` is not used | Owner answer 2026-10-31; positions re-checked on `7de3208` against the HUD of `ui-redesign`. Ally slot 3 moved from (75, 450) to (75, 462) by UI review finding #3 (T30, `7435d25`) so its box starts 15 px under the element wheel; confirmed by the product owner at acceptance (2026-11-19) | y |
 | **Q37** Attack animation | Each ally hit that lands moves the sprite 24 px toward the monster and back in 200 ms, plus the summed light-blue number | Owner answer 2026-10-31 | y |
 | **Q45** Erosão Arcana and Lâminas Sombrias (new) | Orina's Erosão Arcana: `-15 de defesa dos inimigos`, for every hit (leader and allies). Vex's Lâminas Sombrias: `-15 de resistência a crítico dos inimigos`, for the leader's hits, so the two passives stay different | With one defense, the old texts (`-15 de defesa mágica` and `-15 de defesa física`) become the same effect; critical resistance is the other enemy number that already has a break talent (`CRIT_RESIST_BREAK`) and an enemy chip. Alternatives: both lower the one defense by 15 and stack (-30 with both), or the owner names another effect for Vex | y (owner, 2026-11-19: recommended default) |
 | **Q46** Which effects reach ally hits (new) | Ally hits go through the strike of a tick (Ally Damage): the one defense after `PHYSICAL_BREAK`, Erosão Arcana and Brado Aterrador; the ally's own armor pierce and boss damage; Prisão de Espinhos and Bênção da Grande Árvore. Not: critical hits, the combo, Ventos Ligeiros and Bênção's click bonus, the leader's star bonus and power talents. Consequence: allies lose half their damage on the chapter 5 boss (defense 50) and 80 % on the chapter 15 boss (defense 80) unless armor pierce or breaks lower it | AD-021: "every effect applies to every strike" and an ally hit is a strike; the leader's own click power stays the leader's (Q5). The old plan (team resistance 20 to 50 on bosses) gave allies more on bosses; AD-021 already accepted losing that lever | y (owner, 2026-11-19: recommended default) |
@@ -371,7 +371,7 @@ Rows `Q1` to `Q13` carry the owner's answers of 2026-10-30, rows `Q26` to `Q37` 
 1. WHILE the team is active, at least one bought slot holds a hero, a living monster is on screen and the pause menu is closed, the game SHALL land one hit of every fighting ally each time 1000 ms of fight time pass, the first 1000 ms after the monster appears.  <!-- state-driven -->
 2. WHEN an ally hit lands THEN the game SHALL use the ally's star multiplier 2, 4, 6, 8, 10, 12, 14, 16, 18 or 20 for 0 to 9 stars.  <!-- event-driven -->
 3. WHEN Lyra with 0 stars and no pieces is an ally of a FIRE leader against a FIRE monster with defense 0 THEN the game SHALL deal 2 per tick (E1).  <!-- event-driven -->
-4. WHEN Orina with 3 stars, a weapon of 10 click damage at +0 and a ring of +20 % click damage is an ally of a FIRE leader against a NATURE monster with defense 50 THEN the game SHALL deal 105.6 per tick (E3).  <!-- event-driven -->
+4. WHEN Lyra with 3 stars, a weapon of 10 click damage at +0 and a ring of +20 % click damage is an ally of a FIRE leader against a NATURE monster with defense 50 THEN the game SHALL deal 105.6 per tick, and 137.28 per tick when Orina with the same stars and pieces is that ally instead, because her own Erosão Arcana lowers the defense to 35 (E3).  <!-- event-driven -->
 5. WHEN Lyra with 0 stars and an amulet of +20 % boss damage is an ally of a FIRE leader against a FIRE miniboss with defense 10 THEN the game SHALL deal 2.16 per tick (E4).  <!-- event-driven -->
 6. WHEN Lyra has 9 stars and no pieces as an ally against a FIRE monster with defense 0 under a FIRE leader THEN the game SHALL deal 20 per tick (E12).  <!-- event-driven -->
 7. WHEN the leader changes THEN the game SHALL use the new leader's element on the next ally hit (E15).  <!-- event-driven -->
@@ -513,28 +513,28 @@ Rows `Q1` to `Q13` carry the owner's answers of 2026-10-30, rows `Q26` to `Q37` 
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| TEAM-01 | P1: Team and slots on the backend - AC 1, 2 (read) | Tasks | In Tasks |
-| TEAM-02 | P1: Team and slots on the backend - AC 3 to 9, 17 (slot purchase) | Tasks | In Tasks |
-| TEAM-03 | P1: Team and slots on the backend - AC 10 to 17, 21 (team save) | Tasks | In Tasks |
-| TEAM-04 | P1: Team and slots on the backend - AC 18 to 20, 22 to 25 (leader swap, reset, auth, deletion, migration) | Tasks | In Tasks |
-| TEAM-05 | P1: Ally hits use the one damage - AC 1 to 10 (rewritten 2026-11-19; was the team damage type and resistance) | Tasks | In Tasks |
-| TEAM-06 | P1: Allies fight - AC 2 to 8 (formula and sources) | Tasks | In Tasks |
-| TEAM-07 | P1: Allies fight - AC 1, 9, 11 to 15 (rhythm, kill, gates) | Tasks | In Tasks |
-| TEAM-08 | P1: Allies fight - AC 10 (damage number) | Tasks | In Tasks |
-| TEAM-09 | P1: Equipe screen - AC 1 to 9, 18, 19, 21, 22 (screen, slot states, HUD button) | Tasks | In Tasks |
-| TEAM-10 | P1: Slot purchase dialog - AC 1 to 6 | Tasks | In Tasks |
-| TEAM-11 | P2: Ally passives - AC 1 to 10 | Tasks | In Tasks |
-| TEAM-12 | P2: Allies on the field - AC 1 to 9 | Tasks | In Tasks |
-| TEAM-13 | P1: Equipe screen - AC 10 to 17, 20, 23 (team editing, busy, failure) | Tasks | In Tasks |
+| TEAM-01 | P1: Team and slots on the backend - AC 1, 2 (read) | Tasks | Verified |
+| TEAM-02 | P1: Team and slots on the backend - AC 3 to 9, 17 (slot purchase) | Tasks | Verified |
+| TEAM-03 | P1: Team and slots on the backend - AC 10 to 17, 21 (team save) | Tasks | Verified |
+| TEAM-04 | P1: Team and slots on the backend - AC 18 to 20, 22 to 25 (leader swap, reset, auth, deletion, migration) | Tasks | Verified |
+| TEAM-05 | P1: Ally hits use the one damage - AC 1 to 10 (rewritten 2026-11-19; was the team damage type and resistance) | Tasks | Verified |
+| TEAM-06 | P1: Allies fight - AC 2 to 8 (formula and sources) | Tasks | Verified |
+| TEAM-07 | P1: Allies fight - AC 1, 9, 11 to 15 (rhythm, kill, gates) | Tasks | Verified |
+| TEAM-08 | P1: Allies fight - AC 10 (damage number) | Tasks | Verified |
+| TEAM-09 | P1: Equipe screen - AC 1 to 9, 18, 19, 21, 22 (screen, slot states, HUD button) | Tasks | Verified |
+| TEAM-10 | P1: Slot purchase dialog - AC 1 to 6 | Tasks | Verified |
+| TEAM-11 | P2: Ally passives - AC 1 to 10 | Tasks | Verified |
+| TEAM-12 | P2: Allies on the field - AC 1 to 9 | Tasks | Verified |
+| TEAM-13 | P1: Equipe screen - AC 10 to 17, 20, 23 (team editing, busy, failure) | Tasks | Verified |
 
-**Coverage:** 13 total, 13 mapped to tasks (`tasks.md`), 0 unmapped
+**Coverage:** 13 total, 13 mapped to tasks (`tasks.md`), 0 unmapped; 13 Verified (Verifier round 2 PASS, `validation.md` at `9b542bc`; TEAM-05, -06, -07, -09 and -11 closed by the round 1 fixes `5680c42` and `06316ef`). Accepted by the product owner on 2026-11-19 (`tasks.md` § Acceptance)
 
 ---
 
 ## Success Criteria
 
-- [ ] A player below chapter 5, or who never beat the chapter 5 boss, sees no change in combat and the rail keeps six buttons.
-- [ ] Unit tests pin the ten star multipliers, E1 to E15, P1 to P10 and each passive with exact numbers.
-- [ ] An e2e test buys slot 1 against the fake backend, places an ally, and reads the ally's damage and its sprite moving.
-- [ ] A backend integration test proves slots and allies survive a reset and a double purchase pays once.
-- [ ] `grep -rn -i "team_resistance\|teamResistance\|TEAM_DAMAGE" backend/src game/src` prints nothing after the feature.
+- [x] A player below chapter 5, or who never beat the chapter 5 boss, sees no change in combat and the rail keeps six buttons.
+- [x] Unit tests pin the ten star multipliers, E1 to E15, P1 to P10 and each passive with exact numbers.
+- [x] e2e tests against the fake backend buy slot 1 (`heroTeam.spec.js:224`), place an ally and read its damage (`heroTeamEditing.spec.js:53`), and read its sprite moving (`heroTeamField.spec.js:159`).
+- [x] A backend integration test proves slots and allies survive a reset and a double purchase pays once.
+- [x] `grep -rn -i "team_resistance\|teamResistance\|TEAM_DAMAGE" backend/src game/src` prints nothing after the feature.

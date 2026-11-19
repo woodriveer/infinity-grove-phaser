@@ -37,6 +37,51 @@ Q45 and Q46 were answered on 2026-11-19 with the recommended defaults below, so 
 
 ---
 
+## Acceptance (product-owner, 2026-11-19)
+
+**Verdict: ACCEPTED.** T1 to T30 are done, the Verifier round 2 gives PASS (`9b542bc`) and the ui-artist review round 2 gives APROVADO (`a9eb31b`). No new task of this feature.
+
+**Evidence read**: `validation.md` round 2 (diff range `0248def..06316ef`): 98 of 98 ACs matched to the spec outcome with `file:line` evidence, every listed edge case pinned (the frame-end rule by `ClickerGame.test.js:5410` and `:5427`), every player-visible AC with an e2e scenario in the six `heroTeam*.spec.js` files. The round 1 gaps 1 to 3 are closed by test-only commits (`5680c42`, `06316ef`); no production file changed after round 1. Sensor: round 1 34 of 35 killed (G24 survived), round 2 4 of 4 killed (G24, N2, N3, N4), controls survived. Gates: backend 1149/1149, game unit 2015/2015, feature e2e 91/92 at `06316ef` (`heroTeamCombat.spec.js:324` timed out under 3 workers and passes alone; see TD-012), full e2e 482/484 at `c5847a8` (`heroTeam.spec.js:347`, fixed by `06316ef`, and the known flake `wake.spec.js:56`), deploy 287/289 (the known Windows crash code of `deploy/regression.test.mjs:385`, `:412`; `deploy/` untouched). The Verifier's gap 4 (E3 wording, T27 boxes) belonged to the product owner and is closed by the edits below.
+
+**Spec goals** (`spec.md`, Goals):
+
+| Goal | Evidence (`validation.md`) | Status |
+| --- | --- | --- |
+| 1. Slots opened by the chapter 5 to 8 bosses, bought with gold, filled with owned heroes, stored by the server | Backend AC 1 to 25 (`HeroControllerIT.kt:227`, `:300`; `TeamControllerIT.kt:93`, `:321`, `:459`; `PreviousBackendCompatibilityIT.kt:171`); purchase dialog AC 1 to 6 (e2e `heroTeam.spec.js:200`, `:224`, `:333`); editing (e2e `heroTeamEditing.spec.js:53`, `:78`) | Met |
+| 2. Every ally hits once a second with the one damage (Ally Damage formula, the leader's element, the one `defense`) | One damage AC 1 to 10 and Allies fight AC 1 to 15 (`skillCombat.test.js:985` to `:1090` E1 to E15; `allyAttacker.test.js:9` ten multipliers; `allyCombat.test.js:15`; e2e `heroTeamCombat.spec.js:100`, `:138`, `:239`, `:251`); sensor G24, N3, N4 killed | Met |
+| 3. Each hero has a passive while it fights as an ally | Passives AC 1 to 10 (e2e `heroTeamPassives.spec.js:114`, `:136`, `:158`, `:178`, `:202`, `:249`, `:264`; skill-hit halves `ClickerGame.test.js:5473`, `:5487`); sensor N2 killed | Met |
+| 4. The allies stand on the field and visibly attack | Field AC 1 to 9 (`ClickerGame.test.js:5559`, `:5532`; e2e `heroTeamField.spec.js:86`, `:97`, `:107`, `:159`, `:266`); ui-review shots `09-field-formation`, `09b-field-ally-hit`, `10-field-kael` | Met |
+| 5. A player who never won the chapter 5 boss, or stands below chapter 5, plays as today | e2e `heroTeam.spec.js:82` (six buttons, no `hud-team`), `heroTeamCombat.spec.js:114` (no damage after a reset to chapter 1), `heroTeamPassives.spec.js:218`; the full e2e suite of the other features passes (482/484, both failures explained) | Met |
+
+**Success criteria**: all five met. Criterion 3 was reworded at acceptance: it said "an e2e test", and the purchase, the placement with its damage and the sprite motion are three scenarios (`heroTeam.spec.js:224`, `heroTeamEditing.spec.js:53`, `heroTeamField.spec.js:159`); the behaviour is covered, the wording was too narrow. Criterion 5: `grep -rn -i "team_resistance\|teamResistance\|TEAM_DAMAGE" backend/src game/src` prints nothing (run at acceptance on `9b542bc`).
+
+**T30 spec edit confirmed**: game-dev moved ally slot 3 from (75, 450) to (75, 462) in the formation table, the worst-case boxes and Allies on the Field AC 1 (`7435d25`) to close UI review finding #3. The new box (x 30 to 120, y 342 to 462) starts 15 px under the element wheel (bottom y 327; the finding asked for 12), ends 33 px above slot 4 (y 495), and stays left of slot 1 (x 135). All allies of a tick move together, so the 24 px motion keeps the same gaps. The tests follow the new value (`ClickerGame.test.js:5559`, e2e `heroTeamField.spec.js:97`, `:107`). Confirmed; the Q36 row of the spec Assumptions records it, and the T16 and T26 texts below now read 462.
+
+**Rulings on the ui-review suggestions** (recorded, nothing built here):
+
+| # | Suggestion | Ruling |
+| --- | --- | --- |
+| 1 | The passive line ends in an ellipsis in a full card (`Graça da Aurora: +25% de dano da...`, `07-team-full`), hiding the value; try 3 lines or the full text on hover | Kept as specified: the spec caps the passive at 2 lines (Equipe Screen Layout) and the review marks it met. The value is readable in the Equipamento attribute panel (P10). No item now; revisit if players ask |
+| 2 | The notice `Vaga de aliado comprada!` is plain 13 px text; a parchment badge with a gold border would fit the game better (`06-team-bought`) | Declined for this feature: the spec places a plain notice inside the panel (Assumptions "Purchase notice place") and the gold flash on the new slot is the main feedback (Q32). A styled notice belongs to a shared notice pattern for every panel, not one screen. No item now |
+| 3 | The light-blue ally number `3.8` reads faint over the light forest (`09b`); a 1 to 2 px dark outline would help | Backlog item **TD-013** in `STATE.md` (open, low). The number already uses `DAMAGE_FONT` with its 8 px `#2a1408` stroke (spec Facts), so the item first measures the contrast in the shot; a change of colour or stroke needs an owner decision, because Q12 fixed light blue |
+| 4 | The monster shows as a grey placeholder in the combat shots | Fake backend art, not the feature. No item |
+| 5 | The panel never scrolls, even with a full team | Observation, nothing to do |
+| 6 | Phone layout | Already TD-010. No new item |
+
+**Verifier follow-up recorded**: the real-time poll of `heroTeamCombat.spec.js:340` (a 10 HP monster that Lyra kills a second after each respawn) is backlog item **TD-012** in `STATE.md` (open, test debt, owner `test-engineer`), together with the domain test title `skillCombat.test.js:993`, which still names Orina for the 105.6 of E3 (true at the domain call, which receives no team passives, but out of step with the reworded E3). Not built here.
+
+**Edits made at acceptance**:
+
+1. `spec.md`: E3 rewritten (Lyra 105.6; Orina with her own Erosão Arcana 137.28) and Allies fight AC 4 rewritten to match (`heroTeamCombat.spec.js:239`, `:251`); Goals and Success Criteria ticked, criterion 3 reworded; TEAM-01 to TEAM-13 set to Verified; the Q36 row records the T30 move of slot 3.
+2. `tasks.md`: this section; T15 test case `a leader change switches the element of the next ally hit` corrected to NATURE (WATER beats FIRE in `game/src/domain/combat/elements.js`, so WATER would deal 4, not 1; the built test stubs Orina as NATURE, `ClickerGame.test.js:5284`); T10 and T24 E3 cases aligned with what was built; T16 and T26 positions read (75, 462); T27 Done-when boxes ticked (`ui-review.html` round 2 holds S1 to S8 as shots `01` to `10` in desktop and phone with the verdict APROVADO, and its findings #1 to #3 are T28 to T30).
+3. `STATE.md`: AD-018 status set to built and accepted; TD-012 and TD-013 added; Handoff set to the `gitops` release and to `miniboss-adds` next.
+
+**Waiting for the owner's confirmation**: the rulings on suggestions 1 to 3 (TD-013 low priority). Nothing blocks the release.
+
+**Next step**: `gitops` releases `hero-team`: push, deploy check (the backend runs `V12__hero_team.sql` at boot, expand only; a game reads a missing `team` as a locked team, so either deploy order works), production check (no `Equipe` button for an account below the chapter 5 boss; for an account past it, the Equipe panel with slot 1 buyable), `report.html` from `.specs/features/hero-team/coverage/`, `CHANGELOG.md`, tag.
+
+---
+
 ## Test Coverage Matrix
 
 > Generated from codebase, project guidelines, and spec. Guidelines found: `CLAUDE.md` (unit for service/domain, e2e for every player-visible behaviour), `backend/build.gradle.kts` (JUnit 5, Testcontainers Postgres, ktlint, JaCoCo), `game/vitest.config.js` (jsdom), `game/playwright.config.js` (fake backend `game/e2e/support/fakeBackend.js`), `game/ui-review.config.js` (shots at 1280x720 and 390x844). No coverage thresholds, so strong defaults apply.
@@ -1176,7 +1221,7 @@ Place it right after `click`. Test fixture: `const leader = leaderAttacker({ lea
 
 - `E1: Lyra 0 stars deals 2 to a FIRE monster with defense 0`.
 - `E2: Lyra 0 stars deals 1 to a FIRE monster with defense 50`.
-- `E3: Orina 3 stars with a 10 click weapon and a +20 % ring deals 105.6 to a NATURE monster with defense 50`.
+- `E3: Orina 3 stars with a 10 click weapon and a +20 % ring deals 105.6 to a NATURE monster with defense 50` (the domain call receives no team passives, so this is the hit of an ally without Erosão Arcana; with Orina's own passive the scene deals 137.28, spec E3 as reworded at acceptance).
 - `E4: Lyra 0 stars with +20 % boss damage deals 2.16 to a FIRE miniboss with defense 10`: `boss: true`.
 - `E5: Lyra and Seraphine 0 stars with the team factor deal 2.5 each`: two `allyHit` calls with `ally(0, [], 1.25)` → 5 in total.
 - `E6: Vex 0 stars with 50 % armor pierce deals 1.6 to a FIRE monster with defense 40`.
@@ -1604,7 +1649,7 @@ const atChapter = (chapter, ...args) => ({ ...progress(...args), chapter });
 - `an ally hit leaves the combo streak unchanged`: `ctx.click()` once, read `ctx.hud('.combo-hud').textContent`; `update(0, 1000)` → the same text.
 - `the pause menu freezes the ally clock`: `update(0, 600)`, `scene.pauseFight()`, `update(0, 10000)`, `scene.resumeFight()`, `update(0, 399)` → health 10; `update(0, 1)` → 8.
 - `ally hits keep landing while a hero screen is open`: `await scene.heroUi.show('heroes')`, `update(0, 1000)` → 8.
-- `a leader change switches the element of the next ally hit`: heroes with Orina `{ ...heroEntry('orina', { 0: 1 }), element: 'WATER' }`; first tick 2; `heroesGateway.setLeader` resolves `{ leaderId: 'orina', team: teamPayload([ 'lyra', null, null, null ]) }`, `await scene.heroes.setLeader('orina')`; next tick deals 1 (WATER against FIRE).
+- `a leader change switches the element of the next ally hit`: heroes with Orina stubbed as NATURE `{ ...heroEntry('orina', { 0: 1 }), element: 'NATURE' }`; first tick 2 (FIRE against FIRE); `heroesGateway.setLeader` resolves `{ leaderId: 'orina', team: teamPayload([ 'lyra', null, null, null ]) }`, `await scene.heroes.setLeader('orina')`; next tick deals 1 (NATURE against FIRE is 0.5 in `elements.js`; WATER beats FIRE and would deal 4). Corrected at acceptance to match `elements.js` and the built test.
 - `an ally that equips a piece hits with it on the next tick`: first tick 2; `equipmentGateway.list` resolves a weapon `{ id: 'w', slot: 'WEAPON', rarity: 'COMMON', refine: 0, clickDamage: 1, affixes: [], heroId: 'lyra', sellPrice: 1 }`, `await scene.equipment.load()`; next tick deals 4.
 - `Kael as an ally starts a 30 s miniboss at Time: 35`: `leaderId: 'lyra'`, allies `[ 'kael', null, null, null ]`, `start: atChapter(5, 1, 'PHASE', 5)`; `killAll`, `advance` → `timer(ctx)` `Time: 35`.
 - `Kael as the leader brings no passive: Time: 30`: leader Kael, allies `[ 'lyra', null, null, null ]`.
@@ -1643,7 +1688,7 @@ const FORMATION_LEADER = { x: 320, y: 600, width: 180, height: 240, depth: 0.5 }
 const FORMATION = {
     1: { x: 180, y: 460, width: 90, height: 120, depth: 0.4 },
     2: { x: 180, y: 605, width: 90, height: 120, depth: 0.4 },
-    3: { x: 75, y: 450, width: 90, height: 120, depth: 0.3 },
+    3: { x: 75, y: 462, width: 90, height: 120, depth: 0.3 }, // y 450 until T30
     4: { x: 75, y: 615, width: 90, height: 120, depth: 0.3 }
 };
 const ALLY_MOVE = { distance: 24, duration: 100 };
@@ -1709,7 +1754,7 @@ No sprite calls `setInteractive`, so the canvas `pointerdown` handler still gets
 - `with no ally the leader stands at (230, 612), 320 px high`: allies `[ null, null, null, null ]` → the leader image at x 230, y 612, `scale * height` 320.
 - `with Lyra in slot 1 the leader moves to (320, 600) fitted in 180 x 240`: leader Kael → x 320, y 600, `scale` 0.6, depth 0.5.
 - `Lyra as leader in the formation is fitted at scale 0.8`: leader Lyra, Kael in slot 1 → leader `scale` 0.8.
-- `allies stand at (180, 460), (180, 605), (75, 450) and (75, 615) at depths 0.4, 0.4, 0.3 and 0.3`: leader Kael, allies `[ 'lyra', 'orina', 'seraphine', 'vex' ]` → four images `hero_lyra`, `hero_orina`, `hero_seraphine`, `hero_vex` with those x, y and depth, origin (0.5, 1).
+- `allies stand at (180, 460), (180, 605), (75, 462) and (75, 615) at depths 0.4, 0.4, 0.3 and 0.3`: leader Kael, allies `[ 'lyra', 'orina', 'seraphine', 'vex' ]` → four images `hero_lyra`, `hero_orina`, `hero_seraphine`, `hero_vex` with those x, y and depth, origin (0.5, 1).
 - `Kael in an ally box is scaled 0.3 and Lyra 0.4`: leader Orina, allies `[ 'kael', 'lyra', null, null ]` → `scale` 0.3 and 0.4 (width 90 and 40.8, height 83.7 and 120).
 - `an empty or unbought slot draws no sprite`: `boughtSlots: 2`, allies `[ 'lyra', null, null, null ]` → one ally image.
 - `no ally is drawn below chapter 5`: `atChapter(4)` with Lyra in slot 1 → no `hero_lyra` image; the leader at (230, 612).
@@ -2399,7 +2444,7 @@ let teamFailure = null;
 - `PHYSICAL_BREAK 5 lowers the defense an ally meets: 1.3 against defense 40`: `talents: { PHYSICAL_BREAK: 5 }` (One damage AC 7).
 - `Ventos Ligeiros, a running combo and critical pieces leave an ally hit at 2`: leader Lyra 3 stars, NATURE monster defense 0, Orina in slot 1 wearing a ring `CRIT_CHANCE` 50 and `CRIT_DAMAGE_PCT` 100; use skill 3, click 5 times, let the click damage pass, then `advance` to the next ally tick → the ally text `2` (One damage AC 8).
 - `a 3 star leader leaves the ally hit at 2`: leader Kael 3 stars, Lyra 0 stars in slot 1, FIRE monster defense 0 → 2 (One damage AC 9).
-- `Orina 3 stars with a 10 click weapon and a +20 % ring deals 105.6 to a NATURE monster with defense 50`: (Allies fight AC 4, E3).
+- `Lyra 3 stars with a 10 click weapon and a +20 % ring deals 105.6 to a NATURE monster with defense 50` and `Orina 3 stars with the same pieces also lowers the defense by 15: 13.2 x 8 x 2 x 0.65 = 137.28`: (Allies fight AC 4, E3 as reworded at acceptance; built as `heroTeamCombat.spec.js:239`, `:251`).
 - `a 9 star Lyra deals 20`: (Allies fight AC 2, AC 6).
 - `Lyra with +20 % boss damage deals 2.16 to a FIRE miniboss with defense 10`: start at the miniboss (Allies fight AC 5, E4).
 - `an ally hit uses the new leader's element after a leader change`: NATURE monster, Lyra in slot 1; first tick 4 under Kael; change the leader to Orina in the Líder screen; next tick 1 (Allies fight AC 7, E15).
@@ -2490,7 +2535,7 @@ let teamFailure = null;
 **Test cases**:
 
 - `Lyra in slot 1 and Seraphine in slot 2 stand at (180, 460) and (180, 605) behind the leader at (320, 600)`: `cleared: [ 5, 6 ]`, `team: { boughtSlots: 2, allies: [ 'lyra', 'seraphine', null, null ] }` → slot 1 `hero_lyra` at (180, 460), slot 2 `hero_seraphine` at (180, 605), both depth 0.4, origin (0.5, 1); the leader at (320, 600), depth 0.5 (AC 1, AC 2; Independent Test).
-- `slots 3 and 4 stand at (75, 450) and (75, 615) at depth 0.3`: four allies (AC 1).
+- `slots 3 and 4 stand at (75, 462) and (75, 615) at depth 0.3`: four allies (AC 1; y 450 until T30).
 - `Kael in an ally box measures 90 x 83.7 and Lyra 40.8 x 120`: leader Orina, Kael and Lyra in slots 1 and 2 (AC 3; tolerance 0.1).
 - `Kael leading the formation measures 180 x 167.4 and Lyra 81.6 x 240`: two runs (AC 4; tolerance 0.1).
 - `each ally tick moves the sprite 24 px right and back`: slot 1 Lyra → after the tick x reaches 204 and returns to 180 (AC 5).
@@ -2545,8 +2590,8 @@ Checks per screen: every size, color, border style, opacity and text of the spec
 **Gate**: build - `cd game && npm run ui:shots -- heroTeam` exits 0
 **Done when**:
 
-- [ ] `ui-review.html` holds the 8 screens with desktop and phone shots and a verdict.
-- [ ] Every finding is a task in this file.
+- [x] `ui-review.html` holds the 8 screens with desktop and phone shots and a verdict.
+- [x] Every finding is a task in this file.
 
 **Commit**: `docs(hero-team): add the ui review`
 
