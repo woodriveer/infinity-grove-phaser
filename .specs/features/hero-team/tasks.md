@@ -2198,7 +2198,7 @@ async confirmTeamSlot ()
 
 ---
 
-### T21: Serve the team from the e2e fake backend [ ]
+### T21: Serve the team from the e2e fake backend [x]
 
 **Owner**: test-engineer
 **Goal**: The fake backend answers the team payload in `GET /heroes` and `PUT /leader`, serves `PUT /team` and `POST /team/slots` with the spec checks in order, and can hold or fail team requests, so the e2e tasks can drive every visible criterion (TEAM-01 to TEAM-04 as seen by the game).
@@ -2261,7 +2261,7 @@ let teamFailure = null;
 **Gate**: full - `cd game && npm test && npx playwright test`
 **Done when**:
 
-- [ ] `GET /heroes` of a new player answers the locked team; the whole Playwright suite passes with the counts of `main` before the task (failures on the load-flake list of `STATE.md` rerun alone twice with `--workers=1`).
+- [x] `GET /heroes` of a new player answers the locked team; the whole Playwright suite passes with the counts of `main` before the task (failures on the load-flake list of `STATE.md` rerun alone twice with `--workers=1`).
 
 **Commit**: `test(game): serve the hero team from the e2e fake backend`
 

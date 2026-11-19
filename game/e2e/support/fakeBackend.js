@@ -109,6 +109,9 @@ const MINIBOSS_RATE = 0.01;
 const CHAPTER_BOSS_RATE = 0.10;
 const DAILY_CHAPTER_BOSS_WINS = 10;
 const FUSION_SIZE = 3;
+//  Hero team (spec hero-team): the price in copper of the four ally slots and the chapter boss that opens each one
+const SLOT_PRICES = [ 10000, 20000, 30000, 40000 ];
+const SLOT_CHAPTERS = [ 5, 6, 7, 8 ];
 
 const AUTO_CLICK_INTERVALS = [ 500, 250, 150, 100, 50 ];
 const AUTO_CLICK_PRICES = [ 10, 25, 50, 100 ];
@@ -145,6 +148,15 @@ const heroView = (cards, hero) => {
         skills: hero.skills.map((candidate) => ({ ...candidate, unlocked: stars >= candidate.slot, level: skillLevel(stars, candidate.slot) }))
     };
 };
+
+//  The team payload of spec hero-team (TeamResponse)
+const teamView = (cards, team) => ({
+    unlocked: cards.cleared.has(5),
+    openSlots: SLOT_CHAPTERS.filter((chapter) => cards.cleared.has(chapter)).length,
+    boughtSlots: team.boughtSlots,
+    slotPrices: [ ...SLOT_PRICES ],
+    allies: [ ...team.allies ]
+});
 
 //  The bosses the player has beaten, as the backend lists them for the farm: a chapter below the campaign's lists every miniboss and its chapter
 //  boss; the campaign's own chapter keeps the rule of the stage
@@ -231,13 +243,15 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  talentPoints {name: n} (points available at the start, on top of the ones the starting levels cost; first clears pay more) and
 //  autoClick {name: { level, crystals }} (default level 0 and 0 crystals; the upgrade follows AutoClickController) and
 //  lastChapter (the last chapter a cleared chapter boss opens, default 1: the boss of that chapter completes the campaign).
+//  team {name: { boughtSlots, allies: [ 4 hero ids or null ] }} (starting teams, default no slot bought and no ally; the team is unlocked once the player has cleared chapter 5) and
+//  holdTeam() -> release() holds PUT /team, POST /team/slots and PUT /leader, failNextTeamRequest({ status = 500, code }) makes the next one of them answer that problem, teamOf(name) reads a stored team.
 //  healthDelayMs delays the answer of GET /api/health (the backend wake-up of spec supabase-postgres), which is counted by healthCalls() and kept out of calls.
 //  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens, and holdFarm(chapter, { fail }) -> release() to hold the answer of GET /farm?chapter=n, and holdOutcome() -> release() to hold the answer of POST /farm/outcome.
 export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
     chapterDefinitions = {},
     cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = [],
-    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1, healthDelayMs = 0
+    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1, healthDelayMs = 0, team: startingTeam = {}
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -249,6 +263,10 @@ export async function mockBackend (page, {
     const farmHolds = new Map();
     //  POST /farm/outcome requests wait on this promise while holdOutcome() holds them
     let outcomeHold = null;
+    //  PUT /team, POST /team/slots and PUT /leader wait on this promise while holdTeam() holds them
+    let teamHold = null;
+    //  The next team request answers this problem instead ({ status, code }), set by failNextTeamRequest
+    let teamFailure = null;
 
     const dropsOf = (ruleId) => (Array.isArray(drops) ? drops : drops[ruleId] ?? DEFAULT_DROPS);
     const nextDrop = (ruleId) => {
@@ -283,6 +301,17 @@ export async function mockBackend (page, {
         }
 
         return cardsByUser.get(username);
+    };
+
+    const teamByUser = new Map();
+    const teamOf = (username) => {
+        if (!teamByUser.has(username)) {
+            const given = startingTeam[username] ?? {};
+
+            teamByUser.set(username, { boughtSlots: given.boughtSlots ?? 0, allies: [ ...(given.allies ?? [ null, null, null, null ]) ] });
+        }
+
+        return teamByUser.get(username);
     };
 
     const equipmentByUser = new Map();
@@ -580,7 +609,7 @@ export async function mockBackend (page, {
         return username;
     };
 
-    const handleHeroes = (route, method, path, body, now) => {
+    const handleHeroes = async (route, method, path, body, now) => {
         const username = authenticated(route, now);
 
         if (!username) { return null; }
@@ -588,7 +617,7 @@ export async function mockBackend (page, {
         const cards = cardsOf(username);
 
         if (method === 'GET' && path === '/heroes') {
-            return route.fulfill({ json: { leaderId: cards.leader, heroes: HEROES.map((hero) => heroView(cards, hero)) } });
+            return route.fulfill({ json: { leaderId: cards.leader, heroes: HEROES.map((hero) => heroView(cards, hero)), team: teamView(cards, teamOf(username)) } });
         }
 
         const fuse = path.match(/^\/heroes\/([^/]+)\/fuse$/);
@@ -633,13 +662,87 @@ export async function mockBackend (page, {
         }
 
         if (method === 'PUT' && path === '/leader') {
+            if (teamHold) { await teamHold; }
+
+            if (teamFailure) {
+                const { status, code } = teamFailure;
+
+                teamFailure = null;
+                return route.fulfill(problem(status, 'Failed', code));
+            }
+
             const hero = HEROES.find((candidate) => candidate.id === body.heroId);
 
             if (!hero) { return route.fulfill(problem(404, `Hero '${body.heroId}' not found`, 'HERO_NOT_FOUND')); }
             if (!heroView(cards, hero).owned) { return route.fulfill(problem(409, `Hero '${hero.id}' is not owned`, 'HERO_NOT_OWNED')); }
 
+            const team = teamOf(username);
+            const old = cards.leader;
+
+            //  The hero who leaves the lead takes the place of the ally who becomes the leader
+            if (hero.id !== old && team.allies.includes(hero.id)) { team.allies = team.allies.map((ally) => (ally === hero.id ? old : ally)); }
+
             cards.leader = hero.id;
-            return route.fulfill({ json: { leaderId: hero.id } });
+            return route.fulfill({ json: { leaderId: hero.id, team: teamView(cards, team) } });
+        }
+
+        return route.fulfill(problem(404, 'Not found'));
+    };
+
+    //  Hero team contract (TeamController): PUT /team saves the four entries, POST /team/slots buys the next slot; the checks run in the order of the spec
+    const handleTeam = async (route, method, path, body, now) => {
+        const username = authenticated(route, now);
+
+        if (!username) { return null; }
+
+        if (teamHold) { await teamHold; }
+
+        if (teamFailure) {
+            const { status, code } = teamFailure;
+
+            teamFailure = null;
+            return route.fulfill(problem(status, 'Failed', code));
+        }
+
+        const cards = cardsOf(username);
+        const team = teamOf(username);
+
+        if (method === 'PUT' && path === '/team') {
+            const { allies } = body;
+            const named = Array.isArray(allies) ? allies.filter((ally) => ally !== null) : [];
+            const valid = Array.isArray(allies) && allies.length === 4 && allies.every((ally) => ally === null || typeof ally === 'string')
+                && new Set(named).size === named.length && !named.includes(cards.leader);
+
+            if (!valid) { return route.fulfill(problem(400, 'Team is invalid', 'INVALID_TEAM')); }
+            if (named.some((id) => !HEROES.some((hero) => hero.id === id))) { return route.fulfill(problem(404, 'Hero not found', 'HERO_NOT_FOUND')); }
+            if (!cards.cleared.has(5)) { return route.fulfill(problem(409, 'Team is locked', 'TEAM_LOCKED')); }
+            if (allies.some((ally, index) => ally !== null && index >= team.boughtSlots)) { return route.fulfill(problem(409, 'Slot is not bought', 'TEAM_SLOT_NOT_BOUGHT')); }
+            if (named.some((id) => !heroView(cards, HEROES.find((hero) => hero.id === id)).owned)) { return route.fulfill(problem(409, 'Hero is not owned', 'HERO_NOT_OWNED')); }
+
+            team.allies = [ ...allies ];
+            return route.fulfill({ json: { leaderId: cards.leader, team: teamView(cards, team) } });
+        }
+
+        if (method === 'POST' && path === '/team/slots') {
+            const from = body.fromSlots;
+            const view = teamView(cards, team);
+
+            if (!Number.isInteger(from) || from < 0) { return route.fulfill(problem(400, 'fromSlots is invalid', 'INVALID_TEAM_SLOT_REQUEST')); }
+            if (from !== team.boughtSlots) {
+                const mismatch = problem(409, 'Slots changed', 'TEAM_SLOT_MISMATCH');
+
+                return route.fulfill({ ...mismatch, json: { ...mismatch.json, team: view } });
+            }
+            if (team.boughtSlots === 4) { return route.fulfill(problem(409, 'All slots are bought', 'TEAM_SLOTS_MAX')); }
+            if (team.boughtSlots >= view.openSlots) { return route.fulfill(problem(409, 'Slot is locked', 'TEAM_SLOT_LOCKED')); }
+
+            const wallet = walletOf(username);
+
+            if (wallet.copper < SLOT_PRICES[from]) { return route.fulfill(problem(409, 'Not enough copper', 'NOT_ENOUGH_COPPER')); }
+
+            wallet.copper -= SLOT_PRICES[from];
+            team.boughtSlots += 1;
+            return route.fulfill({ json: { team: teamView(cards, team), wallet: coins(wallet.copper) } });
         }
 
         return route.fulfill(problem(404, 'Not found'));
@@ -916,6 +1019,7 @@ export async function mockBackend (page, {
         if (path === '/wallet' || path === '/wallet/sync') { return handleWallet(route, method, path, body, now); }
         if (path === '/progress' || path === '/progress/outcome') { return handleProgress(route, method, path, body, now); }
         if (path === '/heroes' || path.startsWith('/heroes/') || path === '/leader') { return handleHeroes(route, method, path, body, now); }
+        if (path === '/team' || path.startsWith('/team/')) { return handleTeam(route, method, path, body, now); }
         if (path === '/farm' || path === '/farm/outcome') { return handleFarm(route, method, path, body, now); }
         if (path === '/equipment' || path.startsWith('/equipment/')) { return handleEquipment(route, method, path, body, now); }
         if (path === '/talents' || path.startsWith('/talents/')) { return handleTalents(route, method, path, body, now); }
@@ -955,6 +1059,8 @@ export async function mockBackend (page, {
     await page.route('**/api/heroes', handler);
     await page.route('**/api/heroes/**', handler);
     await page.route('**/api/leader', handler);
+    await page.route('**/api/team', handler);
+    await page.route('**/api/team/**', handler);
     //  A predicate, not a glob: a glob does not match the query string of GET /farm?chapter=n
     await page.route((url) => url.pathname === '/api/farm', handler);
     await page.route('**/api/farm/**', handler);
@@ -974,6 +1080,7 @@ export async function mockBackend (page, {
         progresses,
         cards: cardsByUser,
         cardsOf,
+        teamOf,
         equipmentOf,
         talentsOf,
         //  Replaces the list the drop rolls read, e.g. [ 0 ] drops every time
@@ -1000,6 +1107,21 @@ export async function mockBackend (page, {
                 farmHolds.delete(String(chapter));
                 release();
             };
+        },
+        //  Holds every PUT /team, POST /team/slots and PUT /leader until the returned release() runs
+        holdTeam: () => {
+            let release = () => {};
+            const held = new Promise((resolve) => { release = resolve; });
+
+            teamHold = held;
+            return () => {
+                if (teamHold === held) { teamHold = null; }
+                release();
+            };
+        },
+        //  The next team request (PUT /team, POST /team/slots or PUT /leader) answers this problem instead of its result
+        failNextTeamRequest: ({ status = 500, code } = {}) => {
+            teamFailure = { status, code };
         },
         //  Holds every POST /farm/outcome until the returned release() runs: the win is applied and answered only then
         holdOutcome: () => {
