@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Dano unificado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+<div class="brand">Infinity Grove · Revisão de UI</div>
+<section class="panel"><div class="head"><div><h1>Dano unificado</h1><div class="meta"><code>.specs/features/unified-damage</code> · commits <code>até f8f0cd1</code> · 2026-11-19 · local (npm run dev), backend simulado</div></div><span class="chip verdict ok">APROVADO</span></div>
+<p style="margin-top:16px">As telas alteradas seguem a spec: a linha do inimigo tem um único chip Defesa N% com escudo marrom e depois Crit res N%, o painel de atributos tem 10 linhas com uma Quebra de defesa, a tela de Talentos tem uma Quebra de defesa por grau e os textos da Orina e das habilidades não citam tipo de dano. Nenhum achado bloqueia; há sugestões de acabamento.</p>
+<div class="stats"><div class="stat"><div class="n">6</div><div class="l">telas e estados verificados</div></div><div class="stat"><div class="n">16</div><div class="l">capturas (desktop + celular)</div></div><div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div><div class="stat"><div class="n">0</div><div class="l">achados médios e baixos</div></div></div></section>
+<section class="panel"><h2>Fidelidade à spec</h2><ul class="checks">
+<li class="yes"><span class="mark">✓</span><span>Linha do inimigo com exatamente três chips: Water, Defesa 11%, Crit res 33%, sem chip mágico; escudo #b07a3a; mesma altura e cor dos outros chips; uma linha, centralizada <code>S1</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Defesa quebrada: o chip lê Defesa 6% com Quebra de defesa 5 <code>S2</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Talentos: coluna Quebra de defesa com 2 cartas por grau, ícones talent-break-physical (e -g2/-g3) e talent-break-crit, sem vaga da carta mágica <code>S3</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Atributos: 10 linhas, Quebra de defesa: 3, sem Tipo de dano e sem linha em branco <code>S4</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Detalhe da Orina: Bônus de líder: +20% de dano total. (em breve); efeitos das habilidades quebram linha sem estourar o cartão <code>S5</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>Barra de habilidades: Líder · +20% de dano total. (em breve) cabe ao lado do nome <code>S6</code></span></li>
+<li class="yes"><span class="mark">✓</span><span>A coluna Quebra de defesa é mais curta que as outras e as quatro colunas alinham no topo: alinham no topo; a altura do Grau 3 não aparece nas capturas porque o modal rola (ver sugestão 1). Verificado só pelo teste e2e <code>S3</code></span></li>
+</ul></section>
+<section class="panel"><h2>Capturas</h2>
+<div class="screen"><h3>Combate · linha do inimigo</h3>
+<div class="shots">
+<figure><a href="ui-review/01-enemy-line-desktop.png" target="_blank"><img src="ui-review/01-enemy-line-desktop.png" alt="Linha do inimigo" loading="lazy"></a><figcaption><span class="t">Linha do inimigo</span><span class="d">Miniboss água, defesa 11, crit res 33: chips Water, Defesa 11% (escudo marrom) e Crit res 33%, sem chip azul mágico. O chip Fraco: Natureza segue acima.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/01-enemy-line-phone.png" target="_blank"><img src="ui-review/01-enemy-line-phone.png" alt="Linha do inimigo" loading="lazy"></a><figcaption><span class="t">Linha do inimigo</span><span class="d">Miniboss água, defesa 11, crit res 33: chips Water, Defesa 11% (escudo marrom) e Crit res 33%, sem chip azul mágico. O chip Fraco: Natureza segue acima.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Combate · defesa quebrada</h3>
+<div class="shots">
+<figure><a href="ui-review/02-enemy-line-broken-desktop.png" target="_blank"><img src="ui-review/02-enemy-line-broken-desktop.png" alt="Defesa quebrada" loading="lazy"></a><figcaption><span class="t">Defesa quebrada</span><span class="d">Quebra de defesa 5: o chip passa de Defesa 11% para Defesa 6%.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/02-enemy-line-broken-phone.png" target="_blank"><img src="ui-review/02-enemy-line-broken-phone.png" alt="Defesa quebrada" loading="lazy"></a><figcaption><span class="t">Defesa quebrada</span><span class="d">Quebra de defesa 5: o chip passa de Defesa 11% para Defesa 6%.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Talentos</h3>
+<div class="shots">
+<figure><a href="ui-review/03-talents-desktop.png" target="_blank"><img src="ui-review/03-talents-desktop.png" alt="Tela de Talentos" loading="lazy"></a><figcaption><span class="t">Tela de Talentos</span><span class="d">Coluna Quebra de defesa com 2 cartas por grau (Grau 1 visível), alinhada no topo com as outras três colunas.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/03-talents-phone.png" target="_blank"><img src="ui-review/03-talents-phone.png" alt="Tela de Talentos" loading="lazy"></a><figcaption><span class="t">Tela de Talentos</span><span class="d">Coluna Quebra de defesa com 2 cartas por grau (Grau 1 visível), alinhada no topo com as outras três colunas.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Talentos · coluna Quebra de defesa</h3>
+<div class="shots">
+<figure><a href="ui-review/03b-talents-break-column-desktop.png" target="_blank"><img src="ui-review/03b-talents-break-column-desktop.png" alt="Coluna recortada" loading="lazy"></a><figcaption><span class="t">Coluna recortada</span><span class="d">Recorte da coluna: Quebra de defesa e Quebra de resistência a crítico em cada grau; Grau 2 bloqueado em tom esmaecido, sem vaga vazia.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/03b-talents-break-column-phone.png" target="_blank"><img src="ui-review/03b-talents-break-column-phone.png" alt="Coluna recortada" loading="lazy"></a><figcaption><span class="t">Coluna recortada</span><span class="d">Recorte da coluna: Quebra de defesa e Quebra de resistência a crítico em cada grau; Grau 2 bloqueado em tom esmaecido, sem vaga vazia.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Equipamento · atributos</h3>
+<div class="shots">
+<figure><a href="ui-review/04-attributes-desktop.png" target="_blank"><img src="ui-review/04-attributes-desktop.png" alt="Equipamento" loading="lazy"></a><figcaption><span class="t">Equipamento</span><span class="d">Painel de atributos de Kael com Quebra de defesa 3, sem Tipo de dano.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/04-attributes-phone.png" target="_blank"><img src="ui-review/04-attributes-phone.png" alt="Equipamento" loading="lazy"></a><figcaption><span class="t">Equipamento</span><span class="d">Painel de atributos de Kael com Quebra de defesa 3, sem Tipo de dano.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Equipamento · painel recortado</h3>
+<div class="shots">
+<figure><a href="ui-review/04b-attributes-panel-desktop.png" target="_blank"><img src="ui-review/04b-attributes-panel-desktop.png" alt="Painel de atributos" loading="lazy"></a><figcaption><span class="t">Painel de atributos</span><span class="d">10 linhas em três colunas; Quebra de defesa: 3 na coluna da direita, sem linha em branco.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/04b-attributes-panel-phone.png" target="_blank"><img src="ui-review/04b-attributes-panel-phone.png" alt="Painel de atributos" loading="lazy"></a><figcaption><span class="t">Painel de atributos</span><span class="d">10 linhas em três colunas; Quebra de defesa: 3 na coluna da direita, sem linha em branco.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Herói · detalhe da Orina</h3>
+<div class="shots">
+<figure><a href="ui-review/05-orina-detail-desktop.png" target="_blank"><img src="ui-review/05-orina-detail-desktop.png" alt="Detalhe da Orina" loading="lazy"></a><figcaption><span class="t">Detalhe da Orina</span><span class="d">Bônus de líder: +20% de dano total. (em breve); três efeitos de habilidade quebram linha dentro do cartão, sem tipo de dano.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/05-orina-detail-phone.png" target="_blank"><img src="ui-review/05-orina-detail-phone.png" alt="Detalhe da Orina" loading="lazy"></a><figcaption><span class="t">Detalhe da Orina</span><span class="d">Bônus de líder: +20% de dano total. (em breve); três efeitos de habilidade quebram linha dentro do cartão, sem tipo de dano.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+<div class="screen"><h3>Barra de habilidades</h3>
+<div class="shots">
+<figure><a href="ui-review/06-skill-bar-desktop.png" target="_blank"><img src="ui-review/06-skill-bar-desktop.png" alt="Barra de habilidades" loading="lazy"></a><figcaption><span class="t">Barra de habilidades</span><span class="d">Líder · +20% de dano total. (em breve) cabe ao lado do nome da líder em duas linhas.</span><span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div>
+<div class="shots phone" style="margin-top:16px">
+<figure><a href="ui-review/06-skill-bar-phone.png" target="_blank"><img src="ui-review/06-skill-bar-phone.png" alt="Barra de habilidades" loading="lazy"></a><figcaption><span class="t">Barra de habilidades</span><span class="d">Líder · +20% de dano total. (em breve) cabe ao lado do nome da líder em duas linhas.</span><span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span></figcaption></figure>
+</div></div>
+</section>
+<section class="panel"><h2>Achados</h2><p class="empty">Nenhum achado.</p></section>
+<section class="panel"><h2>Sugestões</h2><ul class="checks">
+<li><span class="mark">✦</span><span>Talentos (desktop e celular): o modal rola, então só o Grau 1 e parte do Grau 2 aparecem sem rolar. Se a tela for revisada de novo, vale uma captura com a lista rolada até o Grau 3.</span></li>
+<li><span class="mark">✦</span><span>Linha do inimigo: o chip mostra Water em inglês, enquanto o resto da tela usa Água/Fogo (AD-007). A spec pede Water, mas o texto destoa do painel Elementos; trocar para o nome em português numa feature à parte.</span></li>
+<li><span class="mark">✦</span><span>Atributos: o painel flui em colunas, então Quebra de resistência a crítico fica sozinha no fim da coluna 1, longe de Quebra de defesa (coluna 3). Agrupar as duas quebras na mesma coluna facilitaria a leitura.</span></li>
+<li><span class="mark">✦</span><span>Celular: o jogo aparece em letterbox, e os chips da linha do inimigo ficam com cerca de 6 px de altura de texto. É o comportamento já existente do canvas, não da feature.</span></li>
+<li><span class="mark">✦</span><span>Talentos no celular: ícones de Poder do clique e Combo não carregaram na captura (carregamento tardio das imagens). Não ligado à feature; vale conferir que as imagens recebem o espaço reservado.</span></li>
+</ul></section>
+<section class="panel"><h2>Console e recursos</h2><p class="empty">O script das capturas não coleta o console. As 12 execuções (6 telas, 2 larguras) terminaram sem falha e nenhuma captura mostra ícone de 404 nos chips, painel, talentos ou cartões da Orina.</p></section>
+<footer>Revisão do ui-artist · 2026-11-19</footer>
+</main>
+</body>
+</html>

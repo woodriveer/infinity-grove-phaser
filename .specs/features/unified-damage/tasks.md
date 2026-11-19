@@ -1022,7 +1022,7 @@ const strikeNow = (page) => page.evaluate(() => {
 
 ---
 
-### T14: Review the changed screens [ ]
+### T14: Review the changed screens [x]
 
 **Owner**: ui-artist
 **Goal**: Screenshot every changed screen at desktop and phone width and write `ui-review.html` from `.claude/templates/ui-review.html`; findings become new tasks (UDMG-06, UDMG-09, UDMG-10, UDMG-11).
@@ -1054,8 +1054,8 @@ const strikeNow = (page) => page.evaluate(() => {
 **Gate**: build - `cd game && npm run ui:shots -- unifiedDamage` exits 0
 **Done when**:
 
-- [ ] `ui-review.html` has a section with a desktop and a phone screenshot for each of S1 to S6 and a verdict per check.
-- [ ] Every failed check is a new task in this file.
+- [x] `ui-review.html` has a section with a desktop and a phone screenshot for each of S1 to S6 and a verdict per check.
+- [x] Every failed check is a new task in this file.
 
 **Commit**: `docs(unified-damage): add the ui review`
 
