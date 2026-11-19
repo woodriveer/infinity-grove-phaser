@@ -2509,7 +2509,7 @@ let teamFailure = null;
 
 ---
 
-### T27: Review the hero team screens [ ]
+### T27: Review the hero team screens [x]
 
 **Owner**: ui-artist
 **Goal**: Check every changed screen against spec § Equipe Screen Layout and § Allies on the Field and record the verdict in `ui-review.html` (TEAM-09, TEAM-10, TEAM-12).
@@ -2549,6 +2549,45 @@ Checks per screen: every size, color, border style, opacity and text of the spec
 - [ ] Every finding is a task in this file.
 
 **Commit**: `docs(hero-team): add the ui review`
+
+---
+
+### T28: Keep the Equipe panel from moving when the purchase dialog or the notice shows [ ]
+
+**Owner**: game-dev
+**Goal**: The panel keeps its height and position when `team-buy-dialog` and `team-notice` appear (UI review finding #1, TEAM-09).
+**Where**: `game/public/style.css` (`/* ══ Equipe ══ */`), `game/src/adapters/phaser/HeroUi.js`
+**Contract**: Reserve the room of the notice line and the dialog (or float them over the panel) so the slot row stays at the same y in `03-team-buyable`, `04-team-dialog` and `06-team-bought` (today 222, 173 and 235 px on screen).
+**Tests**: e2e: the box of `team-slot-1` is equal before and after the click on it, and after the purchase notice shows.
+**Gate**: `cd game && npm test && npx playwright test heroTeam`
+**Done when**: [ ] the slot row does not move in any of the three states.
+**Commit**: `fix(game): keep the Equipe panel steady on purchase`
+
+---
+
+### T29: Keep Heróis disponíveis legible while disabled [ ]
+
+**Owner**: game-dev
+**Goal**: A disabled `.team-hero` stays readable on parchment (finding #2, AD-022).
+**Where**: `game/public/style.css` (`.team-hero:disabled`)
+**Contract**: Opacity of the entry at 0.75 or more (or only the sprite dimmed); contrast of the name and passive at least 4.5:1.
+**Tests**: e2e: computed opacity of `team-available-lyra` while disabled is at least 0.75.
+**Gate**: `cd game && npm test && npx playwright test heroTeam`
+**Done when**: [ ] the list reads clearly in `03-team-buyable` and `08-team-inactive`.
+**Commit**: `fix(game): keep the available heroes legible while disabled`
+
+---
+
+### T30: Give the top ally of the formation room under the element wheel [ ]
+
+**Owner**: game-dev
+**Goal**: At least 12 px between the highest ally sprite and the bottom of the Elementos panel (finding #3).
+**Where**: `game/src/adapters/phaser/ClickerGame.js` (formation positions)
+**Contract**: The ally 3 sprite top is at least 12 px under the Elementos panel, with no overlap of the other sprites or the battle bar.
+**Tests**: update the formation position tests.
+**Gate**: `cd game && npm test && npx playwright test heroTeamField`
+**Done when**: [ ] `09-field-formation` shows the gap.
+**Commit**: `fix(game): move the top ally off the element wheel`
 
 ---
 
