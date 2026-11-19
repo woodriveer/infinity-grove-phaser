@@ -3,6 +3,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.repository
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.EnemyStats
+import br.com.woodriver.infinity_grove_ws.domain.StageAdd
 import br.com.woodriver.infinity_grove_ws.domain.StageDefinition
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -62,8 +63,9 @@ class ChapterEntity(
     fun toDomain(
         stages: List<StageEntity>,
         enemies: Map<Long, EnemyStats>,
+        adds: Map<String, List<StageAdd>> = emptyMap(),
     ): ChapterDefinition {
-        val ordered = stages.sortedBy { it.number }.map { it.toDomain(enemies) }
+        val ordered = stages.sortedBy { it.number }.map { it.toDomain(enemies, adds[it.id] ?: emptyList()) }
         return ChapterDefinition(number, bossHitPoints, bossTimeLimitMs, ordered, enemies.enemy(bossEnemyId), bossDropRuleId)
     }
 
@@ -113,18 +115,21 @@ class StageEntity(
     @Column(nullable = false)
     var minibossDropRuleId: Int,
 ) {
-    fun toDomain(enemies: Map<Long, EnemyStats>) =
-        StageDefinition(
-            number = number,
-            phasesPerStage = phasesPerStage,
-            monsterHealth = monsterHitPoints,
-            minibossHealth = minibossHitPoints,
-            minibossTimeLimitMs = minibossTimeLimitMs,
-            monster = enemies.enemy(monsterEnemyId),
-            miniboss = enemies.enemy(minibossEnemyId),
-            monsterDropRuleId = monsterDropRuleId,
-            minibossDropRuleId = minibossDropRuleId,
-        )
+    fun toDomain(
+        enemies: Map<Long, EnemyStats>,
+        adds: List<StageAdd> = emptyList(),
+    ) = StageDefinition(
+        number = number,
+        phasesPerStage = phasesPerStage,
+        monsterHealth = monsterHitPoints,
+        minibossHealth = minibossHitPoints,
+        minibossTimeLimitMs = minibossTimeLimitMs,
+        monster = enemies.enemy(monsterEnemyId),
+        miniboss = enemies.enemy(minibossEnemyId),
+        monsterDropRuleId = monsterDropRuleId,
+        minibossDropRuleId = minibossDropRuleId,
+        adds = adds,
+    )
 
     companion object {
         fun idOf(
@@ -150,5 +155,42 @@ class StageEntity(
             monsterDropRuleId = stage.monsterDropRuleId,
             minibossDropRuleId = stage.minibossDropRuleId,
         )
+    }
+}
+
+/** One add of a stage (spec miniboss-adds), keyed `chapter/stage/slot`; `(stage_id, slot)` is unique. */
+@Entity
+@Table(
+    name = "stage_adds",
+    uniqueConstraints = [UniqueConstraint(name = "uk_stage_adds_stage_slot", columnNames = ["stage_id", "slot"])],
+)
+class StageAddEntity(
+    @Id
+    @Column(nullable = false, updatable = false)
+    var id: String,
+    @Column(name = "stage_id", nullable = false, updatable = false)
+    var stageId: String,
+    @Column(nullable = false, updatable = false)
+    var slot: Int,
+    @Column(nullable = false)
+    var hitPoints: Long,
+    @Column(nullable = false)
+    var defenseBuff: Int,
+) {
+    fun toDomain() = StageAdd(hitPoints, defenseBuff)
+
+    companion object {
+        fun idOf(
+            chapter: Int,
+            stage: Int,
+            slot: Int,
+        ) = "$chapter/$stage/$slot"
+
+        fun from(
+            chapter: Int,
+            stage: Int,
+            slot: Int,
+            add: StageAdd,
+        ) = StageAddEntity(idOf(chapter, stage, slot), StageEntity.idOf(chapter, stage), slot, add.health, add.defenseBuff)
     }
 }

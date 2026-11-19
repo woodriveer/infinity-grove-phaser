@@ -4,6 +4,7 @@ import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.EnemyStats
+import br.com.woodriver.infinity_grove_ws.domain.StageAdd
 import br.com.woodriver.infinity_grove_ws.domain.StageDefinition
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
@@ -31,6 +32,7 @@ class ChapterRepositoryIT : IntegrationTestBase() {
     private fun chapter(
         bossHealth: Long = 321,
         stages: Int = 3,
+        adds: List<StageAdd> = emptyList(),
     ) = ChapterDefinition(
         number,
         bossHealth = bossHealth,
@@ -47,6 +49,7 @@ class ChapterRepositoryIT : IntegrationTestBase() {
                     miniboss = EnemyStats(Element.LIGHT, 20 + it, 40 + it),
                     monsterDropRuleId = 2,
                     minibossDropRuleId = 3,
+                    adds = adds,
                 )
             },
         boss = EnemyStats(Element.DARKNESS, 55, 77),
@@ -54,6 +57,7 @@ class ChapterRepositoryIT : IntegrationTestBase() {
     )
 
     private fun clean() {
+        jdbc.update("delete from stage_adds where stage_id like ?", "$number/%")
         jpaStageRepository.deleteAll(jpaStageRepository.findAllByChapterOrderByNumber(number))
         jpaChapterRepository.deleteById(number)
         removeUnusedEnemies()
@@ -228,5 +232,53 @@ class ChapterRepositoryIT : IntegrationTestBase() {
             assertEquals(0, it["magical_defense"])
             assertEquals(0, it["crit_resistance"])
         }
+    }
+
+    private fun addRows() = jdbc.queryForObject("select count(*) from stage_adds where stage_id like '90/%'", Int::class.java)
+
+    @Test
+    fun `a chapter with two adds per stage reads back equal, adds in slot order`() {
+        val adds = listOf(StageAdd(500, 30), StageAdd(600, 40))
+        repository.save(chapter(adds = adds))
+
+        val read = repository.findByNumber(number)!!
+
+        assertEquals(chapter(adds = adds), read)
+        assertEquals(listOf(StageAdd(500, 30), StageAdd(600, 40)), read.stage(1).adds)
+    }
+
+    @Test
+    fun `saving a chapter again with one add per stage keeps only that add`() {
+        repository.save(chapter(adds = listOf(StageAdd(500, 30), StageAdd(600, 40))))
+
+        repository.save(chapter(adds = listOf(StageAdd(700, 10))))
+
+        assertEquals(listOf(StageAdd(700, 10)), repository.findByNumber(number)!!.stage(1).adds)
+        assertEquals(3, addRows())
+    }
+
+    @Test
+    fun `saving a chapter again without adds deletes its add rows`() {
+        repository.save(chapter(adds = listOf(StageAdd(500, 30), StageAdd(600, 40))))
+
+        repository.save(chapter())
+
+        assertEquals(0, addRows())
+        repository.findByNumber(number)!!.stages.forEach { assertEquals(emptyList(), it.adds) }
+    }
+
+    @Test
+    fun `an add of 3000000000 health round-trips in the hit point column`() {
+        repository.save(chapter(adds = listOf(StageAdd(3_000_000_000L, 90))))
+
+        assertEquals(listOf(StageAdd(3_000_000_000L, 90)), repository.findByNumber(number)!!.stage(1).adds)
+    }
+
+    @Test
+    fun `the seeded chapters 11 to 15 read two adds on every stage and chapters 1 to 10 none`() {
+        assertEquals(listOf(StageAdd(1_966_080, 30), StageAdd(1_966_080, 30)), repository.findByNumber(11)!!.stage(1).adds)
+        assertEquals(listOf(StageAdd(31_457_280, 50), StageAdd(31_457_280, 50)), repository.findByNumber(15)!!.stage(1).adds)
+        repository.findByNumber(10)!!.stages.forEach { assertEquals(emptyList(), it.adds) }
+        assertEquals(100, jdbc.queryForObject("select count(*) from stage_adds", Int::class.java))
     }
 }

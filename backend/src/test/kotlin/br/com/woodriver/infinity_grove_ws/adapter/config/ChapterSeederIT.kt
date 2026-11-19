@@ -7,6 +7,7 @@ import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaDropRuleReposito
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.DropRule
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.jdbc.core.JdbcTemplate
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -25,6 +26,9 @@ class ChapterSeederIT : IntegrationTestBase() {
     @Autowired
     private lateinit var jpaDropRules: JpaDropRuleRepository
 
+    @Autowired
+    private lateinit var jdbc: JdbcTemplate
+
     private fun seedRules() = dropRules.findAll().rules.filter { it.id in 1..15 }
 
     // other integration tests play against the seeded chapter 1, so every test leaves it seeded again
@@ -40,11 +44,10 @@ class ChapterSeederIT : IntegrationTestBase() {
 
     /** Removes chapter [number] with its stages, if it is stored. */
     private fun removeChapter(number: Int) {
+        jdbc.update("delete from stage_adds where stage_id in (select id from stages where chapter = ?)", number)
         jpaStageRepository.deleteAll(jpaStageRepository.findAllByChapterOrderByNumber(number))
         if (jpaChapterRepository.existsById(number)) jpaChapterRepository.deleteById(number)
     }
-
-    private fun ChapterDefinition.withoutAdds() = copy(stages = stages.map { it.copy(adds = emptyList()) })
 
     @Test
     fun `application start leaves chapter 1 with the seed values`() {
@@ -63,13 +66,22 @@ class ChapterSeederIT : IntegrationTestBase() {
 
     @Test
     fun `application start seeds chapters 1 to 15`() {
-        // T1 only: the adds are not stored yet (T2 adds stage_adds and restores the plain comparison)
-        (1..15).forEach { assertEquals(ChapterDefinition.of(it).withoutAdds(), repository.findByNumber(it)) }
+        (1..15).forEach { assertEquals(ChapterDefinition.of(it), repository.findByNumber(it)) }
         assertEquals(524_288_000L, repository.findByNumber(15)!!.bossHealth)
         assertEquals(3_112_960L, repository.findByNumber(10)!!.stage(10).minibossHealth)
         val rules = dropRules.findAll()
         assertTrue((1..45).all { rules.ruleFor(it) != null })
         assertEquals(DropRule(45, 10_560, 24_640, 1500), rules.ruleFor(45))
+    }
+
+    @Test
+    fun `a missing chapter 11 is seeded on start with two adds on each of its 10 stages`() {
+        removeChapter(11)
+
+        seeder.seed()
+
+        assertEquals(ChapterDefinition.of(11), repository.findByNumber(11))
+        assertEquals(20, jdbc.queryForObject("select count(*) from stage_adds where stage_id like '11/%'", Int::class.java))
     }
 
     @Test

@@ -16,7 +16,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * AD-016: the release before V12 (the V11-era backend, last migration V11) must keep starting and serving on the database after V12.
+ * AD-016: the release before V13 (the hero-team backend, last migration V12) must keep starting and serving on the database after V13.
  * Its entities are the current ones (SchemaValidationIT); these checks replay its column types, its read and write paths and Flyway's
  * validation of its own migrations V1 to V10. Compatibility with the release before 64-bit health (commit `91e3111`) ended by design
  * at V10, which drops the legacy integer health columns it maps. Booting the previous image itself is not executed here.
@@ -168,7 +168,7 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `the previous release starts on the migrated schema and its validation ignores V12`() {
+    fun `the previous release starts on the migrated schema and its validation ignores V13`() {
         Flyway
             .configure()
             .dataSource(dataSource)
@@ -205,7 +205,7 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
         }
     }
 
-    /** The migrations of the previous release: the files of `V1` to `V11`, which are unchanged since that release. */
+    /** The migrations of the previous release: the files of `V1` to `V12`, which are unchanged since that release. */
     private fun previousMigrations(): Path {
         val dir = Files.createTempDirectory("previous-release-migrations")
         PathMatchingResourcePatternResolver()
@@ -219,6 +219,6 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
 
     private companion object {
         const val PREVIOUS_SCHEMA = "previous_backend_check"
-        const val PREVIOUS_LAST_VERSION = 11
+        const val PREVIOUS_LAST_VERSION = 12
     }
 }

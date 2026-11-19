@@ -181,7 +181,7 @@ data class StageAdd(
 
 ---
 
-### T2: Store the adds in `stage_adds` [ ]
+### T2: Store the adds in `stage_adds` [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: A new table holds the adds of each stage; the migration fills the stored chapters 11 to 15, the repository reads and writes them with the stages, and the previous backend keeps working (ADDS-01, spec Adds AC 2, AD-016).
@@ -312,8 +312,10 @@ jpaStageAddRepository.saveAll(wanted)
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 16 new cases and the renamed case pass, `SchemaValidationIT` and `ChapterSeederIT` `application start seeds chapters 1 to 15` pass unchanged, and every existing backend test passes.
-- [ ] `V13__miniboss_adds.sql` creates one table and one index and inserts only into it (no `alter`, no `drop`, no `update`).
+- [x] The 16 new cases and the renamed case pass, `SchemaValidationIT` and `ChapterSeederIT` `application start seeds chapters 1 to 15` pass unchanged, and every existing backend test passes.
+- [x] `V13__miniboss_adds.sql` creates one table and one index and inserts only into it (no `alter`, no `drop`, no `update`).
+
+**Note (T2 done)**: `ChapterSeederIT` `application start seeds chapters 1 to 15` is back to the plain `assertEquals(ChapterDefinition.of(it), repository.findByNumber(it))` of before T1 (the `withoutAdds` workaround of T1 is gone). `PreviousBackendCompatibilityIT` also gets its `previousMigrations` KDoc moved from `V1` to `V11` to `V1` to `V12`.
 
 **Commit**: `feat(backend): store the miniboss adds in stage_adds`
 
