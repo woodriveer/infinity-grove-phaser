@@ -1373,7 +1373,7 @@ const numbers = (page) => scene(page, '(s) => s.children.list.filter((o) => o.ty
 
 ---
 
-### T15: Cover the skills on every monster in the browser [ ]
+### T15: Cover the skills on every monster in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: e2e scenarios pin that every damage skill and debuff lands on every living monster in the order adds then miniboss, with the right numbers (ADDS-06, ADDS-07; spec Damage skills AC 1 to 10).
@@ -1410,7 +1410,7 @@ const numbers = (page) => scene(page, '(s) => s.children.list.filter((o) => o.ty
 **Gate**: full - `cd game && npm test && npx playwright test e2e/minibossAddsSkills.spec.js`
 **Done when**:
 
-- [ ] The 14 scenarios pass twice in a row, and `npx playwright test e2e/skills.spec.js e2e/skillsAll.spec.js e2e/unifiedDamage.spec.js` passes.
+- [x] The 14 scenarios pass twice in a row, and `npx playwright test e2e/skills.spec.js e2e/skillsAll.spec.js e2e/unifiedDamage.spec.js` passes.
 
 **Commit**: `test(game): cover the skills on every monster in the browser`
 
