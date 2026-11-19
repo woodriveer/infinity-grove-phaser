@@ -2565,7 +2565,7 @@ Checks per screen: every size, color, border style, opacity and text of the spec
 
 ---
 
-### T29: Keep Heróis disponíveis legible while disabled [ ]
+### T29: Keep Heróis disponíveis legible while disabled [x]
 
 **Owner**: game-dev
 **Goal**: A disabled `.team-hero` stays readable on parchment (finding #2, AD-022).
@@ -2573,7 +2573,7 @@ Checks per screen: every size, color, border style, opacity and text of the spec
 **Contract**: Opacity of the entry at 0.75 or more (or only the sprite dimmed); contrast of the name and passive at least 4.5:1.
 **Tests**: e2e: computed opacity of `team-available-lyra` while disabled is at least 0.75.
 **Gate**: `cd game && npm test && npx playwright test heroTeam`
-**Done when**: [ ] the list reads clearly in `03-team-buyable` and `08-team-inactive`.
+**Done when**: [x] the list reads clearly in `03-team-buyable` and `08-team-inactive`.
 **Commit**: `fix(game): keep the available heroes legible while disabled`
 
 ---

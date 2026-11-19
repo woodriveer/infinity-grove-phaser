@@ -299,6 +299,19 @@ test.describe('Hero team: Equipe screen', () => {
         expect(await sceneBox(page, page.locator('.hero-window'))).toEqual(windowBefore);
     });
 
+    test('a disabled available hero stays legible: its opacity is at least 0.75', async ({ page }) => {
+        await startTeam(page, { cleared: [ 5 ] });
+        await openTeam(page);
+
+        const lyra = page.getByTestId('team-available-lyra');
+
+        await expect(lyra).toBeDisabled();
+
+        const opacity = await lyra.evaluate((node) => Number(getComputedStyle(node).opacity));
+
+        expect(opacity).toBeGreaterThanOrEqual(0.75);
+    });
+
     test('Comprar is disabled while the purchase runs', async ({ page }) => {
         const handle = await startTeam(page, { cleared: [ 5 ], copper: 10_000 });
 

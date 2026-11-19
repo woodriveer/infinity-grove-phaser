@@ -3348,7 +3348,9 @@ body.piece-dragging .piece-tooltip {
 .team-hero { box-sizing: border-box; width: 200px; height: 80px; padding: 8px; display: flex; align-items: center; gap: 8px; border-radius: var(--radius-md); background: var(--parchment-100); border: var(--inset-border); font: inherit; color: var(--ink-900); text-align: left; cursor: pointer; }
 .team-slot:disabled,
 .team-hero:disabled { cursor: default; }
-.team-hero-portrait { opacity: 0.6; }
+/* A hero that cannot be picked yet keeps its text readable on parchment (AD-022, 4.5:1 for the passive): the entry is a little faded, the portrait more */
+.team-hero:disabled { opacity: 0.85; }
+.team-hero:disabled .team-hero-portrait { opacity: 0.6; }
 .team-hero-portrait { width: 64px; height: 64px; object-fit: contain; }
 .team-hero-text { display: flex; flex-direction: column; gap: 2px; }
 .team-hero-name { font-family: var(--font-body); font-weight: 700; font-size: 13px; }
