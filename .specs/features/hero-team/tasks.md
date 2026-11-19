@@ -1130,7 +1130,7 @@ Update the comment above `monsterAfterBreak` to name the passives.
 
 ---
 
-### T10: Land an ally hit through the one damage [ ]
+### T10: Land an ally hit through the one damage [x]
 
 **Owner**: game-dev
 **Goal**: `SkillCombat.allyHit` lands one ally hit through the strike of a tick, so it meets the one defense and every effect (TEAM-05, TEAM-06).
@@ -1192,7 +1192,7 @@ Place it right after `click`. Test fixture: `const leader = leaderAttacker({ lea
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 18 cases pass and the whole Vitest suite passes.
+- [x] The 18 cases pass and the whole Vitest suite passes.
 
 **Commit**: `feat(game): land ally hits through the one damage`
 

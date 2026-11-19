@@ -153,6 +153,21 @@ export class SkillCombat
         return result;
     }
 
+    //  One ally hit on `monster` (spec hero-team): the ally's attacker through the strike of a tick at 100 %, so it is never critical, gets
+    //  no click bonus and meets the one defense, Brado, Prisão and Bênção like every strike (spec unified-damage); damages the monster
+    allyHit ({ attacker, monster, boss })
+    {
+        this.follow(monster);
+
+        const damage = tickDamage({
+            attacker, percent: 100, buffs: this.buffIds(), debuffs: this.debuffIds(), defender: this.statsOf(monster), boss, factors: this.factors()
+        });
+
+        monster.hit(damage);
+
+        return { damage, critical: false };
+    }
+
     //  Uses a skill: refused while locked, cooling or without a living monster; otherwise it lands its hits and starts the cooldown.
     //  `level` (1 to 3) scales the hits, the effects, the damage over time, the aimed shot and the countdown extension.
     use ({ heroId, slot, unlocked, level = 1, attacker, monster, boss })

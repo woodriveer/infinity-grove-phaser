@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { allyAttacker } from '../combat/allyAttacker';
+import { leaderAttacker } from '../combat/leaderAttacker';
 import { Monster } from '../combat/monster';
 import { PLAYER } from '../combat/damage';
 import { monsterAfterBreak } from '../talents/talents';
@@ -958,5 +960,159 @@ describe('skill levels', () => {
         use(skills, monster, 'lyra', 1, { level: 3 });
 
         expect(clickOf(skills, monster).damage).toBeCloseTo(1.5, 9);
+    });
+});
+
+describe('allyHit', () => {
+    //  A 3 star leader unlocks every skill; the allies are built apart from it
+    const leader = leaderAttacker({ leader: { element: 'FIRE', stars: 3 } });
+    const ally = (stars = 0, pieces = [], allyFactor = 1, leaderElement = 'FIRE') => allyAttacker({ ally: { stars }, pieces, leaderElement, allyFactor });
+    const monsterWith = (element = 'FIRE', defense = 0) => new Monster(1000, null, { element, defense, critResistance: 0 });
+    const piece = (slot, affixes, extra = {}) => ({ id: slot, slot, affixes, ...extra });
+    const start = (skills, monster, heroId, slot) => skills.use({ heroId, slot, unlocked: true, level: 1, attacker: leader, monster, boss: false });
+
+    //  Lands one ally hit and reads the damage both from the answer and from the health of the monster
+    const land = (skills, monster, attacker, boss = false) =>
+    {
+        const before = monster.health;
+        const result = skills.allyHit({ attacker, monster, boss });
+
+        expect(before - monster.health).toBeCloseTo(result.damage, 9);
+
+        return result.damage;
+    };
+
+    it('E1: Lyra 0 stars deals 2 to a FIRE monster with defense 0', () => {
+        expect(land(combat(), monsterWith('FIRE', 0), ally())).toBeCloseTo(2, 9);
+    });
+
+    it('E2: Lyra 0 stars deals 1 to a FIRE monster with defense 50', () => {
+        expect(land(combat(), monsterWith('FIRE', 50), ally())).toBeCloseTo(1, 9);
+    });
+
+    it('E3: Orina 3 stars with a 10 click weapon and a +20 % ring deals 105.6 to a NATURE monster with defense 50', () => {
+        const pieces = [ piece('WEAPON', [], { clickDamage: 10 }), piece('RING', [ { type: 'CLICK_DAMAGE_PCT', value: 20 } ]) ];
+
+        expect(land(combat(), monsterWith('NATURE', 50), ally(3, pieces))).toBeCloseTo(105.6, 9);
+    });
+
+    it('E4: Lyra 0 stars with +20 % boss damage deals 2.16 to a FIRE miniboss with defense 10', () => {
+        const pieces = [ piece('AMULET', [ { type: 'BOSS_DAMAGE_PCT', value: 20 } ]) ];
+
+        expect(land(combat(), monsterWith('FIRE', 10), ally(0, pieces), true)).toBeCloseTo(2.16, 9);
+    });
+
+    it('E5: Lyra and Seraphine 0 stars with the team factor deal 2.5 each', () => {
+        const skills = combat();
+        const monster = monsterWith();
+
+        expect(land(skills, monster, ally(0, [], 1.25))).toBeCloseTo(2.5, 9);
+        expect(land(skills, monster, ally(0, [], 1.25))).toBeCloseTo(2.5, 9);
+        expect(1000 - monster.health).toBeCloseTo(5, 9);
+    });
+
+    it('E6: Vex 0 stars with 50 % armor pierce deals 1.6 to a FIRE monster with defense 40', () => {
+        const pieces = [ piece('RING', [ { type: 'ARMOR_PIERCE_PCT', value: 50 } ]) ];
+
+        expect(land(combat(), monsterWith('FIRE', 40), ally(0, pieces))).toBeCloseTo(1.6, 9);
+    });
+
+    it('E7: Prisão de Espinhos raises an ally hit to 2.5', () => {
+        const skills = combat();
+        const monster = monsterWith();
+
+        start(skills, monster, 'orina', 1);
+
+        expect(land(skills, monster, ally())).toBeCloseTo(2.5, 9);
+    });
+
+    it('E8: Bênção da Grande Árvore raises an ally hit to 2.6', () => {
+        const skills = combat();
+        const monster = monsterWith();
+
+        start(skills, monster, 'seraphine', 1);
+
+        expect(land(skills, monster, ally())).toBeCloseTo(2.6, 9);
+    });
+
+    it('E9: Brado Aterrador lowers the defense 40 an ally meets to 10: 1.8', () => {
+        const skills = combat();
+        const monster = monsterWith('FIRE', 40);
+
+        start(skills, monster, 'kael', 3);
+
+        expect(land(skills, monster, ally())).toBeCloseTo(1.8, 9);
+    });
+
+    it('E10: PHYSICAL_BREAK 5 lowers the defense 40 an ally meets to 35: 1.3', () => {
+        const skills = new SkillCombat({
+            random: never, statsOf: (m) => monsterAfterBreak(m.stats, [ { id: 'PHYSICAL_BREAK', baseId: 'PHYSICAL_BREAK', value: 5 } ])
+        });
+
+        expect(land(skills, monsterWith('FIRE', 40), ally())).toBeCloseTo(1.3, 9);
+    });
+
+    it('E11: Orina\'s passive lowers the defense 40 two allies meet to 25: 1.5 each', () => {
+        const skills = new SkillCombat({ random: never, statsOf: (m) => monsterAfterBreak(m.stats, null, { defenseBreak: 15 }) });
+        const monster = monsterWith('FIRE', 40);
+
+        expect(land(skills, monster, ally())).toBeCloseTo(1.5, 9);
+        expect(land(skills, monster, ally())).toBeCloseTo(1.5, 9);
+    });
+
+    it('E12: Lyra 9 stars deals 20', () => {
+        expect(land(combat(), monsterWith(), ally(9))).toBeCloseTo(20, 9);
+    });
+
+    it('E13: critical pieces, Ventos Ligeiros and Bomba de Fumaça leave an ally hit at 2', () => {
+        const skills = combat(() => 0);
+        const monster = monsterWith();
+        const pieces = [ piece('RING', [ { type: 'CRIT_CHANCE', value: 50 }, { type: 'CRIT_DAMAGE_PCT', value: 100 } ]) ];
+
+        start(skills, monster, 'lyra', 3);
+        start(skills, monster, 'vex', 2);
+
+        expect(land(skills, monster, ally(0, pieces))).toBeCloseTo(2, 9);
+    });
+
+    it('E14: a 3 star leader with CLICK_DAMAGE 20 leaves an ally hit at 2', () => {
+        const strong = leaderAttacker({ leader: { element: 'FIRE', stars: 3 }, talents: [ { id: 'CLICK_DAMAGE', value: 20 } ] });
+
+        expect(strong.baseDamage).toBeGreaterThan(leader.baseDamage);
+        expect(land(combat(), monsterWith(), ally())).toBeCloseTo(2, 9);
+    });
+
+    it('E15: the leader\'s element decides: FIRE deals 4 and WATER deals 1 to a NATURE monster', () => {
+        expect(land(combat(), monsterWith('NATURE', 0), ally(0, [], 1, 'FIRE'))).toBeCloseTo(4, 9);
+        expect(land(combat(), monsterWith('NATURE', 0), ally(0, [], 1, 'WATER'))).toBeCloseTo(1, 9);
+    });
+
+    it('an ally hit is never critical even when random returns 0', () => {
+        const skills = combat(() => 0);
+        const result = skills.allyHit({ attacker: ally(), monster: monsterWith(), boss: false });
+
+        expect(result.critical).toBe(false);
+        expect(result.damage).toBeCloseTo(2, 9);
+    });
+
+    it('an ally hit after Prisão ended deals 2 again', () => {
+        const skills = combat();
+        const monster = monsterWith();
+
+        start(skills, monster, 'orina', 1);
+        skills.advance(2000, { monster });
+
+        expect(land(skills, monster, ally())).toBeCloseTo(2, 9);
+    });
+
+    it('an ally hit on a dead monster deals nothing', () => {
+        const skills = combat();
+        const monster = new Monster(1, null, { element: 'FIRE', defense: 0, critResistance: 0 });
+
+        skills.allyHit({ attacker: ally(), monster, boss: false });
+        skills.allyHit({ attacker: ally(), monster, boss: false });
+
+        expect(monster.health).toBe(0);
+        expect(monster.dead).toBe(true);
     });
 });
