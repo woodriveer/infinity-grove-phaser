@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { allyAttacker } from '../combat/allyAttacker';
 import { leaderAttacker } from '../combat/leaderAttacker';
-import { Monster } from '../combat/monster';
+import { Fight } from '../combat/fight';
+import { DEFAULT_STATS, Monster } from '../combat/monster';
 import { PLAYER } from '../combat/damage';
 import { monsterAfterBreak } from '../talents/talents';
 import { SkillCombat } from './skillCombat';
@@ -1223,5 +1224,272 @@ describe('effects per monster', () => {
         use(skills, boss, 'orina', 2);
 
         expect(skills.advance(1000, { monster: boss }).targets).toEqual([ boss ]);
+    });
+});
+
+describe('skills on every monster', () => {
+    const rolls = (...values) => { let i = 0; return () => values[i++ % values.length]; };
+    const damages = (hits) => hits.map((hit) => hit.damage);
+    const kill = (monster) => monster.hit(monster.health);
+    const fresh = () => ({ main: monsterOf(1000), a1: monsterOf(1000), a2: monsterOf(1000) });
+    const guarded = (health, buff = 30, mainHealth = 1000) =>
+    {
+        const main = new Monster(mainHealth, null, { element: 'FIRE', defense: 49, critResistance: 0 });
+        const fight = new Fight(main, [ { health, defenseBuff: buff, stats: DEFAULT_STATS }, { health, defenseBuff: buff, stats: DEFAULT_STATS } ]);
+        const skills = new SkillCombat({ random: never, statsOf: (monster) => fight.statsOf(monster) });
+
+        return { fight, skills, main, a1: fight.adds[0].monster, a2: fight.adds[1].monster };
+    };
+
+    it('Chuva de Meteoros hits Lacaio 1, Lacaio 2 and the miniboss in that order for 25 each', () => {
+        const { main, a1, a2 } = fresh();
+        const result = use(combat(), main, 'orina', 3, { adds: [ a1, a2 ] });
+
+        expect(result.hits).toEqual([ { damage: 25, critical: false }, { damage: 25, critical: false }, { damage: 25, critical: false } ]);
+        expect(result.targets).toEqual([ a1, a2, main ]);
+        expect([ a1.health, a2.health, main.health ]).toEqual([ 975, 975, 975 ]);
+    });
+
+    it('Corte Dimensional, Investida do Baluarte, Luz Divina and Golpe Sangrento land one hit on each living monster', () => {
+        const run = (heroId, slot) =>
+        {
+            const { main, a1, a2 } = fresh();
+
+            return use(combat(), main, heroId, slot, { adds: [ a1, a2 ] });
+        };
+
+        expect(damages(run('kael', 1).hits)).toEqual([ 15, 15, 15 ]);
+        expect(damages(run('kael', 2).hits)).toEqual([ 4, 4, 4 ]);
+        expect(damages(run('seraphine', 2).hits)).toEqual([ 8, 8, 8 ]);
+        expect(damages(run('vex', 3).hits)).toEqual([ 6, 6, 6 ]);
+    });
+
+    it('a skill skips a dead add', () => {
+        const { main, a1, a2 } = fresh();
+
+        kill(a1);
+
+        expect(use(combat(), main, 'orina', 3, { adds: [ a1, a2 ] }).targets).toEqual([ a2, main ]);
+    });
+
+    it('E7: Chuva kills both guarding adds first and meets the miniboss unguarded: 25, 25 and 12.75', () => {
+        const { fight, skills, main, a1, a2 } = guarded(20);
+        const result = use(skills, main, 'orina', 3, { adds: fight.livingAddMonsters() });
+
+        expect(damages(result.hits)[0]).toBeCloseTo(25, 9);
+        expect(damages(result.hits)[1]).toBeCloseTo(25, 9);
+        expect(damages(result.hits)[2]).toBeCloseTo(12.75, 9);
+        expect(main.health).toBeCloseTo(987.25, 9);
+        expect([ a1.dead, a2.dead ]).toEqual([ true, true ]);
+    });
+
+    it('E8: Chuva on a guarded miniboss whose adds survive deals 2.5 to it', () => {
+        const { fight, skills, main } = guarded(1000);
+        const result = use(skills, main, 'orina', 3, { adds: fight.livingAddMonsters() });
+
+        expect(damages(result.hits)[0]).toBeCloseTo(25, 9);
+        expect(damages(result.hits)[1]).toBeCloseTo(25, 9);
+        expect(damages(result.hits)[2]).toBeCloseTo(2.5, 9);
+    });
+
+    it('E9: Brado Aterrador level 1 on the guarded chapter 11 miniboss: a click deals 0.4', () => {
+        const { fight, skills, main } = guarded(30);
+
+        use(skills, main, 'kael', 3, { adds: fight.livingAddMonsters() });
+
+        expect(skills.click({ attacker: PLAYER, monster: main, main, boss: false }).damage).toBeCloseTo(0.4, 9);
+    });
+
+    it('Brado Aterrador and Prisão de Espinhos go on every living monster', () => {
+        const brado = fresh();
+        const skills = combat();
+
+        use(skills, brado.main, 'kael', 3, { adds: [ brado.a1, brado.a2 ] });
+
+        expect(skills.effectsWithOwner(brado.a1).map((effect) => effect.label)).toEqual([ 'Brado Aterrador' ]);
+        expect(skills.effectsWithOwner(brado.a2).map((effect) => effect.label)).toEqual([ 'Brado Aterrador' ]);
+
+        const prisao = fresh();
+        const other = combat();
+
+        use(other, prisao.main, 'orina', 1, { adds: [ prisao.a1, prisao.a2 ] });
+
+        expect(other.click({ attacker: PLAYER, monster: prisao.a1, main: prisao.main, boss: false }).damage).toBeCloseTo(1.25, 9);
+    });
+
+    it('Flecha Dupla shoots two arrows at each monster: six hits of 3', () => {
+        const { main, a1, a2 } = fresh();
+        const result = use(combat(), main, 'lyra', 1, { adds: [ a1, a2 ] });
+
+        expect(damages(result.hits)).toEqual([ 3, 3, 3, 3, 3, 3 ]);
+        expect(result.targets).toEqual([ a1, a1, a2, a2, main, main ]);
+    });
+
+    it('each arrow of Flecha Dupla rolls its own critical', () => {
+        const { main, a1, a2 } = fresh();
+        const result = use(combat(rolls(0, 0.99, 0.99, 0, 0.99, 0.99)), main, 'lyra', 1, { adds: [ a1, a2 ] });
+
+        expect(result.hits.map((hit) => hit.critical)).toEqual([ true, false, false, true, false, false ]);
+        expect(damages(result.hits)).toEqual([ 6, 3, 3, 6, 3, 3 ]);
+    });
+
+    it('a first arrow that kills an add stops its second arrow', () => {
+        const { main, a2 } = fresh();
+        const a1 = monsterOf(2);
+        const result = use(combat(), main, 'lyra', 1, { adds: [ a1, a2 ] });
+
+        expect(result.hits).toHaveLength(5);
+        expect(result.targets).toEqual([ a1, a2, a2, main, main ]);
+    });
+
+    it('Tiro Preciso lands a critical 60 on every monster alive at the end of the cast', () => {
+        const { main, a1, a2 } = fresh();
+        const skills = combat();
+
+        use(skills, main, 'lyra', 2, { adds: [ a1, a2 ] });
+
+        const { hits, targets } = skills.advance(2000, { monster: main, adds: [ a1, a2 ] });
+
+        expect(hits).toEqual([ { damage: 60, critical: true }, { damage: 60, critical: true }, { damage: 60, critical: true } ]);
+        expect(targets).toEqual([ a1, a2, main ]);
+    });
+
+    it('Tiro Preciso skips an add that died during the cast', () => {
+        const { main, a1, a2 } = fresh();
+        const skills = combat();
+
+        use(skills, main, 'lyra', 2, { adds: [ a1, a2 ] });
+        kill(a1);
+
+        const { hits, targets } = skills.advance(2000, { monster: main, adds: [ a1, a2 ] });
+
+        expect(hits).toHaveLength(2);
+        expect(targets).toEqual([ a2, main ]);
+    });
+
+    it('Tiro Preciso is lost when the miniboss dies during the cast', () => {
+        const { main, a1, a2 } = fresh();
+        const skills = combat();
+
+        use(skills, main, 'lyra', 2, { adds: [ a1, a2 ] });
+        kill(main);
+
+        expect(skills.advance(2000, { monster: main, adds: [ a1, a2 ] }).hits).toEqual([]);
+    });
+
+    it('Tempestade Arcana ticks 2 on each monster every second', () => {
+        const { main, a1, a2 } = fresh();
+        const skills = combat();
+        const options = { monster: main, adds: [ a1, a2 ] };
+
+        use(skills, main, 'orina', 2, { adds: [ a1, a2 ] });
+
+        const first = skills.advance(1000, options);
+
+        expect(damages(first.hits)).toEqual([ 2, 2, 2 ]);
+        expect(first.targets).toEqual([ a1, a2, main ]);
+
+        for (let tick = 2; tick <= 6; tick++)
+        {
+            expect(skills.advance(1000, options).hits).toHaveLength(3);
+        }
+
+        expect(skills.advance(1000, options).hits).toEqual([]);
+        expect(main.health).toBe(988);
+    });
+
+    it('Tempestade stops on an add that dies and keeps ticking on the others', () => {
+        const { main, a1, a2 } = fresh();
+        const skills = combat();
+        const options = { monster: main, adds: [ a1, a2 ] };
+
+        use(skills, main, 'orina', 2, { adds: [ a1, a2 ] });
+        skills.advance(1000, options);
+        kill(a1);
+
+        const next = skills.advance(1000, options);
+
+        expect(damages(next.hits)).toEqual([ 2, 2 ]);
+        expect(next.targets).toEqual([ a2, main ]);
+    });
+
+    it('a tick that kills both adds drops their buff for the miniboss tick of the same second', () => {
+        const { fight, skills, main } = guarded(2);
+        const options = { monster: main, adds: fight.livingAddMonsters() };
+
+        use(skills, main, 'orina', 2, { adds: fight.livingAddMonsters() });
+
+        const result = skills.advance(1000, options);
+
+        expect(damages(result.hits)[0]).toBeCloseTo(2, 9);
+        expect(damages(result.hits)[1]).toBeCloseTo(2, 9);
+        expect(damages(result.hits)[2]).toBeCloseTo(1.02, 9);
+    });
+
+    it('Bomba de Veneno adds one stack to every living monster', () => {
+        const { main, a1, a2 } = fresh();
+        const skills = combat();
+
+        use(skills, main, 'vex', 1, { adds: [ a1, a2 ] });
+
+        expect(skills.effectsWithOwner(a1).map((effect) => effect.label)).toEqual([ 'Bomba de Veneno x1' ]);
+        expect(damages(skills.advance(1000, { monster: main, adds: [ a1, a2 ] }).hits)).toEqual([ 1, 1, 1 ]);
+    });
+
+    it('Golpe Sangrento starts a Bleed on every monster it hit', () => {
+        const { main, a1, a2 } = fresh();
+        const skills = combat();
+
+        expect(damages(use(skills, main, 'vex', 3, { adds: [ a1, a2 ] }).hits)).toEqual([ 6, 6, 6 ]);
+        expect(damages(skills.advance(1000, { monster: main, adds: [ a1, a2 ] }).hits)).toEqual([ 1.5, 1.5, 1.5 ]);
+    });
+
+    it('Golpe Sangrento starts no Bleed on an add it killed', () => {
+        const { main, a2 } = fresh();
+        const a1 = monsterOf(6);
+        const skills = combat();
+
+        use(skills, main, 'vex', 3, { adds: [ a1, a2 ] });
+
+        expect(a1.dead).toBe(true);
+
+        const result = skills.advance(1000, { monster: main, adds: [ a1, a2 ] });
+
+        expect(damages(result.hits)).toEqual([ 1.5, 1.5 ]);
+        expect(result.targets).toEqual([ a2, main ]);
+    });
+
+    it('a dead add loses only its own effects', () => {
+        const { main, a1, a2 } = fresh();
+        const skills = combat();
+
+        use(skills, main, 'kael', 3, { adds: [ a1, a2 ] });
+        kill(a1);
+        skills.advance(1, { monster: main, adds: [ a2 ] });
+
+        expect(skills.effectsWithOwner(a1).map((effect) => effect.label)).not.toContain('Brado Aterrador');
+        expect(skills.effectsWithOwner(main).map((effect) => effect.label)).toContain('Brado Aterrador');
+        expect(skills.effectsWithOwner(a2).map((effect) => effect.label)).toContain('Brado Aterrador');
+    });
+
+    it('the Stun of Investida stops the countdown once in a fight with adds', () => {
+        const { main, a1, a2 } = fresh();
+        const skills = combat();
+
+        use(skills, main, 'kael', 2, { adds: [ a1, a2 ], boss: true });
+
+        expect(skills.countdownMs(1000)).toBe(0);
+
+        skills.advance(3000, { monster: main, adds: [ a1, a2 ], boss: true });
+
+        expect(skills.countdownMs(1000)).toBe(1000);
+    });
+
+    it('a skill with no adds lands on the one monster as before', () => {
+        const main = monsterOf(1000);
+        const result = use(combat(), main, 'orina', 3);
+
+        expect(result.hits).toEqual([ { damage: 25, critical: false } ]);
+        expect(result.targets).toEqual([ main ]);
     });
 });

@@ -789,7 +789,7 @@ allyHit ({ attacker, monster, main = monster, boss }) { /* ... */ }
 
 ---
 
-### T9: Land skills, ticks and the aimed shot on every living monster [ ]
+### T9: Land skills, ticks and the aimed shot on every living monster [x]
 
 **Owner**: game-dev
 **Goal**: `use` and `advance` take the living adds and land every damage skill, debuff, tick and aimed shot on each monster in the order adds then main (ADDS-06, ADDS-07, spec Damage skills AC 1 to 8, Adds AC 7, Edge Cases).
@@ -849,7 +849,7 @@ The domain cases use `PLAYER` (FIRE, base 1, critical 10 %, multiplier 2) and FI
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 22 cases pass, every existing `skillCombat.test.js` case passes unchanged, and the whole Vitest suite passes.
+- [x] The 22 cases pass, every existing `skillCombat.test.js` case passes unchanged, and the whole Vitest suite passes.
 
 **Commit**: `feat(game): land every damage skill on every living monster`
 

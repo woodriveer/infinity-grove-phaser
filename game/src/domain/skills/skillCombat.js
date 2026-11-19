@@ -199,7 +199,9 @@ export class SkillCombat
 
     //  Uses a skill: refused while locked, cooling or without a living monster; otherwise it lands its hits and starts the cooldown.
     //  `level` (1 to 3) scales the hits, the effects, the damage over time, the aimed shot and the countdown extension.
-    use ({ heroId, slot, unlocked, level = 1, attacker, monster, boss })
+    //  `adds` are the living add monsters of the fight in slot order (spec miniboss-adds): the skill lands on each add, then on the main
+    //  `monster`, all the hits of one monster before the next.
+    use ({ heroId, slot, unlocked, level = 1, attacker, monster, adds = [], boss })
     {
         const skill = skillOf(heroId, slot);
 
@@ -213,7 +215,7 @@ export class SkillCombat
 
         const owner = { heroId, slot };
         const factor = levelFactor(level);
-        const victims = [ monster ];
+        const victims = [ ...adds.filter((add) => add && add !== monster && !add.dead), monster ];
 
         if (skill.buff)
         {
@@ -283,7 +285,7 @@ export class SkillCombat
     //  Moves the clock by `ms`: cooldowns and effects run down and the damage over time ticks once per second. Returns the ticks that
     //  landed and the monster each landed on. The time is cut at every tick and every end of an effect so each tick sees the effects that
     //  run at that moment.
-    advance (ms, { monster = null, boss = false } = {})
+    advance (ms, { monster = null, adds = [], boss = false } = {})
     {
         this.follow(monster);
 
@@ -296,7 +298,7 @@ export class SkillCombat
 
         const hits = [];
         const targets = [];
-        const victims = monster ? [ monster ] : [];
+        const victims = monster ? [ ...adds.filter((add) => add && add !== monster && !add.dead), monster ] : [];
         let left = ms;
 
         while (left > 0 && (this.buffs.length || this.markedEffects().length || this.cast))
