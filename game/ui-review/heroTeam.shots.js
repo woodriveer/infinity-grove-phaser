@@ -135,8 +135,11 @@ test('inactive', async ({ page }, testInfo) => {
 test('field formation', async ({ page }, testInfo) => {
     await start(page, { cleared: [ 5, 6, 7, 8 ], team: FOUR, leader: 'lyra', freeze: true });
     await shot(page, testInfo, '09-field-formation');
-    await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').update(0, 1000));
-    await page.waitForTimeout(150);
+    await page.evaluate(() => {
+        window.__PHASER_GAME__.scene.getScene('ClickerGame').update(0, 1000);
+        window.__PHASER_GAME__.loop.wake();
+    });
+    await page.waitForTimeout(250);
     await shot(page, testInfo, '09b-field-ally-hit');
 });
 
