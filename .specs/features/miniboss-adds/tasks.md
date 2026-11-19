@@ -321,7 +321,7 @@ jpaStageAddRepository.saveAll(wanted)
 
 ---
 
-### T3: Answer the adds in the progress and farm payloads [ ]
+### T3: Answer the adds in the progress and farm payloads [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Every stage of `GET /progress`, `POST /progress/outcome` and `GET /farm` carries `adds` (ADDS-01, spec Adds AC 1).
@@ -376,7 +376,7 @@ JSON of chapter 11 stage 1: `"adds": [ { "health": 1966080, "defenseBuff": 30 },
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 6 cases pass and every existing backend test passes.
+- [x] The 6 cases pass and every existing backend test passes.
 
 **Commit**: `feat(backend): answer the adds of each stage in the progress and farm payloads`
 

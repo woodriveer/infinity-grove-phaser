@@ -546,4 +546,57 @@ class ProgressControllerIT : IntegrationTestBase() {
 
         assertEquals(0, talentRepository.earnedPoints("yan"))
     }
+
+    @Test
+    fun `GET progress answers an empty adds list on every stage of chapter 1`() {
+        user()
+
+        getProgress()
+            .then()
+            .statusCode(200)
+            .body("definition.stages[0].adds", hasSize<Any>(0))
+            .body("definition.stages[9].adds", hasSize<Any>(0))
+    }
+
+    @Test
+    fun `GET progress at chapter 11 answers two adds of 30 with 1966080 health on stage 1`() {
+        user()
+        jpaProgressRepository.save(ProgressEntity("yan", 11, 1, "PHASE", 1, false))
+
+        getProgress()
+            .then()
+            .statusCode(200)
+            .body("definition.stages[0].adds", hasSize<Any>(2))
+            .body("definition.stages[0].adds[0].health", equalTo(1_966_080))
+            .body("definition.stages[0].adds[0].defenseBuff", equalTo(30))
+            .body("definition.stages[0].adds[1].health", equalTo(1_966_080))
+            .body("definition.stages[0].adds[1].defenseBuff", equalTo(30))
+            .body("definition.stages[9].adds[0].health", equalTo(3_735_552))
+    }
+
+    @Test
+    fun `GET progress at chapter 15 answers adds of 31457280 health and 50 defense`() {
+        user()
+        jpaProgressRepository.save(ProgressEntity("yan", 15, 1, "PHASE", 1, false))
+
+        getProgress()
+            .then()
+            .statusCode(200)
+            .body("definition.stages[0].adds[1].health", equalTo(31_457_280))
+            .body("definition.stages[0].adds[1].defenseBuff", equalTo(50))
+    }
+
+    @Test
+    fun `a reported miniboss win at chapter 11 answers the next stage with its adds`() {
+        user()
+        jpaProgressRepository.save(ProgressEntity("yan", 11, 1, "MINIBOSS", 1, false))
+
+        report(body(1, "MINIBOSS", 1, "CLEARED", chapter = 11))
+            .then()
+            .statusCode(200)
+            .body("stage", equalTo(2))
+            .body("encounter", equalTo("PHASE"))
+            .body("definition.stages[1].adds", hasSize<Any>(2))
+            .body("definition.stages[1].adds[0].defenseBuff", equalTo(30))
+    }
 }

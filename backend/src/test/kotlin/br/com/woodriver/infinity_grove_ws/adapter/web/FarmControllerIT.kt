@@ -434,4 +434,30 @@ class FarmControllerIT : IntegrationTestBase() {
             .statusCode(200)
             .body("drop.heroId", equalTo("orina"))
     }
+
+    @Test
+    fun `GET farm of chapter 11 answers the adds of its minibosses`() {
+        val token = register()
+        progressAt(1, "PHASE", chapter = 12)
+
+        asUser(token)
+            .get("/farm?chapter=11")
+            .then()
+            .statusCode(200)
+            .body("definition.stages[0].adds", hasSize<Any>(2))
+            .body("definition.stages[0].adds[0].health", equalTo(1_966_080))
+            .body("definition.stages[0].adds[0].defenseBuff", equalTo(30))
+    }
+
+    @Test
+    fun `GET farm of chapter 2 answers empty adds`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+
+        asUser(token)
+            .get("/farm?chapter=2")
+            .then()
+            .statusCode(200)
+            .body("definition.stages[0].adds", hasSize<Any>(0))
+    }
 }

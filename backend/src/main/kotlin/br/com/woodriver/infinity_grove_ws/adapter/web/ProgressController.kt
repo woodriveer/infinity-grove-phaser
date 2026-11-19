@@ -9,6 +9,7 @@ import br.com.woodriver.infinity_grove_ws.domain.InvalidOutcomeException
 import br.com.woodriver.infinity_grove_ws.domain.Outcome
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
 import br.com.woodriver.infinity_grove_ws.domain.ProgressView
+import br.com.woodriver.infinity_grove_ws.domain.StageAdd
 import br.com.woodriver.infinity_grove_ws.domain.StageDefinition
 import br.com.woodriver.infinity_grove_ws.usecase.GetProgressUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.OutcomeResult
@@ -41,6 +42,16 @@ data class EnemyStatsResponse(
     }
 }
 
+/** One add of a miniboss in the progress and farm payloads (spec miniboss-adds). */
+data class AddResponse(
+    val health: Long,
+    val defenseBuff: Int,
+) {
+    companion object {
+        fun from(add: StageAdd) = AddResponse(add.health, add.defenseBuff)
+    }
+}
+
 data class StageResponse(
     val number: Int,
     val phasesPerStage: Int,
@@ -51,6 +62,7 @@ data class StageResponse(
     val miniboss: EnemyStatsResponse,
     val monsterDropRuleId: Int,
     val minibossDropRuleId: Int,
+    val adds: List<AddResponse>,
 ) {
     companion object {
         fun from(stage: StageDefinition) =
@@ -64,6 +76,7 @@ data class StageResponse(
                 miniboss = EnemyStatsResponse.from(stage.miniboss),
                 monsterDropRuleId = stage.monsterDropRuleId,
                 minibossDropRuleId = stage.minibossDropRuleId,
+                adds = stage.adds.map(AddResponse::from),
             )
     }
 }
