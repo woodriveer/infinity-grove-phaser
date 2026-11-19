@@ -584,7 +584,7 @@ data class LeaderResponse(
 
 ---
 
-### T4: Save the allies with `PUT /team` [ ]
+### T4: Save the allies with `PUT /team` [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: A player saves the four ally entries under the `player_cards` lock, with every refusal of the spec in its order (TEAM-03, TEAM-04 AC 22, 23).
@@ -710,8 +710,10 @@ Answers: 200 `{ "leaderId": string, "team": team payload }`; 400 `INVALID_TEAM`;
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] `PUT /team` answers every case above.
-- [ ] The 8 `TeamServiceTest` and 20 `TeamControllerIT` cases pass; the whole backend suite passes.
+- [x] `PUT /team` answers every case above.
+- [x] The 8 `TeamServiceTest` and 20 `TeamControllerIT` cases pass; the whole backend suite passes.
+
+**Note (T4)**: the use case file is `<main>/usecase/SaveTeamUseCase.kt`, not `TeamUseCase.kt`: with `SaveTeamUseCase` as its only declaration, ktlint (`standard:filename`) refuses the name `TeamUseCase.kt`. T5 renames it to `TeamUseCase.kt` (`git mv`) when it adds `BuyTeamSlotUseCase`, which gives the file two declarations. In `a player changes only their own team`, `ana` registers with `FIRE` and holds Lyra: the task says `ana` puts `lyra`, and a `NATURE` player has Lyra as leader, which the save refuses with `INVALID_TEAM`.
 
 **Commit**: `feat(backend): save the hero team with PUT /team`
 
