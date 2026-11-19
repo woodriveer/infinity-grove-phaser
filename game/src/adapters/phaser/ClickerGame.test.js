@@ -20,7 +20,7 @@ const walletApi = { get: vi.fn(), sync: vi.fn() };
 //  The real campaign session over a mocked backend gateway, started on stage 1 phase 1 of a seeded-like chapter
 const campaignGateway = { get: vi.fn(), report: vi.fn() };
 //  The real hero collection and farm session over mocked gateways; by default the player owns Kael with one blank card
-const heroesGateway = { list: vi.fn(), fuse: vi.fn(), setLeader: vi.fn() };
+const heroesGateway = { list: vi.fn(), fuse: vi.fn(), setLeader: vi.fn(), setTeam: vi.fn(), buySlot: vi.fn() };
 const farmGateway = { get: vi.fn(), win: vi.fn() };
 const talentGateway = { list: vi.fn(), upgrade: vi.fn() };
 //  The real auto click state over a mocked gateway, and the switch preference as a plain object (on unless a test turns it off)
@@ -71,6 +71,14 @@ const heroEntry = (id, copies = {}, stars = 0) => ({
 
 const heroesResponse = () => ({ leaderId: 'kael', heroes: [ heroEntry('kael', { 0: 1 }), heroEntry('lyra'), heroEntry('orina') ] });
 
+const TEAM_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
+const teamPayload = (allies, { openSlots = 4, boughtSlots = 4, unlocked = true } = {}) => ({ unlocked, openSlots, boughtSlots, slotPrices: [ 10000, 20000, 30000, 40000 ], allies });
+//  Every hero owned and FIRE (heroEntry); `stars` gives a hero more stars, e.g. { lyra: 9 }
+const teamHeroes = (allies, { leaderId = 'kael', stars = {} } = {}) => ({
+    leaderId, heroes: TEAM_IDS.map((id) => heroEntry(id, { 0: 1 }, stars[id] ?? 0)), team: teamPayload(allies)
+});
+const atChapter = (chapter, ...args) => ({ ...progress(...args), chapter });
+
 const walletResponse = (coins = { gold: 2, silver: 14, copper: 37 }, drops = { 1: [3, 1, 5, 2, 4] }) => ({ wallet: coins, drops });
 
 //  Minimal Phaser stand-in: records what ClickerGame adds and exposes the click handler and tweens.
@@ -97,6 +105,8 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
     heroesGateway.list.mockReset();
     heroesGateway.fuse.mockReset();
     heroesGateway.setLeader.mockReset();
+    heroesGateway.setTeam.mockReset();
+    heroesGateway.buySlot.mockReset();
     heroesGateway.list.mockImplementation(() => (heroes instanceof Error ? Promise.reject(heroes) : Promise.resolve(heroes)));
     farmGateway.get.mockReset();
     farmGateway.win.mockReset();
@@ -5109,5 +5119,280 @@ describe('ClickerGame hero ascension', () => {
 
         expect(slot(ctx, 1).getAttribute('data-state')).toBe('cooling');
         expect(slotText(ctx, 1)).toBe('15s');
+    });
+});
+
+describe('ClickerGame hero team', () => {
+    const killAll = (ctx) => {
+        while (ctx.scene.monster && !ctx.scene.monster.dead)
+        {
+            ctx.click();
+        }
+    };
+    //  The fade ends, then the respawn delay: the next encounter appears
+    const advance = (ctx) => {
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+    };
+    const label = (ctx) => ctx.hud('.stage-hud').textContent;
+    const timer = (ctx) => ctx.hud('.boss-timer').textContent;
+    const ALLY_BLUE = '#7fd4ff';
+    //  The auto click is off and the talents are empty: nothing but the allies and the clicks of the test touches the monster (AD-013)
+    const open = async (allies, { heroOptions = {}, start = atChapter(5), ...extra } = {}) =>
+    {
+        const ctx = await createScene({ start, heroes: teamHeroes(allies, heroOptions), talents: [], autoClickOn: false, ...extra });
+
+        await flush();
+
+        return ctx;
+    };
+    const allyTexts = (ctx) => ctx.texts.filter((text) => text.style.color === ALLY_BLUE);
+    const hp = (ctx) => ctx.hud('.monster-hp').textContent;
+    const withDefense = (monster) => ({ ...definition, stages: definition.stages.map((stage, index) => (index === 0 ? { ...stage, monster } : stage)) });
+    const ironMonster = () => ({ ...atChapter(5), definition: withDefense({ element: 'FIRE', defense: 40, critResistance: 30 }) });
+
+    it('a fighting ally hits the monster for 2 at 1000 ms with no click', async () => {
+        const ctx = await open([ 'lyra', null, null, null ]);
+
+        ctx.scene.update(0, 999);
+        expect(ctx.scene.monster.health).toBe(10);
+
+        ctx.scene.update(0, 1);
+        expect(ctx.scene.monster.health).toBe(8);
+    });
+
+    it('the ally tick shows one light-blue 2 at x 740 in the damage font', async () => {
+        const ctx = await open([ 'lyra', null, null, null ]);
+
+        ctx.scene.update(0, 1000);
+
+        const text = ctx.texts.at(-1);
+
+        expect(text.text).toBe('2');
+        expect(text.x).toBe(740);
+        expect(text.y).toBe(ctx.scene.damageTextY);
+        expect(text.style).toMatchObject({ color: ALLY_BLUE, fontSize: 28, fontFamily: 'Cinzel', fontStyle: '700', stroke: '#2a1408', strokeThickness: 8 });
+    });
+
+    it('two allies show one number with the sum of the tick', async () => {
+        const ctx = await open([ 'lyra', 'orina', null, null ]);
+
+        ctx.scene.update(0, 1000);
+
+        expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '4' ]);
+        expect(ctx.scene.monster.health).toBe(6);
+    });
+
+    it('Seraphine as an ally multiplies every ally hit by 1.25', async () => {
+        const ctx = await open([ 'lyra', 'seraphine', null, null ]);
+
+        ctx.scene.update(0, 1000);
+
+        expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '5' ]);
+        expect(ctx.scene.monster.health).toBe(5);
+    });
+
+    it('an ally hit that does not kill moves the health bar and the HP text', async () => {
+        const ctx = await open([ 'lyra', null, null, null ]);
+
+        ctx.scene.update(0, 1000);
+
+        expect(hp(ctx)).toBe('HP 8/10');
+        expect(ctx.fill.width).toBeCloseTo(240 * 0.8, 9);
+    });
+
+    it('an ally kill is handled once and the later slots do not land', async () => {
+        const ctx = await open([ 'lyra', 'orina', null, null ], { heroOptions: { stars: { lyra: 9 } }, wallet: walletResponse(undefined, { 1: [ 3 ] }) });
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.monster.dead).toBe(true);
+        expect(ctx.texts.map((text) => text.text)).toEqual([ '20' ]);
+        expect(ctx.sprites).toHaveLength(3);
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.texts).toHaveLength(1);
+        expect(ctx.sprites).toHaveLength(3);
+    });
+
+    it('no ally hits while the campaign stands at chapter 4', async () => {
+        const ctx = await open([ 'lyra', null, null, null ], { start: atChapter(4) });
+
+        ctx.scene.update(0, 3000);
+
+        expect(ctx.scene.monster.health).toBe(10);
+        expect(allyTexts(ctx)).toHaveLength(0);
+    });
+
+    it('no ally hits before the heroes load', async () => {
+        const ctx = await open([ 'lyra', null, null, null ], { heroes: new Error('offline') });
+
+        ctx.scene.update(0, 3000);
+
+        expect(ctx.scene.monster.health).toBe(10);
+    });
+
+    it('a heroes payload without team lands no ally hit', async () => {
+        const ctx = await createScene({ start: atChapter(5), heroes: heroesResponse(), talents: [], autoClickOn: false });
+
+        await flush();
+        ctx.scene.update(0, 3000);
+
+        expect(ctx.scene.monster.health).toBe(10);
+    });
+
+    it('an ally hit leaves the combo streak unchanged', async () => {
+        const ctx = await open([ 'lyra', null, null, null ]);
+
+        ctx.click();
+
+        const streak = ctx.hud('.combo-hud').textContent;
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.hud('.combo-hud').textContent).toBe(streak);
+    });
+
+    it('the pause menu freezes the ally clock', async () => {
+        const ctx = await open([ 'lyra', null, null, null ]);
+
+        ctx.scene.update(0, 600);
+        ctx.scene.pauseFight();
+        ctx.scene.update(0, 10000);
+        ctx.scene.resumeFight();
+        ctx.scene.update(0, 399);
+
+        expect(ctx.scene.monster.health).toBe(10);
+
+        ctx.scene.update(0, 1);
+
+        expect(ctx.scene.monster.health).toBe(8);
+    });
+
+    it('ally hits keep landing while a hero screen is open', async () => {
+        const ctx = await open([ 'lyra', null, null, null ]);
+
+        await ctx.scene.heroUi.show('heroes');
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.monster.health).toBe(8);
+    });
+
+    it('a leader change switches the element of the next ally hit', async () => {
+        //  The task text says WATER, but WATER beats FIRE (x2); NATURE against FIRE is the half hit the spec reads as 1
+        const payload = teamHeroes([ 'lyra', null, null, null ]);
+        const heroes = { ...payload, heroes: payload.heroes.map((hero) => (hero.id === 'orina' ? { ...hero, element: 'NATURE' } : hero)) };
+        const ctx = await open([ 'lyra', null, null, null ], { heroes });
+
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.monster.health).toBe(8);
+
+        heroesGateway.setLeader.mockResolvedValue({ leaderId: 'orina', team: teamPayload([ 'lyra', null, null, null ]) });
+        await ctx.scene.heroes.setLeader('orina');
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.monster.health).toBe(7);
+    });
+
+    it('an ally that equips a piece hits with it on the next tick', async () => {
+        const ctx = await open([ 'lyra', null, null, null ]);
+        const weapon = { id: 'w', slot: 'WEAPON', rarity: 'COMMON', refine: 0, clickDamage: 1, affixes: [], heroId: 'lyra', sellPrice: 1 };
+
+        ctx.scene.update(0, 1000);
+        expect(ctx.scene.monster.health).toBe(8);
+
+        equipmentGateway.list.mockResolvedValue({ capacity: 100, pieces: [ weapon ] });
+        await ctx.scene.equipment.load();
+        ctx.scene.update(0, 1000);
+
+        expect(ctx.scene.monster.health).toBe(4);
+    });
+
+    it('Kael as an ally starts a 30 s miniboss at Time: 35', async () => {
+        const ctx = await open([ 'kael', null, null, null ], { heroOptions: { leaderId: 'lyra' }, start: atChapter(5, 1, 'PHASE', 5) });
+
+        killAll(ctx);
+        advance(ctx);
+
+        expect(timer(ctx)).toBe('Time: 35');
+    });
+
+    it('Kael as the leader brings no passive: Time: 30', async () => {
+        const ctx = await open([ 'lyra', null, null, null ], { start: atChapter(5, 1, 'PHASE', 5) });
+
+        killAll(ctx);
+        advance(ctx);
+
+        expect(timer(ctx)).toBe('Time: 30');
+    });
+
+    it('a team change keeps the running countdown', async () => {
+        const ctx = await open([ 'kael', null, null, null ], { heroOptions: { leaderId: 'lyra' }, start: atChapter(5, 1, 'PHASE', 5) });
+
+        killAll(ctx);
+        advance(ctx);
+        expect(timer(ctx)).toBe('Time: 35');
+
+        heroesGateway.setTeam.mockResolvedValue({ leaderId: 'lyra', team: teamPayload([ null, null, null, null ]) });
+        await ctx.scene.heroes.setTeam([ null, null, null, null ]);
+        ctx.scene.update(0, 0);
+
+        expect(timer(ctx)).toBe('Time: 35');
+    });
+
+    it('Orina as an ally shows Defesa 25% on a monster of defense 40', async () => {
+        const ctx = await open([ 'orina', null, null, null ], { start: ironMonster() });
+
+        expect(ctx.hud('.enemy-stats').textContent).toBe('Fire  Defesa 25%  Crit res 30%');
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBeCloseTo(9.25, 9);
+    });
+
+    it('Vex as an ally shows Crit res 15% on a monster of critical resistance 30', async () => {
+        const ctx = await open([ 'vex', null, null, null ], { start: ironMonster() });
+
+        expect(ctx.hud('.enemy-stats').textContent).toBe('Fire  Defesa 40%  Crit res 15%');
+    });
+
+    it('Lyra as an ally makes a roll of 15 a critical click', async () => {
+        const withLyra = await open([ 'lyra', null, null, null ]);
+
+        withLyra.dice.value = 0.15;
+        withLyra.click();
+
+        expect(withLyra.scene.monster.health).toBe(8);
+
+        const without = await open([ null, null, null, null ]);
+
+        without.dice.value = 0.15;
+        without.click();
+
+        expect(without.scene.monster.health).toBe(9);
+    });
+
+    it('the purchase wallet reaches the wallet text', async () => {
+        const ctx = await open([ null, null, null, null ], { wallet: walletResponse() });
+
+        await flush();
+        heroesGateway.buySlot.mockResolvedValue({ team: teamPayload([ null, null, null, null ], { boughtSlots: 1 }), wallet: { gold: 0, silver: 50, copper: 0 } });
+        await ctx.scene.heroes.buySlot(0);
+
+        expect(ctx.walletText().textContent).toBe('Gold: 0  Silver: 50  Copper: 0');
+    });
+
+    it('the next chapter reloads the heroes', async () => {
+        const ctx = await open([ 'lyra', null, null, null ], { start: atChapter(5, 10, 'CHAPTER_BOSS', 1) });
+
+        campaignGateway.report.mockResolvedValue(atChapter(6, 1, 'PHASE', 1));
+        killAll(ctx);
+        advance(ctx);
+        await flush();
+
+        expect(label(ctx)).toBe('Stage 1/10  Phase 1/5');
+        expect(heroesGateway.list).toHaveBeenCalledTimes(2);
     });
 });

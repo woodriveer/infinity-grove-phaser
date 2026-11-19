@@ -3,6 +3,8 @@ import { BossCountdown } from '../../domain/campaign/bossCountdown';
 import { MINIBOSS, farmEncounterOf } from '../../domain/campaign/campaign';
 import { AutoClicker, autoClickUnlocked } from '../../domain/combat/autoClick';
 import { resetReward } from '../../domain/campaign/accountReset';
+import { allyAttacker } from '../../domain/combat/allyAttacker';
+import { AllyCombat } from '../../domain/combat/allyCombat';
 import { Combo, comboText } from '../../domain/combat/combo';
 import { formatDamage } from '../../domain/combat/damage';
 import { weaknessOf } from '../../domain/combat/elements';
@@ -11,6 +13,7 @@ import { bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/eq
 import { defenseOf, healthText, Monster } from '../../domain/combat/monster';
 import { clickHits } from '../../domain/heroes/leaderBonus';
 import { ELEMENT_LABELS } from '../../domain/heroes/heroes';
+import { activePassives, fightingAllies, teamActive } from '../../domain/heroes/team';
 import { SkillCombat } from '../../domain/skills/skillCombat';
 import { skillLevelOf } from '../../domain/skills/skillLevel';
 import { monsterAfterBreak, talentComboCap, talentTimeBonusMs } from '../../domain/talents/talents';
@@ -65,6 +68,9 @@ const SKILL_KEYS = [ [ 'ONE', 1 ], [ 'TWO', 2 ], [ 'THREE', 3 ], [ 'Q', 1 ], [ '
 const DAMAGE_FONT = { fontFamily: 'Cinzel', fontStyle: '700', stroke: '#2a1408', strokeThickness: 8 };
 const CRITICAL_TEXT = { color: '#ff8a1f', fontSize: 48 };
 const NORMAL_TEXT = { color: '#ffd35c', fontSize: 32 };
+const ALLY_TEXT = { color: '#7fd4ff', fontSize: 28 };
+//  The ally number stands right of the monster centre so it does not cover the click numbers (spec hero-team)
+const ALLY_TEXT_OFFSET = 70;
 const STAGE_MESSAGE = { x: 512, y: 384 };
 const BATTLE_BAR = { x: 512, y: 686 };
 const BATTLE_BAR_HTML = '<div class="battle-bar"></div>';
@@ -127,7 +133,9 @@ export class ClickerGame extends Scene
         this.coinsFlying = 0;
         this.random = services.random ?? Math.random;
         //  The break talents lower the stats of the monster at the moment of every hit, so an upgrade counts from the next click
-        this.skills = new SkillCombat({ random: this.random, statsOf: (monster) => monsterAfterBreak(monster.stats, this.talents.talents()) });
+        this.skills = new SkillCombat({ random: this.random, statsOf: (monster) => monsterAfterBreak(monster.stats, this.talents.talents(), this.passives()) });
+        this.allies = new AllyCombat();
+        this.encounterChapter = null;
         this.combo = new Combo();
         this.effectsKey = '';
         this.loadingCampaign = false;
@@ -152,6 +160,7 @@ export class ClickerGame extends Scene
         this.session.onEquipmentDrop((drop) => this.receiveEquipmentDrop(drop));
         this.session.onTalentPoints((points) => this.heroUi.showTalentPoints(points));
         this.equipment.onWallet((coins) => this.receiveWallet(coins));
+        this.heroes.onWallet((coins) => this.receiveWallet(coins));
         this.talents.onChange(() => this.refreshEnemyStats());
         this.autoClick.onChange(() => this.showAutoClick());
 
@@ -543,7 +552,11 @@ export class ClickerGame extends Scene
             skillState: (slot) => this.skillState(slot),
             mapPosition: () => this.session.mapPosition()
         });
-        this.heroes.onChange(() => this.showCharacter());
+        this.heroes.onChange(() =>
+        {
+            this.showCharacter();
+            this.refreshEnemyStats();
+        });
         this.loadHeroes();
         this.loadEquipment();
         this.loadTalents();
@@ -754,6 +767,15 @@ export class ClickerGame extends Scene
             return;
         }
 
+        //  A new chapter (a chapter boss won, a reset) can open ally slots or turn the team on or off: read the heroes again
+        if (this.encounterChapter !== null && this.session.chapter !== this.encounterChapter)
+        {
+            this.loadHeroes();
+        }
+
+        this.encounterChapter = this.session.chapter;
+        this.showCharacter();
+
         //  A new encounter replaces any message, the completion of the previous chapter included
         this.stageMessage.textContent = '';
         this.monster = new Monster(encounter.health, encounter.dropRuleId, encounter.stats);
@@ -763,11 +785,13 @@ export class ClickerGame extends Scene
         this.chapterHud.textContent = `Capítulo ${this.session.chapter}`;
         this.showAutoClick();
         this.monsterStats = encounter.stats;
-        this.showEnemyStats(monsterAfterBreak(encounter.stats, this.talents.talents()));
+        this.showEnemyStats(monsterAfterBreak(encounter.stats, this.talents.talents(), this.passives()));
 
         if (encounter.timeLimitMs)
         {
-            this.countdown = new BossCountdown(encounter.timeLimitMs + bossTimeBonusMs(this.leaderPieces()) + talentTimeBonusMs(this.talents.talents(), encounter));
+            this.countdown = new BossCountdown(
+                encounter.timeLimitMs + bossTimeBonusMs(this.leaderPieces()) + talentTimeBonusMs(this.talents.talents(), encounter) + this.passives().bossTimeMs
+            );
             this.showCountdown();
             this.placeBossTimer();
         }
@@ -778,7 +802,7 @@ export class ClickerGame extends Scene
     {
         if (this.monster && !this.monster.dead && this.monsterStats)
         {
-            this.showEnemyStats(monsterAfterBreak(this.monsterStats, this.talents.talents()));
+            this.showEnemyStats(monsterAfterBreak(this.monsterStats, this.talents.talents(), this.passives()));
         }
     }
 
@@ -867,9 +891,11 @@ export class ClickerGame extends Scene
         this.autoClickFrame(delta);
         this.showCombo();
 
+        const alive = this.monster && !this.monster.dead;
+        //  The allies strike first, so an effect that ends in this frame still counts for them (spec hero-team)
+        const allyTicks = this.allyFrame(delta);
         //  The stop of Stun and Root is read before the skills use it up with this frame
         const countdownMs = this.skills.countdownMs(delta);
-        const alive = this.monster && !this.monster.dead;
         const { hits } = this.skills.advance(delta, { monster: this.monster, boss: this.countdown !== null });
 
         hits.forEach(({ damage, critical }) => this.showDamage(formatDamage(damage), MONSTER.x, critical));
@@ -879,7 +905,7 @@ export class ClickerGame extends Scene
         {
             this.afterDamage();
         }
-        else if (alive && hits.length > 0)
+        else if (alive && (hits.length > 0 || allyTicks > 0))
         {
             this.updateHealthBar();
         }
@@ -938,7 +964,61 @@ export class ClickerGame extends Scene
     //  load it keeps the default attacker
     leaderAttacker ()
     {
-        return leaderAttacker({ leader: this.heroes.leader(), pieces: this.leaderPieces(), talents: this.talents.talents() });
+        return leaderAttacker({ leader: this.heroes.leader(), pieces: this.leaderPieces(), talents: this.talents.talents(), passives: this.passives() });
+    }
+
+    //  The heroes of the bought, filled ally slots while the team is active (spec hero-team); none before the heroes or the campaign load
+    fightingAllies ()
+    {
+        return fightingAllies({ team: this.heroes.team(), heroes: this.heroes.heroes(), leaderId: this.heroes.leaderId(), active: teamActive(this.session.mapPosition()) });
+    }
+
+    //  The passives of the fighting allies: they reach the click, the monster stats and the boss countdown
+    passives ()
+    {
+        return activePassives({ team: this.heroes.team(), heroes: this.heroes.heroes(), leaderId: this.heroes.leaderId(), position: this.session.mapPosition() });
+    }
+
+    //  The attacker of each fighting ally, read at every tick: its stars and pieces, the element of the leader and Seraphine's factor
+    allyAttackers ()
+    {
+        const leader = this.heroes.leader();
+
+        if (!leader)
+        {
+            return [];
+        }
+
+        const { allyFactor } = this.passives();
+
+        return this.fightingAllies().map(({ slot, hero }) => ({
+            slot, attacker: allyAttacker({ ally: hero, pieces: wornBy(this.equipment.pieces(), hero.id), leaderElement: leader.element, allyFactor })
+        }));
+    }
+
+    //  The ally ticks of this frame on the monster on screen (a countdown means a boss); shows one number per tick. Returns how many landed.
+    allyFrame (delta)
+    {
+        const monster = this.monster && !this.monster.dead ? this.monster : null;
+        const boss = this.countdown !== null;
+        const { ticks } = this.allies.advance(delta, {
+            monster,
+            allies: this.allyAttackers(),
+            hit: (attacker, target) => this.skills.allyHit({ attacker, monster: target, boss }).damage
+        });
+
+        ticks.forEach(({ damage, slots }) =>
+        {
+            this.showDamage(formatDamage(damage), MONSTER.x + ALLY_TEXT_OFFSET, false, ALLY_TEXT);
+            this.onAllyTick(slots);
+        });
+
+        return ticks.length;
+    }
+
+    //  The sprites of the slots that landed move (the formation fills it in); nothing to do here yet
+    onAllyTick ()
+    {
     }
 
     //  The leader uses the skill of `slot` (a click on its slot or the key 1, 2 or 3) on the monster on screen. A countdown means a boss.
@@ -1402,10 +1482,10 @@ export class ClickerGame extends Scene
         return onMonster ? pointer.x : MONSTER.x;
     }
 
-    //  A critical hit is bigger and orange, a normal one gold
-    showDamage (damage, x, critical = false)
+    //  A critical hit is bigger and orange, a normal one gold; `style` gives another look (the light-blue number of an ally tick)
+    showDamage (damage, x, critical = false, style = null)
     {
-        const textStyle = { ...DAMAGE_FONT, ...(critical ? CRITICAL_TEXT : NORMAL_TEXT) };
+        const textStyle = { ...DAMAGE_FONT, ...(style ?? (critical ? CRITICAL_TEXT : NORMAL_TEXT)) };
 
         const text = this.add.text(x, this.damageTextY, damage, textStyle).setOrigin(0.5, 1).setDepth(1);
 

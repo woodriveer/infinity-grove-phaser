@@ -1457,7 +1457,7 @@ Update the port comment at the top with `setTeam(allies)` and `buySlot(fromSlots
 
 ---
 
-### T15: Land the ally ticks in the combat scene [ ]
+### T15: Land the ally ticks in the combat scene [x]
 
 **Owner**: game-dev
 **Goal**: The scene lands the ally ticks every frame before the skills, shows the light-blue number, handles a kill like a click kill, applies the passives to the click, the enemy line and the countdown, takes the purchase wallet and reloads the heroes on a chapter change (TEAM-06, TEAM-07, TEAM-08, TEAM-09 AC 21, TEAM-11).
@@ -1616,7 +1616,7 @@ const atChapter = (chapter, ...args) => ({ ...progress(...args), chapter });
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 22 cases pass, every existing `ClickerGame` case passes unchanged, and the whole Vitest suite passes.
+- [x] The 22 cases pass, every existing `ClickerGame` case passes unchanged, and the whole Vitest suite passes.
 
 **Commit**: `feat(game): land the ally ticks in the combat scene`
 
