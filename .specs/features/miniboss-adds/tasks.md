@@ -1320,7 +1320,7 @@ const outcomeCalls = (backend) => backend.calls.filter((call) => call.path === '
 
 ---
 
-### T14: Cover the target choice in the browser [ ]
+### T14: Cover the target choice in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: e2e scenarios pin the target rules, the marker, the target chip, the add layout, the auto click and the allies on the target (ADDS-04, ADDS-05; spec Target AC 1 to 11, Edge Cases).
@@ -1367,7 +1367,7 @@ const numbers = (page) => scene(page, '(s) => s.children.list.filter((o) => o.ty
 **Gate**: full - `cd game && npm test && npx playwright test e2e/minibossAddsTarget.spec.js`
 **Done when**:
 
-- [ ] The 14 scenarios pass twice in a row.
+- [x] The 14 scenarios pass twice in a row.
 
 **Commit**: `test(game): cover the miniboss target in the browser`
 
