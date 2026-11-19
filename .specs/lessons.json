@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 109,
+  "next_id": 112,
   "lessons": [
     {
       "id": "L-001",
@@ -1761,17 +1761,19 @@
       "text": "When an AC lists several triggers for one outcome, give each trigger its own test; a shared code path covered by another trigger is not evidence for the rest.",
       "signal": "ac_gap",
       "scope": "game/adapters",
-      "status": "candidate",
+      "status": "confirmed",
       "features": [
-        "boss-replay-chapters"
+        "boss-replay-chapters",
+        "hero-team"
       ],
-      "recurrence": 1,
+      "recurrence": 2,
       "harmful": 0,
       "evidence": [
-        "validation.md round 2 G3 (P1-Choose AC 14, HeroUi.js:725) (game/adapters)"
+        "validation.md round 2 G3 (P1-Choose AC 14, HeroUi.js:725) (game/adapters)",
+        "validation.md One damage AC 9, Allies fight AC 8, Passives AC 2 and 4 (game/adapters)"
       ],
       "created": "2026-11-17T13:08:29Z",
-      "last_seen": "2026-11-17T13:08:29Z"
+      "last_seen": "2026-11-19T16:52:18Z"
     },
     {
       "id": "L-099",
@@ -1952,6 +1954,60 @@
       ],
       "created": "2026-11-19T06:35:49Z",
       "last_seen": "2026-11-19T06:35:49Z"
+    },
+    {
+      "id": "L-109",
+      "key": "surviving_mutant::pin a same frame ordering rule with a test where the effect ends in the frame the hit lands because any other timing passes in either order",
+      "text": "Pin a same-frame ordering rule with a test where the effect ends in the frame the hit lands, because any other timing passes in either order",
+      "signal": "surviving_mutant",
+      "scope": "game/adapters",
+      "status": "candidate",
+      "features": [
+        "hero-team"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md G24 (ClickerGame.js:940 frame order) (game/adapters)"
+      ],
+      "created": "2026-11-19T16:52:18Z",
+      "last_seen": "2026-11-19T16:52:18Z"
+    },
+    {
+      "id": "L-110",
+      "key": "spec_precision_gap::compute every worked example with every rule the spec applies to its actors the actor s own passive included",
+      "text": "Compute every worked example with every rule the spec applies to its actors, the actor's own passive included",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "hero-team"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md:109 E3 (Allies fight AC 4) (spec)"
+      ],
+      "created": "2026-11-19T16:52:18Z",
+      "last_seen": "2026-11-19T16:52:18Z"
+    },
+    {
+      "id": "L-111",
+      "key": "gate_fail::stop the scene clock or wait for timed re renders to finish before an e2e test measures a dom node that a timer re renders",
+      "text": "Stop the scene clock or wait for timed re-renders to finish before an e2e test measures a DOM node that a timer re-renders",
+      "signal": "gate_fail",
+      "scope": "game-e2e",
+      "status": "candidate",
+      "features": [
+        "hero-team"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "game/e2e/heroTeam.spec.js:347 (game-e2e)"
+      ],
+      "created": "2026-11-19T16:52:18Z",
+      "last_seen": "2026-11-19T16:52:18Z"
     }
   ]
 }

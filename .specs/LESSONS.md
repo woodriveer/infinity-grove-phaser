@@ -20,6 +20,12 @@ Corroborated across multiple features. Safe to apply as guidance.
 - evidence: spec.md edge case farm after reset; validation.md Edge cases (indirect via FarmServiceTest.kt:101) (tests) (+1 more)
 - last seen: 2026-10-28T09:23:26Z
 
+### L-098 - When an AC lists several triggers for one outcome, give each trigger its own test; a shared code path covered by another trigger is not evidence for the rest.
+- signal: `ac_gap` · recurrence: 2 feature(s) · scope: `game/adapters` · harmful: 0
+- features: boss-replay-chapters, hero-team
+- evidence: validation.md round 2 G3 (P1-Choose AC 14, HeroUi.js:725) (game/adapters) (+1 more)
+- last seen: 2026-11-19T16:52:18Z
+
 ## Candidates (under observation - do NOT load as guidance yet)
 
 Seen once or not yet corroborated. Tracked, not trusted.
@@ -594,12 +600,6 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md round 2 S9 (HeroUi.js:156) (game/adapters)
 - last seen: 2026-11-17T13:08:29Z
 
-### L-098 - When an AC lists several triggers for one outcome, give each trigger its own test; a shared code path covered by another trigger is not evidence for the rest.
-- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `game/adapters` · harmful: 0
-- features: boss-replay-chapters
-- evidence: validation.md round 2 G3 (P1-Choose AC 14, HeroUi.js:725) (game/adapters)
-- last seen: 2026-11-17T13:08:29Z
-
 ### L-099 - When the spec promises an e2e scenario for every player-visible edge case, the e2e task lists each visible edge case or the spec records which ones stay unit-only.
 - signal: `ac_gap` · recurrence: 1 feature(s) · scope: `tasks` · harmful: 0
 - features: boss-replay-chapters
@@ -659,6 +659,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - features: unified-damage
 - evidence: spec.md:283 (end-second rule names ticks only; skillCombat.test.js:617 aimed shot at Prisão's end second) (game/src/domain/skills)
 - last seen: 2026-11-19T06:35:49Z
+
+### L-109 - Pin a same-frame ordering rule with a test where the effect ends in the frame the hit lands, because any other timing passes in either order
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game/adapters` · harmful: 0
+- features: hero-team
+- evidence: validation.md G24 (ClickerGame.js:940 frame order) (game/adapters)
+- last seen: 2026-11-19T16:52:18Z
+
+### L-110 - Compute every worked example with every rule the spec applies to its actors, the actor's own passive included
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: hero-team
+- evidence: spec.md:109 E3 (Allies fight AC 4) (spec)
+- last seen: 2026-11-19T16:52:18Z
+
+### L-111 - Stop the scene clock or wait for timed re-renders to finish before an e2e test measures a DOM node that a timer re-renders
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `game-e2e` · harmful: 0
+- features: hero-team
+- evidence: game/e2e/heroTeam.spec.js:347 (game-e2e)
+- last seen: 2026-11-19T16:52:18Z
 
 ## Quarantined (failed when applied - ignore)
 
