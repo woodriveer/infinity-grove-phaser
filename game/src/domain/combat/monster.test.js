@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DAMAGE_PER_CLICK, DEFAULT_STATS, healthText, MONSTER_MAX_HEALTH, Monster } from './monster';
+import { DAMAGE_PER_CLICK, DEFAULT_STATS, defenseOf, healthText, MONSTER_MAX_HEALTH, Monster } from './monster';
 
 describe('Monster', () => {
     it('starts at 10 health and alive', () => {
@@ -212,5 +212,27 @@ describe('healthText', () => {
         monster.hit(0.05);
 
         expect(healthText(monster)).toBe('HP 2K/2K');
+    });
+});
+
+describe('defenseOf', () => {
+    it('reads defense first', () => {
+        expect(defenseOf({ defense: 40, physicalDefense: 70 })).toBe(40);
+    });
+
+    it('keeps a defense of 0 even when physicalDefense is set', () => {
+        expect(defenseOf({ defense: 0, physicalDefense: 50 })).toBe(0);
+    });
+
+    it('falls back to physicalDefense of an old payload', () => {
+        expect(defenseOf({ physicalDefense: 50, magicalDefense: 10 })).toBe(50);
+    });
+
+    it('never reads magicalDefense', () => {
+        expect(defenseOf({ magicalDefense: 30 })).toBe(0);
+    });
+
+    it('reads 0 without any defense field', () => {
+        expect(defenseOf({ element: 'FIRE' })).toBe(0);
     });
 });

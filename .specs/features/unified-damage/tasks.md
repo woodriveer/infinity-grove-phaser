@@ -381,7 +381,7 @@ private fun load(username: String) =
 
 ---
 
-### T4: Make every hit meet one defense [ ]
+### T4: Make every hit meet one defense [x]
 
 **Owner**: game-dev
 **Goal**: Add `defenseOf(stats)` and make `calculateDamage` read it for every hit, ignoring any damage type (UDMG-01).
@@ -449,8 +449,8 @@ const defense = defenseOf(defender) * (1 - Math.min(100, attacker.armorPierce ??
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] `grep -n "magicalDefense\|damageType ===" game/src/domain/combat/damage.js` finds nothing.
-- [ ] The edited and new tests pass; the whole Vitest suite passes.
+- [x] `grep -n "magicalDefense\|damageType ===" game/src/domain/combat/damage.js` finds nothing.
+- [x] The edited and new tests pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): meet one defense with every hit`
 

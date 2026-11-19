@@ -19,8 +19,8 @@ describe('hitDamage', () => {
         expect(hitDamage({ attacker, percent: 100, damageType: 'PHYSICAL', armorPierce: 30, defender: enemy('FIRE', 50), random: never, ...none }).damage).toBe(1);
     });
 
-    it('uses the magical defense for magical hits', () => {
-        expect(hitDamage({ attacker: PLAYER, percent: 2500, damageType: 'MAGICAL', defender: enemy('FIRE', 90, 20), random: never, ...none }).damage).toBe(20);
+    it('meets the one defense with every hit: 2500 % against physicalDefense 90 deals 2.5', () => {
+        expect(hitDamage({ attacker: PLAYER, percent: 2500, damageType: 'MAGICAL', defender: enemy('FIRE', 90, 20), random: never, ...none }).damage).toBeCloseTo(2.5, 10);
     });
 
     it('deals 1.5 times more with vsDarkness against a darkness monster, and the same against another element', () => {
@@ -121,8 +121,8 @@ describe('debuffs', () => {
         expect(clickDamage({ attacker: PLAYER, defender: enemy('FIRE', 10), random: never, ...brado }).damage).toBe(1);
     });
 
-    it('leaves the magical defense alone under Brado', () => {
-        expect(hitDamage({ attacker: PLAYER, percent: 100, damageType: 'MAGICAL', defender: enemy('FIRE', 0, 50), random: never, buffs: [], debuffs: [ 'brado' ] }).damage).toBe(0.5);
+    it('lowers the one defense under Brado for every hit: defense 50 hit at 100 % deals 0.8', () => {
+        expect(hitDamage({ attacker: PLAYER, percent: 100, damageType: 'MAGICAL', defender: enemy('FIRE', 50, 0), random: never, buffs: [], debuffs: [ 'brado' ] }).damage).toBe(0.8);
     });
 
     it('multiplies magical damage by 1.25 under Prisão and leaves physical alone', () => {

@@ -44,8 +44,8 @@ describe('using a skill', () => {
         expect(monster.dead).toBe(true);
     });
 
-    it('lands Chuva de Meteoros as one magical hit of 25 and Golpe Sangrento as 6', () => {
-        const meteors = monsterOf(1000, stats('FIRE', 90, 20));
+    it('lands Chuva de Meteoros as one hit of 25 (20 on defense 20) and Golpe Sangrento as 6', () => {
+        const meteors = monsterOf(1000, stats('FIRE', 20));
 
         expect(use(combat(), meteors, 'orina', 3).hits).toEqual([ { damage: 20, critical: false } ]);
         expect(use(combat(), monsterOf(), 'vex', 3).hits).toEqual([ { damage: 6, critical: false } ]);
@@ -164,21 +164,21 @@ describe('break talents', () => {
         expect(monster.stats.physicalDefense).toBe(20);
     });
 
-    it('uses the magical break for a magical skill hit and the physical one for a physical hit', () => {
+    it('lowers the one defense of every hit with PHYSICAL_BREAK: Chuva de Meteoros 2250 and Investida 360 against defense 20 with PHYSICAL_BREAK 10', () => {
         const magic = monsterOf(100000, stats('FIRE', 20, 20));
         const physical = monsterOf(100000, stats('FIRE', 20, 20));
 
-        withBreak({ MAGICAL_BREAK: 10 }).use({ heroId: 'orina', slot: 3, unlocked: true, attacker: base100, monster: magic, boss: false });
-        withBreak({ MAGICAL_BREAK: 10 }).use({ heroId: 'kael', slot: 2, unlocked: true, attacker: base100, monster: physical, boss: false });
+        withBreak({ PHYSICAL_BREAK: 10 }).use({ heroId: 'orina', slot: 3, unlocked: true, attacker: base100, monster: magic, boss: false });
+        withBreak({ PHYSICAL_BREAK: 10 }).use({ heroId: 'kael', slot: 2, unlocked: true, attacker: base100, monster: physical, boss: false });
 
-        //  Chuva de Meteoros: 2500 % of 100 against magical defense 20 - 10 = 10 %; Investida: 400 % against physical defense 20 (no physical break)
+        //  Chuva de Meteoros: 2500 % of 100 against defense 20 - 10 = 10 %; Investida: 400 % against the same 10 %
         expect(100000 - magic.health).toBeCloseTo(2250, 6);
-        expect(100000 - physical.health).toBeCloseTo(320, 6);
+        expect(100000 - physical.health).toBeCloseTo(360, 6);
     });
 
-    it('applies the break to a damage tick: Tempestade Arcana on magical defense 20 with MAGICAL_BREAK 5 ticks 200 x 0.85', () => {
-        const skills = withBreak({ MAGICAL_BREAK: 5 });
-        const monster = monsterOf(100000, stats('FIRE', 0, 20));
+    it('applies the break to a damage tick: Tempestade Arcana on defense 20 with PHYSICAL_BREAK 5 ticks 200 x 0.85', () => {
+        const skills = withBreak({ PHYSICAL_BREAK: 5 });
+        const monster = monsterOf(100000, stats('FIRE', 20));
 
         skills.use({ heroId: 'orina', slot: 2, unlocked: true, attacker: base100, monster, boss: false });
         const { hits } = skills.advance(1000, { monster });

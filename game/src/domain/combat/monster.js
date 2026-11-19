@@ -3,6 +3,10 @@ import { formatShort } from './numberFormat';
 export const DAMAGE_PER_CLICK = 1;
 export const MONSTER_MAX_HEALTH = 10;
 
+//  The one defense of a monster's stats (spec unified-damage): `defense`, else `physicalDefense` of a payload from the backend of before
+//  unified-damage (TD-002), else 0. `magicalDefense` is never read.
+export const defenseOf = (stats) => stats.defense ?? stats.physicalDefense ?? 0;
+
 //  A monster without attributes: fire, no defense, no critical resistance
 export const DEFAULT_STATS = { element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 };
 

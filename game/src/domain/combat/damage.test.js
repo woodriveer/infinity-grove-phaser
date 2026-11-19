@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateDamage, formatDamage, MAGICAL, PLAYER } from './damage';
+import { calculateDamage, formatDamage, PLAYER } from './damage';
 
 const enemy = (element, physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element, physicalDefense, magicalDefense, critResistance });
 const never = () => 0.99;
@@ -24,21 +24,31 @@ describe('calculateDamage', () => {
         expect(calculateDamage({ defender: enemy('FIRE'), random: never })).toEqual({ damage: 1, critical: false });
     });
 
-    it('multiplies by 1 minus the physical defense in percent', () => {
-        expect(calculateDamage({ defender: enemy('FIRE', 50, 0), random: never }).damage).toBe(0.5);
+    it('multiplies by 1 minus the defense in percent', () => {
+        expect(calculateDamage({ defender: { element: 'FIRE', defense: 50, critResistance: 0 }, random: never }).damage).toBe(0.5);
     });
 
-    it('ignores the magical defense for a physical click', () => {
+    it('never reads magicalDefense: an old payload with physicalDefense 0 and magicalDefense 80 deals 1', () => {
         expect(calculateDamage({ defender: enemy('FIRE', 0, 80), random: never }).damage).toBe(1);
     });
 
-    it('uses the magical defense, and not the physical one, for magical damage', () => {
-        const attacker = { ...PLAYER, damageType: MAGICAL };
+    it('meets the same defense whatever damageType an older attacker carries: physicalDefense 80 deals 0.2', () => {
+        const attacker = { ...PLAYER, damageType: 'MAGICAL' };
 
-        expect(calculateDamage({ attacker, defender: enemy('FIRE', 80, 20), random: never }).damage).toBeCloseTo(0.8, 10);
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 80, 20), random: never }).damage).toBeCloseTo(0.2, 10);
     });
 
-    it('deals 1 against nature with physical defense 50 and no critical (2 x 0.5)', () => {
+    it('reads defense before physicalDefense: defense 40 and physicalDefense 70 deal 0.6', () => {
+        const defender = { element: 'FIRE', defense: 40, physicalDefense: 70, magicalDefense: 70, critResistance: 0 };
+
+        expect(calculateDamage({ defender, random: never }).damage).toBeCloseTo(0.6, 10);
+    });
+
+    it('meets defense 0 when the stats carry no defense field', () => {
+        expect(calculateDamage({ defender: { element: 'FIRE', critResistance: 0 }, random: never }).damage).toBe(1);
+    });
+
+    it('deals 1 against nature with defense 50 and no critical (2 x 0.5)', () => {
         expect(calculateDamage({ defender: enemy('NATURE', 50), random: never }).damage).toBe(1);
     });
 
@@ -120,7 +130,7 @@ describe('formatDamage', () => {
 });
 
 describe('armor pierce', () => {
-    it('ignores the given percent of the physical defense: 50 % of a 50 defense leaves 25', () => {
+    it('ignores the given percent of the defense: 50 % of a 50 defense leaves 25', () => {
         const attacker = { ...PLAYER, armorPierce: 50 };
 
         expect(calculateDamage({ attacker, defender: enemy('FIRE', 50), random: never }).damage).toBe(0.75);
@@ -131,10 +141,10 @@ describe('armor pierce', () => {
         expect(calculateDamage({ attacker: { ...PLAYER, armorPierce: 150 }, defender: enemy('FIRE', 50), random: never }).damage).toBe(1);
     });
 
-    it('applies to the magical defense for magical damage', () => {
-        const attacker = { ...PLAYER, damageType: MAGICAL, armorPierce: 50 };
+    it('applies to the one defense whatever damageType an older attacker carries: pierce 50 on defense 40 deals 0.8', () => {
+        const attacker = { ...PLAYER, damageType: 'MAGICAL', armorPierce: 50 };
 
-        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 40), random: never }).damage).toBe(0.8);
+        expect(calculateDamage({ attacker, defender: { element: 'FIRE', defense: 40, critResistance: 0 }, random: never }).damage).toBe(0.8);
     });
 
     it('changes nothing when the attacker has none', () => {
