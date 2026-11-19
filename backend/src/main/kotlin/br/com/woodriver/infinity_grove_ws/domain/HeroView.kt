@@ -52,8 +52,9 @@ data class FuseAllView(
     val fusions: Int,
 )
 
-/** Every hero of the catalog as one player sees them, and the id of their leader. */
+/** Every hero of the catalog as one player sees them, the id of their leader and their team. */
 data class HeroesView(
     val leaderId: String,
     val heroes: List<HeroView>,
+    val team: TeamView,
 )

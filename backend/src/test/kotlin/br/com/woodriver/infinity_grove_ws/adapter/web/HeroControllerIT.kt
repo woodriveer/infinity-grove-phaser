@@ -2,14 +2,18 @@ package br.com.woodriver.infinity_grove_ws.adapter.web
 
 import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.adapter.repository.CardCopyEntity
+import br.com.woodriver.infinity_grove_ws.adapter.repository.ProgressEntity
+import br.com.woodriver.infinity_grove_ws.adapter.repository.TeamRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.WalletEntity
 import br.com.woodriver.infinity_grove_ws.domain.CopyKey
+import br.com.woodriver.infinity_grove_ws.domain.Team
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.response.Response
 import io.restassured.specification.RequestSpecification
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasSize
+import org.springframework.beans.factory.annotation.Autowired
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -17,6 +21,21 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class HeroControllerIT : IntegrationTestBase() {
+    @Autowired
+    private lateinit var teamRepository: TeamRepository
+
+    /** Stores the chapters whose boss [username] beat, as the `cleared_chapters` column of `player_cards`. */
+    private fun clear(
+        username: String,
+        chapters: String,
+    ) {
+        jpaPlayerCardsRepository
+            .findById(username)
+            .get()
+            .also { it.clearedChapters = chapters }
+            .let(jpaPlayerCardsRepository::save)
+    }
+
     /** Registers a player over HTTP and returns the `Authorization` header value. */
     private fun register(
         username: String = "yan",
@@ -202,6 +221,104 @@ class HeroControllerIT : IntegrationTestBase() {
 
         leader(token, """{"heroId":"ghost"}""").then().statusCode(404).body("code", equalTo("HERO_NOT_FOUND"))
         leader(token, "{}").then().statusCode(400)
+    }
+
+    @Test
+    fun `GET heroes answers a locked team for a new player`() {
+        val token = register()
+
+        asUser(token)
+            .get("/heroes")
+            .then()
+            .statusCode(200)
+            .body("team.unlocked", equalTo(false))
+            .body("team.openSlots", equalTo(0))
+            .body("team.boughtSlots", equalTo(0))
+            .body("team.slotPrices", equalTo(listOf(10000, 20000, 30000, 40000)))
+            .body("team.allies", equalTo(listOf(null, null, null, null)))
+    }
+
+    @Test
+    fun `GET heroes answers the open slots of the cleared chapters 5 to 8`() {
+        val token = register()
+        clear("yan", "1,2,3,4,5,6")
+
+        asUser(token)
+            .get("/heroes")
+            .then()
+            .statusCode(200)
+            .body("team.unlocked", equalTo(true))
+            .body("team.openSlots", equalTo(2))
+    }
+
+    @Test
+    fun `GET heroes answers the stored allies`() {
+        val token = register()
+        clear("yan", "5")
+        give("yan", "lyra", 0, 1)
+        teamRepository.save("yan", Team(1, listOf("lyra", null, null, null)))
+
+        asUser(token)
+            .get("/heroes")
+            .then()
+            .statusCode(200)
+            .body("team.boughtSlots", equalTo(1))
+            .body("team.allies", equalTo(listOf("lyra", null, null, null)))
+    }
+
+    @Test
+    fun `PUT leader with the hero of ally slot 1 swaps them and answers the team`() {
+        val token = register()
+        clear("yan", "5")
+        give("yan", "lyra", 0, 1)
+        teamRepository.save("yan", Team(1, listOf("lyra", null, null, null)))
+
+        leader(token, """{"heroId":"lyra"}""")
+            .then()
+            .statusCode(200)
+            .body("leaderId", equalTo("lyra"))
+            .body("team.allies", equalTo(listOf("kael", null, null, null)))
+
+        assertEquals(listOf("kael", null, null, null), teamRepository.find("yan").allies)
+    }
+
+    @Test
+    fun `PUT leader with a hero outside the team keeps the allies`() {
+        val token = register()
+        clear("yan", "5")
+        give("yan", "lyra", 0, 1)
+        give("yan", "orina", 0, 1)
+        teamRepository.save("yan", Team(1, listOf("lyra", null, null, null)))
+
+        leader(token, """{"heroId":"orina"}""")
+            .then()
+            .statusCode(200)
+            .body("team.allies", equalTo(listOf("lyra", null, null, null)))
+    }
+
+    @Test
+    fun `an account reset keeps the team`() {
+        val token = register()
+        clear("yan", "5,6")
+        jpaProgressRepository.save(ProgressEntity("yan", 6, 1, "PHASE", 1, false))
+        give("yan", "lyra", 0, 1)
+        teamRepository.save("yan", Team(2, listOf("lyra", null, null, null)))
+
+        asUser(token)
+            .contentType(ContentType.JSON)
+            .body("""{"fromChapter":6}""")
+            .post("/account/reset")
+            .then()
+            .statusCode(200)
+
+        asUser(token)
+            .get("/heroes")
+            .then()
+            .statusCode(200)
+            .body("team.unlocked", equalTo(true))
+            .body("team.openSlots", equalTo(2))
+            .body("team.boughtSlots", equalTo(2))
+            .body("team.allies", equalTo(listOf("lyra", null, null, null)))
     }
 
     @Test

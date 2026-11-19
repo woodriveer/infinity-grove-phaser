@@ -457,7 +457,7 @@ Plus the renamed `PreviousBackendCompatibilityIT` test must pass with `PREVIOUS_
 
 ---
 
-### T3: Answer the team in `GET /heroes` and swap it in `PUT /leader` [ ]
+### T3: Answer the team in `GET /heroes` and swap it in `PUT /leader` [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: `GET /heroes` answers the team payload; `PUT /leader` with an ally swaps the two and answers the team (TEAM-01 AC 1, 2; TEAM-04 AC 18, 19, 20).
@@ -577,8 +577,8 @@ data class LeaderResponse(
 **Gate**: full - `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] `GET /heroes` and `PUT /leader` carry `team`; the existing hero tests still pass unchanged apart from the constructor and `.leaderId`.
-- [ ] The 7 new `HeroServiceTest` cases and 6 new `HeroControllerIT` cases pass; the whole backend suite passes.
+- [x] `GET /heroes` and `PUT /leader` carry `team`; the existing hero tests still pass unchanged apart from the constructor and `.leaderId`.
+- [x] The 7 new `HeroServiceTest` cases and 6 new `HeroControllerIT` cases pass; the whole backend suite passes.
 
 **Commit**: `feat(backend): answer the team with the heroes and swap it on a leader change`
 

@@ -3,6 +3,7 @@ package br.com.woodriver.infinity_grove_ws.usecase
 import br.com.woodriver.infinity_grove_ws.domain.FuseAllView
 import br.com.woodriver.infinity_grove_ws.domain.HeroView
 import br.com.woodriver.infinity_grove_ws.domain.HeroesView
+import br.com.woodriver.infinity_grove_ws.domain.LeaderChange
 
 interface ListHeroesUseCase {
     /** Returns the whole catalog as the player sees it: chapters, copies, stars and unlocked skills, and the leader. */
@@ -27,9 +28,9 @@ interface FuseAllCardsUseCase {
 }
 
 interface SetLeaderUseCase {
-    /** Makes [heroId], which the player must own, the leader and returns its id. */
+    /** Makes [heroId], which the player must own, the leader; a hero of an ally slot swaps with the old leader. */
     fun setLeader(
         username: String,
         heroId: String,
-    ): String
+    ): LeaderChange
 }

@@ -5,11 +5,14 @@ import br.com.woodriver.infinity_grove_ws.domain.Hero
 import br.com.woodriver.infinity_grove_ws.domain.HeroNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.HeroView
 import br.com.woodriver.infinity_grove_ws.domain.HeroesView
+import br.com.woodriver.infinity_grove_ws.domain.LeaderChange
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCardsMissingException
+import br.com.woodriver.infinity_grove_ws.domain.TeamView
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.port.HeroRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.TeamRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.usecase.FuseAllCardsUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.FuseCardsUseCase
@@ -25,6 +28,7 @@ class HeroService(
     private val heroRepository: HeroRepositoryPort,
     private val playerCardsRepository: PlayerCardsRepositoryPort,
     private val userRepository: UserRepositoryPort,
+    private val teamRepository: TeamRepositoryPort,
 ) : ListHeroesUseCase,
     FuseCardsUseCase,
     FuseAllCardsUseCase,
@@ -32,7 +36,11 @@ class HeroService(
     override fun list(username: String): HeroesView {
         logger.info("Listing heroes username={}", username)
         val cards = load(username)
-        return HeroesView(cards.leaderId, heroRepository.findAll().map { HeroView.of(it, cards) })
+        return HeroesView(
+            cards.leaderId,
+            heroRepository.findAll().map { HeroView.of(it, cards) },
+            TeamView.of(teamRepository.find(username), cards.bosses),
+        )
     }
 
     override fun fuse(
@@ -61,12 +69,16 @@ class HeroService(
     override fun setLeader(
         username: String,
         heroId: String,
-    ): String {
+    ): LeaderChange {
         logger.info("Setting leader username={} hero={}", username, heroId)
         requireHero(heroId)
-        val changed = load(username).withLeader(heroId)
+        val cards = load(username)
+        val changed = cards.withLeader(heroId)
+        val before = teamRepository.find(username)
+        val team = before.afterLeaderChange(cards.leaderId, heroId)
         playerCardsRepository.save(changed)
-        return changed.leaderId
+        if (team != before) teamRepository.save(username, team)
+        return LeaderChange(changed.leaderId, TeamView.of(team, changed.bosses))
     }
 
     private fun requireHero(heroId: String): Hero =

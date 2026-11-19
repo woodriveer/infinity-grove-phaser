@@ -4,6 +4,7 @@ import br.com.woodriver.infinity_grove_ws.domain.HeroView
 import br.com.woodriver.infinity_grove_ws.domain.HeroesView
 import br.com.woodriver.infinity_grove_ws.domain.InvalidFusionException
 import br.com.woodriver.infinity_grove_ws.domain.SkillView
+import br.com.woodriver.infinity_grove_ws.domain.TeamView
 import br.com.woodriver.infinity_grove_ws.usecase.FuseAllCardsUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.FuseCardsUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.ListHeroesUseCase
@@ -72,12 +73,26 @@ data class HeroResponse(
     }
 }
 
+/** The team payload of spec hero-team: one object in GET /heroes, PUT /leader, PUT /team, POST /team/slots and the 409 body. */
+data class TeamResponse(
+    val unlocked: Boolean,
+    val openSlots: Int,
+    val boughtSlots: Int,
+    val slotPrices: List<Long>,
+    val allies: List<String?>,
+) {
+    companion object {
+        fun from(view: TeamView) = TeamResponse(view.unlocked, view.openSlots, view.boughtSlots, view.slotPrices, view.allies)
+    }
+}
+
 data class HeroesResponse(
     val leaderId: String,
     val heroes: List<HeroResponse>,
+    val team: TeamResponse,
 ) {
     companion object {
-        fun from(view: HeroesView) = HeroesResponse(view.leaderId, view.heroes.map(HeroResponse::from))
+        fun from(view: HeroesView) = HeroesResponse(view.leaderId, view.heroes.map(HeroResponse::from), TeamResponse.from(view.team))
     }
 }
 
@@ -88,6 +103,7 @@ data class FuseAllResponse(
 
 data class LeaderResponse(
     val leaderId: String,
+    val team: TeamResponse,
 )
 
 @RestController
@@ -126,6 +142,7 @@ class HeroController(
     ): LeaderResponse {
         val heroId = body["heroId"] as? String
         require(!heroId.isNullOrBlank()) { "heroId must not be blank" }
-        return LeaderResponse(setLeader.setLeader(principal.name, heroId))
+        val change = setLeader.setLeader(principal.name, heroId)
+        return LeaderResponse(change.leaderId, TeamResponse.from(change.team))
     }
 }

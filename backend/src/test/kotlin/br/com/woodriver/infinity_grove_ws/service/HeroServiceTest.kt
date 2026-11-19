@@ -2,8 +2,10 @@ package br.com.woodriver.infinity_grove_ws.service
 
 import br.com.woodriver.infinity_grove_ws.InMemoryHeroRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryTeamRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
 import br.com.woodriver.infinity_grove_ws.LogCapture
+import br.com.woodriver.infinity_grove_ws.domain.BossRecord
 import br.com.woodriver.infinity_grove_ws.domain.CopyKey
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.HeroNotFoundException
@@ -14,6 +16,8 @@ import br.com.woodriver.infinity_grove_ws.domain.NotEnoughCardsException
 import br.com.woodriver.infinity_grove_ws.domain.NothingToFuseException
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCardsMissingException
+import br.com.woodriver.infinity_grove_ws.domain.Team
+import br.com.woodriver.infinity_grove_ws.domain.TeamView
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import kotlin.test.Test
@@ -26,15 +30,17 @@ class HeroServiceTest {
     private val heroes = InMemoryHeroRepository(*HeroSeed.heroes().toTypedArray())
     private val cards = InMemoryPlayerCardsRepository()
     private val users = InMemoryUserRepository()
-    private val service = HeroService(heroes, cards, users)
+    private val teams = InMemoryTeamRepository()
+    private val service = HeroService(heroes, cards, users, teams)
 
     private fun player(
         start: Element = Element.FIRE,
         extra: Map<CopyKey, Int> = emptyMap(),
+        cleared: Set<Int> = emptySet(),
     ): PlayerCards {
         users.save(User("yan", "hash", 1L, 1L))
         val started = PlayerCards.start("yan", start, HeroSeed.heroes())
-        return cards.save(started.copy(copies = started.copies + extra))
+        return cards.save(started.copy(copies = started.copies + extra, bosses = BossRecord(cleared)))
     }
 
     @Test
@@ -168,10 +174,78 @@ class HeroServiceTest {
     fun `set leader stores an owned hero`() {
         player(extra = mapOf(CopyKey("lyra", 0) to 1))
 
-        assertEquals("lyra", service.setLeader("yan", "lyra"))
+        assertEquals("lyra", service.setLeader("yan", "lyra").leaderId)
 
         assertEquals("lyra", cards.cards.getValue("yan").leaderId)
         assertEquals("lyra", service.list("yan").leaderId)
+    }
+
+    @Test
+    fun `list answers a locked team for a player who never won the chapter 5 boss`() {
+        player()
+
+        assertEquals(TeamView(false, 0, 0, Team.SLOT_PRICES, listOf(null, null, null, null)), service.list("yan").team)
+    }
+
+    @Test
+    fun `list answers the stored team with the open slots of the cleared chapters`() {
+        player(extra = mapOf(CopyKey("lyra", 0) to 1, CopyKey("orina", 0) to 1), cleared = setOf(5, 6, 7))
+        teams.save("yan", Team(2, listOf("lyra", "orina", null, null)))
+
+        assertEquals(TeamView(true, 3, 2, Team.SLOT_PRICES, listOf("lyra", "orina", null, null)), service.list("yan").team)
+    }
+
+    @Test
+    fun `set leader to the hero of ally slot 2 puts the old leader in slot 2`() {
+        player(extra = mapOf(CopyKey("lyra", 0) to 1, CopyKey("orina", 0) to 1), cleared = setOf(5, 6))
+        teams.save("yan", Team(2, listOf("lyra", "orina", null, null)))
+
+        val change = service.setLeader("yan", "orina")
+
+        assertEquals("orina", change.leaderId)
+        assertEquals(listOf("lyra", "kael", null, null), change.team.allies)
+        assertEquals(listOf("lyra", "kael", null, null), teams.find("yan").allies)
+    }
+
+    @Test
+    fun `set leader to a hero outside the team keeps the allies`() {
+        player(extra = mapOf(CopyKey("lyra", 0) to 1, CopyKey("seraphine", 0) to 1), cleared = setOf(5))
+        teams.save("yan", Team(1, listOf("lyra", null, null, null)))
+
+        val change = service.setLeader("yan", "seraphine")
+
+        assertEquals(listOf("lyra", null, null, null), change.team.allies)
+    }
+
+    @Test
+    fun `set leader without a team stores no team row`() {
+        player(extra = mapOf(CopyKey("lyra", 0) to 1))
+
+        service.setLeader("yan", "lyra")
+
+        assertFalse(teams.teams.containsKey("yan"))
+    }
+
+    @Test
+    fun `set leader to the current leader keeps the team`() {
+        player(extra = mapOf(CopyKey("lyra", 0) to 1), cleared = setOf(5))
+        teams.save("yan", Team(1, listOf("lyra", null, null, null)))
+
+        val change = service.setLeader("yan", "kael")
+
+        assertEquals("kael", change.leaderId)
+        assertEquals(listOf("lyra", null, null, null), change.team.allies)
+        assertEquals(Team(1, listOf("lyra", null, null, null)), teams.find("yan"))
+    }
+
+    @Test
+    fun `a refused leader change keeps the team`() {
+        player(extra = mapOf(CopyKey("lyra", 0) to 1), cleared = setOf(5))
+        teams.save("yan", Team(1, listOf("lyra", null, null, null)))
+
+        assertFailsWith<HeroNotOwnedException> { service.setLeader("yan", "vex") }
+
+        assertEquals(Team(1, listOf("lyra", null, null, null)), teams.find("yan"))
     }
 
     @Test
