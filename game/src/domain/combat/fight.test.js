@@ -103,6 +103,16 @@ describe('Fight', () => {
         expect(fight.defenseBonus()).toBe(0);
     });
 
+    it('an add of buff 1 raises the guarded defense by 1 and one of buff 0 by nothing', () => {
+        const small = new Fight(mainMonster(), [ add(30, 1), add(30, 0) ]);
+
+        expect(small.defenseBonus()).toBe(1);
+        expect(small.statsOf(small.main).defense).toBe(50);
+        const none = new Fight(mainMonster(), [ add(30, 0), add(30, 0) ]);
+
+        expect(none.statsOf(none.main)).toBe(none.main.stats);
+    });
+
     it('E1: the chapter 11 stage 1 miniboss defends 90, 79 and 49 with 2, 1 and 0 adds alive', () => {
         const fight = twoAdds();
 

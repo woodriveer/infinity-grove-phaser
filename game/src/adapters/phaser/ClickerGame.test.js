@@ -6012,6 +6012,46 @@ describe('ClickerGame miniboss target', () => {
         expect(healthOf(ctx, 2)).toBe(30);
     });
 
+    //  The bodies of the Fight Layout: Lacaio 1 x 425 to 535, y 297.5 to 422.5; Lacaio 2 x 425 to 535, y 477.5 to 602.5; miniboss x 560 to 780, y 315 to 565
+    it('a click just inside the body of an add or of the miniboss picks that monster', async () => {
+        const ctx = await addsScene();
+        const { fight } = ctx.scene;
+        const inside = [
+            [ { x: 426, y: 299 }, fight.adds[0].monster ], [ { x: 534, y: 601 }, fight.adds[1].monster ], [ { x: 562, y: 317 }, fight.main ],
+            [ { x: 534, y: 421 }, fight.adds[0].monster ], [ { x: 426, y: 479 }, fight.adds[1].monster ], [ { x: 778, y: 563 }, fight.main ]
+        ];
+
+        inside.forEach(([ pointer, monster ]) =>
+        {
+            ctx.click(pointer);
+
+            expect(fight.target).toBe(monster);
+        });
+    });
+
+    it('a click just outside every body hits the target and keeps it', async () => {
+        const ctx = await addsScene();
+        const { fight } = ctx.scene;
+        const outside = [
+            { x: 540, y: 360 }, { x: 420, y: 360 }, { x: 480, y: 295 }, { x: 480, y: 425 }, { x: 480, y: 475 }, { x: 480, y: 605 },
+            { x: 555, y: 440 }, { x: 785, y: 440 }, { x: 670, y: 312 }, { x: 670, y: 568 }
+        ];
+
+        ctx.click(lacaio2);
+
+        outside.forEach((pointer) =>
+        {
+            ctx.click(pointer);
+
+            expect(fight.target).toBe(fight.adds[1].monster);
+        });
+
+        expect(healthOf(ctx, 2)).toBeCloseTo(30 - 1 - outside.length, 9);
+        expect(healthOf(ctx, 1)).toBe(30);
+        expect(ctx.scene.monster.health).toBe(100);
+        expect([ lastText(ctx).x, lastText(ctx).y ]).toEqual([ 480, 540 ]);
+    });
+
     it('the target goes back to the miniboss when the target add dies', async () => {
         const ctx = await addsScene();
 
