@@ -2552,7 +2552,7 @@ Checks per screen: every size, color, border style, opacity and text of the spec
 
 ---
 
-### T28: Keep the Equipe panel from moving when the purchase dialog or the notice shows [ ]
+### T28: Keep the Equipe panel from moving when the purchase dialog or the notice shows [x]
 
 **Owner**: game-dev
 **Goal**: The panel keeps its height and position when `team-buy-dialog` and `team-notice` appear (UI review finding #1, TEAM-09).
@@ -2560,7 +2560,7 @@ Checks per screen: every size, color, border style, opacity and text of the spec
 **Contract**: Reserve the room of the notice line and the dialog (or float them over the panel) so the slot row stays at the same y in `03-team-buyable`, `04-team-dialog` and `06-team-bought` (today 222, 173 and 235 px on screen).
 **Tests**: e2e: the box of `team-slot-1` is equal before and after the click on it, and after the purchase notice shows.
 **Gate**: `cd game && npm test && npx playwright test heroTeam`
-**Done when**: [ ] the slot row does not move in any of the three states.
+**Done when**: [x] the slot row does not move in any of the three states.
 **Commit**: `fix(game): keep the Equipe panel steady on purchase`
 
 ---

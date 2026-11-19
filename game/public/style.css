@@ -3312,7 +3312,9 @@ body.piece-dragging .piece-tooltip {
 /* ══ Equipe (spec hero-team) ══ */
 .team-screen { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .team-status { margin: 0; font-family: var(--font-body); font-weight: 600; font-size: 14px; color: var(--ember-700); }
-.team-notice { margin: 0; font-family: var(--font-body); font-weight: 700; font-size: 14px; color: var(--ink-900); }
+/* The room of the notice (its line and one gap) stays reserved on the next line while it is hidden, so the panel does not move when it shows or goes */
+.team-notice { margin: 0; min-height: 18px; font-family: var(--font-body); font-weight: 700; font-size: 14px; line-height: 18px; color: var(--ink-900); }
+.team-notice[hidden] + .team-dps { margin-top: 30px; }
 .team-dps { margin: 0; font-family: var(--font-heading); font-weight: 700; font-size: 18px; color: var(--ink-900); }
 .team-slots { display: flex; gap: 16px; justify-content: center; }
 .team-slot { box-sizing: border-box; width: 132px; height: 210px; padding: 8px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; background: transparent; border: 2px solid var(--wood-600); font: inherit; color: var(--ink-900); cursor: pointer; }
@@ -3335,7 +3337,8 @@ body.piece-dragging .piece-tooltip {
 .team-coin { display: block; width: 32px; height: 32px; margin-top: 40px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff1b0, #e0b45a 55%, #8a5a12); box-shadow: 0 0 0 1px var(--wood-900), inset 0 -2px 0 rgb(0 0 0 / 0.3); }
 .team-price { font-family: var(--font-heading); font-weight: 700; font-size: 22px; color: var(--ink-900); }
 .team-lock-text { font-family: var(--font-body); font-weight: 500; font-size: 11px; color: var(--ink-600); }
-.team-buy-dialog { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--parchment-100); border: var(--inset-border); }
+/* The dialog floats under the slot row: its margin cancels its height and the gap, so the panel keeps its height and nothing moves when it opens */
+.team-buy-dialog { --buy-dialog-height: 116px; position: relative; z-index: 1; box-sizing: border-box; height: var(--buy-dialog-height); margin-bottom: calc(-1 * (var(--buy-dialog-height) + 12px)); display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--parchment-100); border: var(--inset-border); box-shadow: var(--panel-shadow); }
 .team-buy-question { margin: 0; font-family: var(--font-body); font-weight: 600; font-size: 14px; }
 .team-buy-short { margin: 0; font-family: var(--font-body); font-weight: 600; font-size: 13px; color: var(--ember-700); }
 .team-buy-actions,
@@ -3345,6 +3348,7 @@ body.piece-dragging .piece-tooltip {
 .team-hero { box-sizing: border-box; width: 200px; height: 80px; padding: 8px; display: flex; align-items: center; gap: 8px; border-radius: var(--radius-md); background: var(--parchment-100); border: var(--inset-border); font: inherit; color: var(--ink-900); text-align: left; cursor: pointer; }
 .team-slot:disabled,
 .team-hero:disabled { cursor: default; }
+.team-hero-portrait { opacity: 0.6; }
 .team-hero-portrait { width: 64px; height: 64px; object-fit: contain; }
 .team-hero-text { display: flex; flex-direction: column; gap: 2px; }
 .team-hero-name { font-family: var(--font-body); font-weight: 700; font-size: 13px; }

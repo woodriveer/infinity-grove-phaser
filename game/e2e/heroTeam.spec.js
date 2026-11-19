@@ -256,6 +256,49 @@ test.describe('Hero team: Equipe screen', () => {
         await expect(slot(page, 1)).toHaveCSS('border-top-style', 'dashed');
     });
 
+    test('the slot row and the panel stay put when the purchase dialog opens, when the notice shows and when it goes', async ({ page }) => {
+        await startTeam(page, { cleared: [ 5 ], copper: 10_000 });
+        await openTeam(page);
+
+        const windowOf = () => sceneBox(page, page.locator('.hero-window'));
+        const before = await sceneBox(page, slot(page, 1));
+        const windowBefore = await windowOf();
+
+        await slot(page, 1).click();
+        await expect(page.getByTestId('team-buy-dialog')).toBeVisible();
+
+        expect(await sceneBox(page, slot(page, 1))).toEqual(before);
+        expect(await windowOf()).toEqual(windowBefore);
+
+        //  The notice and the flash are timers of the scene clock, which moves only with `tick` while the loop sleeps
+        await page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
+        await page.getByTestId('team-buy-confirm').click();
+        await expect(page.getByTestId('team-notice')).toBeVisible();
+
+        expect(await sceneBox(page, slot(page, 1))).toEqual(before);
+        expect(await windowOf()).toEqual(windowBefore);
+
+        await tick(page, 3_000);
+        await expect(page.getByTestId('team-notice')).toBeHidden();
+
+        expect(await sceneBox(page, slot(page, 1))).toEqual(before);
+        expect(await windowOf()).toEqual(windowBefore);
+    });
+
+    test('the slot row stays put when the dialog shows Moedas insuficientes', async ({ page }) => {
+        await startTeam(page, { cleared: [ 5 ], copper: 5_000 });
+        await openTeam(page);
+
+        const before = await sceneBox(page, slot(page, 1));
+        const windowBefore = await sceneBox(page, page.locator('.hero-window'));
+
+        await slot(page, 1).click();
+        await expect(page.locator('.team-buy-short')).toBeVisible();
+
+        expect(await sceneBox(page, slot(page, 1))).toEqual(before);
+        expect(await sceneBox(page, page.locator('.hero-window'))).toEqual(windowBefore);
+    });
+
     test('Comprar is disabled while the purchase runs', async ({ page }) => {
         const handle = await startTeam(page, { cleared: [ 5 ], copper: 10_000 });
 
