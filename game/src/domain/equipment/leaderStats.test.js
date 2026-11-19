@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { NO_PASSIVES } from '../heroes/team';
 import { leaderStats } from './leaderStats';
 
 const kael = (stars = 0) => ({ id: 'kael', element: 'FIRE', stars });
@@ -120,5 +121,55 @@ describe('leaderStats', () => {
         expect(kaelLines.clickDamage).toBe('Dano de clique: 3.2');
         expect(kaelLines.critChance).toBe('Chance de crítico: 70%');
         expect(kaelLines.critDamage).toBe('Dano crítico: x4');
+    });
+});
+
+describe('leaderStats with the team passives', () => {
+    const passives = (extra) => ({ ...NO_PASSIVES, ...extra });
+
+    it('P10: Lyra, Kael, Orina and Vex as allies read 20 %, 5 s, 5 s, 15 and 15', () => {
+        const shown = lines({
+            leader: kael(), passives: passives({ bossTimeMs: 5000, critChance: 10, defenseBreak: 15, critResistBreak: 15 })
+        });
+
+        expect(shown.critChance).toBe('Chance de crítico: 20%');
+        expect(shown.minibossTime).toBe('Tempo extra de miniboss: 5s');
+        expect(shown.bossTime).toBe('Tempo extra de chefe: 5s');
+        expect(shown.breakDefense).toBe('Quebra de defesa: 15');
+        expect(shown.breakCrit).toBe('Quebra de resistência a crítico: 15');
+    });
+
+    it('Lyra alone raises only the critical chance', () => {
+        const shown = lines({ leader: kael(), passives: passives({ critChance: 10 }) });
+
+        expect(shown.critChance).toBe('Chance de crítico: 20%');
+        expect(shown.minibossTime).toBe('Tempo extra de miniboss: 0s');
+        expect(shown.bossTime).toBe('Tempo extra de chefe: 0s');
+        expect(shown.breakDefense).toBe('Quebra de defesa: 0');
+        expect(shown.breakCrit).toBe('Quebra de resistência a crítico: 0');
+    });
+
+    it('Kael adds 5 s to the talent seconds', () => {
+        const shown = lines({ leader: kael(), talents: talents({ MINIBOSS_TIME: 4 }), passives: passives({ bossTimeMs: 5000 }) });
+
+        expect(shown.minibossTime).toBe('Tempo extra de miniboss: 9s');
+    });
+
+    it('Orina adds 15 to PHYSICAL_BREAK 3', () => {
+        const shown = lines({ leader: kael(), talents: talents({ PHYSICAL_BREAK: 3 }), passives: passives({ defenseBreak: 15 }) });
+
+        expect(shown.breakDefense).toBe('Quebra de defesa: 18');
+    });
+
+    it('Vex adds 15 to the critical resistance break', () => {
+        const shown = lines({ leader: kael(), passives: passives({ critResistBreak: 15 }) });
+
+        expect(shown.breakCrit).toBe('Quebra de resistência a crítico: 15');
+    });
+
+    it('without passives the lines are the ones of before', () => {
+        const input = { leader: lyra(3), pieces: [ piece([ affix('BOSS_TIME_SECONDS', 2) ]) ], talents: talents({ PHYSICAL_BREAK: 3 }) };
+
+        expect(leaderStats(input)).toEqual(leaderStats({ ...input, passives: NO_PASSIVES }));
     });
 });

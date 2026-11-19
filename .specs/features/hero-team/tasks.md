@@ -1279,7 +1279,7 @@ Test helpers: `const hitter = (base) => ({ baseDamage: base })`; `const hit = vi
 
 ---
 
-### T12: Show the passives in the attribute panel [ ]
+### T12: Show the passives in the attribute panel [x]
 
 **Owner**: game-dev
 **Goal**: The attribute panel of the Equipamento screen counts the team passives that apply now, from the same builders as the combat (TEAM-11 AC 9, AD-012).
@@ -1325,7 +1325,7 @@ export const leaderStats = ({ leader, pieces = [], talents = null, passives = NO
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] The 6 new cases and every existing case pass; the whole Vitest suite passes.
+- [x] The 6 new cases and every existing case pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): count the team passives in the attribute panel`
 

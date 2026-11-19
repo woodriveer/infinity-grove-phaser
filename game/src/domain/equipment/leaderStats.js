@@ -3,6 +3,7 @@
 //  `leader` is a hero of the heroes payload, `pieces` the pieces it wears and `talents` the list of the backend (or null).
 import { leaderAttacker } from '../combat/leaderAttacker';
 import { ELEMENT_LABELS } from '../heroes/heroes';
+import { NO_PASSIVES } from '../heroes/team';
 import { talentValue } from '../talents/talents';
 import { bossTimeBonusMs } from './equipment';
 
@@ -12,10 +13,12 @@ const one = (value) => String(Math.round(value * 10) / 10);
 //  At most two decimals without a trailing zero (the critical multiplier)
 const two = (value) => String(Math.round(value * 100) / 100);
 
-export const leaderStats = ({ leader, pieces = [], talents = null }) =>
+//  `passives`: the team passives that apply now (spec hero-team): Lyra in the critical chance, Kael in both time lines, Orina in the
+//  defense break line and Vex in the critical resistance break line
+export const leaderStats = ({ leader, pieces = [], talents = null, passives = NO_PASSIVES }) =>
 {
-    const attacker = leaderAttacker({ leader, pieces, talents });
-    const equipmentSeconds = bossTimeBonusMs(pieces) / 1000;
+    const attacker = leaderAttacker({ leader, pieces, talents, passives });
+    const equipmentSeconds = bossTimeBonusMs(pieces) / 1000 + passives.bossTimeMs / 1000;
 
     return [
         { id: 'element', text: `Elemento: ${ELEMENT_LABELS[leader.element]}` },
@@ -26,7 +29,7 @@ export const leaderStats = ({ leader, pieces = [], talents = null }) =>
         { id: 'bossDamage', text: `Dano em chefes: ${one(attacker.bossDamage ?? 0)}%` },
         { id: 'minibossTime', text: `Tempo extra de miniboss: ${one(equipmentSeconds + talentValue(talents, 'MINIBOSS_TIME'))}s` },
         { id: 'bossTime', text: `Tempo extra de chefe: ${one(equipmentSeconds + talentValue(talents, 'BOSS_TIME'))}s` },
-        { id: 'breakDefense', text: `Quebra de defesa: ${talentValue(talents, 'PHYSICAL_BREAK')}` },
-        { id: 'breakCrit', text: `Quebra de resistência a crítico: ${talentValue(talents, 'CRIT_RESIST_BREAK')}` }
+        { id: 'breakDefense', text: `Quebra de defesa: ${talentValue(talents, 'PHYSICAL_BREAK') + passives.defenseBreak}` },
+        { id: 'breakCrit', text: `Quebra de resistência a crítico: ${talentValue(talents, 'CRIT_RESIST_BREAK') + passives.critResistBreak}` }
     ];
 };
