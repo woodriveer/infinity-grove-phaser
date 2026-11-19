@@ -4,7 +4,7 @@ import { addBonuses, BRANCH_TITLES, describeTalentEffect, monsterAfterBreak, tal
 
 //  The tree as the backend answers it: value is level x perLevel
 const tree = (levels = {}) => [
-    [ 'MINIBOSS_TIME', 2 ], [ 'BOSS_TIME', 3 ], [ 'PHYSICAL_BREAK', 1 ], [ 'MAGICAL_BREAK', 1 ], [ 'CRIT_RESIST_BREAK', 1 ],
+    [ 'MINIBOSS_TIME', 2 ], [ 'BOSS_TIME', 3 ], [ 'PHYSICAL_BREAK', 1 ], [ 'CRIT_RESIST_BREAK', 1 ],
     [ 'CLICK_DAMAGE', 5 ], [ 'CRIT_CHANCE', 1 ], [ 'CRIT_DAMAGE', 5 ], [ 'COMBO', 5 ], [ 'CLICK_FLAT_DAMAGE', 2 ]
 ].map(([ id, perLevel ]) => {
     const level = levels[id] ?? 0;
@@ -12,7 +12,7 @@ const tree = (levels = {}) => [
     return { id, perLevel, level, value: level === 0 ? 0 : perLevel * level - (id === 'CLICK_FLAT_DAMAGE' ? 1 : 0) };
 });
 
-const monster = (physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element: 'FIRE', physicalDefense, magicalDefense, critResistance });
+const monster = (defense = 0, critResistance = 0) => ({ element: 'FIRE', defense, critResistance });
 
 describe('talentValue', () => {
     it('reads the value the backend sent', () => {
@@ -77,32 +77,47 @@ describe('addBonuses', () => {
 });
 
 describe('monsterAfterBreak', () => {
-    it('lowers the physical defense by 3 points with PHYSICAL_BREAK 3 and leaves the rest', () => {
-        expect(monsterAfterBreak(monster(10, 10, 10), tree({ PHYSICAL_BREAK: 3 }))).toEqual(monster(7, 10, 10));
+    it('lowers the defense by 3 points with PHYSICAL_BREAK 3 and leaves the rest', () => {
+        expect(monsterAfterBreak(monster(10, 10), tree({ PHYSICAL_BREAK: 3 }))).toEqual(monster(7, 10));
     });
 
-    it('lowers the magical defense by 3 points with MAGICAL_BREAK 3 and leaves the rest', () => {
-        expect(monsterAfterBreak(monster(10, 10, 10), tree({ MAGICAL_BREAK: 3 }))).toEqual(monster(10, 7, 10));
+    it('ignores a MAGICAL_BREAK entry of an older talent list', () => {
+        expect(monsterAfterBreak(monster(10, 10), [ { id: 'MAGICAL_BREAK', value: 3 } ])).toEqual(monster(10, 10));
     });
 
     it('lowers the critical resistance by 8 points with CRIT_RESIST_BREAK 8', () => {
-        expect(monsterAfterBreak(monster(10, 10, 20), tree({ CRIT_RESIST_BREAK: 8 }))).toEqual(monster(10, 10, 12));
+        expect(monsterAfterBreak(monster(10, 20), tree({ CRIT_RESIST_BREAK: 8 }))).toEqual(monster(10, 12));
     });
 
     it('never goes below 0', () => {
-        expect(monsterAfterBreak(monster(2, 1, 0), tree({ PHYSICAL_BREAK: 5, MAGICAL_BREAK: 5, CRIT_RESIST_BREAK: 5 }))).toEqual(monster(0, 0, 0));
+        expect(monsterAfterBreak(monster(2, 0), tree({ PHYSICAL_BREAK: 5, CRIT_RESIST_BREAK: 5 }))).toEqual(monster(0, 0));
     });
 
     it('keeps the element and changes nothing without talents', () => {
-        expect(monsterAfterBreak({ ...monster(10, 10, 10), element: 'WATER' }, null)).toEqual({ ...monster(10, 10, 10), element: 'WATER' });
+        expect(monsterAfterBreak({ ...monster(10, 10), element: 'WATER' }, null)).toEqual({ ...monster(10, 10), element: 'WATER' });
     });
 
     it('does not change the stats it was given', () => {
-        const stats = monster(10, 10, 10);
+        const stats = monster(10, 10);
 
         monsterAfterBreak(stats, tree({ PHYSICAL_BREAK: 3 }));
 
-        expect(stats).toEqual(monster(10, 10, 10));
+        expect(stats).toEqual(monster(10, 10));
+    });
+
+    it('reads physicalDefense of an old payload and writes defense', () => {
+        expect(monsterAfterBreak({ element: 'FIRE', physicalDefense: 20, magicalDefense: 20, critResistance: 0 }, tree({ PHYSICAL_BREAK: 5 })))
+            .toEqual({ element: 'FIRE', physicalDefense: 20, magicalDefense: 20, critResistance: 0, defense: 15 });
+    });
+
+    it('takes the defense to 0, not below, when the break is larger: defense 10 and PHYSICAL_BREAK 15', () => {
+        expect(monsterAfterBreak(monster(10, 0), tree({ PHYSICAL_BREAK: 15 }))).toEqual(monster(0, 0));
+    });
+
+    it('adds the grades of the break: PHYSICAL_BREAK 10 and PHYSICAL_BREAK_G2 value 4 take defense 20 to 6', () => {
+        const talents = [ { id: 'PHYSICAL_BREAK', value: 10 }, { id: 'PHYSICAL_BREAK_G2', baseId: 'PHYSICAL_BREAK', value: 4 } ];
+
+        expect(monsterAfterBreak(monster(20, 0), talents)).toEqual(monster(6, 0));
     });
 });
 
@@ -161,9 +176,9 @@ describe('describeTalentEffect', () => {
 });
 
 describe('talentIconName and the branch titles', () => {
-    it('names the 8 icons as the asset prompts do', () => {
-        expect([ 'MINIBOSS_TIME', 'BOSS_TIME', 'PHYSICAL_BREAK', 'MAGICAL_BREAK', 'CRIT_RESIST_BREAK', 'CLICK_DAMAGE', 'CRIT_CHANCE', 'CRIT_DAMAGE' ].map((id) => talentIconName(id))).toEqual([
-            'talent-miniboss-time', 'talent-boss-time', 'talent-break-physical', 'talent-break-magical', 'talent-break-crit', 'talent-click-damage', 'talent-crit-chance', 'talent-crit-damage'
+    it('names the 7 icons as the asset prompts do', () => {
+        expect([ 'MINIBOSS_TIME', 'BOSS_TIME', 'PHYSICAL_BREAK', 'CRIT_RESIST_BREAK', 'CLICK_DAMAGE', 'CRIT_CHANCE', 'CRIT_DAMAGE' ].map((id) => talentIconName(id))).toEqual([
+            'talent-miniboss-time', 'talent-boss-time', 'talent-break-physical', 'talent-break-crit', 'talent-click-damage', 'talent-crit-chance', 'talent-crit-damage'
         ]);
     });
 

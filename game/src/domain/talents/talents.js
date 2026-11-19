@@ -2,6 +2,7 @@
 //  ({ id, branch, label, unit, perLevel, maxLevel, level, value, nextCost }); the game types no number of the catalog, it reads `value`.
 //  Pure JavaScript: no Phaser. A missing list means no talent: the fight has no talent effect until they load.
 import { CHAPTER_BOSS, FARM, MINIBOSS } from '../campaign/campaign';
+import { defenseOf } from '../combat/monster';
 
 const SECOND = 1000;
 
@@ -19,12 +20,11 @@ export const talentAttackerBonus = (talents) => ({
     critDamagePct: talentValue(talents, 'CRIT_DAMAGE')
 });
 
-//  The stats of a monster after the break talents: points off the physical defense, the magical defense and the critical resistance, none
-//  below 0. The damage type of a hit picks the defense it meets, so the physical talent works for clicks and the magical one for magic.
+//  The stats of a monster after the break talents: points off the one defense (PHYSICAL_BREAK, all grades) and off the critical resistance
+//  (CRIT_RESIST_BREAK), none below 0. Every other field is kept as received.
 export const monsterAfterBreak = (stats, talents) => ({
     ...stats,
-    physicalDefense: Math.max(0, stats.physicalDefense - talentValue(talents, 'PHYSICAL_BREAK')),
-    magicalDefense: Math.max(0, stats.magicalDefense - talentValue(talents, 'MAGICAL_BREAK')),
+    defense: Math.max(0, defenseOf(stats) - talentValue(talents, 'PHYSICAL_BREAK')),
     critResistance: Math.max(0, stats.critResistance - talentValue(talents, 'CRIT_RESIST_BREAK'))
 });
 
@@ -87,7 +87,6 @@ const ICON_NAMES = {
     MINIBOSS_TIME: 'miniboss-time',
     BOSS_TIME: 'boss-time',
     PHYSICAL_BREAK: 'break-physical',
-    MAGICAL_BREAK: 'break-magical',
     CRIT_RESIST_BREAK: 'break-crit',
     CLICK_DAMAGE: 'click-damage',
     CRIT_CHANCE: 'crit-chance',

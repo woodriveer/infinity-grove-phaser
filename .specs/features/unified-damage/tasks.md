@@ -655,7 +655,7 @@ The existing skill-level tests of `describe('skill levels')` keep their values: 
 
 ---
 
-### T7: Let the defense break talent lower the one defense [ ]
+### T7: Let the defense break talent lower the one defense [x]
 
 **Owner**: game-dev
 **Goal**: `monsterAfterBreak` lowers `defense` by `PHYSICAL_BREAK` and ignores `MAGICAL_BREAK`; the icon map loses `MAGICAL_BREAK` (UDMG-04).
@@ -708,8 +708,8 @@ export const monsterAfterBreak = (stats, talents) => ({
 **Gate**: quick - `cd game && npm test`
 **Done when**:
 
-- [ ] `grep -n "MAGICAL\|magicalDefense\|physicalDefense:" game/src/domain/talents/talents.js` finds nothing.
-- [ ] The edited and new tests pass; the whole Vitest suite passes.
+- [x] `grep -n "MAGICAL\|magicalDefense\|physicalDefense:" game/src/domain/talents/talents.js` finds nothing.
+- [x] The edited and new tests pass; the whole Vitest suite passes.
 
 **Commit**: `feat(game): let the defense break lower the one defense`
 
