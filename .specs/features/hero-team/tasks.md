@@ -2319,7 +2319,7 @@ let teamFailure = null;
 
 ---
 
-### T23: Cover the team editing in the browser [ ]
+### T23: Cover the team editing in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: e2e scenarios prove placing, replacing, removing, the leader swap, the busy state, the failure and a close during a request (TEAM-13, TEAM-09 AC 4, 18).
@@ -2356,7 +2356,7 @@ let teamFailure = null;
 **Gate**: full - `cd game && npx playwright test e2e/heroTeamEditing.spec.js` then `cd game && npm test && npx playwright test`
 **Done when**:
 
-- [ ] The 12 scenarios pass; the whole Playwright suite passes.
+- [x] The 12 scenarios pass; the whole Playwright suite passes.
 
 **Commit**: `test(game): cover the team editing`
 
