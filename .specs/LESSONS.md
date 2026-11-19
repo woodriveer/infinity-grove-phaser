@@ -636,6 +636,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: game/e2e/gameVersion.spec.js:99-100 (tasks.md:375 waitForScene Preloader) (tests)
 - last seen: 2026-11-18T21:45:48Z
 
+### L-105 - When an effect must apply to every strike kind, pin it with one test per strike kind, the forced-critical aimed shot included.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game/domain/skills` · harmful: 0
+- features: unified-damage
+- evidence: M19, M20 (game/src/domain/skills/skillDamage.js:19) (game/domain/skills)
+- last seen: 2026-11-19T06:20:45Z
+
+### L-106 - Normalize a tolerant payload field once at the boundary; a second fallback read behind the normalizer is dead code no test can pin.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `game` · harmful: 0
+- features: unified-damage
+- evidence: M10 (game/src/adapters/phaser/ClickerGame.js:787) (game)
+- last seen: 2026-11-19T06:20:45Z
+
+### L-107 - Write grep-based success criteria that exclude comment lines or name every comment allowed to match.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `specs` · harmful: 0
+- features: unified-damage
+- evidence: spec.md Success Criteria 2 (campaign.js:9, damage.js:10) (specs)
+- last seen: 2026-11-19T06:20:45Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
