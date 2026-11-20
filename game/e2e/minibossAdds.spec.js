@@ -130,6 +130,24 @@ test.describe('Miniboss adds', () => {
         expect((await state(page)).main).toBeCloseTo(99.18, 5);
     });
 
+    test('a dead add fades its body, bar, fill and text out over 500 ms and leaves the other add alone', async ({ page }) => {
+        await startAdds(page);
+
+        await hitAt(page, ...LACAIO_1, 30);
+
+        //  One tween over the four parts of Lacaio 1 (body 110 x 125, back and fill 8 px high, the buff text), 500 ms, to alpha 0
+        const fades = await scene(page, `(s) => s.tweens.getTweens().filter((tween) => tween.targets.some((o) => o.type === 'Rectangle' && o.width === 110)).map((tween) => ({
+            duration: tween.duration, alpha: tween.data[0].key, to: tween.data[0].end,
+            parts: tween.targets.map((o) => [ o.type, o.x, o.y ])
+        }))`);
+
+        expect(fades).toEqual([ {
+            duration: 500, alpha: 'alpha', to: 0,
+            parts: [ [ 'Rectangle', 480, 360 ], [ 'Rectangle', 430, 279.5 ], [ 'Rectangle', 430, 279.5 ], [ 'Text', 480, 276.5 ] ]
+        } ]);
+        expect((await state(page)).drawn).toBe(1);
+    });
+
     test('a dead add fades out and never comes back', async ({ page }) => {
         await startAdds(page);
 
@@ -279,6 +297,23 @@ test.describe('Miniboss adds', () => {
         expect(await state(page)).toMatchObject({ main: 100, adds: [ 30, 30 ], target: 'Miniboss' });
         await expect(page.locator('.stage-hud')).toHaveText('Rever chefe: Miniboss 1');
         await expect(page.locator('.enemy-stats')).toContainText('Defesa 90%');
+    });
+
+    test('a farm fight that replaces a fight with adds removes the old adds at once and draws the new ones at full health', async ({ page }) => {
+        await startAdds(page);
+
+        await hitAt(page, ...LACAIO_1, 10);
+        await hitAt(page, ...LACAIO_2, 5);
+
+        expect((await state(page)).adds).toEqual([ 20, 25 ]);
+
+        await scene(page, "(s) => s.startFarm({ kind: 'MINIBOSS', stage: 2 })");
+
+        expect(await state(page)).toMatchObject({ main: 100, adds: [ 30, 30 ], target: 'Miniboss', drawn: 2 });
+        //  No part of the old fight is left next to the new one: two bodies, two bars with their fills, two buff texts, one marker
+        expect(await leftovers(page)).toEqual({ bodies: 2, bars: 4, labels: 2, markers: 1 });
+        await expect(page.locator('.stage-hud')).toHaveText('Rever chefe: Miniboss 2');
+        await expect(page.getByTestId('target-chip')).toHaveText('Alvo: Miniboss · HP 100/100');
     });
 
     test('a reload during the fight restarts the miniboss and both adds at full health with a full countdown', async ({ page }) => {
