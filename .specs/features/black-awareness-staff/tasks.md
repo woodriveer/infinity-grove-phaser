@@ -1238,7 +1238,7 @@ It reads the user with `authenticated(route, <now as the main handler reads it>)
 
 ---
 
-#### T21: e2e: damage of the staff [ ]
+#### T21: e2e: damage of the staff [x]
 
 **Owner**: test-engineer
 **Goal**: The x3 against DARKNESS on the real scene, one test per strike kind (BAS-08, BAS-09, BAS-11, BAS-12; L-098).
@@ -1264,7 +1264,7 @@ It reads the user with `authenticated(route, <now as the main handler reads it>)
 **Gate**: `cd game && npx playwright test e2e/blackAwarenessStaffDamage.spec.js`
 **Done when**:
 
-- [ ] The 7 tests pass twice in a row with `--workers=1`.
+- [x] The 7 tests pass twice in a row with `--workers=1`.
 
 **Commit**: `test(game): cover the darkness bonus of the staff in the browser`
 
