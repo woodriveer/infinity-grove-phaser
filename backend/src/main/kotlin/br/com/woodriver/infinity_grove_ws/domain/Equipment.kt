@@ -78,9 +78,16 @@ data class EquipmentRules(
     }
 }
 
+/** A fixed effect a piece carries outside its affixes; a refine or a reroll never changes it (spec black-awareness-staff). */
+enum class PieceSpecial {
+    /** Cajado da Consciência Negra: +200 % damage against DARKNESS monsters, applied by the game. Only on a legendary weapon. */
+    BLACK_AWARENESS_STAFF,
+}
+
 /**
  * A piece of equipment. A [Slot.WEAPON] carries [baseClick] (its own click damage, not an affix); every piece carries [affixes].
- * [heroId] is the hero wearing it, null while it sits in the bag. Stored values are base values; the getters apply the refine level.
+ * [heroId] is the hero wearing it, null while it sits in the bag. [special] is a fixed effect outside the affixes, kept by every copy.
+ * Stored values are base values; the getters apply the refine level.
  */
 data class Piece(
     val id: String,
@@ -91,6 +98,7 @@ data class Piece(
     val refine: Int,
     val affixes: List<Affix>,
     val heroId: String? = null,
+    val special: PieceSpecial? = null,
 ) {
     init {
         require(id.isNotBlank()) { "Piece id must not be blank" }
@@ -100,6 +108,9 @@ data class Piece(
         require(affixes.size <= rarity.affixCount) { "A $rarity piece holds at most ${rarity.affixCount} affixes, got ${affixes.size}" }
         require(affixes.map { it.type }.toSet().size == affixes.size) { "Affix types must not repeat, got ${affixes.map { it.type }}" }
         require(affixes.all { it.type.allowedOn(slot) }) { "Affixes ${affixes.map { it.type }} are not allowed on $slot" }
+        require(special == null || (slot == Slot.WEAPON && rarity == Rarity.LEGENDARY)) {
+            "Special $special needs a legendary weapon, got $rarity $slot"
+        }
     }
 
     /** The value of [affix] at this refine level: the base times `1 + 0.1 * refine`, rounded down. */

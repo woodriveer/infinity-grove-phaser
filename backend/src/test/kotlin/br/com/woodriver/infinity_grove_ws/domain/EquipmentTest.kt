@@ -208,6 +208,66 @@ class EquipmentTest {
         assertFailsWith<InvalidAffixException> { weapon(refine = 5).rerolled(-1, zero) }
     }
 
+    private val four =
+        listOf(
+            Affix(AffixType.CRIT_CHANCE, 9),
+            Affix(AffixType.CRIT_DAMAGE_PCT, 50),
+            Affix(AffixType.BOSS_DAMAGE_PCT, 25),
+            Affix(AffixType.BOSS_TIME_SECONDS, 5),
+        )
+
+    private fun staff(
+        refine: Int,
+        affixes: List<Affix>,
+    ) = Piece("s", "yan", Slot.WEAPON, Rarity.LEGENDARY, 10, refine, affixes, special = PieceSpecial.BLACK_AWARENESS_STAFF)
+
+    @Test
+    fun `a legendary weapon carries the black awareness staff special`() {
+        assertEquals(PieceSpecial.BLACK_AWARENESS_STAFF, staff(0, four).special)
+    }
+
+    @Test
+    fun `a piece built without special has none`() {
+        assertNull(Piece("r", "yan", Slot.RING, Rarity.COMMON, null, 0, emptyList()).special)
+    }
+
+    @Test
+    fun `a special on a legendary ring is rejected`() {
+        assertFailsWith<IllegalArgumentException> {
+            Piece("r", "yan", Slot.RING, Rarity.LEGENDARY, null, 0, emptyList(), special = PieceSpecial.BLACK_AWARENESS_STAFF)
+        }
+    }
+
+    @Test
+    fun `a special on an epic weapon is rejected`() {
+        assertFailsWith<IllegalArgumentException> {
+            Piece("w", "yan", Slot.WEAPON, Rarity.EPIC, 8, 0, emptyList(), special = PieceSpecial.BLACK_AWARENESS_STAFF)
+        }
+    }
+
+    @Test
+    fun `refined keeps the special`() {
+        val refined = staff(0, four).refined()
+        assertEquals(1, refined.refine)
+        assertEquals(PieceSpecial.BLACK_AWARENESS_STAFF, refined.special)
+    }
+
+    @Test
+    fun `rerolled keeps the special and changes only the chosen affix`() {
+        val rerolled = staff(5, four).rerolled(0) { 0.0 }
+        assertEquals(PieceSpecial.BLACK_AWARENESS_STAFF, rerolled.special)
+        assertEquals(
+            listOf(
+                Affix(AffixType.ARMOR_PIERCE_PCT, 25),
+                Affix(AffixType.CRIT_DAMAGE_PCT, 50),
+                Affix(AffixType.BOSS_DAMAGE_PCT, 25),
+                Affix(AffixType.BOSS_TIME_SECONDS, 5),
+            ),
+            rerolled.affixes,
+        )
+        assertEquals(5, rerolled.refine)
+    }
+
     private fun scripted(vararg values: Double): () -> Double {
         val queue = values.toMutableList()
         return { if (queue.isEmpty()) 0.0 else queue.removeAt(0) }

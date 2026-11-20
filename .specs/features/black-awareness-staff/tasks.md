@@ -116,7 +116,7 @@ T23
 
 ### Phase 1: Backend domain
 
-#### T1: `PieceSpecial` and `Piece.special` [ ]
+#### T1: `PieceSpecial` and `Piece.special` [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: A piece can carry the fixed special `BLACK_AWARENESS_STAFF`, only on a legendary weapon, and refine and reroll keep it (BAS-15).
@@ -162,8 +162,8 @@ require(special == null || (slot == Slot.WEAPON && rarity == Rarity.LEGENDARY)) 
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 6 new cases pass; every earlier backend test passes unchanged.
-- [ ] `ktlintCheck` exits 0.
+- [x] The 6 new cases pass; every earlier backend test passes unchanged.
+- [x] `ktlintCheck` exits 0.
 
 **Commit**: `feat(backend): let a legendary weapon carry the black awareness staff special`
 
