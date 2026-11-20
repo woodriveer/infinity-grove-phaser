@@ -218,6 +218,14 @@
 - **Date**: 2026-11-19
 - **Status**: active, released as v0.7.0 on 2026-11-20 (all 16 tasks of `.specs/features/miniboss-adds/tasks.md` ticked; the owner approved spec, design and tasks on 2026-11-19 and answered Q47 to Q52 with the recommended defaults; ui review APROVADO with 0 findings, `a9eb31b`; `test-engineer` author check clean, mutants 17 of 18 killed and the survivor equivalent, `728573d`). Conforms to AD-002, AD-003, AD-004, AD-007, AD-010, AD-016, AD-018 (its `target` seam and formation), AD-019, AD-021, AD-022 and AD-024
 
+### AD-028
+- **Decision**: Event gifts are a second, non-boss source of equipment. `POST /gifts/claim`, called by the game once per battle start, grants the Cajado da Consciência Negra when the date of the backend clock in `America/Sao_Paulo` is November 20 (any year) and the account has no `player_gifts` row for `BLACK_AWARENESS_STAFF` (once per account ever, unique key, under the `player_cards` row lock). The staff is a legendary weapon rolled like a boss one plus a fixed `special` (`equipment_pieces.special`, never an affix, kept by refine and reroll); it is stored even when the bag is full (the bag may hold one piece over its capacity). The game multiplies every strike of the wearer against a DARKNESS monster by `1 + darknessDamagePct / 100` (200: x3) in `calculateDamage`. Migration `V14__black_awareness_staff.sql`, expand only (spec `black-awareness-staff`).
+- **Reason**: Owner request of 2026-11-20 (Dia da Consciência Negra): a commemorative legendary staff for every account that enters on November 20, never two, with +200 % damage against Darkness that cannot be rerolled.
+- **Trade-off**: The bag capacity is no longer a hard limit (by one piece per gift); the damage bonus is computed in the browser like every other (AD-002); a player who never reloads across midnight gets the staff only at the next battle start.
+- **Scope**: `backend` `Equipment.kt` (`PieceSpecial`), `PieceRoller`, `Gift.kt`, `GiftPorts.kt`, `SaoPauloGiftCalendar`, `GiftRepository`, `GiftService`, `GiftController`, `PieceEntity`, `PieceResponse`, `V14__black_awareness_staff.sql`; `game/src/domain/equipment/specials.js`, `equipment.js`, `domain/combat/damage.js`, `allyAttacker.js`, `adapters/http/giftApi.js`, `application/gifts/giftClaim.js`, `pieceTile.js`, `HeroUi`, `ClickerGame`, `game/public/style.css`
+- **Date**: 2026-11-20
+- **Status**: proposed (spec `black-awareness-staff`, waiting for the owner's answers to Q1 to Q6). Extends AD-009 (pieces no longer come only from boss reports) and the bag rule of `equipment`; conforms to AD-003, AD-007, AD-010, AD-016 and AD-021 (no damage type: one more multiplicative factor, like Luz Divina's `vsDarkness`)
+
 ## Technical Debt
 
 TD-001 to TD-008 are recorded in the spec of the feature that found them (`characters`, `unified-damage`, `supabase-postgres`). New debts are logged here.
