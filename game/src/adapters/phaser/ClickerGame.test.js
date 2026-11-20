@@ -29,6 +29,8 @@ const autoClickGateway = { get: vi.fn(), upgrade: vi.fn() };
 const resetGateway = { reset: vi.fn() };
 const autoClickPreference = { on: true, stored: [], enabled () { return this.on; }, setEnabled (on) { this.on = on; this.stored.push(on); } };
 const equipmentGateway = { list: vi.fn(), equip: vi.fn(), unequip: vi.fn(), refine: vi.fn(), reroll: vi.fn(), sell: vi.fn() };
+//  The gift claim: by default nothing is granted; a test gives the answer, or an Error to reject with
+const giftGateway = { claim: vi.fn() };
 //  The critical roll: 0.99 never crits a monster of the default stats (10 % chance); a test sets `dice.value` to force one
 const dice = { value: 0.99 };
 const services = {
@@ -41,6 +43,7 @@ const services = {
     createFarmSession: () => createFarmSession({ gateway: farmGateway }),
     createAutoClickState: () => createAutoClickState({ gateway: autoClickGateway }),
     createAccountReset: (ports) => createAccountReset({ gateway: resetGateway, ...ports }),
+    gifts: giftGateway,
     autoClickPreference
 };
 
@@ -89,8 +92,10 @@ const AUTO_CLICK_LEVEL_0 = { level: 0, maxLevel: 4, intervalMs: 500, crystals: 0
 
 const COMBO_MAXED = { id: 'COMBO', branch: 'COMBO', perLevel: 5, maxLevel: 10, level: 10, value: 50, nextCost: null };
 
-const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] }, talents = [ COMBO_MAXED ], autoClick = AUTO_CLICK_LEVEL_0, autoClickOn = true, textures = {} } = {}) => {
+const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] }, talents = [ COMBO_MAXED ], autoClick = AUTO_CLICK_LEVEL_0, autoClickOn = true, textures = {}, gift = { granted: false } } = {}) => {
     dice.value = 0.99;
+    giftGateway.claim.mockReset();
+    giftGateway.claim.mockImplementation(() => (gift instanceof Error ? Promise.reject(gift) : Promise.resolve(gift)));
     autoClickPreference.on = autoClickOn;
     autoClickPreference.stored = [];
     autoClickGateway.get.mockReset();
@@ -2957,6 +2962,49 @@ describe('ClickerGame equipment', () => {
         testid(ctx, 'equip-piece-w1').click();
 
         expect(testid(ctx, 'piece-refine').disabled).toBe(true);
+    });
+});
+
+describe('ClickerGame gift', () => {
+    const STAFF = {
+        id: 'gift-staff', slot: 'WEAPON', rarity: 'LEGENDARY', refine: 0, clickDamage: 11, heroId: null, sellPrice: 500, refineCost: 4000, rerollCost: null,
+        affixes: [ { type: 'BOSS_DAMAGE_PCT', value: 28 }, { type: 'BOSS_TIME_SECONDS', value: 6 }, { type: 'CRIT_DAMAGE_PCT', value: 55 }, { type: 'ARMOR_PIERCE_PCT', value: 28 } ],
+        special: 'BLACK_AWARENESS_STAFF'
+    };
+    const GIFT_TEXT = 'Presente do Dia da Consciência Negra: Cajado da Consciência Negra na mochila!';
+    const notice = (ctx) => ctx.control('[data-testid="card-notice"]');
+
+    it('the battle start claims the gift exactly once', async () => {
+        await createScene();
+        await flush();
+
+        expect(giftGateway.claim).toHaveBeenCalledTimes(1);
+    });
+
+    it('a granted staff shows the gift notice', async () => {
+        const ctx = await createScene({ gift: { granted: true, gift: 'BLACK_AWARENESS_STAFF', piece: STAFF } });
+        await flush();
+
+        expect(notice(ctx).textContent).toBe(GIFT_TEXT);
+        expect(notice(ctx).hidden).toBe(false);
+    });
+
+    it('granted false shows no notice', async () => {
+        const ctx = await createScene({ gift: { granted: false } });
+        await flush();
+
+        expect(notice(ctx).hidden).toBe(true);
+    });
+
+    it('a failing claim shows no notice and a click still hits', async () => {
+        const ctx = await createScene({ gift: new Error('offline') });
+        await flush();
+
+        expect(notice(ctx).hidden).toBe(true);
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(9);
     });
 });
 

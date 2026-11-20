@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { claimGift as claimEventGift } from '../../application/gifts/giftClaim';
 import { BossCountdown } from '../../domain/campaign/bossCountdown';
 import { MINIBOSS, farmEncounterOf } from '../../domain/campaign/campaign';
 import { AutoClicker, autoClickUnlocked } from '../../domain/combat/autoClick';
@@ -172,6 +173,7 @@ export class ClickerGame extends Scene
         this.farmBySwitch = false;
         this.heroes = services.createHeroCollection();
         this.equipment = services.createEquipmentCollection();
+        this.gifts = services.gifts;
         this.talents = services.createTalentCollection();
         this.farm = services.createFarmSession();
         this.autoClick = services.createAutoClickState();
@@ -593,6 +595,7 @@ export class ClickerGame extends Scene
         this.loadHeroes();
         this.loadEquipment();
         this.loadTalents();
+        this.claimGift();
     }
 
     //  The leader and the fighting allies. With no ally drawn the leader stands as before (CHARACTER); with at least one, at the tip of the
@@ -685,6 +688,13 @@ export class ClickerGame extends Scene
         {
             //  The fight has no talent effect; the next tick tries again
         }
+    }
+
+    //  The event gift (spec black-awareness-staff): claimed once per battle start; a granted staff joins the list and shows the notice.
+    //  A failure shows nothing (the next start claims again).
+    claimGift ()
+    {
+        return claimEventGift({ gateway: this.gifts, equipment: this.equipment, onGift: () => this.heroUi.showGift() });
     }
 
     //  The pieces worn by the leader; none while the heroes or the equipment have not loaded

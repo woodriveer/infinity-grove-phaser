@@ -1107,7 +1107,7 @@ export const claimGift = async ({ gateway, equipment, onGift }) =>
 
 ---
 
-#### T18: Claim the gift when the battle starts (`ClickerGame`) [ ]
+#### T18: Claim the gift when the battle starts (`ClickerGame`) [x]
 
 **Owner**: game-dev
 **Goal**: Every battle start claims once; a granted staff joins the list and shows the notice (BAS-07, spec P1 Receive AC 9 to 11).
@@ -1150,8 +1150,8 @@ export const claimGift = async ({ gateway, equipment, onGift }) =>
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 4 cases pass; every earlier `ClickerGame` case passes unchanged.
-- [ ] `npm run build` exits 0.
+- [x] The 4 cases pass; every earlier `ClickerGame` case passes unchanged.
+- [x] `npm run build` exits 0.
 
 **Commit**: `feat(game): claim the black awareness gift when the battle starts`
 
