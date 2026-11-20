@@ -13,11 +13,11 @@ const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defe
 
 const ADD = { health: 30, defenseBuff: 30 };
 //  Two stages: phase monsters of 10, a miniboss of `minibossHealth` with `defense`, its adds; the chapter boss 1000 (spec miniboss-adds)
-const addsChapter = ({ adds = [ ADD, ADD ], defense = 49, minibossHealth = 100, element = 'FIRE' } = {}) => ({
+const addsChapter = ({ adds = [ ADD, ADD ], defense = 49, minibossHealth = 100, element = 'FIRE', monsterDefense = 0 } = {}) => ({
     bossHealth: 1000, bossTimeLimitMs: 60_000, boss: monsterOf(element, 30, 30), bossDropRuleId: 3,
     stages: [ 1, 2 ].map((number) => ({
         number, phasesPerStage: 5, monsterHealth: 10, minibossHealth, minibossTimeLimitMs: 30_000,
-        monster: monsterOf(element), miniboss: monsterOf(element, defense), monsterDropRuleId: 1, minibossDropRuleId: 2, adds
+        monster: monsterOf(element, monsterDefense), miniboss: monsterOf(element, defense), monsterDropRuleId: 1, minibossDropRuleId: 2, adds
     }))
 });
 
@@ -220,6 +220,26 @@ test.describe('Miniboss target', () => {
         expect(allyNumbers).toMatchObject([ { text: '2', x: 520, y: 360 }, { text: '0.4', x: 740, y: 273 } ]);
     });
 
+    //  The adds carry the stats of the stage's phase monster (seeded with defense 0, so a fixture gives them defense 20 to make a break visible)
+    test('Quebra de defesa 5 lowers the defense of an add: a click deals 0.85 on defense 20', async ({ page }) => {
+        await startAdds(page, { definition: addsChapter({ monsterDefense: 20 }), talents: { PHYSICAL_BREAK: 5 } });
+
+        await hitAt(page, ...LACAIO_1);
+
+        expect((await state(page)).adds[0]).toBeCloseTo(29.15, 5);
+        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 15%  Crit res 0%');
+    });
+
+    test('the Erosão Arcana of an Orina ally lowers the defense an ally hit meets on an add: two hits of 1.9 show 3.8', async ({ page }) => {
+        await startAdds(page, { definition: addsChapter({ monsterDefense: 20 }), team: { boughtSlots: 2, allies: [ 'lyra', 'orina', null, null ] } });
+
+        await hitAt(page, ...LACAIO_1);
+        await advance(page, 1000);
+
+        //  Lyra and Orina hit for 2 each on defense 20 - 15 = 5; the tick shows their sum at the add's ally number place
+        expect(await lastNumber(page)).toMatchObject({ text: '3.8', x: 520, y: 360, color: ALLY });
+    });
+
     test('a click on an add counts for the combo', async ({ page }) => {
         await startAdds(page, { talents: { COMBO: 10 } });
 
@@ -312,19 +332,19 @@ test.describe('Miniboss target', () => {
             const style = getComputedStyle(chip);
             const probe = document.createElement('div');
 
-            probe.style.cssText = 'color: var(--parchment-100); background-color: var(--chip-bg); border: 1px solid var(--gold-400)';
+            probe.style.cssText = 'color: var(--parchment-100); background-color: var(--chip-bg); border: 1px solid var(--gold-400); font-family: var(--font-body)';
             document.body.append(probe);
 
             const tokens = getComputedStyle(probe);
-            const resolved = { color: tokens.color, background: tokens.backgroundColor, border: tokens.borderTopColor };
+            const resolved = { color: tokens.color, background: tokens.backgroundColor, border: tokens.borderTopColor, fontFamily: tokens.fontFamily };
 
             probe.remove();
 
             return {
                 css: {
                     fontSize: style.fontSize, fontWeight: style.fontWeight, borderTopWidth: style.borderTopWidth, borderTopStyle: style.borderTopStyle,
-                    borderTopColor: style.borderTopColor, borderRadius: style.borderTopLeftRadius, paddingTop: style.paddingTop, paddingLeft: style.paddingLeft,
-                    color: style.color, background: style.backgroundColor
+                    borderTopColor: style.borderTopColor, borderRadius: style.borderTopLeftRadius, paddingTop: style.paddingTop, paddingRight: style.paddingRight,
+                    paddingBottom: style.paddingBottom, paddingLeft: style.paddingLeft, fontFamily: style.fontFamily, color: style.color, background: style.backgroundColor
                 },
                 resolved,
                 boxes: { chip: toScene(chip), weak: toScene(document.querySelector('[data-testid="weak-chip"]')), stats: toScene(document.querySelector('.enemy-stats')) }
@@ -337,8 +357,10 @@ test.describe('Miniboss target', () => {
         expect(await page.getByTestId('target-chip').textContent()).toBe('Alvo: Miniboss · HP 100/100');
         expect(forMiniboss.css).toMatchObject({
             fontSize: '12px', fontWeight: '700', borderTopWidth: '1px', borderTopStyle: 'solid', borderTopColor: 'rgb(224, 180, 90)', borderRadius: '999px',
-            paddingTop: '3px', paddingLeft: '10px'
+            paddingTop: '3px', paddingRight: '10px', paddingBottom: '3px', paddingLeft: '10px'
         });
+        expect(forMiniboss.css.fontFamily).toBe(forMiniboss.resolved.fontFamily);
+        expect(forMiniboss.css.fontFamily).toContain('Figtree');
         expect(forMiniboss.css.color).toBe(forMiniboss.resolved.color);
         expect(forMiniboss.css.background).toBe(forMiniboss.resolved.background);
         expect(forMiniboss.css.borderTopColor).toBe(forMiniboss.resolved.border);
