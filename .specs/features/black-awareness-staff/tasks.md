@@ -1338,7 +1338,7 @@ Gaps closed by new tests: bulk sale of the staff (`blackAwarenessStaff.spec.js:1
 
 ### Phase 7: UI review
 
-#### T23: UI review of the staff [ ]
+#### T23: UI review of the staff [x]
 
 **Owner**: ui-artist
 **Goal**: The player-visible changes match the spec and the Grove theme (AD-022) (BAS-07, BAS-13, BAS-14).
@@ -1360,7 +1360,7 @@ Gaps closed by new tests: bulk sale of the staff (`blackAwarenessStaff.spec.js:1
 **Gate**: `cd game && npm run ui:shots -- blackAwarenessStaff`
 **Done when**:
 
-- [ ] `ui-review.html` has a verdict (APROVADO or REPROVADO) and every finding is listed for the product owner to turn into tasks.
+- [x] `ui-review.html` has a verdict (APROVADO or REPROVADO) and every finding is listed for the product owner to turn into tasks.
 
 **Commit**: `docs(ui): review the black awareness staff`
 
