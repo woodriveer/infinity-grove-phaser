@@ -769,7 +769,7 @@ export const GIFT_NOTICE_MS = 6000;
 
 ---
 
-#### T11: Title, lines and attacker of the staff (`equipment.js`) [ ]
+#### T11: Title, lines and attacker of the staff (`equipment.js`) [x]
 
 **Owner**: game-dev
 **Goal**: The staff's name and special line on every piece view, and `darknessDamagePct` on the attacker of its wearer (BAS-08, BAS-11, BAS-14, BAS-17).
@@ -806,7 +806,7 @@ export const GIFT_NOTICE_MS = 6000;
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 7 cases pass; every earlier unit test passes unchanged (`leaderStats`, `leaderAttacker`, `allyAttacker` included).
+- [x] The 7 cases pass; every earlier unit test passes unchanged (`leaderStats`, `leaderAttacker`, `allyAttacker` included).
 
 **Commit**: `feat(game): name the staff and give its wearer the darkness bonus`
 

@@ -1,6 +1,8 @@
 //  The rules the game applies to the equipment payload of the backend (GET /equipment). Pure JavaScript: no Phaser, so every rule is unit-tested.
 //  A piece is { id, slot, rarity, refine, clickDamage?, affixes: [ { type, value } ], heroId?, refineCost?, rerollCost?, sellPrice }.
 //  Every value is already refined by the server; the game only sums them.
+import { specialOf } from './specials';
+
 export const MAX_REFINE = 10;
 export const REROLL_MIN_REFINE = 5;
 
@@ -23,10 +25,11 @@ export const describeAffix = ({ type, value }) => `${AFFIXES[type].label} +${val
 //  "Dano de clique: 3.3" for a weapon (one decimal, trailing zero kept so a refine always shows)
 export const describeClickDamage = (piece) => `Dano de clique: ${piece.clickDamage.toFixed(1)}`;
 
-//  The text lines of a piece: the weapon click damage first, then one line per affix
+//  The text lines of a piece: the weapon click damage first, then one line per affix, then the line of its special (the staff)
 export const pieceLines = (piece) => [
     ...(piece.clickDamage == null ? [] : [ describeClickDamage(piece) ]),
-    ...piece.affixes.map(describeAffix)
+    ...piece.affixes.map(describeAffix),
+    ...(specialOf(piece) ? [ specialOf(piece).line ] : [])
 ];
 
 //  What changes when `piece` takes the place of `worn` (the piece of the same slot, or nothing): one { text, gain } per number that differs,
@@ -44,8 +47,8 @@ export const compareLines = (piece, worn = null) =>
     }));
 };
 
-//  "Raro Arma +3": the title of a piece on the screens
-export const pieceTitle = (piece) => `${RARITY_LABELS[piece.rarity]} ${SLOT_LABELS[piece.slot]} +${piece.refine}`;
+//  "Raro Arma +3": the title of a piece on the screens; a piece with a special shows its name ("Cajado da Consciência Negra +3")
+export const pieceTitle = (piece) => `${specialOf(piece)?.name ?? `${RARITY_LABELS[piece.rarity]} ${SLOT_LABELS[piece.slot]}`} +${piece.refine}`;
 
 //  "Raro Arma", the text of the drop notice
 export const dropLabel = (piece) => `${RARITY_LABELS[piece.rarity]} ${SLOT_LABELS[piece.slot]}`;
@@ -59,7 +62,7 @@ const sumOf = (pieces, type) => pieces.reduce((total, piece) => total
 //  The attacker of a click for a hero wearing `pieces`, built on `base`: base damage (base + weapon click damage) times the click damage
 //  percent, the critical chance (at most 100) and multiplier, the armor pierce and the boss damage. With no pieces and no bonus it is `base` itself.
 //  `bonus` carries more sources of the same numbers (the stars and talents of the leader): clickDamageFlat adds to the base damage before the percent, clickDamagePct and critDamagePct add to the pieces'
-//  percents, critChance adds points.
+//  percents, critChance adds points. `darknessDamagePct` (percent more damage against DARKNESS, the staff) only when a worn piece has it.
 export const attackerFor = (base, pieces, { clickDamageFlat = 0, clickDamagePct = 0, critChance = 0, critDamagePct = 0 } = {}) =>
 {
     if (pieces.length === 0 && !clickDamageFlat && !clickDamagePct && !critChance && !critDamagePct)
@@ -68,6 +71,7 @@ export const attackerFor = (base, pieces, { clickDamageFlat = 0, clickDamagePct 
     }
 
     const weaponDamage = pieces.find((piece) => piece.slot === 'WEAPON')?.clickDamage ?? 0;
+    const darknessDamagePct = pieces.reduce((sum, piece) => sum + (specialOf(piece)?.darknessDamagePct ?? 0), 0);
 
     return {
         ...base,
@@ -75,7 +79,8 @@ export const attackerFor = (base, pieces, { clickDamageFlat = 0, clickDamagePct 
         critChance: Math.min(100, base.critChance + sumOf(pieces, 'CRIT_CHANCE') + critChance),
         critMultiplier: base.critMultiplier + (sumOf(pieces, 'CRIT_DAMAGE_PCT') + critDamagePct) / 100,
         armorPierce: sumOf(pieces, 'ARMOR_PIERCE_PCT'),
-        bossDamage: sumOf(pieces, 'BOSS_DAMAGE_PCT')
+        bossDamage: sumOf(pieces, 'BOSS_DAMAGE_PCT'),
+        ...(darknessDamagePct > 0 && { darknessDamagePct })
     };
 };
 

@@ -208,3 +208,48 @@ describe('compareLines', () => {
         expect(compareLines(piece({ affixes: [ affix('CRIT_DAMAGE_PCT', 27) ] }))).toEqual([ { text: 'Dano crítico +27%', gain: true } ]);
     });
 });
+
+describe('the Cajado da Consciência Negra', () => {
+    const STAFF = {
+        id: 's', slot: 'WEAPON', rarity: 'LEGENDARY', refine: 0, clickDamage: 11,
+        affixes: [ affix('BOSS_DAMAGE_PCT', 28), affix('BOSS_TIME_SECONDS', 6), affix('CRIT_DAMAGE_PCT', 55), affix('ARMOR_PIERCE_PCT', 28) ],
+        special: 'BLACK_AWARENESS_STAFF'
+    };
+
+    it('the staff title is its name and refine', () => {
+        expect(pieceTitle(STAFF)).toBe('Cajado da Consciência Negra +0');
+        expect(pieceTitle({ ...STAFF, refine: 3 })).toBe('Cajado da Consciência Negra +3');
+    });
+
+    it('a piece with an unknown special keeps the rarity and slot title', () => {
+        expect(pieceTitle({ ...STAFF, special: 'FROST_RUNE' })).toBe('Lendário Arma +0');
+    });
+
+    it('the staff lines end with the special line', () => {
+        expect(pieceLines(STAFF)).toEqual([
+            'Dano de clique: 11.0', 'Dano em chefes +28%', 'Tempo extra de chefe +6s', 'Dano crítico +55%', 'Perfuração de armadura +28%',
+            'Especial: +200% de dano contra Escuridão'
+        ]);
+    });
+
+    it('a piece with an unknown special has no special line', () => {
+        const lines = pieceLines({ ...STAFF, special: 'FROST_RUNE' });
+
+        expect(lines).toHaveLength(5);
+        expect(lines.some((line) => line.startsWith('Especial'))).toBe(false);
+    });
+
+    it('the attacker of a hero wearing the staff carries darknessDamagePct 200', () => {
+        expect(attackerFor(PLAYER, [ { ...STAFF, clickDamage: 10, affixes: [] } ])).toEqual({
+            element: 'FIRE', baseDamage: 11, critChance: 10, critMultiplier: 2, armorPierce: 0, bossDamage: 0, darknessDamagePct: 200
+        });
+    });
+
+    it('the attacker of a plain weapon has no darknessDamagePct field', () => {
+        expect('darknessDamagePct' in attackerFor(PLAYER, [ { ...STAFF, clickDamage: 10, affixes: [], special: undefined } ])).toBe(false);
+    });
+
+    it('a staff with an unknown special gives no darknessDamagePct', () => {
+        expect('darknessDamagePct' in attackerFor(PLAYER, [ { ...STAFF, clickDamage: 10, affixes: [], special: 'FROST_RUNE' } ])).toBe(false);
+    });
+});
