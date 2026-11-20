@@ -1204,7 +1204,7 @@ It reads the user with `authenticated(route, <now as the main handler reads it>)
 
 ---
 
-#### T20: e2e: gift, notice and staff views [ ]
+#### T20: e2e: gift, notice and staff views [x]
 
 **Owner**: test-engineer
 **Goal**: Every player-visible AC of P1 Receive (game side) and P1 See in the browser (BAS-07, BAS-13 to BAS-17).
@@ -1232,7 +1232,7 @@ It reads the user with `authenticated(route, <now as the main handler reads it>)
 **Gate**: `cd game && npx playwright test e2e/blackAwarenessStaff.spec.js`
 **Done when**:
 
-- [ ] The 11 tests pass twice in a row with `--workers=1`.
+- [x] The 11 tests pass twice in a row with `--workers=1`.
 
 **Commit**: `test(game): cover the black awareness gift and the staff views in the browser`
 
