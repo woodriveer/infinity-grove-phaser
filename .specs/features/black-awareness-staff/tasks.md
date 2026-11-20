@@ -896,7 +896,7 @@ and `* darkness` as the last factor of `damage`. Add `darknessDamagePct` to the 
 
 ### Phase 5: Game wiring and views
 
-#### T14: Gift API adapter and composition [ ]
+#### T14: Gift API adapter and composition [x]
 
 **Owner**: game-dev
 **Goal**: `POST /gifts/claim` reachable from the scenes as `services.gifts` (BAS-07).
@@ -934,7 +934,7 @@ export const createGiftApi = (httpClient) => ({
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 2 cases pass; the hexagonal import test still passes.
+- [x] The 2 cases pass; the hexagonal import test still passes.
 
 **Commit**: `feat(game): add the gift claim api`
 

@@ -4,6 +4,7 @@ import { authApi } from './adapters/http/authApi';
 import { createAutoClickApi } from './adapters/http/autoClickApi';
 import { createEquipmentApi } from './adapters/http/equipmentApi';
 import { createFarmApi } from './adapters/http/farmApi';
+import { createGiftApi } from './adapters/http/giftApi';
 import { createHealthApi } from './adapters/http/healthApi';
 import { createHeroesApi } from './adapters/http/heroesApi';
 import { createHttpClient } from './adapters/http/httpClient';
@@ -37,6 +38,7 @@ export const talentApi = createTalentApi(httpClient);
 export const autoClickApi = createAutoClickApi(httpClient);
 export const accountResetApi = createAccountResetApi(httpClient);
 export const healthApi = createHealthApi(httpClient);
+export const giftApi = createGiftApi(httpClient);
 
 //  A fresh wallet service, campaign session, hero collection, equipment collection, talent collection, farm session and auto click state
 //  per game scene
@@ -55,6 +57,7 @@ export const services = {
     session: sessionManager,
     users: userApi,
     backend: healthApi,
+    gifts: giftApi,
     createWalletSync,
     createCampaignSession,
     createHeroCollection,

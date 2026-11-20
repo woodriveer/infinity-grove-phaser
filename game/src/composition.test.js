@@ -4,8 +4,9 @@ import { services } from './composition';
 describe('composition root', () => {
     it('hands the scenes the session, the user api and one factory per game service', () => {
         expect(Object.keys(services).sort()).toEqual([
-            'autoClickPreference', 'backend', 'createAccountReset', 'createAutoClickState', 'createCampaignSession', 'createEquipmentCollection', 'createFarmSession', 'createHeroCollection', 'createTalentCollection', 'createWalletSync', 'session', 'users'
+            'autoClickPreference', 'backend', 'createAccountReset', 'createAutoClickState', 'createCampaignSession', 'createEquipmentCollection', 'createFarmSession', 'createHeroCollection', 'createTalentCollection', 'createWalletSync', 'gifts', 'session', 'users'
         ]);
+        expect(typeof services.gifts.claim).toBe('function');
         expect(typeof services.users.signUp).toBe('function');
         expect(typeof services.session.restore).toBe('function');
         expect(typeof services.backend.wake).toBe('function');

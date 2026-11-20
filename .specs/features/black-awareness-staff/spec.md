@@ -150,7 +150,7 @@ Rows `y` were decided by the owner before the spec (relayed by the orchestrator 
 | BAS-04 | P1 Receive: AC 6 (bag full overflow) | Tasks | Pending |
 | BAS-05 | P1 Receive: AC 7 (concurrency) | Tasks | Pending |
 | BAS-06 | P1 Receive: AC 8, edge 404 (auth) | Tasks | Pending |
-| BAS-07 | P1 Receive: AC 9, AC 10, AC 11 (game claim and notice) | Tasks | Pending |
+| BAS-07 | P1 Receive: AC 9, AC 10, AC 11 (game claim and notice) | Tasks | Implementing |
 | BAS-08 | P1 Damage: AC 1, AC 2, AC 9 (click, non-DARKNESS, attacker field) | Tasks | Implementing |
 | BAS-09 | P1 Damage: AC 3, AC 4, AC 5, AC 6 (skill hit, tick, Luz Divina, auto click, aimed shot) | Tasks | Implementing |
 | BAS-10 | P1 Damage: AC 7 (ally) | Tasks | Implementing |
