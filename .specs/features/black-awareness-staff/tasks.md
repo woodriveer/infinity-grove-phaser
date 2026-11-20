@@ -459,7 +459,7 @@ class SaoPauloGiftCalendar(
 
 ---
 
-#### T7: `GiftRepository` (player_gifts) [ ]
+#### T7: `GiftRepository` (player_gifts) [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Read and insert gift grants; a duplicate insert fails (BAS-02, BAS-05).
@@ -524,7 +524,7 @@ class GiftRepository(private val jpaPlayerGiftRepository: JpaPlayerGiftRepositor
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 4 cases pass; `SchemaValidationIT` passes with the new entity.
+- [x] The 4 cases pass; `SchemaValidationIT` passes with the new entity.
 
 **Commit**: `feat(backend): store the gifts an account received`
 
