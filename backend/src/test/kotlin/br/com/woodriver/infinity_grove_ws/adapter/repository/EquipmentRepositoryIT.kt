@@ -4,17 +4,23 @@ import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.domain.Affix
 import br.com.woodriver.infinity_grove_ws.domain.AffixType
 import br.com.woodriver.infinity_grove_ws.domain.Piece
+import br.com.woodriver.infinity_grove_ws.domain.PieceSpecial
 import br.com.woodriver.infinity_grove_ws.domain.Rarity
 import br.com.woodriver.infinity_grove_ws.domain.Slot
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.jdbc.core.JdbcTemplate
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class EquipmentRepositoryIT : IntegrationTestBase() {
     @Autowired
     private lateinit var repository: EquipmentRepository
+
+    @Autowired
+    private lateinit var jdbc: JdbcTemplate
 
     // every row here references a player through a foreign key
     @BeforeEach
@@ -118,5 +124,46 @@ class EquipmentRepositoryIT : IntegrationTestBase() {
 
         assertTrue(repository.findAll("yan").isEmpty())
         assertEquals(listOf("c"), repository.findAll("other").map { it.id })
+    }
+
+    private val staff =
+        Piece(
+            "staff",
+            "yan",
+            Slot.WEAPON,
+            Rarity.LEGENDARY,
+            11,
+            0,
+            listOf(
+                Affix(AffixType.BOSS_DAMAGE_PCT, 28),
+                Affix(AffixType.BOSS_TIME_SECONDS, 6),
+                Affix(AffixType.CRIT_DAMAGE_PCT, 55),
+                Affix(AffixType.ARMOR_PIERCE_PCT, 28),
+            ),
+            special = PieceSpecial.BLACK_AWARENESS_STAFF,
+        )
+
+    @Test
+    fun `a staff reads back with its special`() {
+        repository.save(staff)
+
+        assertEquals(listOf(staff), repository.findAll("yan"))
+    }
+
+    @Test
+    fun `a staff refined and saved again keeps its special`() {
+        repository.save(staff)
+        repository.save(staff.refined())
+
+        val stored = repository.findAll("yan").single()
+        assertEquals(1, stored.refine)
+        assertEquals(PieceSpecial.BLACK_AWARENESS_STAFF, stored.special)
+    }
+
+    @Test
+    fun `a piece without special stores null in the special column`() {
+        repository.save(ring("r9"))
+
+        assertNull(jdbc.queryForObject("select special from equipment_pieces where id = ?", String::class.java, "r9"))
     }
 }

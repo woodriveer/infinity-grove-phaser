@@ -287,7 +287,7 @@ data class GiftClaim(
 
 ### Phase 2: Backend persistence
 
-#### T4: Migration V14 and `PieceEntity.special` [ ]
+#### T4: Migration V14 and `PieceEntity.special` [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Store the special of a piece and create the gift table, expand only (AD-016) (BAS-01, BAS-15).
@@ -341,8 +341,8 @@ var special: String? = null,
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 3 new cases pass; `SchemaValidationIT`, `PreviousBackendCompatibilityIT` and every earlier test pass unchanged.
-- [ ] The migration file name is exactly `V14__black_awareness_staff.sql`.
+- [x] The 3 new cases pass; `SchemaValidationIT`, `PreviousBackendCompatibilityIT` and every earlier test pass unchanged.
+- [x] The migration file name is exactly `V14__black_awareness_staff.sql`.
 
 **Commit**: `feat(backend): store the special of a piece and the player gifts table`
 

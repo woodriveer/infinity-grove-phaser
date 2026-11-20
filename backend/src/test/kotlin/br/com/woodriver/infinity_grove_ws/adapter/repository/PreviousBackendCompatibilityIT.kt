@@ -169,6 +169,19 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
 
     @Test
     fun `the previous release starts on the migrated schema and its validation ignores V13`() {
+        previousReleaseStartsOnMigratedSchema(lastVersion = 12, futureMigrations = 2)
+    }
+
+    @Test
+    fun `the release before the black awareness staff starts on the migrated schema and its validation ignores V14`() {
+        previousReleaseStartsOnMigratedSchema(lastVersion = 13, futureMigrations = 1)
+    }
+
+    /** The release whose last migration is `V[lastVersion]` validates its own files and sees [futureMigrations] newer ones as future. */
+    private fun previousReleaseStartsOnMigratedSchema(
+        lastVersion: Int,
+        futureMigrations: Int,
+    ) {
         Flyway
             .configure()
             .dataSource(dataSource)
@@ -178,9 +191,9 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
             .load()
             .migrate()
 
-        val previousDir = previousMigrations()
+        val previousDir = previousMigrations(lastVersion)
         try {
-            assertEquals(PREVIOUS_LAST_VERSION, previousDir.toFile().listFiles()!!.size)
+            assertEquals(lastVersion, previousDir.toFile().listFiles()!!.size)
 
             val previous =
                 Flyway
@@ -193,11 +206,11 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
             previous.validate()
             assertEquals(0, previous.migrate().migrationsExecuted)
             assertEquals(
-                listOf(MigrationState.FUTURE_SUCCESS),
+                List(futureMigrations) { MigrationState.FUTURE_SUCCESS },
                 previous
                     .info()
                     .all()
-                    .filter { (it.version?.major?.toInt() ?: 0) > PREVIOUS_LAST_VERSION }
+                    .filter { (it.version?.major?.toInt() ?: 0) > lastVersion }
                     .map { it.state },
             )
         } finally {
@@ -205,12 +218,12 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
         }
     }
 
-    /** The migrations of the previous release: the files of `V1` to `V12`, which are unchanged since that release. */
-    private fun previousMigrations(): Path {
+    /** The migrations of a previous release: the files of `V1` to `V[lastVersion]`, which are unchanged since that release. */
+    private fun previousMigrations(lastVersion: Int): Path {
         val dir = Files.createTempDirectory("previous-release-migrations")
         PathMatchingResourcePatternResolver()
             .getResources("classpath*:db/migration/V*.sql")
-            .filter { resource -> versionOf(resource.filename!!) <= PREVIOUS_LAST_VERSION }
+            .filter { resource -> versionOf(resource.filename!!) <= lastVersion }
             .forEach { resource -> resource.inputStream.use { Files.copy(it, dir.resolve(resource.filename!!)) } }
         return dir
     }
@@ -219,6 +232,5 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
 
     private companion object {
         const val PREVIOUS_SCHEMA = "previous_backend_check"
-        const val PREVIOUS_LAST_VERSION = 12
     }
 }

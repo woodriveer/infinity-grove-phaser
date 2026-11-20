@@ -3,6 +3,7 @@ package br.com.woodriver.infinity_grove_ws.adapter.repository
 import br.com.woodriver.infinity_grove_ws.domain.Affix
 import br.com.woodriver.infinity_grove_ws.domain.AffixType
 import br.com.woodriver.infinity_grove_ws.domain.Piece
+import br.com.woodriver.infinity_grove_ws.domain.PieceSpecial
 import br.com.woodriver.infinity_grove_ws.domain.Rarity
 import br.com.woodriver.infinity_grove_ws.domain.Slot
 import jakarta.persistence.Column
@@ -11,7 +12,10 @@ import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
 
-/** One row per piece of equipment; the affixes are `TYPE:base` pairs joined by commas, the same text style as the wallet queues. */
+/**
+ * One row per piece of equipment; the affixes are `TYPE:base` pairs joined by commas, the same text style as the wallet queues.
+ * `special` is the name of the piece's `PieceSpecial`, null for none.
+ */
 @Entity
 @Table(name = "equipment_pieces", indexes = [Index(name = "idx_equipment_pieces_username", columnList = "username")])
 class PieceEntity(
@@ -34,6 +38,8 @@ class PieceEntity(
     var heroId: String?,
     @Column(name = "created_at", nullable = false, updatable = false)
     var createdAt: Long,
+    @Column(length = 32)
+    var special: String? = null,
 ) {
     fun toDomain() =
         Piece(
@@ -45,6 +51,7 @@ class PieceEntity(
             refine = refine,
             affixes = if (affixes.isEmpty()) emptyList() else affixes.split(",").map(::parseAffix),
             heroId = heroId,
+            special = special?.let(PieceSpecial::valueOf),
         )
 
     companion object {
@@ -61,6 +68,7 @@ class PieceEntity(
             affixes = piece.affixes.joinToString(",") { "${it.type.name}:${it.base}" },
             heroId = piece.heroId,
             createdAt = createdAt,
+            special = piece.special?.name,
         )
 
         private fun parseAffix(text: String): Affix {
