@@ -199,3 +199,34 @@ describe('calculateDamage with a forced critical', () => {
         expect(calculateDamage({ defender: enemy('FIRE'), random: never, forceCritical: false })).toEqual({ damage: 1, critical: false });
     });
 });
+
+describe('calculateDamage with the darkness bonus of the staff', () => {
+    const staffer = { element: 'FIRE', baseDamage: 10, critChance: 0, critMultiplier: 2, darknessDamagePct: 200 };
+    const target = (element, defense = 0) => ({ element, defense, critResistance: 0 });
+
+    it('a darkness bonus of 200 deals 3 times against DARKNESS: 27', () => {
+        expect(calculateDamage({ attacker: staffer, defender: target('DARKNESS'), random: never }).damage).toBeCloseTo(27, 10);
+    });
+
+    it('the same attacker without the field deals 9 against DARKNESS', () => {
+        expect(calculateDamage({ attacker: { ...staffer, darknessDamagePct: undefined }, defender: target('DARKNESS'), random: never }).damage).toBeCloseTo(9, 10);
+    });
+
+    it('the bonus does nothing against WATER: 5', () => {
+        expect(calculateDamage({ attacker: staffer, defender: target('WATER'), random: never }).damage).toBeCloseTo(5, 10);
+    });
+
+    it('the bonus does nothing against LIGHT: 9', () => {
+        expect(calculateDamage({ attacker: staffer, defender: target('LIGHT'), random: never }).damage).toBeCloseTo(9, 10);
+    });
+
+    it('the bonus multiplies with defense, a critical and boss damage: 40.5', () => {
+        const attacker = { ...staffer, bossDamage: 50 };
+
+        expect(calculateDamage({ attacker, defender: target('DARKNESS', 50), random: never, forceCritical: true, boss: true }).damage).toBeCloseTo(40.5, 10);
+    });
+
+    it('a defense of 100 still deals 0 with the bonus', () => {
+        expect(calculateDamage({ attacker: staffer, defender: target('DARKNESS', 100), random: never }).damage).toBe(0);
+    });
+});

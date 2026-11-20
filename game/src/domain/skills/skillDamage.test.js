@@ -220,3 +220,34 @@ describe('tickDamage', () => {
         expect(tickDamage({ attacker: PLAYER, percent: 100, defender: enemy(), buffs: [ 'bencao' ], debuffs: [ 'prisao' ] })).toBeCloseTo(1.625, 10);
     });
 });
+
+describe('the staff against DARKNESS', () => {
+    const staffer = { element: 'FIRE', baseDamage: 10, critChance: 0, critMultiplier: 2, darknessDamagePct: 200 };
+    const dark = { element: 'DARKNESS', defense: 0, critResistance: 0 };
+
+    it('a click with the staff on DARKNESS deals 27', () => {
+        expect(clickDamage({ attacker: staffer, buffs: [], debuffs: [], defender: dark, random: never, boss: false }).damage).toBeCloseTo(27, 10);
+    });
+
+    it('a 600 % skill hit with the staff on DARKNESS deals 162', () => {
+        expect(hitDamage({ attacker: staffer, percent: 600, buffs: [], debuffs: [], defender: dark, random: never, boss: false }).damage).toBeCloseTo(162, 10);
+    });
+
+    it('a 150 % tick with the staff on DARKNESS deals 40.5', () => {
+        expect(tickDamage({ attacker: staffer, percent: 150, buffs: [], debuffs: [], defender: dark, boss: false })).toBeCloseTo(40.5, 10);
+    });
+
+    it('Luz Divina with the staff deals 4.5 times on DARKNESS: 324', () => {
+        const light = { ...staffer, element: 'LIGHT' };
+
+        expect(hitDamage({ attacker: light, percent: 800, vsDarkness: 1.5, buffs: [], debuffs: [], defender: dark, random: never, boss: false }).damage)
+            .toBeCloseTo(324, 10);
+    });
+
+    it('a forced critical aimed shot with the staff is 3 times the same shot without it', () => {
+        const shot = (attacker) => hitDamage({ attacker, percent: 3000, forceCritical: true, buffs: [], debuffs: [], defender: dark, random: never, boss: false }).damage;
+
+        expect(shot(staffer)).toBeCloseTo(1620, 10);
+        expect(shot({ ...staffer, darknessDamagePct: undefined })).toBeCloseTo(540, 10);
+    });
+});

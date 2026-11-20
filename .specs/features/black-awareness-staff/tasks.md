@@ -812,7 +812,7 @@ export const GIFT_NOTICE_MS = 6000;
 
 ---
 
-#### T12: The x3 against DARKNESS in `calculateDamage` [ ]
+#### T12: The x3 against DARKNESS in `calculateDamage` [x]
 
 **Owner**: game-dev
 **Goal**: One multiplication covers every strike: click, auto click, skill hit, aimed shot, tick, ally hit (BAS-08, BAS-09).
@@ -854,7 +854,7 @@ and `* darkness` as the last factor of `damage`. Add `darknessDamagePct` to the 
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 11 cases pass; every earlier unit test passes unchanged.
+- [x] The 11 cases pass; every earlier unit test passes unchanged.
 
 **Commit**: `feat(game): triple the damage of the staff against darkness`
 
