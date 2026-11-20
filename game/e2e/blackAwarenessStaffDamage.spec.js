@@ -128,6 +128,12 @@ test.describe('Black awareness staff damage', () => {
         expect(await strikeNow(page)).toBeCloseTo(BASE, 5);
     });
 
+    test('a staff worn by another hero gives the leader nothing', async ({ page }) => {
+        await startAs(page, 'vex', [ PLAIN_ON, { ...STAFF_ON, id: 'lyra-staff', heroId: 'lyra' } ]);
+
+        expect(await strikeNow(page)).toBeCloseTo(BASE, 5);
+    });
+
     test('against a FIRE monster the staff changes nothing: 27.72', async ({ page }) => {
         await startAs(page, 'vex', [ STAFF_ON ], { element: 'FIRE' });
 
