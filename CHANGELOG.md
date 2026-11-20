@@ -3,6 +3,17 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.8.0] - 2026-11-20
+
+Cajado da Consciência Negra (`black-awareness-staff`): presente do Dia da Consciência Negra para quem entra no jogo em 20 de novembro.
+
+### Adicionado
+
+- Toda conta que entra no jogo em 20 de novembro (horário de São Paulo) recebe, uma única vez, um **Cajado da Consciência Negra** na mochila, com um aviso na tela. O cajado vem mesmo com a mochila cheia.
+- É uma arma lendária de verdade, com atributos sorteados, e pode ser refinada, sorteada de novo e vendida como qualquer outra.
+- Enquanto um herói usa o cajado, cada golpe dele contra monstros de TREVAS causa o triplo do dano (+200%): clique, clique automático, habilidades, sangramento e tiro mirado. Aliados que usam o cajado também ganham o bônus.
+- O cajado tem ícone, nome e a linha do efeito em todas as telas de equipamento.
+
 ## [0.7.0] - 2026-11-20
 
 Lacaios dos minichefes (`miniboss-adds`): a partir do capítulo 11, cada minichefe luta ao lado de dois lacaios, e agora você escolhe quem atacar.
