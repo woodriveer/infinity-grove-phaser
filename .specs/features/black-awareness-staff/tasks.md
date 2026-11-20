@@ -348,7 +348,7 @@ var special: String? = null,
 
 ---
 
-#### T5: `special` in the piece JSON [ ]
+#### T5: `special` in the piece JSON [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Every piece the API answers carries `special` when it has one, also after a refine and a reroll (BAS-15, BAS-16).
@@ -383,7 +383,7 @@ filled in `from` with `special = piece.special?.name`; KDoc line: "`special` is 
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 4 new cases pass; every earlier test passes unchanged.
+- [x] The 4 new cases pass; every earlier test passes unchanged.
 
 **Commit**: `feat(backend): answer the special of a piece`
 

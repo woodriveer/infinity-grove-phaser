@@ -57,6 +57,36 @@ class EquipmentSellIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `selling the staff pays 500 copper and removes it`() {
+        jpaPieceRepository.save(
+            PieceEntity(
+                "staff",
+                "yan",
+                "WEAPON",
+                "LEGENDARY",
+                11,
+                0,
+                "BOSS_DAMAGE_PCT:28,BOSS_TIME_SECONDS:6,CRIT_DAMAGE_PCT:55,ARMOR_PIERCE_PCT:28",
+                null,
+                1,
+                "BLACK_AWARENESS_STAFF",
+            ),
+        )
+        jpaWalletRepository.save(WalletEntity("yan", 0))
+
+        asUser()
+            .post("/equipment/staff/sell")
+            .then()
+            .statusCode(200)
+            .body("equipment.pieces", hasSize<Any>(0))
+            .body("wallet.copper", equalTo(0))
+            .body("wallet.silver", equalTo(5))
+
+        assertEquals(0, jpaPieceRepository.count())
+        assertEquals(500L, copper())
+    }
+
+    @Test
     fun `selling a worn piece takes it off the hero and sells it`() {
         piece("w1", heroId = "kael")
         jpaWalletRepository.save(WalletEntity("yan", 5))

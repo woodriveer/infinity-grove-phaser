@@ -7,6 +7,7 @@ import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasSize
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -62,6 +63,31 @@ class EquipmentRerollIT : IntegrationTestBase() {
 
         assertEquals("CRIT_DAMAGE_PCT:20,BOSS_DAMAGE_PCT:6", jpaPieceRepository.findById("w1").get().affixes)
         assertEquals(1_000L, copper())
+    }
+
+    @Test
+    fun `rerolling an affix of the staff keeps its special and four affixes`() {
+        jpaPieceRepository.save(
+            PieceEntity(
+                "staff",
+                "yan",
+                "WEAPON",
+                "LEGENDARY",
+                11,
+                5,
+                "BOSS_DAMAGE_PCT:28,BOSS_TIME_SECONDS:6,CRIT_DAMAGE_PCT:55,ARMOR_PIERCE_PCT:28",
+                null,
+                1,
+                "BLACK_AWARENESS_STAFF",
+            ),
+        )
+        funded(5_000)
+
+        reroll("staff", """{"affix":0}""")
+            .then()
+            .statusCode(200)
+            .body("equipment.pieces[0].special", equalTo("BLACK_AWARENESS_STAFF"))
+            .body("equipment.pieces[0].affixes", hasSize<Any>(4))
     }
 
     @Test

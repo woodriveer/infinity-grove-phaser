@@ -64,6 +64,33 @@ class EquipmentRefineIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `refining the staff keeps its special`() {
+        jpaPieceRepository.save(
+            PieceEntity(
+                "staff",
+                "yan",
+                "WEAPON",
+                "LEGENDARY",
+                11,
+                0,
+                "BOSS_DAMAGE_PCT:28,BOSS_TIME_SECONDS:6,CRIT_DAMAGE_PCT:55,ARMOR_PIERCE_PCT:28",
+                null,
+                1,
+                "BLACK_AWARENESS_STAFF",
+            ),
+        )
+        funded(4_000)
+
+        asUser()
+            .post("/equipment/staff/refine")
+            .then()
+            .statusCode(200)
+            .body("equipment.pieces[0].refine", equalTo(1))
+            .body("equipment.pieces[0].special", equalTo("BLACK_AWARENESS_STAFF"))
+            .body("equipment.pieces[0].clickDamage", equalTo(12.1f))
+    }
+
+    @Test
     fun `a second refine without the copper is 409 NOT_ENOUGH_COPPER and changes nothing`() {
         piece("w1")
         funded(600)

@@ -192,6 +192,32 @@ class EquipmentControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `GET equipment answers the special of the staff and omits it for other pieces`() {
+        jpaPieceRepository.save(
+            PieceEntity(
+                "staff",
+                "yan",
+                "WEAPON",
+                "LEGENDARY",
+                11,
+                0,
+                "BOSS_DAMAGE_PCT:28,BOSS_TIME_SECONDS:6,CRIT_DAMAGE_PCT:55,ARMOR_PIERCE_PCT:28",
+                null,
+                1,
+                "BLACK_AWARENESS_STAFF",
+            ),
+        )
+        weapon("w1", createdAt = 2)
+
+        asUser()
+            .get("/equipment")
+            .then()
+            .statusCode(200)
+            .body("pieces.find { it.id == 'staff' }.special", equalTo("BLACK_AWARENESS_STAFF"))
+            .body("pieces.find { it.id == 'w1' }.special", nullValue())
+    }
+
+    @Test
     fun `every equipment route needs a token`() {
         given().get("/equipment").then().statusCode(401)
         given()

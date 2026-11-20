@@ -14,6 +14,7 @@ data class AffixResponse(
 /**
  * A piece as the game shows it: every value already refined, plus what the next refine, a reroll and a sale cost in copper.
  * Absent fields are null: `clickDamage` outside a weapon, `heroId` in the bag, `refineCost` at +10, `rerollCost` below +5.
+ * `special` is the fixed effect of the piece (`BLACK_AWARENESS_STAFF`), absent for none.
  */
 data class PieceResponse(
     val id: String,
@@ -30,6 +31,8 @@ data class PieceResponse(
     @JsonInclude(JsonInclude.Include.NON_NULL)
     val rerollCost: Long?,
     val sellPrice: Long,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val special: String?,
 ) {
     companion object {
         fun from(
@@ -46,6 +49,7 @@ data class PieceResponse(
             refineCost = piece.refineCost(rules),
             rerollCost = piece.rerollCost(rules),
             sellPrice = piece.sellPrice(),
+            special = piece.special?.name,
         )
     }
 }

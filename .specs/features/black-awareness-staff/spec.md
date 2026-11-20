@@ -159,7 +159,7 @@ Rows `y` were decided by the owner before the spec (relayed by the orchestrator 
 | BAS-13 | P1 See: AC 1 (tile) | Tasks | Implementing |
 | BAS-14 | P1 See: AC 2, AC 3 (title, lines) | Tasks | Implementing |
 | BAS-15 | P1 See: AC 4, AC 5 (special survives refine and reroll; not an affix) | Tasks | Implementing |
-| BAS-16 | P1 See: AC 6 (sale) | Tasks | Pending |
+| BAS-16 | P1 See: AC 6 (sale) | Tasks | Implementing |
 | BAS-17 | P1 See: AC 7 (unknown special) | Tasks | Implementing |
 
 **Coverage:** 17 total, 17 mapped to tasks, 0 unmapped.
