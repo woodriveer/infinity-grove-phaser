@@ -3,6 +3,7 @@ package br.com.woodriver.infinity_grove_ws
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.DropRule
 import br.com.woodriver.infinity_grove_ws.domain.DropTable
+import br.com.woodriver.infinity_grove_ws.domain.GiftGrant
 import br.com.woodriver.infinity_grove_ws.domain.Hero
 import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
@@ -20,6 +21,8 @@ import br.com.woodriver.infinity_grove_ws.port.CrystalRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.DropRollerPort
 import br.com.woodriver.infinity_grove_ws.port.DropRuleRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.EquipmentRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.GiftCalendarPort
+import br.com.woodriver.infinity_grove_ws.port.GiftRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.HeroRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.IdGeneratorPort
 import br.com.woodriver.infinity_grove_ws.port.PasswordHasherPort
@@ -34,6 +37,7 @@ import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.WalletRepositoryPort
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 
 class FakePasswordHasher : PasswordHasherPort {
@@ -247,6 +251,26 @@ class InMemoryEquipmentRepository : EquipmentRepositoryPort {
     override fun deleteByUsername(username: String) {
         pieces.values.removeIf { it.username == username }
     }
+}
+
+class InMemoryGiftRepository : GiftRepositoryPort {
+    val grants = mutableListOf<GiftGrant>()
+
+    override fun exists(
+        username: String,
+        giftId: String,
+    ) = grants.any { it.username == username && it.giftId == giftId }
+
+    override fun save(grant: GiftGrant): GiftGrant {
+        check(!exists(grant.username, grant.giftId)) { "duplicate gift ${grant.giftId} for ${grant.username}" }
+        return grant.also { grants += it }
+    }
+}
+
+class FixedGiftCalendar(
+    var today: LocalDate,
+) : GiftCalendarPort {
+    override fun today() = today
 }
 
 class InMemoryTalentRepository : TalentRepositoryPort {

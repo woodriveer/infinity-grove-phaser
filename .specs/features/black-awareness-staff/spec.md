@@ -147,7 +147,7 @@ Rows `y` were decided by the owner before the spec (relayed by the orchestrator 
 | BAS-01 | P1 Receive: AC 1, AC 2 (staff roll and grant) | Tasks | Implementing |
 | BAS-02 | P1 Receive: AC 3 (once per account ever) | Tasks | Implementing |
 | BAS-03 | P1 Receive: AC 4, AC 5 (gift day in Sao Paulo, boundaries) | Tasks | Implementing |
-| BAS-04 | P1 Receive: AC 6 (bag full overflow) | Tasks | Pending |
+| BAS-04 | P1 Receive: AC 6 (bag full overflow) | Tasks | Implementing |
 | BAS-05 | P1 Receive: AC 7 (concurrency) | Tasks | Implementing |
 | BAS-06 | P1 Receive: AC 8, edge 404 (auth) | Tasks | Pending |
 | BAS-07 | P1 Receive: AC 9, AC 10, AC 11 (game claim and notice) | Tasks | Implementing |

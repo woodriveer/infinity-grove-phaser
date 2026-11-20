@@ -532,7 +532,7 @@ class GiftRepository(private val jpaPlayerGiftRepository: JpaPlayerGiftRepositor
 
 ### Phase 3: Backend use case and endpoint
 
-#### T8: `GiftService` (claim use case) [ ]
+#### T8: `GiftService` (claim use case) [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Grant the staff once per account on November 20 in Sao Paulo, under the player lock, ignoring the bag capacity (BAS-01 to BAS-05).
@@ -616,7 +616,7 @@ class FixedGiftCalendar(var today: LocalDate) : GiftCalendarPort {
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 9 cases pass; every earlier backend test passes unchanged.
+- [x] The 9 cases pass; every earlier backend test passes unchanged.
 
 **Commit**: `feat(backend): grant the black awareness staff once per account on november 20`
 
