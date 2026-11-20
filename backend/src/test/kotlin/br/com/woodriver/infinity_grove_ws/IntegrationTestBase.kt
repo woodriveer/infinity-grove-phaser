@@ -14,6 +14,7 @@ import br.com.woodriver.infinity_grove_ws.adapter.repository.JpaWalletRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.UserEntity
 import br.com.woodriver.infinity_grove_ws.adapter.security.JwtAccessTokenIssuer
 import br.com.woodriver.infinity_grove_ws.port.ChanceRollerPort
+import br.com.woodriver.infinity_grove_ws.port.GiftCalendarPort
 import io.restassured.RestAssured
 import io.restassured.specification.RequestSpecification
 import org.junit.jupiter.api.BeforeEach
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.testcontainers.postgresql.PostgreSQLContainer
+import java.time.LocalDate
 
 @TestConfiguration(proxyBeanMethods = false)
 class PostgresTestConfiguration {
@@ -53,6 +55,25 @@ class ChanceTestConfiguration {
     fun controllableChanceRoller() = ControllableChanceRoller()
 }
 
+/** The gift date every integration test reads; by default not a gift day, so no other test receives the staff. */
+class ControllableGiftCalendar : GiftCalendarPort {
+    @Volatile
+    var today: LocalDate = NOT_GIFT_DAY
+
+    override fun today() = today
+
+    companion object {
+        val NOT_GIFT_DAY: LocalDate = LocalDate.of(2026, 11, 19)
+    }
+}
+
+@TestConfiguration(proxyBeanMethods = false)
+class GiftCalendarTestConfiguration {
+    @Bean
+    @Primary
+    fun controllableGiftCalendar() = ControllableGiftCalendar()
+}
+
 const val TEST_JWT_SECRET = "integration-test-secret-0123456789-abcdef"
 
 @SpringBootTest(
@@ -65,7 +86,7 @@ const val TEST_JWT_SECRET = "integration-test-secret-0123456789-abcdef"
         "app.equipment.miniboss-rate=0.25",
     ],
 )
-@Import(PostgresTestConfiguration::class, ChanceTestConfiguration::class)
+@Import(PostgresTestConfiguration::class, ChanceTestConfiguration::class, GiftCalendarTestConfiguration::class)
 abstract class IntegrationTestBase {
     @LocalServerPort
     private var port: Int = 0
@@ -107,6 +128,9 @@ abstract class IntegrationTestBase {
     protected lateinit var chance: ControllableChanceRoller
 
     @Autowired
+    protected lateinit var giftCalendar: ControllableGiftCalendar
+
+    @Autowired
     private lateinit var accessTokenIssuer: JwtAccessTokenIssuer
 
     /** A valid `Bearer` header value for [username]; the user does not need to exist, the access token is stateless. */
@@ -125,6 +149,7 @@ abstract class IntegrationTestBase {
         RestAssured.port = port
         RestAssured.basePath = ""
         chance.value = ControllableChanceRoller.NO_DROP
+        giftCalendar.today = ControllableGiftCalendar.NOT_GIFT_DAY
         jpaRefreshTokenRepository.deleteAll()
         jpaProgressRepository.deleteAll()
         jpaPieceRepository.deleteAll()

@@ -622,7 +622,7 @@ class FixedGiftCalendar(var today: LocalDate) : GiftCalendarPort {
 
 ---
 
-#### T9: `POST /gifts/claim` [ ]
+#### T9: `POST /gifts/claim` [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The endpoint the game calls on every battle start (BAS-01 to BAS-06).
@@ -703,8 +703,8 @@ Do not replace the `Clock` bean: tokens are signed with it and checked against t
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 6 cases pass; every earlier IT passes with the new `@Import`.
-- [ ] `cd backend && ./gradlew test` passes in full (no `--tests` filter).
+- [x] The 6 cases pass; every earlier IT passes with the new `@Import`.
+- [x] `cd backend && ./gradlew test` passes in full (no `--tests` filter).
 
 **Commit**: `feat(backend): add the gift claim endpoint`
 
