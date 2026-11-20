@@ -218,7 +218,7 @@ Body: `val rarity = Rarity.LEGENDARY`; `val baseClick = between(weaponClickRange
 
 ---
 
-#### T3: Gift day rule and gift values (`Gift.kt`) [ ]
+#### T3: Gift day rule and gift values (`Gift.kt`) [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The pure rule "November 20 of any year" and the values the gift use case returns and stores (BAS-03).
@@ -279,7 +279,7 @@ data class GiftClaim(
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The new cases pass; every earlier backend test passes unchanged.
+- [x] The new cases pass; every earlier backend test passes unchanged.
 
 **Commit**: `feat(backend): add the november 20 gift day rule`
 
