@@ -1451,8 +1451,8 @@ Checks per screen: every size, position, colour and text of § Fight Layout; no 
 **Gate**: build - `cd game && npm run ui:shots -- minibossAdds` exits 0
 **Done when**:
 
-- [ ] `ui-review.html` holds the 7 screens with desktop and phone shots and a verdict.
-- [ ] Every finding is a task in this file.
+- [x] `ui-review.html` holds the 7 screens with desktop and phone shots and a verdict.
+- [x] Every finding is a task in this file.
 
 **Commit**: `docs(miniboss-adds): add the ui review`
 
