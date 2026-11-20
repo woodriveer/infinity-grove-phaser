@@ -940,7 +940,7 @@ export const createGiftApi = (httpClient) => ({
 
 ---
 
-#### T15: Gift claim service (`giftClaim.js`) [ ]
+#### T15: Gift claim service (`giftClaim.js`) [x]
 
 **Owner**: game-dev
 **Goal**: Claim once, add a granted piece to the equipment list, never throw (BAS-07, spec D15).
@@ -1000,7 +1000,7 @@ export const claimGift = async ({ gateway, equipment, onGift }) =>
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 5 cases pass.
+- [x] The 5 cases pass.
 
 **Commit**: `feat(game): claim the event gift and add it to the equipment`
 
