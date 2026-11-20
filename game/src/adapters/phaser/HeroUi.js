@@ -2,6 +2,7 @@ import { farmMapPosition } from '../../domain/campaign/bossMap';
 import { bagPieces, selectedInBag, sellNotice as sellNoticeText, toggleRarity, toggleSelected } from '../../domain/equipment/bulkSell';
 import { dropLabel, wornBy } from '../../domain/equipment/equipment';
 import { leaderStats } from '../../domain/equipment/leaderStats';
+import { GIFT_NOTICE, GIFT_NOTICE_MS } from '../../domain/equipment/specials';
 import { raisedSkills } from '../../domain/heroes/bagCards';
 import { activePassives, slotStates } from '../../domain/heroes/team';
 import { raisedSkillSlot, skillLevelOf } from '../../domain/skills/skillLevel';
@@ -1174,6 +1175,14 @@ export class HeroUi
         this.showNotice(`Equipamento encontrado: ${dropLabel(drop.piece)}`);
     }
 
+    //  "Presente do Dia da Consciência Negra: ..." for 6 s (spec black-awareness-staff D9), in the place of the drop notices; the red dot of
+    //  Equipamento turns on unless Equipamento is open
+    showGift ()
+    {
+        this.equipmentBadge.hidden = this.open && this.screen === 'equipment';
+        this.showNotice(GIFT_NOTICE, GIFT_NOTICE_MS);
+    }
+
     //  The red dot of Talentos counts the unspent points ("+9" from 10 on) and hides at zero
     refreshTalentsBadge ()
     {
@@ -1197,13 +1206,13 @@ export class HeroUi
             .catch(() => {});
     }
 
-    showNotice (text)
+    showNotice (text, ms = NOTICE_MS)
     {
         const id = ++this.noticeId;
 
         this.notice.textContent = text;
         this.notice.hidden = false;
-        this.scene.time.delayedCall(NOTICE_MS, () =>
+        this.scene.time.delayedCall(ms, () =>
         {
             if (id === this.noticeId)
             {

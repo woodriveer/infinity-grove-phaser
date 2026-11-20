@@ -1061,7 +1061,7 @@ export const claimGift = async ({ gateway, equipment, onGift }) =>
 
 ---
 
-#### T17: Gift notice in `HeroUi` [ ]
+#### T17: Gift notice in `HeroUi` [x]
 
 **Owner**: game-dev
 **Goal**: `showGift()` shows the gift notice for 6000 ms and lights the Equipamento dot (BAS-07, spec P1 Receive AC 10).
@@ -1101,7 +1101,7 @@ export const claimGift = async ({ gateway, equipment, onGift }) =>
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 3 cases pass; every earlier `HeroUi` case passes unchanged.
+- [x] The 3 cases pass; every earlier `HeroUi` case passes unchanged.
 
 **Commit**: `feat(game): show the black awareness gift notice`
 

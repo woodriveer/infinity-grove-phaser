@@ -1678,6 +1678,40 @@ describe('HeroUi equipment badge', () => {
     });
 });
 
+describe('HeroUi gift notice', () => {
+    it('showGift shows the gift text for 6000 ms and lights the Equipamento dot', () => {
+        const ctx = createUi();
+
+        ctx.ui.showGift();
+
+        expect(ctx.testid('card-notice').textContent).toBe('Presente do Dia da Consciência Negra: Cajado da Consciência Negra na mochila!');
+        expect(ctx.testid('card-notice').hidden).toBe(false);
+        expect(ctx.timers.at(-1).delay).toBe(6000);
+        expect(ctx.testid('equipment-badge').hidden).toBe(false);
+
+        ctx.timers.at(-1).callback();
+
+        expect(ctx.testid('card-notice').hidden).toBe(true);
+    });
+
+    it('showGift while Equipamento is open leaves the dot off', async () => {
+        const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ piece() ] } });
+
+        await open(ctx, 'equipment');
+        ctx.ui.showGift();
+
+        expect(ctx.testid('equipment-badge').hidden).toBe(true);
+    });
+
+    it('a dropped piece notice still lasts 3000 ms', () => {
+        const ctx = createUi();
+
+        ctx.ui.showEquipmentDrop({ piece: piece(), sold: false });
+
+        expect(ctx.timers.at(-1).delay).toBe(3000);
+    });
+});
+
 describe('HeroUi talent points badge', () => {
     const badgeAfter = async (available) => {
         const ctx = createUi({ talentList: talentsAnswer({}, available) });
