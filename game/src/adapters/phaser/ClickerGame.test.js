@@ -5674,10 +5674,13 @@ describe('ClickerGame hero team formation', () => {
 
 const ADD = { health: 30, defenseBuff: 30 };
 //  Stage 1 of chapter 11: phase monsters of defense 0, a miniboss of defense 49 and its adds
-const addsDefinition = ({ adds = [ ADD, ADD ], miniboss = { element: 'FIRE', defense: 49, critResistance: 0 }, minibossHealth = 100 } = {}) => ({
+const addsDefinition = ({
+    adds = [ ADD, ADD ], miniboss = { element: 'FIRE', defense: 49, critResistance: 0 }, minibossHealth = 100,
+    monster = { element: 'FIRE', defense: 0, critResistance: 0 }
+} = {}) => ({
     ...definition,
     stages: definition.stages.map((stage) => (stage.number === 1
-        ? { ...stage, minibossHealth, miniboss, monster: { element: 'FIRE', defense: 0, critResistance: 0 }, adds }
+        ? { ...stage, minibossHealth, miniboss, monster, adds }
         : stage))
 });
 const addsStart = (options) => ({ ...progress(1, 'MINIBOSS', 1), chapter: 11, definition: addsDefinition(options) });
@@ -5922,6 +5925,37 @@ describe('ClickerGame miniboss adds', () => {
 
         expect(result.damage).toBeCloseTo(1, 9);
         expect(add.health).toBeCloseTo(29, 9);
+    });
+
+    //  The adds carry the stats of the stage's phase monster; here defense 20 so that a break is visible (the seeded phase monsters have 0)
+    const SHIELDED = { monster: { element: 'FIRE', defense: 20, critResistance: 30 } };
+    const breakTalent = { id: 'PHYSICAL_BREAK', perLevel: 1, maxLevel: 10, level: 5, value: 5, nextCost: 300 };
+
+    it('a hit on an add of defense 20 deals 0.8, and 0.85 under Quebra de defesa 5', async () => {
+        const plain = await addsScene(SHIELDED);
+
+        plain.click({ x: 480, y: 360 });
+
+        expect(plain.scene.fight.adds[0].monster.health).toBeCloseTo(29.2, 9);
+
+        const broken = await addsScene(SHIELDED, { talents: [ breakTalent ] });
+
+        broken.click({ x: 480, y: 360 });
+
+        expect(broken.scene.fight.adds[0].monster.health).toBeCloseTo(29.15, 9);
+    });
+
+    it('the Erosão Arcana of an Orina ally takes 15 points off the defense of an add: two hits of 1.9 show one 3.8, not 3.2', async () => {
+        const ctx = await addsScene(SHIELDED, { heroes: teamHeroes([ 'lyra', 'orina', null, null ]) });
+
+        ctx.click({ x: 480, y: 360 });
+
+        const before = ctx.texts.length;
+
+        ctx.scene.update(0, 1000);
+
+        //  Lyra and Orina hit for 2 each; the add's 20 defense drops to 5, so each deals 1.9 and the tick shows their sum at the add's ally number place
+        expect(ctx.texts.slice(before).map(({ text, x, y, style }) => [ text, x, y, style.color ])).toEqual([ [ '3.8', 520, 360, '#7fd4ff' ] ]);
     });
 });
 
