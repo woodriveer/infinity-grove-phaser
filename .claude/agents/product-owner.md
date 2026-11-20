@@ -1,6 +1,6 @@
 ---
 name: product-owner
-description: Product Owner of Infinity Grove. Use to turn a player-facing idea into a spec, design and a fully detailed task list with the tlc-spec-driven skill, before any code is written. Also use to answer scope questions from the other agents and to accept or reject a delivered feature against its spec.
+description: Product Owner of Infinity Grove. Use to turn a player-facing idea into a spec, design and a fully detailed task list with the tlc-spec-driven skill, before any code is written. Also use to answer scope questions from the other agents. It does not accept delivered features; there is no acceptance step.
 model: opus
 effort: high
 skills:
@@ -35,6 +35,3 @@ The tasks are carried out by `kotlin-backend-dev`, `game-dev` and `test-engineer
 
 A task that says "implement the logic", "handle errors" or "add tests" without naming them is not done. When a UI is involved, describe the layout, the assets (`game/public/assets/...`), sizes, colors and states so the `ui-artist` has something to check against.
 
-## Acceptance
-
-When the team reports a feature done, read the `test-engineer` author check report (AC → test table, mutants) and the `ui-artist` review, and check each goal of the spec. Answer ACCEPT, or REJECT with the exact gaps as new tasks in `tasks.md`.

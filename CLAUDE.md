@@ -4,7 +4,7 @@
 
 # Release report
 
-- After each feature/spec is done (`product-owner` ACCEPT, everything pushed), write an HTML report of the result to `.specs/features/<feature>/report.html`, commit it, and give the user its path. Write it in Portuguese (AD-007).
+- After each feature/spec is done (every task ticked, `test-engineer` author check clean, `ui-artist` APROVADO when the player sees a change, everything pushed), write an HTML report of the result to `.specs/features/<feature>/report.html`, commit it, and give the user its path. Write it in Portuguese (AD-007).
 - The report has:
   - the verdict, the commit range and the `test-engineer` author check summary (sensor killed/survived);
   - **production code** of the range (`git diff --numstat <range>`): lines added and removed and files touched, split into backend (`backend/src/main`) and game (`game/src` without `*.test.js`, plus `game/public/*.css`). Specs, tests, assets and build config (`game/vite.config.js` and the like) are not production code;
@@ -20,7 +20,7 @@
 - The backend and the game go live from `origin/main` while `./publish.sh` runs. From the repository root it starts the blue-green stack in Docker (Postgres, the active backend slot, the Traefik proxy on `localhost:8080`, Dozzle), opens the `cloudflared` quick tunnel to the proxy, publishes the game Worker through that tunnel and starts the deploy watcher (`deploy/watcher.mjs`).
 - Every 60 s the watcher fetches `origin/main` and deploys the newest commit it has not handled. A commit that changes `backend/**` (backend tests in `backend/src/test/**` alone do not count) is built into the idle slot, checked by the regression suite (`deploy/regression.mjs`) and switched in with no downtime; a failing commit never takes traffic. A commit that changes the game republishes the Worker through the same tunnel. Any other commit is only recorded. The state is in `.deploy-state`.
 - Only the tree of a commit is deployed, never the working tree: uncommitted files never reach players.
-- After finishing a new feature/spec (`product-owner` ACCEPT, everything pushed), make sure `./publish.sh` is running and the commit is on `origin/main`; the watcher deploys it within a few minutes. This step is never skipped silently: if `publish.sh` is not running and cannot be started, report that the deploy is pending.
+- After finishing a new feature/spec (done as in Release report, everything pushed), make sure `./publish.sh` is running and the commit is on `origin/main`; the watcher deploys it within a few minutes. This step is never skipped silently: if `publish.sh` is not running and cannot be started, report that the deploy is pending.
 - `./deploy.sh --rollback` brings back the previous backend within 5 minutes of a deploy; after that the old slot and its image are removed.
 - Dozzle shows the live logs of every container (slots, proxy, regression runs) at `http://localhost:8888`.
 - A second `./publish.sh` while one runs only prints the tunnel and the active slot; `--force` republishes the Worker of the handled commit. To publish only the Worker by hand, run `BACKEND_URL=<tunnel> npm run deploy` inside `game/`. Details in `game/readme.md`.
@@ -39,7 +39,7 @@ The main session is the orchestrator; the agents live in `.claude/agents/`. For 
    - During a feature, agents run only the unit suites and the feature's own e2e spec files. The full e2e suite runs once per feature, by `gitops` with the coverage commands for `report.html`.
    - No agent leaves a test suite running in the background or runs two suites at once in the same checkout.
    - Work of different features that touches different files (for example test-only fixes) runs in parallel, each agent in its own worktree (`isolation: "worktree"`); each rebases on `origin/main` before it pushes (`git pull --rebase origin main && git push origin HEAD:main`).
-5. `product-owner` accepts or rejects against the spec.
+5. There is no acceptance step. The orchestrator checks that every task of `tasks.md` is ticked, the `test-engineer` author check has no gaps or surviving mutants and the `ui-artist` review is APROVADO (when the player sees a change); any gap becomes a task for its owner. Scope questions still go to `product-owner`.
 6. `gitops` pushes, makes sure the deploy is live, checks production, writes `report.html`, updates `CHANGELOG.md` and cuts the release tag.
 
 ## graphify
