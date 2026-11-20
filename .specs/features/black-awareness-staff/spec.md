@@ -156,11 +156,11 @@ Rows `y` were decided by the owner before the spec (relayed by the orchestrator 
 | BAS-10 | P1 Damage: AC 7 (ally) | Tasks | Pending |
 | BAS-11 | P1 Damage: AC 8 (bag or other hero gives nothing) | Tasks | Pending |
 | BAS-12 | P1 Damage: AC 10 (battle scene numbers) | Tasks | Pending |
-| BAS-13 | P1 See: AC 1 (tile) | Tasks | Pending |
-| BAS-14 | P1 See: AC 2, AC 3 (title, lines) | Tasks | Pending |
+| BAS-13 | P1 See: AC 1 (tile) | Tasks | Implementing |
+| BAS-14 | P1 See: AC 2, AC 3 (title, lines) | Tasks | Implementing |
 | BAS-15 | P1 See: AC 4, AC 5 (special survives refine and reroll; not an affix) | Tasks | Pending |
 | BAS-16 | P1 See: AC 6 (sale) | Tasks | Pending |
-| BAS-17 | P1 See: AC 7 (unknown special) | Tasks | Pending |
+| BAS-17 | P1 See: AC 7 (unknown special) | Tasks | Implementing |
 
 **Coverage:** 17 total, 17 mapped to tasks, 0 unmapped.
 

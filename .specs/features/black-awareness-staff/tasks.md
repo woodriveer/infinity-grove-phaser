@@ -712,7 +712,7 @@ Do not replace the `Clock` bean: tokens are signed with it and checked against t
 
 ### Phase 4: Game domain
 
-#### T10: Special catalog (`specials.js`) [ ]
+#### T10: Special catalog (`specials.js`) [x]
 
 **Owner**: game-dev
 **Goal**: One place for the staff's name, icon, damage percent, line and notice (BAS-13, BAS-14, BAS-17).
@@ -763,7 +763,7 @@ export const GIFT_NOTICE_MS = 6000;
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 5 cases pass; every earlier unit test passes unchanged.
+- [x] The 5 cases pass; every earlier unit test passes unchanged.
 
 **Commit**: `feat(game): add the black awareness staff special`
 
