@@ -4,23 +4,23 @@
 
 # Release report
 
-- After each feature/spec is done (Verifier PASS, everything pushed), write an HTML report of the result to `.specs/features/<feature>/report.html`, commit it, and give the user its path. Write it in Portuguese (AD-007).
+- After each feature/spec is done (`product-owner` ACCEPT, everything pushed), write an HTML report of the result to `.specs/features/<feature>/report.html`, commit it, and give the user its path. Write it in Portuguese (AD-007).
 - The report has:
-  - the verdict, the commit range and the Verifier summary (sensor killed/survived);
+  - the verdict, the commit range and the `test-engineer` author check summary (sensor killed/survived);
   - **production code** of the range (`git diff --numstat <range>`): lines added and removed and files touched, split into backend (`backend/src/main`) and game (`game/src` without `*.test.js`, plus `game/public/*.css`). Specs, tests, assets and build config (`game/vite.config.js` and the like) are not production code;
   - **test code** of the range: backend (`backend/src/test`), game unit (`game/src/**/*.test.js`), e2e (`game/e2e`), with the number of tests added and the totals of each suite after the run;
   - **unit test coverage**: line and branch percentage of backend (JaCoCo) and game (Vitest `--coverage`, v8), for the whole project and for the files the feature changed;
   - **e2e coverage**: the line percentage of game code that the Playwright suite exercises (istanbul instrumentation), and the feature's e2e scenarios with pass/fail;
   - failing tests that are not caused by the feature, and why.
 - Coverage commands: backend `cd backend && ./gradlew cleanTest test` (JaCoCo, `build/reports/jacoco/test/jacocoTestReport.xml`); game unit `cd game && npm run test:coverage` (`coverage/unit/coverage-summary.json`); e2e `cd game && npm run test:e2e:coverage` (`coverage/e2e/coverage-summary.json`); deploy `node --test --experimental-test-coverage "deploy/**/*.test.mjs"` (printed in the run output). The e2e number is a lower bound: a page reloaded inside a test loses what it counted before the reload.
-- Every number comes from a command run for that report, or for coverage from the Verifier's final full run when only docs changed after it (`.claude/agents/gitops.md`). If a coverage tool is not configured, write `não medido` with the reason. Never estimate a number.
+- Every number comes from a command run for that report. If a coverage tool is not configured, write `não medido` with the reason. Never estimate a number.
 
 # Deploy
 
 - The backend and the game go live from `origin/main` while `./publish.sh` runs. From the repository root it starts the blue-green stack in Docker (Postgres, the active backend slot, the Traefik proxy on `localhost:8080`, Dozzle), opens the `cloudflared` quick tunnel to the proxy, publishes the game Worker through that tunnel and starts the deploy watcher (`deploy/watcher.mjs`).
 - Every 60 s the watcher fetches `origin/main` and deploys the newest commit it has not handled. A commit that changes `backend/**` (backend tests in `backend/src/test/**` alone do not count) is built into the idle slot, checked by the regression suite (`deploy/regression.mjs`) and switched in with no downtime; a failing commit never takes traffic. A commit that changes the game republishes the Worker through the same tunnel. Any other commit is only recorded. The state is in `.deploy-state`.
 - Only the tree of a commit is deployed, never the working tree: uncommitted files never reach players.
-- After finishing a new feature/spec (Verifier PASS, everything pushed), make sure `./publish.sh` is running and the commit is on `origin/main`; the watcher deploys it within a few minutes. This step is never skipped silently: if `publish.sh` is not running and cannot be started, report that the deploy is pending.
+- After finishing a new feature/spec (`product-owner` ACCEPT, everything pushed), make sure `./publish.sh` is running and the commit is on `origin/main`; the watcher deploys it within a few minutes. This step is never skipped silently: if `publish.sh` is not running and cannot be started, report that the deploy is pending.
 - `./deploy.sh --rollback` brings back the previous backend within 5 minutes of a deploy; after that the old slot and its image are removed.
 - Dozzle shows the live logs of every container (slots, proxy, regression runs) at `http://localhost:8888`.
 - A second `./publish.sh` while one runs only prints the tunnel and the active slot; `--force` republishes the Worker of the handled commit. To publish only the Worker by hand, run `BACKEND_URL=<tunnel> npm run deploy` inside `game/`. Details in `game/readme.md`.
@@ -35,8 +35,8 @@ The main session is the orchestrator; the agents live in `.claude/agents/`. For 
 1. `product-owner` (Opus, high) writes spec, design and fully detailed tasks with `tlc-spec-driven`; the user approves them.
 2. Each task goes to its owner: `kotlin-backend-dev` (Sonnet, high) for `backend/` and the deploy scripts (`deploy/`, `publish.sh`, `deploy.sh`, `start.sh`), `game-dev` (Sonnet, high) for `game/`, `test-engineer` (Sonnet, high) for test tasks.
 3. `ui-artist` reviews every change the player can see and writes `ui-review.html` from `.claude/templates/ui-review.html`, with Playwright screenshots of every changed screen (`npm run ui:shots` in `game/`); findings become tasks.
-4. The `verifier` agent (Opus) runs as the Verifier; it must not have authored the feature. The `test-engineer` runs its author check first (`.claude/agents/test-engineer.md`). Re-verification rounds are scoped to the gaps and fixes; the full suites run in round 1, and the final PASS round runs the full e2e suite again only when production code changed since the last full run (`.claude/agents/verifier.md`). Mutants run with `node scripts/sensor.mjs`.
-   - The Verifier's full runs use the coverage commands, and `gitops` reads the summaries it leaves in `.specs/features/<feature>/coverage/` instead of running the suites again. Only `gitops` turns them into percentages, in `report.html`.
+4. There is no Verifier agent. The `test-engineer` author check (`.claude/agents/test-engineer.md`) is the test gate, and the `verifier` step of `tlc-spec-driven` (validation.md, `validate_state.py`) is off in this project. Mutants run with `node scripts/sensor.mjs`.
+   - During a feature, agents run only the unit suites and the feature's own e2e spec files. The full e2e suite runs once per feature, by `gitops` with the coverage commands for `report.html`.
    - No agent leaves a test suite running in the background or runs two suites at once in the same checkout.
    - Work of different features that touches different files (for example test-only fixes) runs in parallel, each agent in its own worktree (`isolation: "worktree"`); each rebases on `origin/main` before it pushes (`git pull --rebase origin main && git push origin HEAD:main`).
 5. `product-owner` accepts or rejects against the spec.

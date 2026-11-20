@@ -37,4 +37,4 @@ A task that says "implement the logic", "handle errors" or "add tests" without n
 
 ## Acceptance
 
-When the team reports a feature done, read the Verifier's `validation.md` and the `ui-artist` review, and check each goal of the spec. Answer ACCEPT, or REJECT with the exact gaps as new tasks in `tasks.md`.
+When the team reports a feature done, read the `test-engineer` author check report (AC → test table, mutants) and the `ui-artist` review, and check each goal of the spec. Answer ACCEPT, or REJECT with the exact gaps as new tasks in `tasks.md`.
