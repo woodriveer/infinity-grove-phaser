@@ -67,6 +67,50 @@ describe('renderPieceTile', () => {
     });
 });
 
+describe('renderPieceTile with a special', () => {
+    const STAFF = {
+        id: 's', slot: 'WEAPON', rarity: 'LEGENDARY', refine: 0, clickDamage: 11, heroId: null, sellPrice: 500,
+        affixes: [ { type: 'BOSS_DAMAGE_PCT', value: 28 }, { type: 'BOSS_TIME_SECONDS', value: 6 }, { type: 'CRIT_DAMAGE_PCT', value: 55 }, { type: 'ARMOR_PIERCE_PCT', value: 28 } ],
+        special: 'BLACK_AWARENESS_STAFF'
+    };
+    const staffTile = (extra = {}) => renderPieceTile({ ...STAFF, ...extra }, { testid: 'equip-piece-s', onClick: vi.fn() });
+
+    it('the staff tile shows the staff art and carries its special', () => {
+        const node = staffTile();
+
+        expect(node.querySelector('img.icon-image').getAttribute('src').endsWith('assets/staff_black_awares_day.png')).toBe(true);
+        expect(node.getAttribute('data-special')).toBe('BLACK_AWARENESS_STAFF');
+        expect(node.getAttribute('data-rarity')).toBe('LEGENDARY');
+        expect(node.getAttribute('data-gems')).toBe('4');
+        expect(node.querySelector('.icon').classList.contains('piece-icon-special')).toBe(true);
+        expect(node.getAttribute('aria-label')).toBe('Cajado da Consciência Negra +0');
+    });
+
+    it('a staff at +3 shows +3 and its name with +3', () => {
+        const node = staffTile({ refine: 3 });
+
+        expect(node.querySelector('.piece-refine').textContent).toBe('+3');
+        expect(node.getAttribute('aria-label')).toBe('Cajado da Consciência Negra +3');
+    });
+
+    it('a staff whose art is missing falls back to the weapon icon', () => {
+        const node = staffTile();
+        const image = node.querySelector('img');
+
+        image.dispatchEvent(new Event('error'));
+
+        expect(image.getAttribute('src').endsWith('assets/slot-weapon.png')).toBe(true);
+    });
+
+    it('a piece with an unknown special shows the slot icon and no data-special', () => {
+        const node = staffTile({ special: 'FROST_RUNE' });
+
+        expect(node.querySelector('img').getAttribute('src').endsWith('assets/slot-weapon.png')).toBe(true);
+        expect(node.hasAttribute('data-special')).toBe(false);
+        expect(node.getAttribute('aria-label')).toBe('Lendário Arma +0');
+    });
+});
+
 describe('renderEmptyTile', () => {
     it('is a dashed disabled tile with the text vazio and the dimmed icon', () => {
         const node = renderEmptyTile('RING', { testid: 'equip-slot-kael-RING' });

@@ -2559,6 +2559,19 @@ button.bag-card:hover:not(:disabled) {
     height: 40px;
 }
 
+/* The Cajado da Consciência Negra (spec black-awareness-staff): its art, black background included, fills the tile as a rounded square
+   inside the gold legendary frame */
+.piece-tile[data-special] .icon {
+    width: 52px;
+    height: 52px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.piece-tile[data-special] .icon-image {
+    object-fit: cover;
+}
+
 .piece-gems {
     position: absolute;
     top: -5px;

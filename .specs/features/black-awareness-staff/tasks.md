@@ -1006,7 +1006,7 @@ export const claimGift = async ({ gateway, equipment, onGift }) =>
 
 ---
 
-#### T16: Staff tile icon and style [ ]
+#### T16: Staff tile icon and style [x]
 
 **Owner**: game-dev
 **Goal**: The staff tile shows its art and carries `data-special` (BAS-13, BAS-17, spec D12).
@@ -1054,8 +1054,8 @@ export const claimGift = async ({ gateway, equipment, onGift }) =>
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 4 cases pass; every earlier `pieceTile` and `dragEquip` unit test passes unchanged.
-- [ ] `game/public/assets/staff_black_awares_day.png` is in the commit.
+- [x] The 4 cases pass; every earlier `pieceTile` and `dragEquip` unit test passes unchanged.
+- [x] `game/public/assets/staff_black_awares_day.png` is in the commit.
 
 **Commit**: `feat(game): show the staff art on its tile`
 
