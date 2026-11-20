@@ -216,7 +216,7 @@
 - **Trade-off**: With one defense the old counterplay "a magical leader or the team goes straight in" is gone; one living add keeps the miniboss at 90 from chapter 12 stage 4 on (spec Q47, Q48, not balance-tested). The server cannot see adds or targets (AD-002). A forged client can ignore the adds. `stage_adds` restricts the deletion of a stage that has adds.
 - **Scope**: `backend` `Chapter.kt` (`StageAdd`, `StageDefinition.adds`, `ChapterDefinition.addsOf`), `ChapterEntities.kt`, `ChapterRepository.kt`, `ProgressController.kt` (`AddResponse`), `V13__miniboss_adds.sql`, `backend/docs/adr/0014-miniboss-adds.md`; `game/src/domain/combat/adds.js`, `fight.js`, `game/src/domain/campaign/campaign.js`, `game/src/domain/skills/skillCombat.js`, `ClickerGame`, `game/public/style.css` (`.target-chip`)
 - **Date**: 2026-11-19
-- **Status**: active (spec, design and tasks of `.specs/features/miniboss-adds/` written; the owner approved them on 2026-11-19 and answered Q47 to Q52 with the recommended defaults). Conforms to AD-002, AD-003, AD-004, AD-007, AD-010, AD-016, AD-018 (its `target` seam and formation), AD-019, AD-021, AD-022 and AD-024
+- **Status**: active, released as v0.7.0 on 2026-11-20 (all 16 tasks of `.specs/features/miniboss-adds/tasks.md` ticked; the owner approved spec, design and tasks on 2026-11-19 and answered Q47 to Q52 with the recommended defaults; ui review APROVADO with 0 findings, `a9eb31b`; `test-engineer` author check clean, mutants 17 of 18 killed and the survivor equivalent, `728573d`). Conforms to AD-002, AD-003, AD-004, AD-007, AD-010, AD-016, AD-018 (its `target` seam and formation), AD-019, AD-021, AD-022 and AD-024
 
 ## Technical Debt
 
@@ -259,11 +259,11 @@ TD-001 to TD-008 are recorded in the spec of the feature that found them (`chara
 
 ## Handoff
 
-- **Features**: `miniboss-adds` (AD-027, active, `.specs/features/miniboss-adds/`): spec revised for AD-021 and the shipped `hero-team`, design and 16 tasks approved by the owner on 2026-11-19 (Q47 to Q52: recommended defaults), implementation started; `hero-team` (AD-018) released as v0.6.0 (`2079f3c`); `unified-damage` (AD-021) released as v0.5.0 (`7de3208`); `game-version` (AD-026) v0.4.1; `hero-bag-cards` (AD-025) v0.4.0; `ui-redesign` (AD-022) and `boss-replay-chapters` (AD-024) done
-- **Phase / Task**: `miniboss-adds` Specify, Design and Tasks done; `validate_spec.py` 0 errors (1 warning: the open owner questions), `validate_tasks.py` 0 errors (2 warnings: T4 and T16 have no tests, as the matrix says). No implementation started
-- **Completed**: `hero-team` released as v0.6.0; `unified-damage` released as v0.5.0; earlier features as listed in their specs
+- **Features**: `miniboss-adds` (AD-027) released as v0.7.0 (head `728573d`, report `.specs/features/miniboss-adds/report.html`); `hero-team` (AD-018) released as v0.6.0 (`2079f3c`); `unified-damage` (AD-021) released as v0.5.0 (`7de3208`); `game-version` (AD-026) v0.4.1; `hero-bag-cards` (AD-025) v0.4.0; `ui-redesign` (AD-022) and `boss-replay-chapters` (AD-024) done
+- **Phase / Task**: `miniboss-adds` released (v0.7.0); backend slot blue (`a9e68c2`, Flyway at V13) and the Worker at `728573d`
+- **Completed**: `miniboss-adds` released as v0.7.0; `hero-team` released as v0.6.0; `unified-damage` released as v0.5.0; earlier features as listed in their specs
 - **In-progress** (file:line): none
-- **Next step**: T1 to T4 (`kotlin-backend-dev`, `V13__miniboss_adds.sql`) and T5 to T12 (`game-dev`) run in two worktrees; T13 to T15 (`test-engineer`) after T12; T16 (`ui-artist`) last
+- **Next step**: pick the next feature or tech debt from the list below
 - **Waiting for the owner**: `hero-team`: the acceptance rulings on the ui-review suggestions (passive ellipsis kept, plain purchase notice kept, ally number contrast as TD-013 low priority), nothing blocking. `unified-damage`: the acceptance rulings on the ui-review suggestions (TD-011 low priority; the enemy line as the first slice of TD-001), nothing blocking. `ui-redesign`: the PO rulings marked `n` in its spec Assumptions table (D2, D3, findings #10 to #13, the `Click to Start!` ruling; list in its `tasks.md` § Acceptance; #10 and #12 are owner art)
 - **Blockers**: none
 - **Next candidate work**: TD-002 (contract step of `unified-damage`: rename `physical_defense` to `defense`, drop `magical_defense`, the two API fields, the game fallback and the old fixtures) once `unified-damage` is live on the backend and the Worker. TD-001 translation, starting with the enemy line. TD-012 (hero-team test debt: the real-time poll of `heroTeamCombat.spec.js:340` and the E3 test title), TD-013 (ally number contrast), TD-010 (tiny text on phones) and TD-011 (attribute panel break lines apart) stay open. The next ui review of Talentos adds a shot scrolled to Grau 3 and waits for the talent icons to load

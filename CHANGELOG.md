@@ -3,6 +3,22 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.7.0] - 2026-11-20
+
+Lacaios dos minichefes (`miniboss-adds`): a partir do capítulo 11, cada minichefe luta ao lado de dois lacaios, e agora você escolhe quem atacar.
+
+### Adicionado
+
+- Do capítulo 11 ao 15, todo minichefe (na campanha e no Rever chefes) entra em campo com 2 **Lacaios**. Cada lacaio vivo aumenta a defesa do minichefe (+30 no capítulo 11, +35, +40, +45 e +50 até o capítulo 15, no máximo 90 de defesa).
+- Escolha o alvo com um clique no monstro. O clique automático e os golpes dos aliados atingem o alvo escolhido; o alvo marcado aparece na ficha do inimigo. Se o lacaio alvo morre, o alvo volta para o minichefe.
+- Cada lacaio tem sua barra de vida e some com um esmaecer rápido ao morrer.
+
+### Alterado
+
+- Toda habilidade de dano, efeito enfraquecedor, dano por tempo e tiro mirado atinge todos os monstros vivos da luta, e os números aparecem em cada um. Um efeito em um monstro não termina quando você acerta outro.
+- Vencer o minichefe termina a luta mesmo com lacaios vivos; lacaios não dão recompensa. O tempo limite continua valendo como antes.
+- Capítulos 1 a 10, monstros comuns e chefes de capítulo continuam exatamente como antes.
+
 ## [0.6.0] - 2026-11-19
 
 Equipe de heróis (`hero-team`): do capítulo 5 em diante, seus heróis lutam ao seu lado.
