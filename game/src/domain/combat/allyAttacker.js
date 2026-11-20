@@ -1,6 +1,6 @@
 //  The attacker of one ally hit (spec hero-team, Ally Damage): Ally Base (1 + weapon click damage, times the click damage percent of its
 //  own pieces) times the star multiplier and the team factor, the element of the leader, the armor pierce and boss damage of its pieces,
-//  never critical. Pure JavaScript: no Phaser.
+//  never critical, and the `darknessDamagePct` of a staff it wears (spec black-awareness-staff). Pure JavaScript: no Phaser.
 import { attackerFor } from '../equipment/equipment';
 import { PLAYER } from './damage';
 
@@ -19,7 +19,8 @@ export const allyAttacker = ({ ally, pieces = [], leaderElement, allyFactor = 1 
         critChance: 0,
         critMultiplier: 1,
         armorPierce: worn.armorPierce ?? 0,
-        bossDamage: worn.bossDamage ?? 0
+        bossDamage: worn.bossDamage ?? 0,
+        ...(worn.darknessDamagePct ? { darknessDamagePct: worn.darknessDamagePct } : {})
     };
 };
 

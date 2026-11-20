@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { tickDamage } from '../skills/skillDamage';
 import { allyAttacker, allyDamagePerSecond, allyStarMultiplier } from './allyAttacker';
 
 const weapon = (clickDamage) => ({ id: 'w', slot: 'WEAPON', clickDamage, affixes: [] });
@@ -70,5 +71,28 @@ describe('allyAttacker', () => {
         expect(allyDamagePerSecond({ ally: { stars: 3 }, pieces: [ weapon(10), ring(affix('CLICK_DAMAGE_PCT', 20)) ] })).toBeCloseTo(105.6, 9);
         expect(allyDamagePerSecond({ ally: { stars: 0 }, allyFactor: 1.25 })).toBeCloseTo(2.5, 9);
         expect(allyDamagePerSecond({ ally: { stars: 9 }, pieces: [ weapon(624) ] })).toBeCloseTo(12500, 9);
+    });
+});
+
+describe('allyAttacker wearing the Cajado da Consciência Negra', () => {
+    const STAFF10 = { id: 's', slot: 'WEAPON', rarity: 'LEGENDARY', refine: 0, clickDamage: 10, affixes: [], special: 'BLACK_AWARENESS_STAFF' };
+
+    it('an ally of 0 stars wearing the staff carries darknessDamagePct 200 and base 22', () => {
+        expect(allyAttacker({ ally: { stars: 0 }, pieces: [ STAFF10 ], leaderElement: 'FIRE' })).toEqual({
+            element: 'FIRE', baseDamage: 22, critChance: 0, critMultiplier: 1, armorPierce: 0, bossDamage: 0, darknessDamagePct: 200
+        });
+    });
+
+    it('its hit on a DARKNESS monster of defense 0 is 59.4', () => {
+        const attacker = allyAttacker({ ally: { stars: 0 }, pieces: [ STAFF10 ], leaderElement: 'FIRE' });
+        const defender = { element: 'DARKNESS', defense: 0, critResistance: 0 };
+
+        expect(tickDamage({ attacker, percent: 100, buffs: [], debuffs: [], defender, boss: false })).toBeCloseTo(59.4, 10);
+    });
+
+    it('an ally without the staff has no darknessDamagePct field', () => {
+        const attacker = allyAttacker({ ally: { stars: 0 }, pieces: [ { ...STAFF10, special: undefined } ], leaderElement: 'FIRE' });
+
+        expect('darknessDamagePct' in attacker).toBe(false);
     });
 });

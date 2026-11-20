@@ -860,7 +860,7 @@ and `* darkness` as the last factor of `damage`. Add `darknessDamagePct` to the 
 
 ---
 
-#### T13: The staff on an ally (`allyAttacker.js`) [ ]
+#### T13: The staff on an ally (`allyAttacker.js`) [x]
 
 **Owner**: game-dev
 **Goal**: An ally wearing the staff keeps the bonus on its hits (BAS-10).
@@ -887,8 +887,8 @@ and `* darkness` as the last factor of `damage`. Add `darknessDamagePct` to the 
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 3 cases pass; the 4 existing `allyAttacker` cases pass unchanged.
-- [ ] `npm run build` exits 0.
+- [x] The 3 cases pass; the 4 existing `allyAttacker` cases pass unchanged.
+- [x] `npm run build` exits 0.
 
 **Commit**: `feat(game): keep the darkness bonus of the staff on an ally`
 
