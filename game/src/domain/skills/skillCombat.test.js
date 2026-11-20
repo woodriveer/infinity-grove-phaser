@@ -1413,6 +1413,39 @@ describe('skills on every monster', () => {
         expect(next.targets).toEqual([ a2, main ]);
     });
 
+    it('Tempestade ticks three times in one advance and the add that dies on the second tick takes no third', () => {
+        const { main, a2 } = fresh();
+        const dying = monsterOf(3);
+        const skills = combat();
+        const options = { monster: main, adds: [ dying, a2 ] };
+
+        use(skills, main, 'orina', 2, { adds: [ dying, a2 ] });
+
+        const { hits, targets } = skills.advance(3000, options);
+
+        //  Tick 1: dying 3 -> 1, a2, main. Tick 2: dying is killed (dealt 2), a2, main. Tick 3: a2 and main only
+        expect(targets).toEqual([ dying, a2, main, dying, a2, main, a2, main ]);
+        expect(damages(hits)).toEqual([ 2, 2, 2, 2, 2, 2, 2, 2 ]);
+        expect(dying.dead).toBe(true);
+        expect(a2.health).toBe(994);
+    });
+
+    it('two damage over time effects on an add that the first one kills: the second one lands nothing on the dead add', () => {
+        const { main } = fresh();
+        const dying = monsterOf(1);
+        const skills = combat();
+        const options = { monster: main, adds: [ dying ] };
+
+        use(skills, main, 'orina', 2, { adds: [ dying ] });
+        use(skills, main, 'vex', 1, { adds: [ dying ] });
+
+        const { targets } = skills.advance(1000, options);
+
+        expect(dying.dead).toBe(true);
+        expect(targets.filter((target) => target === dying)).toHaveLength(1);
+        expect(targets.filter((target) => target === main)).toHaveLength(2);
+    });
+
     it('a tick that kills both adds drops their buff for the miniboss tick of the same second', () => {
         const { fight, skills, main } = guarded(2);
         const options = { monster: main, adds: fight.livingAddMonsters() };
