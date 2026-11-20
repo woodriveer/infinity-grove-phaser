@@ -156,6 +156,23 @@ test.describe('Miniboss skills', () => {
         expect(after.slice(-6).map(({ x }) => x < 600)).toEqual([ true, true, true, true, false, false ]);
     });
 
+    test('Flecha Dupla: the second arrow does not land on an add that the first one killed', async ({ page }) => {
+        await startAdds(page, lead('lyra', 'NATURE', { adds: [ { health: 4, defenseBuff: 30 }, BIG ] }));
+
+        const before = (await numbers(page)).length;
+
+        await useSkill(page, 1);
+
+        const after = await numbers(page);
+
+        //  Lacaio 1 (4 health) takes one arrow of 4.2; Lacaio 2 takes two; the miniboss, now guarded by one add (50 + 30 = 80), takes two of 0.84
+        expect(after.length - before).toBe(5);
+        expect((await state(page)).adds[0]).toBe(0);
+        expect(after.slice(-5).map(({ text, y }) => [ text, y ])).toEqual([
+            [ '4.2', 360 ], [ '4.2', 540 ], [ '4.2', 540 ], [ '0.8', MINIBOSS_NUMBER_Y ], [ '0.8', MINIBOSS_NUMBER_Y ]
+        ]);
+    });
+
     test('Tiro Preciso lands a critical 105 on each add and 10.5 on the miniboss', async ({ page }) => {
         await startAdds(page, lead('lyra', 'NATURE', { adds: [ BIG, BIG ] }));
 
@@ -172,6 +189,30 @@ test.describe('Miniboss skills', () => {
         await advance(page, 1000);
 
         expect(await lastNumbers(page, 3)).toMatchObject(shown([ '2.8', '2.8', '0.3' ]));
+    });
+
+    test('a dead add loses only its own Tempestade Arcana: later ticks land on the other add and the miniboss', async ({ page }) => {
+        await startAdds(page, lead('orina', 'WATER', { adds: [ { health: 3, defenseBuff: 30 }, BIG ] }));
+
+        await useSkill(page, 2);
+        await advance(page, 1000);
+
+        expect(await lastNumbers(page, 3)).toMatchObject(shown([ '2.8', '2.8', '0.3' ]));
+
+        //  Ticks 2 and 3 come in one frame of 2000 ms. Tick 2 kills the add (0.2 left) and its miniboss hit already meets 50 + 30 = 80
+        //  (2.8 x 0.2 = 0.56); tick 3 lands on the other add and the miniboss only
+        const before = (await numbers(page)).length;
+
+        await advance(page, 2000);
+
+        const after = await numbers(page);
+
+        expect((await state(page)).adds[0]).toBe(0);
+        expect(after.length - before).toBe(5);
+        expect(after.slice(-5)).toMatchObject([
+            { text: '2.8', x: 480, y: 360 }, { text: '2.8', x: 480, y: 540 }, { text: '0.6', x: 670, y: MINIBOSS_NUMBER_Y },
+            { text: '2.8', x: 480, y: 540 }, { text: '0.6', x: 670, y: MINIBOSS_NUMBER_Y }
+        ]);
     });
 
     test('Bomba de Veneno puts a stack on every monster', async ({ page }) => {
