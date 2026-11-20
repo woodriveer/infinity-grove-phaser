@@ -2,11 +2,12 @@
 //  living add raises the main's one defense by its buff, at most MAX_GUARDED_DEFENSE. Pure JavaScript: no Phaser.
 import { DEFAULT_STATS, defenseOf, Monster } from './monster';
 
-export const MAX_GUARDED_DEFENSE = 90;
+export const MAX_GUARDED_DEFENSE = 2000;
 export const MAIN_NAME = 'Miniboss';
 export const addName = (slot) => `Lacaio ${slot}`;
 
-//  The defense of a main monster guarded by `bonus` points: capped at 90 once there is a bonus, unchanged without one
+//  The defense of a main monster guarded by `bonus` points: capped at MAX_GUARDED_DEFENSE once there is a bonus, unchanged without one.
+//  From 100 on a hit deals 0 (calculateDamage), so the miniboss takes no damage until enough adds die.
 export const guardedDefense = (defense, bonus) => (bonus > 0 ? Math.min(defense + bonus, MAX_GUARDED_DEFENSE) : defense);
 
 export class Fight

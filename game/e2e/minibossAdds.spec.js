@@ -11,6 +11,8 @@ const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
 
 const ADD = { health: 30, defenseBuff: 30 };
+//  Two adds that guard the defense-49 miniboss up to 90 (49 + 21 + 20), under the 100 where a hit deals 0
+const GUARD_90 = [ { health: 30, defenseBuff: 21 }, { health: 30, defenseBuff: 20 } ];
 //  Two stages: phase monsters of 10, a miniboss of `minibossHealth` with `defense`, its adds; the chapter boss 1000 (spec miniboss-adds)
 const addsChapter = ({ adds = [ ADD, ADD ], defense = 49, minibossHealth = 100, element = 'FIRE' } = {}) => ({
     bossHealth: 1000, bossTimeLimitMs: 60_000, boss: monsterOf(element, 30, 30), bossDropRuleId: 3,
@@ -97,21 +99,21 @@ const LACAIO_2 = [ 480, 540 ];
 const MINIBOSS = [ 670, 440 ];
 
 test.describe('Miniboss adds', () => {
-    test('a chapter 11 miniboss appears with two adds of 30 health and Defesa 90%', async ({ page }) => {
+    test('a chapter 11 miniboss appears with two adds of 30 health and Defesa 109%', async ({ page }) => {
         await startAdds(page);
 
         expect(await state(page)).toMatchObject({ main: 100, adds: [ 30, 30 ], target: 'Miniboss', drawn: 2 });
-        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 90%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 109%  Crit res 0%');
         await expect(page.getByTestId('target-chip')).toHaveText('Alvo: Miniboss · HP 100/100');
         expect(await scene(page, '(s) => s.children.list.filter((o) => o.type === "Text" && o.text === "+30 de defesa").length')).toBe(2);
     });
 
-    test('a click on the guarded miniboss deals 0.1, then 0.21 after one add died and 0.51 after both', async ({ page }) => {
+    test('a click on the guarded miniboss deals 0 at defense 109, then 0.21 after one add died and 0.51 after both', async ({ page }) => {
         await startAdds(page);
 
         await hitAt(page, ...MINIBOSS);
 
-        await expect(page.getByTestId('monster-hp')).toHaveText('HP 99.9/100');
+        await expect(page.getByTestId('monster-hp')).toHaveText('HP 100/100');
 
         await hitAt(page, ...LACAIO_1, 30);
 
@@ -119,7 +121,7 @@ test.describe('Miniboss adds', () => {
 
         await hitAt(page, ...MINIBOSS);
 
-        expect((await state(page)).main).toBeCloseTo(99.69, 5);
+        expect((await state(page)).main).toBeCloseTo(99.79, 5);
 
         await hitAt(page, ...LACAIO_2, 30);
 
@@ -127,7 +129,7 @@ test.describe('Miniboss adds', () => {
 
         await hitAt(page, ...MINIBOSS);
 
-        expect((await state(page)).main).toBeCloseTo(99.18, 5);
+        expect((await state(page)).main).toBeCloseTo(99.28, 5);
     });
 
     test('a dead add fades its body, bar, fill and text out over 500 ms and leaves the other add alone', async ({ page }) => {
@@ -222,7 +224,7 @@ test.describe('Miniboss adds', () => {
     });
 
     test('killing the miniboss with both adds alive wins once: stage 2 phase 1 and one CLEARED report', async ({ page }) => {
-        const backend = await startAdds(page, { definition: addsChapter({ minibossHealth: 1 }) });
+        const backend = await startAdds(page, { definition: addsChapter({ minibossHealth: 1, adds: GUARD_90 }) });
 
         await hitAt(page, ...MINIBOSS, 10);
         await wake(page);
@@ -296,7 +298,7 @@ test.describe('Miniboss adds', () => {
 
         expect(await state(page)).toMatchObject({ main: 100, adds: [ 30, 30 ], target: 'Miniboss' });
         await expect(page.locator('.stage-hud')).toHaveText('Rever chefe: Miniboss 1');
-        await expect(page.locator('.enemy-stats')).toContainText('Defesa 90%');
+        await expect(page.locator('.enemy-stats')).toContainText('Defesa 109%');
     });
 
     test('a farm fight that replaces a fight with adds removes the old adds at once and draws the new ones at full health', async ({ page }) => {
@@ -318,7 +320,7 @@ test.describe('Miniboss adds', () => {
 
     test('a reload during the fight restarts the miniboss and both adds at full health with a full countdown', async ({ page }) => {
         test.setTimeout(120_000);
-        await startAdds(page);
+        await startAdds(page, { definition: addsChapter({ adds: GUARD_90 }) });
 
         await hitAt(page, ...LACAIO_1, 5);
         await hitAt(page, ...MINIBOSS);
@@ -357,18 +359,18 @@ test.describe('Miniboss adds', () => {
         await expect(page.locator('.enemy-stats')).toContainText('Defesa 79%');
     });
 
-    test('the guarded chapter 15 miniboss stays at Defesa 90% with one add of 50 alive', async ({ page }) => {
+    test('the guarded chapter 15 miniboss defends 161% with two adds of 50, 111% with one and 61% with none', async ({ page }) => {
         const fifty = { health: 30, defenseBuff: 50 };
 
         await startAdds(page, { definition: addsChapter({ defense: 61, adds: [ fifty, fifty ] }) });
 
-        await expect(page.locator('.enemy-stats')).toContainText('Defesa 90%');
+        await expect(page.locator('.enemy-stats')).toContainText('Defesa 161%');
         expect(await scene(page, '(s) => s.children.list.filter((o) => o.type === "Text" && o.text === "+50 de defesa").length')).toBe(2);
 
         await hitAt(page, ...LACAIO_1, 30);
 
         expect((await state(page)).adds).toEqual([ 0, 30 ]);
-        await expect(page.locator('.enemy-stats')).toContainText('Defesa 90%');
+        await expect(page.locator('.enemy-stats')).toContainText('Defesa 111%');
 
         await hitAt(page, ...LACAIO_2, 30);
 

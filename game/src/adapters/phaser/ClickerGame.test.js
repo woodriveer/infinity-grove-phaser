@@ -5673,6 +5673,9 @@ describe('ClickerGame hero team formation', () => {
 });
 
 const ADD = { health: 30, defenseBuff: 30 };
+//  Two adds that guard the defense-49 miniboss up to 90 (49 + 21 + 20), under the 100 where a hit deals 0: the tests that need the
+//  guarded miniboss to take damage use them
+const GUARD_90 = [ { health: 30, defenseBuff: 21 }, { health: 30, defenseBuff: 20 } ];
 //  Stage 1 of chapter 11: phase monsters of defense 0, a miniboss of defense 49 and its adds
 const addsDefinition = ({
     adds = [ ADD, ADD ], miniboss = { element: 'FIRE', defense: 49, critResistance: 0 }, minibossHealth = 100,
@@ -5747,25 +5750,25 @@ describe('ClickerGame miniboss adds', () => {
         }
     });
 
-    it('the enemy line of the guarded miniboss reads Defesa 90%', async () => {
+    it('the enemy line of the guarded miniboss reads Defesa 109%', async () => {
         const ctx = await addsScene();
 
-        expect(enemyLine(ctx)).toBe('Fire  Defesa 90%  Crit res 0%');
+        expect(enemyLine(ctx)).toBe('Fire  Defesa 109%  Crit res 0%');
     });
 
-    it('a click on the guarded miniboss deals 0.1, then 0.21 after one add died and 0.51 after both', async () => {
+    it('a click on the guarded miniboss deals 0 at defense 109, then 0.21 after one add died and 0.51 after both', async () => {
         const ctx = await addsScene();
 
         ctx.click(onMiniboss);
-        expect(ctx.scene.monster.health).toBeCloseTo(99.9, 9);
+        expect(ctx.scene.monster.health).toBe(100);
 
         killAdd(ctx, 1);
         ctx.click(onMiniboss);
-        expect(ctx.scene.monster.health).toBeCloseTo(99.69, 9);
+        expect(ctx.scene.monster.health).toBeCloseTo(99.79, 9);
 
         killAdd(ctx, 2);
         ctx.click(onMiniboss);
-        expect(ctx.scene.monster.health).toBeCloseTo(99.18, 9);
+        expect(ctx.scene.monster.health).toBeCloseTo(99.28, 9);
     });
 
     it('an add death changes the enemy line to Defesa 79%', async () => {
@@ -5806,7 +5809,7 @@ describe('ClickerGame miniboss adds', () => {
     });
 
     it('the target chip reads Alvo: Miniboss · HP 100/100 and follows its HP', async () => {
-        const ctx = await addsScene();
+        const ctx = await addsScene({ adds: GUARD_90 });
 
         expect(chip(ctx)).toBe('Alvo: Miniboss · HP 100/100');
 
@@ -5843,7 +5846,7 @@ describe('ClickerGame miniboss adds', () => {
     });
 
     it("the miniboss's death fades the living adds before the miniboss and wins once", async () => {
-        const ctx = await addsScene({ minibossHealth: 0.1 });
+        const ctx = await addsScene({ minibossHealth: 0.1, adds: GUARD_90 });
         const parts = [ ...partsOf(ctx), ctx.scene.marker ];
 
         ctx.click(onMiniboss);
@@ -6006,7 +6009,7 @@ describe('ClickerGame miniboss target', () => {
     });
 
     it('a click on the miniboss makes it the target again', async () => {
-        const ctx = await addsScene();
+        const ctx = await addsScene({ adds: GUARD_90 });
 
         ctx.click(lacaio1);
         ctx.click(onMiniboss);
@@ -6147,7 +6150,7 @@ describe('ClickerGame miniboss target', () => {
     });
 
     it('an ally meets the guarded miniboss: Lyra deals 0.2 at x 740', async () => {
-        const ctx = await allyScene([ 'lyra', null, null, null ]);
+        const ctx = await allyScene([ 'lyra', null, null, null ], { adds: GUARD_90 });
 
         ctx.scene.update(0, 1000);
 
@@ -6222,7 +6225,8 @@ describe('ClickerGame miniboss target', () => {
 describe('ClickerGame miniboss skills', () => {
     //  A 3-star leader has every skill unlocked at level 1 and a click base of 1.4 (+40 %); every heroEntry is FIRE like the monsters
     const leader3 = (id) => ({ leaderId: id, heroes: [ heroEntry(id, { 3: 1 }, 3) ] });
-    const BIG = { health: 100, defenseBuff: 30 };
+    //  50 + 20 + 20 = 90, under the 100 where a hit deals 0
+    const BIG = { health: 100, defenseBuff: 20 };
     const GUARDED = { miniboss: { element: 'FIRE', defense: 50, critResistance: 0 }, adds: [ BIG, BIG ] };
     const skillScene = (id, options = GUARDED) => addsScene(options, { heroes: leader3(id) });
     const numbers = (ctx, from) => ctx.texts.slice(from).map(({ text, x, y }) => [ text, x, y ]);
@@ -6312,7 +6316,7 @@ describe('ClickerGame miniboss skills', () => {
     });
 
     it('Tiro Preciso lands a critical on every monster at the end of its cast', async () => {
-        const far = { health: 200, defenseBuff: 30 };
+        const far = { health: 200, defenseBuff: 20 };
         const ctx = await skillScene('lyra', { ...GUARDED, adds: [ far, far ] });
 
         ctx.scene.useSkill(2);

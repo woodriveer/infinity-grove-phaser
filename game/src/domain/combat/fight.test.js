@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { calculateDamage, PLAYER } from './damage';
-import { addName, Fight, guardedDefense, MAIN_NAME } from './fight';
+import { addName, Fight, guardedDefense, MAIN_NAME, MAX_GUARDED_DEFENSE } from './fight';
 import { DEFAULT_STATS, Monster } from './monster';
 import { monsterAfterBreak } from '../talents/talents';
 
@@ -113,10 +113,10 @@ describe('Fight', () => {
         expect(none.statsOf(none.main)).toBe(none.main.stats);
     });
 
-    it('E1: the chapter 11 stage 1 miniboss defends 90, 79 and 49 with 2, 1 and 0 adds alive', () => {
+    it('E1: the chapter 11 stage 1 miniboss defends 109, 79 and 49 with 2, 1 and 0 adds alive', () => {
         const fight = twoAdds();
 
-        expect(fight.statsOf(fight.main)).toEqual({ element: 'FIRE', defense: 90, critResistance: 20 });
+        expect(fight.statsOf(fight.main)).toEqual({ element: 'FIRE', defense: 109, critResistance: 20 });
 
         kill(fight.adds[0].monster);
         expect(fight.statsOf(fight.main)).toEqual({ element: 'FIRE', defense: 79, critResistance: 20 });
@@ -125,24 +125,24 @@ describe('Fight', () => {
         expect(fight.statsOf(fight.main)).toEqual({ element: 'FIRE', defense: 49, critResistance: 20 });
     });
 
-    it('E2: the chapter 15 stage 1 miniboss defends 90 with one add of 50 alive and 61 with none', () => {
+    it('E2: the chapter 15 stage 1 miniboss defends 161 with two adds of 50, 111 with one and 61 with none', () => {
         const main = mainMonster({ element: 'FIRE', defense: 61, critResistance: 0 });
         const fight = twoAdds(main, 50);
 
-        expect(fight.statsOf(main).defense).toBe(90);
+        expect(fight.statsOf(main).defense).toBe(161);
 
         kill(fight.adds[0].monster);
-        expect(fight.statsOf(main).defense).toBe(90);
+        expect(fight.statsOf(main).defense).toBe(111);
 
         kill(fight.adds[1].monster);
         expect(fight.statsOf(main).defense).toBe(61);
     });
 
-    it('E3: two adds of 35 on defense 52 give 90, not 122', () => {
+    it('E3: two adds of 35 on defense 52 give 122, every buff counts below the cap', () => {
         const main = mainMonster({ element: 'FIRE', defense: 52, critResistance: 0 });
         const fight = twoAdds(main, 35);
 
-        expect(fight.statsOf(main).defense).toBe(90);
+        expect(fight.statsOf(main).defense).toBe(122);
     });
 
     it("statsOf of the main without a living add is its own stats object", () => {
@@ -170,8 +170,11 @@ describe('Fight', () => {
         expect(fight.statsOf(fight.adds[0].monster)).toBe(fight.adds[0].monster.stats);
     });
 
-    it('guardedDefense caps at 90 and keeps a defense without bonus', () => {
-        expect(guardedDefense(49, 60)).toBe(90);
+    it('guardedDefense caps at MAX_GUARDED_DEFENSE 2000 and keeps a defense without bonus', () => {
+        expect(MAX_GUARDED_DEFENSE).toBe(2000);
+        expect(guardedDefense(49, 60)).toBe(109);
+        expect(guardedDefense(1990, 10)).toBe(2000);
+        expect(guardedDefense(1990, 11)).toBe(2000);
         expect(guardedDefense(49, 30)).toBe(79);
         expect(guardedDefense(49, 0)).toBe(49);
         expect(guardedDefense(90, 0)).toBe(90);
@@ -208,11 +211,11 @@ describe('Fight', () => {
         expect(fight.addOf(fight.main)).toBeNull();
     });
 
-    it('E4: a Base-1 hit on the guarded chapter 11 miniboss deals 0.1, 0.21 and 0.51', () => {
+    it('E4: a Base-1 hit on the guarded chapter 11 miniboss deals 0, 0.21 and 0.51', () => {
         const fight = twoAdds();
         const hit = () => calculateDamage({ attacker: PLAYER, defender: monsterAfterBreak(fight.statsOf(fight.main), null), random: () => 0.99 }).damage;
 
-        expect(hit()).toBeCloseTo(0.1, 9);
+        expect(hit()).toBe(0);
 
         kill(fight.adds[0].monster);
         expect(hit()).toBeCloseTo(0.21, 9);
@@ -221,18 +224,24 @@ describe('Fight', () => {
         expect(hit()).toBeCloseTo(0.51, 9);
     });
 
-    it('E5: Quebra de defesa 5 lowers the capped 90 to 85', () => {
+    it('E5: Quebra de defesa 5 lowers the guarded 109 to 104, still no damage; with one add alive 79 to 74', () => {
         const fight = twoAdds();
         const breaks = [ { id: 'PHYSICAL_BREAK', baseId: 'PHYSICAL_BREAK', value: 5 } ];
         const defender = monsterAfterBreak(fight.statsOf(fight.main), breaks);
 
-        expect(defender.defense).toBe(85);
-        expect(calculateDamage({ attacker: PLAYER, defender, random: () => 0.99 }).damage).toBeCloseTo(0.15, 9);
+        expect(defender.defense).toBe(104);
+        expect(calculateDamage({ attacker: PLAYER, defender, random: () => 0.99 }).damage).toBe(0);
+
+        kill(fight.adds[0].monster);
+        const weaker = monsterAfterBreak(fight.statsOf(fight.main), breaks);
+
+        expect(weaker.defense).toBe(74);
+        expect(calculateDamage({ attacker: PLAYER, defender: weaker, random: () => 0.99 }).damage).toBeCloseTo(0.26, 9);
     });
 
-    it('E6: Erosão Arcana lowers the capped 90 to 75', () => {
+    it('E6: Erosão Arcana lowers the guarded 109 to 94', () => {
         const fight = twoAdds();
 
-        expect(monsterAfterBreak(fight.statsOf(fight.main), null, { defenseBreak: 15 }).defense).toBe(75);
+        expect(monsterAfterBreak(fight.statsOf(fight.main), null, { defenseBreak: 15 }).defense).toBe(94);
     });
 });

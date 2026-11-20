@@ -1283,21 +1283,21 @@ describe('skills on every monster', () => {
         expect([ a1.dead, a2.dead ]).toEqual([ true, true ]);
     });
 
-    it('E8: Chuva on a guarded miniboss whose adds survive deals 2.5 to it', () => {
+    it('E8: Chuva on a guarded miniboss whose adds survive deals 0 to it (defense 109)', () => {
         const { fight, skills, main } = guarded(1000);
         const result = use(skills, main, 'orina', 3, { adds: fight.livingAddMonsters() });
 
         expect(damages(result.hits)[0]).toBeCloseTo(25, 9);
         expect(damages(result.hits)[1]).toBeCloseTo(25, 9);
-        expect(damages(result.hits)[2]).toBeCloseTo(2.5, 9);
+        expect(damages(result.hits)[2]).toBe(0);
     });
 
-    it('E9: Brado Aterrador level 1 on the guarded chapter 11 miniboss: a click deals 0.4', () => {
+    it('E9: Brado Aterrador level 1 lowers the guarded chapter 11 miniboss from 109 to 79: a click deals 0.21', () => {
         const { fight, skills, main } = guarded(30);
 
         use(skills, main, 'kael', 3, { adds: fight.livingAddMonsters() });
 
-        expect(skills.click({ attacker: PLAYER, monster: main, main, boss: false }).damage).toBeCloseTo(0.4, 9);
+        expect(skills.click({ attacker: PLAYER, monster: main, main, boss: false }).damage).toBeCloseTo(0.21, 9);
     });
 
     it('Brado Aterrador and Prisão de Espinhos go on every living monster', () => {

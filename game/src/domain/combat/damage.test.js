@@ -173,6 +173,20 @@ describe('boss damage', () => {
     });
 });
 
+describe('calculateDamage at a defense of 100 or more', () => {
+    it('deals 0 at defense 100 and above, never a negative damage', () => {
+        expect(calculateDamage({ defender: enemy('FIRE', 100), random: never }).damage).toBe(0);
+        expect(calculateDamage({ defender: enemy('FIRE', 122), random: always }).damage).toBe(0);
+        expect(calculateDamage({ defender: enemy('FIRE', 2000), random: never, boss: true }).damage).toBe(0);
+    });
+
+    it('deals damage again once armor pierce brings the defense under 100', () => {
+        const attacker = { ...PLAYER, armorPierce: 50 };
+
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 120), random: never }).damage).toBeCloseTo(0.4, 10);
+    });
+});
+
 describe('calculateDamage with a forced critical', () => {
     it('is critical against a defender with critical resistance 100, which never crits otherwise', () => {
         const defender = enemy('FIRE', 0, 0, 100);

@@ -28,7 +28,7 @@ Re-checked on `main` at `3e8ff62` (2026-11-19).
 
 ## Goals
 
-- [ ] From chapter 11, every miniboss fight (campaign and farm) starts with the miniboss and 2 adds, and each living add raises the miniboss's one defense by the amount of the Add Table, at most 90.
+- [ ] From chapter 11, every miniboss fight (campaign and farm) starts with the miniboss and 2 adds, and each living add raises the miniboss's one defense by the amount of the Add Table, at most 2000 (owner, 2026-11-20).
 - [ ] The player picks the target with a click, and the auto click and the allies hit that target.
 - [ ] Every damage skill hits every living monster of the fight.
 - [ ] The fight is won when the miniboss dies, with or without adds alive, and lost on the countdown as today.
@@ -64,29 +64,30 @@ Owner decision for chapters 11 and 15 (Q21) and chapters 12 to 14 (Q39), rewritt
 
 Rules:
 
-- **Guarded defense**: the miniboss's defense is `min(own defense + sum of the buffs of the living adds, 90)`. Every other reduction applies after it, in today's order: `Quebra de defesa` and Erosão Arcana (floor 0), then Brado Aterrador, then armor pierce.
+- **Guarded defense** (owner, 2026-11-20: the cap went from 90 to 2000 so that every add counts): the miniboss's defense is `min(own defense + sum of the buffs of the living adds, 2000)` (`MAX_GUARDED_DEFENSE`, `fight.js`). Every other reduction applies after it, in today's order: `Quebra de defesa` and Erosão Arcana (floor 0), then Brado Aterrador, then armor pierce.
+- **Defense of 100 or more deals 0**: the click formula `damage x max(0, 1 - defense / 100)` (`damage.js`) never goes negative, so a miniboss whose defense after every reduction is 100 or more takes no damage until enough adds die or the reductions bring it under 100.
 - An add has the stats of the stage's phase monster (the stage's element, defense 0, critical resistance 0 as seeded), its own health and no drop rule.
 - **Chapter 11 stage 1** (miniboss defense 49, phase monster 655 360, add 1 966 080, miniboss 3 276 800):
 
   | Adds alive | Miniboss defense | Base-1 hit, element 1.0, no critical |
   | --- | --- | --- |
-  | 2 | 90 | 0.1 |
+  | 2 | 109 | 0 |
   | 1 | 79 | 0.21 |
   | 0 | 49 | 0.51 |
 
-  With Brado Aterrador level 1 running on the miniboss: 60 (0.4), 49 (0.51), 19 (0.81). With `Quebra de defesa` 5: 85 (0.15), 74 (0.26), 44 (0.56).
-- **Chapter 15 stage 1** (miniboss defense 61): 2 adds 90, 1 add 90 (61 + 50 = 111, capped), 0 adds 61.
-- **One living add keeps the miniboss at 90** from chapter 12 stage 4 (52 + 3 + 35 = 90) and on every stage of chapters 13 to 15 (Q48). Per stage 1 and stage 10:
+  With Brado Aterrador level 1 running on the miniboss: 79 (0.21), 49 (0.51), 19 (0.81). With `Quebra de defesa` 5: 104 (0), 74 (0.26), 44 (0.56).
+- **Chapter 15 stage 1** (miniboss defense 61): 2 adds 161, 1 add 111, 0 adds 61.
+- **Every living add counts**: with both adds alive the miniboss of chapters 11 to 15 is always at 100 or more (no damage); from chapter 12 stage 5 (56 + 35 = 91 + 1 per stage) one living add keeps it at 91 or more, and from chapter 13 stage 6 (60 + 40) at 100 or more, so the miniboss takes no damage until both adds die. Per stage 1 and stage 10:
 
   | Chapter | Stage 1: 2 / 1 / 0 adds | Stage 10: 2 / 1 / 0 adds |
   | --- | --- | --- |
-  | 11 | 90 / 79 / 49 | 90 / 88 / 58 |
-  | 12 | 90 / 87 / 52 | 90 / 90 / 61 |
-  | 13 | 90 / 90 / 55 | 90 / 90 / 64 |
-  | 14 | 90 / 90 / 58 | 90 / 90 / 67 |
-  | 15 | 90 / 90 / 61 | 90 / 90 / 70 |
+  | 11 | 109 / 79 / 49 | 118 / 88 / 58 |
+  | 12 | 122 / 87 / 52 | 131 / 96 / 61 |
+  | 13 | 135 / 95 / 55 | 144 / 104 / 64 |
+  | 14 | 148 / 103 / 58 | 157 / 112 / 67 |
+  | 15 | 161 / 111 / 61 | 170 / 120 / 70 |
 
-- **What the plans cost** (chapter 11 stage 1, Base-1 hits, before breaks): straight at the miniboss with both adds alive, 3 276 800 / 0.1 = 32.8 M raw damage; both adds first, 2 x 1 966 080 + 3 276 800 / 0.51 = 10.4 M. Killing the adds is the cheap plan; lowering the guarded defense (Q47) is the other one.
+- **What the plans cost** (chapter 11 stage 1, Base-1 hits, before breaks): straight at the miniboss with both adds alive is impossible (0 per hit); both adds first, 2 x 1 966 080 + 3 276 800 / 0.51 = 10.4 M. Killing the adds is the plan; lowering the guarded defense under 100 (Q47) only helps once at most one add lives, or with enough breaks.
 
 ## Target and Skill Rules
 
@@ -176,15 +177,15 @@ Rows `Q20` to `Q25` and `Q38` to `Q41` carry the owner's answers of 2026-10-30 a
 1. WHEN the backend answers a progress or a farm list THEN every stage of the definition SHALL carry `adds`, a list of `{ health, defenseBuff }` in slot order.  <!-- event-driven -->
 2. WHEN the backend seeds or migrates chapters 11 to 15 THEN each stage SHALL carry 2 adds with the buff of the Add Table and health 3 times its phase monster health, and chapters 1 to 10 SHALL carry an empty list.  <!-- event-driven -->
 3. WHEN a miniboss whose stage carries adds appears THEN the game SHALL spawn the miniboss and every add with its health and the stats of the stage's phase monster, at the places of the Fight Layout.  <!-- event-driven -->
-4. WHILE adds are alive the game SHALL compute the miniboss's defense as its own defense plus the `defenseBuff` of every living add, at most 90, before every other reduction.  <!-- state-driven -->
-5. WHEN the chapter 11 stage 1 miniboss (defense 49) is hit by a Base-1 click with no critical and element multiplier 1.0 THEN the game SHALL deal 0.1 with 2 adds alive, 0.21 with 1 and 0.51 with none.  <!-- event-driven -->
-6. WHEN the chapter 15 stage 1 miniboss (defense 61) has one add alive THEN the game SHALL use defense 90, and with none 61.  <!-- event-driven -->
-7. WHEN Brado Aterrador level 1 runs on the chapter 11 stage 1 miniboss with 2 adds alive THEN a Base-1 hit SHALL deal 0.4 (90 - 30 = 60).  <!-- event-driven -->
+4. WHILE adds are alive the game SHALL compute the miniboss's defense as its own defense plus the `defenseBuff` of every living add, at most 2000, before every other reduction; a defense of 100 or more after every reduction SHALL deal 0.  <!-- state-driven -->
+5. WHEN the chapter 11 stage 1 miniboss (defense 49) is hit by a Base-1 click with no critical and element multiplier 1.0 THEN the game SHALL deal 0 with 2 adds alive (defense 109), 0.21 with 1 and 0.51 with none.  <!-- event-driven -->
+6. WHEN the chapter 15 stage 1 miniboss (defense 61) has two adds alive THEN the game SHALL use defense 161, with one 111 and with none 61.  <!-- event-driven -->
+7. WHEN Brado Aterrador level 1 runs on the chapter 11 stage 1 miniboss with 2 adds alive THEN a Base-1 hit SHALL deal 0.21 (109 - 30 = 79).  <!-- event-driven -->
 8. WHEN an add dies THEN the game SHALL fade it out over 500 ms, never respawn it in that fight, and drop its buff from the next hit.  <!-- event-driven -->
 9. WHEN a stage carries an empty or missing `adds` list THEN the game SHALL fight the miniboss exactly as today.  <!-- event-driven -->
 10. IF an add entry has a `health` that is not a number of at least 1 or a `defenseBuff` that is not an integer from 0 to 90 THEN the game SHALL skip that entry, and IF more than 2 valid entries come THEN the game SHALL spawn only the first 2.  <!-- unwanted-behavior -->
 
-**Independent Test**: In the browser against the fake backend at a chapter 11 stage 1 miniboss with 2 adds, three monsters appear; the target chip reads `Alvo: Miniboss`, the enemy line shows `Defesa 90%`; after one add dies it shows `Defesa 79%`, and after both `Defesa 49%`.
+**Independent Test**: In the browser against the fake backend at a chapter 11 stage 1 miniboss with 2 adds, three monsters appear; the target chip reads `Alvo: Miniboss`, the enemy line shows `Defesa 109%`; after one add dies it shows `Defesa 79%`, and after both `Defesa 49%`.
 
 ---
 
@@ -259,8 +260,8 @@ Rows `Q20` to `Q25` and `Q38` to `Q41` carry the owner's answers of 2026-10-30 a
 - WHEN a damage skill kills both adds and the miniboss in one use THEN the game SHALL win the fight once and send one `CLEARED` report.
 - WHEN the player clicks the monster that is already the target THEN the game SHALL hit it and keep it as the target.
 - WHEN an ally tick kills the target add THEN the later ally hits of that tick SHALL land on the miniboss, the new target.
-- WHEN two adds of chapter 12 (+35 each) are alive on a miniboss with defense 52 THEN the game SHALL use 90, not 122.
-- WHEN `Quebra de defesa`, Erosão Arcana or Brado lower a guarded miniboss THEN the game SHALL subtract them from the capped value, never below 0.
+- WHEN two adds of chapter 12 (+35 each) are alive on a miniboss with defense 52 THEN the game SHALL use 122.
+- WHEN `Quebra de defesa`, Erosão Arcana or Brado lower a guarded miniboss THEN the game SHALL subtract them from the guarded value, never below 0.
 - WHEN Lâminas Sombrias (Vex ally, -15 critical resistance) runs THEN it SHALL apply to every monster of the fight, as today.
 - WHILE the pause menu is open the game SHALL change no target and land no hit.
 - WHILE a hero screen is open a click on the canvas SHALL hit nothing and change no target, as today.

@@ -6,14 +6,17 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 //  The auto click is switched off while the game loads and the Phaser loop is put to sleep: time moves only with advance(page, ms) and every
 //  hit is a call of the scene, so no real frame adds a tick (the pattern of heroTeamCombat.spec.js).
 //  Every scenario uses a 3-star leader (click base 1.4, critical damage x2.5, the default roll 0.99 never crits, every skill level 1). The monsters
-//  take the leader's element so the multiplier is 1. The miniboss has defense 50: 90 with both adds alive, 50 with none.
+//  take the leader's element so the multiplier is 1. The miniboss has defense 50: 90 with both adds of 20 alive (under the 100 where a hit deals 0),
+//  50 with none.
 const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 
 //  A monster of the payload: the defense and both legacy columns equal
 const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
 
-const ADD = { health: 30, defenseBuff: 30 };
-const BIG = { health: 200, defenseBuff: 30 };
+const ADD = { health: 30, defenseBuff: 20 };
+const BIG = { health: 200, defenseBuff: 20 };
+//  The add of 30 that the second arrow and the Tempestade scenarios keep alive next to a dying add of 30: 50 + 30 + 30 = 110 while both live
+const BIG_30 = { health: 200, defenseBuff: 30 };
 //  Two stages: phase monsters of 10, a miniboss of `minibossHealth` with `defense`, its adds; the chapter boss 1000 (spec miniboss-adds)
 const addsChapter = ({ adds = [ ADD, ADD ], defense = 49, minibossHealth = 100, element = 'FIRE' } = {}) => ({
     bossHealth: 1000, bossTimeLimitMs: 60_000, boss: monsterOf(element, 30, 30), bossDropRuleId: 3,
@@ -157,7 +160,7 @@ test.describe('Miniboss skills', () => {
     });
 
     test('Flecha Dupla: the second arrow does not land on an add that the first one killed', async ({ page }) => {
-        await startAdds(page, lead('lyra', 'NATURE', { adds: [ { health: 4, defenseBuff: 30 }, BIG ] }));
+        await startAdds(page, lead('lyra', 'NATURE', { adds: [ { health: 4, defenseBuff: 30 }, BIG_30 ] }));
 
         const before = (await numbers(page)).length;
 
@@ -192,12 +195,13 @@ test.describe('Miniboss skills', () => {
     });
 
     test('a dead add loses only its own Tempestade Arcana: later ticks land on the other add and the miniboss', async ({ page }) => {
-        await startAdds(page, lead('orina', 'WATER', { adds: [ { health: 3, defenseBuff: 30 }, BIG ] }));
+        await startAdds(page, lead('orina', 'WATER', { adds: [ { health: 3, defenseBuff: 30 }, BIG_30 ] }));
 
         await useSkill(page, 2);
         await advance(page, 1000);
 
-        expect(await lastNumbers(page, 3)).toMatchObject(shown([ '2.8', '2.8', '0.3' ]));
+        //  Tick 1 meets the miniboss at 50 + 30 + 30 = 110, 100 or more: it deals 0
+        expect(await lastNumbers(page, 3)).toMatchObject(shown([ '2.8', '2.8', '0' ]));
 
         //  Ticks 2 and 3 come in one frame of 2000 ms. Tick 2 kills the add (0.2 left) and its miniboss hit already meets 50 + 30 = 80
         //  (2.8 x 0.2 = 0.56); tick 3 lands on the other add and the miniboss only

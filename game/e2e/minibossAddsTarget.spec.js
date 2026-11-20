@@ -12,6 +12,8 @@ const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
 
 const ADD = { health: 30, defenseBuff: 30 };
+//  Two adds that guard the defense-49 miniboss up to 90 (49 + 21 + 20), under the 100 where a hit deals 0
+const GUARD_90 = [ { health: 30, defenseBuff: 21 }, { health: 30, defenseBuff: 20 } ];
 //  Two stages: phase monsters of 10, a miniboss of `minibossHealth` with `defense`, its adds; the chapter boss 1000 (spec miniboss-adds)
 const addsChapter = ({ adds = [ ADD, ADD ], defense = 49, minibossHealth = 100, element = 'FIRE', monsterDefense = 0 } = {}) => ({
     bossHealth: 1000, bossTimeLimitMs: 60_000, boss: monsterOf(element, 30, 30), bossDropRuleId: 3,
@@ -119,7 +121,7 @@ test.describe('Miniboss target', () => {
     });
 
     test('a click on the miniboss makes it the target again', async ({ page }) => {
-        await startAdds(page);
+        await startAdds(page, { definition: addsChapter({ adds: GUARD_90 }) });
 
         await hitAt(page, ...LACAIO_1);
 
@@ -186,7 +188,7 @@ test.describe('Miniboss target', () => {
     });
 
     test('an ally hits the guarded miniboss for 0.2 and the target add for 2', async ({ page }) => {
-        await startAdds(page, { team: LYRA_ALLY });
+        await startAdds(page, { team: LYRA_ALLY, definition: addsChapter({ adds: GUARD_90 }) });
 
         await advance(page, 1000);
 
