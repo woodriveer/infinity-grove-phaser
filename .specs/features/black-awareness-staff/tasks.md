@@ -169,7 +169,7 @@ require(special == null || (slot == Slot.WEAPON && rarity == Rarity.LEGENDARY)) 
 
 ---
 
-#### T2: `PieceRoller.blackAwarenessStaff` [ ]
+#### T2: `PieceRoller.blackAwarenessStaff` [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Roll the staff exactly like a boss legendary weapon after the slot pick (BAS-01, spec P1 Receive AC 1 and 2).
@@ -212,7 +212,7 @@ Body: `val rarity = Rarity.LEGENDARY`; `val baseClick = between(weaponClickRange
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 4 new cases pass; every earlier backend test passes unchanged.
+- [x] The 4 new cases pass; every earlier backend test passes unchanged.
 
 **Commit**: `feat(backend): roll the black awareness staff like a legendary weapon`
 

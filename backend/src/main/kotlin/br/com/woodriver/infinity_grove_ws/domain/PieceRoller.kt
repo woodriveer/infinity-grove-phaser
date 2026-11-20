@@ -60,6 +60,32 @@ object PieceRoller {
         return Piece(id, username, slot, rarity, baseClick, refine = 0, affixes = affixes)
     }
 
+    /**
+     * The Cajado da Consciência Negra of [username] (spec black-awareness-staff): a legendary weapon at +0 in the bag, its click damage
+     * and 4 affixes rolled like a boss weapon after the slot pick, reading [chance] in the same order (the click, then each affix type
+     * and value), and the special [PieceSpecial.BLACK_AWARENESS_STAFF].
+     */
+    fun blackAwarenessStaff(
+        username: String,
+        id: String,
+        chance: () -> Double,
+    ): Piece {
+        val rarity = Rarity.LEGENDARY
+        val baseClick = between(weaponClickRanges[rarity.index - 1], chance)
+        val remaining = AffixType.allowedOn(Slot.WEAPON).toMutableList()
+        val affixes = List(rarity.affixCount) { affix(remaining.removeAt(pick(remaining.size, chance)), rarity, chance) }
+        return Piece(
+            id,
+            username,
+            Slot.WEAPON,
+            rarity,
+            baseClick,
+            refine = 0,
+            affixes = affixes,
+            special = PieceSpecial.BLACK_AWARENESS_STAFF,
+        )
+    }
+
     /** An affix of [type] with a value drawn from the band of [rarity]. */
     fun affix(
         type: AffixType,

@@ -212,4 +212,61 @@ class PieceRollerTest {
         assertEquals(Rarity.EPIC, rarityIn(5, Encounter.CHAPTER_BOSS, 0.85))
         assertEquals(Rarity.LEGENDARY, rarityIn(5, Encounter.CHAPTER_BOSS, 0.99))
     }
+
+    private fun staff(
+        click: Int,
+        vararg affixes: Affix,
+    ) = Piece("s1", "yan", Slot.WEAPON, Rarity.LEGENDARY, click, 0, affixes.toList(), null, PieceSpecial.BLACK_AWARENESS_STAFF)
+
+    @Test
+    fun `the staff at chance 0_5 has click 11 and boss damage 28, boss time 6, crit damage 55, armor pierce 28`() {
+        assertEquals(
+            staff(
+                11,
+                Affix(AffixType.BOSS_DAMAGE_PCT, 28),
+                Affix(AffixType.BOSS_TIME_SECONDS, 6),
+                Affix(AffixType.CRIT_DAMAGE_PCT, 55),
+                Affix(AffixType.ARMOR_PIERCE_PCT, 28),
+            ),
+            PieceRoller.blackAwarenessStaff("yan", "s1") { 0.5 },
+        )
+    }
+
+    @Test
+    fun `the staff at chance 0 has click 10 and the four lowest band values`() {
+        assertEquals(
+            staff(
+                10,
+                Affix(AffixType.CRIT_CHANCE, 9),
+                Affix(AffixType.CRIT_DAMAGE_PCT, 50),
+                Affix(AffixType.BOSS_DAMAGE_PCT, 25),
+                Affix(AffixType.BOSS_TIME_SECONDS, 5),
+            ),
+            PieceRoller.blackAwarenessStaff("yan", "s1") { 0.0 },
+        )
+    }
+
+    @Test
+    fun `the staff at chance 0_99 has click 12 and the four highest band values`() {
+        assertEquals(
+            staff(
+                12,
+                Affix(AffixType.ARMOR_PIERCE_PCT, 30),
+                Affix(AffixType.BOSS_TIME_SECONDS, 6),
+                Affix(AffixType.BOSS_DAMAGE_PCT, 30),
+                Affix(AffixType.CRIT_DAMAGE_PCT, 60),
+            ),
+            PieceRoller.blackAwarenessStaff("yan", "s1") { 0.99 },
+        )
+    }
+
+    @Test
+    fun `the staff reads nine chances`() {
+        var reads = 0
+        PieceRoller.blackAwarenessStaff("yan", "s1") {
+            reads += 1
+            0.5
+        }
+        assertEquals(9, reads)
+    }
 }
