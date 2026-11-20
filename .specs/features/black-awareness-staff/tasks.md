@@ -389,7 +389,7 @@ filled in `from` with `special = piece.special?.name`; KDoc line: "`special` is 
 
 ---
 
-#### T6: Gift ports and the Sao Paulo calendar [ ]
+#### T6: Gift ports and the Sao Paulo calendar [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The backend decides the date in `America/Sao_Paulo` from the injectable `Clock` (BAS-03, spec P1 Receive AC 5).
@@ -453,7 +453,7 @@ class SaoPauloGiftCalendar(
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 4 cases pass; the application context of every IT still starts (one `GiftCalendarPort` bean).
+- [x] The 4 cases pass; the application context of every IT still starts (one `GiftCalendarPort` bean).
 
 **Commit**: `feat(backend): read the gift date in sao paulo time`
 
