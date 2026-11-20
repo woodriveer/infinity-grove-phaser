@@ -188,6 +188,24 @@ test.describe('Black awareness staff', () => {
         await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 5 Copper: 50');
     });
 
+    test('the bulk sale sells the staff for 500 copper and sends its id', async ({ page }) => {
+        const { backend } = await startGame(page, { equipment: { yan: [ GIFT_STAFF ] }, wallets: { yan: 50 } });
+        await openEquipment(page);
+
+        await page.getByTestId('bulk-sell-start').click();
+        await expect(page.getByTestId('bulk-sell-bar')).toBeVisible();
+        await tile(page).click();
+
+        await expect(page.getByTestId('bulk-sell-summary')).toHaveText('Selecionadas: 1 · Total: 5 prata');
+
+        await page.getByTestId('bulk-sell-submit').click();
+        await page.getByTestId('bulk-sell-confirm-yes').click();
+
+        await expect(tile(page)).toHaveCount(0);
+        await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 5 Copper: 50');
+        expect(backend.calls.filter(({ method, path }) => method === 'POST' && path === '/equipment/sell').map(({ body }) => body)).toEqual([ { pieceIds: [ 'gift-staff' ] } ]);
+    });
+
     test('a piece with an unknown special shows as a plain legendary weapon', async ({ page }) => {
         await startGame(page, { equipment: { yan: [ { ...GIFT_STAFF, special: 'FROST_RUNE' } ] } });
         await openEquipment(page);
