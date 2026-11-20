@@ -183,6 +183,12 @@ const REROLL_COST = 5000;
 
 const refineCostOf = (piece) => (piece.refine >= MAX_REFINE ? null : Math.floor(500 * 17 ** piece.refine / 10 ** piece.refine) * RARITY[piece.rarity].cost);
 
+//  The staff GiftController answers at chance 0.5 (spec black-awareness-staff P1 Receive AC 2)
+export const GIFT_STAFF = Object.freeze({
+    id: 'gift-staff', slot: 'WEAPON', rarity: 'LEGENDARY', refine: 0, baseClick: 11, heroId: null, special: 'BLACK_AWARENESS_STAFF',
+    affixes: [ { type: 'BOSS_DAMAGE_PCT', base: 28 }, { type: 'BOSS_TIME_SECONDS', base: 6 }, { type: 'CRIT_DAMAGE_PCT', base: 55 }, { type: 'ARMOR_PIERCE_PCT', base: 28 } ]
+});
+
 const pieceView = (piece) => ({
     id: piece.id,
     slot: piece.slot,
@@ -191,6 +197,7 @@ const pieceView = (piece) => ({
     ...(piece.baseClick != null && { clickDamage: piece.baseClick * (10 + piece.refine) / 10 }),
     affixes: piece.affixes.map(({ type, base }) => ({ type, value: Math.floor(base * (10 + piece.refine) / 10) })),
     ...(piece.heroId && { heroId: piece.heroId }),
+    ...(piece.special && { special: piece.special }),
     ...(refineCostOf(piece) !== null && { refineCost: refineCostOf(piece) }),
     ...(piece.refine >= REROLL_MIN_REFINE && { rerollCost: REROLL_COST }),
     sellPrice: Math.floor(100 * RARITY[piece.rarity].index * (2 + piece.refine) / 2)
@@ -245,13 +252,15 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  lastChapter (the last chapter a cleared chapter boss opens, default 1: the boss of that chapter completes the campaign).
 //  team {name: { boughtSlots, allies: [ 4 hero ids or null ] }} (starting teams, default no slot bought and no ally; the team is unlocked once the player has cleared chapter 5) and
 //  holdTeam() -> release() holds PUT /team, POST /team/slots and PUT /leader, failNextTeamRequest({ status = 500, code }) makes the next one of them answer that problem, teamOf(name) reads a stored team.
+//  gifts {name: true | 'fail'} (POST /gifts/claim of GiftController: true grants GIFT_STAFF on the first claim of that player and { granted: false } after, 'fail' answers 500 on every claim,
+//  a player not listed is never granted), the claims are kept out of `calls` and counted by giftCalls() (one username per request).
 //  healthDelayMs delays the answer of GET /api/health (the backend wake-up of spec supabase-postgres), which is counted by healthCalls() and kept out of calls.
 //  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens, and holdFarm(chapter, { fail }) -> release() to hold the answer of GET /farm?chapter=n, and holdOutcome() -> release() to hold the answer of POST /farm/outcome.
 export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
     chapterDefinitions = {},
     cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = [],
-    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1, healthDelayMs = 0, team: startingTeam = {}
+    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1, healthDelayMs = 0, team: startingTeam = {}, gifts: startingGifts = {}
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -335,6 +344,10 @@ export async function mockBackend (page, {
 
         return { piece: pieceView(piece), sold: false };
     };
+
+    //  Players that already received the staff of the gift day
+    const grantedGifts = new Set();
+    const giftCalls = [];
 
     const talentsByUser = new Map();
     const talentsOf = (username) => {
@@ -1048,6 +1061,34 @@ export async function mockBackend (page, {
         return route.fulfill({ json: { status: 'UP', commit: 'e2e' } });
     });
 
+    //  POST /gifts/claim of GiftController; outside `calls` like /api/health so no existing call list changes
+    await page.route('**/api/gifts/**', async (route) => {
+        const request = route.request();
+        const path = new URL(request.url()).pathname.replace(/^\/api/, '');
+        const now = Date.now();
+        const username = authenticated(route, now);
+
+        if (!username) { return null; }
+
+        giftCalls.push(username);
+
+        if (request.method() !== 'POST' || path !== '/gifts/claim') { return route.fulfill(problem(404, 'Not found')); }
+
+        const gift = startingGifts[username];
+
+        if (gift === 'fail') { return route.fulfill(problem(500, 'Gift failed')); }
+
+        if (gift !== true || grantedGifts.has(username)) { return route.fulfill({ json: { granted: false } }); }
+
+        grantedGifts.add(username);
+
+        const piece = { ...GIFT_STAFF, affixes: GIFT_STAFF.affixes.map((affix) => ({ ...affix })) };
+
+        equipmentOf(username).push(piece);
+
+        return route.fulfill({ json: { granted: true, gift: 'BLACK_AWARENESS_STAFF', piece: pieceView(piece) } });
+    });
+
     await page.route('**/api/users**', handler);
     await page.route('**/api/auth/**', handler);
     //  Not `**/api/wallet**`: that would also catch Vite's module request for /src/api/walletApi.js
@@ -1083,6 +1124,8 @@ export async function mockBackend (page, {
         teamOf,
         equipmentOf,
         talentsOf,
+        //  The username of every POST /gifts/claim received, in order
+        giftCalls: () => [ ...giftCalls ],
         //  Replaces the list the drop rolls read, e.g. [ 0 ] drops every time
         setChances: (values) => {
             chances = [ ...values ];

@@ -1159,7 +1159,7 @@ export const claimGift = async ({ gateway, equipment, onGift }) =>
 
 ### Phase 6: e2e and author check
 
-#### T19: Fake backend: `special`, gifts and the claim route [ ]
+#### T19: Fake backend: `special`, gifts and the claim route [x]
 
 **Owner**: test-engineer
 **Goal**: The e2e fake answers `special` and `POST /gifts/claim` like `GiftController` (BAS-07, BAS-13).
@@ -1198,7 +1198,7 @@ It reads the user with `authenticated(route, <now as the main handler reads it>)
 **Gate**: `cd game && npx playwright test e2e/equipment.spec.js e2e/equipmentUi.spec.js e2e/drops.spec.js`
 **Done when**:
 
-- [ ] The three existing specs pass unchanged (no existing call list or piece body changed for pieces without `special`).
+- [x] The three existing specs pass unchanged (no existing call list or piece body changed for pieces without `special`).
 
 **Commit**: `test(game): answer the gift claim and the piece special in the e2e fake backend`
 
