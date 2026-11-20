@@ -224,7 +224,7 @@
 - **Trade-off**: The bag capacity is no longer a hard limit (by one piece per gift); the damage bonus is computed in the browser like every other (AD-002); a player who never reloads across midnight gets the staff only at the next battle start.
 - **Scope**: `backend` `Equipment.kt` (`PieceSpecial`), `PieceRoller`, `Gift.kt`, `GiftPorts.kt`, `SaoPauloGiftCalendar`, `GiftRepository`, `GiftService`, `GiftController`, `PieceEntity`, `PieceResponse`, `V14__black_awareness_staff.sql`; `game/src/domain/equipment/specials.js`, `equipment.js`, `domain/combat/damage.js`, `allyAttacker.js`, `adapters/http/giftApi.js`, `application/gifts/giftClaim.js`, `pieceTile.js`, `HeroUi`, `ClickerGame`, `game/public/style.css`
 - **Date**: 2026-11-20
-- **Status**: proposed (spec `black-awareness-staff`, waiting for the owner's answers to Q1 to Q6). Extends AD-009 (pieces no longer come only from boss reports) and the bag rule of `equipment`; conforms to AD-003, AD-007, AD-010, AD-016 and AD-021 (no damage type: one more multiplicative factor, like Luz Divina's `vsDarkness`)
+- **Status**: accepted 2026-11-20 (spec `black-awareness-staff`, owner approved the Q1 to Q6 defaults). Extends AD-009 (pieces no longer come only from boss reports) and the bag rule of `equipment`; conforms to AD-003, AD-007, AD-010, AD-016 and AD-021 (no damage type: one more multiplicative factor, like Luz Divina's `vsDarkness`)
 
 ## Technical Debt
 
