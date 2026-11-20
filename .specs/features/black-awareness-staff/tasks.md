@@ -1270,7 +1270,7 @@ It reads the user with `authenticated(route, <now as the main handler reads it>)
 
 ---
 
-#### T22: Author check and mutants [ ]
+#### T22: Author check and mutants [x]
 
 **Owner**: test-engineer
 **Goal**: The feature's test gate (`.claude/agents/test-engineer.md` § Author check): every AC value pinned, mutants killed (BAS-01 to BAS-17).
@@ -1298,8 +1298,39 @@ It reads the user with `authenticated(route, <now as the main handler reads it>)
 **Gate**: `node scripts/sensor.mjs <scratchpad>/mutants.json` exits 0
 **Done when**:
 
-- [ ] Every AC of the spec has a row with `file:line` and the spec value; 0 gaps.
-- [ ] 7 of 7 mutants killed; `git status --porcelain` is as before the run.
+- [x] Every AC of the spec has a row with `file:line` and the spec value; 0 gaps.
+- [x] 7 of 7 mutants killed; `git status --porcelain` is as before the run.
+
+**Author check** (run on 2026-11-20, tree at `3e32039`):
+
+| AC | Test `file:line` | Exact value |
+| -- | -- | -- |
+| BAS-01 Receive AC1 | `GiftControllerIT.kt:57` (slot WEAPON, LEGENDARY, refine 0, special, heroId null, 200); `PieceRollerTest.kt:236,250` (bands: click 10 to 12, lowest and highest values) | `granted` true, `gift` BLACK_AWARENESS_STAFF, `piece.refine` 0 |
+| BAS-01 Receive AC2 | `GiftControllerIT.kt:57`; `PieceRollerTest.kt:222` | clickDamage 11.0; BOSS_DAMAGE_PCT 28, BOSS_TIME_SECONDS 6, CRIT_DAMAGE_PCT 55, ARMOR_PIERCE_PCT 28; sellPrice 500 |
+| BAS-02 Receive AC3 | `GiftServiceTest.kt:69,81,123`; `GiftControllerIT.kt:88`; `GiftRepositoryIT.kt:37` | `granted` false, nothing stored, also on 2027-11-20 and after a sale |
+| BAS-03 Receive AC4 | `GiftServiceTest.kt:91,102`; `GiftControllerIT.kt:107` | Nov 19 and Nov 21: `granted` false, nothing stored, no chance read |
+| BAS-03 Receive AC5 | `SaoPauloGiftCalendarTest.kt:13,18,23,28`; `GiftTest.kt:11,17` | 03:00:00Z = Nov 20; 02:59:59Z = Nov 19; 2026-11-21T02:59:59Z = Nov 20; 2026-11-21T03:00:00Z = Nov 21 |
+| BAS-04 Receive AC6 | `GiftServiceTest.kt:110`; `GiftControllerIT.kt:121` | bag of 100 receives the 101st piece, nothing sold |
+| BAS-05 Receive AC7 | `GiftControllerIT.kt:140` | `[false, true]`, one row with the special |
+| BAS-06 Receive AC8 and 404 | `GiftControllerIT.kt:165`; `GiftServiceTest.kt:132` | 401 and 0 rows in `player_gifts`; unknown user rejected |
+| BAS-07 Receive AC9 | `ClickerGame.test.js:2977`; `blackAwarenessStaff.spec.js:38,88` | one call: `giftCalls()` equals `['yan']` |
+| BAS-07 Receive AC10 | `HeroUi.test.js:1682`; `giftClaim.test.js:15`; `blackAwarenessStaff.spec.js:38,51` | notice text of the spec, 6000 ms (unit `delay` 6000, e2e pending timer 6000), red dot visible, piece in the bag with no second request |
+| BAS-07 Receive AC11 | `giftClaim.test.js:25,41`; `ClickerGame.test.js:2992,2999`; `blackAwarenessStaff.spec.js:88,96` | no notice (hidden), a click lowers the monster health |
+| BAS-08 Damage AC1 | `damage.test.js:207`; `skillDamage.test.js:228`; `blackAwarenessStaffDamage.spec.js:113` | 27 (10 x 0.9 x 3); 46.2 on the scene |
+| BAS-08 Damage AC2 | `damage.test.js:215`; `blackAwarenessStaffDamage.spec.js:137` | 5 against WATER; 27.72 against FIRE |
+| BAS-09 Damage AC3, AC4, AC5 | `skillDamage.test.js:232,236,240` | 162; 40.5; 324 |
+| BAS-09 Damage AC6 | `skillDamage.test.js:247`; `blackAwarenessStaffDamage.spec.js:154,172` | auto click 46.2 vs 15.4, ratio 3; aimed shot ratio 3 |
+| BAS-10 Damage AC7 | `allyAttacker.test.js:80,86` | `darknessDamagePct` 200, base 22, hit 59.4 |
+| BAS-11 Damage AC8 | `ClickerGame.test.js:2776`; `blackAwarenessStaffDamage.spec.js:125,131` | 15.4 with the staff in the bag and worn by Lyra |
+| BAS-08 Damage AC9 | `equipment.test.js:242,248,252`; `allyAttacker.test.js:80,93` | `darknessDamagePct: 200`; no field for a plain piece or an unknown special |
+| BAS-12 Damage AC10 | `blackAwarenessStaffDamage.spec.js:113,143` | 46.2 per click; Golpe Sangrento 277.2 then 346.5 after 1 s (69.3 bleed) |
+| BAS-13 See AC1 | `pieceTile.test.js:78`; `blackAwarenessStaff.spec.js:109` | `staff_black_awares_day.png` (naturalWidth 2048), `data-special`, `data-rarity` LEGENDARY, `data-gems` 4, `aria-label` `Cajado da Consciência Negra +0`, icon 52px x 52px, radius 10px, border 3px `rgb(217, 165, 33)` |
+| BAS-14 See AC2, AC3 | `equipment.test.js:219,228`; `blackAwarenessStaff.spec.js:131,143` | title `Cajado da Consciência Negra +0`; 6 lines, last `Especial: +200% de dano contra Escuridão` |
+| BAS-15 See AC4, AC5 | `EquipmentRefineIT.kt:67`; `EquipmentRerollIT.kt:69`; `blackAwarenessStaff.spec.js:143,159` | refine `+1`, click 12.1, special line stays; reroll: 4 buttons, special line stays |
+| BAS-16 See AC6 | `EquipmentSellIT.kt:60`; `blackAwarenessStaff.spec.js:176,191` | 500 copper: wallet `Silver: 5 Copper: 50`; bulk sale sends `{ pieceIds: ['gift-staff'] }` and `Total: 5 prata` |
+| BAS-17 See AC7 | `equipment.test.js:224,235`; `pieceTile.test.js:105`; `blackAwarenessStaff.spec.js:209` | `Lendário Arma +0`, `slot-weapon.png`, no `data-special`, 5 tooltip lines, none `Especial` |
+
+Gaps closed by new tests: bulk sale of the staff (`blackAwarenessStaff.spec.js:191`), a staff worn by another hero (`blackAwarenessStaffDamage.spec.js:131`). Mutants M1 to M7: 7 killed, 0 survived, `git status --porcelain` unchanged. Backend 1228 passed, game unit 2188 passed.
 
 **Commit**: `test(game): record the black awareness staff author check`
 
