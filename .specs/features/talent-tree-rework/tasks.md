@@ -108,7 +108,7 @@ T18 → T22
 ### Phase 6b: fixes (game-dev)
 
 ```
-T24
+T22 → T24
 ```
 
 ### Phase 7: UI review (ui-artist)
