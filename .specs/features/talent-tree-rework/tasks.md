@@ -291,7 +291,7 @@ filled in `TalentsResponse.from` with `requiredId = it.prerequisiteId` and `requ
 
 ---
 
-#### T3: `V15__talent_tree_rework.sql` and ADR 0015 [ ]
+#### T3: `V15__talent_tree_rework.sql` and ADR 0015 [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The levels of the retired talents are deleted once so their points come back, and the decision is recorded (TTR-11).
@@ -331,8 +331,8 @@ ADR `0015-talent-tree-rework.md` (same headings as 0014): Context (BOSS_TIME and
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 4 cases pass; Flyway boots the test database to V15; every earlier backend test passes unchanged.
-- [ ] `ktlintCheck` exits 0.
+- [x] The 4 cases pass; Flyway boots the test database to V15; every earlier backend test passes unchanged.
+- [x] `ktlintCheck` exits 0.
 
 **Commit**: `feat(backend): refund the retired talents with the V15 migration`
 

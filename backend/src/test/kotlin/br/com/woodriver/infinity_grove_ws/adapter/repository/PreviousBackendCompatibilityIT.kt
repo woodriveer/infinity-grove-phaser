@@ -169,12 +169,17 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
 
     @Test
     fun `the previous release starts on the migrated schema and its validation ignores V13`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 12, futureMigrations = 2)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 12, futureMigrations = 3)
     }
 
     @Test
     fun `the release before the black awareness staff starts on the migrated schema and its validation ignores V14`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 13, futureMigrations = 1)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 13, futureMigrations = 2)
+    }
+
+    @Test
+    fun `the release before the talent tree rework starts on the migrated schema and its validation ignores V15`() {
+        previousReleaseStartsOnMigratedSchema(lastVersion = 14, futureMigrations = 1)
     }
 
     /** The release whose last migration is `V[lastVersion]` validates its own files and sees [futureMigrations] newer ones as future. */
