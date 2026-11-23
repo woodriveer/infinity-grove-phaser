@@ -163,3 +163,37 @@ describe('comboText', () => {
         expect(comboText(combo)).toBe('Combo x57 · +50%');
     });
 });
+
+describe('Combo with a step', () => {
+    it('a step of 5 gives the 2nd click +5 %, the 11th +50 % and the 12th +50 % under a cap of 50', () => {
+        const bonuses = clicks(new Combo(50, 5), 12);
+
+        expect(bonuses[1]).toBe(5);
+        expect(bonuses[10]).toBe(50);
+        expect(bonuses[11]).toBe(50);
+    });
+
+    it('a step of 2 gives the 6th click +10 % under a cap of 10', () => {
+        expect(clicks(new Combo(10, 2), 6).at(-1)).toBe(10);
+    });
+
+    it('the default step is 1: the 11th click gets +10 % under a cap of 50', () => {
+        expect(clicks(new Combo(50), 11).at(-1)).toBe(10);
+    });
+
+    it('comboText reads Combo x3 · +15% after 3 clicks at step 5 and cap 50', () => {
+        const combo = new Combo(50, 5);
+
+        clicks(combo, 3);
+
+        expect(comboText(combo)).toBe('Combo x3 · +15%');
+    });
+
+    it('comboText stays empty with a cap of 0 whatever the step', () => {
+        const combo = new Combo(0, 5);
+
+        clicks(combo, 3);
+
+        expect(comboText(combo)).toBe('');
+    });
+});

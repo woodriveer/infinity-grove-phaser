@@ -614,7 +614,7 @@ export const addBonuses = (a, b) => ({
 
 ---
 
-#### T8: Combo step [ ]
+#### T8: Combo step [x]
 
 **Owner**: game-dev
 **Goal**: The combo adds `stepPercent` a click, 1 by default (TTR-16).
