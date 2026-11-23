@@ -182,6 +182,25 @@ test.describe('Talentos tree: nodes', () => {
         await expect(page.getByTestId('talent-CLICK_DAMAGE').locator('.talent-node-icon')).toHaveCSS('filter', 'none');
     });
 
+    for (const [ name, viewport ] of [ [ 'desktop', undefined ], [ '390 x 844 phone', { width: 390, height: 844 } ] ])
+    {
+        test(`the lock of a locked node does not overlap its level pill on the ${name}`, async ({ page }) => {
+            await startGame(page, { art: 'missing', viewport });
+            await openTalents(page);
+
+            const hits = await page.evaluate(() => [ ...document.querySelectorAll('.talent-node[data-state="locked"]') ].flatMap((node) => {
+                const lock = node.querySelector('.talent-node-lock').getBoundingClientRect();
+                const pill = node.querySelector('.talent-node-level').getBoundingClientRect();
+                const touching = lock.left < pill.right && pill.left < lock.right && lock.top < pill.bottom && pill.top < lock.bottom;
+
+                return touching ? [ node.dataset.testid ] : [];
+            }));
+
+            expect(await page.locator('.talent-node[data-state="locked"] .talent-node-lock').count()).toBe(19);
+            expect(hits).toEqual([]);
+        });
+    }
+
     test('marks a maxed node with the gold ring', async ({ page }) => {
         await startGame(page, { art: 'present', talents: { CLICK_DAMAGE: 10 } });
         await openTalents(page);

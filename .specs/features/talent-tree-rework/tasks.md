@@ -1780,7 +1780,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 
 ---
 
-#### T26: move the lock off the level pill [ ]
+#### T26: move the lock off the level pill [x]
 
 **Owner**: game-dev
 **Goal**: The lock of a locked grade 2 or 3 node touches neither the "0/10" pill nor the node ring's lower edge (ui-review finding 2).
@@ -1796,7 +1796,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 **Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
 **Done when**:
 
-- [ ] No lock intersects a level pill, and the existing "marks a locked node grey with the lock" test is green.
+- [x] No lock intersects a level pill, and the existing "marks a locked node grey with the lock" test is green.
 
 **Commit**: `fix(game): move the talent lock off the level pill`
 
