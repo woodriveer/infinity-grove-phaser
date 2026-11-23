@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório de release v0.9.0 - talent-tree-rework</title>
+<style>
+body{font-family:system-ui,Segoe UI,sans-serif;max-width:1000px;margin:2rem auto;padding:0 1rem;color:#222;line-height:1.5}
+h1{border-bottom:3px solid #3a6b35;padding-bottom:.4rem} h2{margin-top:2rem;color:#3a6b35}
+table{border-collapse:collapse;width:100%;margin:.6rem 0} th,td{border:1px solid #ccc;padding:.35rem .6rem;text-align:left;vertical-align:top}
+th{background:#eef3ea} .ok{color:#1a7f37;font-weight:600} .warn{color:#9a6700;font-weight:600}
+.verdict{background:#e6f4ea;border:2px solid #1a7f37;padding:.8rem 1rem;border-radius:6px} code{background:#f3f3f3;padding:0 .25rem}
+td.n,th.n{text-align:right}
+</style></head><body>
+<h1>Release v0.9.0 - Reforma da árvore de talentos (<code>talent-tree-rework</code>)</h1>
+
+<h2>Veredito</h2>
+<div class="verdict"><strong>Feito.</strong> Todas as 30 tarefas do <code>tasks.md</code> marcadas, verificação de autor do <code>test-engineer</code> (T22) sem lacunas, revisão do <code>ui-artist</code> rodada 2 APROVADA (f61ddda), tudo no <code>origin/main</code>. Nenhuma falha causada pela feature.</div>
+<table>
+<tr><th>Faixa de commits</th><td><code>a12d5f8..23c5eae</code> (35 commits; primeiro da feature <code>5944341</code>; release anterior v0.8.0 em <code>a12d5f8</code>)</td></tr>
+<tr><th>Verificação de autor (T22)</th><td>25 de 25 requisitos cobertos; sensor de mutantes: <strong>18 mortos, 0 sobreviveram</strong>, 0 inválidos, isolamento ok (16 do plano + M17 contorno selecionado de 3 px para 2 px + M18 anel de nível máximo de 3 px para 2 px). Lacunas fechadas pela própria verificação: valores 20/40/60 e 10/20/30 no nível 10 via HTTP, dano contra chefe no clique automático, duplo clique de Lyra com excedente, Fumaça acima de 100 e crítico forçado com excedente no navegador.</td></tr>
+<tr><th>Mudanças depois da verificação de autor</th><td>T24 (ficha do inimigo abaixo do Lacaio 2, <code>8fae5cb</code>) e T25 a T30 (correções da revisão de UI: nó maximizado distinto, cadeado fora do nível, legenda inteira, rolagem no celular, legendas de reserva, selo de mais) mudaram código de produção com testes próprios, depois do T22. A revisão de UI rodada 2 os aprovou.</td></tr>
+<tr><th>Ajustes de testes fora das listas de tarefas (aprovados pelo orquestrador)</th><td><code>TalentServiceTest</code> (BOSS_TIME para BOSS_DAMAGE); <code>PreviousBackendCompatibilityIT</code> (contagens de migrações futuras); títulos de ramo e cartão Talentos em testes de <code>HeroUi</code> e <code>talentsView</code>; <code>uiRedesign</code> UIR-14 AC9.</td></tr>
+<tr><th>Fora do escopo (conhecido)</th><td>Tamanho do texto no celular (TD-010) e o nome do elemento em inglês ("Fire") na linha do inimigo (anterior à feature, AD-007). A arte pintada ainda não foi gerada: a árvore sai com imagens de reserva e as coordenadas dos nós serão calibradas quando o fundo chegar.</td></tr>
+</table>
+
+<h2>Código de produção da faixa</h2>
+<p>Fonte: <code>git diff --numstat a12d5f8..23c5eae</code>. Especificações, testes, arte e configuração de build não contam.</p>
+<table><tr><th>Parte</th><th class="n">Linhas adicionadas</th><th class="n">Linhas removidas</th><th class="n">Arquivos</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>, inclui a migração V15)</td><td class="n">51</td><td class="n">13</td><td class="n">3</td></tr>
+<tr><td>Game (<code>game/src</code> sem <code>*.test.js</code> + <code>game/public/*.css</code>)</td><td class="n">548</td><td class="n">196</td><td class="n">12</td></tr>
+<tr><th>Total</th><th class="n">599</th><th class="n">209</th><th class="n">15</th></tr></table>
+
+<h2>Código de teste da faixa</h2>
+<p>"Declarações" conta as declarações de teste (<code>@Test</code>/<code>@ParameterizedTest</code>, <code>it(</code>/<code>test(</code>) nas linhas adicionadas e removidas do diff; testes gerados por laço ou <code>.each</code> contam como uma declaração. Os totais vêm das execuções desta release.</p>
+<table><tr><th>Suíte</th><th class="n">Linhas +</th><th class="n">Linhas -</th><th class="n">Arquivos</th><th class="n">Declarações adicionadas / removidas</th><th>Total após a execução</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td class="n">414</td><td class="n">30</td><td class="n">5</td><td class="n">26 / 0</td><td>1254 testes, 0 falhas</td></tr>
+<tr><td>Game unitário (<code>game/src/**/*.test.js</code>)</td><td class="n">1165</td><td class="n">212</td><td class="n">13</td><td class="n">134 / 44</td><td>2278 testes em 90 arquivos, 0 falhas</td></tr>
+<tr><td>e2e (<code>game/e2e</code>)</td><td class="n">1104</td><td class="n">66</td><td class="n">11</td><td class="n">60 / 6</td><td>610 testes: 594 passaram na rodada completa; 16 falharam e passaram sozinhos</td></tr>
+<tr><td>Deploy (<code>deploy/**/*.test.mjs</code>)</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0 / 0</td><td>289 testes: 287 passaram, 2 falham (ver abaixo)</td></tr></table>
+
+<h2>Cobertura de testes unitários</h2>
+<table><tr><th>Escopo</th><th class="n">Linhas</th><th class="n">Ramos</th></tr>
+<tr><td>Backend (JaCoCo), projeto inteiro</td><td class="n">98,56% (3158 de 3204)</td><td class="n">93,50% (1007 de 1077)</td></tr>
+<tr><td>Backend, <code>Talents.kt</code> (alterado)</td><td class="n">100% (139 de 139)</td><td class="n">88,42% (84 de 95)</td></tr>
+<tr><td>Backend, <code>TalentController.kt</code> (alterado)</td><td class="n">100% (52 de 52)</td><td class="n">100% (6 de 6)</td></tr>
+<tr><td>Game (Vitest v8), projeto inteiro</td><td class="n">98,89% (3678 de 3719)</td><td class="n">95,27% (1814 de 1904)</td></tr>
+<tr><td>Game, 11 arquivos JS alterados pela feature</td><td class="n">98,64% (1527 de 1548)</td><td class="n">92,29% (742 de 804)</td></tr></table>
+<p>Arquivos do game alterados, linhas / ramos: <code>ClickerGame.js</code> 97,95 / 91,39; <code>HeroUi.js</code> 99,00 / 88,23; <code>talentTreeLayout.js</code> 100 / 100; <code>talentsView.js</code> 99,23 / 96,82; <code>talentCollection.js</code> 100 / 100; <code>combo.js</code> 100 / 100; <code>damage.js</code> 100 / 100; <code>equipment.js</code> 100 / 100; <code>leaderStats.js</code> 100 / 100; <code>skillDamage.js</code> 100 / 100; <code>talents.js</code> 100 / 91,93. O CSS não entra na cobertura de JS.</p>
+
+<h2>Cobertura e2e</h2>
+<p>Istanbul, rodada completa em 13 partes de 34 a 117 testes (a primeira sem <code>--keep</code>, as demais com <code>--keep</code>). É um limite inferior: uma página recarregada dentro de um teste perde o que contou antes do recarregamento.</p>
+<table><tr><th>Escopo</th><th class="n">Linhas</th><th class="n">Ramos</th></tr>
+<tr><td>Game inteiro</td><td class="n">94,52% (3520 de 3724)</td><td class="n">80,16% (1249 de 1558)</td></tr>
+<tr><td>11 arquivos JS alterados pela feature</td><td class="n">95,49% (1482 de 1552)</td><td class="n">81,14% (525 de 647)</td></tr></table>
+<p>Por arquivo, linhas / ramos: <code>ClickerGame.js</code> 93,98 / 80,62; <code>HeroUi.js</code> 95,43 / 81,36; <code>talentTreeLayout.js</code> 100 / 100; <code>talentsView.js</code> 99,25 / 87,27; <code>talentCollection.js</code> 96,55 / 40; <code>combo.js</code> 100 / 100; <code>damage.js</code> 100 / 76,19; <code>equipment.js</code> 100 / 92,85; <code>leaderStats.js</code> 100 / 57,14; <code>skillDamage.js</code> 100 / 76,66; <code>talents.js</code> 97,56 / 75.</p>
+<p>Cobertura do deploy (<code>node --test --experimental-test-coverage</code>): linhas 96,15%, ramos 95,46%, funções 94,44%.</p>
+
+<h2>Cenários e2e da feature</h2>
+<p>55 cenários em dois arquivos: 54 passaram na rodada completa; 1 falhou na rodada completa e passou sozinho.</p>
+<h3><code>talentTreeRework.spec.js</code> (34)</h3>
+<table><tr><th>Cenário</th><th>Resultado</th></tr>
+<tr><td>Talentos tree: the window › opens a 1024 x 576 window with the tree, the plaques and the empty card</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: the window › opening the screen again clears the selection</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: nodes › draws 28 nodes at their map coordinates, Fúria crescente bigger</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: nodes › captions grade 1 nodes and badges grades 2 and 3</td><td class="warn">falhou na rodada completa por tempo esgotado sob carga; passou sozinho (re-execução isolada)</td></tr>
+<tr><td>Talentos tree: nodes › no caption is clipped and none touches another part of the board</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: nodes › a caption has a backing over the fallback veins and stays 80 px wide</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: nodes › names each node with a title and an aria-label</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: nodes › marks a locked node grey with the lock</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: nodes › a caption has no backing over the painted board and stays 80 px wide</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: nodes › the lock of a locked node does not overlap its level pill on the 390 x 844 phone</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: nodes › the lock of a locked node does not overlap its level pill on the desktop</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: nodes › marks a maxed node with the gold ring</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: nodes › marks an available node with the branch glow and an open one without it</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: node states by shape › an available node carries the plus seal and a pulsing halo; open, locked and maxed nodes carry neither</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: nodes › marks a maxed node of every branch with the double ring and the star seal, never in the branch colour</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: the detail card › selecting a node sends no request and outlines it</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: node states by shape › with the art missing the available node pulses its inset ring too, and the pulse stops for a player who asks for less motion</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: the detail card › buying a level keeps the node selected and updates the card, the chip, the medallion and the veins</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: the detail card › Fúria crescente opens at COMBO 10, costs 2 points and reads +2% por clique</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: the detail card › names the price of the button: 1 ponto, 2 pontos</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: the detail card › shows the lock text of a grade and of Fúria crescente with no button</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: the detail card › Fúria crescente at level 4 reads +5% por clique and Nível máximo</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: banners and lit veins › the lit veins follow the levels: 0, 0.27, 0.44 and 1</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: banners and lit veins › the banners read the branch titles in the branch ink at 140 x 34</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: the art › with every art file present the tree draws the art</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: phones and desktops › on a 390 x 844 phone the tree is zoomed twice, opens centred and keeps the scroll</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: the art › with every art file missing the tree draws its fallbacks and still sells a level</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: phones and desktops › on a phone the selected Fúria crescente ends above the detail card</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: phones and desktops › on the desktop the tree is not zoomed and does not scroll</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: an older backend and failures › a talent list of an older backend draws its nodes and no error</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: an older backend and failures › says Não foi possível reiniciar os talentos. when the reset fails</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: an older backend and failures › says Não foi possível melhorar o talento. and reads the tree again after another 409</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: an older backend and failures › says Pontos de talento insuficientes when the backend refuses for points</td><td class="ok">passou</td></tr>
+<tr><td>Talentos tree: an older backend and failures › says Talentos indisponíveis when the tree cannot load</td><td class="ok">passou</td></tr>
+</table>
+<h3><code>talentTreeReworkCombat.spec.js</code> (21)</h3>
+<table><tr><th>Cenário</th><th>Resultado</th></tr>
+<tr><td>Boss damage › BOSS_DAMAGE 10 and BOSS_DAMAGE_G2 5 add 40 % to a click on the chapter boss: 1.4</td><td class="ok">passou</td></tr>
+<tr><td>Boss damage › the same talents leave a click on a phase monster at 1</td><td class="ok">passou</td></tr>
+<tr><td>Boss damage › a worn ring of BOSS_DAMAGE_PCT 28 makes the boss click 1.68</td><td class="ok">passou</td></tr>
+<tr><td>Boss damage › the same talents add 40 % to a click on a miniboss: 1.4</td><td class="ok">passou</td></tr>
+<tr><td>Boss damage › the chapter boss timer ignores a BOSS_TIME of an older backend: Time: 60</td><td class="ok">passou</td></tr>
+<tr><td>Boss damage › a skill hit on the chapter boss gets the boss damage: Corte Dimensional of a 1-star Kael deals 19.8 with BOSS_DAMAGE 10</td><td class="ok">passou</td></tr>
+<tr><td>Critical chance minus critical resistance › a 3-star Kael reads Seu crítico: 10% against resistance 30; a roll of 0.09 crits (3.5) and 0.10 does not (1.4)</td><td class="ok">passou</td></tr>
+<tr><td>Critical chance minus critical resistance › a 9-star Kael with the three CRIT_CHANCE grades at 10 reads Seu crítico: 100% against 10 and deals 13.44</td><td class="ok">passou</td></tr>
+<tr><td>Critical chance minus critical resistance › the chip follows a talent upgrade: 10% then 11% after a CRIT_CHANCE level</td><td class="ok">passou</td></tr>
+<tr><td>Critical chance minus critical resistance › the chip follows a leader change: 10% for a blank Kael, 40% for a 3-star Lyra</td><td class="ok">passou</td></tr>
+<tr><td>Critical chance minus critical resistance › Bomba de Fumaça adds 15 points: 95 + 15 against resistance 50 makes a roll of 0.59 critical (3.5), and 1.4 before it</td><td class="ok">passou</td></tr>
+<tr><td>Critical chance minus critical resistance › Bomba de Fumaça leaves a roll of 0.60 plain against resistance 50 (E is 60): 1.4</td><td class="ok">passou</td></tr>
+<tr><td>Critical chance minus critical resistance › Lyra&#x27;s double click is forced critical and keeps the overflow: a chance of 120 lands two hits of 2.2</td><td class="ok">passou</td></tr>
+<tr><td>Critical chance minus critical resistance › a CRIT_RESIST_BREAK of an older backend lowers nothing: Seu crítico: 0% against resistance 20</td><td class="ok">passou</td></tr>
+<tr><td>Armor pierce › ARMOR_PIERCE 10 makes a click on defense 50 deal 0.55</td><td class="ok">passou</td></tr>
+<tr><td>Fúria crescente › COMBO 10 and Fúria crescente 4: 3 clicks read Combo x3 · +15% and 11 clicks deal 13.75</td><td class="ok">passou</td></tr>
+<tr><td>Fúria crescente › without Fúria crescente 11 clicks under COMBO 10 deal 11.55</td><td class="ok">passou</td></tr>
+<tr><td>Fúria crescente › with COMBO 0 the combo HUD stays empty whatever COMBO_FURY</td><td class="ok">passou</td></tr>
+<tr><td>Attribute panel › reads Dano em chefes: 20%, Perfuração de armadura: 10%, Tempo extra de chefe: 0s and Quebra de resistência a crítico: 0</td><td class="ok">passou</td></tr>
+<tr><td>Attribute panel › reads Quebra de resistência a crítico: 15 with Vex as a fighting ally</td><td class="ok">passou</td></tr>
+<tr><td>Attribute panel › reads Chance de crítico: 120% for a 3-star Lyra wearing a CRIT_CHANCE 80 ring</td><td class="ok">passou</td></tr>
+</table>
+
+<h2>Falhas não causadas pela feature</h2>
+<h3>Rodada completa de e2e: 16 testes</h3>
+<p>Cada teste abaixo falhou na rodada completa (computador sob carga, com o Docker do deploy, o backend e o navegador na mesma máquina; testes de 30 a 60 s cada) e foi re-executado sozinho, uma vez, com <code>--workers=1</code>: <strong>os 16 passaram (16 passed, 2,5 min)</strong>. Nenhuma falha vem da feature; o único teste da feature entre eles (<code>talentTreeRework.spec.js:141</code>) esgotou o tempo sob carga e passou sozinho.</p>
+<table><tr><th>Teste</th><th>Título</th><th>Causa observada</th><th>Sozinho</th></tr>
+<tr><td><code>clickPower.spec.js:41</code></td><td>Click power: sequência de 11 cliques lê Combo x11 · +11%</td><td>a janela do combo de 1,5 s expirou entre cliques lentos sob carga (hud vazio)</td><td class="ok">passou</td></tr>
+<tr><td><code>dragEquip.spec.js:586</code></td><td>Drag to equip edge scroll: rola a janela com a peça perto da borda superior</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>dragEquip.spec.js:670</code></td><td>Drag to equip edge scroll: a luz segue o bloco que rola sob o ponteiro parado</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>heroTeamCombat.spec.js:324</code></td><td>Hero team ally hits: aliado que mata o monstro derruba moedas</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>skills.spec.js:49</code></td><td>Hero skills: segundo toque durante a recarga não faz nada</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>splash.spec.js:25</code></td><td>Splash screen: toca sozinha e termina no formulário de login</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>splash.spec.js:77</code></td><td>Splash screen no celular: toca e chega ao login</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>talentTreeRework.spec.js:141</code></td><td>Talentos tree nodes: legendas dos nós do grau 1 e selos dos graus 2 e 3 (feature)</td><td>esperava o selo &quot;III&quot; e o tempo esgotou sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>uiRedesign.spec.js:317</code></td><td>Grove theme: Logout como pílula de madeira</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>uiRedesign.spec.js:334</code></td><td>Grove theme: Click to Start como prompt de brasa</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>uiRedesign.spec.js:371</code></td><td>Grove theme: Voltar como pílula de madeira</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>uiRedesign.spec.js:1613</code></td><td>Grove theme: cinco cartões de herói do mesmo tamanho</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>uiRedesign.spec.js:2030</code></td><td>Grove theme: telas de boot e preloader em madeira escura</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>uiRedesign.spec.js:2057</code></td><td>Grove theme: imagens de habilidade com 512 px de altura</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>uiRedesign.spec.js:2090</code></td><td>Grove theme: sem magenta na barra de habilidades</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+<tr><td><code>wake.spec.js:56</code></td><td>Backend wake-up: com o servidor fora, o formulário explica o motivo</td><td>tempo do teste (60 s) esgotado sob carga</td><td class="ok">passou</td></tr>
+</table>
+<h3>Testes de deploy: 2 falhas permanentes</h3>
+<p><code>deploy/regression.test.mjs</code>: "the CLI exits 0 when every check passes" e "the CLI exits 1 when a check fails". O processo filho termina com o código <code>3221226505</code> (0xC0000409, falha fatal do runtime) em vez de 0 e 1, no Node v23.11.0 em Windows. Reproduzido em duas execuções, uma delas só desse arquivo (21 de 23 passam). A pasta <code>deploy/</code> não mudou na faixa desta release (0 arquivos), então a falha é do ambiente e não da feature.</p>
+
+<h2>Deploy</h2>
+<p>O backend com a migração V15 já estava ativo (slot green, commit <code>2a77191</code>) antes desta release; o observador marcou <code>23c5eae</code> como tratado. O Worker é republicado pelo observador a partir do commit da release (que traz a versão 0.9.0 no jogo). O site só fica no ar enquanto o <code>publish.sh</code> estiver rodando.</p>
+</body></html>

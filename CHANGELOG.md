@@ -3,6 +3,30 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.9.0] - 2026-11-23
+
+Reforma da árvore de talentos (`talent-tree-rework`): a tela Talentos virou uma árvore desenhada, o crítico passou a valer acima de 100% e os talentos de chefe, perfuração e combo ganharam novas regras.
+
+### Adicionado
+
+- A tela **Talentos** agora é uma árvore: clique em um nó para ver o nome, o nível, o efeito e o botão de melhorar no cartão de detalhes. As veias de cada ramo acendem conforme você gasta pontos, a seleção e a rolagem são mantidas ao melhorar um talento, e nos celulares a árvore é ampliada e rola nos dois eixos. Enquanto a arte pintada não chega, a árvore usa imagens de reserva.
+- Ramo **Caça aos chefes**: o talento **Dano contra chefes** (+2% por nível, até 120% na cadeia) soma dano contra minichefes e chefes de capítulo.
+- Talento **Perfuração de armadura** (+1% por nível, até 60% na cadeia) no ramo de quebra, que ignora parte da defesa do monstro.
+- Talento **Fúria crescente** (4 níveis) no ramo de combo: o combo passa a crescer de 2% até 5% por clique em vez de 1%. Ele abre quando o talento Limite de dano do combo chega ao nível 10.
+- A ficha do inimigo mostra **Seu crítico: n%**, a chance real de crítico contra o monstro em campo.
+- Cada ponto de crítico acima de 100% soma +1% de dano crítico nos golpes críticos, inclusive no tiro mirado e nos dois cliques de Lyra. A chance de crítico no painel de atributos não tem mais teto de 100%.
+
+### Alterado
+
+- A resistência a crítico do monstro agora é subtraída da sua chance de crítico (antes reduzia a chance em proporção), e a chance real fica entre 0% e 100%.
+- O tempo extra do chefe de capítulo não vem mais de talento: ele continua vindo da fase, dos equipamentos e da passiva de Kael. O talento de tempo do minichefe segue como era.
+- A ficha do inimigo foi para baixo do Lacaio 2, sem cobrir os lacaios dos minichefes.
+- Ajustes visuais da árvore: o nó disponível ganha um selo de mais, o nó no nível máximo é diferente em cada ramo, o cadeado saiu de cima do nível, a legenda do talento aparece inteira e, no celular, o talento selecionado rola para fora do cartão.
+
+### Removido
+
+- Os talentos **Tempo do chefe** e **Quebra de resistência a crítico** foram aposentados. Todos os pontos que você tinha neles voltaram para a sua reserva de pontos de talento, prontos para gastar de novo, sem aviso na tela.
+
 ## [0.8.0] - 2026-11-20
 
 Cajado da Consciência Negra (`black-awareness-staff`): presente do Dia da Consciência Negra para quem entra no jogo em 20 de novembro.
