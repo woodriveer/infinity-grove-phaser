@@ -248,14 +248,14 @@ Open questions: none beyond Q1 to Q12 above, each written into the spec with its
 | TTR-15 | P2 Fúria: AC 5 (requiredId, requiredLevel) | Tasks | Implementing |
 | TTR-16 | P2 Fúria: AC 6, AC 7 (combo step, HUD) | Tasks | Implementing |
 | TTR-17 | P2 Fúria: AC 8, AC 9 (effect and lock texts) | Tasks | Implementing |
-| TTR-18 | P2 Tree: AC 1 (window, plaques, medallion, reset, card) | Tasks | Pending |
+| TTR-18 | P2 Tree: AC 1 (window, plaques, medallion, reset, card) | Tasks | Implementing |
 | TTR-19 | P2 Tree: AC 2, AC 3 (nodes, captions, badges) | Tasks | Implementing |
-| TTR-20 | P2 Tree: AC 4 (node states) | Tasks | Pending |
+| TTR-20 | P2 Tree: AC 4 (node states) | Tasks | Implementing |
 | TTR-21 | P2 Tree: AC 5, AC 6, AC 7, AC 8, AC 9 (selection, detail card, upgrade) | Tasks | Implementing |
 | TTR-22 | P2 Tree: AC 10, AC 11 (banners, lit veins) | Tasks | Implementing |
-| TTR-23 | P2 Tree: AC 12 (fallbacks) | Tasks | Pending |
+| TTR-23 | P2 Tree: AC 12 (fallbacks) | Tasks | Implementing |
 | TTR-24 | P2 Tree: AC 13 (narrow screens) | Tasks | Pending |
-| TTR-25 | P2 Tree: AC 14, AC 15, Edge Cases (missing talents, kept behaviours) | Tasks | Pending |
+| TTR-25 | P2 Tree: AC 14, AC 15, Edge Cases (missing talents, kept behaviours) | Tasks | Implementing |
 
 **Coverage:** 25 total, 25 mapped to tasks, 0 unmapped. The Gemini prompts of the last goal are written in `PROMPTS_ASSETS_UI.md` with this spec (no task).
 

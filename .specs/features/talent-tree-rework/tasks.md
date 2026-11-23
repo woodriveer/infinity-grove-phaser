@@ -1020,7 +1020,7 @@ export const VEINS = Object.freeze([
 
 ---
 
-#### T14: The painted tree view [ ]
+#### T14: The painted tree view [x]
 
 **Owner**: game-dev
 **Goal**: `renderTalents` draws the board, the nodes, the banners, the lit layers, the fixed plaques and the detail card, with a fallback for every art file (TTR-18 to TTR-25).

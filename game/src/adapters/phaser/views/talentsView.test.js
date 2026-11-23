@@ -1,186 +1,350 @@
 import { describe, expect, it, vi } from 'vitest';
-import { renderTalents, renderTalentsUnavailable } from './talentsView';
+import { placeTalentScroll, renderTalents, renderTalentsUnavailable, talentScrollOf } from './talentsView';
 
+//  [ id, branch, label, unit, perLevel of grade 1 ]: the 9 graded talents in the order of the backend
 const catalog = [
-    [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 3 ],
-    [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa', 'points', 1 ],
-    [ 'CRIT_RESIST_BREAK', 'BREAK', 'Quebra de resistência a crítico', 'points', 1 ],
+    [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_DAMAGE', 'TIME', 'Dano contra chefes', '%', 2 ],
+    [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa', 'points', 1 ], [ 'ARMOR_PIERCE', 'BREAK', 'Perfuração de armadura', '%', 1 ],
     [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique (%)', '%', 5 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ],
     [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ], [ 'CLICK_FLAT_DAMAGE', 'POWER', 'Dano direto de clique', 'dmg', 2 ]
 ];
-//  The tree as the backend answers it
-const tree = (levels = {}) => catalog.map(([ id, branch, label, unit, perLevel ]) =>
+const gradeId = (id, grade) => (grade === 1 ? id : `${id}_G${grade}`);
+//  The 28 talents as the backend answers them (design, Data Models): 3 grades of the 9 talents, then Fúria crescente, which COMBO at level 10 opens
+const tree = (levels = {}) =>
 {
-    const level = levels[id] ?? 0;
+    const graded = [ 1, 2, 3 ].flatMap((grade) => catalog.map(([ id, branch, label, unit, perLevel ]) => ({
+        id: gradeId(id, grade), baseId: id, grade, branch, label, unit, perLevel: perLevel * grade, maxLevel: 10, cost: grade,
+        requiredId: grade === 1 ? null : gradeId(id, grade - 1), requiredLevel: grade === 1 ? null : 10
+    })));
+    const fury = { id: 'COMBO_FURY', baseId: 'COMBO_FURY', grade: 1, branch: 'COMBO', label: 'Fúria crescente', unit: 'combo-step', perLevel: 1, maxLevel: 4, cost: 2, requiredId: 'COMBO', requiredLevel: 10 };
 
-    return { id, branch, label, unit, perLevel, maxLevel: 10, level, value: level * perLevel, nextCost: level >= 10 ? null : 1 };
+    return [ ...graded, fury ].map(({ cost, ...talent }) =>
+    {
+        const level = levels[talent.id] ?? 0;
+
+        return {
+            ...talent,
+            level,
+            value: level * talent.perLevel,
+            nextCost: level >= talent.maxLevel ? null : cost,
+            unlocked: talent.requiredId === null || (levels[talent.requiredId] ?? 0) >= talent.requiredLevel
+        };
+    });
+};
+
+const points = (available, spent = 0) => ({ earned: available + spent, spent, available });
+const show = (levels, available = 50, options = {}) => renderTalents(tree(levels), points(available), { onSelect: vi.fn(), onUpgrade: vi.fn(), onReset: vi.fn(), ...options });
+const find = (screen, id) => screen.querySelector(`[data-testid="${id}"]`);
+const text = (screen, id) => find(screen, id).textContent;
+const nodes = (screen) => [ ...screen.querySelectorAll('.talent-node') ];
+const fail = (image) => image.dispatchEvent(new Event('error'));
+
+describe('the nodes', () => {
+    it('draws one node per talent of the list that the map places: 28', () => {
+        expect(nodes(show())).toHaveLength(28);
+    });
+
+    it('draws no node for a talent outside the map and throws nothing', () => {
+        const extra = { id: 'NEW_ONE', baseId: 'NEW_ONE', branch: 'POWER', label: 'Novo', unit: '%', perLevel: 1, maxLevel: 10, level: 0, value: 0, nextCost: 1, unlocked: true };
+        const screen = renderTalents([ ...tree(), extra ], points(5), { onUpgrade: vi.fn() });
+
+        expect(nodes(screen)).toHaveLength(28);
+        expect(find(screen, 'talent-NEW_ONE')).toBeNull();
+    });
+
+    it('draws no node for a mapped talent missing from the list', () => {
+        const screen = renderTalents(tree().filter(({ id }) => id !== 'COMBO_FURY'), points(5), { onUpgrade: vi.fn() });
+
+        expect(nodes(screen)).toHaveLength(27);
+        expect(find(screen, 'talent-COMBO_FURY')).toBeNull();
+    });
+
+    it('centres each node on its map coordinates', () => {
+        const screen = show();
+
+        expect([ find(screen, 'talent-CLICK_DAMAGE').style.left, find(screen, 'talent-CLICK_DAMAGE').style.top ]).toEqual([ '55%', '46%' ]);
+        expect([ find(screen, 'talent-COMBO_FURY').style.left, find(screen, 'talent-COMBO_FURY').style.top ]).toEqual([ '85%', '72%' ]);
+        expect([ find(screen, 'talent-MINIBOSS_TIME').style.left, find(screen, 'talent-MINIBOSS_TIME').style.top ]).toEqual([ '6%', '66%' ]);
+    });
+
+    it('marks Fúria crescente large and gives it the large frame', () => {
+        const screen = show();
+        const fury = find(screen, 'talent-COMBO_FURY');
+
+        expect(fury.classList.contains('is-large')).toBe(true);
+        expect(fury.querySelector('.talent-node-frame').src.endsWith('assets/talent-node-frame-large.png')).toBe(true);
+        expect(find(screen, 'talent-CLICK_DAMAGE').classList.contains('is-large')).toBe(false);
+        expect(find(screen, 'talent-CLICK_DAMAGE').querySelector('.talent-node-frame').src.endsWith('assets/talent-node-frame.png')).toBe(true);
+    });
+
+    it('shows the level chip, the title and the aria-label', () => {
+        const node = find(show({ CLICK_DAMAGE_G2: 3 }), 'talent-CLICK_DAMAGE_G2');
+
+        expect(node.querySelector('.talent-node-level').textContent).toBe('3/10');
+        expect(node.getAttribute('title')).toBe('Dano de clique (%) (Grau 2)');
+        expect(node.getAttribute('aria-label')).toBe('Dano de clique (%) (Grau 2), nível 3 de 10');
+    });
+
+    it('captions grade 1 nodes and Fúria crescente and badges grade 2 and 3', () => {
+        const screen = show();
+
+        expect(text(screen, 'talent-caption-CLICK_DAMAGE')).toBe('Dano de clique (%)');
+        expect(text(screen, 'talent-caption-COMBO_FURY')).toBe('Fúria crescente');
+        expect(find(screen, 'talent-caption-CLICK_DAMAGE_G2')).toBeNull();
+        expect(text(screen, 'talent-node-grade-CLICK_DAMAGE_G2')).toBe('II');
+        expect(text(screen, 'talent-node-grade-CLICK_DAMAGE_G3')).toBe('III');
+        expect(find(screen, 'talent-node-grade-CLICK_DAMAGE')).toBeNull();
+    });
+
+    it('marks a node locked and draws the lock over it', () => {
+        const node = find(show(), 'talent-CLICK_DAMAGE_G2');
+
+        expect(node.getAttribute('data-state')).toBe('locked');
+        expect(node.querySelectorAll('.talent-node-lock')).toHaveLength(1);
+    });
+
+    it('marks a node maxed at its top level', () => {
+        const node = find(show({ CLICK_DAMAGE: 10 }), 'talent-CLICK_DAMAGE');
+
+        expect(node.getAttribute('data-state')).toBe('maxed');
+        expect(node.querySelector('.talent-node-lock')).toBeNull();
+    });
+
+    it('marks a node available when the points pay its next level', () => {
+        expect(find(show({}, 1), 'talent-CRIT_CHANCE').getAttribute('data-state')).toBe('available');
+    });
+
+    it('marks a node open when the points do not pay its next level', () => {
+        expect(find(show({}, 0), 'talent-CRIT_CHANCE').getAttribute('data-state')).toBe('open');
+        expect(find(show({ CRIT_CHANCE: 10 }, 1), 'talent-CRIT_CHANCE_G2').getAttribute('data-state')).toBe('open');
+    });
+
+    it('marks the selected node aria-pressed true and the others false', () => {
+        const screen = show({}, 50, { selectedId: 'COMBO' });
+
+        expect(find(screen, 'talent-COMBO').getAttribute('aria-pressed')).toBe('true');
+        expect(nodes(screen).filter((node) => node.getAttribute('aria-pressed') === 'true')).toHaveLength(1);
+        expect(find(screen, 'talent-CLICK_DAMAGE').getAttribute('aria-pressed')).toBe('false');
+    });
+
+    it('calls onSelect with the id on a node click and never onUpgrade', () => {
+        const onSelect = vi.fn();
+        const onUpgrade = vi.fn();
+        const screen = show({}, 50, { onSelect, onUpgrade });
+
+        find(screen, 'talent-CLICK_DAMAGE').click();
+
+        expect(onSelect).toHaveBeenCalledTimes(1);
+        expect(onSelect).toHaveBeenCalledWith('CLICK_DAMAGE');
+        expect(onUpgrade).not.toHaveBeenCalled();
+    });
 });
 
-const points = (available) => ({ earned: available, spent: 0, available });
-const show = (levels, available = 50, options = {}) => renderTalents(tree(levels), points(available), { onUpgrade: vi.fn(), ...options });
-const text = (screen, id) => screen.querySelector(`[data-testid="${id}"]`).textContent;
+describe('the detail card', () => {
+    const upgradeButton = (screen, id) => find(screen, `talent-upgrade-${id}`);
 
-describe('Reiniciar pontos', () => {
-    const withSpent = (spent, options = {}) => renderTalents(tree(), { earned: spent, spent, available: 0 }, { onUpgrade: vi.fn(), ...options });
-    const button = (screen) => screen.querySelector('[data-testid="talent-reset"]');
+    it('shows the empty text and no button with nothing selected', () => {
+        const screen = show();
+        const detail = find(screen, 'talent-detail');
 
-    it('is labelled and calls onReset when clicked', () => {
-        const onReset = vi.fn();
-        const screen = withSpent(3, { onReset });
-
-        expect(button(screen).textContent).toBe('Reiniciar pontos');
-        button(screen).click();
-        expect(onReset).toHaveBeenCalledTimes(1);
+        expect(text(screen, 'talent-detail-empty')).toBe('Escolha um talento na árvore para ver os detalhes.');
+        expect(detail.querySelector('.talent-upgrade')).toBeNull();
+        expect(detail.hasAttribute('data-branch')).toBe(false);
     });
 
-    it('is disabled while nothing is spent or a request runs', () => {
-        expect(button(withSpent(0)).disabled).toBe(true);
-        expect(button(withSpent(3, { busy: true })).disabled).toBe(true);
-        expect(button(withSpent(3)).disabled).toBe(false);
-    });
-});
+    it('shows the empty text when the selected id is not in the list', () => {
+        const screen = show({}, 50, { selectedId: 'NOPE' });
 
-describe('talent grades', () => {
-    const graded = () => [
-        ...tree({ COMBO: 10 }).map((talent) => ({ ...talent, baseId: talent.id, grade: 1, unlocked: true })),
-        ...tree().map((talent) => ({ ...talent, id: `${talent.id}_G2`, baseId: talent.id, grade: 2, nextCost: 2, unlocked: talent.id === 'COMBO' }))
-    ];
-    const render = (available = 50) => renderTalents(graded(), points(available), { onUpgrade: vi.fn() });
-
-    it('titles the blocks of a column Grau 1 and Grau 2', () => {
-        const screen = render();
-
-        expect([ ...screen.querySelectorAll('[data-testid="talent-branch-COMBO"] .talent-grade-title') ].map((node) => node.textContent)).toEqual([ 'Grau 1', 'Grau 2' ]);
+        expect(text(screen, 'talent-detail-empty')).toBe('Escolha um talento na árvore para ver os detalhes.');
+        expect(find(screen, 'talent-detail').querySelector('.talent-upgrade')).toBeNull();
     });
 
-    it('opens the grade 2 of a talent whose grade 1 is at 10 and prices it at 2 points', () => {
-        const screen = render();
+    it('fills the card of an open talent: name, level, effect and a 1 point button', () => {
+        const screen = show({}, 1, { selectedId: 'CLICK_DAMAGE' });
+
+        expect(text(screen, 'talent-detail-name')).toBe('Dano de clique (%)');
+        expect(text(screen, 'talent-level-CLICK_DAMAGE')).toBe('Nível 0/10');
+        expect(text(screen, 'talent-effect-CLICK_DAMAGE')).toBe('Efeito: nenhum');
+        expect(text(screen, 'talent-upgrade-CLICK_DAMAGE')).toBe('Melhorar (1 ponto)');
+        expect(upgradeButton(screen, 'CLICK_DAMAGE').disabled).toBe(false);
+        expect(find(screen, 'talent-detail').getAttribute('data-branch')).toBe('POWER');
+    });
+
+    it('prices a grade 2 level in points: Melhorar (2 pontos)', () => {
+        const screen = show({ COMBO: 10 }, 50, { selectedId: 'COMBO_G2' });
 
         expect(text(screen, 'talent-upgrade-COMBO_G2')).toBe('Melhorar (2 pontos)');
-        expect(screen.querySelector('[data-testid="talent-locked-COMBO_G2"]')).toBeNull();
     });
 
-    it('shows a locked grade with its reason and no upgrade button', () => {
-        const screen = render();
+    it('calls onUpgrade with the talent when the card button is clicked', () => {
+        const onUpgrade = vi.fn();
+        const screen = show({}, 5, { selectedId: 'CLICK_DAMAGE', onUpgrade });
+
+        upgradeButton(screen, 'CLICK_DAMAGE').click();
+
+        expect(onUpgrade).toHaveBeenCalledTimes(1);
+        expect(onUpgrade.mock.calls[0][0].id).toBe('CLICK_DAMAGE');
+    });
+
+    it('disables the card button while busy', () => {
+        expect(upgradeButton(show({}, 5, { selectedId: 'CLICK_DAMAGE', busy: true }), 'CLICK_DAMAGE').disabled).toBe(true);
+    });
+
+    it('disables the card button when the talent costs more than the points', () => {
+        expect(upgradeButton(show({ COMBO: 10 }, 1, { selectedId: 'COMBO_G2' }), 'COMBO_G2').disabled).toBe(true);
+    });
+
+    it('shows Nível máximo and no button for a maxed talent', () => {
+        const screen = show({ CLICK_DAMAGE: 10 }, 50, { selectedId: 'CLICK_DAMAGE' });
+
+        expect(text(screen, 'talent-max-CLICK_DAMAGE')).toBe('Nível máximo');
+        expect(upgradeButton(screen, 'CLICK_DAMAGE')).toBeNull();
+    });
+
+    it('shows the grade lock text and no button for a locked grade', () => {
+        const screen = show({}, 50, { selectedId: 'CLICK_DAMAGE_G2' });
 
         expect(text(screen, 'talent-locked-CLICK_DAMAGE_G2')).toBe('Bloqueado: chegue ao nível 10 do Grau 1');
-        expect(screen.querySelector('[data-testid="talent-upgrade-CLICK_DAMAGE_G2"]')).toBeNull();
-        expect(screen.querySelector('[data-testid="talent-CLICK_DAMAGE_G2"]').classList.contains('talent-locked')).toBe(true);
+        expect(upgradeButton(screen, 'CLICK_DAMAGE_G2')).toBeNull();
+    });
+
+    it('shows the lock text of Fúria crescente', () => {
+        const screen = show({}, 50, { selectedId: 'COMBO_FURY' });
+
+        expect(text(screen, 'talent-locked-COMBO_FURY')).toBe('Bloqueado: chegue ao nível 10 de Limite de dano do combo');
+        expect(upgradeButton(screen, 'COMBO_FURY')).toBeNull();
+    });
+
+    it('reads Fúria crescente as Nível 1/4 and +2% por clique', () => {
+        const screen = show({ COMBO: 10, COMBO_FURY: 1 }, 50, { selectedId: 'COMBO_FURY' });
+
+        expect(text(screen, 'talent-level-COMBO_FURY')).toBe('Nível 1/4');
+        expect(text(screen, 'talent-effect-COMBO_FURY')).toBe('Efeito: +2% por clique');
     });
 });
 
-describe('renderTalents', () => {
-    it('shows four columns titled Caça aos chefes, Quebra de defesa, Poder do clique and Combo', () => {
+describe('the board', () => {
+    it('draws the four banners in branch order with their titles and positions', () => {
         const screen = show();
 
         expect([ ...screen.querySelectorAll('.talent-branch-title') ].map((node) => node.textContent)).toEqual([ 'Caça aos chefes', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
+        expect([ find(screen, 'talent-branch-POWER').style.left, find(screen, 'talent-branch-POWER').style.top ]).toEqual([ '68%', '11%' ]);
     });
 
-    it('puts the talents of each branch in its column: 2, 2, 4 and 1', () => {
-        const screen = show();
+    it('gives each lit layer its ellipse and its opacity', () => {
+        const screen = show({ MINIBOSS_TIME: 5 });
+        const lit = find(screen, 'talent-lit-TIME');
 
-        expect([ 'TIME', 'BREAK', 'POWER', 'COMBO' ].map((branch) => screen.querySelectorAll(`[data-testid="talent-branch-${branch}"] .talent-card`).length)).toEqual([ 2, 2, 4, 1 ]);
+        expect([ '--cx', '--cy', '--rx', '--ry' ].map((name) => lit.style.getPropertyValue(name))).toEqual([ '10.5%', '53%', '10%', '20%' ]);
+        expect(lit.style.opacity).toBe('0.27');
+        expect(find(screen, 'talent-lit-POWER').style.opacity).toBe('0');
     });
 
-    it('holds the card Limite de dano do combo in the Combo column', () => {
-        const screen = show();
+    it('draws the trunk and 9 veins', () => {
+        const lines = [ ...find(show(), 'talent-tree-veins').querySelectorAll('polyline') ];
 
-        expect(screen.querySelector('[data-testid="talent-branch-COMBO"] .talent-name').textContent).toBe('Limite de dano do combo');
+        expect(lines).toHaveLength(10);
+        expect(lines[0].getAttribute('points')).toBe('50,100 50,58');
     });
 
-    it('reads the available points above the columns', () => {
-        expect(text(show({}, 7), 'talent-points')).toBe('Pontos de talento: 7');
-        expect(text(show({}, 0), 'talent-points')).toBe('Pontos de talento: 0');
+    it('shows the points on the medallion and the reset button', () => {
+        const screen = show({}, 3);
+
+        expect(text(screen, 'talent-points')).toBe('Pontos de talento: 3');
+        expect(text(screen, 'talent-reset')).toBe('Reiniciar pontos');
     });
 
-    it('reads the combo effect: nenhum at level 0 and +25% at level 5', () => {
-        expect(text(show(), 'talent-effect-COMBO')).toBe('Efeito: nenhum');
-        expect(text(show({ COMBO: 5 }), 'talent-effect-COMBO')).toBe('Efeito: +25%');
-    });
+    it('disables Reiniciar pontos while nothing is spent and while busy, and calls onReset', () => {
+        const withSpent = (spent, options = {}) => renderTalents(tree(), points(0, spent), { onUpgrade: vi.fn(), ...options });
+        const onReset = vi.fn();
+        const screen = withSpent(3, { onReset });
 
-    it('shows the label, the level and the effect of a talent', () => {
-        const screen = show({ CLICK_DAMAGE: 3 });
+        expect(find(withSpent(0), 'talent-reset').disabled).toBe(true);
+        expect(find(withSpent(3, { busy: true }), 'talent-reset').disabled).toBe(true);
+        expect(find(screen, 'talent-reset').disabled).toBe(false);
 
-        expect(screen.querySelector('[data-testid="talent-CLICK_DAMAGE"] .talent-name').textContent).toBe('Dano de clique (%)');
-        expect(text(screen, 'talent-level-CLICK_DAMAGE')).toBe('Nível 3/10');
-        expect(text(screen, 'talent-effect-CLICK_DAMAGE')).toBe('Efeito: +15%');
-    });
+        find(screen, 'talent-reset').click();
 
-    it('reads the effect of every unit: +6 s, -3 pontos for a break and +3 pontos', () => {
-        const screen = show({ BOSS_TIME: 2, PHYSICAL_BREAK: 3, CRIT_CHANCE: 3 });
-
-        expect(text(screen, 'talent-effect-BOSS_TIME')).toBe('Efeito: +6 s');
-        expect(text(screen, 'talent-effect-PHYSICAL_BREAK')).toBe('Efeito: -3 pontos');
-        expect(text(screen, 'talent-effect-CRIT_CHANCE')).toBe('Efeito: +3 pontos');
-    });
-
-    it('reads Efeito: nenhum at level 0', () => {
-        expect(text(show(), 'talent-effect-CLICK_DAMAGE')).toBe('Efeito: nenhum');
-    });
-
-    it('shows Melhorar (1 ponto) at every level below the top, whatever the level', () => {
-        const screen = show({ CRIT_CHANCE: 1, CLICK_DAMAGE: 8 });
-
-        expect(text(screen, 'talent-upgrade-CLICK_DAMAGE')).toBe('Melhorar (1 ponto)');
-        expect(text(screen, 'talent-upgrade-CRIT_CHANCE')).toBe('Melhorar (1 ponto)');
-        expect(text(screen, 'talent-upgrade-COMBO')).toBe('Melhorar (1 ponto)');
-    });
-
-    it('shows no wallet price', () => {
-        expect(show().textContent).not.toMatch(/prata|cobre|ouro/);
-    });
-
-    it('calls onUpgrade with the talent when the button is clicked', () => {
-        const onUpgrade = vi.fn();
-        const screen = show({}, 1, { onUpgrade });
-
-        screen.querySelector('[data-testid="talent-upgrade-CLICK_DAMAGE"]').click();
-
-        expect(onUpgrade).toHaveBeenCalledTimes(1);
-        expect(onUpgrade.mock.calls[0][0]).toMatchObject({ id: 'CLICK_DAMAGE', level: 0 });
-    });
-
-    it('enables every button with 1 available point and disables every one with 0', () => {
-        const one = show({}, 1);
-        const none = show({}, 0);
-
-        expect(one.querySelector('[data-testid="talent-upgrade-CLICK_DAMAGE"]').disabled).toBe(false);
-        expect([ ...none.querySelectorAll('.talent-upgrade') ].every((button) => button.disabled)).toBe(true);
-    });
-
-    it('disables every button while a request runs', () => {
-        const screen = show({}, 50, { busy: true });
-
-        expect([ ...screen.querySelectorAll('.talent-upgrade') ].every((button) => button.disabled)).toBe(true);
-    });
-
-    it('shows Nível máximo and no button at level 10', () => {
-        const screen = show({ CLICK_DAMAGE: 10 });
-
-        expect(text(screen, 'talent-max-CLICK_DAMAGE')).toBe('Nível máximo');
-        expect(screen.querySelector('[data-testid="talent-upgrade-CLICK_DAMAGE"]')).toBeNull();
-        expect(text(screen, 'talent-effect-CLICK_DAMAGE')).toBe('Efeito: +50%');
-        expect(screen.querySelector('[data-testid="talent-upgrade-CRIT_CHANCE"]')).not.toBeNull();
-    });
-
-    it('shows the icon of the talent and draws a mark in its place when the file is missing', () => {
-        const screen = show();
-        const icon = screen.querySelector('[data-testid="talent-CLICK_DAMAGE"] .icon');
-
-        expect(icon.querySelector('img').getAttribute('src')).toBe('assets/talent-click-damage.png');
-
-        icon.querySelector('img').dispatchEvent(new Event('error'));
-
-        expect(icon.querySelector('img')).toBeNull();
-        expect(icon.querySelector('.icon-fallback').textContent).toBe('⚔');
+        expect(onReset).toHaveBeenCalledTimes(1);
     });
 });
 
-describe('renderTalentsUnavailable', () => {
-    it('says Talentos indisponíveis', () => {
-        const node = renderTalentsUnavailable();
+describe('the fallbacks', () => {
+    it('falls back to the gradient board when the board image is missing', () => {
+        const screen = show();
 
-        expect(node.textContent).toBe('Talentos indisponíveis');
-        expect(node.getAttribute('data-testid')).toBe('talents-unavailable');
+        fail(screen.querySelector('.talent-tree-image'));
+
+        expect(find(screen, 'talent-tree').classList.contains('is-fallback')).toBe(true);
+        expect(screen.querySelector('.talent-tree-image')).toBeNull();
+    });
+
+    it('falls back to a ring when a node frame is missing', () => {
+        const node = find(show(), 'talent-CLICK_DAMAGE');
+
+        fail(node.querySelector('.talent-node-frame'));
+
+        expect(node.classList.contains('no-frame')).toBe(true);
+        expect(node.querySelector('.talent-node-frame')).toBeNull();
+    });
+
+    it('falls back to the CSS plaque or the bare pill when a banner, the title, the medallion or the reset art is missing', () => {
+        const screen = show({}, 3);
+        const missing = [ [ 'talent-branch-TIME', '.talent-banner-art' ], [ 'talent-title', '.talent-plaque-art' ], [ 'talent-points', '.talent-round-art' ], [ 'talent-reset', '.talent-round-art' ] ];
+
+        missing.forEach(([ id, selector ]) =>
+        {
+            fail(find(screen, id).querySelector(selector));
+
+            expect(find(screen, id).classList.contains('no-art')).toBe(true);
+            expect(find(screen, id).querySelector(selector)).toBeNull();
+        });
+        expect(text(screen, 'talent-points')).toBe('Pontos de talento: 3');
+        expect(text(screen, 'talent-reset')).toBe('Reiniciar pontos');
+    });
+
+    it('falls back to the branch glyph when an icon is missing and to the grade 1 icon first for grades 2 and 3', () => {
+        const screen = show();
+        const plain = find(screen, 'talent-CLICK_DAMAGE');
+        const second = find(screen, 'talent-CLICK_DAMAGE_G2');
+
+        fail(plain.querySelector('.talent-node-icon img'));
+        expect(plain.querySelector('.talent-node-icon .icon-fallback').textContent).toBe('⚔');
+
+        fail(second.querySelector('.talent-node-icon img'));
+        expect(second.querySelector('.talent-node-icon img').src.endsWith('assets/talent-click-damage.png')).toBe(true);
+    });
+
+    it('falls back to the lock glyph when the lock art is missing', () => {
+        const node = find(show(), 'talent-CLICK_DAMAGE_G2');
+
+        fail(node.querySelector('.talent-node-lock img'));
+
+        expect(node.querySelector('.talent-node-lock .icon-fallback').textContent).toBe('🔒');
+    });
+});
+
+describe('the scroll of the tree', () => {
+    it('placeTalentScroll centres the tree without a previous scroll and keeps a previous one', () => {
+        const screen = show();
+        const scroll = find(screen, 'talent-tree-scroll');
+
+        Object.entries({ scrollWidth: 2048, clientWidth: 1024, scrollHeight: 1152, clientHeight: 576 })
+            .forEach(([ name, value ]) => Object.defineProperty(scroll, name, { value, configurable: true }));
+
+        placeTalentScroll(screen, null);
+        expect([ scroll.scrollLeft, scroll.scrollTop ]).toEqual([ 512, 288 ]);
+
+        placeTalentScroll(screen, { left: 120, top: 40 });
+        expect([ scroll.scrollLeft, scroll.scrollTop ]).toEqual([ 120, 40 ]);
+
+        expect(talentScrollOf(null)).toBeNull();
+        expect(talentScrollOf(screen)).toEqual({ left: 120, top: 40 });
+    });
+});
+
+describe('talents unavailable', () => {
+    it('says Talentos indisponíveis', () => {
+        expect(renderTalentsUnavailable().textContent).toBe('Talentos indisponíveis');
     });
 });
