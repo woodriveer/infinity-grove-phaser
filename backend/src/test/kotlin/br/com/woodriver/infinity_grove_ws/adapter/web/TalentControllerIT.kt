@@ -397,4 +397,147 @@ class TalentControllerIT : IntegrationTestBase() {
         assertEquals(0, talentRepository.earnedPoints("yan"))
         assertEquals(1, jpaTalentRepository.findAllByUsername("other").size)
     }
+
+    private val grade1Ids =
+        listOf(
+            "MINIBOSS_TIME",
+            "BOSS_DAMAGE",
+            "PHYSICAL_BREAK",
+            "ARMOR_PIERCE",
+            "CLICK_DAMAGE",
+            "CRIT_CHANCE",
+            "CRIT_DAMAGE",
+            "COMBO",
+            "CLICK_FLAT_DAMAGE",
+        )
+
+    @Test
+    fun `every talent answers what opens it`() {
+        asUser()
+            .get("/talents")
+            .then()
+            .statusCode(200)
+            .body("talents.requiredId", equalTo(List(9) { null } + grade1Ids + grade1Ids.map { "${it}_G2" } + "COMBO"))
+            .body("talents.requiredLevel", equalTo(List(9) { null } + List(18) { 10 } + 10))
+    }
+
+    @Test
+    fun `the boss damage, armor pierce and Fúria crescente rows carry their labels and values`() {
+        asUser()
+            .get("/talents")
+            .then()
+            .statusCode(200)
+            .body("talents[1].id", equalTo("BOSS_DAMAGE"))
+            .body("talents[1].label", equalTo("Dano contra chefes"))
+            .body("talents[1].unit", equalTo("%"))
+            .body("talents[1].perLevel", equalTo(2))
+            .body("talents[10].perLevel", equalTo(4))
+            .body("talents[19].perLevel", equalTo(6))
+            .body("talents[3].id", equalTo("ARMOR_PIERCE"))
+            .body("talents[3].label", equalTo("Perfuração de armadura"))
+            .body("talents[3].perLevel", equalTo(1))
+            .body("talents[12].perLevel", equalTo(2))
+            .body("talents[21].perLevel", equalTo(3))
+            .body("talents[27].id", equalTo("COMBO_FURY"))
+            .body("talents[27].label", equalTo("Fúria crescente"))
+            .body("talents[27].unit", equalTo("combo-step"))
+            .body("talents[27].maxLevel", equalTo(4))
+            .body("talents[27].grade", equalTo(1))
+            .body("talents[27].baseId", equalTo("COMBO_FURY"))
+            .body("talents[27].nextCost", equalTo(2))
+            .body("talents[27].unlocked", equalTo(false))
+    }
+
+    @Test
+    fun `Fúria crescente is locked at 409 until COMBO is at level 10, then costs 2 points a level`() {
+        earned(12)
+        upgrade("COMBO_FURY", 0).statusCode(409).body("code", equalTo("TALENT_LOCKED"))
+        repeat(10) { n -> upgrade("COMBO", n).statusCode(200) }
+
+        upgrade("COMBO_FURY", 0)
+            .statusCode(200)
+            .body("talents[27].level", equalTo(1))
+            .body("talents[27].value", equalTo(1))
+            .body("talents[27].nextCost", equalTo(2))
+            .body("talents[27].unlocked", equalTo(true))
+            .body("points.spent", equalTo(12))
+            .body("points.available", equalTo(0))
+    }
+
+    @Test
+    fun `Fúria crescente at level 4 is 409 TALENT_MAX_LEVEL with a null next cost`() {
+        earned(18)
+        talentRepository.save("yan", "COMBO", 10)
+        talentRepository.save("yan", "COMBO_FURY", 4)
+
+        upgrade("COMBO_FURY", 4).statusCode(409).body("code", equalTo("TALENT_MAX_LEVEL"))
+        asUser()
+            .get("/talents")
+            .then()
+            .statusCode(200)
+            .body("talents[27].nextCost", nullValue())
+            .body("points.spent", equalTo(18))
+
+        assertEquals(4, level("COMBO_FURY"))
+    }
+
+    @Test
+    fun `a fromLevel of 5 or -1 for Fúria crescente is 400 INVALID_TALENT_REQUEST`() {
+        earned(5)
+
+        listOf(5, -1).forEach { sent ->
+            upgrade("COMBO_FURY", sent)
+                .statusCode(400)
+                .body("code", equalTo("INVALID_TALENT_REQUEST"))
+                .body("detail", equalTo("fromLevel must be an integer between 0 and 4"))
+        }
+    }
+
+    @Test
+    fun `a retired chapter boss time or critical resistance break upgrade is 404 TALENT_NOT_FOUND`() {
+        earned(5)
+
+        listOf(
+            "BOSS_TIME",
+            "BOSS_TIME_G2",
+            "BOSS_TIME_G3",
+            "CRIT_RESIST_BREAK",
+            "CRIT_RESIST_BREAK_G2",
+            "CRIT_RESIST_BREAK_G3",
+        ).forEach {
+            upgrade(it, 0).statusCode(404).body("code", equalTo("TALENT_NOT_FOUND"))
+        }
+        assertEquals(0, level("BOSS_TIME"))
+    }
+
+    @Test
+    fun `a stored BOSS_TIME or CRIT_RESIST_BREAK row is ignored and its points are available`() {
+        earned(20)
+        talentRepository.save("yan", "PHYSICAL_BREAK", 3)
+        talentRepository.save("yan", "BOSS_TIME", 5)
+        talentRepository.save("yan", "CRIT_RESIST_BREAK_G2", 2)
+
+        asUser()
+            .get("/talents")
+            .then()
+            .statusCode(200)
+            .body("talents.size()", equalTo(28))
+            .body("points.earned", equalTo(20))
+            .body("points.spent", equalTo(3))
+            .body("points.available", equalTo(17))
+    }
+
+    @Test
+    fun `POST reset deletes a stored BOSS_TIME row`() {
+        earned(3)
+        talentRepository.save("yan", "BOSS_TIME", 5)
+
+        asUser()
+            .post("/talents/reset")
+            .then()
+            .statusCode(200)
+            .body("points.available", equalTo(3))
+
+        assertEquals(0, level("BOSS_TIME"))
+    }
 }

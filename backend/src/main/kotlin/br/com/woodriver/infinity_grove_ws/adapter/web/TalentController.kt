@@ -17,7 +17,8 @@ import java.security.Principal
 
 /**
  * A talent as the game shows it: what one level gives, the level the player has, the value it adds now and the talent points of the next
- * level (null at the top level), its grade (1 to 3, a grade costs its number of points per level) and whether that grade is open.
+ * level (null at the top level), its grade (1 to 3, a grade costs its number of points per level), whether it is open and what opens it:
+ * [requiredId] (the previous grade, or COMBO for Fúria crescente) at [requiredLevel], both null when it is always open.
  */
 data class TalentResponse(
     val id: String,
@@ -32,6 +33,10 @@ data class TalentResponse(
     val grade: Int,
     val baseId: String,
     val unlocked: Boolean,
+    /** The talent whose top level opens this one (the previous grade, or COMBO for Fúria crescente); null when it is always open. */
+    val requiredId: String?,
+    /** The level [requiredId] must reach; null when it is always open. */
+    val requiredLevel: Int?,
 )
 
 /** The talent points of the player: what the first clears paid, what the levels took and what is left. */
@@ -67,6 +72,8 @@ data class TalentsResponse(
                         grade = it.grade,
                         baseId = it.baseId,
                         unlocked = talents.unlocked(it),
+                        requiredId = it.prerequisiteId,
+                        requiredLevel = it.prerequisiteId?.let { id -> TalentCatalog.find(id).maxLevel },
                     )
                 },
                 TalentPointsResponse(points.earned, points.spent, points.available),

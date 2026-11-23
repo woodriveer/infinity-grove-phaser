@@ -241,11 +241,11 @@ Open questions: none beyond Q1 to Q12 above, each written into the spec with its
 | TTR-08 | P1 Critical: AC 8, AC 9, AC 10 (no cap, Fumaça, panel) | Tasks | Implementing |
 | TTR-09 | P1 Critical: AC 11, AC 12, AC 13 (chip, refresh, Vex) | Tasks | Pending |
 | TTR-10 | P1 Retired: AC 1 (armor pierce catalog) | Tasks | Implementing |
-| TTR-11 | P1 Retired: AC 2, AC 3, AC 4 (migration, refund, late rows) | Tasks | Pending |
+| TTR-11 | P1 Retired: AC 2, AC 3, AC 4 (migration, refund, late rows) | Tasks | Implementing |
 | TTR-12 | P1 Retired: AC 5 (armor pierce in combat) | Tasks | Implementing |
 | TTR-13 | P1 Retired: AC 6, AC 7 (game drops retired ids, panel) | Tasks | Pending |
 | TTR-14 | P2 Fúria: AC 1, AC 2, AC 3, AC 4 (catalog, lock, cost, bounds) | Tasks | Implementing |
-| TTR-15 | P2 Fúria: AC 5 (requiredId, requiredLevel) | Tasks | Pending |
+| TTR-15 | P2 Fúria: AC 5 (requiredId, requiredLevel) | Tasks | Implementing |
 | TTR-16 | P2 Fúria: AC 6, AC 7 (combo step, HUD) | Tasks | Pending |
 | TTR-17 | P2 Fúria: AC 8, AC 9 (effect and lock texts) | Tasks | Pending |
 | TTR-18 | P2 Tree: AC 1 (window, plaques, medallion, reset, card) | Tasks | Pending |

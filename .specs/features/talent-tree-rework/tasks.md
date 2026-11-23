@@ -243,7 +243,7 @@ Update the KDoc of `TalentDefinition` (one sentence on `requires` and `costFacto
 
 ### Phase 2: Backend response and migration
 
-#### T2: `requiredId` and `requiredLevel` in the talent answer [ ]
+#### T2: `requiredId` and `requiredLevel` in the talent answer [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Every talent of `GET /talents`, the upgrade and the reset answers says what opens it (TTR-01, TTR-11, TTR-14, TTR-15).
@@ -284,8 +284,8 @@ filled in `TalentsResponse.from` with `requiredId = it.prerequisiteId` and `requ
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 8 new cases pass; every earlier backend test passes unchanged.
-- [ ] `ktlintCheck` exits 0.
+- [x] The 8 new cases pass; every earlier backend test passes unchanged.
+- [x] `ktlintCheck` exits 0.
 
 **Commit**: `feat(backend): answer the prerequisite of every talent`
 
