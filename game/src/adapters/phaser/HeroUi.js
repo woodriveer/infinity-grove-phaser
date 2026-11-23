@@ -16,7 +16,7 @@ import { renderFusionResult } from './views/fusionView';
 import { renderLeaderPicker } from './views/leaderView';
 import { refreshSkillBar, renderLeaderCard, renderSkillBar } from './views/skillBar';
 import { renderTeam, teamModel } from './views/teamView';
-import { renderTalents, renderTalentsUnavailable } from './views/talentsView';
+import { placeTalentScroll, renderTalents, renderTalentsUnavailable, talentScrollOf } from './views/talentsView';
 
 const HUD = { x: 956, y: 370 };
 const PANEL = { x: 512, y: 384 };
@@ -78,7 +78,7 @@ const HUD_HTML = `<div class="hero-hud">${RAIL.map(buttonHtml).join('')}</div>`;
 const PANEL_HTML = '<div class="hero-panel" hidden><div class="hero-window">'
     + '<div class="hero-header"><span class="hero-title"></span><span>'
     + '<button type="button" class="hero-back" data-testid="hero-back" hidden>Voltar</button> '
-    + '<button type="button" class="hero-close" data-testid="hero-close">Fechar</button></span></div>'
+    + '<button type="button" class="hero-close" data-testid="hero-close"><img class="hero-close-art" src="assets/talent-close-button.png" alt=""><span class="hero-close-text">Fechar</span></button></span></div>'
     + '<p class="hero-error" role="alert" hidden></p><div class="hero-body"></div></div></div>';
 
 const BAR_HTML = '<div class="skill-bar-host"></div>';
@@ -102,6 +102,7 @@ export class HeroUi
         this.equipment = equipment;
         this.talents = talents;
         this.talentBusy = false;
+        this.talentSelected = null;
         this.equipBusy = false;
         this.sellMode = null;
         this.fusionBusy = false;
@@ -147,7 +148,13 @@ export class HeroUi
         this.errorLine = this.panel.querySelector('.hero-error');
         this.body = this.panel.querySelector('.hero-body');
         this.backButton = this.panel.querySelector('.hero-back');
+        this.window = this.panel.querySelector('.hero-window');
         this.panel.querySelector('.hero-close').addEventListener('click', () => this.close());
+
+        //  The painted close button of the talent tree; without the file the plain text button stays
+        const closeArt = this.panel.querySelector('.hero-close-art');
+
+        closeArt.addEventListener('error', () => closeArt.remove());
         this.backButton.addEventListener('click', () => this.goBack());
         this.goBack = () => {};
 
@@ -225,6 +232,8 @@ export class HeroUi
         this.teamAsking = null;
         this.teamNotice = null;
         this.teamFlash = null;
+        this.talentSelected = null;
+        this.window.classList.toggle('is-talents', screen === 'talents');
         this.title.textContent = title;
         this.setError('');
 
@@ -303,6 +312,7 @@ export class HeroUi
         this.sellMode = null;
         this.bagHeroId = null;
         this.fuseAllAsking = false;
+        this.window.classList.remove('is-talents');
         this.panel.hidden = true;
         this.body.replaceChildren();
     }
@@ -986,15 +996,29 @@ export class HeroUi
         }
     }
 
-    //  The three branches of the talent tree; `busy` disables every button while an upgrade runs
+    //  The talent tree; `busy` disables the buttons while a request runs. The selected node and the scroll of the tree survive a re-render
     render_talents ()
     {
         this.backButton.hidden = true;
-        this.body.replaceChildren(renderTalents(this.talents.talents(), this.talents.points(), {
+
+        const previous = talentScrollOf(this.body.querySelector('[data-testid="talent-screen"]'));
+        const screen = renderTalents(this.talents.talents(), this.talents.points(), {
             busy: this.talentBusy,
+            selectedId: this.talentSelected,
+            onSelect: (id) => this.selectTalent(id),
             onUpgrade: (talent) => this.upgradeTalent(talent),
             onReset: () => this.resetTalents()
-        }));
+        });
+
+        this.body.replaceChildren(screen);
+        placeTalentScroll(screen, previous);
+    }
+
+    //  Shows a talent in the detail card; no request
+    selectTalent (id)
+    {
+        this.talentSelected = id;
+        this.render_talents();
     }
 
     //  Buys the next level of a talent for the level the player saw; a refusal shows its text and the tree the backend answered after it

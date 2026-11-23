@@ -32,7 +32,8 @@ const farmState = () => ({ bosses: [ { kind: 'MINIBOSS', stage: 1 }, { kind: 'CH
 const createUi = ({ list = catalog(), farmGet = farmState(), equipmentList = { capacity: 100, pieces: [] }, wallet = 1_000_000, skillState, talentList = { talents: [] }, position = null } = {}) => {
     const talentGateway = {
         list: vi.fn(() => (talentList instanceof Error ? Promise.reject(talentList) : Promise.resolve(talentList))),
-        upgrade: vi.fn()
+        upgrade: vi.fn(),
+        reset: vi.fn()
     };
     const heroesGateway = {
         list: vi.fn(() => (list instanceof Error ? Promise.reject(list) : Promise.resolve(list))),
@@ -1220,23 +1221,33 @@ describe('HeroUi bag badge', () => {
 });
 
 const talentTree = (levels = {}) => [
-    [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 3 ],
-    [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa', 'points', 1 ],
-    [ 'CRIT_RESIST_BREAK', 'BREAK', 'Quebra de resistência a crítico', 'points', 1 ],
-    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique', '%', 3 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ],
-    [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ]
-].map(([ id, branch, label, unit, perLevel ]) => {
-    const level = levels[id] ?? 0;
+    ...[
+        [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_DAMAGE', 'TIME', 'Dano contra chefes', '%', 2 ],
+        [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa', 'points', 1 ],
+        [ 'ARMOR_PIERCE', 'BREAK', 'Perfuração de armadura', '%', 1 ],
+        [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique', '%', 3 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ],
+        [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ]
+    ].map(([ id, branch, label, unit, perLevel ]) => {
+        const level = levels[id] ?? 0;
 
-    return { id, branch, label, unit, perLevel, maxLevel: 10, level, value: level * perLevel, nextCost: level >= 10 ? null : 1 };
-});
+        return { id, branch, label, unit, perLevel, maxLevel: 10, level, value: level * perLevel, nextCost: level >= 10 ? null : 1 };
+    }),
+    {
+        id: 'COMBO_FURY', baseId: 'COMBO_FURY', grade: 1, branch: 'COMBO', label: 'Fúria crescente', unit: 'combo-step', perLevel: 1, maxLevel: 4,
+        level: levels.COMBO_FURY ?? 0, value: levels.COMBO_FURY ?? 0, nextCost: (levels.COMBO_FURY ?? 0) >= 4 ? null : 2,
+        unlocked: (levels.COMBO ?? 0) >= 10, requiredId: 'COMBO', requiredLevel: 10
+    }
+];
 
 const pointsOf = (available, spent = 0) => ({ earned: available + spent, spent, available });
 //  What the backend answers: the tree and the points
 const talentsAnswer = (levels = {}, available = 1) => ({ talents: talentTree(levels), points: pointsOf(available) });
 
 describe('HeroUi Talentos', () => {
-    it('opens the window titled Talentos with the points line, the four columns', async () => {
+    //  Shows the talent in the card of the tree (no request)
+    const pick = (ctx, id) => ctx.testid(`talent-${id}`).click();
+
+    it('opens the window titled Talentos with the points medallion and the four banners', async () => {
         const ctx = createUi({ talentList: talentsAnswer({}, 3) });
 
         await open(ctx, 'talents');
@@ -1251,6 +1262,7 @@ describe('HeroUi Talentos', () => {
         ctx.talentGateway.upgrade.mockResolvedValue({ talents: talentTree({ COMBO: 1 }), points: pointsOf(0, 1) });
 
         await open(ctx, 'talents');
+        pick(ctx, 'COMBO');
         ctx.testid('talent-upgrade-COMBO').click();
         await flush();
 
@@ -1265,8 +1277,12 @@ describe('HeroUi Talentos', () => {
         const ctx = createUi({ talentList: talentsAnswer({}, 0), wallet: 1_000_000 });
 
         await open(ctx, 'talents');
+        pick(ctx, 'COMBO');
 
-        expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-upgrade') ]).every((button) => button.disabled)).toBe(true);
+        const buttons = ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-upgrade') ]);
+
+        expect(buttons).toHaveLength(1);
+        expect(buttons.every((button) => button.disabled)).toBe(true);
     });
 
     it('disables every Melhorar button while the request runs and enables them after', async () => {
@@ -1275,6 +1291,7 @@ describe('HeroUi Talentos', () => {
 
         ctx.talentGateway.upgrade.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
         await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
         ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
 
         expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-upgrade') ]).every((button) => button.disabled)).toBe(true);
@@ -1282,7 +1299,7 @@ describe('HeroUi Talentos', () => {
         finish({ talents: talentTree({ CLICK_DAMAGE: 1 }), points: pointsOf(4, 1) });
         await flush();
 
-        expect(ctx.testid('talent-upgrade-CRIT_CHANCE').disabled).toBe(false);
+        expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').disabled).toBe(false);
     });
 
     it('says Pontos de talento insuficientes on NOT_ENOUGH_TALENT_POINTS and shows the tree the backend answered', async () => {
@@ -1291,6 +1308,7 @@ describe('HeroUi Talentos', () => {
         ctx.talentGateway.upgrade.mockRejectedValue(new ApiError('Not enough', { status: 409, code: 'NOT_ENOUGH_TALENT_POINTS' }));
         await open(ctx, 'talents');
         ctx.talentGateway.list.mockResolvedValue(talentsAnswer({ CLICK_DAMAGE: 2 }, 3));
+        pick(ctx, 'CLICK_DAMAGE');
         ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
         await flush();
 
@@ -1306,6 +1324,7 @@ describe('HeroUi Talentos', () => {
 
         mismatch.talentGateway.upgrade.mockRejectedValue(new ApiError('Mismatch', { status: 409, code: 'TALENT_LEVEL_MISMATCH' }));
         await open(mismatch, 'talents');
+        pick(mismatch, 'CLICK_DAMAGE');
         mismatch.testid('talent-upgrade-CLICK_DAMAGE').click();
         await flush();
 
@@ -1316,6 +1335,7 @@ describe('HeroUi Talentos', () => {
 
         down.talentGateway.upgrade.mockRejectedValue(new ApiError('down', { status: 500 }));
         await open(down, 'talents');
+        pick(down, 'CLICK_DAMAGE');
         down.testid('talent-upgrade-CLICK_DAMAGE').click();
         await flush();
 
@@ -1328,6 +1348,7 @@ describe('HeroUi Talentos', () => {
 
         ctx.talentGateway.upgrade.mockRejectedValueOnce(new ApiError('down', { status: 500 }));
         await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
         ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
         await flush();
         ctx.talentGateway.upgrade.mockResolvedValue({ talents: talentTree({ CLICK_DAMAGE: 1 }), points: pointsOf(1, 1) });
@@ -1351,12 +1372,152 @@ describe('HeroUi Talentos', () => {
 
         ctx.talentGateway.upgrade.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
         await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
         ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
         ctx.ui.close();
         finish({ talents: talentTree({ CLICK_DAMAGE: 1 }), points: pointsOf(0, 1) });
         await flush();
 
         expect(ctx.query('.hero-body').childElementCount).toBe(0);
+    });
+
+    it('adds is-talents to the window on Talentos and removes it on another screen and on close', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+        const hasClass = () => ctx.query('.hero-window').classList.contains('is-talents');
+
+        await open(ctx, 'talents');
+        expect(hasClass()).toBe(true);
+
+        await open(ctx, 'bag');
+        expect(hasClass()).toBe(false);
+
+        await open(ctx, 'talents');
+        expect(hasClass()).toBe(true);
+
+        ctx.ui.close();
+        expect(hasClass()).toBe(false);
+    });
+
+    it('selects a node without a request and shows it in the card', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+
+        await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
+
+        expect(ctx.talentGateway.upgrade).not.toHaveBeenCalled();
+        expect(ctx.testid('talent-level-CLICK_DAMAGE').textContent).toBe('Nível 0/10');
+        expect(ctx.testid('talent-CLICK_DAMAGE').getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('keeps the selected node after an upgrade', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+
+        ctx.talentGateway.upgrade.mockResolvedValue({ talents: talentTree({ CLICK_DAMAGE: 1 }), points: pointsOf(0, 1) });
+        await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
+        ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
+        await flush();
+
+        expect(ctx.testid('talent-level-CLICK_DAMAGE').textContent).toBe('Nível 1/10');
+        expect(ctx.testid('talent-CLICK_DAMAGE').getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('keeps the selected node after a reset', async () => {
+        const ctx = createUi({ talentList: { talents: talentTree({ CLICK_DAMAGE: 1 }), points: pointsOf(0, 1) } });
+
+        ctx.talentGateway.reset.mockResolvedValue(talentsAnswer({}, 1));
+        await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
+        ctx.testid('talent-reset').click();
+        await flush();
+
+        expect(ctx.talentGateway.reset).toHaveBeenCalledTimes(1);
+        expect(ctx.testid('talent-level-CLICK_DAMAGE').textContent).toBe('Nível 0/10');
+        expect(ctx.testid('talent-CLICK_DAMAGE').getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('keeps the selected node after the points reload', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+
+        await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
+        ctx.talentGateway.list.mockResolvedValue(talentsAnswer({ CLICK_DAMAGE: 2 }, 3));
+        ctx.ui.showTalentPoints();
+        await flush();
+
+        expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 3');
+        expect(ctx.testid('talent-level-CLICK_DAMAGE').textContent).toBe('Nível 2/10');
+        expect(ctx.testid('talent-CLICK_DAMAGE').getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('keeps the selected node after a refused upgrade and the reload of the 409', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+
+        ctx.talentGateway.upgrade.mockRejectedValue(new ApiError('Mismatch', { status: 409, code: 'TALENT_LEVEL_MISMATCH' }));
+        await open(ctx, 'talents');
+        ctx.talentGateway.list.mockResolvedValue(talentsAnswer({ CLICK_DAMAGE: 2 }, 3));
+        pick(ctx, 'CLICK_DAMAGE');
+        ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
+        await flush();
+
+        expect(ctx.talentGateway.list).toHaveBeenCalledTimes(2);
+        expect(ctx.testid('talent-level-CLICK_DAMAGE').textContent).toBe('Nível 2/10');
+        expect(ctx.testid('talent-CLICK_DAMAGE').getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('clears the selection when Talentos opens again', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+
+        await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
+        ctx.ui.close();
+        await open(ctx, 'talents');
+
+        expect(ctx.testid('talent-detail-empty')).not.toBeNull();
+        expect(ctx.testid('talent-CLICK_DAMAGE').getAttribute('aria-pressed')).toBe('false');
+    });
+
+    it('clears the selection when another screen is shown in between', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+
+        await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
+        await open(ctx, 'bag');
+        await open(ctx, 'talents');
+
+        expect(ctx.testid('talent-detail-empty')).not.toBeNull();
+    });
+
+    it('centres the tree on opening and keeps the scroll the player chose across a re-render', async () => {
+        const sizes = { scrollWidth: 2048, clientWidth: 1024, scrollHeight: 1152, clientHeight: 576 };
+
+        Object.entries(sizes).forEach(([ name, value ]) => Object.defineProperty(HTMLElement.prototype, name, { value, configurable: true }));
+
+        try
+        {
+            const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+
+            await open(ctx, 'talents');
+            expect([ ctx.testid('talent-tree-scroll').scrollLeft, ctx.testid('talent-tree-scroll').scrollTop ]).toEqual([ 512, 288 ]);
+
+            ctx.testid('talent-tree-scroll').scrollLeft = 200;
+            pick(ctx, 'CLICK_DAMAGE');
+
+            expect(ctx.testid('talent-tree-scroll').scrollLeft).toBe(200);
+        }
+        finally
+        {
+            Object.keys(sizes).forEach((name) => delete HTMLElement.prototype[name]);
+        }
+    });
+
+    it('removes the close art when its file is missing and keeps Fechar', async () => {
+        const ctx = createUi();
+
+        ctx.query('.hero-close-art').dispatchEvent(new Event('error'));
+
+        expect(ctx.query('.hero-close-art')).toBeNull();
+        expect(ctx.testid('hero-close').textContent).toBe('Fechar');
     });
 });
 

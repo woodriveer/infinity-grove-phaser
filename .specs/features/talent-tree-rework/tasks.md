@@ -1268,7 +1268,7 @@ div.talent-screen                           testid talent-screen
 
 ---
 
-#### T16: Talentos panel: window mode, selection, scroll and close art [ ]
+#### T16: Talentos panel: window mode, selection, scroll and close art [x]
 
 **Owner**: game-dev
 **Goal**: The panel opens the tree in its own window size, keeps the selected node and the scroll across re-renders, clears them on opening, and shows the painted close button (TTR-18, TTR-21, TTR-24, TTR-25).
