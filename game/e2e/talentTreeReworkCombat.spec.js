@@ -6,7 +6,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 //  `Seu crítico`, Fúria crescente and the attribute panel. The leader is Kael (fire) against fire monsters, so an element is neutral and a
 //  number is read as the change of the monster's health (L-091). The roll is fixed by `openMainMenu(page, { random })`, 0.99 unless a case names one.
 const MONSTER_HEALTH = 1000;
-const monsterOf = (defense = 0, critResistance = 0) => ({ element: 'FIRE', defense, physicalDefense: defense, magicalDefense: defense, critResistance });
+const monsterOf = (defense = 0, critResistance = 0, element = 'FIRE') => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
 
 //  Ten stages of the same three monsters: the phase monster, the miniboss and the chapter boss (the last encounter of stage 10)
 const chapter = ({ monster, boss = monster, bossTimeLimitMs = 60_000 }) => ({
@@ -187,6 +187,43 @@ test.describe('Critical chance minus critical resistance', () => {
         await page.getByTestId('hero-close').click();
 
         await expect(page.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Seu crítico: 40%');
+    });
+
+    //  Vex wears a ring of CRIT_CHANCE 55: C is 10 + 30 (three stars) + 55 = 95 against resistance 50, so E is 45; the 15 points of Bomba de Fumaça make it 60
+    test('Bomba de Fumaça adds 15 points: 95 + 15 against resistance 50 makes a roll of 0.59 critical (3.5), and 1.4 before it', async ({ page }) => {
+        const menu = await startGame(page, {
+            leader: 'vex', stars: 3, monster: monsterOf(0, 50, 'DARKNESS'), equipment: [ ring('r1', 'CRIT_CHANCE', 55, 'vex') ], roll: 0.59
+        });
+
+        await expect(page.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Seu crítico: 45%');
+        await menu.canvas.click();
+        await expect.poll(() => dealt(page)).toBeCloseTo(1.4, 5);
+
+        await page.keyboard.press('2');
+        await menu.canvas.click();
+
+        await expect.poll(() => dealt(page)).toBeCloseTo(1.4 + 3.5, 5);
+    });
+
+    test('Bomba de Fumaça leaves a roll of 0.60 plain against resistance 50 (E is 60): 1.4', async ({ page }) => {
+        const menu = await startGame(page, {
+            leader: 'vex', stars: 3, monster: monsterOf(0, 50, 'DARKNESS'), equipment: [ ring('r1', 'CRIT_CHANCE', 55, 'vex') ], roll: 0.60
+        });
+
+        await page.keyboard.press('2');
+        await menu.canvas.click();
+
+        await expect.poll(() => dealt(page)).toBeCloseTo(1.4, 5);
+    });
+
+    test("Lyra's double click is forced critical and keeps the overflow: a chance of 120 lands two hits of 2.2", async ({ page }) => {
+        const menu = await startGame(page, {
+            leader: 'lyra', monster: monsterOf(0, 0, 'NATURE'), equipment: [ ring('r1', 'CRIT_CHANCE', 110, 'lyra') ], roll: 0.29
+        });
+
+        await menu.canvas.click();
+
+        await expect.poll(() => dealt(page)).toBeCloseTo(4.4, 5);
     });
 
     test('a CRIT_RESIST_BREAK of an older backend lowers nothing: Seu crítico: 0% against resistance 20', async ({ page }) => {

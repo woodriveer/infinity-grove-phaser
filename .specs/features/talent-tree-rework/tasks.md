@@ -1581,7 +1581,7 @@ div.talent-screen                           testid talent-screen
 
 ---
 
-#### T22: Author check of the feature [ ]
+#### T22: Author check of the feature [x]
 
 **Owner**: test-engineer
 **Goal**: The feature's test gate (`.claude/agents/test-engineer.md` § Author check): every AC value pinned, mutants killed (TTR-01 to TTR-25).
@@ -1618,10 +1618,71 @@ div.talent-screen                           testid talent-screen
 **Gate**: `node scripts/sensor.mjs <scratchpad>/mutants.json` exits 0
 **Done when**:
 
-- [ ] Every AC of the spec has a row with `file:line` and the spec value; 0 gaps.
-- [ ] 16 of 16 mutants killed; `git status --porcelain` is as before the run.
+- [x] Every AC of the spec has a row with `file:line` and the spec value; 0 gaps.
+- [x] 16 of 16 mutants killed; `git status --porcelain` is as before the run.
 
 **Commit**: `test(game): record the talent tree rework author check`
+
+**AC to assertion table** (written by the T22 author check; paths shortened: `BT` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`, `GS` = `game/src/`, `E2E` = `game/e2e/`, `TT` = `E2E/talentTreeRework.spec.js`, `TC` = `E2E/talentTreeReworkCombat.spec.js`, `CG` = `GS/adapters/phaser/ClickerGame.test.js`):
+
+| Requirement | Spec AC | Test (file:line) | Exact value asserted |
+| ----------- | ------- | ---------------- | -------------------- |
+| TTR-01 | P1 Boss AC 1 | `BT/domain/TalentsTest.kt:298`, `:324`; `BT/adapter/web/TalentControllerIT.kt:67`, `:425`, `:452` | `BOSS_DAMAGE`, `_G2`, `_G3`: branch TIME, label `Dano contra chefes`, unit `%`, `perLevel` 2, 4, 6 at indexes 1, 10, 19, `maxLevel` 10, `value` 20, 40, 60 at level 10, `nextCost` null; ids `BOSS_TIME*` not found; 28 talents |
+| TTR-01 | P1 Boss AC 2 | `BT/adapter/web/TalentControllerIT.kt:518` | upgrade of `BOSS_TIME`, `_G2`, `_G3`: 404 `TALENT_NOT_FOUND`, level 0 stored |
+| TTR-02 | P1 Boss AC 3 | `GS/domain/combat/leaderAttacker.test.js:130`; `CG:2830`, `:3739`; `TC:65`, `TC:89` | 1.4 with `BOSS_DAMAGE` 10 + `BOSS_DAMAGE_G2` 5 on the chapter boss; 1.68 with a piece of `BOSS_DAMAGE_PCT` 28; 1.2 with `BOSS_DAMAGE` 10 / a piece of 20 |
+| TTR-02 | P1 Boss AC 4 | `GS/domain/combat/leaderAttacker.test.js:130`; `CG:3739`; `TC:73` | 1 on a phase monster |
+| TTR-02 | P1 Boss AC 5 | click `CG:3739`, `TC:65`, miniboss `TC:81`; auto click `CG:2841`; skill hit `GS/domain/skills/skillDamage.test.js:50`, `TC:99`; aimed shot `GS/domain/skills/skillCombat.test.js:611`; damage-over-time tick `GS/domain/skills/skillCombat.test.js:585` | 1.4 / 1.2 (auto click) / 19.8 (Corte Dimensional 16.5 x 1.2) / 90 (30 x 2 x 1.5) / 3 (tick 2 x 1.5) |
+| TTR-03 | P1 Boss AC 6 | `CG:3760`; `GS/domain/talents/talents.test.js:168-195`; `TC:109` | `countdown.limitMs` 60000 and `.boss-timer` `Time: 60` with an older `BOSS_TIME` 10 (value 30) in the list |
+| TTR-04 | P1 Boss AC 7 | `GS/domain/talents/talents.test.js:253`; `GS/adapters/phaser/HeroUi.test.js:1250`; `E2E/talents.spec.js:73`, `TT:309` | `Caça aos chefes`, `Quebra de defesa`, `Poder do clique`, `Combo` in DOM order; the TIME banner reads `Caça aos chefes` |
+| TTR-04 | P1 Boss AC 8 | `GS/domain/equipment/leaderStats.test.js:78`, `:86`; `TC:300` | `Dano em chefes: 20%`, `Tempo extra de chefe: 0s` |
+| TTR-05 | P1 Critical AC 1 | `GS/domain/combat/damage.test.js:64`, `:126` | `effectiveCritChance` (40, 30) 10; (30, 50) 0; (130, 10) 100; a missing resistance reads 0 |
+| TTR-05 | P1 Critical AC 2 | `GS/domain/combat/damage.test.js:79`; `TC:133` | C 40 vs R 30: roll 0.09 deals 2 (critical), 0.10 deals 1; e2e 3.5 and 1.4 |
+| TTR-05 | P1 Critical AC 3 | `GS/domain/combat/damage.test.js:86`, `:132`; `E2E/elements.spec.js:63` | C 30 vs R 50 on a roll of 0: 1, not critical; R 100 never crits; chip `Seu crítico: 0%` |
+| TTR-06 | P1 Critical AC 4 | `GS/domain/combat/damage.test.js:92`, `:100`, `:106`, `:112`; `TC:155` | 2.7 (130/10, x2.5), 2 (110/10), 2.01 (111/10), 2.5 (250/100); e2e 13.44 |
+| TTR-06 | P1 Critical AC 5 | `GS/domain/combat/damage.test.js:120`, `:254`; `GS/domain/skills/skillDamage.test.js:42`; `CG:3476`; `TC:219` | forced: 2.3 (150 vs 20), 2 (10 vs 100); Lyra's double click 2.2 and 2.2 (4.4 in the browser) |
+| TTR-07 | P1 Critical AC 6 | click `TC:155`; auto click `CG:2841` (shares `strike`); skill hit `GS/domain/skills/skillDamage.test.js:88`, `TC:193`; aimed shot `GS/domain/skills/skillDamage.test.js:42`; Lyra `CG:3476`, `TC:219` | each kind applies AC 1 to AC 5 (3.5 under Fumaça, 2.1, 2.3, 2.2) |
+| TTR-07 | P1 Critical AC 7 | `GS/domain/skills/skillDamage.test.js:227`; `GS/domain/combat/allyAttacker.test.js:29`, `:59` | tick with C 250 deals 1; ally `critChance` 0, `critMultiplier` 1 |
+| TTR-08 | P1 Critical AC 8 | `GS/domain/combat/leaderAttacker.test.js:47`, `:115`; `GS/domain/skills/skillDamage.test.js:88` | 120, 115, and Fumaça 95 + 15 crits on a roll of 0.999 (damage 2.1) |
+| TTR-08 | P1 Critical AC 9 | `GS/domain/skills/skillDamage.test.js:96`; `TC:193`, `TC:208` | roll 0.59 critical (e2e 3.5 after 1.4), 0.60 plain (1.4) |
+| TTR-08 | P1 Critical AC 10 | `GS/domain/equipment/leaderStats.test.js:59`; `TC:323` | `Chance de crítico: 120%` |
+| TTR-09 | P1 Critical AC 11 | `CG:2125`, `:2149`, `:2156`; `E2E/unifiedDamage.spec.js:146`; `E2E/elements.spec.js:38`, `:63`; `TC:133`, `TC:155` | `Seu crítico: 10%` (3-star, R 30), `100%` (C 130, R 10), `0%` (R 12 / 100), `7%`, `40%`; no `Crit res` anywhere (`grep` prints nothing) |
+| TTR-09 | P1 Critical AC 12 | `CG:3597`, `:3612`, `:3624`, `:3703`, `:3714`, `:5549`, `:6168`; `TC:165`, `TC:179` | after upgrade 10% to 15%, reset back to 10%, equip/unequip, leader change 10% to 40%, allies 10% to 20%, new target 10% to 6%; e2e 10% to 11% and 10% to 40% |
+| TTR-09 | P1 Critical AC 13 | `CG:5540`, `:5684`; `GS/domain/talents/talents.test.js:330`, `:334`; `E2E/heroTeamPassives.spec.js:178` | with Vex `Seu crítico: 10%` and a roll of 8 critical (2); without `5%` and 1 |
+| TTR-10 | P1 Retired AC 1 | `BT/domain/TalentsTest.kt:311`, `:324`; `BT/adapter/web/TalentControllerIT.kt:425`, `:452`, `:518`; `E2E/unifiedDamage.spec.js:196` | `ARMOR_PIERCE` label `Perfuração de armadura`, unit `%`, `perLevel` 1, 2, 3, value 10, 20, 30 at level 10; `CRIT_RESIST_BREAK*` 404; six BREAK node titles in order |
+| TTR-11 | P1 Retired AC 2 | `BT/adapter/repository/TalentTreeReworkMigrationIT.kt:37`, `:70`, `:81` | the six ids deleted, `COMBO` 3 and `MINIBOSS_TIME` 2 and other players' rows kept, a rerun changes nothing |
+| TTR-11 | P1 Retired AC 3 | `BT/adapter/repository/TalentTreeReworkMigrationIT.kt:56` | `TalentPoints(30, 3)`, available 27 |
+| TTR-11 | P1 Retired AC 4 | `BT/domain/TalentsTest.kt:407`; `BT/adapter/web/TalentControllerIT.kt:535`, `:552` | late row ignored: earned 20, spent 3, available 17; reset deletes it, available 3 |
+| TTR-12 | P1 Retired AC 5 | `GS/domain/combat/leaderAttacker.test.js:141`; `CG:3695`; `TC:240` | 0.55 (defense 50), 0.64 (+ `PHYSICAL_BREAK` 10), 0.69 (piece 28), 1 (piece 95, pierce capped at 100) |
+| TTR-13 | P1 Retired AC 6 | `GS/application/talents/talentCollection.test.js:168`, `:179`, `:187`, `:195`; `GS/domain/talents/talents.test.js:129`; `TC:109`, `TC:229`; `TT:417` | six retired ids dropped on load, upgrade and reset; an older `CRIT_RESIST_BREAK` 20 lowers nothing (`Seu crítico: 0%`); 21 nodes |
+| TTR-13 | P1 Retired AC 7 | `GS/domain/equipment/leaderStats.test.js:86`, `:180`; `TC:300`, `TC:310` | `Perfuração de armadura: 10%`; `Quebra de resistência a crítico: 0` and 15 with Vex |
+| TTR-14 | P2 Fúria AC 1 | `BT/domain/TalentsTest.kt:336`, `:151`; `BT/adapter/web/TalentControllerIT.kt:425` | last id `COMBO_FURY`, branch COMBO, label `Fúria crescente`, unit `combo-step`, `perLevel` 1, `maxLevel` 4, grade 1, baseId, `nextCost` 2, value 0, 1, 4 |
+| TTR-14 | P2 Fúria AC 2 | `BT/domain/TalentsTest.kt:348`, `:355`; `BT/adapter/web/TalentControllerIT.kt:473` | locked at COMBO 9 (409 `TALENT_LOCKED`), open at 10 |
+| TTR-14 | P2 Fúria AC 3 | `BT/adapter/web/TalentControllerIT.kt:473`; `BT/domain/TalentsTest.kt:362` | level 1, value 1, `nextCost` 2, spent 12, available 0 |
+| TTR-14 | P2 Fúria AC 4 | `BT/adapter/web/TalentControllerIT.kt:489`, `:506`; `BT/domain/TalentsTest.kt:371`, `:380` | 409 `TALENT_MAX_LEVEL`; 400 `INVALID_TALENT_REQUEST` with `fromLevel must be an integer between 0 and 4` for 5 and -1 |
+| TTR-15 | P2 Fúria AC 5 | `BT/adapter/web/TalentControllerIT.kt:415`; `BT/domain/TalentsTest.kt:390`, `:400` | `requiredId` null x9, then base ids, then `<id>_G2`, then `COMBO`; `requiredLevel` null x9, 10 x19 |
+| TTR-16 | P2 Fúria AC 6 | `GS/domain/combat/combo.test.js:168`, `:176`, `:180`; `GS/domain/talents/talents.test.js:94`, `:99`; `CG:3725`; `TC:265`, `TC:275` | step 5: 2nd +5, 11th +50, 12th +50; step 2 cap 10: 6th +10; default 11th +10; e2e 13.75 and 11.55 in 11 clicks |
+| TTR-16 | P2 Fúria AC 7 | `GS/domain/combat/combo.test.js:184`, `:192`; `CG:3725`; `TC:265`, `TC:285` | `Combo x3 · +15%`; empty with COMBO 0 |
+| TTR-17 | P2 Fúria AC 8 | `GS/domain/talents/talents.test.js:222`; `GS/adapters/phaser/views/talentsView.test.js:218`; `TT:277`, `TT:295` | `Efeito: nenhum`, `Efeito: +2% por clique`, `Efeito: +5% por clique`, `Nível 0/4`, `1/4`, `4/4` |
+| TTR-17 | P2 Fúria AC 9 | `GS/domain/talents/talents.test.js:272`; `GS/adapters/phaser/views/talentsView.test.js:211`; `TT:263` | `Bloqueado: chegue ao nível 10 de Limite de dano do combo`, no `talent-upgrade-COMBO_FURY` |
+| TTR-18 | P2 Tree AC 1 | `GS/adapters/phaser/HeroUi.test.js:1250`, `:1384`; `TT:78`, `TT:104`, `TT:359` | window 1024 x 576, title 192 x 64 `Talentos`, `talent-points` left/bottom 12px `Pontos de talento: 0`, reset right/bottom 12px, card 380 wide, empty text, close 120 x 40 with art |
+| TTR-19 | P2 Tree AC 2 | `GS/adapters/phaser/views/talentsView.test.js:43`, `:62`, `:70`, `:80`; `TT:120`, `TT:161` | 28 nodes, 60 / 88 px, centre (563, 265) within 1 px, `title` and `aria-label` `Dano de clique (%), nível 3 de 10` |
+| TTR-19 | P2 Tree AC 3 | `GS/adapters/phaser/views/talentsView.test.js:88`; `TT:141` | captions `Dano contra chefes`, `Perfuração de armadura`, `Fúria crescente` (12px), badges `II`, `III` (11px), 10 captions and 18 badges |
+| TTR-20 | P2 Tree AC 4 | `GS/adapters/phaser/views/talentsView.test.js:99`, `:106`, `:113`, `:117`, `:122`; `TT:172`, `TT:185`, `TT:195`, `TT:209` | locked `grayscale(1) brightness(0.55)` + lock; maxed `rgb(224, 180, 90) 0px 0px 0px 3px` and chip colour; available `rgb(201, 154, 31) 0px 0px 0px 3px`; open `none`; selected 3px solid `rgb(244, 230, 200)` |
+| TTR-21 | P2 Tree AC 5, AC 6 | `GS/adapters/phaser/views/talentsView.test.js:130`, `:146`, `:162`, `:197`, `:204`; `GS/adapters/phaser/HeroUi.test.js:1401`; `TT:209`, `TT:263`; `E2E/talents.spec.js:67` | no request on select; `Melhorar (1 ponto)`, `Melhorar (2 pontos)`, `Nível máximo`, `Bloqueado: chegue ao nível 10 do Grau 1`; empty text |
+| TTR-21 | P2 Tree AC 7, AC 8 | `GS/adapters/phaser/views/talentsView.test.js:179`, `:189`, `:193`; `GS/adapters/phaser/HeroUi.test.js:1412`, `:1425`, `:1439`; `TT:236` | after a purchase `Nível 1/10`, `Efeito: +5%`, chip `1/10`, `Pontos de talento: 0`, POWER veins `0.21`, button disabled, node still selected |
+| TTR-21 | P2 Tree AC 9 | `GS/adapters/phaser/HeroUi.test.js:1468`, `:1480`; `TT:104` | no `aria-pressed="true"` and the empty text after reopening |
+| TTR-22 | P2 Tree AC 10 | `GS/adapters/phaser/views/talentsView.test.js:227`; `TT:309` | titles in order; banner 140 x 34; inks `rgb(36, 93, 100)`, `rgb(149, 55, 36)`, `rgb(108, 83, 17)`, `rgb(106, 49, 197)` |
+| TTR-22 | P2 Tree AC 11 | `GS/domain/talents/talents.test.js:295`, `:299`, `:304`, `:311`; `GS/adapters/phaser/views/talentsView.test.js:234`; `TT:236`, `TT:321` | opacity 0, 0.27, 0.44 (0.47 without Fúria), 1, 0.21 |
+| TTR-23 | P2 Tree AC 12 | `GS/adapters/phaser/views/talentsView.test.js:273`, `:282`, `:291`, `:306`, `:318`; `GS/adapters/phaser/HeroUi.test.js:1514`; `TT:172`, `TT:333` | `is-fallback`, veins visible, `no-frame` ring `rgb(201, 154, 31) 0px 0px 0px 4px inset`, `.icon-fallback`, `.no-art` plaque `rgb(244, 230, 200)` + `rgb(90, 61, 38)`, pill `rgba(28, 18, 12, 0.85)`, `Fechar` text |
+| TTR-24 | P2 Tree AC 13 | `GS/adapters/phaser/views/talentsView.test.js:328`; `GS/adapters/phaser/HeroUi.test.js:1491`; `TT:380`, `TT:404` | phone: `zoom` 2, scroll 2048 x 1152, `scrollLeft` 512, `scrollTop` 288, kept at 200, medallion `offsetLeft` 12, card 380; desktop: zoom 1, 1024 = 1024 |
+| TTR-25 | P2 Tree AC 14 | `GS/adapters/phaser/views/talentsView.test.js:47`, `:55`; `TT:417` | no node for a talent outside the map or missing from the list; 21 nodes and no `pageerror` for an older list |
+| TTR-25 | P2 Tree AC 15 | `GS/adapters/phaser/HeroUi.test.js:1453`, `:1250`; `GS/adapters/phaser/views/talentsView.test.js:257`, `:347`; `TT:78`, `TT:436`, `TT:461`, `TT:479`, `TT:492` | `Pontos de talento insuficientes`, `Não foi possível melhorar o talento.` plus one more `GET /talents`, `Não foi possível reiniciar os talentos.`, `Talentos indisponíveis`; `Reiniciar pontos` disabled at 0 spent |
+
+**Sensor result** (`node scripts/sensor.mjs`, 18 mutants: the 16 of the task plus M17 the selected outline 3 px to 2 px and M18 the maxed ring 3 px to 2 px): 18 killed, 0 survived, 0 invalid, isolation ok.
+
+**Gaps closed by the author check** (tests added in the T22 commit): `TalentControllerIT.kt:452` (values 20, 40, 60 and 10, 20, 30 at level 10 through HTTP, P1 Boss AC 1 and P1 Retired AC 1), `CG:2841` (boss damage on the auto click, P1 Boss AC 5), `CG:3476` (Lyra's double click keeps the overflow, P1 Critical AC 5, AC 6), `TC:193` and `TC:208` (Fumaça past 100 in the browser, P1 Critical AC 9), `TC:219` (forced critical overflow in the browser, P1 Critical AC 5).
+
+**Reported, not a test gap**: `game/e2e/minibossAddsTarget.spec.js:318` (the enemy line must clear Lacaio 2, `left >= 535`) fails on every run since T12 because `Seu crítico: 10%` is wider than `Crit res 0%`: the row now reads `left` 531.45 (`right` 808.53). The fix is in `ClickerGame.showEnemyStats` or `.enemy-stats .tag` (production), not in the test. `ClickerGame.test.js:6481` reads `Seu crítico: 40%` (a 3-star Orina against resistance 0: 10 + 30 = 40); the 10 % of the T12 table was the blank-card value and is wrong, the code is right.
 
 ---
 

@@ -2838,6 +2838,14 @@ describe('ClickerGame equipment', () => {
         expect(boss.scene.monster.health).toBeCloseTo(boss.scene.monster.maxHealth - 1.2, 10);
     });
 
+    it('adds the boss damage to the auto click on a boss too: 1.2 for a piece of BOSS_DAMAGE_PCT 20', async () => {
+        const ctx = await createScene({ start: { ...miniboss(stats('FIRE')), chapter: 2 }, equipment: list(affixPiece('BOSS_DAMAGE_PCT', 20)), autoClickOn: true });
+
+        ctx.scene.update(0, 500);
+
+        expect(ctx.scene.monster.health).toBeCloseTo(ctx.scene.monster.maxHealth - 1.2, 10);
+    });
+
     it('adds the extra boss seconds of the pieces to the countdown of a boss', async () => {
         const ctx = await createScene({ start: progress(1, 'PHASE', 5), equipment: list(affixPiece('BOSS_TIME_SECONDS', 5)) });
 
@@ -3463,6 +3471,17 @@ describe('ClickerGame Lyra double click', () => {
         ctx.click();
 
         expect(ctx.texts.map((text) => text.text)).toEqual([ '2', '2' ]);
+    });
+
+    it('adds the critical chance past 100 to both hits: a chance of 120 deals 2.2 twice', async () => {
+        const talents = [ { id: 'CRIT_CHANCE', baseId: 'CRIT_CHANCE', value: 110 } ];
+        const ctx = await createScene({ start: big(), heroes: leaderOf('lyra'), talents });
+
+        ctx.dice.value = 0.29;
+        ctx.click();
+
+        expect(ctx.texts.map((text) => text.text)).toEqual([ '2.2', '2.2' ]);
+        expect(ctx.scene.monster.health).toBeCloseTo(1000 - 4.4, 10);
     });
 
     it('does not land the second hit when the first kills', async () => {

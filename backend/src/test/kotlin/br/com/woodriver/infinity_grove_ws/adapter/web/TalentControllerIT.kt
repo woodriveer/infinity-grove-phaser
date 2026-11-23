@@ -449,6 +449,27 @@ class TalentControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `the boss damage and armor pierce chains answer 20, 40, 60 and 10, 20, 30 at level 10 with no next cost`() {
+        listOf("BOSS_DAMAGE", "BOSS_DAMAGE_G2", "BOSS_DAMAGE_G3", "ARMOR_PIERCE", "ARMOR_PIERCE_G2", "ARMOR_PIERCE_G3")
+            .forEach { talentRepository.save("yan", it, 10) }
+
+        asUser()
+            .get("/talents")
+            .then()
+            .statusCode(200)
+            .body("talents[1].maxLevel", equalTo(10))
+            .body("talents[1].value", equalTo(20))
+            .body("talents[10].value", equalTo(40))
+            .body("talents[19].value", equalTo(60))
+            .body("talents[3].maxLevel", equalTo(10))
+            .body("talents[3].value", equalTo(10))
+            .body("talents[12].value", equalTo(20))
+            .body("talents[21].value", equalTo(30))
+            .body("talents[1].nextCost", nullValue())
+            .body("talents[3].nextCost", nullValue())
+    }
+
+    @Test
     fun `Fúria crescente is locked at 409 until COMBO is at level 10, then costs 2 points a level`() {
         earned(12)
         upgrade("COMBO_FURY", 0).statusCode(409).body("code", equalTo("TALENT_LOCKED"))
