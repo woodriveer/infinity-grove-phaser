@@ -4,8 +4,12 @@
 //             list and upgrade resolve with { talents: [ { id, level, value, nextCost, ... } ], points: { earned, spent, available } }.
 //             Each rejects with an ApiError.
 
-//  Talents the backend of before unified-damage still answers; they left the catalog and are dropped on read (spec unified-damage, TD-002)
-export const RETIRED_TALENT_IDS = [ 'MAGICAL_BREAK', 'MAGICAL_BREAK_G2', 'MAGICAL_BREAK_G3' ];
+//  Talents an older backend still answers; they left the catalog and are dropped on read (specs unified-damage and talent-tree-rework)
+export const RETIRED_TALENT_IDS = [
+    'MAGICAL_BREAK', 'MAGICAL_BREAK_G2', 'MAGICAL_BREAK_G3',
+    'BOSS_TIME', 'BOSS_TIME_G2', 'BOSS_TIME_G3',
+    'CRIT_RESIST_BREAK', 'CRIT_RESIST_BREAK_G2', 'CRIT_RESIST_BREAK_G3'
+];
 
 export const createTalentCollection = ({ gateway }) =>
 {

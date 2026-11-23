@@ -165,8 +165,39 @@ describe('talentCollection', () => {
             expect(collection.talents()).toEqual([ talent('CLICK_DAMAGE'), talent('CRIT_CHANCE', 4) ]);
         });
 
-        it('lists the three retired ids', () => {
-            expect(RETIRED_TALENT_IDS).toEqual([ 'MAGICAL_BREAK', 'MAGICAL_BREAK_G2', 'MAGICAL_BREAK_G3' ]);
+        it('lists the nine retired ids', () => {
+            expect(RETIRED_TALENT_IDS).toEqual([
+                'MAGICAL_BREAK', 'MAGICAL_BREAK_G2', 'MAGICAL_BREAK_G3',
+                'BOSS_TIME', 'BOSS_TIME_G2', 'BOSS_TIME_G3',
+                'CRIT_RESIST_BREAK', 'CRIT_RESIST_BREAK_G2', 'CRIT_RESIST_BREAK_G3'
+            ]);
+        });
+
+        const OLD_IDS = [ 'BOSS_TIME', 'BOSS_TIME_G2', 'BOSS_TIME_G3', 'CRIT_RESIST_BREAK', 'CRIT_RESIST_BREAK_G2', 'CRIT_RESIST_BREAK_G3' ];
+        const olderList = () => ({ talents: [ ...OLD_IDS.map((id) => talent(id)), talent('COMBO') ], points: points(9, 0) });
+
+        it('drops every grade of BOSS_TIME and CRIT_RESIST_BREAK from a loaded list', async () => {
+            gateway.list.mockResolvedValue(olderList());
+
+            await collection.load();
+
+            expect(collection.talents().map((t) => t.id)).toEqual([ 'COMBO' ]);
+        });
+
+        it('drops them from the list an upgrade answers', async () => {
+            gateway.upgrade.mockResolvedValue(olderList());
+
+            await collection.upgrade('COMBO', 0);
+
+            expect(collection.talents().map((t) => t.id)).toEqual([ 'COMBO' ]);
+        });
+
+        it('drops them from the list a reset answers', async () => {
+            gateway.reset.mockResolvedValue(olderList());
+
+            await collection.reset();
+
+            expect(collection.talents().map((t) => t.id)).toEqual([ 'COMBO' ]);
         });
     });
 });

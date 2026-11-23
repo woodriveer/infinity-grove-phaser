@@ -767,7 +767,7 @@ export const branchGlow = (talents, branch) =>
 
 ---
 
-#### T10: Drop the six retired ids on read [ ]
+#### T10: Drop the six retired ids on read [x]
 
 **Owner**: game-dev
 **Goal**: A list from an older backend never brings `BOSS_TIME*` or `CRIT_RESIST_BREAK*` into the game (TTR-13).
