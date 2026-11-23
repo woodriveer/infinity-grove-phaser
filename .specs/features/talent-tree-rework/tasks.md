@@ -857,7 +857,7 @@ Update the comment above `leaderStats` (Kael in both time lines, Vex alone in th
 
 ### Phase 5: Game screens
 
-#### T12: `Seu crítico` chip, chip refresh and combo step in the battle scene [ ]
+#### T12: `Seu crítico` chip, chip refresh and combo step in the battle scene [x]
 
 **Owner**: game-dev
 **Goal**: The enemy line shows the effective critical chance and follows every change of it; the combo uses the step of Fúria crescente (TTR-09, TTR-16).

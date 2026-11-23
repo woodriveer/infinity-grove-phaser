@@ -239,7 +239,7 @@ Open questions: none beyond Q1 to Q12 above, each written into the spec with its
 | TTR-06 | P1 Critical: AC 4, AC 5 (overflow, forced critical) | Tasks | Implementing |
 | TTR-07 | P1 Critical: AC 6, AC 7 (every strike kind) | Tasks | Implementing |
 | TTR-08 | P1 Critical: AC 8, AC 9, AC 10 (no cap, Fumaça, panel) | Tasks | Implementing |
-| TTR-09 | P1 Critical: AC 11, AC 12, AC 13 (chip, refresh, Vex) | Tasks | Pending |
+| TTR-09 | P1 Critical: AC 11, AC 12, AC 13 (chip, refresh, Vex) | Tasks | Implementing |
 | TTR-10 | P1 Retired: AC 1 (armor pierce catalog) | Tasks | Implementing |
 | TTR-11 | P1 Retired: AC 2, AC 3, AC 4 (migration, refund, late rows) | Tasks | Implementing |
 | TTR-12 | P1 Retired: AC 5 (armor pierce in combat) | Tasks | Implementing |

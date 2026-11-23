@@ -7,7 +7,7 @@ import { resetReward } from '../../domain/campaign/accountReset';
 import { allyAttacker } from '../../domain/combat/allyAttacker';
 import { AllyCombat } from '../../domain/combat/allyCombat';
 import { Combo, comboText } from '../../domain/combat/combo';
-import { formatDamage } from '../../domain/combat/damage';
+import { effectiveCritChance, formatDamage } from '../../domain/combat/damage';
 import { weaknessOf } from '../../domain/combat/elements';
 import { Fight } from '../../domain/combat/fight';
 import { leaderAttacker } from '../../domain/combat/leaderAttacker';
@@ -18,7 +18,7 @@ import { ELEMENT_LABELS } from '../../domain/heroes/heroes';
 import { activePassives, fightingAllies, teamActive } from '../../domain/heroes/team';
 import { SkillCombat } from '../../domain/skills/skillCombat';
 import { skillLevelOf } from '../../domain/skills/skillLevel';
-import { monsterAfterBreak, talentComboCap, talentTimeBonusMs } from '../../domain/talents/talents';
+import { monsterAfterBreak, talentComboCap, talentComboStep, talentTimeBonusMs } from '../../domain/talents/talents';
 import { HeroUi } from './HeroUi';
 import { autoClickIntervalText, renderAutoClick } from './views/autoClickView';
 import { RESET_ERROR_TEXT, renderResetButton, renderResetDialog, resetNoticeText } from './views/resetView';
@@ -191,6 +191,7 @@ export class ClickerGame extends Scene
         this.equipment.onWallet((coins) => this.receiveWallet(coins));
         this.heroes.onWallet((coins) => this.receiveWallet(coins));
         this.talents.onChange(() => this.refreshEnemyStats());
+        this.equipment.onChange(() => this.refreshEnemyStats());
         this.autoClick.onChange(() => this.showAutoClick());
 
         this.add.image(512, 384, 'background');
@@ -1046,13 +1047,15 @@ export class ClickerGame extends Scene
         this.targetChip.textContent = this.fight?.hasAdds && target ? `Alvo: ${this.fight.nameOf(target)} · ${healthText(target)}` : '';
     }
 
-    //  "Water  Defesa 10%  Crit res 12%", one chip each; the double spaces are hidden between the chips. data-element and data-stat give each
+    //  "Water  Defesa 10%  Seu crítico: 28%", one chip each; the double spaces are hidden between the chips. data-element and data-stat give each
     //  chip its dot or icon (spec ui-redesign UIR-07); the one defense is read by defenseOf (spec unified-damage)
     showEnemyStats (stats)
     {
-        const { element, critResistance } = stats;
+        const { element } = stats;
         const name = element.charAt(0) + element.slice(1).toLowerCase();
-        const chips = [ [ 'defense', `Defesa ${defenseOf(stats)}%` ], [ 'crit', `Crit res ${critResistance}%` ] ];
+        //  The click's critical chance against this monster (spec talent-tree-rework): no skill buff, no overflow, one decimal at most
+        const chance = Math.round(effectiveCritChance(this.leaderAttacker().critChance, stats.critResistance ?? 0) * 10) / 10;
+        const chips = [ [ 'defense', `Defesa ${defenseOf(stats)}%` ], [ 'crit', `Seu crítico: ${chance}%` ] ];
         const tags = [
             el('span', 'tag tag-element', name, { 'data-element': element }),
             ...chips.map(([ stat, text ]) => el('span', 'tag', text, { 'data-stat': stat }))
@@ -1535,6 +1538,7 @@ export class ClickerGame extends Scene
         //  A countdown means the monster is a boss. One click is one step of the combo; the double click of Lyra lands two critical hits that
         //  share its bonus, and the second does not land when the first one kills.
         this.combo.maxPercent = talentComboCap(this.talents.talents());
+        this.combo.stepPercent = talentComboStep(this.talents.talents());
 
         const multiplier = 1 + this.combo.click() / 100;
         const hits = clickHits(this.heroes.leader()?.id, this.random);
@@ -1556,6 +1560,7 @@ export class ClickerGame extends Scene
     showCombo ()
     {
         this.combo.maxPercent = talentComboCap(this.talents.talents());
+        this.combo.stepPercent = talentComboStep(this.talents.talents());
 
         const text = comboText(this.combo);
 
