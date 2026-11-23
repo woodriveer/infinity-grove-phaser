@@ -103,7 +103,7 @@ test.describe('Miniboss adds', () => {
         await startAdds(page);
 
         expect(await state(page)).toMatchObject({ main: 100, adds: [ 30, 30 ], target: 'Miniboss', drawn: 2 });
-        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 109%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 109%  Seu crítico: 10%');
         await expect(page.getByTestId('target-chip')).toHaveText('Alvo: Miniboss · HP 100/100');
         expect(await scene(page, '(s) => s.children.list.filter((o) => o.type === "Text" && o.text === "+30 de defesa").length')).toBe(2);
     });
@@ -349,7 +349,7 @@ test.describe('Miniboss adds', () => {
         expect(after.drawn).toBe(0);
         expect(after.marker).toBeNull();
         await expect(page.getByTestId('target-chip')).toBeHidden();
-        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 11%  Crit res 12%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 11%  Seu crítico: 0%');
     });
 
     test('a stage with an invalid add spawns only the valid one', async ({ page }) => {

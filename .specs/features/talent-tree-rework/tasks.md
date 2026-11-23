@@ -1392,7 +1392,7 @@ div.talent-screen                           testid talent-screen
 
 ---
 
-#### T18: Re-pin the enemy line and the Vex scenario in the existing e2e [ ]
+#### T18: Re-pin the enemy line and the Vex scenario in the existing e2e [x]
 
 **Owner**: test-engineer
 **Goal**: The existing e2e read `Seu crítico: <n>%` and the subtractive rule (TTR-09).
@@ -1434,7 +1434,7 @@ div.talent-screen                           testid talent-screen
 **Gate**: `cd game && npx playwright test e2e/elements.spec.js e2e/minibossAdds.spec.js e2e/minibossAddsSkills.spec.js e2e/minibossAddsTarget.spec.js e2e/uiRedesign.spec.js e2e/heroTeamPassives.spec.js e2e/unifiedDamage.spec.js` (the Talentos tests of `uiRedesign.spec.js` and `unifiedDamage.spec.js` are T19's and may fail until it lands)
 **Done when**:
 
-- [ ] Every changed test passes; `grep -rn "Crit res" game/e2e` prints nothing.
+- [x] Every changed test passes; `grep -rn "Crit res" game/e2e` prints nothing.
 
 **Commit**: `test(game): read Seu crítico on the enemy line in the existing e2e`
 

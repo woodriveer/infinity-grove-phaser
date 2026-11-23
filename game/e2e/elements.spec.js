@@ -35,7 +35,7 @@ test.describe('Elements', () => {
         await mockBackend(page, { users: { yan: 'secret123' }, definition: ELEMENTS_CHAPTER });
         const menu = await startGame(page);
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Nature  Defesa 0%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Nature  Defesa 0%  Seu crítico: 10%');
         await expect.poll(() => monsterHealth(page)).toBe(20);
 
         await menu.canvas.click();
@@ -60,7 +60,7 @@ test.describe('Elements', () => {
         });
         const menu = await startGame(page, { random: 0 });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Darkness  Defesa 50%  Crit res 100%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Darkness  Defesa 50%  Seu crítico: 0%');
         await expect.poll(() => monsterHealth(page)).toBe(100);
 
         await menu.canvas.click();

@@ -127,7 +127,7 @@ test.describe('Miniboss skills', () => {
         expect(await lastNumbers(page, 3)).toMatchObject(shown([ '35', '35', '17.5' ]));
         expect((await state(page)).adds).toEqual([ 0, 0 ]);
         expect((await state(page)).main).toBeCloseTo(182.5, 5);
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 50%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 50%  Seu crítico: 40%');
     });
 
     test('a skill that kills both adds and the miniboss wins once', async ({ page }) => {

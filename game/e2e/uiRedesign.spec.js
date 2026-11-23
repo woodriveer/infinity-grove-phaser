@@ -844,7 +844,7 @@ test.describe('Grove theme', () => {
     test('draws the enemy chips with a dot and two icons: the defense shield and the crit target', async ({ page }) => {
         await startAs(page, { monster: bare('NATURE', 10, 20, 30) });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Nature  Defesa 10%  Crit res 30%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Nature  Defesa 10%  Seu crítico: 10%');
         await expectStyle(page.locator('.enemy-stats'), { 'background-color': 'rgba(0, 0, 0, 0)' });
         //  UIR-07 AC18: a dark chip with a 1 px solid bronze border
         await expectStyle(page.locator('.tag-element'), { 'background-color': 'rgba(28, 18, 12, 0.85)', 'border-top-width': '1px', 'border-top-style': 'solid', 'border-top-color': 'rgb(176, 122, 58)' });

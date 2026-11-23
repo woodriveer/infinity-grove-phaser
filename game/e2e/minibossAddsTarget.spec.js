@@ -117,7 +117,7 @@ test.describe('Miniboss target', () => {
 
         await expect.poll(() => state(page)).toMatchObject({ target: 'Lacaio 1', adds: [ 29, 30 ], marker: [ 480, 253.5 ] });
         await expect(page.getByTestId('target-chip')).toHaveText('Alvo: Lacaio 1 · HP 29/30');
-        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 0%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 0%  Seu crítico: 10%');
     });
 
     test('a click on the miniboss makes it the target again', async ({ page }) => {
@@ -229,7 +229,7 @@ test.describe('Miniboss target', () => {
         await hitAt(page, ...LACAIO_1);
 
         expect((await state(page)).adds[0]).toBeCloseTo(29.15, 5);
-        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 15%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 15%  Seu crítico: 10%');
     });
 
     test('the Erosão Arcana of an Orina ally lowers the defense an ally hit meets on an add: two hits of 1.9 show 3.8', async ({ page }) => {

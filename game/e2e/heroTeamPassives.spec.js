@@ -175,24 +175,24 @@ test.describe('Hero team: passives', () => {
         expect(await dealt(page)).toBeCloseTo(1, 5);
     });
 
-    test('Vex as an ally shows Crit res 15% on a monster of critical resistance 30 and a roll of 8 is critical', async ({ page, browser }) => {
+    test('Vex as an ally shows Seu crítico: 10% on a monster of critical resistance 5 and a roll of 8 is critical', async ({ page, browser }) => {
         //  Two games boot in this scenario
         test.setTimeout(120_000);
 
-        await startTeam(page, { team: { boughtSlots: 1, allies: [ 'vex', null, null, null ] }, monster: monsterOf('FIRE', 0, 30), roll: 0.08 });
+        await startTeam(page, { team: { boughtSlots: 1, allies: [ 'vex', null, null, null ] }, monster: monsterOf('FIRE', 0, 5), roll: 0.08 });
 
-        await expect(page.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Crit res 15%');
+        await expect(page.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Seu crítico: 10%');
 
         await strike(page);
 
         expect(await dealt(page)).toBeCloseTo(2, 5);
 
-        //  Without Vex the chance is 10 x 0.7 = 7: the same roll of 8 is a plain click
+        //  Without Vex the chance is 10 - 5 = 5: the same roll of 8 is a plain click
         const context = await browser.newContext();
         const other = await context.newPage();
 
-        await startTeam(other, { monster: monsterOf('FIRE', 0, 30), roll: 0.08 });
-        await expect(other.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Crit res 30%');
+        await startTeam(other, { monster: monsterOf('FIRE', 0, 5), roll: 0.08 });
+        await expect(other.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Seu crítico: 5%');
         await strike(other);
 
         expect(await dealt(other)).toBeCloseTo(1, 5);

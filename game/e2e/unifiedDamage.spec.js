@@ -92,7 +92,7 @@ test.describe('Unified damage', () => {
     test('Chuva de Meteoros meets the one defense of an old payload: physicalDefense 50 and magicalDefense 10 make 25 x 1.4 x 0.5 = 17.5', async ({ page }) => {
         await startAs(page, 'orina', { monster: { element: 'WATER', physicalDefense: 50, magicalDefense: 10, critResistance: 0 } });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 50%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 50%  Seu crítico: 40%');
 
         await use(page, 3);
 
@@ -102,7 +102,7 @@ test.describe('Unified damage', () => {
     test('a monster of the new payload shows Defesa 40% and a click meets it: 1.4 x 0.6 = 0.84', async ({ page }) => {
         await startAs(page, 'orina', { monster: enemy('WATER', 40, 12) });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 40%  Crit res 12%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 40%  Seu crítico: 28%');
         await expect(page.locator('.enemy-stats')).not.toContainText('Physical def');
         await expect(page.locator('.enemy-stats')).not.toContainText('Magical def');
         await expect(page.locator('.enemy-stats [data-stat="defense"]')).toHaveCount(1);
@@ -115,7 +115,7 @@ test.describe('Unified damage', () => {
     test('defense wins over physicalDefense when a payload has both: Defesa 40%', async ({ page }) => {
         await startAs(page, 'orina', { monster: { element: 'WATER', defense: 40, physicalDefense: 70, magicalDefense: 70, critResistance: 0 } });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 40%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 40%  Seu crítico: 40%');
 
         await click(page);
 
@@ -125,14 +125,14 @@ test.describe('Unified damage', () => {
     test('PHYSICAL_BREAK 5 lowers the defense for an Orina skill too: Chuva de Meteoros on defense 20 deals 25 x 1.4 x 0.85 = 29.75', async ({ page }) => {
         await startAs(page, 'orina', { monster: enemy('WATER', 20), talents: { PHYSICAL_BREAK: 5 } });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 15%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 15%  Seu crítico: 40%');
 
         await use(page, 3);
 
         await expect.poll(() => dealt(page)).toBeCloseTo(25 * STAR * 0.85, 5);
     });
 
-    test('the enemy line is one centred row of three dark chips: element, Defesa with the brown shield, Crit res with the red target', async ({ page }) => {
+    test('the enemy line is one centred row of three dark chips: element, Defesa with the brown shield, Seu crítico with the red target', async ({ page }) => {
         await startAs(page, 'orina', { monster: enemy('WATER', 11, 33) });
 
         const chips = page.locator('.enemy-stats .tag');
@@ -143,7 +143,7 @@ test.describe('Unified damage', () => {
         await expect(chips.nth(1)).toHaveAttribute('data-stat', 'defense');
         await expect(chips.nth(1)).toHaveText('Defesa 11%');
         await expect(chips.nth(2)).toHaveAttribute('data-stat', 'crit');
-        await expect(chips.nth(2)).toHaveText('Crit res 33%');
+        await expect(chips.nth(2)).toHaveText('Seu crítico: 7%');
         await expect(page.locator('.enemy-stats [data-stat="physical"], .enemy-stats [data-stat="magical"]')).toHaveCount(0);
 
         await expect(page.locator('.enemy-stats')).toHaveCSS('display', 'flex');
@@ -178,14 +178,14 @@ test.describe('Unified damage', () => {
     test('upgrading PHYSICAL_BREAK from 5 to 6 turns Defesa 15% into 14% on the same monster, and the next click meets it: 1.4 x 0.86', async ({ page }) => {
         await startAs(page, 'orina', { monster: enemy('WATER', 20), talents: { PHYSICAL_BREAK: 5 }, talentPoints: 1 });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 15%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 15%  Seu crítico: 40%');
 
         await page.getByTestId('hud-talents').click();
         await page.getByTestId('talent-upgrade-PHYSICAL_BREAK').click();
         await expect(page.getByTestId('talent-level-PHYSICAL_BREAK')).toHaveText('Nível 6/10');
         await page.getByTestId('hero-close').click();
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 14%  Crit res 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 14%  Seu crítico: 40%');
 
         await click(page);
 
