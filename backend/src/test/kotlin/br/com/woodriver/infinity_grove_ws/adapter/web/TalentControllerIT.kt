@@ -64,25 +64,26 @@ class TalentControllerIT : IntegrationTestBase() {
             .then()
 
     @Test
-    fun `a new player gets the 27 talents of 3 grades at level 0 with a next cost of 1, 2 and 3 points and no points`() {
+    fun `a new player gets the 28 talents at level 0 with a next cost of 1, 2, 3 and 2 points and no points`() {
         asUser()
             .get("/talents")
             .then()
             .statusCode(200)
-            .body("talents.size()", equalTo(27))
+            .body("talents.size()", equalTo(28))
             .body(
                 "talents.id.findAll { !it.contains('_G') }",
                 equalTo(
                     listOf(
                         "MINIBOSS_TIME",
-                        "BOSS_TIME",
+                        "BOSS_DAMAGE",
                         "PHYSICAL_BREAK",
-                        "CRIT_RESIST_BREAK",
+                        "ARMOR_PIERCE",
                         "CLICK_DAMAGE",
                         "CRIT_CHANCE",
                         "CRIT_DAMAGE",
                         "COMBO",
                         "CLICK_FLAT_DAMAGE",
+                        "COMBO_FURY",
                     ),
                 ),
             ).body(
@@ -90,14 +91,14 @@ class TalentControllerIT : IntegrationTestBase() {
                 equalTo(
                     List(3) {
                         listOf("TIME", "TIME", "BREAK", "BREAK", "POWER", "POWER", "POWER", "COMBO", "POWER")
-                    }.flatten(),
+                    }.flatten() + "COMBO",
                 ),
-            ).body("talents.level", equalTo(List(27) { 0 }))
-            .body("talents.value", equalTo(List(27) { 0 }))
-            .body("talents.nextCost", equalTo(List(9) { 1 } + List(9) { 2 } + List(9) { 3 }))
-            .body("talents.maxLevel", equalTo(List(27) { 10 }))
-            .body("talents.grade", equalTo(List(9) { 1 } + List(9) { 2 } + List(9) { 3 }))
-            .body("talents.unlocked", equalTo(List(9) { true } + List(18) { false }))
+            ).body("talents.level", equalTo(List(28) { 0 }))
+            .body("talents.value", equalTo(List(28) { 0 }))
+            .body("talents.nextCost", equalTo(List(9) { 1 } + List(9) { 2 } + List(9) { 3 } + 2))
+            .body("talents.maxLevel", equalTo(List(27) { 10 } + 4))
+            .body("talents.grade", equalTo(List(9) { 1 } + List(9) { 2 } + List(9) { 3 } + 1))
+            .body("talents.unlocked", equalTo(List(9) { true } + List(19) { false }))
             .body("talents[16].id", equalTo("COMBO_G2"))
             .body("talents[16].baseId", equalTo("COMBO"))
             .body("talents[16].perLevel", equalTo(10))
@@ -125,7 +126,7 @@ class TalentControllerIT : IntegrationTestBase() {
             .post("/talents/reset")
             .then()
             .statusCode(200)
-            .body("talents.level", equalTo(List(27) { 0 }))
+            .body("talents.level", equalTo(List(28) { 0 }))
             .body("points.earned", equalTo(3))
             .body("points.spent", equalTo(0))
             .body("points.available", equalTo(3))
@@ -185,7 +186,7 @@ class TalentControllerIT : IntegrationTestBase() {
             .get("/talents")
             .then()
             .statusCode(200)
-            .body("talents.size()", equalTo(27))
+            .body("talents.size()", equalTo(28))
             .body("points.earned", equalTo(20))
             .body("points.spent", equalTo(3))
             .body("points.available", equalTo(17))

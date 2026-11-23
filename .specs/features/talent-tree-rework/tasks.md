@@ -117,7 +117,7 @@ T23
 
 ### Phase 1: Backend catalog
 
-#### T1: Catalog with `BOSS_DAMAGE`, `ARMOR_PIERCE` and `COMBO_FURY` [ ]
+#### T1: Catalog with `BOSS_DAMAGE`, `ARMOR_PIERCE` and `COMBO_FURY` [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The catalog answers 28 talents: the two retired rows replaced in place and one single talent with its own prerequisite and cost (TTR-01, TTR-10, TTR-14).
@@ -234,8 +234,8 @@ Update the KDoc of `TalentDefinition` (one sentence on `requires` and `costFacto
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 12 new cases pass; the 8 re-pinned tests pass with the values above; every other backend test passes unchanged.
-- [ ] `ktlintCheck` exits 0.
+- [x] The 12 new cases pass; the 8 re-pinned tests pass with the values above; every other backend test passes unchanged.
+- [x] `ktlintCheck` exits 0.
 
 **Commit**: `feat(backend): replace the retired talents and add Fúria crescente to the catalog`
 

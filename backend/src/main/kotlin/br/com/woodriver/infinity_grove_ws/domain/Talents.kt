@@ -9,7 +9,8 @@ enum class TalentBranch { TIME, BREAK, POWER, COMBO }
  * POWER talent into a bonus and the value of a BREAK talent into a reduction of the monster stat it names.
  *
  * A talent comes in [grade]s: grade 1 keeps the id of its [baseId], grade N is `<baseId>_G<N>`. A grade gives N times the grade 1 value per
- * level, costs N talent points per level and opens when the previous grade reaches its top level.
+ * level, costs N talent points per level and opens when the previous grade reaches its top level. A talent with one grade can name the
+ * talent that opens it ([requires]: Fúria crescente opens at the top of COMBO) and its own price ([costFactor]).
  */
 data class TalentDefinition(
     val id: String,
@@ -21,19 +22,28 @@ data class TalentDefinition(
     val firstLevel: Int = perLevel,
     val grade: Int = 1,
     val baseId: String = id,
+    /** The talent whose top level opens this one when it is not a grade (Fúria crescente opens at the top of COMBO). */
+    val requires: String? = null,
+    /** The talent points of one level before [TalentRules.costPerLevel]; null means the grade (grade N costs N). */
+    val costFactor: Int? = null,
 ) {
     init {
         require(perLevel >= 1) { "Talent $id per-level $perLevel must be at least 1" }
         require(firstLevel >= 1) { "Talent $id first-level $firstLevel must be at least 1" }
         require(maxLevel >= 1) { "Talent $id max-level $maxLevel must be at least 1" }
         require(grade in 1..MAX_GRADE) { "Talent $id grade $grade must be between 1 and $MAX_GRADE" }
+        require(requires == null || grade == 1) { "Talent $id with a prerequisite of its own must have one grade" }
+        require(costFactor == null || costFactor >= 1) { "Talent $id cost factor $costFactor must be at least 1" }
     }
 
     /** The id of the grade before this one, null for grade 1: its top level opens this grade. */
     val previousGradeId: String? get() = if (grade == 1) null else gradeId(baseId, grade - 1)
 
-    /** The talent points one level of this grade costs. */
-    fun costPerLevel(rules: TalentRules): Int = rules.costPerLevel * grade
+    /** The talent whose top level opens this one: [requires], else the previous grade; null when it is always open. */
+    val prerequisiteId: String? get() = requires ?: previousGradeId
+
+    /** The talent points one level of this talent costs: its [costFactor], else its grade. */
+    fun costPerLevel(rules: TalentRules): Int = rules.costPerLevel * (costFactor ?: grade)
 
     /** What [level] levels give: [firstLevel] for the first one and [perLevel] more for each next one, 0 at level 0. */
     fun valueAt(level: Int): Int = if (level == 0) 0 else firstLevel + (level - 1) * perLevel
@@ -58,21 +68,36 @@ data class TalentDefinition(
 }
 
 /**
- * The 9 talents of the four branches (Tempo, Quebra de defesa, Poder do clique and Combo, the cap of the combo bonus) in 3 grades each:
- * the 9 of grade 1, then the 9 of grade 2, then the 9 of grade 3. The magical defense break left the tree with unified-damage (AD-021).
+ * The 9 talents of the four branches in 3 grades each, then the single talents: Fúria crescente. The chapter boss time and the critical
+ * resistance break left the tree with talent-tree-rework.
  */
 object TalentCatalog {
     private val grade1 =
         listOf(
             TalentDefinition("MINIBOSS_TIME", TalentBranch.TIME, "Tempo do miniboss", "s", 2),
-            TalentDefinition("BOSS_TIME", TalentBranch.TIME, "Tempo do chefe do capítulo", "s", 3),
+            TalentDefinition("BOSS_DAMAGE", TalentBranch.TIME, "Dano contra chefes", "%", 2),
             TalentDefinition("PHYSICAL_BREAK", TalentBranch.BREAK, "Quebra de defesa", "points", 1),
-            TalentDefinition("CRIT_RESIST_BREAK", TalentBranch.BREAK, "Quebra de resistência a crítico", "points", 1),
+            TalentDefinition("ARMOR_PIERCE", TalentBranch.BREAK, "Perfuração de armadura", "%", 1),
             TalentDefinition("CLICK_DAMAGE", TalentBranch.POWER, "Dano de clique (%)", "%", 5),
             TalentDefinition("CRIT_CHANCE", TalentBranch.POWER, "Chance de crítico", "points", 1),
             TalentDefinition("CRIT_DAMAGE", TalentBranch.POWER, "Dano crítico", "%", 5),
             TalentDefinition("COMBO", TalentBranch.COMBO, "Limite de dano do combo", "%", 5),
             TalentDefinition("CLICK_FLAT_DAMAGE", TalentBranch.POWER, "Dano direto de clique", "dmg", 2, firstLevel = 1),
+        )
+
+    /** Talents with one grade and an explicit prerequisite: Fúria crescente, +1 combo step a level, opens at level 10 of COMBO. */
+    private val singles =
+        listOf(
+            TalentDefinition(
+                "COMBO_FURY",
+                TalentBranch.COMBO,
+                "Fúria crescente",
+                "combo-step",
+                1,
+                maxLevel = 4,
+                requires = "COMBO",
+                costFactor = 2,
+            ),
         )
 
     val all: List<TalentDefinition> =
@@ -86,7 +111,7 @@ object TalentCatalog {
                     baseId = it.id,
                 )
             }
-        }
+        } + singles
 
     fun find(id: String): TalentDefinition = all.firstOrNull { it.id == id } ?: throw TalentNotFoundException(id)
 }
@@ -161,10 +186,10 @@ data class PlayerTalents(
     /** The points the levels already bought took. */
     fun points(rules: TalentRules) = TalentPoints(earned, TalentCatalog.all.sumOf { level(it.id) * it.costPerLevel(rules) })
 
-    /** True for grade 1 and for a grade whose previous grade is at its top level. */
+    /** True for a talent that is always open and for one whose prerequisite (the previous grade, or COMBO for Fúria crescente) is at its top level. */
     fun unlocked(definition: TalentDefinition): Boolean {
-        val previous = definition.previousGradeId ?: return true
-        return level(previous) >= TalentCatalog.find(previous).maxLevel
+        val prerequisite = definition.prerequisiteId ?: return true
+        return level(prerequisite) >= TalentCatalog.find(prerequisite).maxLevel
     }
 
     /** The points of the next level of [definition], null at its top level. */
@@ -228,7 +253,7 @@ data class PlayerTalents(
 
         /**
          * The levels [stored] for [username] as the catalog knows them: a row whose id is not in the catalog (a row of the retired magical
-         * defense break that the previous backend wrote after unified-damage, or any other) is left out and logged, so its points count as available.
+         * defense break, chapter boss time or critical resistance break that the previous backend wrote, or any other) is left out and logged, so its points count as available.
          */
         fun fromStored(
             username: String,

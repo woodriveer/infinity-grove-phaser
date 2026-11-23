@@ -116,7 +116,7 @@ class TalentServiceTest {
         service.upgrade("yan", "COMBO", 0)
         service.upgrade("yan", "CLICK_DAMAGE", 0)
 
-        assertFailsWith<NotEnoughTalentPointsException> { service.upgrade("yan", "BOSS_TIME", 0) }
+        assertFailsWith<NotEnoughTalentPointsException> { service.upgrade("yan", "BOSS_DAMAGE", 0) }
         assertEquals(0, service.list("yan").points(rules).available)
     }
 
