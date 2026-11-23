@@ -1354,7 +1354,7 @@ div.talent-screen                           testid talent-screen
 
 ### Phase 6: e2e and author check
 
-#### T17: Fake backend: the 28-talent contract [ ]
+#### T17: Fake backend: the 28-talent contract [x]
 
 **Owner**: test-engineer
 **Goal**: The e2e fake backend answers the talents exactly like the new backend (TTR-01, TTR-10, TTR-14, TTR-15).
@@ -1385,8 +1385,8 @@ div.talent-screen                           testid talent-screen
 **Gate**: `cd game && npx playwright test e2e/talents.spec.js e2e/unifiedDamage.spec.js` (tests that read the old Talentos cards fail until T19; every test of these two files that does not open Talentos passes)
 **Done when**:
 
-- [ ] `GET /talents` of the fake answers 28 talents with the fields of design § Data Models (checked by T20 and T21).
-- [ ] The talents tests of `talents.spec.js` that do not open the screen (`Talents in combat`, `without COMBO ...`, `COMBO 2 caps a streak ...`) pass.
+- [x] `GET /talents` of the fake answers 28 talents with the fields of design § Data Models (checked by T20 and T21).
+- [x] The talents tests of `talents.spec.js` that do not open the screen (`Talents in combat`, `without COMBO ...`, `COMBO 2 caps a streak ...`) pass.
 
 **Commit**: `test(game): serve the reworked talent catalog from the fake backend`
 

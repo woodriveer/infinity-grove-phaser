@@ -203,12 +203,13 @@ const pieceView = (piece) => ({
     sellPrice: Math.floor(100 * RARITY[piece.rarity].index * (2 + piece.refine) / 2)
 });
 
-//  Talent contract (TalentController): the 9 talents of the backend catalog in 3 grades, level 0 to 10, a level costs its grade in talent points; the first clear of a
-//  phase pays nothing, of a miniboss 2 and of a chapter boss 5; POST /talents/reset takes every level back
+//  Talent contract (TalentController): the 28 talents of the backend catalog, 9 in 3 grades (level 0 to 10, a level costs its grade in talent points, grade N opens at level 10 of
+//  grade N - 1) and the single Fúria crescente (level 0 to 4, 2 points a level, opens at level 10 of COMBO); every talent answers maxLevel, requiredId and requiredLevel;
+//  the first clear of a phase pays nothing, of a miniboss 2 and of a chapter boss 5; POST /talents/reset takes every level back
 const TALENT_CATALOG = [
-    [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 3 ],
+    [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_DAMAGE', 'TIME', 'Dano contra chefes', '%', 2 ],
     [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa', 'points', 1 ],
-    [ 'CRIT_RESIST_BREAK', 'BREAK', 'Quebra de resistência a crítico', 'points', 1 ],
+    [ 'ARMOR_PIERCE', 'BREAK', 'Perfuração de armadura', '%', 1 ],
     [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique (%)', '%', 5 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ],
     [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ], [ 'CLICK_FLAT_DAMAGE', 'POWER', 'Dano direto de clique', 'dmg', 2 ]
 ];
@@ -218,19 +219,29 @@ const TALENT_POINTS = { PHASE: 0, MINIBOSS: 2, CHAPTER_BOSS: 5 };
 //  3 grades of the catalog: grade N is `<id>_G<N>`, gives N times the value, costs N points a level and opens at level 10 of the grade before
 const TALENT_GRADES = [ 1, 2, 3 ];
 const gradeId = (id, grade) => (grade === 1 ? id : `${id}_G${grade}`);
-const TALENTS = TALENT_GRADES.flatMap((grade) => TALENT_CATALOG.map(([ baseId, branch, label, unit, perLevel ]) => ({ id: gradeId(baseId, grade), baseId, grade, branch, label, unit, perLevel: perLevel * grade })));
-const isUnlocked = (talent, levels) => talent.grade === 1 || (levels[gradeId(talent.baseId, talent.grade - 1)] ?? 0) >= TALENT_MAX_LEVEL;
+const GRADED_TALENTS = TALENT_GRADES.flatMap((grade) => TALENT_CATALOG.map(([ baseId, branch, label, unit, perLevel ]) => ({
+    id: gradeId(baseId, grade), baseId, grade, branch, label, unit, perLevel: perLevel * grade, maxLevel: TALENT_MAX_LEVEL, cost: grade,
+    requiredId: grade === 1 ? null : gradeId(baseId, grade - 1), requiredLevel: grade === 1 ? null : TALENT_MAX_LEVEL
+})));
+const TALENTS = [
+    ...GRADED_TALENTS,
+    { id: 'COMBO_FURY', baseId: 'COMBO_FURY', grade: 1, branch: 'COMBO', label: 'Fúria crescente', unit: 'combo-step', perLevel: 1, maxLevel: 4, cost: 2, requiredId: 'COMBO', requiredLevel: 10 }
+];
+const isUnlocked = (talent, levels) => talent.requiredId === null || (levels[talent.requiredId] ?? 0) >= talent.requiredLevel;
 
 const talentsView = (levels) => TALENTS.map((talent) => {
-    const { id, baseId, grade, branch, label, unit, perLevel } = talent;
+    const { id, baseId, grade, branch, label, unit, perLevel, maxLevel, cost, requiredId, requiredLevel } = talent;
     const level = levels[id] ?? 0;
     const flat = baseId === 'CLICK_FLAT_DAMAGE' ? grade : 0;
 
-    return { id, baseId, grade, branch, label, unit, perLevel, maxLevel: TALENT_MAX_LEVEL, level, value: level === 0 ? 0 : perLevel * level - flat, nextCost: level >= TALENT_MAX_LEVEL ? null : grade, unlocked: isUnlocked(talent, levels) };
+    return {
+        id, baseId, grade, branch, label, unit, perLevel, maxLevel, level, value: level === 0 ? 0 : perLevel * level - flat,
+        nextCost: level >= maxLevel ? null : cost, unlocked: isUnlocked(talent, levels), requiredId, requiredLevel
+    };
 });
 
 const pointsView = (earned, levels) => {
-    const spent = TALENTS.reduce((sum, talent) => sum + (levels[talent.id] ?? 0) * talent.grade, 0);
+    const spent = TALENTS.reduce((sum, talent) => sum + (levels[talent.id] ?? 0) * talent.cost, 0);
 
     return { earned, spent, available: earned - spent };
 };
@@ -363,7 +374,7 @@ export async function mockBackend (page, {
     const clearedByUser = new Map();
     const earnedOf = (username) => {
         if (!earnedByUser.has(username)) {
-            const levels = Object.values(startingTalents[username] ?? {}).reduce((sum, level) => sum + level, 0);
+            const levels = Object.entries(startingTalents[username] ?? {}).reduce((sum, [ id, level ]) => sum + level * (TALENTS.find((talent) => talent.id === id)?.cost ?? 1), 0);
 
             earnedByUser.set(username, levels + (startingTalentPoints[username] ?? 0));
         }
@@ -495,14 +506,14 @@ export async function mockBackend (page, {
         const talent = TALENTS.find((candidate) => candidate.id === id);
 
         if (!talent) { return route.fulfill(problem(404, `Talent '${id}' not found`, 'TALENT_NOT_FOUND')); }
-        if (!Number.isInteger(body.fromLevel) || body.fromLevel < 0 || body.fromLevel > TALENT_MAX_LEVEL) { return route.fulfill(problem(400, 'fromLevel must be an integer between 0 and 10', 'INVALID_TALENT_REQUEST')); }
+        if (!Number.isInteger(body.fromLevel) || body.fromLevel < 0 || body.fromLevel > talent.maxLevel) { return route.fulfill(problem(400, `fromLevel must be an integer between 0 and ${talent.maxLevel}`, 'INVALID_TALENT_REQUEST')); }
 
         const level = levels[id] ?? 0;
 
         if (body.fromLevel !== level) { return route.fulfill(problem(409, `Talent '${id}' is at level ${level}`, 'TALENT_LEVEL_MISMATCH')); }
         if (!isUnlocked(talent, levels)) { return route.fulfill(problem(409, 'Talent grade is locked', 'TALENT_LOCKED')); }
-        if (level >= TALENT_MAX_LEVEL) { return route.fulfill(problem(409, 'Talent is already at the maximum level', 'TALENT_MAX_LEVEL')); }
-        if (pointsView(earnedOf(username), levels).available < talent.grade) { return route.fulfill(problem(409, 'Not enough talent points', 'NOT_ENOUGH_TALENT_POINTS')); }
+        if (level >= talent.maxLevel) { return route.fulfill(problem(409, 'Talent is already at the maximum level', 'TALENT_MAX_LEVEL')); }
+        if (pointsView(earnedOf(username), levels).available < talent.cost) { return route.fulfill(problem(409, 'Not enough talent points', 'NOT_ENOUGH_TALENT_POINTS')); }
 
         levels[id] = level + 1;
         return route.fulfill({ json: { talents: talentsView(levels), points: pointsView(earnedOf(username), levels) } });
