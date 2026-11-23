@@ -467,7 +467,7 @@ Update the comment above `attackerFor` (no cap; the two new bonus fields).
 
 ---
 
-#### T6: Fumaça without the critical cap [ ]
+#### T6: Fumaça without the critical cap [x]
 
 **Owner**: game-dev
 **Goal**: A skill buff adds its critical points with no cap, so a strike during Fumaça follows the new rule (TTR-07, TTR-08).

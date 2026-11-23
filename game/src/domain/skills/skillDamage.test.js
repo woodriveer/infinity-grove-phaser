@@ -39,6 +39,14 @@ describe('hitDamage', () => {
             .toEqual({ damage: 60, critical: true });
     });
 
+    it('a forced hit with a critical chance of 150 against resistance 20 deals 2.3 times its base', () => {
+        const attacker = { ...PLAYER, critChance: 150 };
+        const result = hitDamage({ attacker, percent: 100, forceCritical: true, defender: enemy('FIRE', 0, 20), random: never, ...none });
+
+        expect(result.damage).toBeCloseTo(2.3, 10);
+        expect(result.critical).toBe(true);
+    });
+
     it('applies the boss damage of the attacker on a boss', () => {
         const attacker = { ...PLAYER, bossDamage: 50 };
 
@@ -77,17 +85,19 @@ describe('buffs', () => {
         expect(clickDamage({ attacker: PLAYER, defender: enemy(), random: roll, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(true);
     });
 
-    it('caps the critical chance at 100 under Fumaça', () => {
+    it('Fumaça adds 15 points with no cap: 95 + 15 crits on a roll of 0.999 and adds 10 % critical damage (2.1)', () => {
         const attacker = { ...PLAYER, critChance: 95 };
+        const result = clickDamage({ attacker, defender: enemy(), random: () => 0.999, buffs: [ 'fumaca' ], debuffs: [] });
 
-        expect(clickDamage({ attacker, defender: enemy(), random: () => 0.999, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(true);
+        expect(result.critical).toBe(true);
+        expect(result.damage).toBeCloseTo(2.1, 10);
     });
 
-    it('caps 95 + 15 at 100 before the critical resistance: against resistance 50 a roll of 52 does not crit', () => {
+    it('adds Fumaça before the critical resistance: 95 + 15 against 50 crits on a roll of 0.59 and not on 0.60', () => {
         const attacker = { ...PLAYER, critChance: 95 };
 
-        expect(clickDamage({ attacker, defender: enemy('FIRE', 0, 50), random: () => 0.52, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(false);
-        expect(clickDamage({ attacker, defender: enemy('FIRE', 0, 50), random: () => 0.49, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(true);
+        expect(clickDamage({ attacker, defender: enemy('FIRE', 0, 50), random: () => 0.60, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(false);
+        expect(clickDamage({ attacker, defender: enemy('FIRE', 0, 50), random: () => 0.59, buffs: [ 'fumaca' ], debuffs: [] }).critical).toBe(true);
     });
 });
 
@@ -212,6 +222,12 @@ describe('tickDamage', () => {
         const attacker = { ...PLAYER, critChance: 100 };
 
         expect(tickDamage({ attacker, percent: 200, defender: enemy(), ...none })).toBe(2);
+    });
+
+    it('a tick never crits, even with a critical chance of 250', () => {
+        const attacker = { ...PLAYER, critChance: 250 };
+
+        expect(tickDamage({ attacker, percent: 100, buffs: [], debuffs: [], defender: enemy('FIRE', 0), boss: false })).toBe(1);
     });
 
     it('follows the defense, Bênção and Prisão at the tick', () => {

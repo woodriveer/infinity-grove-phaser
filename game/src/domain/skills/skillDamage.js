@@ -22,7 +22,7 @@ const strike = ({ attacker, percent = 100, armorPierce = 0, critChance, forceCri
         ...attacker,
         baseDamage: attacker.baseDamage * percent / 100,
         armorPierce: Math.min(100, (attacker.armorPierce ?? 0) + armorPierce),
-        critChance: critChance ?? Math.min(100, attacker.critChance + (buffs.includes('fumaca') ? FUMACA_CRIT_POINTS * factorOf(factors, 'fumaca') : 0))
+        critChance: critChance ?? attacker.critChance + (buffs.includes('fumaca') ? FUMACA_CRIT_POINTS * factorOf(factors, 'fumaca') : 0)
     };
     const target = debuffs.includes('brado')
         ? { ...defender, defense: Math.max(0, defenseOf(defender) - BRADO_DEFENSE_POINTS * factorOf(factors, 'brado')) }
