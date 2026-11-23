@@ -935,7 +935,7 @@ Update the comment above `leaderStats` (Kael in both time lines, Vex alone in th
 
 ---
 
-#### T13: Layout map of the talent tree [ ]
+#### T13: Layout map of the talent tree [x]
 
 **Owner**: game-dev
 **Goal**: One file holds every coordinate of the tree, provisional until the art arrives (TTR-19, TTR-22, spec D14).
