@@ -569,11 +569,18 @@ button:disabled {
     display: none;
 }
 
-/* Three rows do not fit the centred 80 px box above the battle bar (y 624): with the target chip the column sits on the bottom edge,
-   16.5 px up, where the weak chip and the enemy chips stand in a fight without adds, and the target chip takes the room above them */
+/* Three rows do not fit the centred 80 px box above the battle bar (y 624): with the target chip the column sits on the bottom edge and the
+   target chip takes the room above the weak chip and the enemy chips. The enemy chips are 19 px tall and end at y 622.5, so they start at
+   y 603.5, below Lacaio 2 (y 602.5), whatever their width: the widest line (Darkness, Defesa 161%, Seu crítico: 99.5%) is 312 px and
+   cannot stay right of x 535 around the centre x 670 (spec miniboss-adds, T14) */
 .hud-enemy:has(.target-chip:not(:empty)) {
     justify-content: flex-end;
-    padding-bottom: 16.5px;
+    padding-bottom: 13.5px;
+}
+
+.hud-enemy:has(.target-chip:not(:empty)) .enemy-stats .tag {
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 .hud-effects {

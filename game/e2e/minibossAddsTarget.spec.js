@@ -382,4 +382,33 @@ test.describe('Miniboss target', () => {
             expect(boxes.stats.bottom).toBeLessThan(624);
         }
     });
+
+    //  The widest enemy line a miniboss fight can show (Darkness, Defesa 161%, Seu crítico: 99.5%) is about 312 px wide around x 670, so it
+    //  cannot stay right of x 535: its row starts below Lacaio 2 (y 602.5) and ends above the battle bar (y 624), whichever add is the target
+    test('the widest enemy line starts below Lacaio 2 and ends above the battle bar', async ({ page }) => {
+        await startAdds(page, { definition: addsChapter({ element: 'DARKNESS', defense: 101 }) });
+        await scene(page, '(s) => { const real = s.leaderAttacker.bind(s); s.leaderAttacker = () => ({ ...real(), critChance: 99.5 }); s.refreshEnemyStats(); }');
+
+        const read = () => page.evaluate(() => {
+            const canvas = document.querySelector('#game-container canvas').getBoundingClientRect();
+            const rect = document.querySelector('.enemy-stats').getBoundingClientRect();
+
+            return {
+                left: ((rect.x - canvas.x) * 1024) / canvas.width, right: ((rect.right - canvas.x) * 1024) / canvas.width,
+                top: ((rect.y - canvas.y) * 768) / canvas.height, bottom: ((rect.bottom - canvas.y) * 768) / canvas.height
+            };
+        });
+
+        for (const [ target, text, minWidth ] of [ [ MINIBOSS, 'Darkness  Defesa 161%  Seu crítico: 99.5%', 300 ], [ LACAIO_2, 'Darkness  Defesa 0%  Seu crítico: 99.5%', 250 ] ])
+        {
+            await hitAt(page, ...target);
+
+            const box = await read();
+
+            expect(await page.locator('.enemy-stats').textContent()).toBe(text);
+            expect(box.right - box.left, `enemy stats ${JSON.stringify(box)}`).toBeGreaterThan(minWidth);
+            expect(box.top, `enemy stats ${JSON.stringify(box)}`).toBeGreaterThanOrEqual(602.5);
+            expect(box.bottom, `enemy stats ${JSON.stringify(box)}`).toBeLessThan(624);
+        }
+    });
 });

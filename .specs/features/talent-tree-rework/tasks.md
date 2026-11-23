@@ -105,6 +105,12 @@ T17 → T21 → T22
 T18 → T22
 ```
 
+### Phase 6b: fixes (game-dev)
+
+```
+T24
+```
+
 ### Phase 7: UI review (ui-artist)
 
 ```
@@ -1686,6 +1692,30 @@ div.talent-screen                           testid talent-screen
 
 ---
 
+### Phase 6b: fixes
+
+#### T24: keep the enemy line clear of Lacaio 2 [x]
+
+**Owner**: game-dev
+**Goal**: The enemy line of a fight with adds never touches Lacaio 2, whatever its width, with the approved text `Seu crítico: N%` (TTR-09; miniboss-adds T14, ui-redesign UIR-07).
+**Where**: `game/public/style.css` (`.hud-enemy:has(.target-chip:not(:empty))` and its `.enemy-stats .tag`)
+**Also changes**: `game/e2e/minibossAddsTarget.spec.js` (one new test; `:318` stays as it is)
+**Read first**: `game/e2e/minibossAddsTarget.spec.js:318-385`, `.specs/features/miniboss-adds/design.md:267`, `game/public/style.css:527-580` and `:765-775`
+**Depends on**: T22
+**Requirement**: TTR-09
+
+**What**: `Seu crítico: 10%` made the line 277 px wide on a miniboss at Defesa 109%, so it reached x 531.45 around the centre x 670 (Lacaio 2 ends at x 535). No padding can fix the widest line a fight can show (Darkness, `Defesa 161%`, `Seu crítico: 99.5%`: 312 px, 264 px with no padding at all), so the row moves below Lacaio 2 instead, the placement `miniboss-adds` design.md:267 asks for: in a fight with the target chip the column keeps the bottom edge at 13.5 px (was 16.5) and the enemy chips lose 1 px of padding above and below (19 px tall), so the line spans y 603.5 to 622.5 (Lacaio 2 ends at y 602.5, the battle bar starts at y 624). A fight without adds keeps the 21 px chips and the 3 px padding that `unifiedDamage.spec.js:161` pins.
+
+**Tests**: e2e: `the widest enemy line starts below Lacaio 2 and ends above the battle bar` (Darkness miniboss at `Defesa 161%` and `Seu crítico: 99.5%`: top at or below 602.5, bottom under 624; the add target `Defesa 0%`)
+**Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/minibossAddsTarget.spec.js e2e/talentTreeReworkCombat.spec.js`
+**Done when**:
+
+- [x] `minibossAddsTarget.spec.js:318` passes unchanged and the new test passes.
+
+**Commit**: `fix(game): start the enemy line below Lacaio 2`
+
+---
+
 ### Phase 7: UI review
 
 #### T23: UI review of the tree and the enemy line [ ]
@@ -1747,6 +1777,7 @@ div.talent-screen                           testid talent-screen
 | T21 | 1 spec file | ✅ Granular |
 | T22 | author check | ✅ Granular |
 | T23 | 1 review | ✅ Granular |
+| T24 | 1 stylesheet rule | ✅ Granular |
 
 ### Diagram-Definition Cross-Check
 
@@ -1775,6 +1806,7 @@ div.talent-screen                           testid talent-screen
 | T21 | T17 | T17 → T21 | ✅ Match |
 | T22 | T18, T19, T20, T21 | T18, T19, T20, T21 → T22 | ✅ Match |
 | T23 | T22 (Phase 6) | (none in phase) | ✅ Match |
+| T24 | T22 (Phase 6) | (none in phase) | ✅ Match |
 
 ### Test Co-location Validation
 
@@ -1803,3 +1835,4 @@ div.talent-screen                           testid talent-screen
 | T21 | e2e | e2e | e2e | ✅ OK |
 | T22 | author check | unit, integration, e2e | all | ✅ OK |
 | T23 | UI review artifact | none | none | ✅ OK |
+| T24 | Stylesheet | e2e | e2e | ✅ OK |
