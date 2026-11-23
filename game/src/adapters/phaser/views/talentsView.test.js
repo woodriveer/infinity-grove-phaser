@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { placeTalentScroll, renderTalents, renderTalentsUnavailable, talentScrollOf } from './talentsView';
+import { placeTalentScroll, renderTalents, renderTalentsUnavailable, revealTalent, talentScrollOf } from './talentsView';
 
 //  [ id, branch, label, unit, perLevel of grade 1 ]: the 9 graded talents in the order of the backend
 const catalog = [
@@ -340,6 +340,75 @@ describe('the scroll of the tree', () => {
 
         expect(talentScrollOf(null)).toBeNull();
         expect(talentScrollOf(screen)).toEqual({ left: 120, top: 40 });
+    });
+});
+
+describe('revealTalent', () => {
+    //  A phone board: 2048 x 1152 in a 1024 x 576 viewport, opened centred (scroll 512, 288); the plaque is fixed on the top 76 px, the card on the bottom 136 px
+    const phone = (scrollLeft, scrollTop) =>
+    {
+        const screen = show();
+        const scroll = find(screen, 'talent-tree-scroll');
+
+        Object.entries({ scrollWidth: 2048, clientWidth: 1024, scrollHeight: 1152, clientHeight: 576 })
+            .forEach(([ name, value ]) => Object.defineProperty(scroll, name, { value, configurable: true }));
+        scroll.scrollLeft = scrollLeft;
+        scroll.scrollTop = scrollTop;
+
+        return { screen, scroll };
+    };
+
+    it('scrolls Fúria crescente from under the card up into the free area, as far as the board allows', () => {
+        const { screen, scroll } = phone(512, 288);
+
+        revealTalent(screen, 'COMBO_FURY');
+
+        //  Its centre (85 %, 72 %) is at (1740.8, 829.44) of the board: the right edge keeps 88 + 12 px, the bottom of the board is the limit
+        expect(scroll.scrollLeft).toBeCloseTo(1740.8 - (1024 - 88 - 12), 5);
+        expect(scroll.scrollTop).toBe(1152 - 576);
+    });
+
+    it('scrolls a grade 3 node out from under the plaque and keeps its caption room above the card for a grade 1 node', () => {
+        const { screen, scroll } = phone(512, 288);
+
+        revealTalent(screen, 'CLICK_DAMAGE_G3');
+
+        //  (55 %, 20 %) is at (1126.4, 230.4): 76 + 60 px under the top edge
+        expect(scroll.scrollLeft).toBe(512);
+        expect(scroll.scrollTop).toBeCloseTo(230.4 - (76 + 60), 5);
+
+        const low = phone(0, 0);
+
+        revealTalent(low.screen, 'MINIBOSS_TIME');
+
+        //  (6 %, 66 %) is at (122.88, 760.32): left edge 60 + 12 px, bottom edge 576 - 136 - 60 - 108 px
+        expect(low.scroll.scrollLeft).toBe(0);
+        expect(low.scroll.scrollTop).toBeCloseTo(760.32 - (576 - 136 - 60 - 108), 5);
+    });
+
+    it('leaves the scroll alone when the node is already in the free area', () => {
+        const { screen, scroll } = phone(200, 288);
+
+        revealTalent(screen, 'CLICK_DAMAGE');
+
+        expect([ scroll.scrollLeft, scroll.scrollTop ]).toEqual([ 200, 288 ]);
+    });
+
+    it('does nothing on a board that does not scroll, for a talent without a node or without a screen', () => {
+        const flat = show();
+        const scroll = find(flat, 'talent-tree-scroll');
+
+        Object.entries({ scrollWidth: 1024, clientWidth: 1024, scrollHeight: 576, clientHeight: 576 })
+            .forEach(([ name, value ]) => Object.defineProperty(scroll, name, { value, configurable: true }));
+        scroll.scrollTop = 7;
+        revealTalent(flat, 'COMBO_FURY');
+        expect(scroll.scrollTop).toBe(7);
+
+        const { screen, scroll: moving } = phone(512, 288);
+
+        revealTalent(screen, 'NOT_A_TALENT');
+        revealTalent(null, 'COMBO_FURY');
+        expect([ moving.scrollLeft, moving.scrollTop ]).toEqual([ 512, 288 ]);
     });
 });
 

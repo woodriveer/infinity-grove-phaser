@@ -44,3 +44,14 @@ export const VEINS = Object.freeze([
         NODE_POSITIONS[id], NODE_POSITIONS[`${id}_G2`], NODE_POSITIONS[`${id}_G3`]
     ])
 ]);
+
+//  The parts fixed over the scrolling board, in px of the 1024 x 576 window: the plaque "Talentos" ends 76 px from the top, the detail card
+//  (112 px, one more line for a lock text) and the two bottom buttons start 136 px from the bottom
+export const FIXED_TOP = 76;
+export const FIXED_BOTTOM = 136;
+
+//  Half the side of a node, the gap to its caption plus three lines of it, and a margin, in px of the unzoomed board (a phone draws it twice as big)
+export const NODE_HALF = 30;
+export const LARGE_NODE_HALF = 44;
+export const CAPTION_ROOM = 54;
+export const REVEAL_MARGIN = 6;

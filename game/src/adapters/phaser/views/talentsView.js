@@ -1,6 +1,8 @@
 import { BRANCH_TITLES, BRANCHES, branchGlow, describeTalentEffect, talentFullName, talentIconName, talentLockText } from '../../../domain/talents/talents';
 import { el, iconWithFallback } from './dom';
-import { BANNER_POSITIONS, BRANCH_GLOWS, LARGE_NODES, NODE_POSITIONS, TREE_IMAGE, VEINS } from './talentTreeLayout';
+import {
+    BANNER_POSITIONS, BRANCH_GLOWS, CAPTION_ROOM, FIXED_BOTTOM, FIXED_TOP, LARGE_NODE_HALF, LARGE_NODES, NODE_HALF, NODE_POSITIONS, REVEAL_MARGIN, TREE_IMAGE, TREE_SIZE, VEINS
+} from './talentTreeLayout';
 
 export const UNAVAILABLE_TEXT = 'Talentos indisponíveis';
 export const EMPTY_DETAIL_TEXT = 'Escolha um talento na árvore para ver os detalhes.';
@@ -249,4 +251,37 @@ export const placeTalentScroll = (screen, previous) =>
 
     scroll.scrollLeft = previous ? previous.left : (scroll.scrollWidth - scroll.clientWidth) / 2;
     scroll.scrollTop = previous ? previous.top : (scroll.scrollHeight - scroll.clientHeight) / 2;
+};
+
+//  `offset` moved the least that puts `centre` (a position on the board) between `low` and `high` of the viewport, inside `0..limit`
+const keepBetween = (offset, centre, low, high, limit) =>
+{
+    const at = centre - offset;
+    const moved = at < low ? centre - low : at > high ? centre - high : offset;
+
+    return Math.min(Math.max(moved, 0), limit);
+};
+
+//  Scrolls the tree of `screen` so the node `id` and its caption sit in the free area, clear of the plaque, the card and the bottom buttons that stay
+//  fixed over the board (a phone shows the board zoomed, so the node can sit under its own card); a node already there keeps the scroll the player chose.
+//  Nothing happens when the board does not scroll (the desktop) or the talent has no node.
+export const revealTalent = (screen, id) =>
+{
+    const scroll = scrollOf(screen);
+    const position = NODE_POSITIONS[id];
+
+    if (!scroll || !position || (scroll.scrollWidth <= scroll.clientWidth && scroll.scrollHeight <= scroll.clientHeight))
+    {
+        return;
+    }
+
+    const zoom = scroll.scrollWidth / TREE_SIZE.width;
+    const half = (LARGE_NODES.includes(id) ? LARGE_NODE_HALF : NODE_HALF) * zoom;
+    const margin = REVEAL_MARGIN * zoom;
+
+    scroll.scrollLeft = keepBetween(scroll.scrollLeft, position.x / 100 * scroll.scrollWidth, half + margin, scroll.clientWidth - half - margin, scroll.scrollWidth - scroll.clientWidth);
+    scroll.scrollTop = keepBetween(
+        scroll.scrollTop, position.y / 100 * scroll.scrollHeight,
+        FIXED_TOP + half, scroll.clientHeight - FIXED_BOTTOM - half - CAPTION_ROOM * zoom, scroll.scrollHeight - scroll.clientHeight
+    );
 };

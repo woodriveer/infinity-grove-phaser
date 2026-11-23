@@ -1824,7 +1824,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 
 ---
 
-#### T28: scroll a selected node clear of the fixed parts on phones [ ]
+#### T28: scroll a selected node clear of the fixed parts on phones [x]
 
 **Owner**: game-dev
 **Goal**: On a phone, selecting a node brings it, with its caption, into the area free of the fixed plaque, the detail card and Reiniciar pontos, so it never sits under its own card (TTR-24; ui-review finding 4).
@@ -1840,7 +1840,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 **Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
 **Done when**:
 
-- [ ] On a 390 x 844 phone the selected Fúria crescente and its caption are not covered by the card, and the unit tests pass.
+- [x] On a 390 x 844 phone the selected Fúria crescente and its caption are not covered by the card, and the unit tests pass.
 
 **Commit**: `fix(game): scroll the selected talent clear of the card on phones`
 

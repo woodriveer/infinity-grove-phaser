@@ -469,6 +469,37 @@ test.describe('Talentos tree: phones and desktops', () => {
         expect((await size(page.getByTestId('talent-detail')))[0]).toBe(380);
     });
 
+    test('on a phone the selected Fúria crescente ends above the detail card', async ({ page }) => {
+        await startGame(page, { art: 'missing', viewport: { width: 390, height: 844 } });
+        await openTalents(page);
+
+        const bounds = () => page.evaluate(() => {
+            const box = (selector) => { const { top, bottom } = document.querySelector(selector).getBoundingClientRect(); return { top, bottom }; };
+
+            return {
+                node: box('[data-testid="talent-COMBO_FURY"]'),
+                caption: box('[data-testid="talent-caption-COMBO_FURY"]'),
+                card: box('[data-testid="talent-detail"]'),
+                reset: box('[data-testid="talent-reset"]')
+            };
+        });
+
+        //  The tree opens centred, with Fúria crescente under the card
+        const before = await bounds();
+
+        expect(before.node.bottom).toBeGreaterThan(before.card.top);
+
+        //  A click on the node selects it (the card hides it, so the click is sent to the node itself)
+        await page.getByTestId('talent-COMBO_FURY').evaluate((node) => node.click());
+        await expect(page.getByTestId('talent-detail-name')).toHaveText('Fúria crescente');
+
+        const after = await bounds();
+
+        expect(after.node.bottom).toBeLessThan(after.card.top);
+        expect(after.caption.bottom).toBeLessThan(after.card.top);
+        expect(after.caption.bottom).toBeLessThan(after.reset.top);
+    });
+
     test('on the desktop the tree is not zoomed and does not scroll', async ({ page }) => {
         await startGame(page, { art: 'missing' });
         await openTalents(page);

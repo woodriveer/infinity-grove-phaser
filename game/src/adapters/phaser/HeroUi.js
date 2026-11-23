@@ -16,7 +16,7 @@ import { renderFusionResult } from './views/fusionView';
 import { renderLeaderPicker } from './views/leaderView';
 import { refreshSkillBar, renderLeaderCard, renderSkillBar } from './views/skillBar';
 import { renderTeam, teamModel } from './views/teamView';
-import { placeTalentScroll, renderTalents, renderTalentsUnavailable, talentScrollOf } from './views/talentsView';
+import { placeTalentScroll, renderTalents, renderTalentsUnavailable, revealTalent, talentScrollOf } from './views/talentsView';
 
 const HUD = { x: 956, y: 370 };
 const PANEL = { x: 512, y: 384 };
@@ -1014,11 +1014,12 @@ export class HeroUi
         placeTalentScroll(screen, previous);
     }
 
-    //  Shows a talent in the detail card; no request
+    //  Shows a talent in the detail card; no request. On a phone the tree scrolls the node clear of the card
     selectTalent (id)
     {
         this.talentSelected = id;
         this.render_talents();
+        revealTalent(this.body.querySelector('[data-testid="talent-screen"]'), id);
     }
 
     //  Buys the next level of a talent for the level the player saw; a refusal shows its text and the tree the backend answered after it
