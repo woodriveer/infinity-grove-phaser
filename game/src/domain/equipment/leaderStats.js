@@ -14,7 +14,8 @@ const one = (value) => String(Math.round(value * 10) / 10);
 const two = (value) => String(Math.round(value * 100) / 100);
 
 //  `passives`: the team passives that apply now (spec hero-team): Lyra in the critical chance, Kael in both time lines, Orina in the
-//  defense break line and Vex in the critical resistance break line
+//  defense break line and Vex alone in the critical resistance break line (no talent adds chapter boss time or breaks the critical
+//  resistance since talent-tree-rework)
 export const leaderStats = ({ leader, pieces = [], talents = null, passives = NO_PASSIVES }) =>
 {
     const attacker = leaderAttacker({ leader, pieces, talents, passives });
@@ -28,8 +29,8 @@ export const leaderStats = ({ leader, pieces = [], talents = null, passives = NO
         { id: 'armorPierce', text: `Perfuração de armadura: ${one(attacker.armorPierce ?? 0)}%` },
         { id: 'bossDamage', text: `Dano em chefes: ${one(attacker.bossDamage ?? 0)}%` },
         { id: 'minibossTime', text: `Tempo extra de miniboss: ${one(equipmentSeconds + talentValue(talents, 'MINIBOSS_TIME'))}s` },
-        { id: 'bossTime', text: `Tempo extra de chefe: ${one(equipmentSeconds + talentValue(talents, 'BOSS_TIME'))}s` },
+        { id: 'bossTime', text: `Tempo extra de chefe: ${one(equipmentSeconds)}s` },
         { id: 'breakDefense', text: `Quebra de defesa: ${talentValue(talents, 'PHYSICAL_BREAK') + passives.defenseBreak}` },
-        { id: 'breakCrit', text: `Quebra de resistência a crítico: ${talentValue(talents, 'CRIT_RESIST_BREAK') + passives.critResistBreak}` }
+        { id: 'breakCrit', text: `Quebra de resistência a crítico: ${passives.critResistBreak}` }
     ];
 };

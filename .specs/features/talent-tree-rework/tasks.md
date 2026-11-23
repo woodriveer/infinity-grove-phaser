@@ -810,7 +810,7 @@ export const RETIRED_TALENT_IDS = [
 
 ---
 
-#### T11: Attribute panel lines without the retired talents [ ]
+#### T11: Attribute panel lines without the retired talents [x]
 
 **Owner**: game-dev
 **Goal**: The Equipamento panel reads the chapter boss time without a talent and the critical resistance break from Vex only (TTR-04, TTR-13).

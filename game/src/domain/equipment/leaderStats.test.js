@@ -75,18 +75,34 @@ describe('leaderStats', () => {
         expect(result.bossTime).toBe('Tempo extra de chefe: 5s');
     });
 
-    it('reads BOSS_TIME on the chapter boss line only', () => {
-        const result = lines({ leader: kael(), talents: talents({ BOSS_TIME: 12 }) });
+    it('reads no talent on the chapter boss line: BOSS_DAMAGE 10 and an older BOSS_TIME read 0s', () => {
+        const older = [ { id: 'BOSS_DAMAGE', baseId: 'BOSS_DAMAGE', value: 20 }, { id: 'BOSS_TIME', baseId: 'BOSS_TIME', value: 36 } ];
+        const result = lines({ leader: kael(), talents: older });
 
         expect(result.minibossTime).toBe('Tempo extra de miniboss: 0s');
-        expect(result.bossTime).toBe('Tempo extra de chefe: 12s');
+        expect(result.bossTime).toBe('Tempo extra de chefe: 0s');
     });
 
-    it('reads the two break talents', () => {
+    it('shows BOSS_DAMAGE 10 as Dano em chefes: 20% and ARMOR_PIERCE 10 as Perfuração de armadura: 10%', () => {
+        const result = lines({ leader: kael(), talents: talents({ BOSS_DAMAGE: 20, ARMOR_PIERCE: 10 }) });
+
+        expect(result.bossDamage).toBe('Dano em chefes: 20%');
+        expect(result.armorPierce).toBe('Perfuração de armadura: 10%');
+        expect(result.bossTime).toBe('Tempo extra de chefe: 0s');
+        expect(result.breakCrit).toBe('Quebra de resistência a crítico: 0');
+    });
+
+    it('adds the talent to the pieces: BOSS_DAMAGE value 20 and a ring of BOSS_DAMAGE_PCT 28 read 48%', () => {
+        const result = lines({ leader: kael(), pieces: [ piece([ affix('BOSS_DAMAGE_PCT', 28) ]) ], talents: talents({ BOSS_DAMAGE: 20 }) });
+
+        expect(result.bossDamage).toBe('Dano em chefes: 48%');
+    });
+
+    it('reads the defense break talent and ignores the critical break talent', () => {
         const result = lines({ leader: kael(), talents: talents({ PHYSICAL_BREAK: 3, CRIT_RESIST_BREAK: 8 }) });
 
         expect(result.breakDefense).toBe('Quebra de defesa: 3');
-        expect(result.breakCrit).toBe('Quebra de resistência a crítico: 8');
+        expect(result.breakCrit).toBe('Quebra de resistência a crítico: 0');
         expect(result.breakPhysical).toBeUndefined();
         expect(result.breakMagical).toBeUndefined();
     });
