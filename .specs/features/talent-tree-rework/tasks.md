@@ -117,6 +117,12 @@ T24
 T23
 ```
 
+### Phase 6c: UI review fixes (game-dev)
+
+```
+T25 → T26 → T27 → T28 → T29 → T30
+```
+
 ---
 
 ## Task Breakdown
@@ -1748,6 +1754,142 @@ div.talent-screen                           testid talent-screen
 
 ---
 
+### Phase 6c: UI review fixes
+
+Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇAS PEDIDAS). Out of scope: finding 5 (tiny phone text, the owner's debt TD-010) and finding 8 (the element name in English, not born in this feature). Every task runs after the review (T23) and edits the same stylesheet, so they run in order.
+
+#### T25: make the maxed node read distinctly in every branch [ ]
+
+**Owner**: game-dev
+**Goal**: A maxed node tells apart from an open or available one in all four branches without relying on the branch colour (TTR-20; ui-review finding 1, high).
+**Where**: `game/public/style.css` (`.talent-node[data-state="maxed"]` and its `no-frame` twin)
+**Also changes**: `game/e2e/talentTreeRework.spec.js` (re-pin the maxed `box-shadow` of "marks a maxed node with the gold ring")
+**Read first**: ui-review finding 1, `game/public/style.css:2400-2417`, `game/e2e/talentTreeRework.spec.js:185-195`
+**Depends on**: None (the review T23 is done)
+**Requirement**: TTR-20
+
+**What**: the maxed ring (`--gold-400`, #E0B45A) is almost the Poder do clique colour (#C99A1F). A maxed node gets a double ring (a 2 px dark gap, then a 3 px light gold `--gold-200` ring, a hue no branch uses) and a gold star seal (`::after`, 20 px circle, top left corner, the corner the lock of T26 and the "+" seal of T30 also use; a node is never two of locked, available and maxed). A selected maxed node keeps its outline clear of the double ring.
+
+**Tests**: e2e: `marks a maxed node with the gold ring` re-pinned to the new `box-shadow` and a new assertion on the seal (`::after` content `"★"`), on a node of each of the four branches
+**Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
+**Done when**:
+
+- [ ] A maxed node of every branch shows the double ring and the star seal, none of them in the branch colour.
+
+**Commit**: `fix(game): make the maxed talent node distinct in every branch`
+
+---
+
+#### T26: move the lock off the level pill [ ]
+
+**Owner**: game-dev
+**Goal**: The lock of a locked grade 2 or 3 node touches neither the "0/10" pill nor the node ring's lower edge (ui-review finding 2).
+**Where**: `game/public/style.css` (`.talent-node .talent-node-lock`)
+**Also changes**: `game/e2e/talentTreeRework.spec.js` (one test)
+**Read first**: ui-review finding 2, `game/public/style.css:2406`, `:2414`, `:2417`
+**Depends on**: T25
+**Requirement**: TTR-20
+
+**What**: the lock moves from the bottom right to the top left corner (`top: -8px; left: -8px`), the corner the grade badge (top right) does not use. The pill stays at the bottom.
+
+**Tests**: e2e: `the lock of a locked node does not overlap its level pill` (the bounding boxes of `.talent-node-lock` and `.talent-node-level` do not intersect, on the desktop and on a 390 x 844 phone, for every locked node)
+**Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
+**Done when**:
+
+- [ ] No lock intersects a level pill, and the existing "marks a locked node grey with the lock" test is green.
+
+**Commit**: `fix(game): move the talent lock off the level pill`
+
+---
+
+#### T27: show the full name of the grade 1 caption [ ]
+
+**Owner**: game-dev
+**Goal**: No grade 1 caption ends in an ellipsis: "Limite de dano do combo" reads whole (TTR-19; ui-review finding 3). The card keeps the full name.
+**Where**: `game/public/style.css` (`.talent-node-caption`)
+**Also changes**: `game/e2e/talentTreeRework.spec.js` (one test)
+**Read first**: ui-review finding 3, `game/public/style.css:2416`
+**Depends on**: T26
+**Requirement**: TTR-19
+
+**What**: the caption keeps its 80 px width and 12 px font and may wrap to three lines (`-webkit-line-clamp: 3`), the longest label needing three at 80 px. The captions stay clear of every other part of the board and of the fixed medallion and Reiniciar button.
+
+**Tests**: e2e: `no caption is clipped` (for each of the 10 captions `scrollHeight <= clientHeight`, the text equals the label, and no caption box intersects another caption, a node, the medallion, the reset button or the detail card)
+**Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
+**Done when**:
+
+- [ ] All 10 captions show their whole text on the desktop without overlap.
+
+**Commit**: `fix(game): show the whole talent caption`
+
+---
+
+#### T28: scroll a selected node clear of the fixed parts on phones [ ]
+
+**Owner**: game-dev
+**Goal**: On a phone, selecting a node brings it, with its caption, into the area free of the fixed plaque, the detail card and Reiniciar pontos, so it never sits under its own card (TTR-24; ui-review finding 4).
+**Where**: `game/src/adapters/phaser/views/talentsView.js` (new `revealTalent(screen, id)`), `game/src/adapters/phaser/views/talentTreeLayout.js` (the reserved bands), `game/src/adapters/phaser/HeroUi.js` (`selectTalent` calls it)
+**Also changes**: `game/src/adapters/phaser/views/talentsView.test.js`, `game/e2e/talentTreeRework.spec.js`
+**Read first**: ui-review finding 4, `game/src/adapters/phaser/views/talentsView.js:230-252`, `game/src/adapters/phaser/HeroUi.js:1000-1020`, `game/e2e/talentTreeRework.spec.js:379-402`
+**Depends on**: T27
+**Requirement**: TTR-24
+
+**What**: the position of a node in the scroll area is its percent of `scrollWidth` and `scrollHeight` (the board is the only content), its size is the base size times `scrollWidth / 1024`. The free band keeps the node and its caption between the plaque (76 px from the top of the viewport) and the card (136 px from the bottom) and the node inside the side edges. A node already inside the band leaves the scroll as the player left it; a node outside moves to the nearest edge of the band. On the desktop, where nothing scrolls, nothing changes.
+
+**Tests**: unit: `revealTalent` scrolls a node under the card up into the band (Fúria crescente on a 2048 x 1152 board), leaves a node in the band alone, does nothing on a board that does not scroll or for an id without a position; e2e: `on a phone the selected Fúria crescente ends above the detail card` (its box bottom and its caption above the card top, Reiniciar pontos clear of it); the test of line 380 stays as it is
+**Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
+**Done when**:
+
+- [ ] On a 390 x 844 phone the selected Fúria crescente and its caption are not covered by the card, and the unit tests pass.
+
+**Commit**: `fix(game): scroll the selected talent clear of the card on phones`
+
+---
+
+#### T29: keep the veins from cutting the captions [ ]
+
+**Owner**: game-dev
+**Goal**: The fallback veins no longer make a caption hard to read where they cross it (TTR-23; ui-review finding 6).
+**Where**: `game/public/style.css` (`.talent-tree.is-fallback .talent-node-caption`)
+**Also changes**: `game/e2e/talentTreeRework.spec.js` (one test)
+**Read first**: ui-review finding 6, `game/public/style.css:2396-2398`, `:2416`
+**Depends on**: T28
+**Requirement**: TTR-23
+
+**What**: in the fallback the caption gets a dark translucent backing (`rgb(28 18 12 / 0.72)`, 6 px radius, 3 px side padding, `box-sizing: border-box` so the 80 px box does not grow). With the painted board present the caption stays as it is.
+
+**Tests**: e2e: `the fallback caption has a backing and the painted one has none` (`toHaveCSS` background colour, with art missing and present)
+**Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
+**Done when**:
+
+- [ ] Every caption of the fallback tree sits on its backing and no caption box grew.
+
+**Commit**: `fix(game): back the fallback talent captions`
+
+---
+
+#### T30: tell an available node from an open one [ ]
+
+**Owner**: game-dev
+**Goal**: A node the player can buy now differs from an open node by more than a halo (TTR-20; ui-review finding 7).
+**Where**: `game/public/style.css` (`.talent-node[data-state="available"]`)
+**Also changes**: `game/e2e/talentTreeRework.spec.js` (one test)
+**Read first**: ui-review finding 7, `game/public/style.css:2408`, `:2410`
+**Depends on**: T29
+**Requirement**: TTR-20
+
+**What**: an available node gets a "+" seal (`::after`, 20 px parchment circle, branch ink glyph, top left corner) and a slow pulse of its halo (`@media (prefers-reduced-motion: no-preference)` only). The halo values the existing e2e pins stay.
+
+**Tests**: e2e: `an available node carries the plus seal and an open one does not` (`::after` content `"+"` on the available node, none on open, locked and maxed-star nodes)
+**Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
+**Done when**:
+
+- [ ] Available, open, locked and maxed nodes tell apart by shape as well as colour.
+
+**Commit**: `fix(game): mark the available talent node with a plus seal`
+
+---
+
 ## Validation Tables
 
 ### Task Granularity Check
@@ -1778,6 +1920,12 @@ div.talent-screen                           testid talent-screen
 | T22 | author check | ✅ Granular |
 | T23 | 1 review | ✅ Granular |
 | T24 | 1 stylesheet rule | ✅ Granular |
+| T25 | 1 stylesheet rule | ✅ Granular |
+| T26 | 1 stylesheet rule | ✅ Granular |
+| T27 | 1 stylesheet rule | ✅ Granular |
+| T28 | 1 function + 1 call | ✅ Granular |
+| T29 | 1 stylesheet rule | ✅ Granular |
+| T30 | 1 stylesheet rule | ✅ Granular |
 
 ### Diagram-Definition Cross-Check
 
@@ -1807,6 +1955,12 @@ div.talent-screen                           testid talent-screen
 | T22 | T18, T19, T20, T21 | T18, T19, T20, T21 → T22 | ✅ Match |
 | T23 | T22 (Phase 6) | (none in phase) | ✅ Match |
 | T24 | T22 (Phase 6) | (none in phase) | ✅ Match |
+| T25 | None | (none) | ✅ Match |
+| T26 | T25 | T25 → T26 | ✅ Match |
+| T27 | T26 | T26 → T27 | ✅ Match |
+| T28 | T27 | T27 → T28 | ✅ Match |
+| T29 | T28 | T28 → T29 | ✅ Match |
+| T30 | T29 | T29 → T30 | ✅ Match |
 
 ### Test Co-location Validation
 
@@ -1836,3 +1990,9 @@ div.talent-screen                           testid talent-screen
 | T22 | author check | unit, integration, e2e | all | ✅ OK |
 | T23 | UI review artifact | none | none | ✅ OK |
 | T24 | Stylesheet | e2e | e2e | ✅ OK |
+| T25 | Stylesheet | e2e | e2e | ✅ OK |
+| T26 | Stylesheet | e2e | e2e | ✅ OK |
+| T27 | Stylesheet | e2e | e2e | ✅ OK |
+| T29 | Stylesheet | e2e | e2e | ✅ OK |
+| T30 | Stylesheet | e2e | e2e | ✅ OK |
+| T28 | Game view and scene | unit (jsdom) + e2e | unit + e2e | ✅ OK |
