@@ -43,10 +43,10 @@ describe('leaderAttacker', () => {
         expect(attacker.critMultiplier).toBeCloseTo(2.5, 10);
     });
 
-    it('caps the critical chance at 100: 3 stars and 80 points of equipment', () => {
+    it('does not cap the critical chance: 3 stars and 80 points of equipment read 120', () => {
         const attacker = leaderAttacker({ leader: { element: 'FIRE', stars: 3 }, pieces: [ piece([ affix('CRIT_CHANCE', 80) ]) ] });
 
-        expect(attacker.critChance).toBe(100);
+        expect(attacker.critChance).toBe(120);
     });
 
     it('keeps the weapon damage under the star percent: a weapon of 3 and 1 star hit for 4 x 1.1', () => {
@@ -76,7 +76,7 @@ describe('leaderAttacker', () => {
         expect(attacker.baseDamage).toBeCloseTo(1.35, 10);
     });
 
-    it('caps the critical chance at 100 with 3 stars, equipment and talents together', () => {
+    it('adds 3 stars, equipment and talents together: 10 + 30 + 50 + 10 = 100', () => {
         const attacker = leaderAttacker({
             leader: { element: 'FIRE', stars: 3 },
             pieces: [ piece([ affix('CRIT_CHANCE', 50) ]) ],
@@ -111,12 +111,12 @@ describe('leaderAttacker with the team passives', () => {
         expect(attacker.critChance).toBe(20);
     });
 
-    it('the passive critical chance caps at 100', () => {
+    it('the passive critical chance adds past 100: 10 + 95 + 10 = 115', () => {
         const attacker = leaderAttacker({
             leader: { element: 'FIRE', stars: 0 }, pieces: [ piece([ affix('CRIT_CHANCE', 95) ]) ], passives: { ...NO_PASSIVES, critChance: 10 }
         });
 
-        expect(attacker.critChance).toBe(100);
+        expect(attacker.critChance).toBe(115);
     });
 
     it('the passive changes nothing else', () => {

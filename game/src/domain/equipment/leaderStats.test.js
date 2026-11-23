@@ -56,8 +56,8 @@ describe('leaderStats', () => {
         expect(result.bossDamage).toBe('Dano em chefes: 9%');
     });
 
-    it('caps the critical chance at 100%', () => {
-        expect(lines({ leader: lyra(3), pieces: [ piece([ affix('CRIT_CHANCE', 80) ]) ] }).critChance).toBe('Chance de crítico: 100%');
+    it('shows the critical chance past 100: 120%', () => {
+        expect(lines({ leader: lyra(3), pieces: [ piece([ affix('CRIT_CHANCE', 80) ]) ] }).critChance).toBe('Chance de crítico: 120%');
     });
 
     it('adds the power talents to the numbers: CLICK_DAMAGE 20, CRIT_CHANCE 4 and CRIT_DAMAGE 30 read 1.2, 14% and x2.3', () => {

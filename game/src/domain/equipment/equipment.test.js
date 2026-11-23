@@ -24,13 +24,34 @@ describe('attackerFor', () => {
         expect(attackerFor(PLAYER, [])).toBe(PLAYER);
     });
 
-    it('adds the three numbers of a bonus to the ones of the pieces, and still caps the critical chance at 100', () => {
+    it('adds the numbers of a bonus to the ones of the pieces with no cap on the critical chance: 120', () => {
         const ring = piece({ affixes: [ affix('CLICK_DAMAGE_PCT', 10), affix('CRIT_CHANCE', 80), affix('CRIT_DAMAGE_PCT', 30) ] });
         const attacker = attackerFor(PLAYER, [ ring ], { clickDamagePct: 20, critChance: 30, critDamagePct: 20 });
 
         expect(attacker.baseDamage).toBeCloseTo(1.3, 10);
-        expect(attacker.critChance).toBe(100);
+        expect(attacker.critChance).toBe(120);
         expect(attacker.critMultiplier).toBeCloseTo(2.5, 10);
+    });
+
+    it('adds the armor pierce and boss damage of a bonus to the ones of the pieces: 28 + 10 and 25 + 20', () => {
+        const ring = piece({ affixes: [ affix('ARMOR_PIERCE_PCT', 28), affix('BOSS_DAMAGE_PCT', 25) ] });
+        const attacker = attackerFor(PLAYER, [ ring ], { armorPierce: 10, bossDamage: 20 });
+
+        expect(attacker.armorPierce).toBe(38);
+        expect(attacker.bossDamage).toBe(45);
+    });
+
+    it('a bonus of only boss damage 20 without pieces gives armorPierce 0 and bossDamage 20', () => {
+        const attacker = attackerFor(PLAYER, [], { bossDamage: 20 });
+
+        expect(attacker.armorPierce).toBe(0);
+        expect(attacker.bossDamage).toBe(20);
+        expect(attacker.critChance).toBe(10);
+        expect(attacker.baseDamage).toBe(1);
+    });
+
+    it('returns the base itself without pieces and with every bonus at 0', () => {
+        expect(attackerFor(PLAYER, [], {})).toBe(PLAYER);
     });
 
     it('applies a bonus even when the hero wears nothing', () => {
@@ -66,9 +87,9 @@ describe('attackerFor', () => {
         expect(attackerFor(PLAYER, [ weapon(3.3) ]).baseDamage).toBeCloseTo(4.3, 10);
     });
 
-    it('adds the crit chance points to the 10 % base and caps it at 100', () => {
+    it('adds the crit chance points to the 10 % base with no cap: 95 points read 105', () => {
         expect(attackerFor(PLAYER, [ piece({ affixes: [ affix('CRIT_CHANCE', 4) ] }) ]).critChance).toBe(14);
-        expect(attackerFor(PLAYER, [ piece({ affixes: [ affix('CRIT_CHANCE', 95) ] }) ]).critChance).toBe(100);
+        expect(attackerFor(PLAYER, [ piece({ affixes: [ affix('CRIT_CHANCE', 95) ] }) ]).critChance).toBe(105);
     });
 
     it('adds the critical damage percent to the x2 multiplier', () => {

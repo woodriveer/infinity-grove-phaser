@@ -402,7 +402,7 @@ Update the header comment of `calculateDamage` (the critical sentence and `force
 
 ---
 
-#### T5: No critical cap, armor pierce and boss damage bonuses in `attackerFor` [ ]
+#### T5: No critical cap, armor pierce and boss damage bonuses in `attackerFor` [x]
 
 **Owner**: game-dev
 **Goal**: The attacker carries the plain sum of its critical chance and takes armor pierce and boss damage from a bonus (TTR-02, TTR-08, TTR-12).

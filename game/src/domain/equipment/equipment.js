@@ -60,12 +60,13 @@ const sumOf = (pieces, type) => pieces.reduce((total, piece) => total
     + piece.affixes.filter((affix) => affix.type === type).reduce((sum, affix) => sum + affix.value, 0), 0);
 
 //  The attacker of a click for a hero wearing `pieces`, built on `base`: base damage (base + weapon click damage) times the click damage
-//  percent, the critical chance (at most 100) and multiplier, the armor pierce and the boss damage. With no pieces and no bonus it is `base` itself.
+//  percent, the critical chance (no cap: every point past 100 becomes critical damage in calculateDamage, spec talent-tree-rework) and multiplier,
+//  the armor pierce and the boss damage. With no pieces and no bonus it is `base` itself.
 //  `bonus` carries more sources of the same numbers (the stars and talents of the leader): clickDamageFlat adds to the base damage before the percent, clickDamagePct and critDamagePct add to the pieces'
-//  percents, critChance adds points. `darknessDamagePct` (percent more damage against DARKNESS, the staff) only when a worn piece has it.
-export const attackerFor = (base, pieces, { clickDamageFlat = 0, clickDamagePct = 0, critChance = 0, critDamagePct = 0 } = {}) =>
+//  percents, critChance adds points, armorPierce and bossDamage add percents. `darknessDamagePct` (percent more damage against DARKNESS, the staff) only when a worn piece has it.
+export const attackerFor = (base, pieces, { clickDamageFlat = 0, clickDamagePct = 0, critChance = 0, critDamagePct = 0, armorPierce = 0, bossDamage = 0 } = {}) =>
 {
-    if (pieces.length === 0 && !clickDamageFlat && !clickDamagePct && !critChance && !critDamagePct)
+    if (pieces.length === 0 && !clickDamageFlat && !clickDamagePct && !critChance && !critDamagePct && !armorPierce && !bossDamage)
     {
         return base;
     }
@@ -76,10 +77,10 @@ export const attackerFor = (base, pieces, { clickDamageFlat = 0, clickDamagePct 
     return {
         ...base,
         baseDamage: (base.baseDamage + weaponDamage + clickDamageFlat) * (1 + (sumOf(pieces, 'CLICK_DAMAGE_PCT') + clickDamagePct) / 100),
-        critChance: Math.min(100, base.critChance + sumOf(pieces, 'CRIT_CHANCE') + critChance),
+        critChance: base.critChance + sumOf(pieces, 'CRIT_CHANCE') + critChance,
         critMultiplier: base.critMultiplier + (sumOf(pieces, 'CRIT_DAMAGE_PCT') + critDamagePct) / 100,
-        armorPierce: sumOf(pieces, 'ARMOR_PIERCE_PCT'),
-        bossDamage: sumOf(pieces, 'BOSS_DAMAGE_PCT'),
+        armorPierce: sumOf(pieces, 'ARMOR_PIERCE_PCT') + armorPierce,
+        bossDamage: sumOf(pieces, 'BOSS_DAMAGE_PCT') + bossDamage,
         ...(darknessDamagePct > 0 && { darknessDamagePct })
     };
 };
