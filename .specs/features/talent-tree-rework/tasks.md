@@ -1154,7 +1154,7 @@ div.talent-screen                           testid talent-screen
 
 ---
 
-#### T15: Talent tree styles [ ]
+#### T15: Talent tree styles [x]
 
 **Owner**: game-dev
 **Goal**: The stylesheet draws the tree, every node state, every fallback and the phone zoom (TTR-18 to TTR-24).

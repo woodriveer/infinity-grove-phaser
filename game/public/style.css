@@ -2358,85 +2358,87 @@ button.bag-card:hover:not(:disabled) {
     border: 1px solid var(--gold-400);
 }
 
-/* ══ Talentos: the points line and four columns of cards ══ */
+/* ══ Talentos: the painted tree (spec talent-tree-rework) ══ */
 
-.talent-screen {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
+.hero-window.is-talents { position: relative; width: 1024px; height: 576px; max-height: none; padding: 0; overflow: hidden; background: var(--wood-900); border: none; border-radius: 0; }
+.hero-window.is-talents .hero-header { position: absolute; top: 8px; right: 8px; z-index: 3; margin: 0; }
+.hero-window.is-talents .hero-title { display: none; }
+.hero-window.is-talents .hero-error { position: absolute; top: 76px; left: 50%; z-index: 4; margin: 0; transform: translateX(-50%); }
+.hero-window.is-talents .hero-body { position: absolute; inset: 0; }
+.hero-close-art { display: none; }
+.hero-close-text { position: relative; }
+.hero-window.is-talents .hero-close-art { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-window.is-talents .hero-close:has(.hero-close-art) { position: relative; width: 120px; height: 40px; padding: 0; color: var(--parchment-100); text-shadow: 0 1px 2px #000; background: none; border: none; box-shadow: none; }
+
+/* --branch marks the node glow, the banner bar and the card bar; --branch-ink is the same hue dark enough for text on parchment (4.5:1) */
+.talent-screen [data-branch="TIME"] { --branch: #3b9aa6; --branch-ink: #245d64; }
+.talent-screen [data-branch="BREAK"] { --branch: #c4492f; --branch-ink: #953724; }
+.talent-screen [data-branch="POWER"] { --branch: #c99a1f; --branch-ink: #6c5311; }
+.talent-screen [data-branch="COMBO"] { --branch: #8a5bd6; --branch-ink: #6a31c5; }
+
+.talent-screen { position: absolute; inset: 0; }
+.talent-tree-scroll { position: absolute; inset: 0; overflow: hidden; }
+.talent-tree { position: relative; width: 1024px; height: 576px; background: radial-gradient(ellipse at 50% 100%, var(--wood-700) 0%, var(--wood-900) 70%); }
+.talent-tree-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.talent-lit {
+    position: absolute; inset: 0; pointer-events: none;
+    background: url("assets/talent-tree-bg-lit.jpg") center / cover no-repeat, radial-gradient(ellipse var(--rx) var(--ry) at var(--cx) var(--cy), var(--branch) 0%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse var(--rx) var(--ry) at var(--cx) var(--cy), #000 60%, transparent 100%);
+    mask-image: radial-gradient(ellipse var(--rx) var(--ry) at var(--cx) var(--cy), #000 60%, transparent 100%);
 }
+.talent-tree-veins { display: none; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.talent-tree.is-fallback .talent-tree-veins { display: block; }
+.talent-tree-veins polyline { fill: none; stroke: rgb(245 234 216 / 0.35); stroke-width: 3; stroke-dasharray: 6 5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 
-.talent-points {
-    grid-column: 1 / -1;
-    font-family: var(--font-heading);
-    font-size: 18px;
-    font-weight: 700;
-}
+.talent-node { position: absolute; z-index: 1; width: 60px; height: 60px; padding: 0; border: none; border-radius: 50%; background: none; transform: translate(-50%, -50%); cursor: pointer; }
+.talent-node.is-large { width: 88px; height: 88px; }
+.talent-node-frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.talent-node.no-frame { background: radial-gradient(circle, var(--wood-700) 0 62%, var(--wood-900) 63%); box-shadow: inset 0 0 0 4px var(--branch); }
+.talent-node .talent-node-icon { position: absolute; top: 50%; left: 50%; width: 36px; height: 36px; transform: translate(-50%, -50%); }
+.talent-node.is-large .talent-node-icon { width: 54px; height: 54px; }
+.talent-node .talent-node-lock { position: absolute; right: -2px; bottom: -2px; width: 24px; height: 24px; font-size: 14px; }
+.talent-node[data-state="locked"] .talent-node-icon { filter: grayscale(1) brightness(0.55); }
+.talent-node[data-state="available"] { box-shadow: 0 0 0 3px var(--branch), 0 0 16px 6px var(--branch); }
+.talent-node[data-state="maxed"] { box-shadow: 0 0 0 3px var(--gold-400); }
+.talent-node.no-frame[data-state="available"] { box-shadow: inset 0 0 0 4px var(--branch), 0 0 0 3px var(--branch), 0 0 16px 6px var(--branch); }
+.talent-node.no-frame[data-state="maxed"] { box-shadow: inset 0 0 0 4px var(--branch), 0 0 0 3px var(--gold-400); }
+.talent-node[aria-pressed="true"] { outline: 3px solid var(--parchment-100); outline-offset: 4px; }
+.talent-node:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
+.talent-node-level { position: absolute; top: calc(100% - 8px); left: 50%; padding: 0 7px; font-family: var(--font-heading); font-size: 11px; font-weight: 700; line-height: 14px; color: var(--parchment-100); white-space: nowrap; background: rgb(28 18 12 / 0.85); border: 1px solid var(--bronze-500); border-radius: 999px; transform: translateX(-50%); pointer-events: none; }
+.talent-node[data-state="maxed"] .talent-node-level { color: var(--gold-400); border-color: var(--gold-400); }
+.talent-node-caption { position: absolute; top: calc(100% + 9px); left: 50%; display: -webkit-box; width: 80px; overflow: hidden; font-family: var(--font-body); font-size: 12px; font-weight: 700; line-height: 15px; color: var(--parchment-100); text-align: center; text-shadow: 0 1px 2px #000, 0 0 4px #000; transform: translateX(-50%); -webkit-line-clamp: 2; -webkit-box-orient: vertical; pointer-events: none; }
+.talent-node-grade { position: absolute; top: -4px; right: -4px; display: grid; place-items: center; width: 20px; height: 20px; font-family: var(--font-heading); font-size: 11px; font-weight: 700; color: var(--gold-200); background: var(--wood-900); border: 1px solid var(--gold-400); border-radius: 50%; pointer-events: none; }
 
-.talent-column {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 12px;
-    border-radius: var(--radius-md);
-    background: var(--parchment-300);
-    border: var(--inset-border);
-}
+.talent-banner { position: absolute; z-index: 1; display: grid; place-items: center; width: 140px; height: 34px; transform: translate(-50%, -50%); }
+.talent-banner-art,
+.talent-plaque-art { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.talent-branch-title { position: relative; font-family: var(--font-heading); font-size: 13px; font-weight: 700; color: var(--branch-ink); white-space: nowrap; }
+.talent-banner.no-art,
+.talent-title.no-art { background: var(--parchment-100); border: 2px solid var(--wood-600); border-radius: 8px; }
+.talent-banner.no-art { box-shadow: inset 0 -3px 0 var(--branch); }
 
-/* --branch marks the column (card bar, icon tint); --branch-ink is the same hue dark enough for text and buttons (4.5:1, spec UIR-14 AC 15) */
-.talent-column[data-branch="TIME"] { --branch: #3b9aa6; --branch-ink: #245d64; }
-.talent-column[data-branch="BREAK"] { --branch: #c4492f; --branch-ink: #953724; }
-.talent-column[data-branch="POWER"] { --branch: #c99a1f; --branch-ink: #6c5311; }
-.talent-column[data-branch="COMBO"] { --branch: #8a5bd6; --branch-ink: #6a31c5; }
+.talent-title { position: absolute; top: 6px; left: 50%; z-index: 2; display: grid; place-items: center; width: 192px; height: 64px; transform: translateX(-50%); }
+.talent-title-text { position: relative; font-family: var(--font-heading); font-size: 22px; font-weight: 700; color: var(--ink-900); }
 
-.talent-branch-title {
-    font-family: var(--font-heading);
-    font-size: 18px;
-    color: var(--branch-ink);
-    font-weight: 700;
-}
+.talent-points,
+.talent-reset { position: absolute; bottom: 12px; z-index: 2; display: flex; align-items: center; gap: 8px; height: 56px; }
+.talent-points { left: 12px; }
+.talent-reset { right: 12px; padding: 0; background: none; border: none; cursor: pointer; }
+.talent-round-art { width: 56px; height: 56px; flex: none; pointer-events: none; }
+.talent-pill { padding: 6px 12px; font-family: var(--font-heading); font-size: 14px; font-weight: 700; line-height: 18px; color: var(--parchment-100); white-space: nowrap; background: rgb(28 18 12 / 0.85); border: 1px solid var(--bronze-500); border-radius: 999px; }
+.talent-reset:disabled { opacity: 0.45; cursor: not-allowed; }
+.talent-reset:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 
-.talent-card {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 6px;
-    background: var(--parchment-100);
-    box-shadow: inset 4px 0 0 var(--branch), 0 1px 0 rgb(90 61 38 / 0.25);
-}
-
-.talent-text {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-    font-size: 13px;
-}
-
-.talent-name {
-    line-height: 1.2;
-}
-
+.talent-detail { position: absolute; left: 50%; bottom: 8px; z-index: 2; display: flex; flex-direction: column; gap: 4px; box-sizing: border-box; width: 380px; min-height: 112px; padding: 10px 16px 10px 20px; font-size: 13px; color: var(--ink-900); background: var(--parchment-100); border: 2px solid var(--wood-600); border-radius: var(--radius-lg); box-shadow: inset 4px 0 0 var(--branch, var(--bronze-500)), 0 6px 18px rgb(0 0 0 / 0.45); transform: translateX(-50%); }
+.talent-detail-name { font-family: var(--font-heading); font-size: 16px; font-weight: 700; }
 .talent-level,
-.talent-effect {
-    color: var(--color-neutral-700);
-}
+.talent-effect,
+.talent-detail-empty { color: var(--color-neutral-700); }
+.talent-detail-empty { margin: 0; font-style: italic; }
 
 .talent-max {
     font-weight: 800;
     color: var(--branch-ink);
-}
-
-.talent-grade-title {
-    padding-top: 6px;
-    font-family: var(--font-heading);
-    font-size: 14px;
-    border-top: 1px solid rgba(0, 0, 0, 0.15);
-    font-weight: 700;
-}
-
-.talent-locked {
-    opacity: 0.5;
 }
 
 .talent-lock {
@@ -2462,23 +2464,10 @@ button.bag-card:hover:not(:disabled) {
     cursor: not-allowed;
 }
 
-.talent-reset {
-    grid-column: 1 / -1;
-    justify-self: start;
-    padding: 6px 14px;
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 800;
-    color: var(--color-text);
-    border: 1px solid currentColor;
-    border-radius: 999px;
-    background: transparent;
-    cursor: pointer;
-}
-
-.talent-reset:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
+/* Phones (spec talent-tree-rework D16): the board is drawn twice as big and scrolls on both axes */
+@media (max-width: 640px) {
+    .talent-tree-scroll { overflow: auto; }
+    .talent-tree { zoom: 2; }
 }
 
 /* An icon from assets/ui, or the mark drawn in its place while the art does not exist */

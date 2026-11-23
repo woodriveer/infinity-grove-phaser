@@ -254,7 +254,7 @@ Open questions: none beyond Q1 to Q12 above, each written into the spec with its
 | TTR-21 | P2 Tree: AC 5, AC 6, AC 7, AC 8, AC 9 (selection, detail card, upgrade) | Tasks | Implementing |
 | TTR-22 | P2 Tree: AC 10, AC 11 (banners, lit veins) | Tasks | Implementing |
 | TTR-23 | P2 Tree: AC 12 (fallbacks) | Tasks | Implementing |
-| TTR-24 | P2 Tree: AC 13 (narrow screens) | Tasks | Pending |
+| TTR-24 | P2 Tree: AC 13 (narrow screens) | Tasks | Implementing |
 | TTR-25 | P2 Tree: AC 14, AC 15, Edge Cases (missing talents, kept behaviours) | Tasks | Implementing |
 
 **Coverage:** 25 total, 25 mapped to tasks, 0 unmapped. The Gemini prompts of the last goal are written in `PROMPTS_ASSETS_UI.md` with this spec (no task).
