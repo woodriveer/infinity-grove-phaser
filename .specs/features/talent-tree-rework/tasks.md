@@ -516,7 +516,7 @@ The `Math.min(100, ...)` of `armorPierce` stays.
 
 ---
 
-#### T7: Talent effects: boss damage, armor pierce, no chapter boss time, no critical break, combo step [ ]
+#### T7: Talent effects: boss damage, armor pierce, no chapter boss time, no critical break, combo step [x]
 
 **Owner**: game-dev
 **Goal**: The talents feed the new attacker fields, stop reading the retired ids and give the combo its step (TTR-02, TTR-03, TTR-12, TTR-13, TTR-16).

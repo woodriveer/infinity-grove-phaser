@@ -224,12 +224,12 @@ describe('break talents', () => {
         expect(skills.click({ attacker: base100, monster, boss: false }).damage).toBe(100);
     });
 
-    it('lowers the critical resistance: resistance 20 and CRIT_RESIST_BREAK 20 let a roll of 9 crit at 10 %', () => {
-        const monster = monsterOf(1000, stats('FIRE', 0, 0, 20));
+    it('ignores CRIT_RESIST_BREAK of an older list: resistance 5 and CRIT_RESIST_BREAK 20 leave a roll of 9 plain at 10 %', () => {
+        const monster = monsterOf(1000, stats('FIRE', 0, 0, 5));
         const roll = () => 0.09;
 
-        expect(withBreak({ CRIT_RESIST_BREAK: 20 }, roll).click({ attacker: PLAYER, monster, boss: false })).toEqual({ damage: 2, critical: true });
-        expect(new SkillCombat({ random: roll }).click({ attacker: PLAYER, monster: monsterOf(1000, stats('FIRE', 0, 0, 20)), boss: false }).critical).toBe(false);
+        expect(withBreak({ CRIT_RESIST_BREAK: 20 }, roll).click({ attacker: PLAYER, monster, boss: false })).toEqual({ damage: 1, critical: false });
+        expect(new SkillCombat({ random: roll }).click({ attacker: PLAYER, monster: monsterOf(1000, stats('FIRE', 0, 0, 0)), boss: false }).critical).toBe(true);
     });
 });
 

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { leaderAttacker } from './leaderAttacker';
-import { PLAYER } from './damage';
+import { calculateDamage, PLAYER } from './damage';
 import { NO_PASSIVES } from '../heroes/team';
+import { monsterAfterBreak } from '../talents/talents';
 
 const piece = (affixes, extra = {}) => ({ id: 'p', slot: 'RING', rarity: 'COMMON', refine: 0, affixes, sellPrice: 1, heroId: 'kael', ...extra });
 const affix = (type, value) => ({ type, value });
@@ -124,6 +125,30 @@ describe('leaderAttacker with the team passives', () => {
 
         expect(attacker.baseDamage).toBe(1);
         expect(attacker.critMultiplier).toBe(2);
+    });
+
+    it('BOSS_DAMAGE 10 and BOSS_DAMAGE_G2 5 add 40 % against a boss: a click of a 0-star leader deals 1.4, 1.68 with a piece of BOSS_DAMAGE_PCT 28, 1 on a phase monster', () => {
+        const leader = { element: 'FIRE', stars: 0 };
+        const talents = [ { id: 'BOSS_DAMAGE', baseId: 'BOSS_DAMAGE', value: 20 }, { id: 'BOSS_DAMAGE_G2', baseId: 'BOSS_DAMAGE', value: 20 } ];
+        const defender = { element: 'FIRE', defense: 0, critResistance: 0 };
+        const click = (attacker, boss) => calculateDamage({ attacker, defender, random: () => 0.99, boss }).damage;
+
+        expect(click(leaderAttacker({ leader, talents }), true)).toBeCloseTo(1.4, 10);
+        expect(click(leaderAttacker({ leader, talents, pieces: [ piece([ affix('BOSS_DAMAGE_PCT', 28) ]) ] }), true)).toBeCloseTo(1.68, 10);
+        expect(click(leaderAttacker({ leader, talents }), false)).toBeCloseTo(1, 10);
+    });
+
+    it('ARMOR_PIERCE 10 ignores 10 % of the defense: 0.55 on defense 50, 0.64 after PHYSICAL_BREAK 10, 0.69 with a piece of ARMOR_PIERCE_PCT 28, 1 with one of 95', () => {
+        const leader = { element: 'FIRE', stars: 0 };
+        const talents = [ { id: 'ARMOR_PIERCE', baseId: 'ARMOR_PIERCE', value: 10 } ];
+        const defender = { element: 'FIRE', defense: 50, critResistance: 0 };
+        const click = (attacker, target = defender) => calculateDamage({ attacker, defender: target, random: () => 0.99 }).damage;
+        const ring = (value) => piece([ affix('ARMOR_PIERCE_PCT', value) ]);
+
+        expect(click(leaderAttacker({ leader, talents }))).toBeCloseTo(0.55, 10);
+        expect(click(leaderAttacker({ leader, talents }), monsterAfterBreak(defender, [ { id: 'PHYSICAL_BREAK', baseId: 'PHYSICAL_BREAK', value: 10 } ]))).toBeCloseTo(0.64, 10);
+        expect(click(leaderAttacker({ leader, talents, pieces: [ ring(28) ] }))).toBeCloseTo(0.69, 10);
+        expect(click(leaderAttacker({ leader, talents, pieces: [ ring(95) ] }))).toBeCloseTo(1, 10);
     });
 
     it('without passives the attacker is the one of before', () => {

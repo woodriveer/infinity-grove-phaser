@@ -3562,7 +3562,7 @@ describe('ClickerGame star bonus', () => {
 
 describe('ClickerGame talents in combat', () => {
     const tree = (levels = {}) => [
-        [ 'MINIBOSS_TIME', 2 ], [ 'BOSS_TIME', 3 ], [ 'PHYSICAL_BREAK', 1 ], [ 'CRIT_RESIST_BREAK', 1 ],
+        [ 'MINIBOSS_TIME', 2 ], [ 'BOSS_DAMAGE', 2 ], [ 'PHYSICAL_BREAK', 1 ], [ 'ARMOR_PIERCE', 1 ],
         [ 'CLICK_DAMAGE', 3 ], [ 'CRIT_CHANCE', 1 ], [ 'CRIT_DAMAGE', 5 ], [ 'COMBO', 5 ]
     ].map(([ id, perLevel ]) => ({ id, perLevel, maxLevel: 10, level: levels[id] ?? 0, value: (levels[id] ?? 0) * perLevel, nextCost: 300 }));
     const bigMonsters = (monster, extra = {}) => ({
@@ -3609,21 +3609,33 @@ describe('ClickerGame talents in combat', () => {
     });
 
     it('shows the lowered defense on the enemy chips and keeps the stats of the monster itself', async () => {
-        const ctx = await createScene({ start: bigMonsters(fire(20, 20, 20)), talents: tree({ PHYSICAL_BREAK: 5, CRIT_RESIST_BREAK: 8 }) });
+        const ctx = await createScene({ start: bigMonsters(fire(20, 20, 20)), talents: tree({ PHYSICAL_BREAK: 5 }) });
 
         expect(ctx.hud('.enemy-stats').textContent).toContain('Defesa 15%');
-        expect(ctx.hud('.enemy-stats').textContent).toContain('Crit res 12%');
+        expect(ctx.hud('.enemy-stats').textContent).toContain('Crit res 20%');
         expect(ctx.hud('.enemy-stats').textContent).not.toContain('Magical def');
         expect(ctx.scene.monster.stats.physicalDefense).toBe(20);
     });
 
-    it('lowers the critical resistance by 8 points: resistance 20 and CRIT_RESIST_BREAK 8 make a roll of 9 crit at 10 %', async () => {
-        const ctx = await createScene({ start: bigMonsters(fire(0, 0, 20)), talents: tree({ CRIT_RESIST_BREAK: 20 }) });
+    it('ARMOR_PIERCE 10 ignores 10 % of the defense: a click on defense 50 deals 0.55', async () => {
+        const ctx = await createScene({ start: bigMonsters(fire(50, 50, 0)), talents: tree({ ARMOR_PIERCE: 10 }) });
 
-        ctx.dice.value = 0.09;
         ctx.click();
 
-        expect(ctx.texts.at(-1).text).toBe('2');
+        expect(ctx.scene.monster.health).toBeCloseTo(1000 - 0.55, 10);
+    });
+
+    it('BOSS_DAMAGE 10 adds 20 % to a click on the chapter boss and nothing on a phase monster', async () => {
+        const boss = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1), talents: tree({ BOSS_DAMAGE: 10 }) });
+        const phase = await createScene({ start: bigMonsters(fire()), talents: tree({ BOSS_DAMAGE: 10 }) });
+
+        boss.dice.value = 0.99;
+        boss.click();
+        phase.dice.value = 0.99;
+        phase.click();
+
+        expect(300 - boss.scene.monster.health).toBeCloseTo(1.2, 10);
+        expect(1000 - phase.scene.monster.health).toBeCloseTo(1, 10);
     });
 
     it('adds 10 s to the limit of a miniboss with MINIBOSS_TIME 5 and nothing to a chapter boss', async () => {
@@ -3634,12 +3646,12 @@ describe('ClickerGame talents in combat', () => {
         expect(boss.scene.countdown.limitMs).toBe(60_000);
     });
 
-    it('adds 12 s to the limit of the chapter boss with BOSS_TIME 4 and nothing to a miniboss', async () => {
-        const boss = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1), talents: tree({ BOSS_TIME: 4 }) });
-        const miniboss = await createScene({ start: progress(1, 'MINIBOSS', 1), talents: tree({ BOSS_TIME: 4 }) });
+    it('gives the chapter boss no talent time: BOSS_DAMAGE 10 leaves the limit as it is', async () => {
+        const boss = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1), talents: tree({ BOSS_DAMAGE: 10 }) });
+        const plain = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1), talents: tree({}) });
 
-        expect(boss.scene.countdown.limitMs).toBe(72_000);
-        expect(miniboss.scene.countdown.limitMs).toBe(30_000);
+        expect(boss.scene.countdown.limitMs).toBe(plain.scene.countdown.limitMs);
+        expect(boss.scene.countdown.limitMs).toBe(60_000);
     });
 
     it('adds the time talents to the time of the equipment', async () => {

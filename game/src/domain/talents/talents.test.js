@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { CHAPTER_BOSS, FARM, MINIBOSS, PHASE } from '../campaign/campaign';
-import { addBonuses, BRANCH_TITLES, describeTalentEffect, monsterAfterBreak, talentAttackerBonus, talentComboCap, talentIconName, talentTimeBonusMs, talentValue } from './talents';
+import {
+    addBonuses, BRANCH_TITLES, describeTalentEffect, monsterAfterBreak, talentAttackerBonus, talentComboCap, talentComboStep, talentIconName, talentTimeBonusMs, talentValue
+} from './talents';
 
 //  The tree as the backend answers it: value is level x perLevel
 const tree = (levels = {}) => [
-    [ 'MINIBOSS_TIME', 2 ], [ 'BOSS_TIME', 3 ], [ 'PHYSICAL_BREAK', 1 ], [ 'CRIT_RESIST_BREAK', 1 ],
+    [ 'MINIBOSS_TIME', 2 ], [ 'BOSS_DAMAGE', 2 ], [ 'PHYSICAL_BREAK', 1 ], [ 'ARMOR_PIERCE', 1 ],
     [ 'CLICK_DAMAGE', 5 ], [ 'CRIT_CHANCE', 1 ], [ 'CRIT_DAMAGE', 5 ], [ 'COMBO', 5 ], [ 'CLICK_FLAT_DAMAGE', 2 ]
 ].map(([ id, perLevel ]) => {
     const level = levels[id] ?? 0;
@@ -53,7 +55,24 @@ describe('talentComboCap', () => {
 
 describe('talentAttackerBonus', () => {
     it('gives CLICK_DAMAGE 5, CRIT_CHANCE 4 and CRIT_DAMAGE 6 as +25 %, +4 points and +30 %', () => {
-        expect(talentAttackerBonus(tree({ CLICK_DAMAGE: 5, CRIT_CHANCE: 4, CRIT_DAMAGE: 6 }))).toEqual({ clickDamageFlat: 0, clickDamagePct: 25, critChance: 4, critDamagePct: 30 });
+        expect(talentAttackerBonus(tree({ CLICK_DAMAGE: 5, CRIT_CHANCE: 4, CRIT_DAMAGE: 6 })))
+            .toEqual({ clickDamageFlat: 0, clickDamagePct: 25, critChance: 4, critDamagePct: 30, armorPierce: 0, bossDamage: 0 });
+    });
+
+    it('gives ARMOR_PIERCE 10 and BOSS_DAMAGE 10 as 10 points of armor pierce and 20 % boss damage', () => {
+        const bonus = talentAttackerBonus(tree({ ARMOR_PIERCE: 10, BOSS_DAMAGE: 10 }));
+
+        expect(bonus.armorPierce).toBe(10);
+        expect(bonus.bossDamage).toBe(20);
+    });
+
+    it('adds the grades of the boss damage: BOSS_DAMAGE 10 and BOSS_DAMAGE_G2 value 20 read 40', () => {
+        const grades = [
+            { id: 'BOSS_DAMAGE', baseId: 'BOSS_DAMAGE', value: 20 },
+            { id: 'BOSS_DAMAGE_G2', baseId: 'BOSS_DAMAGE', value: 20 }
+        ];
+
+        expect(talentAttackerBonus(grades).bossDamage).toBe(40);
     });
 
     it('gives CLICK_FLAT_DAMAGE 3 as +5 flat damage', () => {
@@ -61,18 +80,39 @@ describe('talentAttackerBonus', () => {
     });
 
     it('gives nothing without talents', () => {
-        expect(talentAttackerBonus(null)).toEqual({ clickDamageFlat: 0, clickDamagePct: 0, critChance: 0, critDamagePct: 0 });
+        expect(talentAttackerBonus(null)).toEqual({ clickDamageFlat: 0, clickDamagePct: 0, critChance: 0, critDamagePct: 0, armorPierce: 0, bossDamage: 0 });
     });
 
-    it('does not read the time or break talents', () => {
-        expect(talentAttackerBonus(tree({ BOSS_TIME: 9, PHYSICAL_BREAK: 9 }))).toEqual({ clickDamageFlat: 0, clickDamagePct: 0, critChance: 0, critDamagePct: 0 });
+    it('does not read MINIBOSS_TIME and PHYSICAL_BREAK', () => {
+        expect(talentAttackerBonus(tree({ MINIBOSS_TIME: 9, PHYSICAL_BREAK: 9 })))
+            .toEqual({ clickDamageFlat: 0, clickDamagePct: 0, critChance: 0, critDamagePct: 0, armorPierce: 0, bossDamage: 0 });
+    });
+});
+
+describe('talentComboStep', () => {
+    it('is 1 without Fúria crescente and before the talents load', () => {
+        expect(talentComboStep([])).toBe(1);
+        expect(talentComboStep(null)).toBe(1);
+    });
+
+    it('is 1 plus the value of Fúria crescente: 2 at level 1, 5 at level 4', () => {
+        expect(talentComboStep([ { id: 'COMBO_FURY', baseId: 'COMBO_FURY', value: 1 } ])).toBe(2);
+        expect(talentComboStep([ { id: 'COMBO_FURY', baseId: 'COMBO_FURY', value: 4 } ])).toBe(5);
     });
 });
 
 describe('addBonuses', () => {
     it('adds the three numbers', () => {
         expect(addBonuses({ clickDamagePct: 10, critChance: 1, critDamagePct: 2 }, { clickDamageFlat: 3, clickDamagePct: 5, critChance: 4, critDamagePct: 6 }))
-            .toEqual({ clickDamageFlat: 3, clickDamagePct: 15, critChance: 5, critDamagePct: 8 });
+            .toEqual({ clickDamageFlat: 3, clickDamagePct: 15, critChance: 5, critDamagePct: 8, armorPierce: 0, bossDamage: 0 });
+    });
+
+    it('adds armor pierce and boss damage, reading a missing one as 0', () => {
+        const zero = { clickDamageFlat: 0, clickDamagePct: 0, critChance: 0, critDamagePct: 0 };
+        const sum = addBonuses({ ...zero, armorPierce: 3 }, { ...zero, bossDamage: 4 });
+
+        expect(sum.armorPierce).toBe(3);
+        expect(sum.bossDamage).toBe(4);
     });
 });
 
@@ -85,12 +125,14 @@ describe('monsterAfterBreak', () => {
         expect(monsterAfterBreak(monster(10, 10), [ { id: 'MAGICAL_BREAK', value: 3 } ])).toEqual(monster(10, 10));
     });
 
-    it('lowers the critical resistance by 8 points with CRIT_RESIST_BREAK 8', () => {
-        expect(monsterAfterBreak(monster(10, 20), tree({ CRIT_RESIST_BREAK: 8 }))).toEqual(monster(10, 12));
+    it('ignores a CRIT_RESIST_BREAK entry of an older list: critical resistance 20 stays 20', () => {
+        const older = [ { id: 'CRIT_RESIST_BREAK', baseId: 'CRIT_RESIST_BREAK', value: 8 } ];
+
+        expect(monsterAfterBreak(monster(10, 20), older)).toEqual(monster(10, 20));
     });
 
     it('never goes below 0', () => {
-        expect(monsterAfterBreak(monster(2, 0), tree({ PHYSICAL_BREAK: 5, CRIT_RESIST_BREAK: 5 }))).toEqual(monster(0, 0));
+        expect(monsterAfterBreak(monster(2, 0), tree({ PHYSICAL_BREAK: 5 }))).toEqual(monster(0, 0));
     });
 
     it('keeps the element and changes nothing without talents', () => {
@@ -126,28 +168,30 @@ describe('talentTimeBonusMs', () => {
         expect(talentTimeBonusMs(tree({ MINIBOSS_TIME: 5 }), { kind: MINIBOSS })).toBe(10_000);
     });
 
-    it('adds 12 s to the chapter boss with BOSS_TIME 4', () => {
-        expect(talentTimeBonusMs(tree({ BOSS_TIME: 4 }), { kind: CHAPTER_BOSS })).toBe(12_000);
+    it('gives the chapter boss nothing, even with BOSS_TIME 4 of an older list', () => {
+        const older = [ { id: 'BOSS_TIME', baseId: 'BOSS_TIME', value: 12 } ];
+
+        expect(talentTimeBonusMs(older, { kind: CHAPTER_BOSS })).toBe(0);
     });
 
     it('does not add the seconds of one to the other', () => {
-        const talents = tree({ MINIBOSS_TIME: 5, BOSS_TIME: 4 });
+        const talents = tree({ MINIBOSS_TIME: 5, BOSS_DAMAGE: 4 });
 
         expect(talentTimeBonusMs(talents, { kind: MINIBOSS })).toBe(10_000);
-        expect(talentTimeBonusMs(talents, { kind: CHAPTER_BOSS })).toBe(12_000);
-        expect(talentTimeBonusMs(tree({ BOSS_TIME: 4 }), { kind: MINIBOSS })).toBe(0);
+        expect(talentTimeBonusMs(talents, { kind: CHAPTER_BOSS })).toBe(0);
+        expect(talentTimeBonusMs(tree({ BOSS_DAMAGE: 4 }), { kind: MINIBOSS })).toBe(0);
         expect(talentTimeBonusMs(tree({ MINIBOSS_TIME: 5 }), { kind: CHAPTER_BOSS })).toBe(0);
     });
 
     it('gives a farm fight the bonus of the boss it replays', () => {
-        const talents = tree({ MINIBOSS_TIME: 5, BOSS_TIME: 4 });
+        const talents = tree({ MINIBOSS_TIME: 5, BOSS_DAMAGE: 4 });
 
         expect(talentTimeBonusMs(talents, { kind: FARM, boss: { kind: MINIBOSS, stage: 3 } })).toBe(10_000);
-        expect(talentTimeBonusMs(talents, { kind: FARM, boss: { kind: CHAPTER_BOSS } })).toBe(12_000);
+        expect(talentTimeBonusMs(talents, { kind: FARM, boss: { kind: CHAPTER_BOSS } })).toBe(0);
     });
 
     it('gives a phase monster and a list that has not loaded nothing', () => {
-        expect(talentTimeBonusMs(tree({ MINIBOSS_TIME: 5, BOSS_TIME: 4 }), { kind: PHASE })).toBe(0);
+        expect(talentTimeBonusMs(tree({ MINIBOSS_TIME: 5, BOSS_DAMAGE: 4 }), { kind: PHASE })).toBe(0);
         expect(talentTimeBonusMs(null, { kind: MINIBOSS })).toBe(0);
     });
 });
@@ -206,8 +250,8 @@ describe('monsterAfterBreak with the team passives', () => {
         expect(monsterAfterBreak(monster(10, 30), null, { critResistBreak: 15 })).toEqual(monster(10, 15));
     });
 
-    it('Vex\'s passive with CRIT_RESIST_BREAK 3 on critical resistance 10 reads 0', () => {
-        expect(monsterAfterBreak(monster(10, 10), tree({ CRIT_RESIST_BREAK: 3 }), { critResistBreak: 15 })).toEqual(monster(10, 0));
+    it('Vex\'s passive on critical resistance 10 reads 0', () => {
+        expect(monsterAfterBreak(monster(10, 10), null, { critResistBreak: 15 })).toEqual(monster(10, 0));
     });
 
     it('an old payload with physicalDefense 50 and Orina\'s passive reads defense 35', () => {
