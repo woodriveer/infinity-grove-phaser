@@ -109,9 +109,9 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <code>.specs/features/talent-tree-rework</code> · commits <code>até 8fae5cb</code> · 2026-11-23 · local (npm run dev, porta 5175, backend falso, arte talent-* roteada como ausente)
                 </div>
             </div>
-            <span class="chip verdict changes">MUDANÇAS PEDIDAS</span>
+            <span class="chip verdict ok">APROVADO (rodada 2)</span>
         </div>
-        <p style="margin-top:16px">A árvore sem arte (fallback) é coerente com o Grove, cabe na janela e não tem sobreposição entre nós, legendas e faixas; a linha "Seu crítico" e o painel de atributos estão corretos. Um defeito bloqueia: o estado "no máximo" some no ramo Poder do clique. Outros sete achados são médios e baixos. Reprovado só por esse ponto: corrigindo o #1 o fallback pode ser entregue como está, e o layout em % aceita a arte e a calibração quando o fundo chegar.</p>
+        <p style="margin-top:16px"><strong>Rodada 2:</strong> os achados 1, 2, 3, 4, 6 e 7 foram corrigidos (T25 a T30) e reverificados com capturas novas em desktop e celular; os achados 5 (TD-010) e 8 (nome do elemento em inglês, anterior à feature) ficam com o dono e não bloqueiam. Sem achados novos. Rodada 1 (MUDANÇAS PEDIDAS) logo abaixo, com as capturas originais em <code>ui-review/round1/</code>.<br><br>Rodada 1: A árvore sem arte (fallback) é coerente com o Grove, cabe na janela e não tem sobreposição entre nós, legendas e faixas; a linha "Seu crítico" e o painel de atributos estão corretos. Um defeito bloqueia: o estado "no máximo" some no ramo Poder do clique. Outros sete achados são médios e baixos. Reprovado só por esse ponto: corrigindo o #1 o fallback pode ser entregue como está, e o layout em % aceita a arte e a calibração quando o fundo chegar.</p>
         <div class="stats">
             <div class="stat"><div class="n">13</div><div class="l">telas e estados verificados</div></div>
             <div class="stat"><div class="n">26</div><div class="l">capturas (desktop + celular)</div></div>
@@ -120,7 +120,20 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
         </div>
     </section>
     <section class="panel">
-        <h2>Fidelidade à spec</h2>
+        <h2>Rodada 2: reverificação das correções</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>#1 Máximo: anel duplo e selo de estrela dourado, distinto da cor do ramo; com todo o Poder do clique no 10/10 os 12 nós leem "máximo" de relance. <code>09-veins</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>#2 Cadeado: agora no canto superior esquerdo do nó, fora da pílula "0/10"; sem sobreposição no desktop e no celular. <code>02-states</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>#3 Legendas: até três linhas, "Limite de dano do combo" inteiro. <code>02-states</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>#4 Celular: Fúria crescente selecionada fica rolada acima do cartão, visível e com o anel de seleção. <code>07-card-fury-level-4-phone</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>#6 Veias: o fundo escuro translúcido por trás das legendas devolve o contraste nos cruzamentos; aceito no lugar de rotear as veias, pois a arte pintada substitui o fallback. Não afeta a arte presente (<code>10-art-present</code>).</span></li>
+            <li class="yes"><span class="mark">✓</span><span>#7 Disponível: selo "+" claro, distinto do cadeado (bloqueado) e da estrela (máximo); o pulso lento do halo não aparece em captura estática e o dev informa que é desligado em movimento reduzido.<code>02-states</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Layout medido de novo: 0 sobreposições nó-nó e legenda-legenda, 0 faixas sobre a placa ou nós; janela, cartão (356 px no desktop), medalhão, Reiniciar e Fechar nas mesmas posições; linha "Seu crítico" a y 566 abaixo do Lacaio 2.</span></li>
+            <li class="no"><span class="mark">–</span><span>Pendentes fora do escopo: #5 texto do cartão pequeno no celular (TD-010, dono) e #8 chip "Fire" em inglês (anterior à feature).</span></li>
+        </ul>
+    </section>
+    <section class="panel">
+        <h2>Fidelidade à spec (rodada 1)</h2>
         <ul class="checks">
             <li class="yes"><span class="mark">✓</span><span>Árvore em fallback: degradê, veias tracejadas do tronco até cada cadeia, 28 nós com anel e glifo, sem nó, legenda, chip ou selo sobreposto a outro (medido por script: 0 sobreposições nó-nó e legenda-legenda) <code>spec P2 Tree</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Quatro faixas de pergaminho livres da placa "Talentos" e dos nós de grau 3 (medido: 0 interseções) <code>design § Layout map</code></span></li>
@@ -135,7 +148,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
         </ul>
     </section>
     <section class="panel">
-        <h2>Capturas</h2>
+        <h2>Capturas (rodada 2, depois das correções)</h2>
         <div class="screen">
             <h3>Talentos: árvore vazia (fallback, sem arte)</h3>
             <div class="shots">
@@ -144,7 +157,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Árvore sem pontos</span>
                         <span class="d">Fundo em degradê, veias tracejadas, 28 nós com anel, 4 faixas, placa, medalhão, botão e cartão vazio. Nenhum 404 de arte quebra o layout.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #2</span><span class="chip sev-media">achado #3</span><span class="chip sev-baixa">achado #6</span></span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">achado #2 corrigido</span><span class="chip ok">achado #3 corrigido</span><span class="chip ok">achado #6 corrigido</span></span>
                     </figcaption>
                 </figure>
             </div>
@@ -154,7 +167,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Árvore sem pontos</span>
                         <span class="d">Fundo em degradê, veias tracejadas, 28 nós com anel, 4 faixas, placa, medalhão, botão e cartão vazio. Nenhum 404 de arte quebra o layout.</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #4</span><span class="chip sev-media">achado #5</span></span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">achado #4 corrigido</span><span class="chip sev-media">achado #5 (fora do escopo)</span></span>
                     </figcaption>
                 </figure>
             </div>
@@ -167,7 +180,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Bloqueado, aberto, disponível, selecionado</span>
                         <span class="d">Chance de crítico (3/10) selecionado e com brilho; Dano de clique no máximo; graus bloqueados em cinza com cadeado.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-alta">achado #1</span><span class="chip sev-baixa">achado #7</span></span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">achado #1 corrigido</span><span class="chip ok">achado #7 corrigido</span></span>
                     </figcaption>
                 </figure>
                 <figure>
@@ -175,7 +188,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Cartão de talento no máximo</span>
                         <span class="d">Dano de clique (%) 10/10: "Nível máximo" na tinta do ramo. O anel dourado do nó é igual ao do ramo.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-alta">achado #1</span></span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">achado #1 corrigido</span></span>
                     </figcaption>
                 </figure>
                 <figure>
@@ -225,7 +238,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Bloqueado, aberto, disponível, selecionado</span>
                         <span class="d">Chance de crítico (3/10) selecionado e com brilho; Dano de clique no máximo; graus bloqueados em cinza com cadeado.</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #4</span></span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">achado #4 corrigido</span></span>
                     </figcaption>
                 </figure>
                 <figure>
@@ -257,7 +270,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Fúria crescente bloqueada</span>
                         <span class="d">Nó grande com cadeado e texto de bloqueio em itálico.</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #4</span></span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">achado #4 corrigido</span></span>
                     </figcaption>
                 </figure>
                 <figure>
@@ -265,7 +278,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Fúria crescente no nível 4</span>
                         <span class="d">"Efeito: +5% por clique" e "Nível máximo" em roxo.</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #4</span></span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">achado #4 corrigido</span></span>
                     </figcaption>
                 </figure>
                 <figure>
@@ -286,7 +299,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Veias a 0, 0,27, 0,44 e 1</span>
                         <span class="d">Quebra de defesa apagado, Caça aos chefes 0,27, Combo 0,44 e Poder do clique 1: o brilho da cor do ramo cresce.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-alta">achado #1</span><span class="chip sev-baixa">achado #6</span></span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">achado #1 corrigido</span><span class="chip ok">achado #6 corrigido</span></span>
                     </figcaption>
                 </figure>
             </div>
@@ -332,7 +345,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Miniboss</span>
                         <span class="d">"Seu crítico: 0%" no terceiro chip, ícone vermelho, uma linha, ao lado de "Defesa 80%".</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #8</span></span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #8 (fora do escopo)</span></span>
                     </figcaption>
                 </figure>
                 <figure>
@@ -340,7 +353,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Miniboss com lacaios</span>
                         <span class="d">A linha começa abaixo do Lacaio 2 (y 566 contra fim da caixa em 565), sem corte.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #8</span></span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #8 (fora do escopo)</span></span>
                     </figcaption>
                 </figure>
             </div>
@@ -350,7 +363,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Miniboss</span>
                         <span class="d">"Seu crítico: 0%" no terceiro chip, ícone vermelho, uma linha, ao lado de "Defesa 80%".</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #8</span></span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #8 (fora do escopo)</span></span>
                     </figcaption>
                 </figure>
                 <figure>
@@ -358,7 +371,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">Miniboss com lacaios</span>
                         <span class="d">A linha começa abaixo do Lacaio 2 (y 566 contra fim da caixa em 565), sem corte.</span>
-                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #8</span></span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #8 (fora do escopo)</span></span>
                     </figcaption>
                 </figure>
             </div>
@@ -388,7 +401,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
         </div>
     </section>
     <section class="panel">
-        <h2>Achados</h2>
+        <h2>Achados (rodada 1, imagens originais)</h2>
         <article class="finding">
             <div>
                 <div class="top"><span class="chip sev-alta">#1 · Alta</span><strong>O estado "no máximo" some no ramo Poder do clique</strong></div>
@@ -399,7 +412,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <dt>Arquivo</dt><dd><code>game/public/style.css (regra .talent-node[data-state="maxed"] e variável do ramo POWER)</code></dd>
                 </dl>
             </div>
-            <a href="ui-review/03-card-maxed-desktop.png" target="_blank"><img src="ui-review/03-card-maxed-desktop.png" alt="Captura do achado #1"></a>
+            <a href="ui-review/round1/03-card-maxed-desktop.png" target="_blank"><img src="ui-review/round1/03-card-maxed-desktop.png" alt="Captura do achado #1"></a>
         </article>
         <article class="finding">
             <div>
@@ -411,7 +424,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <dt>Arquivo</dt><dd><code>game/public/style.css (.talent-node-lock, .talent-node-level)</code></dd>
                 </dl>
             </div>
-            <a href="ui-review/01-tree-empty-desktop.png" target="_blank"><img src="ui-review/01-tree-empty-desktop.png" alt="Captura do achado #2"></a>
+            <a href="ui-review/round1/01-tree-empty-desktop.png" target="_blank"><img src="ui-review/round1/01-tree-empty-desktop.png" alt="Captura do achado #2"></a>
         </article>
         <article class="finding">
             <div>
@@ -423,7 +436,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <dt>Arquivo</dt><dd><code>game/public/style.css (.talent-node-caption, largura/line-clamp) ou o rótulo em game/src/adapters/phaser/views/talentsView.js</code></dd>
                 </dl>
             </div>
-            <a href="ui-review/02-states-open-selected-desktop.png" target="_blank"><img src="ui-review/02-states-open-selected-desktop.png" alt="Captura do achado #3"></a>
+            <a href="ui-review/round1/02-states-open-selected-desktop.png" target="_blank"><img src="ui-review/round1/02-states-open-selected-desktop.png" alt="Captura do achado #3"></a>
         </article>
         <article class="finding">
             <div>
@@ -435,7 +448,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/talentsView.js (seleção) e game/public/style.css (.talent-tree-scroll, padding inferior)</code></dd>
                 </dl>
             </div>
-            <a href="ui-review/07-card-fury-level-4-phone.png" target="_blank"><img src="ui-review/07-card-fury-level-4-phone.png" alt="Captura do achado #4"></a>
+            <a href="ui-review/round1/07-card-fury-level-4-phone.png" target="_blank"><img src="ui-review/round1/07-card-fury-level-4-phone.png" alt="Captura do achado #4"></a>
         </article>
         <article class="finding">
             <div>
@@ -447,7 +460,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <dt>Arquivo</dt><dd><code>game/public/style.css (.talent-detail, .talent-pill) · TD-010</code></dd>
                 </dl>
             </div>
-            <a href="ui-review/01-tree-empty-phone.png" target="_blank"><img src="ui-review/01-tree-empty-phone.png" alt="Captura do achado #5"></a>
+            <a href="ui-review/round1/01-tree-empty-phone.png" target="_blank"><img src="ui-review/round1/01-tree-empty-phone.png" alt="Captura do achado #5"></a>
         </article>
         <article class="finding">
             <div>
@@ -459,7 +472,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/talentsView.js (caminhos das veias) e game/public/style.css (.talent-node-caption)</code></dd>
                 </dl>
             </div>
-            <a href="ui-review/09-veins-0-27-44-100-desktop.png" target="_blank"><img src="ui-review/09-veins-0-27-44-100-desktop.png" alt="Captura do achado #6"></a>
+            <a href="ui-review/round1/09-veins-0-27-44-100-desktop.png" target="_blank"><img src="ui-review/round1/09-veins-0-27-44-100-desktop.png" alt="Captura do achado #6"></a>
         </article>
         <article class="finding">
             <div>
@@ -471,7 +484,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <dt>Arquivo</dt><dd><code>game/public/style.css (.talent-node[data-state="available"])</code></dd>
                 </dl>
             </div>
-            <a href="ui-review/02-states-open-selected-desktop.png" target="_blank"><img src="ui-review/02-states-open-selected-desktop.png" alt="Captura do achado #7"></a>
+            <a href="ui-review/round1/02-states-open-selected-desktop.png" target="_blank"><img src="ui-review/round1/02-states-open-selected-desktop.png" alt="Captura do achado #7"></a>
         </article>
         <article class="finding">
             <div>
@@ -483,7 +496,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/ClickerGame.js (montagem da linha do inimigo, perto da linha 1050)</code></dd>
                 </dl>
             </div>
-            <a href="ui-review/12-chip-adds-desktop.png" target="_blank"><img src="ui-review/12-chip-adds-desktop.png" alt="Captura do achado #8"></a>
+            <a href="ui-review/round1/12-chip-adds-desktop.png" target="_blank"><img src="ui-review/round1/12-chip-adds-desktop.png" alt="Captura do achado #8"></a>
         </article>
     </section>
     <section class="panel">

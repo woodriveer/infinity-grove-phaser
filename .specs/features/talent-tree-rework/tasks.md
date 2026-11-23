@@ -1724,7 +1724,7 @@ div.talent-screen                           testid talent-screen
 
 ### Phase 7: UI review
 
-#### T23: UI review of the tree and the enemy line [ ]
+#### T23: UI review of the tree and the enemy line [x]
 
 **Owner**: ui-artist
 **Goal**: The player-visible changes match the spec and the Grove theme (AD-022) with the art missing, which is how the feature ships (TTR-09, TTR-18 to TTR-24).
@@ -1748,7 +1748,7 @@ div.talent-screen                           testid talent-screen
 **Gate**: `cd game && npm run ui:shots -- talentTreeRework`
 **Done when**:
 
-- [ ] `ui-review.html` has a verdict (APROVADO or REPROVADO) and every finding is listed for the product owner to turn into tasks.
+- [x] `ui-review.html` has a verdict (APROVADO or REPROVADO) and every finding is listed for the product owner to turn into tasks.
 
 **Commit**: `docs(ui): review the painted talent tree`
 
