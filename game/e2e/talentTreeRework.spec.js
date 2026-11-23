@@ -186,6 +186,22 @@ test.describe('Talentos tree: nodes', () => {
         expect(report.find(({ id }) => id === 'talent-COMBO').text).toBe('Limite de dano do combo');
     });
 
+    for (const [ art, backing ] of [ [ 'missing', 'rgba(28, 18, 12, 0.72)' ], [ 'present', 'rgba(0, 0, 0, 0)' ] ])
+    {
+        test(`a caption has ${art === 'missing' ? 'a backing over the fallback veins' : 'no backing over the painted board'} and stays 80 px wide`, async ({ page }) => {
+            await startGame(page, { art });
+            await openTalents(page);
+
+            for (const id of [ 'CLICK_DAMAGE', 'CLICK_FLAT_DAMAGE', 'ARMOR_PIERCE', 'COMBO' ])
+            {
+                const caption = page.getByTestId(`talent-caption-${id}`);
+
+                await expect(caption).toHaveCSS('background-color', backing);
+                expect((await size(caption))[0]).toBe(80);
+            }
+        });
+    }
+
     test('names each node with a title and an aria-label', async ({ page }) => {
         await startGame(page, { art: 'missing', talents: { CLICK_DAMAGE: 3 } });
         await openTalents(page);

@@ -1846,7 +1846,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 
 ---
 
-#### T29: keep the veins from cutting the captions [ ]
+#### T29: keep the veins from cutting the captions [x]
 
 **Owner**: game-dev
 **Goal**: The fallback veins no longer make a caption hard to read where they cross it (TTR-23; ui-review finding 6).
@@ -1862,7 +1862,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 **Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
 **Done when**:
 
-- [ ] Every caption of the fallback tree sits on its backing and no caption box grew.
+- [x] Every caption of the fallback tree sits on its backing and no caption box grew.
 
 **Commit**: `fix(game): back the fallback talent captions`
 
