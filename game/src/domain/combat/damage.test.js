@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateDamage, formatDamage, PLAYER } from './damage';
+import { calculateDamage, critOverflow, effectiveCritChance, formatDamage, PLAYER } from './damage';
 
 const enemy = (element, physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element, physicalDefense, magicalDefense, critResistance });
 const never = () => 0.99;
@@ -61,9 +61,72 @@ describe('calculateDamage', () => {
         expect(calculateDamage({ defender: enemy('FIRE'), random: () => 0.1 }).critical).toBe(false);
     });
 
-    it('lowers the critical chance by the critical resistance: 50 resistance makes it 5 %', () => {
-        expect(calculateDamage({ defender: enemy('FIRE', 0, 0, 50), random: () => 0.0499 }).critical).toBe(true);
-        expect(calculateDamage({ defender: enemy('FIRE', 0, 0, 50), random: () => 0.05 }).critical).toBe(false);
+    it('effectiveCritChance subtracts the resistance and stays between 0 and 100', () => {
+        expect(effectiveCritChance(40, 30)).toBe(10);
+        expect(effectiveCritChance(30, 50)).toBe(0);
+        expect(effectiveCritChance(130, 10)).toBe(100);
+        expect(effectiveCritChance(100, 0)).toBe(100);
+    });
+
+    it('critOverflow is the chance past 100 after the resistance', () => {
+        expect(critOverflow(130, 10)).toBe(20);
+        expect(critOverflow(110, 10)).toBe(0);
+        expect(critOverflow(111, 10)).toBe(1);
+        expect(critOverflow(40, 30)).toBe(0);
+        expect(critOverflow(250, 100)).toBe(50);
+    });
+
+    it('40 against resistance 30 crits on a roll of 0.09 and not on 0.10', () => {
+        const attacker = { ...PLAYER, critChance: 40 };
+
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 30), random: () => 0.09 })).toEqual({ damage: 2, critical: true });
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 30), random: () => 0.10 })).toEqual({ damage: 1, critical: false });
+    });
+
+    it('never crits on a roll when the resistance reaches the chance: 30 against 50 on a roll of 0', () => {
+        const attacker = { ...PLAYER, critChance: 30 };
+
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 50), random: always })).toEqual({ damage: 1, critical: false });
+    });
+
+    it('adds the chance past 100 as critical damage: 130 against 10 with a x2.5 critical deals 2.7', () => {
+        const attacker = { ...PLAYER, critChance: 130, critMultiplier: 2.5 };
+        const result = calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 10), random: never });
+
+        expect(result.damage).toBeCloseTo(2.7, 10);
+        expect(result.critical).toBe(true);
+    });
+
+    it('adds no overflow at exactly 100 after the resistance: 110 against 10 deals 2', () => {
+        const attacker = { ...PLAYER, critChance: 110 };
+
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 10), random: never }).damage).toBe(2);
+    });
+
+    it('adds 1 % for one point of overflow: 111 against 10 deals 2.01', () => {
+        const attacker = { ...PLAYER, critChance: 111 };
+
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 10), random: never }).damage).toBeCloseTo(2.01, 10);
+    });
+
+    it('clamps the chance at 100 and keeps the overflow: 250 against 100 deals 2.5', () => {
+        const attacker = { ...PLAYER, critChance: 250 };
+        const result = calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 100), random: never });
+
+        expect(result.damage).toBeCloseTo(2.5, 10);
+        expect(result.critical).toBe(true);
+    });
+
+    it('a forced critical keeps the overflow: 150 against 20 deals 2.3', () => {
+        const attacker = { ...PLAYER, critChance: 150 };
+
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 20), random: never, forceCritical: true }).damage).toBeCloseTo(2.3, 10);
+    });
+
+    it('reads a missing critical resistance as 0: 40 crits on a roll of 0.39', () => {
+        const attacker = { ...PLAYER, critChance: 40 };
+
+        expect(calculateDamage({ attacker, defender: { element: 'FIRE', defense: 0 }, random: () => 0.39 }).critical).toBe(true);
     });
 
     it('never crits a monster with critical resistance 100, not even on the lowest roll', () => {

@@ -5544,8 +5544,8 @@ describe('ClickerGame hero team', () => {
             expect(without.scene.monster.health).toBeCloseTo(1000 - 16.5, 9);
         });
 
-        it('Vex as an ally takes 15 points off the critical resistance 30 a skill hit meets: a roll of 8 crits (33), not without him (16.5)', async () => {
-            const monster = { element: 'FIRE', defense: 0, critResistance: 30 };
+        it('Vex as an ally takes 15 points off the critical resistance 5 a skill hit meets: a roll of 8 crits (33), not without him (16.5)', async () => {
+            const monster = { element: 'FIRE', defense: 0, critResistance: 5 };
             const withVex = await open([ 'vex', null, null, null ], { heroOptions: { stars: { kael: 1 } }, start: bigMonster(monster) });
 
             withVex.dice.value = 0.08;

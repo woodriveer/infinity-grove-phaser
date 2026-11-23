@@ -340,7 +340,7 @@ ADR `0015-talent-tree-rework.md` (same headings as 0014): Context (BOSS_TIME and
 
 ### Phase 3: Game combat rules
 
-#### T4: Subtractive critical chance and overflow in `calculateDamage` [ ]
+#### T4: Subtractive critical chance and overflow in `calculateDamage` [x]
 
 **Owner**: game-dev
 **Goal**: Every strike reads `E = clamp(C - R, 0, 100)` and a critical strike adds `max(0, C - R - 100) / 100` to its multiplier (TTR-05, TTR-06, TTR-07).
