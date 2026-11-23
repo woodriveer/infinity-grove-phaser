@@ -1536,7 +1536,7 @@ div.talent-screen                           testid talent-screen
 
 ---
 
-#### T21: e2e of the reworked combat [ ]
+#### T21: e2e of the reworked combat [x]
 
 **Owner**: test-engineer
 **Goal**: Boss damage, the critical rule, armor pierce, the chip, Fúria crescente and the attribute panel run in the browser (TTR-02, TTR-03, TTR-04, TTR-08, TTR-09, TTR-12, TTR-13, TTR-16).
@@ -1575,7 +1575,7 @@ div.talent-screen                           testid talent-screen
 **Gate**: `cd game && npx playwright test e2e/talentTreeReworkCombat.spec.js`
 **Done when**:
 
-- [ ] The 15 scenarios pass twice in a row with `--workers=1`.
+- [x] The 15 scenarios pass twice in a row with `--workers=1`.
 
 **Commit**: `test(game): cover boss damage, the critical rule and Fúria crescente in the browser`
 
