@@ -70,10 +70,10 @@ describe('talent grades', () => {
 });
 
 describe('renderTalents', () => {
-    it('shows four columns titled Tempo, Quebra de defesa, Poder do clique and Combo', () => {
+    it('shows four columns titled Caça aos chefes, Quebra de defesa, Poder do clique and Combo', () => {
         const screen = show();
 
-        expect([ ...screen.querySelectorAll('.talent-branch-title') ].map((node) => node.textContent)).toEqual([ 'Tempo', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
+        expect([ ...screen.querySelectorAll('.talent-branch-title') ].map((node) => node.textContent)).toEqual([ 'Caça aos chefes', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
     });
 
     it('puts the talents of each branch in its column: 2, 2, 4 and 1', () => {

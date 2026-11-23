@@ -57,7 +57,7 @@ export const addBonuses = (a, b) => ({
     bossDamage: (a.bossDamage ?? 0) + (b.bossDamage ?? 0)
 });
 
-export const BRANCH_TITLES = { TIME: 'Tempo', BREAK: 'Quebra de defesa', POWER: 'Poder do clique', COMBO: 'Combo' };
+export const BRANCH_TITLES = { TIME: 'Caça aos chefes', BREAK: 'Quebra de defesa', POWER: 'Poder do clique', COMBO: 'Combo' };
 export const BRANCHES = [ 'TIME', 'BREAK', 'POWER', 'COMBO' ];
 
 //  "+6 s", "-3 pontos", "+9%", "+3 pontos"; "nenhum" at level 0. A BREAK talent lowers a stat, so its points read as a reduction.
@@ -66,6 +66,12 @@ export const describeTalentEffect = ({ branch, unit, value }) =>
     if (value === 0)
     {
         return 'nenhum';
+    }
+
+    //  Fúria crescente (spec talent-tree-rework): the combo adds 1 % a click plus its value
+    if (unit === 'combo-step')
+    {
+        return `+${COMBO_STEP_PERCENT + value}% por clique`;
     }
 
     if (unit === '%')
@@ -89,16 +95,45 @@ export const describeTalentEffect = ({ branch, unit, value }) =>
 //  The file of the icon of a talent in assets (the names of PROMPTS_ASSETS_UI.md)
 const ICON_NAMES = {
     MINIBOSS_TIME: 'miniboss-time',
-    BOSS_TIME: 'boss-time',
+    BOSS_DAMAGE: 'boss-damage',
     PHYSICAL_BREAK: 'break-physical',
-    CRIT_RESIST_BREAK: 'break-crit',
+    ARMOR_PIERCE: 'armor-pierce',
     CLICK_DAMAGE: 'click-damage',
     CRIT_CHANCE: 'crit-chance',
     CRIT_DAMAGE: 'crit-damage',
     COMBO: 'combo',
-    CLICK_FLAT_DAMAGE: 'click-flat-damage'
+    CLICK_FLAT_DAMAGE: 'click-flat-damage',
+    COMBO_FURY: 'combo-fury'
 };
 
 //  Grade 1 keeps the plain file; grades 2 and 3 have their own file with the suffix `-g2` / `-g3`
 export const talentIconName = (talentId, grade = 1) =>
     `talent-${ICON_NAMES[talentId] ?? talentId.toLowerCase()}${grade > 1 ? `-g${grade}` : ''}`;
+
+//  "Dano de clique (%)" for grade 1 and a single talent, "Dano de clique (%) (Grau 2)" for grade 2
+export const talentFullName = (talent) => ((talent.grade ?? 1) > 1 ? `${talent.label} (Grau ${talent.grade})` : talent.label);
+
+//  Why a locked talent cannot be bought: a grade waits for the grade before, a single talent for its prerequisite (`talents` is the list)
+export const talentLockText = (talent, talents) =>
+{
+    const level = talent.requiredLevel ?? talent.maxLevel;
+
+    if ((talent.grade ?? 1) > 1)
+    {
+        return `Bloqueado: chegue ao nível ${level} do Grau ${talent.grade - 1}`;
+    }
+
+    const required = (talents ?? []).find((other) => other.id === talent.requiredId);
+
+    return required ? `Bloqueado: chegue ao nível ${level} de ${required.label}` : `Bloqueado: chegue ao nível ${level} do talento anterior`;
+};
+
+//  The opacity of the lit veins of `branch` (spec talent-tree-rework D17): 0 without a level, else 0.2 + 0.8 x levels / max levels, two decimals
+export const branchGlow = (talents, branch) =>
+{
+    const mine = (talents ?? []).filter((talent) => talent.branch === branch);
+    const levels = mine.reduce((sum, talent) => sum + talent.level, 0);
+    const max = mine.reduce((sum, talent) => sum + talent.maxLevel, 0);
+
+    return levels === 0 || max === 0 ? 0 : Math.round((0.2 + 0.8 * levels / max) * 100) / 100;
+};

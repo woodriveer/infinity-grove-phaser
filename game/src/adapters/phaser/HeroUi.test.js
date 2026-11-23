@@ -1243,7 +1243,7 @@ describe('HeroUi Talentos', () => {
 
         expect(ctx.query('.hero-title').textContent).toBe('Talentos');
         expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 3');
-        expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-branch-title') ]).map((node) => node.textContent)).toEqual([ 'Tempo', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
+        expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-branch-title') ]).map((node) => node.textContent)).toEqual([ 'Caça aos chefes', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
     });
 
     it('sends the upgrade with fromLevel 0, shows Nível 1/10 and Pontos de talento: 0', async () => {

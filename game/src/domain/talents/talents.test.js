@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { CHAPTER_BOSS, FARM, MINIBOSS, PHASE } from '../campaign/campaign';
 import {
-    addBonuses, BRANCH_TITLES, describeTalentEffect, monsterAfterBreak, talentAttackerBonus, talentComboCap, talentComboStep, talentIconName, talentTimeBonusMs, talentValue
+    addBonuses, BRANCH_TITLES, BRANCHES, branchGlow, describeTalentEffect, monsterAfterBreak, talentAttackerBonus, talentComboCap, talentComboStep, talentFullName, talentIconName,
+    talentLockText, talentTimeBonusMs, talentValue
 } from './talents';
 
 //  The tree as the backend answers it: value is level x perLevel
@@ -217,12 +218,29 @@ describe('describeTalentEffect', () => {
     it('reads the maximum of Dano de clique, 10 levels of 5 %, as +50%', () => {
         expect(describeTalentEffect({ branch: 'POWER', unit: '%', value: 50 })).toBe('+50%');
     });
+
+    it('reads Fúria crescente as +2% por clique at level 1 and +5% por clique at level 4', () => {
+        expect(describeTalentEffect({ branch: 'COMBO', unit: 'combo-step', value: 1 })).toBe('+2% por clique');
+        expect(describeTalentEffect({ branch: 'COMBO', unit: 'combo-step', value: 4 })).toBe('+5% por clique');
+        expect(describeTalentEffect({ branch: 'COMBO', unit: 'combo-step', value: 0 })).toBe('nenhum');
+    });
+
+    it('reads boss damage and armor pierce as percents: +20%', () => {
+        expect(describeTalentEffect({ branch: 'TIME', unit: '%', value: 20 })).toBe('+20%');
+        expect(describeTalentEffect({ branch: 'BREAK', unit: '%', value: 20 })).toBe('+20%');
+    });
 });
 
 describe('talentIconName and the branch titles', () => {
     it('names the 7 icons as the asset prompts do', () => {
-        expect([ 'MINIBOSS_TIME', 'BOSS_TIME', 'PHYSICAL_BREAK', 'CRIT_RESIST_BREAK', 'CLICK_DAMAGE', 'CRIT_CHANCE', 'CRIT_DAMAGE' ].map((id) => talentIconName(id))).toEqual([
-            'talent-miniboss-time', 'talent-boss-time', 'talent-break-physical', 'talent-break-crit', 'talent-click-damage', 'talent-crit-chance', 'talent-crit-damage'
+        expect([ 'MINIBOSS_TIME', 'BOSS_DAMAGE', 'PHYSICAL_BREAK', 'ARMOR_PIERCE', 'CLICK_DAMAGE', 'CRIT_CHANCE', 'CRIT_DAMAGE' ].map((id) => talentIconName(id))).toEqual([
+            'talent-miniboss-time', 'talent-boss-damage', 'talent-break-physical', 'talent-armor-pierce', 'talent-click-damage', 'talent-crit-chance', 'talent-crit-damage'
+        ]);
+    });
+
+    it('names the icons of boss damage, armor pierce and Fúria crescente and suffixes grades 2 and 3', () => {
+        expect([ talentIconName('BOSS_DAMAGE'), talentIconName('BOSS_DAMAGE', 2), talentIconName('ARMOR_PIERCE', 3), talentIconName('COMBO_FURY') ]).toEqual([
+            'talent-boss-damage', 'talent-boss-damage-g2', 'talent-armor-pierce-g3', 'talent-combo-fury'
         ]);
     });
 
@@ -232,8 +250,71 @@ describe('talentIconName and the branch titles', () => {
         ]);
     });
 
-    it('titles the four branches Tempo, Quebra de defesa, Poder do clique and Combo', () => {
-        expect(BRANCH_TITLES).toEqual({ TIME: 'Tempo', BREAK: 'Quebra de defesa', POWER: 'Poder do clique', COMBO: 'Combo' });
+    it('titles the four branches Caça aos chefes, Quebra de defesa, Poder do clique and Combo', () => {
+        expect(BRANCH_TITLES).toEqual({ TIME: 'Caça aos chefes', BREAK: 'Quebra de defesa', POWER: 'Poder do clique', COMBO: 'Combo' });
+    });
+});
+
+describe('talentFullName', () => {
+    it('adds the grade from grade 2', () => {
+        expect(talentFullName({ label: 'Dano de clique (%)', grade: 1 })).toBe('Dano de clique (%)');
+        expect(talentFullName({ label: 'Dano de clique (%)', grade: 2 })).toBe('Dano de clique (%) (Grau 2)');
+        expect(talentFullName({ label: 'Dano de clique (%)' })).toBe('Dano de clique (%)');
+    });
+});
+
+describe('talentLockText', () => {
+    it('of a grade names the grade before', () => {
+        expect(talentLockText({ grade: 2, requiredLevel: 10, maxLevel: 10 }, [])).toBe('Bloqueado: chegue ao nível 10 do Grau 1');
+        expect(talentLockText({ grade: 3, maxLevel: 10 }, [])).toBe('Bloqueado: chegue ao nível 10 do Grau 2');
+    });
+
+    it('of Fúria crescente names Limite de dano do combo', () => {
+        const fury = { id: 'COMBO_FURY', grade: 1, requiredId: 'COMBO', requiredLevel: 10, maxLevel: 4 };
+
+        expect(talentLockText(fury, [ { id: 'COMBO', label: 'Limite de dano do combo' } ])).toBe('Bloqueado: chegue ao nível 10 de Limite de dano do combo');
+        expect(talentLockText(fury, [])).toBe('Bloqueado: chegue ao nível 10 do talento anterior');
+    });
+});
+
+describe('branchGlow', () => {
+    const GRADED = [
+        [ 'MINIBOSS_TIME', 'TIME' ], [ 'BOSS_DAMAGE', 'TIME' ], [ 'PHYSICAL_BREAK', 'BREAK' ], [ 'ARMOR_PIERCE', 'BREAK' ], [ 'CLICK_DAMAGE', 'POWER' ],
+        [ 'CRIT_CHANCE', 'POWER' ], [ 'CRIT_DAMAGE', 'POWER' ], [ 'COMBO', 'COMBO' ], [ 'CLICK_FLAT_DAMAGE', 'POWER' ]
+    ];
+    //  The 28 talents of the backend contract with the levels given by id
+    const full = (levels = {}) => [
+        ...[ 1, 2, 3 ].flatMap((grade) => GRADED.map(([ baseId, branch ]) => {
+            const id = grade === 1 ? baseId : `${baseId}_G${grade}`;
+
+            return { id, baseId, grade, branch, level: levels[id] ?? 0, maxLevel: 10 };
+        })),
+        { id: 'COMBO_FURY', baseId: 'COMBO_FURY', grade: 1, branch: 'COMBO', level: levels.COMBO_FURY ?? 0, maxLevel: 4 }
+    ];
+
+    it('is 0 for a branch without a level', () => {
+        expect(BRANCHES.map((branch) => branchGlow(full(), branch))).toEqual([ 0, 0, 0, 0 ]);
+    });
+
+    it('of TIME with only MINIBOSS_TIME 5 is 0.27', () => {
+        expect(full().filter((talent) => talent.branch === 'TIME')).toHaveLength(6);
+        expect(branchGlow(full({ MINIBOSS_TIME: 5 }), 'TIME')).toBe(0.27);
+    });
+
+    it('of COMBO with only COMBO 10 is 0.44, 0.47 without Fúria crescente', () => {
+        const talents = full({ COMBO: 10 });
+
+        expect(branchGlow(talents, 'COMBO')).toBe(0.44);
+        expect(branchGlow(talents.filter((talent) => talent.id !== 'COMBO_FURY'), 'COMBO')).toBe(0.47);
+    });
+
+    it('of POWER is 0.21 with one level and 1 with its 12 talents at 10', () => {
+        const power = full().filter((talent) => talent.branch === 'POWER');
+        const maxed = Object.fromEntries(power.map((talent) => [ talent.id, 10 ]));
+
+        expect(power).toHaveLength(12);
+        expect(branchGlow(full({ CLICK_DAMAGE: 1 }), 'POWER')).toBe(0.21);
+        expect(branchGlow(full(maxed), 'POWER')).toBe(1);
     });
 });
 

@@ -670,7 +670,7 @@ export const addBonuses = (a, b) => ({
 
 ### Phase 4: Game talent data and texts
 
-#### T9: Talent titles, icons, texts and vein glow [ ]
+#### T9: Talent titles, icons, texts and vein glow [x]
 
 **Owner**: game-dev
 **Goal**: The pure texts and numbers the tree shows: branch titles, icon names, effect, full name, lock text and lit opacity (TTR-04, TTR-17, TTR-19, TTR-21, TTR-22).

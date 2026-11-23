@@ -234,7 +234,7 @@ Open questions: none beyond Q1 to Q12 above, each written into the spec with its
 | TTR-01 | P1 Boss: AC 1, AC 2 (catalog, 404) | Tasks | Implementing |
 | TTR-02 | P1 Boss: AC 3, AC 4, AC 5 (boss damage in combat) | Tasks | Implementing |
 | TTR-03 | P1 Boss: AC 6 (chapter boss time) | Tasks | Implementing |
-| TTR-04 | P1 Boss: AC 7, AC 8 (branch title, attribute panel) | Tasks | Pending |
+| TTR-04 | P1 Boss: AC 7, AC 8 (branch title, attribute panel) | Tasks | Implementing |
 | TTR-05 | P1 Critical: AC 1, AC 2, AC 3 (subtractive chance) | Tasks | Implementing |
 | TTR-06 | P1 Critical: AC 4, AC 5 (overflow, forced critical) | Tasks | Implementing |
 | TTR-07 | P1 Critical: AC 6, AC 7 (every strike kind) | Tasks | Implementing |
@@ -247,12 +247,12 @@ Open questions: none beyond Q1 to Q12 above, each written into the spec with its
 | TTR-14 | P2 Fúria: AC 1, AC 2, AC 3, AC 4 (catalog, lock, cost, bounds) | Tasks | Implementing |
 | TTR-15 | P2 Fúria: AC 5 (requiredId, requiredLevel) | Tasks | Implementing |
 | TTR-16 | P2 Fúria: AC 6, AC 7 (combo step, HUD) | Tasks | Implementing |
-| TTR-17 | P2 Fúria: AC 8, AC 9 (effect and lock texts) | Tasks | Pending |
+| TTR-17 | P2 Fúria: AC 8, AC 9 (effect and lock texts) | Tasks | Implementing |
 | TTR-18 | P2 Tree: AC 1 (window, plaques, medallion, reset, card) | Tasks | Pending |
-| TTR-19 | P2 Tree: AC 2, AC 3 (nodes, captions, badges) | Tasks | Pending |
+| TTR-19 | P2 Tree: AC 2, AC 3 (nodes, captions, badges) | Tasks | Implementing |
 | TTR-20 | P2 Tree: AC 4 (node states) | Tasks | Pending |
-| TTR-21 | P2 Tree: AC 5, AC 6, AC 7, AC 8, AC 9 (selection, detail card, upgrade) | Tasks | Pending |
-| TTR-22 | P2 Tree: AC 10, AC 11 (banners, lit veins) | Tasks | Pending |
+| TTR-21 | P2 Tree: AC 5, AC 6, AC 7, AC 8, AC 9 (selection, detail card, upgrade) | Tasks | Implementing |
+| TTR-22 | P2 Tree: AC 10, AC 11 (banners, lit veins) | Tasks | Implementing |
 | TTR-23 | P2 Tree: AC 12 (fallbacks) | Tasks | Pending |
 | TTR-24 | P2 Tree: AC 13 (narrow screens) | Tasks | Pending |
 | TTR-25 | P2 Tree: AC 14, AC 15, Edge Cases (missing talents, kept behaviours) | Tasks | Pending |
