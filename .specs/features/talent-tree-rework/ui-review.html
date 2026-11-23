@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Reformulação da árvore de talentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Reformulação da árvore de talentos</h1>
+                <div class="meta">
+                    <code>.specs/features/talent-tree-rework</code> · commits <code>até 8fae5cb</code> · 2026-11-23 · local (npm run dev, porta 5175, backend falso, arte talent-* roteada como ausente)
+                </div>
+            </div>
+            <span class="chip verdict changes">MUDANÇAS PEDIDAS</span>
+        </div>
+        <p style="margin-top:16px">A árvore sem arte (fallback) é coerente com o Grove, cabe na janela e não tem sobreposição entre nós, legendas e faixas; a linha "Seu crítico" e o painel de atributos estão corretos. Um defeito bloqueia: o estado "no máximo" some no ramo Poder do clique. Outros sete achados são médios e baixos. Reprovado só por esse ponto: corrigindo o #1 o fallback pode ser entregue como está, e o layout em % aceita a arte e a calibração quando o fundo chegar.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">13</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">26</div><div class="l">capturas (desktop + celular)</div></div>
+            <div class="stat"><div class="n">1</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">7</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Árvore em fallback: degradê, veias tracejadas do tronco até cada cadeia, 28 nós com anel e glifo, sem nó, legenda, chip ou selo sobreposto a outro (medido por script: 0 sobreposições nó-nó e legenda-legenda) <code>spec P2 Tree</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Quatro faixas de pergaminho livres da placa "Talentos" e dos nós de grau 3 (medido: 0 interseções) <code>design § Layout map</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Janela 1024×576 centralizada, placa 192×64, cartão de 380 px, medalhão embaixo à esquerda, Reiniciar embaixo à direita, Fechar no topo direito <code>spec P2 Tree</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Cartão: aberto, grau bloqueado, Fúria crescente bloqueada, nível 4, máximo e vazio; todo texto em português e dentro do pergaminho <code>spec P2 Tree, P2 Fúria</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Veias acesas a 0, 0,27, 0,44 e 1 (brilho na cor do ramo) <code>spec P2 Tree</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Linha do inimigo "Seu crítico: N%" no terceiro chip com ícone vermelho, uma linha, sem corte, abaixo do Lacaio 2 na luta com lacaios <code>TTR-23, TTR-24</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Painel de atributos do Equipamento sem os talentos aposentados; "Quebra de resistência a crítico" permanece pois vem do aliado Vex <code>spec P2 Attributes AC 7, AC 8</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Com arte presente o layout mantém as mesmas caixas (medalhão 56 px, Fechar 120×40, molduras nos 28 nós) <code>TTR-09</code></span></li>
+            <li class="no"><span class="mark">✗</span><span>Estados dos nós distinguíveis de relance <code>tarefa T23 item 2</code> — maxed e a cor do ramo Poder do clique se confundem (achado #1); aberto e disponível quase iguais (#7)</span></li>
+            <li class="no"><span class="mark">✗</span><span>Legendas legíveis e completas <code>spec P2 Tree</code> — uma legenda truncada (#3); texto do cartão ilegível no celular (#5, TD-010)</span></li>
+        </ul>
+    </section>
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>Talentos: árvore vazia (fallback, sem arte)</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/01-tree-empty-desktop.png" target="_blank"><img src="ui-review/01-tree-empty-desktop.png" alt="Árvore sem pontos" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Árvore sem pontos</span>
+                        <span class="d">Fundo em degradê, veias tracejadas, 28 nós com anel, 4 faixas, placa, medalhão, botão e cartão vazio. Nenhum 404 de arte quebra o layout.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #2</span><span class="chip sev-media">achado #3</span><span class="chip sev-baixa">achado #6</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/01-tree-empty-phone.png" target="_blank"><img src="ui-review/01-tree-empty-phone.png" alt="Árvore sem pontos" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Árvore sem pontos</span>
+                        <span class="d">Fundo em degradê, veias tracejadas, 28 nós com anel, 4 faixas, placa, medalhão, botão e cartão vazio. Nenhum 404 de arte quebra o layout.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #4</span><span class="chip sev-media">achado #5</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Talentos: estados dos nós e cartão de detalhe</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/02-states-open-selected-desktop.png" target="_blank"><img src="ui-review/02-states-open-selected-desktop.png" alt="Bloqueado, aberto, disponível, selecionado" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Bloqueado, aberto, disponível, selecionado</span>
+                        <span class="d">Chance de crítico (3/10) selecionado e com brilho; Dano de clique no máximo; graus bloqueados em cinza com cadeado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-alta">achado #1</span><span class="chip sev-baixa">achado #7</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/03-card-maxed-desktop.png" target="_blank"><img src="ui-review/03-card-maxed-desktop.png" alt="Cartão de talento no máximo" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão de talento no máximo</span>
+                        <span class="d">Dano de clique (%) 10/10: "Nível máximo" na tinta do ramo. O anel dourado do nó é igual ao do ramo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-alta">achado #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/04-card-open-grade2-desktop.png" target="_blank"><img src="ui-review/04-card-open-grade2-desktop.png" alt="Cartão de grau 2 aberto" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão de grau 2 aberto</span>
+                        <span class="d">Botão "Melhorar (2 pontos)" na tinta do ramo, texto cabe nos 380 px.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/05-card-locked-grade-desktop.png" target="_blank"><img src="ui-review/05-card-locked-grade-desktop.png" alt="Cartão de grau bloqueado" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão de grau bloqueado</span>
+                        <span class="d">Texto "Bloqueado: chegue ao nível 10 do Grau 1" sem botão.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/06-card-fury-locked-desktop.png" target="_blank"><img src="ui-review/06-card-fury-locked-desktop.png" alt="Fúria crescente bloqueada" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fúria crescente bloqueada</span>
+                        <span class="d">Nó grande com cadeado e texto de bloqueio em itálico.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/07-card-fury-level-4-desktop.png" target="_blank"><img src="ui-review/07-card-fury-level-4-desktop.png" alt="Fúria crescente no nível 4" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fúria crescente no nível 4</span>
+                        <span class="d">"Efeito: +5% por clique" e "Nível máximo" em roxo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/08-card-fury-available-desktop.png" target="_blank"><img src="ui-review/08-card-fury-available-desktop.png" alt="Fúria crescente disponível" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fúria crescente disponível</span>
+                        <span class="d">Com Combo 10 e pontos: brilho roxo e botão de 2 pontos.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/02-states-open-selected-phone.png" target="_blank"><img src="ui-review/02-states-open-selected-phone.png" alt="Bloqueado, aberto, disponível, selecionado" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Bloqueado, aberto, disponível, selecionado</span>
+                        <span class="d">Chance de crítico (3/10) selecionado e com brilho; Dano de clique no máximo; graus bloqueados em cinza com cadeado.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #4</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/03-card-maxed-phone.png" target="_blank"><img src="ui-review/03-card-maxed-phone.png" alt="Cartão de talento no máximo" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão de talento no máximo</span>
+                        <span class="d">Dano de clique (%) 10/10: "Nível máximo" na tinta do ramo. O anel dourado do nó é igual ao do ramo.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/04-card-open-grade2-phone.png" target="_blank"><img src="ui-review/04-card-open-grade2-phone.png" alt="Cartão de grau 2 aberto" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão de grau 2 aberto</span>
+                        <span class="d">Botão "Melhorar (2 pontos)" na tinta do ramo, texto cabe nos 380 px.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/05-card-locked-grade-phone.png" target="_blank"><img src="ui-review/05-card-locked-grade-phone.png" alt="Cartão de grau bloqueado" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão de grau bloqueado</span>
+                        <span class="d">Texto "Bloqueado: chegue ao nível 10 do Grau 1" sem botão.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/06-card-fury-locked-phone.png" target="_blank"><img src="ui-review/06-card-fury-locked-phone.png" alt="Fúria crescente bloqueada" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fúria crescente bloqueada</span>
+                        <span class="d">Nó grande com cadeado e texto de bloqueio em itálico.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #4</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/07-card-fury-level-4-phone.png" target="_blank"><img src="ui-review/07-card-fury-level-4-phone.png" alt="Fúria crescente no nível 4" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fúria crescente no nível 4</span>
+                        <span class="d">"Efeito: +5% por clique" e "Nível máximo" em roxo.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #4</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/08-card-fury-available-phone.png" target="_blank"><img src="ui-review/08-card-fury-available-phone.png" alt="Fúria crescente disponível" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fúria crescente disponível</span>
+                        <span class="d">Com Combo 10 e pontos: brilho roxo e botão de 2 pontos.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Talentos: veias acesas</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/09-veins-0-27-44-100-desktop.png" target="_blank"><img src="ui-review/09-veins-0-27-44-100-desktop.png" alt="Veias a 0, 0,27, 0,44 e 1" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Veias a 0, 0,27, 0,44 e 1</span>
+                        <span class="d">Quebra de defesa apagado, Caça aos chefes 0,27, Combo 0,44 e Poder do clique 1: o brilho da cor do ramo cresce.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-alta">achado #1</span><span class="chip sev-baixa">achado #6</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/09-veins-0-27-44-100-phone.png" target="_blank"><img src="ui-review/09-veins-0-27-44-100-phone.png" alt="Veias a 0, 0,27, 0,44 e 1" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Veias a 0, 0,27, 0,44 e 1</span>
+                        <span class="d">Quebra de defesa apagado, Caça aos chefes 0,27, Combo 0,44 e Poder do clique 1: o brilho da cor do ramo cresce.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Talentos: com arte (placeholder de 1 px)</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/10-art-present-placeholder-desktop.png" target="_blank"><img src="ui-review/10-art-present-placeholder-desktop.png" alt="Arte presente" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Arte presente</span>
+                        <span class="d">Com arte esticada, molduras, medalhão, botões e placa ocupam as mesmas caixas do fallback; sem sobreposição nova.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/10-art-present-placeholder-phone.png" target="_blank"><img src="ui-review/10-art-present-placeholder-phone.png" alt="Arte presente" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Arte presente</span>
+                        <span class="d">Com arte esticada, molduras, medalhão, botões e placa ocupam as mesmas caixas do fallback; sem sobreposição nova.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Combate: linha do inimigo "Seu crítico"</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/11-chip-miniboss-desktop.png" target="_blank"><img src="ui-review/11-chip-miniboss-desktop.png" alt="Miniboss" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Miniboss</span>
+                        <span class="d">"Seu crítico: 0%" no terceiro chip, ícone vermelho, uma linha, ao lado de "Defesa 80%".</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #8</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/12-chip-adds-desktop.png" target="_blank"><img src="ui-review/12-chip-adds-desktop.png" alt="Miniboss com lacaios" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Miniboss com lacaios</span>
+                        <span class="d">A linha começa abaixo do Lacaio 2 (y 566 contra fim da caixa em 565), sem corte.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #8</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/11-chip-miniboss-phone.png" target="_blank"><img src="ui-review/11-chip-miniboss-phone.png" alt="Miniboss" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Miniboss</span>
+                        <span class="d">"Seu crítico: 0%" no terceiro chip, ícone vermelho, uma linha, ao lado de "Defesa 80%".</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #8</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/12-chip-adds-phone.png" target="_blank"><img src="ui-review/12-chip-adds-phone.png" alt="Miniboss com lacaios" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Miniboss com lacaios</span>
+                        <span class="d">A linha começa abaixo do Lacaio 2 (y 566 contra fim da caixa em 565), sem corte.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">achado #8</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Equipamento: painel de atributos</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/13-equipment-attributes-desktop.png" target="_blank"><img src="ui-review/13-equipment-attributes-desktop.png" alt="Painel sem os talentos aposentados" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Painel sem os talentos aposentados</span>
+                        <span class="d">Linhas: Dano em chefes, Perfuração de armadura, Tempo extra de chefe e Quebra de resistência a crítico (esta vem do aliado Vex, como a spec pede).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/13-equipment-attributes-phone.png" target="_blank"><img src="ui-review/13-equipment-attributes-phone.png" alt="Painel sem os talentos aposentados" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Painel sem os talentos aposentados</span>
+                        <span class="d">Linhas: Dano em chefes, Perfuração de armadura, Tempo extra de chefe e Quebra de resistência a crítico (esta vem do aliado Vex, como a spec pede).</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+    <section class="panel">
+        <h2>Achados</h2>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-alta">#1 · Alta</span><strong>O estado "no máximo" some no ramo Poder do clique</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (desktop)</dd>
+                    <dt>O que está errado</dt><dd>O anel dourado de "no máximo" (#E0B45A) é quase a cor do ramo Poder do clique (#C99A1F). Com os 12 nós do ramo no 10/10 não se vê diferença entre nó no máximo e nó comum; só o texto 10/10 dourado de 11 px conta. A tarefa pede que locked, open, available, maxed e selected se distingam de relance.</dd>
+                    <dt>Como deveria ficar</dt><dd>O máximo deve ler diferente em todos os ramos: por exemplo um anel duplo (dourado por fora, tinta do ramo por dentro) ou um selo/estrela no canto, que não dependa da cor do ramo.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (regra .talent-node[data-state="maxed"] e variável do ramo POWER)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/03-card-maxed-desktop.png" target="_blank"><img src="ui-review/03-card-maxed-desktop.png" alt="Captura do achado #1"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#2 · Média</span><strong>O cadeado cobre o contador 0/10 dos nós bloqueados</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (desktop e celular)</dd>
+                    <dt>O que está errado</dt><dd>Em todo grau 2 e 3 bloqueado o selo de cadeado se sobrepõe à borda direita da pílula "0/10" e ao anel do nó (21 nós). No celular, com zoom 2x, o cadeado encosta no "0/10" e aperta o contador.</dd>
+                    <dt>Como deveria ficar</dt><dd>O cadeado fica fora da pílula e do anel (por exemplo canto superior esquerdo, onde o selo de grau III/II não está) ou substitui o contador; nada sobreposto.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (.talent-node-lock, .talent-node-level)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/01-tree-empty-desktop.png" target="_blank"><img src="ui-review/01-tree-empty-desktop.png" alt="Captura do achado #2"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#3 · Média</span><strong>Legenda "Limite de dano do..." cortada com reticências</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (desktop)</dd>
+                    <dt>O que está errado</dt><dd>A legenda do nó de grau 1 do ramo Combo termina em "dano do..." porque o nome completo, "Limite de dano do combo", não cabe em duas linhas de 12 px. O jogador não lê o nome sem clicar.</dd>
+                    <dt>Como deveria ficar</dt><dd>A legenda mostra o nome inteiro (três linhas, ou nome curto "Limite do combo" no catálogo da árvore). O cartão de detalhe já mostra o nome completo.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (.talent-node-caption, largura/line-clamp) ou o rótulo em game/src/adapters/phaser/views/talentsView.js</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/02-states-open-selected-desktop.png" target="_blank"><img src="ui-review/02-states-open-selected-desktop.png" alt="Captura do achado #3"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#4 · Média</span><strong>No celular, o cartão fixo e o botão Reiniciar tapam nós e legendas</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (celular)</dd>
+                    <dt>O que está errado</dt><dd>Com o zoom 2x, o cartão de detalhe e o botão "Reiniciar pontos" ficam fixos sobre a árvore. Ao selecionar Fúria crescente (parte baixa) o nó fica por baixo do cartão, o mesmo cartão que descreve o nó selecionado; "Reiniciar pontos" cobre a legenda "Limite de dano do...". A placa "Talentos" e "Fechar" também cobrem nós da fileira do grau III.</dd>
+                    <dt>Como deveria ficar</dt><dd>Ao selecionar um nó, rolar a árvore para que ele fique acima do cartão (área livre acima de y do cartão), ou reservar uma faixa inferior fora da área rolável.</dd>
+                    <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/talentsView.js (seleção) e game/public/style.css (.talent-tree-scroll, padding inferior)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/07-card-fury-level-4-phone.png" target="_blank"><img src="ui-review/07-card-fury-level-4-phone.png" alt="Captura do achado #4"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#5 · Média</span><strong>No celular o texto do cartão fica com cerca de 5 px na tela</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (celular)</dd>
+                    <dt>O que está errado</dt><dd>A janela de 1024 px é reduzida a 390 px (escala 0,38). O texto do cartão (14 px e 12 px) vira cerca de 5 px; a legenda de 12 px com zoom 2x vira cerca de 9 px, a pílula "Pontos de talento" e "Reiniciar pontos" cerca de 5 px. Ilegível sem ampliar. É o mesmo problema dos demais painéis (TD-010), que continua do dono; aqui o cartão é a única fonte de efeito e custo.</dd>
+                    <dt>Como deveria ficar</dt><dd>Cartão e plaquetas fixas dentro da área com zoom (ou com fonte compensada pela escala) para chegar a pelo menos 9 px na tela. A decisão fica com o dono (TD-010).</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (.talent-detail, .talent-pill) · TD-010</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/01-tree-empty-phone.png" target="_blank"><img src="ui-review/01-tree-empty-phone.png" alt="Captura do achado #5"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#6 · Baixa</span><strong>As veias tracejadas cruzam as legendas dos nós de grau 1</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (desktop)</dd>
+                    <dt>O que está errado</dt><dd>As linhas do tronco passam por trás de "Dano de clique (%)", "Dano direto de clique" e "Perfuração de armadura", e as veias do fallback são cinzas, só o brilho é da cor do ramo. A legenda perde contraste nos cruzamentos.</dd>
+                    <dt>Como deveria ficar</dt><dd>Veias terminam na base do anel, não na legenda, ou a legenda ganha sombra de texto escura; opcionalmente a veia na cor do ramo. Com a arte pintada isto muda, então só vale se o fallback seguir em uso.</dd>
+                    <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/talentsView.js (caminhos das veias) e game/public/style.css (.talent-node-caption)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/09-veins-0-27-44-100-desktop.png" target="_blank"><img src="ui-review/09-veins-0-27-44-100-desktop.png" alt="Captura do achado #6"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#7 · Baixa</span><strong>Nó aberto e nó disponível quase iguais</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (desktop)</dd>
+                    <dt>O que está errado</dt><dd>Um nó aberto (sem pontos para comprar) e um disponível (comprável) diferem só por um halo de 3 px da cor do ramo; em Poder do clique o halo se confunde com o anel dourado.</dd>
+                    <dt>Como deveria ficar</dt><dd>O disponível ganha um sinal além do halo (por exemplo o mesmo "+" ou pulso lento) para o jogador achar o que pode comprar agora.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (.talent-node[data-state="available"])</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/02-states-open-selected-desktop.png" target="_blank"><img src="ui-review/02-states-open-selected-desktop.png" alt="Captura do achado #7"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#8 · Baixa</span><strong>Chip do elemento em inglês ("Fire") na linha do inimigo</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Combate (desktop e celular)</dd>
+                    <dt>O que está errado</dt><dd>O primeiro chip da linha lê "Fire" em inglês, ao lado de "Defesa 80%" e "Seu crítico: 0%". Não nasceu nesta feature (chip de elemento da linha do inimigo), mas é texto para o jogador contra o AD-007.</dd>
+                    <dt>Como deveria ficar</dt><dd>Usar o nome do elemento em português ("Fogo", "Água", "Natureza", "Luz", "Escuridão"), igual ao painel Elementos.</dd>
+                    <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/ClickerGame.js (montagem da linha do inimigo, perto da linha 1050)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/12-chip-adds-desktop.png" target="_blank"><img src="ui-review/12-chip-adds-desktop.png" alt="Captura do achado #8"></a>
+        </article>
+    </section>
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>Sem a arte, o jogador abre a árvore com cerca de 45 erros 404 no console (um por arquivo talent-*). O fallback funciona, mas um aviso por arquivo polui a depuração; vale um único log quando o fundo falhar.</span></li>
+            <li><span class="mark">✦</span><span>No fallback a região central entre as faixas Quebra de defesa e Poder do clique fica vazia; o brilho do ramo ajuda, mas a arte pintada deve ocupá-la. Recalibrar as coordenadas dos nós quando o fundo gerado chegar (os nós a 55% e 46% do quadro estão em %, o que facilita).</span></li>
+            <li><span class="mark">✦</span><span>O botão Reiniciar pontos desabilitado fica muito apagado (contraste baixo); aceitável por estar desabilitado, mas um traço de borda mais claro o deixaria visível sobre o fundo escuro.</span></li>
+        </ul>
+    </section>
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <ul class="checks">
+            <li class="no"><span class="mark">✗</span><span><code>http 404: /assets/talent-*.png|jpg (cerca de 45 arquivos: fundo, fundo aceso, faixa, moldura, placa, medalhão, botões, cadeado e 28 ícones)</code> — esperado: a arte pintada ainda não existe e a árvore usa os fallbacks; cada arquivo gera também um console.error "Failed to load resource".</span></li>
+            <li class="yes"><span class="mark">✓</span><span>Nenhum pageerror nem outro erro de console nas telas revisadas.</span></li>
+        </ul>
+    </section>
+    <footer>Revisão do ui-artist · 2026-11-23</footer>
+</main>
+</body>
+</html>
