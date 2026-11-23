@@ -187,9 +187,30 @@ test.describe('Talentos tree: nodes', () => {
         await openTalents(page);
 
         await expect(page.getByTestId('talent-CLICK_DAMAGE')).toHaveAttribute('data-state', 'maxed');
-        await expect(page.getByTestId('talent-CLICK_DAMAGE')).toHaveCSS('box-shadow', 'rgb(224, 180, 90) 0px 0px 0px 3px');
+        await expect(page.getByTestId('talent-CLICK_DAMAGE')).toHaveCSS('box-shadow', 'rgb(28, 18, 12) 0px 0px 0px 2px, rgb(243, 213, 138) 0px 0px 0px 5px');
         await expect(page.getByTestId('talent-node-level-CLICK_DAMAGE')).toHaveText('10/10');
         await expect(page.getByTestId('talent-node-level-CLICK_DAMAGE')).toHaveCSS('color', 'rgb(224, 180, 90)');
+    });
+
+    test('marks a maxed node of every branch with the double ring and the star seal, never in the branch colour', async ({ page }) => {
+        const maxed = { MINIBOSS_TIME: 10, PHYSICAL_BREAK: 10, CLICK_DAMAGE: 10, COMBO: 10 };
+
+        await startGame(page, { art: 'present', talents: maxed });
+        await openTalents(page);
+
+        for (const id of Object.keys(maxed))
+        {
+            const node = page.getByTestId(`talent-${id}`);
+
+            await expect(node).toHaveAttribute('data-state', 'maxed');
+            await expect(node).toHaveCSS('box-shadow', 'rgb(28, 18, 12) 0px 0px 0px 2px, rgb(243, 213, 138) 0px 0px 0px 5px');
+            expect(await node.evaluate((element) => getComputedStyle(element, '::after').content)).toBe('"★"');
+            expect(await node.evaluate((element) => getComputedStyle(element, '::after').backgroundColor)).toBe('rgb(243, 213, 138)');
+        }
+
+        //  A node that is not maxed carries no star
+        await expect(page.getByTestId('talent-CLICK_DAMAGE_G2')).toHaveCSS('box-shadow', 'none');
+        expect(await page.getByTestId('talent-CLICK_DAMAGE_G2').evaluate((element) => getComputedStyle(element, '::after').content)).toBe('none');
     });
 
     test('marks an available node with the branch glow and an open one without it', async ({ page }) => {

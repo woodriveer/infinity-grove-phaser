@@ -1758,7 +1758,7 @@ div.talent-screen                           testid talent-screen
 
 Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇAS PEDIDAS). Out of scope: finding 5 (tiny phone text, the owner's debt TD-010) and finding 8 (the element name in English, not born in this feature). Every task runs after the review (T23) and edits the same stylesheet, so they run in order.
 
-#### T25: make the maxed node read distinctly in every branch [ ]
+#### T25: make the maxed node read distinctly in every branch [x]
 
 **Owner**: game-dev
 **Goal**: A maxed node tells apart from an open or available one in all four branches without relying on the branch colour (TTR-20; ui-review finding 1, high).
@@ -1774,7 +1774,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 **Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
 **Done when**:
 
-- [ ] A maxed node of every branch shows the double ring and the star seal, none of them in the branch colour.
+- [x] A maxed node of every branch shows the double ring and the star seal, none of them in the branch colour.
 
 **Commit**: `fix(game): make the maxed talent node distinct in every branch`
 

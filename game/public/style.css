@@ -2406,9 +2406,12 @@ button.bag-card:hover:not(:disabled) {
 .talent-node .talent-node-lock { position: absolute; right: -2px; bottom: -2px; width: 24px; height: 24px; font-size: 14px; }
 .talent-node[data-state="locked"] .talent-node-icon { filter: grayscale(1) brightness(0.55); }
 .talent-node[data-state="available"] { box-shadow: 0 0 0 3px var(--branch), 0 0 16px 6px var(--branch); }
-.talent-node[data-state="maxed"] { box-shadow: 0 0 0 3px var(--gold-400); }
+.talent-node[data-state="maxed"] { box-shadow: 0 0 0 2px var(--wood-900), 0 0 0 5px var(--gold-200); }
 .talent-node.no-frame[data-state="available"] { box-shadow: inset 0 0 0 4px var(--branch), 0 0 0 3px var(--branch), 0 0 16px 6px var(--branch); }
-.talent-node.no-frame[data-state="maxed"] { box-shadow: inset 0 0 0 4px var(--branch), 0 0 0 3px var(--gold-400); }
+.talent-node.no-frame[data-state="maxed"] { box-shadow: inset 0 0 0 4px var(--branch), 0 0 0 2px var(--wood-900), 0 0 0 5px var(--gold-200); }
+.talent-node[data-state="maxed"][aria-pressed="true"] { outline-offset: 8px; }
+/* A seal in the top left corner says the state without the branch colour: a gold star when maxed (the lock takes the same corner when locked) */
+.talent-node[data-state="maxed"]::after { content: "★"; position: absolute; top: -8px; left: -8px; display: grid; place-items: center; box-sizing: border-box; width: 22px; height: 22px; font-size: 13px; line-height: 1; color: var(--wood-900); background: var(--gold-200); border: 2px solid var(--wood-900); border-radius: 50%; pointer-events: none; }
 .talent-node[aria-pressed="true"] { outline: 3px solid var(--parchment-100); outline-offset: 4px; }
 .talent-node:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
 .talent-node-level { position: absolute; top: calc(100% - 8px); left: 50%; padding: 0 7px; font-family: var(--font-heading); font-size: 11px; font-weight: 700; line-height: 14px; color: var(--parchment-100); white-space: nowrap; background: rgb(28 18 12 / 0.85); border: 1px solid var(--bronze-500); border-radius: 999px; transform: translateX(-50%); pointer-events: none; }
