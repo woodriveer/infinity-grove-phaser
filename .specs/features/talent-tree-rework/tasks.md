@@ -1483,7 +1483,7 @@ div.talent-screen                           testid talent-screen
 
 ---
 
-#### T20: e2e of the painted tree [ ]
+#### T20: e2e of the painted tree [x]
 
 **Owner**: test-engineer
 **Goal**: Every player-visible rule of the tree runs in the browser (TTR-04, TTR-17 to TTR-25).
@@ -1530,7 +1530,7 @@ div.talent-screen                           testid talent-screen
 **Gate**: `cd game && npx playwright test e2e/talentTreeRework.spec.js`
 **Done when**:
 
-- [ ] The 23 scenarios pass twice in a row with `--workers=1`.
+- [x] The 23 scenarios pass twice in a row with `--workers=1`.
 
 **Commit**: `test(game): cover the painted talent tree in the browser`
 
