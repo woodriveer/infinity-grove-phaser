@@ -1802,7 +1802,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 
 ---
 
-#### T27: show the full name of the grade 1 caption [ ]
+#### T27: show the full name of the grade 1 caption [x]
 
 **Owner**: game-dev
 **Goal**: No grade 1 caption ends in an ellipsis: "Limite de dano do combo" reads whole (TTR-19; ui-review finding 3). The card keeps the full name.
@@ -1818,7 +1818,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 **Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
 **Done when**:
 
-- [ ] All 10 captions show their whole text on the desktop without overlap.
+- [x] All 10 captions show their whole text on the desktop without overlap.
 
 **Commit**: `fix(game): show the whole talent caption`
 

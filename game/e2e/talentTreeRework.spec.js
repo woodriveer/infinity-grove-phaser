@@ -158,6 +158,34 @@ test.describe('Talentos tree: nodes', () => {
         await expect(page.locator('.talent-node-grade')).toHaveCount(18);
     });
 
+    test('no caption is clipped and none touches another part of the board', async ({ page }) => {
+        await startGame(page, { art: 'missing' });
+        await openTalents(page);
+
+        const report = await page.evaluate(() => {
+            const rect = (node) => node.getBoundingClientRect();
+            const touching = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+            const others = [ ...document.querySelectorAll('[data-testid="talent-points"], [data-testid="talent-reset"], [data-testid="talent-detail"], [data-testid="talent-title"]') ];
+
+            return [ ...document.querySelectorAll('.talent-node-caption') ].map((caption) => {
+                const own = caption.closest('.talent-node');
+                const box = rect(caption);
+                const hit = [
+                    ...[ ...document.querySelectorAll('.talent-node-caption') ].filter((other) => other !== caption),
+                    ...[ ...document.querySelectorAll('.talent-node') ].filter((node) => node !== own),
+                    ...others
+                ].filter((other) => touching(box, rect(other))).map((other) => other.dataset.testid ?? other.className);
+
+                return { id: own.dataset.testid, text: caption.textContent, clipped: caption.scrollHeight > caption.clientHeight, hit };
+            });
+        });
+
+        expect(report).toHaveLength(10);
+        expect(report.filter(({ clipped }) => clipped)).toEqual([]);
+        expect(report.filter(({ hit }) => hit.length > 0)).toEqual([]);
+        expect(report.find(({ id }) => id === 'talent-COMBO').text).toBe('Limite de dano do combo');
+    });
+
     test('names each node with a title and an aria-label', async ({ page }) => {
         await startGame(page, { art: 'missing', talents: { CLICK_DAMAGE: 3 } });
         await openTalents(page);
