@@ -1868,7 +1868,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 
 ---
 
-#### T30: tell an available node from an open one [ ]
+#### T30: tell an available node from an open one [x]
 
 **Owner**: game-dev
 **Goal**: A node the player can buy now differs from an open node by more than a halo (TTR-20; ui-review finding 7).
@@ -1884,7 +1884,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 **Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
 **Done when**:
 
-- [ ] Available, open, locked and maxed nodes tell apart by shape as well as colour.
+- [x] Available, open, locked and maxed nodes tell apart by shape as well as colour.
 
 **Commit**: `fix(game): mark the available talent node with a plus seal`
 

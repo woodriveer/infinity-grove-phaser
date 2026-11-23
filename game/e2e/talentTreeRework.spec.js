@@ -289,6 +289,42 @@ test.describe('Talentos tree: nodes', () => {
     });
 });
 
+test.describe('Talentos tree: node states by shape', () => {
+    test('an available node carries the plus seal and a pulsing halo; open, locked and maxed nodes carry neither', async ({ page }) => {
+        //  CLICK_DAMAGE at its maximum opens grade 2 (2 points, 1 in the purse: open) and CRIT_CHANCE (1 point: available)
+        await startGame(page, { art: 'present', talents: { CLICK_DAMAGE: 10 }, points: 1 });
+        await openTalents(page);
+
+        const seal = (id) => page.getByTestId(`talent-${id}`).evaluate((node) => getComputedStyle(node, '::after').content);
+        const animation = (id) => page.getByTestId(`talent-${id}`).evaluate((node) => getComputedStyle(node).animationName);
+
+        await expect(page.getByTestId('talent-CRIT_CHANCE')).toHaveAttribute('data-state', 'available');
+        expect(await seal('CRIT_CHANCE')).toBe('"+"');
+        expect(await animation('CRIT_CHANCE')).toBe('talent-available-pulse');
+        await expect(page.getByTestId('talent-CRIT_CHANCE')).toHaveCSS('animation-duration', '1.6s');
+
+        await expect(page.getByTestId('talent-CLICK_DAMAGE_G2')).toHaveAttribute('data-state', 'open');
+        expect(await seal('CLICK_DAMAGE_G2')).toBe('none');
+        expect(await animation('CLICK_DAMAGE_G2')).toBe('none');
+        expect(await seal('CLICK_DAMAGE_G3')).toBe('none');
+        expect(await seal('CLICK_DAMAGE')).toBe('"★"');
+        expect(await animation('CLICK_DAMAGE')).toBe('none');
+    });
+
+    test('with the art missing the available node pulses its inset ring too, and the pulse stops for a player who asks for less motion', async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await startGame(page, { art: 'missing', points: 1 });
+        await openTalents(page);
+
+        await expect(page.getByTestId('talent-CLICK_DAMAGE')).toHaveAttribute('data-state', 'available');
+        await expect(page.getByTestId('talent-CLICK_DAMAGE')).toHaveCSS('animation-name', 'none');
+        expect(await page.getByTestId('talent-CLICK_DAMAGE').evaluate((node) => getComputedStyle(node, '::after').content)).toBe('"+"');
+
+        await page.emulateMedia({ reducedMotion: 'no-preference' });
+        await expect(page.getByTestId('talent-CLICK_DAMAGE')).toHaveCSS('animation-name', 'talent-available-pulse-inset');
+    });
+});
+
 test.describe('Talentos tree: the detail card', () => {
     test('selecting a node sends no request and outlines it', async ({ page }) => {
         await startGame(page, { art: 'missing' });
