@@ -70,8 +70,9 @@ test.describe('Talentos screen', () => {
         await page.getByTestId('hud-talents').click();
 
         await expect(page.locator('.hero-title')).toHaveText('Talentos');
-        await expect(page.locator('.talent-branch-title')).toHaveText([ 'Tempo', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
+        await expect(page.locator('.talent-branch-title')).toHaveText([ 'Caça aos chefes', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
         await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 1');
+        await page.getByTestId('talent-CLICK_DAMAGE').click();
         await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveText('Efeito: nenhum');
         await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toHaveText('Melhorar (1 ponto)');
 
@@ -94,7 +95,9 @@ test.describe('Talentos screen', () => {
         await page.getByTestId('hud-talents').click();
 
         await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 0');
+        await page.getByTestId('talent-CLICK_DAMAGE').click();
         await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toBeDisabled();
+        await page.getByTestId('talent-COMBO').click();
         await expect(page.getByTestId('talent-upgrade-COMBO')).toBeDisabled();
     });
 
@@ -102,6 +105,7 @@ test.describe('Talentos screen', () => {
         await startGame(page, { talents: { yan: { CLICK_DAMAGE: 10 } } });
 
         await page.getByTestId('hud-talents').click();
+        await page.getByTestId('talent-CLICK_DAMAGE').click();
 
         await expect(page.getByTestId('talent-max-CLICK_DAMAGE')).toHaveText('Nível máximo');
         await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveText('Efeito: +50%');
@@ -179,6 +183,7 @@ test.describe('Talent points and the combo talent', () => {
 
         await page.getByTestId('hud-talents').click();
         await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 2');
+        await page.getByTestId('talent-COMBO').click();
         await page.getByTestId('talent-upgrade-COMBO').click();
 
         await expect(page.getByTestId('talent-level-COMBO')).toHaveText('Nível 1/10');
@@ -190,7 +195,9 @@ test.describe('Talent points and the combo talent', () => {
         await startGame(page, { talents: { yan: { COMBO: 10 } }, talentPoints: { yan: 5 } });
 
         await page.getByTestId('hud-talents').click();
+        await page.getByTestId('talent-CLICK_DAMAGE_G2').click();
         await expect(page.getByTestId('talent-locked-CLICK_DAMAGE_G2')).toBeVisible();
+        await page.getByTestId('talent-COMBO_G2').click();
         await expect(page.getByTestId('talent-upgrade-COMBO_G2')).toHaveText('Melhorar (2 pontos)');
         await page.getByTestId('talent-upgrade-COMBO_G2').click();
 
@@ -204,13 +211,16 @@ test.describe('Talent points and the combo talent', () => {
 
         await page.getByTestId('hud-talents').click();
         await expect(page.getByTestId('talent-reset')).toBeDisabled();
+        await page.getByTestId('talent-COMBO').click();
         await page.getByTestId('talent-upgrade-COMBO').click();
+        await expect(page.getByTestId('talent-level-COMBO')).toHaveText('Nível 1/10');
         await page.getByTestId('talent-upgrade-COMBO').click();
         await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 0');
 
         await page.getByTestId('talent-reset').click();
 
         await expect(page.getByTestId('talent-level-COMBO')).toHaveText('Nível 0/10');
+        await expect(page.getByTestId('talent-node-level-COMBO')).toHaveText('0/10');
         await expect(page.getByTestId('talent-points')).toHaveText('Pontos de talento: 2');
         await expect(page.getByTestId('talent-reset')).toBeDisabled();
     });

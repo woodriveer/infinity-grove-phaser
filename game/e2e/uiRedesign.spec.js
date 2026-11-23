@@ -604,11 +604,11 @@ test.describe('Grove theme', () => {
         await page.getByTestId('fusion-button-kael-1').click();
         await check(page.locator('.hero-error'), page.locator('.hero-error'), 'rgb(244, 230, 200)', 'rgb(138, 53, 16)');
 
-        //  Talents: row 13, the effect line on its light card
+        //  Talents: row 13, the effect line on the light detail card of a selected node
         await page.getByTestId('hero-close').click();
         await openScreen(page, 'talents');
-        const talentCard = page.locator('.talent-card').first();
-        await check(talentCard.locator('.talent-effect').first(), talentCard, 'rgb(87, 75, 62)', 'rgb(244, 230, 200)');
+        await page.getByTestId('talent-CLICK_DAMAGE').click();
+        await check(page.getByTestId('talent-effect-CLICK_DAMAGE'), page.getByTestId('talent-detail'), 'rgb(87, 75, 62)', 'rgb(244, 230, 200)');
 
         expect(rows).toHaveLength(10);
     });
@@ -1558,9 +1558,10 @@ test.describe('Grove theme', () => {
         await expectStyle(page.locator('.leader-entry:not(.is-current)').first(), INSET);
         await page.getByTestId('hero-close').click();
 
-        //  Talents: a talent column
+        //  Talentos: the detail card is light parchment since talent-tree-rework, not inset
         await openScreen(page, 'talents');
-        await expectStyle(page.locator('.talent-column').first(), INSET);
+        await page.getByTestId('talent-CLICK_DAMAGE').click();
+        await expectStyle(page.getByTestId('talent-detail'), { 'background-color': 'rgb(244, 230, 200)' });
         await page.getByTestId('hero-close').click();
 
         //  Equipment: a hero block, then the bulk sale bar
@@ -1740,15 +1741,17 @@ test.describe('Grove theme', () => {
         expect(await page.getByTestId('skill-slot-1').locator('img').evaluate((node) => [ node.offsetWidth, node.offsetHeight ])).toEqual([ 150, 62 ]);
     });
 
-    test('draws talent cards on light parchment', async ({ page }) => {
+    test('draws the talent detail card on light parchment', async ({ page }) => {
         await startAs(page, {});
         await openScreen(page, 'talents');
+        await page.getByTestId('talent-CLICK_DAMAGE').click();
 
-        await expectStyle(page.locator('.talent-card').first(), { 'background-color': 'rgb(244, 230, 200)' });
+        await expectStyle(page.getByTestId('talent-detail'), { 'background-color': 'rgb(244, 230, 200)' });
     });
 
-    test('draws the talent buttons, titles and max marks in the dark branch ink', async ({ page }) => {
+    test('draws the talent card buttons and max mark in the dark branch ink', async ({ page }) => {
         const inks = { TIME: 'rgb(36, 93, 100)', BREAK: 'rgb(149, 55, 36)', POWER: 'rgb(108, 83, 17)', COMBO: 'rgb(106, 49, 197)' };
+        const nodes = { TIME: 'MINIBOSS_TIME', BREAK: 'PHYSICAL_BREAK', POWER: 'CRIT_CHANCE', COMBO: 'COMBO' };
 
         //  CLICK_DAMAGE at its maximum shows `Nível máximo`; 10 points enable the other buttons
         await startAs(page, { talents: { CLICK_DAMAGE: 10 }, talentPoints: 10 });
@@ -1756,9 +1759,9 @@ test.describe('Grove theme', () => {
 
         for (const [ branch, ink ] of Object.entries(inks))
         {
-            const column = page.getByTestId(`talent-branch-${branch}`);
-            const button = column.locator('.talent-upgrade').first();
-            const { 'background-color': columnBack } = await css(column, [ 'background-color' ]);
+            await page.getByTestId(`talent-${nodes[branch]}`).click();
+
+            const button = page.getByTestId(`talent-upgrade-${nodes[branch]}`);
 
             await expect(button).toBeEnabled();
             await expectStyle(button, { 'background-color': ink, color: 'rgb(244, 230, 200)' });
@@ -1767,14 +1770,14 @@ test.describe('Grove theme', () => {
 
             expect(buttonRatio).toBeGreaterThanOrEqual(5.9);
             expect(buttonRatio).toBeLessThanOrEqual(6.02);
-            await expectStyle(column.locator('.talent-branch-title'), { color: ink });
-            expect(columnBack).toBe('rgb(230, 208, 162)');
-            expect(Number(ratio(ink, columnBack).toFixed(2))).toBeGreaterThanOrEqual(4.82);
+            expect(ratio(ink, 'rgb(244, 230, 200)')).toBeGreaterThanOrEqual(4.82);
         }
 
+        await page.getByTestId('talent-CLICK_DAMAGE').click();
         await expectStyle(page.getByTestId('talent-max-CLICK_DAMAGE'), { color: inks.POWER });
         //  The card bar keeps the bright branch colour
-        expect((await css(page.getByTestId('talent-CRIT_CHANCE'), [ 'box-shadow' ]))['box-shadow']).toContain('rgb(201, 154, 31) 4px 0px 0px 0px inset');
+        await page.getByTestId('talent-CRIT_CHANCE').click();
+        expect((await css(page.getByTestId('talent-detail'), [ 'box-shadow' ]))['box-shadow']).toContain('rgb(201, 154, 31) 4px 0px 0px 0px inset');
     });
 
     //  UIR-04 AC7: the battle HUD keeps its place on the scene. The anchors are the ones the redesign keeps when a plaque grows:
@@ -1858,35 +1861,37 @@ test.describe('Grove theme', () => {
         });
     }
 
-    //  UIR-14 AC9: each card keeps its branch colour on its left edge (an inset bar of 4 px). The colours are the baseline's (5d98b6f, style.css:1647-1650)
-    test('draws the left bar of a talent card in the colour of its branch', async ({ page }) => {
+    //  UIR-14 AC9: the detail card keeps the branch colour of the selected talent on its left edge (an inset bar of 4 px). The colours are the baseline's (5d98b6f, style.css:1647-1650)
+    test('draws the left bar of the talent detail card in the colour of its branch', async ({ page }) => {
         await startAs(page, {});
         await openScreen(page, 'talents');
-        const bars = { TIME: 'rgb(59, 154, 166)', BREAK: 'rgb(196, 73, 47)', POWER: 'rgb(201, 154, 31)', COMBO: 'rgb(138, 91, 214)' };
+        const bars = { TIME: [ 'MINIBOSS_TIME', 'rgb(59, 154, 166)' ], BREAK: [ 'PHYSICAL_BREAK', 'rgb(196, 73, 47)' ], POWER: [ 'CRIT_CHANCE', 'rgb(201, 154, 31)' ], COMBO: [ 'COMBO', 'rgb(138, 91, 214)' ] };
 
-        for (const [ branch, colour ] of Object.entries(bars))
+        for (const [ talent, colour ] of Object.values(bars))
         {
-            const card = page.getByTestId(`talent-branch-${branch}`).locator('.talent-card').first();
+            await page.getByTestId(`talent-${talent}`).click();
 
-            expect(await card.evaluate((node) => getComputedStyle(node).boxShadow)).toContain(`${colour} 4px 0px 0px 0px inset`);
+            expect(await page.getByTestId('talent-detail').evaluate((node) => getComputedStyle(node).boxShadow)).toContain(`${colour} 4px 0px 0px 0px inset`);
         }
     });
 
-    //  UIR-14 AC15: the max marks of TIME, BREAK and COMBO are written in their dark ink, at least 4.82:1 on the branch parchment
+    //  UIR-14 AC15: the max marks of TIME, BREAK and COMBO are written in their dark ink, at least 4.82:1 on the light detail card
     test('writes Nível máximo of TIME, BREAK and COMBO in their dark ink', async ({ page }) => {
         const marks = { TIME: [ 'MINIBOSS_TIME', 'rgb(36, 93, 100)' ], BREAK: [ 'PHYSICAL_BREAK', 'rgb(149, 55, 36)' ], COMBO: [ 'COMBO', 'rgb(106, 49, 197)' ] };
 
         await startAs(page, { talents: { MINIBOSS_TIME: 10, PHYSICAL_BREAK: 10, COMBO: 10 }, talentPoints: 10 });
         await openScreen(page, 'talents');
 
-        for (const [ branch, [ talent, ink ] ] of Object.entries(marks))
+        for (const [ talent, ink ] of Object.values(marks))
         {
+            await page.getByTestId(`talent-${talent}`).click();
+
             const mark = page.getByTestId(`talent-max-${talent}`);
-            const back = await page.getByTestId(`talent-branch-${branch}`).evaluate((node) => getComputedStyle(node).backgroundColor);
+            const back = await page.getByTestId('talent-detail').evaluate((node) => getComputedStyle(node).backgroundColor);
 
             await expect(mark).toHaveText('Nível máximo');
             await expectStyle(mark, { color: ink });
-            expect(back).toBe('rgb(230, 208, 162)');
+            expect(back).toBe('rgb(244, 230, 200)');
             expect(ratio(ink, back)).toBeGreaterThanOrEqual(4.82);
         }
     });

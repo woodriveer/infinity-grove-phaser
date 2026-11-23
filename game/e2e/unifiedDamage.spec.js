@@ -181,6 +181,7 @@ test.describe('Unified damage', () => {
         await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 15%  Seu crítico: 40%');
 
         await page.getByTestId('hud-talents').click();
+        await page.getByTestId('talent-PHYSICAL_BREAK').click();
         await page.getByTestId('talent-upgrade-PHYSICAL_BREAK').click();
         await expect(page.getByTestId('talent-level-PHYSICAL_BREAK')).toHaveText('Nível 6/10');
         await page.getByTestId('hero-close').click();
@@ -192,20 +193,22 @@ test.describe('Unified damage', () => {
         await expect.poll(() => dealt(page)).toBeCloseTo(STAR * 0.86, 5);
     });
 
-    test('the Talentos screen has one Quebra de defesa per grade and no magical break', async ({ page }) => {
+    test('the Talentos screen has one Quebra de defesa and one Perfuração de armadura per grade and no magical break', async ({ page }) => {
         await startAs(page, 'kael');
 
         await page.getByTestId('hud-talents').click();
         await expect(page.getByTestId('talent-screen')).toBeVisible();
 
-        await expect(page.getByTestId('talent-branch-BREAK').locator('.talent-name')).toHaveText([
-            'Quebra de defesa', 'Quebra de resistência a crítico',
-            'Quebra de defesa (Grau 2)', 'Quebra de resistência a crítico (Grau 2)',
-            'Quebra de defesa (Grau 3)', 'Quebra de resistência a crítico (Grau 3)'
+        await expect(page.locator('.talent-node[data-branch="BREAK"]')).toHaveCount(6);
+        expect(await page.locator('.talent-node[data-branch="BREAK"]').evaluateAll((nodes) => nodes.map((node) => node.getAttribute('title')))).toEqual([
+            'Quebra de defesa', 'Perfuração de armadura',
+            'Quebra de defesa (Grau 2)', 'Perfuração de armadura (Grau 2)',
+            'Quebra de defesa (Grau 3)', 'Perfuração de armadura (Grau 3)'
         ]);
         await expect(page.getByTestId('talent-MAGICAL_BREAK')).toHaveCount(0);
         await expect(page.getByTestId('talent-MAGICAL_BREAK_G2')).toHaveCount(0);
         await expect(page.getByTestId('talent-MAGICAL_BREAK_G3')).toHaveCount(0);
+        await expect(page.getByTestId('talent-CRIT_RESIST_BREAK')).toHaveCount(0);
     });
 
     test('the attribute panel shows Quebra de defesa: 3 and no damage type', async ({ page }) => {

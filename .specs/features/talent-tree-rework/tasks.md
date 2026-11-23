@@ -1440,7 +1440,7 @@ div.talent-screen                           testid talent-screen
 
 ---
 
-#### T19: Re-pin the existing Talentos e2e on the tree [ ]
+#### T19: Re-pin the existing Talentos e2e on the tree [x]
 
 **Owner**: test-engineer
 **Goal**: The existing Talentos scenarios click a node before they read the detail card and assert the tree's elements (TTR-04, TTR-21, TTR-25).
@@ -1477,7 +1477,7 @@ div.talent-screen                           testid talent-screen
 **Gate**: `cd game && npx playwright test e2e/talents.spec.js e2e/unifiedDamage.spec.js e2e/uiRedesign.spec.js`
 **Done when**:
 
-- [ ] The three files pass; `grep -nE "talent-card|talent-column|talent-grade-" game/e2e/*.spec.js` prints nothing.
+- [x] The three files pass; `grep -nE "talent-card|talent-column|talent-grade-" game/e2e/*.spec.js` prints nothing.
 
 **Commit**: `test(game): read the Talentos tree in the existing e2e`
 
