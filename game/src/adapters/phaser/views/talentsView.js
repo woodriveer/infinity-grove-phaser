@@ -1,4 +1,4 @@
-import { BRANCH_TITLES, BRANCHES, branchGlow, describeTalentEffect, talentFullName, talentIconName, talentLockText } from '../../../domain/talents/talents';
+import { BRANCH_TITLES, BRANCHES, branchGlow, describeTalentEffect, talentDescription, talentFullName, talentIconName, talentLockText } from '../../../domain/talents/talents';
 import { el, iconWithFallback } from './dom';
 import {
     BANNER_POSITIONS, BRANCH_GLOWS, CAPTION_HALF, CAPTION_ROOM, FECHAR_FROM, FECHAR_ROOM, FIXED_BOTTOM, FIXED_TOP, LARGE_NODE_HALF, LARGE_NODES, NODE_HALF, NODE_POSITIONS, PLAQUE_SPAN, REVEAL_MARGIN,
@@ -143,7 +143,8 @@ const renderNode = (talent, { available, selectedId, onSelect }) =>
     return node;
 };
 
-//  The card under the tree: the selected talent, its effect and its upgrade button, or the hint when nothing is selected
+//  The card under the tree: on the left the selected talent's name, its level and effect on one row, what it does and its upgrade button (or why it is locked,
+//  or Nível máximo); on the right its icon in a ring of the branch colour (spec talent-tree-branches). With nothing selected, only the hint.
 const renderDetail = (talents, available, { busy, selectedId, onUpgrade }) =>
 {
     const talent = talents.find(({ id }) => id === selectedId);
@@ -156,20 +157,32 @@ const renderDetail = (talents, available, { busy, selectedId, onUpgrade }) =>
         return detail;
     }
 
+    const grade = talent.grade ?? 1;
+    const baseId = talent.baseId ?? talent.id;
+    const description = talentDescription(talent);
+    const body = el('div', 'talent-detail-body', '', { testid: 'talent-detail-body' });
+    const stats = el('div', 'talent-detail-stats');
+    const icon = el('div', 'talent-detail-icon', '', { testid: 'talent-detail-icon' });
+
     detail.setAttribute('data-branch', talent.branch);
-    detail.append(
-        el('strong', 'talent-detail-name', talentFullName(talent), { testid: 'talent-detail-name' }),
+    stats.append(
         el('div', 'talent-level', `Nível ${talent.level}/${talent.maxLevel}`, { testid: `talent-level-${talent.id}` }),
         el('div', 'talent-effect', `Efeito: ${describeTalentEffect(talent)}`, { testid: `talent-effect-${talent.id}` })
     );
+    body.append(el('strong', 'talent-detail-name', talentFullName(talent), { testid: 'talent-detail-name' }), stats);
+
+    if (description)
+    {
+        body.append(el('p', 'talent-detail-description', description, { testid: `talent-description-${talent.id}` }));
+    }
 
     if (talent.unlocked === false)
     {
-        detail.append(el('div', 'talent-lock', talentLockText(talent, talents), { testid: `talent-locked-${talent.id}` }));
+        body.append(el('div', 'talent-lock', talentLockText(talent, talents), { testid: `talent-locked-${talent.id}` }));
     }
     else if (talent.nextCost == null)
     {
-        detail.append(el('div', 'talent-max', 'Nível máximo', { testid: `talent-max-${talent.id}` }));
+        body.append(el('div', 'talent-max', 'Nível máximo', { testid: `talent-max-${talent.id}` }));
     }
     else
     {
@@ -178,8 +191,12 @@ const renderDetail = (talents, available, { busy, selectedId, onUpgrade }) =>
 
         button.disabled = busy || available < talent.nextCost;
         button.addEventListener('click', () => onUpgrade(talent));
-        detail.append(button);
+        body.append(button);
     }
+
+    //  The same art as the node: the grade's own file, then grade 1, then the branch glyph
+    icon.append(iconWithFallback(talentIconName(baseId, grade), GLYPHS[talent.branch], 'talent-detail-art', grade > 1 ? talentIconName(baseId) : null));
+    detail.append(body, icon);
 
     return detail;
 };

@@ -221,6 +221,84 @@ describe('the detail card', () => {
         expect(text(screen, 'talent-level-COMBO_FURY')).toBe('Nível 1/4');
         expect(text(screen, 'talent-effect-COMBO_FURY')).toBe('Efeito: +2% por clique');
     });
+
+    it('explains the selected talent after its level and effect', () => {
+        const screen = show({}, 1, { selectedId: 'CLICK_DAMAGE' });
+        const description = find(screen, 'talent-description-CLICK_DAMAGE');
+
+        expect(description.tagName).toBe('P');
+        expect(description.classList.contains('talent-detail-description')).toBe(true);
+        expect(description.textContent).toBe('Aumenta em porcentagem o dano de cada clique e de cada habilidade do seu líder.');
+        expect([ ...find(screen, 'talent-detail-body').children ].map((child) => child.getAttribute('data-testid') ?? child.className)).toEqual([
+            'talent-detail-name', 'talent-detail-stats', 'talent-description-CLICK_DAMAGE', 'talent-upgrade-CLICK_DAMAGE'
+        ]);
+    });
+
+    it('explains grade 3 with the text of grade 1, before the lock text', () => {
+        const screen = show({}, 50, { selectedId: 'CLICK_DAMAGE_G3' });
+        const description = find(screen, 'talent-description-CLICK_DAMAGE_G3');
+
+        expect(description.textContent).toBe('Aumenta em porcentagem o dano de cada clique e de cada habilidade do seu líder.');
+        expect(description.nextElementSibling).toBe(find(screen, 'talent-locked-CLICK_DAMAGE_G3'));
+    });
+
+    it('explains Fúria crescente', () => {
+        const screen = show({}, 50, { selectedId: 'COMBO_FURY' });
+
+        expect(text(screen, 'talent-description-COMBO_FURY')).toBe('Cada clique soma mais bônus de combo, então você chega ao limite com menos cliques.');
+    });
+
+    it('shows no description for a talent the game has no text for, and the rest of the card', () => {
+        const extra = { id: 'NEW_ONE', baseId: 'NEW_ONE', branch: 'POWER', label: 'Novo', unit: '%', perLevel: 1, maxLevel: 10, level: 0, value: 0, nextCost: 1, unlocked: true };
+        const screen = renderTalents([ ...tree(), extra ], points(5), { selectedId: 'NEW_ONE', onUpgrade: vi.fn() });
+
+        expect(text(screen, 'talent-detail-name')).toBe('Novo');
+        expect(screen.querySelector('[data-testid^="talent-description-"]')).toBeNull();
+        expect(find(screen, 'talent-upgrade-NEW_ONE')).not.toBeNull();
+    });
+
+    it('puts the level and the effect on one row', () => {
+        const screen = show({}, 1, { selectedId: 'CLICK_DAMAGE' });
+        const row = find(screen, 'talent-level-CLICK_DAMAGE').parentElement;
+
+        expect(find(screen, 'talent-effect-CLICK_DAMAGE').parentElement).toBe(row);
+        expect(row.classList.contains('talent-detail-stats')).toBe(true);
+    });
+
+    it('shows the icon of the talent at the right of the card, the grade file first', () => {
+        const screen = show({ CLICK_DAMAGE: 10 }, 50, { selectedId: 'CLICK_DAMAGE_G2' });
+        const icon = find(screen, 'talent-detail-icon');
+
+        expect([ ...find(screen, 'talent-detail').children ].map((child) => child.getAttribute('data-testid'))).toEqual([ 'talent-detail-body', 'talent-detail-icon' ]);
+        expect(icon.querySelector('.talent-detail-art img').src.endsWith('assets/talent-click-damage-g2.png')).toBe(true);
+    });
+
+    it('falls back on the card to the grade 1 icon, then to the branch glyph', () => {
+        const screen = show({ CLICK_DAMAGE: 10 }, 50, { selectedId: 'CLICK_DAMAGE_G2' });
+        const image = () => screen.querySelector('.talent-detail-art img');
+
+        fail(image());
+        expect(image().src.endsWith('assets/talent-click-damage.png')).toBe(true);
+        fail(image());
+        expect(screen.querySelector('.talent-detail-art .icon-fallback').textContent).toBe('⚔');
+
+        [ [ 'MINIBOSS_TIME', '⏳' ], [ 'PHYSICAL_BREAK', '🛡' ], [ 'COMBO_FURY', '✦' ] ].forEach(([ id, glyph ]) =>
+        {
+            const card = show({}, 50, { selectedId: id });
+
+            fail(card.querySelector('.talent-detail-art img'));
+            expect(card.querySelector('.talent-detail-art .icon-fallback').textContent).toBe(glyph);
+        });
+    });
+
+    it('shows no icon and no description with nothing selected', () => {
+        const screen = show();
+
+        expect(find(screen, 'talent-detail-icon')).toBeNull();
+        expect(find(screen, 'talent-detail-body')).toBeNull();
+        expect(screen.querySelector('[data-testid^="talent-description-"]')).toBeNull();
+        expect(text(screen, 'talent-detail-empty')).toBe('Escolha um talento na árvore para ver os detalhes.');
+    });
 });
 
 describe('the board', () => {

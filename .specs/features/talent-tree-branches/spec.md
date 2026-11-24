@@ -174,8 +174,8 @@ Open questions: none. Q1 to Q6 are answered by the owner (2026-11-24): every rec
 | TTB-03 | P1 Branches: AC 6, AC 7, AC 8 (banners, lit ellipses, fallback veins) | Tasks | Implementing |
 | TTB-04 | P1 Sizes: AC 1, AC 2, AC 3 (node, icon and mark sizes) | Tasks | Implementing |
 | TTB-05 | P1 Card: AC 1, AC 2 (descriptions) | Tasks | Implementing |
-| TTB-06 | P1 Card: AC 3, AC 4 (card icon and its fallback) | Tasks | Pending |
-| TTB-07 | P1 Card: AC 5, AC 6, AC 7 (card size, layout, empty state, kept texts) | Tasks | Pending |
+| TTB-06 | P1 Card: AC 3, AC 4 (card icon and its fallback) | Tasks | Implementing |
+| TTB-07 | P1 Card: AC 5, AC 6, AC 7 (card size, layout, empty state, kept texts) | Tasks | Implementing |
 | TTB-08 | P2 Fúria: AC 1, AC 2, AC 3, AC 4 (place, vein, DOM order, rule) | Tasks | Implementing |
 | TTB-09 | Edge Cases (older backend, phone tests kept) | Tasks | Pending |
 

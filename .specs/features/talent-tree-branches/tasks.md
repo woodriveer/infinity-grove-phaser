@@ -321,7 +321,7 @@ export const REVEAL_MARGIN = 6;
 
 ---
 
-#### T4: Description and icon on the detail card [ ]
+#### T4: Description and icon on the detail card [x]
 
 **Owner**: game-dev
 **Goal**: The card shows what the selected talent does and its icon at the right, with the level and the effect on one row (TTB-05, TTB-06, TTB-07; spec P1 Card AC 1 to AC 7).
@@ -401,7 +401,7 @@ Keep the three branches of the action (`talent-lock`, `talent-max`, `talent-upgr
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 8 new cases pass; every existing case of `talentsView.test.js` and `HeroUi.test.js` passes unchanged.
+- [x] The 8 new cases pass; every existing case of `talentsView.test.js` and `HeroUi.test.js` passes unchanged.
 
 **Commit**: `feat(game): explain the selected talent and show its icon on the card`
 
