@@ -109,15 +109,56 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <code>.specs/features/talent-tree-rework</code> · commits <code>até 8fae5cb</code> · 2026-11-23 · local (npm run dev, porta 5175, backend falso, arte talent-* roteada como ausente)
                 </div>
             </div>
-            <span class="chip verdict changes">MUDANÇAS PEDIDAS (rodada 3)</span>
+            <span class="chip verdict ok">APROVADO (rodada 4)</span>
         </div>
-        <p style="margin-top:16px"><strong>Rodada 3:</strong> com a arte pintada a árvore lê como a referência, mas o layout calibrado (T31) tem cinco achados (3 médios, 2 baixos), na seção da rodada 3. As rodadas 1 e 2 seguem abaixo.<br><br><strong>Rodada 2:</strong> os achados 1, 2, 3, 4, 6 e 7 foram corrigidos (T25 a T30) e reverificados com capturas novas em desktop e celular; os achados 5 (TD-010) e 8 (nome do elemento em inglês, anterior à feature) ficam com o dono e não bloqueiam. Sem achados novos. Rodada 1 (MUDANÇAS PEDIDAS) logo abaixo, com as capturas originais em <code>ui-review/round1/</code>.<br><br>Rodada 1: A árvore sem arte (fallback) é coerente com o Grove, cabe na janela e não tem sobreposição entre nós, legendas e faixas; a linha "Seu crítico" e o painel de atributos estão corretos. Um defeito bloqueia: o estado "no máximo" some no ramo Poder do clique. Outros sete achados são médios e baixos. Reprovado só por esse ponto: corrigindo o #1 o fallback pode ser entregue como está, e o layout em % aceita a arte e a calibração quando o fundo chegar.</p>
+        <p style="margin-top:16px"><strong>Rodada 4:</strong> T32 corrigiu os cinco achados da rodada 3; APROVADO. Sobreposição do Fechar no celular não bloqueia (sugestão A).<br><br><strong>Rodada 3:</strong> com a arte pintada a árvore lê como a referência, mas o layout calibrado (T31) tem cinco achados (3 médios, 2 baixos), na seção da rodada 3. As rodadas 1 e 2 seguem abaixo.<br><br><strong>Rodada 2:</strong> os achados 1, 2, 3, 4, 6 e 7 foram corrigidos (T25 a T30) e reverificados com capturas novas em desktop e celular; os achados 5 (TD-010) e 8 (nome do elemento em inglês, anterior à feature) ficam com o dono e não bloqueiam. Sem achados novos. Rodada 1 (MUDANÇAS PEDIDAS) logo abaixo, com as capturas originais em <code>ui-review/round1/</code>.<br><br>Rodada 1: A árvore sem arte (fallback) é coerente com o Grove, cabe na janela e não tem sobreposição entre nós, legendas e faixas; a linha "Seu crítico" e o painel de atributos estão corretos. Um defeito bloqueia: o estado "no máximo" some no ramo Poder do clique. Outros sete achados são médios e baixos. Reprovado só por esse ponto: corrigindo o #1 o fallback pode ser entregue como está, e o layout em % aceita a arte e a calibração quando o fundo chegar.</p>
         <div class="stats">
             <div class="stat"><div class="n">13</div><div class="l">telas e estados verificados</div></div>
             <div class="stat"><div class="n">26</div><div class="l">capturas (desktop + celular)</div></div>
             <div class="stat"><div class="n">1</div><div class="l">achados de severidade alta</div></div>
             <div class="stat"><div class="n">7</div><div class="l">achados médios e baixos</div></div>
         </div>
+    </section>
+    <section class="panel">
+        <h2>Rodada 4: reverificação do T32 (commit c5a9446)</h2>
+        <p>Veredito: <strong>APROVADO</strong>. Os cinco achados da rodada 3 estão corrigidos na arte pintada; resta uma sugestão para o celular que não bloqueia. Todas as capturas foram refeitas (22 cenários, desktop e celular), as de estados 01 a 09 ainda em fallback.</p>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>#1 Fechar: as quatro colunas Poder terminam bem à esquerda do botão; no desktop há mais de 80 px entre o grau 3 de Dano crítico e o Fechar. <code>11-real-art-desktop</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>#2 Folhagem: as quatro colunas Poder (x 55, 62, 69, 76) agora ficam sobre as folhas douradas; a violeta fica só com o Combo. Espaçamento de 7 % em vez de 6 % é aceito: evita legenda tocando nó vizinho.</span></li>
+            <li class="yes"><span class="mark">✓</span><span>#3 Faixa Combo (81,8 / 49,7): sobre Fúria crescente (80 / 61) e a poucos pixels da coluna Combo, sem cobrir o nó G2 nem a legenda dourada. O desvio de x 85 para 81,8 está correto.</span></li>
+            <li class="yes"><span class="mark">✓</span><span>#4 Escada dourada regular (grau 1 em y 50, 44, 38 e 32), sobe para a direita acompanhando o galho; a placa fica livre.</span></li>
+            <li class="yes"><span class="mark">✓</span><span>#5 Faixas Quebra de defesa e Poder do clique em y 5 %, com folga da borda; a de Poder sobre a copa dourada.</span></li>
+            <li class="yes"><span class="mark">✓</span><span>Hierarquia: cada ramo sobre o seu galho colorido (turquesa, vermelho, dourado, violeta), faixas sobre a própria folhagem, placa central livre. Lê como a referência do dono.</span></li>
+        </ul>
+        <div class="screen">
+            <h3>Talentos: arte pintada real (rodada 4)</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/11-real-art-desktop.png" target="_blank"><img src="ui-review/11-real-art-desktop.png" alt="Árvore com arte real, rodada 4" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Árvore com a arte pintada, depois do T32</span>
+                        <span class="d">Colunas Poder sobre o ouro, Fechar livre, faixa Combo ao lado da coluna.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">achados #1 a #5 corrigidos</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/11-real-art-phone.png" target="_blank"><img src="ui-review/11-real-art-phone.png" alt="Árvore com arte real no celular, rodada 4" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Árvore com a arte pintada, celular</span>
+                        <span class="d">Rolagem padrão: Chance de crítico (selecionado) inteiro com legenda; o grau 3 da coluna fica sob o Fechar.</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-baixa">sugestão A</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <h2 style="margin-top:24px">Sobreposição do Fechar no celular: não bloqueia</h2>
+        <p>Na rolagem padrão o nó selecionado (grau 1 e sua legenda) aparece inteiro, e o Fechar cobre só o topo do grau 3 da mesma coluna, nó não selecionado que sai pela borda de cima da janela de qualquer modo. O quadro rola, o cartão de detalhe mostra o talento selecionado e o botão continua clicável. É um defeito cosmético, não uma perda de função, então não reprova.</p>
+        <h2 style="margin-top:24px">Sugestões</h2>
+        <ul class="checks">
+            <li class="no"><span class="mark">A</span><span>Correção para a lógica de revelar: ao rolar até o nó selecionado, reservar uma margem superior igual à altura do Fechar (cerca de 40 px de tela mais 8 de folga, 24 px do quadro com zoom 2x) para nós na faixa x do Fechar, ou centralizar na coluna inteira (do grau 3 ao grau 1) quando ela cabe em 350 px do quadro. Em <code>game/src/adapters/phaser/views</code>, no cálculo de revelar do quadro (constantes <code>FIXED_TOP</code>, <code>REVEAL_MARGIN</code> em <code>talentTreeLayout.js</code>): usar <code>FIXED_TOP</code> como margem superior só dentro da largura do Fechar e adicionar <code>FECHAR_INSET = 48</code> para x maior que 80 % da janela visível.</span></li>
+        </ul>
     </section>
     <section class="panel">
         <h2>Rodada 3: calibração da árvore à arte pintada (T31, commit 1a47c99)</h2>
