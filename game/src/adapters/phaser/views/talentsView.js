@@ -1,7 +1,8 @@
 import { BRANCH_TITLES, BRANCHES, branchGlow, describeTalentEffect, talentFullName, talentIconName, talentLockText } from '../../../domain/talents/talents';
 import { el, iconWithFallback } from './dom';
 import {
-    BANNER_POSITIONS, BRANCH_GLOWS, CAPTION_ROOM, FIXED_BOTTOM, FIXED_TOP, LARGE_NODE_HALF, LARGE_NODES, NODE_HALF, NODE_POSITIONS, REVEAL_MARGIN, TREE_IMAGE, TREE_SIZE, VEINS
+    BANNER_POSITIONS, BRANCH_GLOWS, CAPTION_HALF, CAPTION_ROOM, FECHAR_FROM, FECHAR_ROOM, FIXED_BOTTOM, FIXED_TOP, LARGE_NODE_HALF, LARGE_NODES, NODE_HALF, NODE_POSITIONS, PLAQUE_SPAN, REVEAL_MARGIN,
+    SEAL_HEIGHT, TREE_IMAGE, TREE_SIZE, VEINS
 } from './talentTreeLayout';
 
 export const UNAVAILABLE_TEXT = 'Talentos indisponíveis';
@@ -262,9 +263,32 @@ const keepBetween = (offset, centre, low, high, limit) =>
     return Math.min(Math.max(moved, 0), limit);
 };
 
+//  The vertical scroll that keeps the whole column of the node `id` (its grade 3 node and seal down to the caption of grade 1) in the free area, or null
+//  when the column is taller than the free area or the node itself would then leave it. The top of the free area is the plaque under the plaque, 48 px under Fechar
+//  and the window edge elsewhere, found from where the column sits across the window once scrolled horizontally to `left`
+const columnScroll = (scroll, id, left, zoom) =>
+{
+    const base = id.replace(/_G[23]$/, '');
+    const top = NODE_POSITIONS[`${base}_G3`] ?? NODE_POSITIONS[id];
+    const bottom = NODE_POSITIONS[base];
+    const halfOf = (node) => (LARGE_NODES.includes(node) ? LARGE_NODE_HALF : NODE_HALF) * zoom;
+    const at = (position) => position.y / 100 * scroll.scrollHeight;
+    const windowX = NODE_POSITIONS[id].x / 100 * scroll.scrollWidth - left;
+    const reach = CAPTION_HALF * zoom;
+    const free = windowX + reach > PLAQUE_SPAN.from && windowX - reach < PLAQUE_SPAN.to ? FIXED_TOP : windowX + reach > FECHAR_FROM ? FECHAR_ROOM : 0;
+    const topEdge = at(top) - halfOf(NODE_POSITIONS[`${base}_G3`] ? `${base}_G3` : id) - SEAL_HEIGHT * zoom;
+    const bottomEdge = at(bottom) + halfOf(base in NODE_POSITIONS ? base : id) + CAPTION_ROOM * zoom;
+    const own = at(NODE_POSITIONS[id]);
+    const from = Math.max(bottomEdge - (scroll.clientHeight - FIXED_BOTTOM), own - (scroll.clientHeight - FIXED_BOTTOM - halfOf(id) - CAPTION_ROOM * zoom));
+    const to = Math.min(topEdge - free, own - (FIXED_TOP + halfOf(id)));
+
+    return from <= to ? { from, to } : null;
+};
+
 //  Scrolls the tree of `screen` so the node `id` and its caption sit in the free area, clear of the plaque, the card and the bottom buttons that stay
 //  fixed over the board (a phone shows the board zoomed, so the node can sit under its own card); a node already there keeps the scroll the player chose.
-//  Nothing happens when the board does not scroll (the desktop) or the talent has no node.
+//  When its whole column (grade 3 down to the caption of grade 1) fits the free area, the column is brought there too, clear of Fechar and the plaque; when it does not fit
+//  the node and its caption win. Nothing happens when the board does not scroll (the desktop) or the talent has no node.
 export const revealTalent = (screen, id) =>
 {
     const scroll = scrollOf(screen);
@@ -280,8 +304,19 @@ export const revealTalent = (screen, id) =>
     const margin = REVEAL_MARGIN * zoom;
 
     scroll.scrollLeft = keepBetween(scroll.scrollLeft, position.x / 100 * scroll.scrollWidth, half + margin, scroll.clientWidth - half - margin, scroll.scrollWidth - scroll.clientWidth);
+
+    const column = columnScroll(scroll, id, scroll.scrollLeft, zoom);
+    const limit = scroll.scrollHeight - scroll.clientHeight;
+
+    if (column)
+    {
+        scroll.scrollTop = Math.min(Math.max(Math.min(Math.max(scroll.scrollTop, column.from), column.to), 0), limit);
+
+        return;
+    }
+
     scroll.scrollTop = keepBetween(
         scroll.scrollTop, position.y / 100 * scroll.scrollHeight,
-        FIXED_TOP + half, scroll.clientHeight - FIXED_BOTTOM - half - CAPTION_ROOM * zoom, scroll.scrollHeight - scroll.clientHeight
+        FIXED_TOP + half, scroll.clientHeight - FIXED_BOTTOM - half - CAPTION_ROOM * zoom, limit
     );
 };

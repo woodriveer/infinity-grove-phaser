@@ -345,12 +345,12 @@ describe('the scroll of the tree', () => {
 
 describe('revealTalent', () => {
     //  A phone board: 2048 x 1152 in a 1024 x 576 viewport, opened centred (scroll 512, 288); the plaque is fixed on the top 76 px, the card on the bottom 136 px
-    const phone = (scrollLeft, scrollTop) =>
+    const phone = (scrollLeft, scrollTop, clientHeight = 576) =>
     {
         const screen = show();
         const scroll = find(screen, 'talent-tree-scroll');
 
-        Object.entries({ scrollWidth: 2048, clientWidth: 1024, scrollHeight: 1152, clientHeight: 576 })
+        Object.entries({ scrollWidth: 2048, clientWidth: 1024, scrollHeight: 1152, clientHeight })
             .forEach(([ name, value ]) => Object.defineProperty(scroll, name, { value, configurable: true }));
         scroll.scrollLeft = scrollLeft;
         scroll.scrollTop = scrollTop;
@@ -392,6 +392,58 @@ describe('revealTalent', () => {
         revealTalent(screen, 'CLICK_DAMAGE');
 
         expect([ scroll.scrollLeft, scroll.scrollTop ]).toEqual([ 700, 400 ]);
+    });
+
+    //  A column (grade 3 node and its seal down to the caption of grade 1) is 520 to 532 px tall at 2x, the free area of a 1024 x 576 window 440 px (the card and the
+    //  buttons take 136 px): it never fits there, so these cases use a taller window of 800 px (664 px free)
+    describe('the whole column', () => {
+        it('brings a column under Fechar 48 px under the top of the window, grade 3 seal included', () => {
+            const { screen, scroll } = phone(1024, 400, 800);
+
+            revealTalent(screen, 'COMBO');
+
+            //  COMBO sits at x 92 % = 1884.16 of the board, 860 px across the window (its caption reaches 940 px, over Fechar from 896); its grade 3 (35 % = 403.2) loses 60 px of
+            //  node and 16 px of seal, and must start 48 px down
+            expect(scroll.scrollLeft).toBe(1024);
+            expect(scroll.scrollTop).toBeCloseTo(403.2 - 60 - 16 - 48, 5);
+        });
+
+        it('brings a column under the plaque 76 px under the top of the window', () => {
+            const { screen, scroll } = phone(512, 288, 800);
+
+            revealTalent(screen, 'CLICK_DAMAGE');
+
+            //  (55 %: 1126.4 across the board, 614.4 across the window); grade 3 at 26 % = 299.52
+            expect(scroll.scrollTop).toBeCloseTo(299.52 - 60 - 16 - 76, 5);
+        });
+
+        it('brings a column clear of every fixed part to the top of the window when it fits', () => {
+            const { screen, scroll } = phone(512, 288, 800);
+
+            revealTalent(screen, 'CLICK_FLAT_DAMAGE');
+
+            //  (62 %: 757.8 across the window, between the plaque and Fechar); grade 3 at 20 % = 230.4 keeps its 60 px and 16 px of seal above the window edge
+            expect(scroll.scrollTop).toBeCloseTo(230.4 - 60 - 16, 5);
+        });
+
+        it('keeps the scroll the player chose when the whole column is already in the free area', () => {
+            const { screen, scroll } = phone(512, 100, 800);
+
+            revealTalent(screen, 'CLICK_FLAT_DAMAGE');
+
+            expect([ scroll.scrollLeft, scroll.scrollTop ]).toEqual([ 512, 100 ]);
+        });
+
+        it('keeps the node and its caption in the free area, as before, when the column does not fit', () => {
+            //  The 1024 x 576 phone window: Fúria crescente under the card goes up as far as its caption allows, the grade 1 node of CLICK_FLAT_DAMAGE is free, so the scroll stays
+            const { screen, scroll } = phone(512, 288);
+
+            revealTalent(screen, 'CLICK_FLAT_DAMAGE');
+            expect([ scroll.scrollLeft, scroll.scrollTop ]).toEqual([ 512, 288 ]);
+
+            revealTalent(screen, 'COMBO_FURY');
+            expect(scroll.scrollTop).toBeCloseTo(702.72 - (576 - 136 - 88 - 108), 5);
+        });
     });
 
     it('does nothing on a board that does not scroll, for a talent without a node or without a screen', () => {

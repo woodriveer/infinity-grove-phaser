@@ -48,6 +48,14 @@ export const VEINS = Object.freeze([
 export const FIXED_TOP = 76;
 export const FIXED_BOTTOM = 136;
 
+//  Where the fixed parts sit across the window, in px of the 1024 px wide window: the plaque spans x 416 to 608, and Fechar (x 901 to 1011) ends 46 px from
+//  the top, so a column under it keeps 48 px free at the top; a node seal sticks 8 px above its node, a caption is 80 px wide
+export const PLAQUE_SPAN = Object.freeze({ from: 416, to: 608 });
+export const FECHAR_FROM = 896;
+export const FECHAR_ROOM = 48;
+export const SEAL_HEIGHT = 8;
+export const CAPTION_HALF = 40;
+
 //  Half the side of a node, the gap to its caption plus three lines of it, and a margin, in px of the unzoomed board (a phone draws it twice as big)
 export const NODE_HALF = 30;
 export const LARGE_NODE_HALF = 44;

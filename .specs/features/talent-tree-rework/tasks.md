@@ -126,7 +126,7 @@ T25 → T26 → T27 → T28 → T29 → T30
 ### Phase 6d: art calibration (game-dev)
 
 ```
-T31 → T32
+T31 → T32 → T33
 ```
 
 ---
@@ -1944,6 +1944,28 @@ The painted board (`talent-tree-bg.jpg` and `talent-tree-bg-lit.jpg`, 2048 x 115
 
 ---
 
+#### T33: keep the whole selected column clear of the fixed parts on a phone [x]
+
+**Owner**: game-dev
+**Goal**: On a phone (2x zoom), the selected node's whole column (grade 3 down to the caption of grade 1) is brought clear of Fechar, the plaque, the card and Reiniciar whenever it fits the free area (TTR-20; ui-review round 3, finding 4 and the owner's approval).
+**Where**: `game/src/adapters/phaser/views/talentsView.js` (`revealTalent`, new `columnScroll`), `game/src/adapters/phaser/views/talentTreeLayout.js` (new constants `PLAQUE_SPAN`, `FECHAR_FROM`, `FECHAR_ROOM`, `SEAL_HEIGHT`, `CAPTION_HALF`)
+**Also changes**: `game/src/adapters/phaser/views/talentsView.test.js`
+**Read first**: `revealTalent` and `keepBetween` in `talentsView.js`, `FIXED_TOP` and `FIXED_BOTTOM` in `talentTreeLayout.js`
+**Depends on**: T32
+**Requirement**: TTR-20
+
+**What**: after the horizontal scroll, `columnScroll` finds where the column sits across the window and the vertical range that puts its grade 3 node (and its 8 px seal) below the top of the free area (76 px under the plaque, 48 px under Fechar, 0 elsewhere) and the caption of grade 1 above the card; the selected node keeps its own limits. When that range exists the scroll is clamped into it (a scroll already inside keeps), otherwise the node and its caption win as before. The desktop does not scroll and is unchanged.
+
+**Tests**: unit: a column under Fechar, a column under the plaque, a column clear of every fixed part, a column already in the free area keeps the scroll, and a column that does not fit keeps the old behaviour (a 800 px tall window for the cases that fit)
+**Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
+**Done when**:
+
+- [x] The cases that fit bring the whole column clear of the fixed parts, and the cases that do not fit behave as before.
+
+**Commit**: `feat(game): keep the selected talent column clear on a phone`
+
+---
+
 ## Validation Tables
 
 ### Task Granularity Check
@@ -1982,6 +2004,7 @@ The painted board (`talent-tree-bg.jpg` and `talent-tree-bg-lit.jpg`, 2048 x 115
 | T30 | 1 stylesheet rule | ✅ Granular |
 | T31 | 1 layout file (+ its re-pinned tests) | ⚠️ Cohesive (the coordinates are one table, the tests pin it) |
 | T32 | 1 layout file (+ its re-pinned tests) | ⚠️ Cohesive (same table as T31) |
+| T33 | 1 function + 5 constants | ✅ Granular |
 
 ### Diagram-Definition Cross-Check
 
@@ -2019,6 +2042,7 @@ The painted board (`talent-tree-bg.jpg` and `talent-tree-bg-lit.jpg`, 2048 x 115
 | T30 | T29 | T29 → T30 | ✅ Match |
 | T31 | None | (none) | ✅ Match |
 | T32 | T31 | T31 → T32 | ✅ Match |
+| T33 | T32 | T32 → T33 | ✅ Match |
 
 ### Test Co-location Validation
 
@@ -2056,3 +2080,4 @@ The painted board (`talent-tree-bg.jpg` and `talent-tree-bg-lit.jpg`, 2048 x 115
 | T28 | Game view and scene | unit (jsdom) + e2e | unit + e2e | ✅ OK |
 | T31 | Game view layout | unit (jsdom) + e2e | unit + e2e | ✅ OK |
 | T32 | Game view layout | unit (jsdom) + e2e | unit + e2e | ✅ OK |
+| T33 | Game view scroll | unit (jsdom) | unit | ✅ OK |
