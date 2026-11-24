@@ -26,7 +26,7 @@ const watch = (page) => {
 
 const start = async (page, { art = 'missing', talents, points = 0, progress, definition = chapter() } = {}) => {
     watch(page);
-    await page.route('**/assets/talent-*', (route) => (art === 'missing' ? route.fulfill({ status: 404, body: '' }) : route.fulfill({ status: 200, contentType: 'image/png', body: PIXEL })));
+    if (art !== 'real') { await page.route('**/assets/talent-*', (route) => (art === 'missing' ? route.fulfill({ status: 404, body: '' }) : route.fulfill({ status: 200, contentType: 'image/png', body: PIXEL }))); }
     await mockBackend(page, {
         users: { yan: 'secret123' }, definition,
         ...(talents && { talents: { yan: talents } }),
@@ -130,6 +130,14 @@ test('07 art present', async ({ page }, testInfo) => {
     await openTalents(page);
     await select(page, 'CRIT_CHANCE');
     await shot(page, testInfo, '10-art-present-placeholder');
+});
+
+test('11 real art', async ({ page }, testInfo) => {
+    await start(page, { art: 'real', talents: { MINIBOSS_TIME: 5, COMBO: 10, ...POWER_AT_10 }, points: 2 });
+    await openTalents(page);
+    await select(page, 'CRIT_CHANCE');
+    await shot(page, testInfo, '11-real-art');
+    console.log('PROBLEMS', testInfo.project.name, JSON.stringify(problems.get(page)));
 });
 
 test('08 enemy chip miniboss', async ({ page }, testInfo) => {
