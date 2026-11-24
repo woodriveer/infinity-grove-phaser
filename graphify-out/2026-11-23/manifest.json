@@ -204,9 +204,9 @@
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/PieceEntity.kt": {
-    "mtime": 1794684226.578156,
-    "seen": 1794753474.9490173,
-    "ast_hash": "d2181b4e325eb874bf78a5fcbcb3a10d",
+    "mtime": 1795197393.0596962,
+    "seen": 1795467493.077908,
+    "ast_hash": "da6c36367a97ce200b6b658f52885e1c",
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/PlayerCardsEntities.kt": {
@@ -342,9 +342,9 @@
     "semantic_hash": "048149e529930826d7310640c26e1b59"
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentResponses.kt": {
-    "mtime": 1794684226.5908506,
-    "seen": 1794753474.949051,
-    "ast_hash": "2f94fbfc2f33dd060791ab4303a81d88",
+    "mtime": 1795197393.0611372,
+    "seen": 1795467493.0858583,
+    "ast_hash": "058c9977cdd94cc87435b6be1cf89a2c",
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/FarmController.kt": {
@@ -366,10 +366,10 @@
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/TalentController.kt": {
-    "mtime": 1794684226.5928493,
-    "seen": 1794753474.949057,
-    "ast_hash": "d5057a13294a8fab107c87a03a100b3f",
-    "semantic_hash": "d5057a13294a8fab107c87a03a100b3f"
+    "mtime": 1795451323.7422519,
+    "seen": 1795467493.0872743,
+    "ast_hash": "144a037065afaf27f99a3d5af1d7e73c",
+    "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/UserController.kt": {
     "mtime": 1794684226.5938492,
@@ -444,10 +444,10 @@
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Equipment.kt": {
-    "mtime": 1794684226.6009974,
-    "seen": 1794753474.949076,
-    "ast_hash": "1b02b1ffc96ec744e11d8651aea911ae",
-    "semantic_hash": "1b02b1ffc96ec744e11d8651aea911ae"
+    "mtime": 1795197393.065514,
+    "seen": 1795467493.0921092,
+    "ast_hash": "4a346951b84358a4cac34382f2cda33a",
+    "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/EquipmentDrop.kt": {
     "mtime": 1794684226.6009974,
@@ -492,10 +492,10 @@
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PieceRoller.kt": {
-    "mtime": 1794684226.605014,
-    "seen": 1794753474.9490874,
-    "ast_hash": "fcadffbd6cbf560a9fe31d381326c0ab",
-    "semantic_hash": "fcadffbd6cbf560a9fe31d381326c0ab"
+    "mtime": 1795197393.0680249,
+    "seen": 1795467493.0979934,
+    "ast_hash": "6063c2dbf5ed8099b27afbed31fc4078",
+    "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerCards.kt": {
     "mtime": 1795015624.1206417,
@@ -534,9 +534,9 @@
     "semantic_hash": "51f162051effd24f899a34475368b97d"
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt": {
-    "mtime": 1795068834.8277006,
-    "seen": 1795186193.8209462,
-    "ast_hash": "f4f2c57f105ce81fb42fb7834d04dd6e",
+    "mtime": 1795451323.74326,
+    "seen": 1795467493.1013618,
+    "ast_hash": "13502d514550a462148067f3914c6934",
     "semantic_hash": ""
   },
   "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/User.kt": {
@@ -816,9 +816,9 @@
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/Fakes.kt": {
-    "mtime": 1795095826.3162367,
-    "seen": 1795186193.8368073,
-    "ast_hash": "0e0638f34fe581accae71b4f6866f965",
+    "mtime": 1795197393.0773497,
+    "seen": 1795467493.1207838,
+    "ast_hash": "b1f904b01fc357f15c35381fbcafe1d3",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/InfinityGroveWsApplicationTests.kt": {
@@ -828,9 +828,9 @@
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/IntegrationTestBase.kt": {
-    "mtime": 1794847585.3564136,
-    "seen": 1794847812.976476,
-    "ast_hash": "7413b627aed553c4d3eebe23ca73f5f7",
+    "mtime": 1795197393.078364,
+    "seen": 1795467493.1211004,
+    "ast_hash": "d9beb5c87b0af128ee6296f32ea14f7e",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/LogCapture.kt": {
@@ -888,9 +888,9 @@
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/EquipmentRepositoryIT.kt": {
-    "mtime": 1794684226.6491897,
-    "seen": 1794753474.949176,
-    "ast_hash": "3722255ab49f0d26e35bf2f72e76d6ea",
+    "mtime": 1795197393.0819113,
+    "seen": 1795467493.1258214,
+    "ast_hash": "633369abe5d283555a2677080119ee61",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/HeroRepositoryIT.kt": {
@@ -1032,9 +1032,9 @@
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentControllerIT.kt": {
-    "mtime": 1794684226.6667569,
-    "seen": 1794753474.9492154,
-    "ast_hash": "e1f9e3fb1e71a56b27fa376fc04240e3",
+    "mtime": 1795197393.087088,
+    "seen": 1795467493.1402268,
+    "ast_hash": "8a8298c547eb7f0d015dcacec03153fc",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentDropFlowIT.kt": {
@@ -1044,21 +1044,21 @@
     "semantic_hash": "cea15f75b13eaf92fe6912dd819468dc"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentRefineIT.kt": {
-    "mtime": 1794684226.6680875,
-    "seen": 1794753474.9492185,
-    "ast_hash": "6b72bfc3fa1a04924b8bf0ea7ef8e4b7",
+    "mtime": 1795197393.0891392,
+    "seen": 1795467493.1408656,
+    "ast_hash": "da1a4e63953e341988bf66c3b87c2d07",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentRerollIT.kt": {
-    "mtime": 1794684226.6691017,
-    "seen": 1794753474.94922,
-    "ast_hash": "8c46c48efed629afe835ded6a2789202",
+    "mtime": 1795197393.090093,
+    "seen": 1795467493.1408715,
+    "ast_hash": "6b05ea8195df217056e2281e7041daaa",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/EquipmentSellIT.kt": {
-    "mtime": 1794684226.6691017,
-    "seen": 1794753474.9492211,
-    "ast_hash": "d0f9189c6ede9d0f8363440044b793f5",
+    "mtime": 1795197393.0923827,
+    "seen": 1795467493.1408758,
+    "ast_hash": "c7d502b72ea8c91a244231a17cdf0022",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/FarmControllerIT.kt": {
@@ -1086,9 +1086,9 @@
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/TalentControllerIT.kt": {
-    "mtime": 1795060645.7621982,
-    "seen": 1795186193.8581781,
-    "ast_hash": "a94fab103d1f95f29fa40b106ffd6162",
+    "mtime": 1795451323.74896,
+    "seen": 1795467493.1445105,
+    "ast_hash": "79eb6da11aac6a514e3a65a8585306db",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/UserControllerIT.kt": {
@@ -1170,10 +1170,10 @@
     "semantic_hash": "8a3bc993befe0c8f1e8f4580d8d99a5b"
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/EquipmentTest.kt": {
-    "mtime": 1794684226.6830149,
-    "seen": 1794753474.949249,
-    "ast_hash": "f488b6785f454f7458ed3a74babba49b",
-    "semantic_hash": "f488b6785f454f7458ed3a74babba49b"
+    "mtime": 1795197393.0953822,
+    "seen": 1795467493.1512654,
+    "ast_hash": "abfffe5a8b31553e3cb4a93de264bf65",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/HeroExceptionsTest.kt": {
     "mtime": 1794947626.7085085,
@@ -1200,10 +1200,10 @@
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/PieceRollerTest.kt": {
-    "mtime": 1794684226.6860256,
-    "seen": 1794753474.9492562,
-    "ast_hash": "f47161d065293b62600af92b70455973",
-    "semantic_hash": "f47161d065293b62600af92b70455973"
+    "mtime": 1795197393.0985737,
+    "seen": 1795467493.1535091,
+    "ast_hash": "a5bf80e600751ae3a1c5ccb1e32b3f17",
+    "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/PlayerCardsTest.kt": {
     "mtime": 1794947626.7110207,
@@ -1236,9 +1236,9 @@
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/TalentsTest.kt": {
-    "mtime": 1795060645.774663,
-    "seen": 1795186193.868522,
-    "ast_hash": "993a482d7b34576b33b0b204e06fd654",
+    "mtime": 1795451323.7511451,
+    "seen": 1795467493.1554399,
+    "ast_hash": "7a1a27daab74f3cf0d1efe81bf3e7662",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/UserTest.kt": {
@@ -1302,9 +1302,9 @@
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/TalentServiceTest.kt": {
-    "mtime": 1795060645.779266,
-    "seen": 1795186193.8714473,
-    "ast_hash": "e8fefe7a6f84987537a56487f058bd7b",
+    "mtime": 1795451323.752665,
+    "seen": 1795467493.160434,
+    "ast_hash": "18cbe53fb7062a41fdc2f2b9905c568f",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/UserServiceTest.kt": {
@@ -1518,9 +1518,9 @@
     "semantic_hash": ""
   },
   "game/e2e/elements.spec.js": {
-    "mtime": 1795060645.7802646,
-    "seen": 1795186193.8961678,
-    "ast_hash": "bf945904df95d27d1859bd9af40c5e05",
+    "mtime": 1795451323.7541604,
+    "seen": 1795467493.1813574,
+    "ast_hash": "86f5ac5b735a0515b12b12cc907dc283",
     "semantic_hash": ""
   },
   "game/e2e/equipment.spec.js": {
@@ -1584,9 +1584,9 @@
     "semantic_hash": ""
   },
   "game/e2e/support/fakeBackend.js": {
-    "mtime": 1795095826.3344998,
-    "seen": 1795186193.9020014,
-    "ast_hash": "6fa1d338116b11364320531f092d6373",
+    "mtime": 1795451323.7611692,
+    "seen": 1795467493.1875818,
+    "ast_hash": "339311e57b03ff03a0b23ebaaee4cd11",
     "semantic_hash": ""
   },
   "game/e2e/support/game.js": {
@@ -1596,15 +1596,15 @@
     "semantic_hash": ""
   },
   "game/e2e/talents.spec.js": {
-    "mtime": 1795060645.791139,
-    "seen": 1795186193.9024227,
-    "ast_hash": "153290c4a3018145d012c7e02f133230",
+    "mtime": 1795451323.7637541,
+    "seen": 1795467493.1878593,
+    "ast_hash": "45ee569d12dd17d23c706c0154b36d3b",
     "semantic_hash": ""
   },
   "game/package.json": {
-    "mtime": 1795145397.2410283,
-    "seen": 1795186193.9029133,
-    "ast_hash": "5dae18b1560308a37615460568a51cfc",
+    "mtime": 1795467382.6386552,
+    "seen": 1795467493.1882558,
+    "ast_hash": "6107affdb05e0cda33b267d0f6bcde8e",
     "semantic_hash": ""
   },
   "game/playwright.config.js": {
@@ -1788,27 +1788,27 @@
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/ClickerGame.js": {
-    "mtime": 1795136504.4916098,
-    "seen": 1795186193.9157305,
-    "ast_hash": "c52341bf56917ebc98a5ea25117b66f8",
+    "mtime": 1795451323.7692707,
+    "seen": 1795467493.2012494,
+    "ast_hash": "1badb17a7c26455da059169efe956873",
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/ClickerGame.test.js": {
-    "mtime": 1795184796.1649113,
-    "seen": 1795186193.9157352,
-    "ast_hash": "98f73ac5c5ee2f1ecd18674ffc1c0dfc",
+    "mtime": 1795451323.771292,
+    "seen": 1795467493.2012568,
+    "ast_hash": "831a009ed224e8955bb1b3d14fa1cc27",
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/HeroUi.js": {
-    "mtime": 1795106759.0397148,
-    "seen": 1795186193.9157393,
-    "ast_hash": "78aa40223ebf2f328cba1d96ca4e5729",
+    "mtime": 1795456618.1615057,
+    "seen": 1795467493.2012613,
+    "ast_hash": "8033e54f6b646ab57621a3214eb05130",
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/HeroUi.test.js": {
-    "mtime": 1795095826.3533053,
-    "seen": 1795186193.9157426,
-    "ast_hash": "c8cbe3ccaf3e5e05a4664e256d203fce",
+    "mtime": 1795451323.774286,
+    "seen": 1795467493.2012653,
+    "ast_hash": "5425ae58dc2cc9dfceddfc5de57f744c",
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/MainMenu.js": {
@@ -1962,16 +1962,16 @@
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/views/pieceTile.js": {
-    "mtime": 1794684227.3196573,
-    "seen": 1794753474.9494615,
-    "ast_hash": "87848ce059cdd40056a664c373806d00",
+    "mtime": 1795197393.127683,
+    "seen": 1795467493.2149055,
+    "ast_hash": "d3354645c072a66ec186c79895d30330",
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/views/pieceTile.test.js": {
-    "mtime": 1794684227.320658,
-    "seen": 1794753474.949463,
-    "ast_hash": "f1a56b33ddaf05173e09b3a98d3d2a7b",
-    "semantic_hash": "f1a56b33ddaf05173e09b3a98d3d2a7b"
+    "mtime": 1795197393.1290057,
+    "seen": 1795467493.2149105,
+    "ast_hash": "2cd7b6614be3e48b35afd9058373eee4",
+    "semantic_hash": ""
   },
   "game/src/adapters/phaser/views/pieceTooltip.js": {
     "mtime": 1794684227.320658,
@@ -2028,15 +2028,15 @@
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/views/talentsView.js": {
-    "mtime": 1794684227.3256607,
-    "seen": 1794753474.9494772,
-    "ast_hash": "f026e19ef494f8706f0f0cc69c88d3dc",
-    "semantic_hash": "f026e19ef494f8706f0f0cc69c88d3dc"
+    "mtime": 1795456618.1640337,
+    "seen": 1795467493.2192297,
+    "ast_hash": "a71aa409aad2e57a7c76e32b9ad13a1d",
+    "semantic_hash": ""
   },
   "game/src/adapters/phaser/views/talentsView.test.js": {
-    "mtime": 1795060645.8091407,
-    "seen": 1795186193.9352057,
-    "ast_hash": "8d026ea55d5052428c020379434a427b",
+    "mtime": 1795456618.1660347,
+    "seen": 1795467493.219237,
+    "ast_hash": "97efaa2c317d37f42a3425dbd593fb4a",
     "semantic_hash": ""
   },
   "game/src/adapters/storage/autoClickPreference.js": {
@@ -2160,15 +2160,15 @@
     "semantic_hash": ""
   },
   "game/src/application/talents/talentCollection.js": {
-    "mtime": 1795068785.789626,
-    "seen": 1795186193.9432304,
-    "ast_hash": "1ef4611e206b91c5af292034a432ed1b",
+    "mtime": 1795451323.780381,
+    "seen": 1795467493.2273865,
+    "ast_hash": "3e20f497ab775b1f587cf9724cd9c121",
     "semantic_hash": ""
   },
   "game/src/application/talents/talentCollection.test.js": {
-    "mtime": 1795060645.8151436,
-    "seen": 1795186193.9432356,
-    "ast_hash": "05ec49010386a1362c1c8dbe14a538ea",
+    "mtime": 1795451323.7808864,
+    "seen": 1795467493.2273905,
+    "ast_hash": "087c7899ea4d851c1b124d42fd67317d",
     "semantic_hash": ""
   },
   "game/src/application/wallet/walletSync.js": {
@@ -2190,15 +2190,15 @@
     "semantic_hash": ""
   },
   "game/src/composition.js": {
-    "mtime": 1794847325.242666,
-    "seen": 1794847813.0439134,
-    "ast_hash": "e0b93d3e3d7f4d1b58fb19c4ea530583",
+    "mtime": 1795197393.1334682,
+    "seen": 1795467493.2282546,
+    "ast_hash": "d6be70bce9317d4a579d5ba52390b2d6",
     "semantic_hash": ""
   },
   "game/src/composition.test.js": {
-    "mtime": 1794847325.2436688,
-    "seen": 1794847813.043918,
-    "ast_hash": "503a35ba385c4a7b14c76fcf33f68d1b",
+    "mtime": 1795197393.1357558,
+    "seen": 1795467493.2282581,
+    "ast_hash": "d426714fad572846bdbead066e657fab",
     "semantic_hash": ""
   },
   "game/src/domain/campaign/accountReset.js": {
@@ -2262,27 +2262,27 @@
     "semantic_hash": ""
   },
   "game/src/domain/combat/combo.js": {
-    "mtime": 1794684227.34866,
-    "seen": 1794753474.9495354,
-    "ast_hash": "bca9b0cda03c647280121c151a29a4a3",
+    "mtime": 1795451323.7823732,
+    "seen": 1795467493.2324877,
+    "ast_hash": "6612402f9dcea7362e3579ea6c114492",
     "semantic_hash": ""
   },
   "game/src/domain/combat/combo.test.js": {
-    "mtime": 1794684227.3496566,
-    "seen": 1794753474.9495368,
-    "ast_hash": "756c7e628d3129c20f7e51132c2c9043",
+    "mtime": 1795451323.78288,
+    "seen": 1795467493.232491,
+    "ast_hash": "0fa09a264086690b7720f6f94471af09",
     "semantic_hash": ""
   },
   "game/src/domain/combat/damage.js": {
-    "mtime": 1795184458.06854,
-    "seen": 1795186193.9493072,
-    "ast_hash": "cb167998357d8f4aeb0d09ee1018b72b",
+    "mtime": 1795451323.7838852,
+    "seen": 1795467493.2324939,
+    "ast_hash": "b9b3083fe44e4c33a6e710ccaccf7156",
     "semantic_hash": ""
   },
   "game/src/domain/combat/damage.test.js": {
-    "mtime": 1795184705.5197234,
-    "seen": 1795186193.9493122,
-    "ast_hash": "e5805f84191ee6836ff1a31af0d12f31",
+    "mtime": 1795451323.784914,
+    "seen": 1795467493.2324967,
+    "ast_hash": "f4ce32d537de89841dba00b8ea8347d5",
     "semantic_hash": ""
   },
   "game/src/domain/combat/elements.js": {
@@ -2304,9 +2304,9 @@
     "semantic_hash": ""
   },
   "game/src/domain/combat/leaderAttacker.test.js": {
-    "mtime": 1795095826.3686066,
-    "seen": 1795186193.9502115,
-    "ast_hash": "7b7fe7885b9c6c6dc09677d44ce69004",
+    "mtime": 1795451323.784914,
+    "seen": 1795467493.2340124,
+    "ast_hash": "5b0a67e57b935358eb8b03d3baa36d71",
     "semantic_hash": ""
   },
   "game/src/domain/combat/monster.js": {
@@ -2346,27 +2346,27 @@
     "semantic_hash": ""
   },
   "game/src/domain/equipment/equipment.js": {
-    "mtime": 1794684227.3586588,
-    "seen": 1794753474.9495595,
-    "ast_hash": "4ec6d6f04a64352083b301df69ff3068",
+    "mtime": 1795451323.7858863,
+    "seen": 1795467493.237137,
+    "ast_hash": "6dc496d33b165dafc869a2e49be82a07",
     "semantic_hash": ""
   },
   "game/src/domain/equipment/equipment.test.js": {
-    "mtime": 1795060645.8261404,
-    "seen": 1795186193.9540222,
-    "ast_hash": "7dd28933583ca2e5abb54ac94e939b29",
+    "mtime": 1795451323.7868898,
+    "seen": 1795467493.2371461,
+    "ast_hash": "3d7b28eb4b1ead7fd39ac37ab2f92023",
     "semantic_hash": ""
   },
   "game/src/domain/equipment/leaderStats.js": {
-    "mtime": 1795106643.3989353,
-    "seen": 1795186193.9540298,
-    "ast_hash": "ec877b34103185912ee2fa6da77d4334",
+    "mtime": 1795451323.7878854,
+    "seen": 1795467493.2371542,
+    "ast_hash": "21456c693a3db49b41e20915bb41f8cb",
     "semantic_hash": ""
   },
   "game/src/domain/equipment/leaderStats.test.js": {
-    "mtime": 1795095826.3722057,
-    "seen": 1795186193.954036,
-    "ast_hash": "b835c78655e9f3b5d6a519395810419c",
+    "mtime": 1795451323.7888896,
+    "seen": 1795467493.2371602,
+    "ast_hash": "ef2be0e6a09654b983bb5d50134e6a62",
     "semantic_hash": ""
   },
   "game/src/domain/heroes/heroes.js": {
@@ -2424,21 +2424,21 @@
     "semantic_hash": ""
   },
   "game/src/domain/skills/skillCombat.test.js": {
-    "mtime": 1795184734.2841094,
-    "seen": 1795186193.9577847,
-    "ast_hash": "3ae4fc2010e4fb798d2559da5162d841",
+    "mtime": 1795451323.7898884,
+    "seen": 1795467493.2430124,
+    "ast_hash": "40925d8cb8853f6f786cfc9b90683587",
     "semantic_hash": ""
   },
   "game/src/domain/skills/skillDamage.js": {
-    "mtime": 1795069630.8128643,
-    "seen": 1795186193.9577906,
-    "ast_hash": "41376dbe66477f3550f90f8be1b5764c",
+    "mtime": 1795451323.7908926,
+    "seen": 1795467493.243017,
+    "ast_hash": "c2c7804f8fa53f76d0e11b6b80faedb5",
     "semantic_hash": ""
   },
   "game/src/domain/skills/skillDamage.test.js": {
-    "mtime": 1795061028.4775155,
-    "seen": 1795186193.9577959,
-    "ast_hash": "65a206d230c40ca8b72a4bb141150bcb",
+    "mtime": 1795451323.7920127,
+    "seen": 1795467493.2430203,
+    "ast_hash": "189c3e5a22811d0095d2b27bd87f8d51",
     "semantic_hash": ""
   },
   "game/src/domain/skills/skillLevel.js": {
@@ -2454,15 +2454,15 @@
     "semantic_hash": "ecb0e52e6014126a924aa36b922e5e7a"
   },
   "game/src/domain/talents/talents.js": {
-    "mtime": 1795106632.5460246,
-    "seen": 1795186193.958865,
-    "ast_hash": "689b0faf746d2c1813cb15be977a2b9c",
+    "mtime": 1795451323.7931345,
+    "seen": 1795467493.2436824,
+    "ast_hash": "0f9b704b0cdc984527617f565e869604",
     "semantic_hash": ""
   },
   "game/src/domain/talents/talents.test.js": {
-    "mtime": 1795095826.381521,
-    "seen": 1795186193.9588723,
-    "ast_hash": "c87212aa4b8e34f9ca932bc482f5b050",
+    "mtime": 1795451323.7937384,
+    "seen": 1795467493.243686,
+    "ast_hash": "862d6594693adec36f8d5ccc445f8c69",
     "semantic_hash": ""
   },
   "game/src/main.js": {
@@ -2670,9 +2670,9 @@
     "semantic_hash": ""
   },
   ".specs/STATE.md": {
-    "mtime": 1795138762.2258205,
-    "seen": 1795186194.1654632,
-    "ast_hash": "cf432d3a9616909d7d910f07894f003d",
+    "mtime": 1795451323.735243,
+    "seen": 1795467493.3882978,
+    "ast_hash": "c28e972f214e91b39eaa2cfa8cb25cba",
     "semantic_hash": ""
   },
   ".specs/features/account-reset/design.md": {
@@ -3240,9 +3240,9 @@
     "semantic_hash": ""
   },
   "CHANGELOG.md": {
-    "mtime": 1795137661.6903396,
-    "seen": 1795186194.2321157,
-    "ast_hash": "8d78de3fda42c9116ae89d3c0fc1a433",
+    "mtime": 1795457214.5148814,
+    "seen": 1795467493.4443283,
+    "ast_hash": "04d3da4da8daa7bf6674fa11f607a650",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -3264,9 +3264,9 @@
     "semantic_hash": ""
   },
   "PROMPTS_ASSETS_UI.md": {
-    "mtime": 1795060645.7116187,
-    "seen": 1795186194.2342207,
-    "ast_hash": "f0e6169379c8f5c651046259b0807365",
+    "mtime": 1795400663.4698074,
+    "seen": 1795467493.4460897,
+    "ast_hash": "2754ac606005068f39f5c3e5bb5e5485",
     "semantic_hash": ""
   },
   "backend/docs/adr/0001-logging.md": {
@@ -8718,9 +8718,9 @@
     "semantic_hash": ""
   },
   "game/e2e/uiRedesign.spec.js": {
-    "mtime": 1795060645.7941415,
-    "seen": 1795186193.9024303,
-    "ast_hash": "999db00f8181005d3b396be07234f798",
+    "mtime": 1795451323.7650354,
+    "seen": 1795467493.187865,
+    "ast_hash": "055267e4531cc9ae988d4bcf83b559c4",
     "semantic_hash": ""
   },
   "game/ui-review/uiRedesign.shots.js": {
@@ -9510,9 +9510,9 @@
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/PreviousBackendCompatibilityIT.kt": {
-    "mtime": 1795130426.4728305,
-    "seen": 1795186193.842588,
-    "ast_hash": "1a7775f869d25fed9d55470e155b5a48",
+    "mtime": 1795451323.7459583,
+    "seen": 1795467493.1288202,
+    "ast_hash": "da62fd08fa119c6fd97400337b0bc16a",
     "semantic_hash": ""
   },
   ".specs/features/campaign-chapters/report.html": {
@@ -10446,9 +10446,9 @@
     "semantic_hash": ""
   },
   "game/e2e/heroTeamPassives.spec.js": {
-    "mtime": 1795095826.3319812,
-    "seen": 1795186193.8991244,
-    "ast_hash": "b65f13b42a34d853e396396da96e647f",
+    "mtime": 1795451323.7552073,
+    "seen": 1795467493.1848474,
+    "ast_hash": "160a7183459bfe65ac31362c975263e2",
     "semantic_hash": ""
   },
   "game/e2e/heroTeamStyle.spec.js": {
@@ -10458,27 +10458,27 @@
     "semantic_hash": ""
   },
   "game/e2e/minibossAdds.spec.js": {
-    "mtime": 1795185653.5689695,
-    "seen": 1795186193.8996375,
-    "ast_hash": "4698a7786fd0789632a545807d61c597",
+    "mtime": 1795451323.756167,
+    "seen": 1795467493.1856928,
+    "ast_hash": "9a42bd2c3924e9285d98ee5ad4d9c641",
     "semantic_hash": ""
   },
   "game/e2e/minibossAddsSkills.spec.js": {
-    "mtime": 1795186019.7615802,
-    "seen": 1795186193.8996453,
-    "ast_hash": "1f1685a1c8b9d3136e8d860cb7292212",
+    "mtime": 1795451323.7581666,
+    "seen": 1795467493.1857018,
+    "ast_hash": "15e777b7a800f918f6ba92035d0cc639",
     "semantic_hash": ""
   },
   "game/e2e/minibossAddsTarget.spec.js": {
-    "mtime": 1795185692.2471106,
-    "seen": 1795186193.8996513,
-    "ast_hash": "7700b1cdbabf200f54018ee151d62b04",
+    "mtime": 1795456618.1548855,
+    "seen": 1795467493.185708,
+    "ast_hash": "1e095e680141e855599b42d8ca3bacdf",
     "semantic_hash": ""
   },
   "game/e2e/unifiedDamage.spec.js": {
-    "mtime": 1795061051.857587,
-    "seen": 1795186193.902437,
-    "ast_hash": "d3e6371091047ca786b9f6c62856c359",
+    "mtime": 1795451323.7650354,
+    "seen": 1795467493.187871,
+    "ast_hash": "fa26a38d6577ba0bdb351cb1028197e3",
     "semantic_hash": ""
   },
   "game/src/adapters/phaser/views/teamView.js": {
@@ -10506,15 +10506,15 @@
     "semantic_hash": ""
   },
   "game/src/domain/combat/allyAttacker.js": {
-    "mtime": 1795106622.4269862,
-    "seen": 1795186193.9476607,
-    "ast_hash": "7a0690ac60bf74063a27c94835c636b7",
+    "mtime": 1795197393.1387577,
+    "seen": 1795467493.2312074,
+    "ast_hash": "d4133599305b04d35ae980ca62b93ce0",
     "semantic_hash": ""
   },
   "game/src/domain/combat/allyAttacker.test.js": {
-    "mtime": 1795095826.362306,
-    "seen": 1795186193.947664,
-    "ast_hash": "935561b0dc5a08ee86a663c0de227e5b",
+    "mtime": 1795197393.1407566,
+    "seen": 1795467493.2312138,
+    "ast_hash": "65c2c74ada08c13c32e340da4a303496",
     "semantic_hash": ""
   },
   "game/src/domain/combat/allyCombat.js": {
@@ -11103,6 +11103,684 @@
     "mtime": 1795060756.0920722,
     "seen": 1795186194.3862925,
     "ast_hash": "3a1cb357e56a3633697d0111ba5bf184",
+    "semantic_hash": ""
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/SaoPauloGiftCalendar.kt": {
+    "mtime": 1795197393.0565915,
+    "seen": 1795467493.0717952,
+    "ast_hash": "101127b25e560bd09efd1072066e93d4",
+    "semantic_hash": ""
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/GiftRepository.kt": {
+    "mtime": 1795197393.05859,
+    "seen": 1795467493.0764706,
+    "ast_hash": "ef9d6f3461a09d8b2ae6e844a9037316",
+    "semantic_hash": ""
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/GiftController.kt": {
+    "mtime": 1795197393.0625763,
+    "seen": 1795467493.0862284,
+    "ast_hash": "c96557c569d2bb1af32376397c9d7976",
+    "semantic_hash": ""
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Gift.kt": {
+    "mtime": 1795197393.065514,
+    "seen": 1795467493.09311,
+    "ast_hash": "f484874eaed972bacfe80c9296a00a35",
+    "semantic_hash": ""
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/port/GiftPorts.kt": {
+    "mtime": 1795197393.069023,
+    "seen": 1795467493.1054459,
+    "ast_hash": "21a3e076424409f96fbf392d927463e6",
+    "semantic_hash": ""
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/service/GiftService.kt": {
+    "mtime": 1795197393.0710225,
+    "seen": 1795467493.1131334,
+    "ast_hash": "08f20f62c0d5c85b3edd88ceec6c820d",
+    "semantic_hash": ""
+  },
+  "backend/src/main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/ClaimGiftUseCase.kt": {
+    "mtime": 1795197393.0720222,
+    "seen": 1795467493.1170998,
+    "ast_hash": "a23aca8fe8b2ff6899e5332ed9e5300b",
+    "semantic_hash": ""
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/config/SaoPauloGiftCalendarTest.kt": {
+    "mtime": 1795197393.0807035,
+    "seen": 1795467493.1230035,
+    "ast_hash": "a573895f49fb93b23914e22d8fc4fd80",
+    "semantic_hash": ""
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/GiftRepositoryIT.kt": {
+    "mtime": 1795197393.083922,
+    "seen": 1795467493.125829,
+    "ast_hash": "d58f1f719ff43fd3ef142be954c0c679",
+    "semantic_hash": ""
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/TalentTreeReworkMigrationIT.kt": {
+    "mtime": 1795451323.7479582,
+    "seen": 1795467493.1326232,
+    "ast_hash": "12d6a6208fd83eecceaa0817fbe1cddc",
+    "semantic_hash": ""
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/GiftControllerIT.kt": {
+    "mtime": 1795197393.0933826,
+    "seen": 1795467493.1413708,
+    "ast_hash": "224277f7fce47a7819cf4d616cbe95b4",
+    "semantic_hash": ""
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/domain/GiftTest.kt": {
+    "mtime": 1795197393.0963829,
+    "seen": 1795467493.1517305,
+    "ast_hash": "8f731761739743c67ee38ac674091070",
+    "semantic_hash": ""
+  },
+  "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/service/GiftServiceTest.kt": {
+    "mtime": 1795197393.0995839,
+    "seen": 1795467493.159075,
+    "ast_hash": "f0a71ef62f69293b7dc7f4693c40299d",
+    "semantic_hash": ""
+  },
+  "game/e2e/blackAwarenessStaff.spec.js": {
+    "mtime": 1795197393.1021218,
+    "seen": 1795467493.1785078,
+    "ast_hash": "db57df6db351288a2b693d0dbfef09da",
+    "semantic_hash": ""
+  },
+  "game/e2e/blackAwarenessStaffDamage.spec.js": {
+    "mtime": 1795197393.1032584,
+    "seen": 1795467493.1785219,
+    "ast_hash": "299411f532db252dc6422d94fd36bcbe",
+    "semantic_hash": ""
+  },
+  "game/e2e/talentTreeRework.spec.js": {
+    "mtime": 1795456618.1568859,
+    "seen": 1795467493.187847,
+    "ast_hash": "98930d6b6b2a2f98919ae4de3d1fb8c6",
+    "semantic_hash": ""
+  },
+  "game/e2e/talentTreeReworkCombat.spec.js": {
+    "mtime": 1795451323.762174,
+    "seen": 1795467493.187854,
+    "ast_hash": "98df18ab8f505e038308a407a534e658",
+    "semantic_hash": ""
+  },
+  "game/src/adapters/http/giftApi.js": {
+    "mtime": 1795197393.110288,
+    "seen": 1795467493.1959486,
+    "ast_hash": "24a2f6362f9f1729739a86be7ec62773",
+    "semantic_hash": ""
+  },
+  "game/src/adapters/http/giftApi.test.js": {
+    "mtime": 1795197393.111287,
+    "seen": 1795467493.1959548,
+    "ast_hash": "04f2fa388ecfb6f3364df9a9b3726097",
+    "semantic_hash": ""
+  },
+  "game/src/adapters/phaser/views/talentTreeLayout.js": {
+    "mtime": 1795456618.163023,
+    "seen": 1795467493.2192173,
+    "ast_hash": "d93f1fbc220f850968c827ef8cf7da7b",
+    "semantic_hash": ""
+  },
+  "game/src/adapters/phaser/views/talentTreeLayout.test.js": {
+    "mtime": 1795451323.7763395,
+    "seen": 1795467493.2192235,
+    "ast_hash": "93d8ae97da6504471a619db433275c50",
+    "semantic_hash": ""
+  },
+  "game/src/application/gifts/giftClaim.js": {
+    "mtime": 1795197393.131468,
+    "seen": 1795467493.226254,
+    "ast_hash": "aa2c0a40fb34394daa2920324415382f",
+    "semantic_hash": ""
+  },
+  "game/src/application/gifts/giftClaim.test.js": {
+    "mtime": 1795197393.132468,
+    "seen": 1795467493.2262592,
+    "ast_hash": "126aa09e07d224827bfb63bb96ce8882",
+    "semantic_hash": ""
+  },
+  "game/src/domain/equipment/specials.js": {
+    "mtime": 1795197393.148304,
+    "seen": 1795467493.237166,
+    "ast_hash": "1090ce2dac8e1858b1f07e705bf1613e",
+    "semantic_hash": ""
+  },
+  "game/src/domain/equipment/specials.test.js": {
+    "mtime": 1795197393.1505995,
+    "seen": 1795467493.237172,
+    "ast_hash": "7738e1180633da06fbb1c0c56a068672",
+    "semantic_hash": ""
+  },
+  "game/ui-review/blackAwarenessStaff.shots.js": {
+    "mtime": 1795197393.1525998,
+    "seen": 1795467493.2452884,
+    "ast_hash": "6a690203642b73dcd8f7533f8af80408",
+    "semantic_hash": ""
+  },
+  "game/ui-review/talentTreeRework.shots.js": {
+    "mtime": 1795456618.1670344,
+    "seen": 1795467493.2486727,
+    "ast_hash": "20d92b907e8d60273f87695855c290ae",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/design.md": {
+    "mtime": 1795190728.3253696,
+    "seen": 1795467493.3930209,
+    "ast_hash": "d7f82a5a8682de8545994287b63a1184",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/report.html": {
+    "mtime": 1795207701.3642352,
+    "seen": 1795467493.393027,
+    "ast_hash": "e3efd1f659c088dd1c79ffb97f3c9411",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/spec.md": {
+    "mtime": 1795197392.9382524,
+    "seen": 1795467493.393032,
+    "ast_hash": "2ab379b1d16e94cef5e7da908cdad1f0",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/tasks.md": {
+    "mtime": 1795197394.613437,
+    "seen": 1795467493.3930364,
+    "ast_hash": "ff256cf9424c5e1a7c2874638eff190f",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review.html": {
+    "mtime": 1795197392.9437027,
+    "seen": 1795467493.3930404,
+    "ast_hash": "fb857b9985cea0a88a1c8016ab9bd8c9",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/design.md": {
+    "mtime": 1795400589.4859283,
+    "seen": 1795467493.4362311,
+    "ast_hash": "6966bb836963edbaef797b0cc9b3975e",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/report.html": {
+    "mtime": 1795467382.571129,
+    "seen": 1795467493.436239,
+    "ast_hash": "eec4181069600160080af779d0218e09",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/spec.md": {
+    "mtime": 1795451323.737244,
+    "seen": 1795467493.436244,
+    "ast_hash": "e55dbb6f9995f7738baff55548b702b8",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/tasks.md": {
+    "mtime": 1795456647.208973,
+    "seen": 1795467493.4362469,
+    "ast_hash": "debdd38cbbbb51c3fef77b9ca9c6061d",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review.html": {
+    "mtime": 1795456617.8686354,
+    "seen": 1795467493.43625,
+    "ast_hash": "19faf79a0d31dd480a0b5cbe7ca84445",
+    "semantic_hash": ""
+  },
+  "backend/docs/adr/0015-talent-tree-rework.md": {
+    "mtime": 1795451323.7407436,
+    "seen": 1795467493.4565928,
+    "ast_hash": "f74dc11df2e174079cfb4eae648ba6c5",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/01-gift-notice-desktop.png": {
+    "mtime": 1795197392.9557269,
+    "seen": 1795467493.4598203,
+    "ast_hash": "c4f115fc45d91525ba0b57e7b7b057c1",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/01-gift-notice-phone.png": {
+    "mtime": 1795197392.9639125,
+    "seen": 1795467493.4598243,
+    "ast_hash": "e6755d6b6be6ce42d218bf49a478246b",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/02-bag-with-staff-desktop.png": {
+    "mtime": 1795197392.971967,
+    "seen": 1795467493.4598272,
+    "ast_hash": "1e2bec5de656fcd70d11105cd55a96a4",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/02-bag-with-staff-phone.png": {
+    "mtime": 1795197392.9774964,
+    "seen": 1795467493.4598303,
+    "ast_hash": "a67b3b57be199b1b3b6682890d418828",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/03-staff-tile-desktop.png": {
+    "mtime": 1795197392.9784546,
+    "seen": 1795467493.4598334,
+    "ast_hash": "5d115417c32d0689b1fd370916cf57e7",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/03-staff-tile-phone.png": {
+    "mtime": 1795197392.9804559,
+    "seen": 1795467493.459836,
+    "ast_hash": "9520de5cebdc053499aa8b535bfff31b",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/04-plain-legendary-tile-desktop.png": {
+    "mtime": 1795197392.9814572,
+    "seen": 1795467493.4598382,
+    "ast_hash": "b3ec4e66e4f7e77e0f5b2b0ad7258f72",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/04-plain-legendary-tile-phone.png": {
+    "mtime": 1795197392.9824555,
+    "seen": 1795467493.4598405,
+    "ast_hash": "22fbe78b3058593e334b7364b91f5c12",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/05-tooltip-desktop.png": {
+    "mtime": 1795197392.9897938,
+    "seen": 1795467493.459843,
+    "ast_hash": "b212c7986e4886eda9887189b36fffde",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/05-tooltip-phone.png": {
+    "mtime": 1795197392.99481,
+    "seen": 1795467493.459845,
+    "ast_hash": "867bb7ffb07a5e993073b77575544c60",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/06-tooltip-closeup-desktop.png": {
+    "mtime": 1795197392.9968672,
+    "seen": 1795467493.4598475,
+    "ast_hash": "fa3ad038e440d90e1c7c78116b73e865",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/06-tooltip-closeup-phone.png": {
+    "mtime": 1795197392.9988818,
+    "seen": 1795467493.45985,
+    "ast_hash": "7dd7b731795a1b9e4f36e9a4ba4dd630",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/07-dragging-desktop.png": {
+    "mtime": 1795197393.006871,
+    "seen": 1795467493.4598525,
+    "ast_hash": "442a013c37693c25643733c730da3740",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/07-dragging-phone.png": {
+    "mtime": 1795197393.0128684,
+    "seen": 1795467493.4598546,
+    "ast_hash": "7fe1b96aba27e11389f9e9f039e12c3b",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/07b-drag-over-hero-desktop.png": {
+    "mtime": 1795197393.0219724,
+    "seen": 1795467493.459858,
+    "ast_hash": "8b58e1520da49231cfdc8fbc1e367e98",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/07b-drag-over-hero-phone.png": {
+    "mtime": 1795197393.0269718,
+    "seen": 1795467493.45986,
+    "ast_hash": "364c6c69933107cd6a41dd1aae30de71",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/08-worn-desktop.png": {
+    "mtime": 1795197393.0326145,
+    "seen": 1795467493.459862,
+    "ast_hash": "81b8b25843a6c2c21f22fe08e71d89d7",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/08-worn-phone.png": {
+    "mtime": 1795197393.03795,
+    "seen": 1795467493.4598649,
+    "ast_hash": "27f1d7345578eab0aa2ce6f4cc986726",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/09-worn-slot-desktop.png": {
+    "mtime": 1795197393.0399525,
+    "seen": 1795467493.4598675,
+    "ast_hash": "5abfc3fbce2811914bda8fbbcd0ef182",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/09-worn-slot-phone.png": {
+    "mtime": 1795197393.0399525,
+    "seen": 1795467493.4598694,
+    "ast_hash": "7436a0c5f5b98136c7654470938e1093",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/10-worn-tooltip-desktop.png": {
+    "mtime": 1795197393.0478208,
+    "seen": 1795467493.459872,
+    "ast_hash": "212f257aa4ae606660235bd66bc60763",
+    "semantic_hash": ""
+  },
+  ".specs/features/black-awareness-staff/ui-review/10-worn-tooltip-phone.png": {
+    "mtime": 1795197393.0535815,
+    "seen": 1795467493.4598742,
+    "ast_hash": "499f3adea4d7ca682250572d332eb82f",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/01-tree-empty-desktop.png": {
+    "mtime": 1795456617.8746967,
+    "seen": 1795467493.523284,
+    "ast_hash": "14371a25716dd5c14b3558f2c2012109",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/01-tree-empty-phone.png": {
+    "mtime": 1795456617.877719,
+    "seen": 1795467493.5232887,
+    "ast_hash": "5d736108e06cae6e7794ab3bc5d4b3d6",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/02-states-open-selected-desktop.png": {
+    "mtime": 1795456617.8826807,
+    "seen": 1795467493.5232923,
+    "ast_hash": "14be4faeaba6c67de215bc7838a51e96",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/02-states-open-selected-phone.png": {
+    "mtime": 1795456617.8855608,
+    "seen": 1795467493.5232956,
+    "ast_hash": "ea54aef751d476c8b9a973d24ddc9372",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/03-card-maxed-desktop.png": {
+    "mtime": 1795456617.8909917,
+    "seen": 1795467493.523299,
+    "ast_hash": "cb4e8f6f24d24d52d7c6ef6ef4bc4a23",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/03-card-maxed-phone.png": {
+    "mtime": 1795456617.893764,
+    "seen": 1795467493.5233018,
+    "ast_hash": "f748e14a638d46d82f7ea59575e44329",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/04-card-open-grade2-desktop.png": {
+    "mtime": 1795456617.898693,
+    "seen": 1795467493.523304,
+    "ast_hash": "ad151905ee545db58df45b824f07b455",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/04-card-open-grade2-phone.png": {
+    "mtime": 1795456617.902839,
+    "seen": 1795467493.5233066,
+    "ast_hash": "45eba85180e1c936db34d62b8f4ff1c8",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/05-card-locked-grade-desktop.png": {
+    "mtime": 1795456617.9074118,
+    "seen": 1795467493.5233092,
+    "ast_hash": "2578ab4104953c9660716712c1f13581",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/05-card-locked-grade-phone.png": {
+    "mtime": 1795456617.9107168,
+    "seen": 1795467493.523313,
+    "ast_hash": "59fd7db83a5556824739e348724f6cd2",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/06-card-fury-locked-desktop.png": {
+    "mtime": 1795456617.9151213,
+    "seen": 1795467493.5233164,
+    "ast_hash": "eed1f5ba33c3358a60200b258c241d72",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/06-card-fury-locked-phone.png": {
+    "mtime": 1795456617.9184163,
+    "seen": 1795467493.523319,
+    "ast_hash": "4f501fa5eae720c1e29f99f0f6320bf2",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/07-card-fury-level-4-desktop.png": {
+    "mtime": 1795456617.923277,
+    "seen": 1795467493.5233216,
+    "ast_hash": "e1e13d2d841b32f65b123a6cf96e6fa1",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/07-card-fury-level-4-phone.png": {
+    "mtime": 1795456617.9270658,
+    "seen": 1795467493.523324,
+    "ast_hash": "1daba0f59847b5d5d0b6c63dae9eeaa0",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/08-card-fury-available-desktop.png": {
+    "mtime": 1795456617.936948,
+    "seen": 1795467493.5233266,
+    "ast_hash": "c1adf04a113cb3cba5da4919b966dbbb",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/08-card-fury-available-phone.png": {
+    "mtime": 1795456617.9425483,
+    "seen": 1795467493.523329,
+    "ast_hash": "57b747d4cfbebf237a50dfdb473b22a4",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/09-veins-0-27-44-100-desktop.png": {
+    "mtime": 1795456617.9491727,
+    "seen": 1795467493.5233316,
+    "ast_hash": "ad9163968055c3852cb0fbb313f2deac",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/09-veins-0-27-44-100-phone.png": {
+    "mtime": 1795456617.9534996,
+    "seen": 1795467493.5233345,
+    "ast_hash": "f0563ee2c02abe39d77889e9f6acddb9",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/10-art-present-placeholder-desktop.png": {
+    "mtime": 1795456617.958592,
+    "seen": 1795467493.5233366,
+    "ast_hash": "436f82a14f9bb9b865f0672c62d8bc57",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/10-art-present-placeholder-phone.png": {
+    "mtime": 1795456617.9621942,
+    "seen": 1795467493.5233395,
+    "ast_hash": "0cf65da06ba67a5733f1079b808b4e84",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/11-chip-miniboss-desktop.png": {
+    "mtime": 1795456617.9712734,
+    "seen": 1795467493.5233421,
+    "ast_hash": "caac6e67a7a13bb71e821cdc32d80a30",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/11-chip-miniboss-phone.png": {
+    "mtime": 1795456617.9784584,
+    "seen": 1795467493.5233443,
+    "ast_hash": "c95cdc1964409f51c8567c329f5bd317",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/12-chip-adds-desktop.png": {
+    "mtime": 1795456617.9873948,
+    "seen": 1795467493.5233467,
+    "ast_hash": "b9e31aff4e9624f57062c2931e82eda8",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/12-chip-adds-phone.png": {
+    "mtime": 1795456617.9975612,
+    "seen": 1795467493.5233493,
+    "ast_hash": "cda8c57d36cca0c3e099dacb2c452fa2",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/13-equipment-attributes-desktop.png": {
+    "mtime": 1795456618.0039113,
+    "seen": 1795467493.5233524,
+    "ast_hash": "a9ff77bf704cfcbb35cca0ffdc7f7adc",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/13-equipment-attributes-phone.png": {
+    "mtime": 1795456618.0089624,
+    "seen": 1795467493.5233552,
+    "ast_hash": "5b0ac79711893d6970b0440eaaa8e10a",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/01-tree-empty-desktop.png": {
+    "mtime": 1795456618.0137837,
+    "seen": 1795467493.5233574,
+    "ast_hash": "6e983388f56dafa3475affce7029d55c",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/01-tree-empty-phone.png": {
+    "mtime": 1795456618.0172734,
+    "seen": 1795467493.52336,
+    "ast_hash": "a617cc5eb9ba45a5a4f79f884592711e",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/02-states-open-selected-desktop.png": {
+    "mtime": 1795456618.0245085,
+    "seen": 1795467493.5233624,
+    "ast_hash": "1738b1c652d37adddfbfd59263f21367",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/02-states-open-selected-phone.png": {
+    "mtime": 1795456618.0280564,
+    "seen": 1795467493.5233643,
+    "ast_hash": "758955e8f2cb9e6cbadd317632221029",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/03-card-maxed-desktop.png": {
+    "mtime": 1795456618.0347383,
+    "seen": 1795467493.5233667,
+    "ast_hash": "fc1c29addf7e0c5cbc9975d7f68d07a9",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/03-card-maxed-phone.png": {
+    "mtime": 1795456618.0396812,
+    "seen": 1795467493.5233698,
+    "ast_hash": "1ded031dabea425744dc81d6b66bc42f",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/04-card-open-grade2-desktop.png": {
+    "mtime": 1795456618.0458317,
+    "seen": 1795467493.5233727,
+    "ast_hash": "7d07a403fef5c9563758c019b972fd5f",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/04-card-open-grade2-phone.png": {
+    "mtime": 1795456618.0508604,
+    "seen": 1795467493.5233748,
+    "ast_hash": "fa36c677ddc1d3edf768a72f51e181eb",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/05-card-locked-grade-desktop.png": {
+    "mtime": 1795456618.0567644,
+    "seen": 1795467493.523377,
+    "ast_hash": "a22aeae5475ad71924cac1e78248476b",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/05-card-locked-grade-phone.png": {
+    "mtime": 1795456618.0606883,
+    "seen": 1795467493.5233798,
+    "ast_hash": "977d6e8b55a865b1c740761d109ae844",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/06-card-fury-locked-desktop.png": {
+    "mtime": 1795456618.066699,
+    "seen": 1795467493.523382,
+    "ast_hash": "cd7e4897f52d9f7feb126e42d3e6a881",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/06-card-fury-locked-phone.png": {
+    "mtime": 1795456618.0716965,
+    "seen": 1795467493.5233843,
+    "ast_hash": "da4cca58038c34a392c4bc112cf54a41",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/07-card-fury-level-4-desktop.png": {
+    "mtime": 1795456618.0789373,
+    "seen": 1795467493.5233867,
+    "ast_hash": "ac4fd3539d211f5e274c602489c02e23",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/07-card-fury-level-4-phone.png": {
+    "mtime": 1795456618.0832846,
+    "seen": 1795467493.5233889,
+    "ast_hash": "4333140e614706f4039793fd61abb33d",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/08-card-fury-available-desktop.png": {
+    "mtime": 1795456618.089198,
+    "seen": 1795467493.5233917,
+    "ast_hash": "ee2d631ab27d41dd6bd4dca6a62c28a7",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/08-card-fury-available-phone.png": {
+    "mtime": 1795456618.0937304,
+    "seen": 1795467493.5233943,
+    "ast_hash": "84d1bb62410920e25a5c16fbdc97c4ec",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/09-veins-0-27-44-100-desktop.png": {
+    "mtime": 1795456618.099964,
+    "seen": 1795467493.5233965,
+    "ast_hash": "e70fe167e586aa6bc66bf5830fafd349",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/09-veins-0-27-44-100-phone.png": {
+    "mtime": 1795456618.105214,
+    "seen": 1795467493.5233994,
+    "ast_hash": "4dbd443641438da5b126ea64b8cb0d27",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/10-art-present-placeholder-desktop.png": {
+    "mtime": 1795456618.1108646,
+    "seen": 1795467493.523402,
+    "ast_hash": "4410fa273efdcacf7c352f4dfcfd21ed",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/10-art-present-placeholder-phone.png": {
+    "mtime": 1795456618.1150591,
+    "seen": 1795467493.5234044,
+    "ast_hash": "42a143a6434918d2d6ffad2693cec976",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/11-chip-miniboss-desktop.png": {
+    "mtime": 1795456618.1228023,
+    "seen": 1795467493.5234065,
+    "ast_hash": "c1aa00356f245c09d59ed8828d75bad9",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/11-chip-miniboss-phone.png": {
+    "mtime": 1795456618.1297667,
+    "seen": 1795467493.523409,
+    "ast_hash": "6a6a4a8a575944ec8e0eaf2013f57eac",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/12-chip-adds-desktop.png": {
+    "mtime": 1795456618.1372433,
+    "seen": 1795467493.523411,
+    "ast_hash": "b9e31aff4e9624f57062c2931e82eda8",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/12-chip-adds-phone.png": {
+    "mtime": 1795456618.1432366,
+    "seen": 1795467493.5234134,
+    "ast_hash": "d2885bcb24acd6e14892c9ca02e105f9",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/13-equipment-attributes-desktop.png": {
+    "mtime": 1795456618.148371,
+    "seen": 1795467493.5234163,
+    "ast_hash": "a9ff77bf704cfcbb35cca0ffdc7f7adc",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/round1/13-equipment-attributes-phone.png": {
+    "mtime": 1795456618.152888,
+    "seen": 1795467493.5234191,
+    "ast_hash": "5b0ac79711893d6970b0440eaaa8e10a",
+    "semantic_hash": ""
+  },
+  "game/public/assets/staff_black_awares_day.png": {
+    "mtime": 1795189842.5432398,
+    "seen": 1795467493.5857563,
+    "ast_hash": "0f2594cc7b936b3e7931b1608fd9636e",
     "semantic_hash": ""
   },
   "game/package-lock.json": {
