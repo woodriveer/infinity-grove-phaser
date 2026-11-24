@@ -122,8 +122,8 @@ test.describe('Talentos tree: nodes', () => {
         await openTalents(page);
 
         await expect(page.locator('.talent-node')).toHaveCount(28);
-        expect((await size(page.getByTestId('talent-CLICK_DAMAGE')))[0]).toBe(60);
-        expect((await size(page.getByTestId('talent-COMBO_FURY')))[0]).toBe(88);
+        expect((await size(page.getByTestId('talent-CLICK_DAMAGE')))[0]).toBe(44);
+        expect((await size(page.getByTestId('talent-COMBO_FURY')))[0]).toBe(56);
 
         //  CLICK_DAMAGE sits at 55 % x 1024 and 50 % x 576 of the board
         const centre = await page.getByTestId('talent-CLICK_DAMAGE').evaluate((node) =>
@@ -148,7 +148,7 @@ test.describe('Talentos tree: nodes', () => {
         await expect(page.getByTestId('talent-node-grade-BOSS_DAMAGE_G2')).toHaveText('II');
         await expect(page.getByTestId('talent-node-grade-BOSS_DAMAGE_G3')).toHaveText('III');
         await expect(page.getByTestId('talent-caption-BOSS_DAMAGE')).toHaveCSS('font-size', '12px');
-        await expect(page.getByTestId('talent-node-grade-BOSS_DAMAGE_G2')).toHaveCSS('font-size', '11px');
+        await expect(page.getByTestId('talent-node-grade-BOSS_DAMAGE_G2')).toHaveCSS('font-size', '10px');
 
         //  Grades 2 and 3 carry a badge and no caption; grade 1 carries no badge
         await expect(page.getByTestId('talent-caption-BOSS_DAMAGE_G2')).toHaveCount(0);

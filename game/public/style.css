@@ -2397,13 +2397,13 @@ button.bag-card:hover:not(:disabled) {
 .talent-tree.is-fallback .talent-tree-veins { display: block; }
 .talent-tree-veins polyline { fill: none; stroke: rgb(245 234 216 / 0.35); stroke-width: 3; stroke-dasharray: 6 5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 
-.talent-node { position: absolute; z-index: 1; width: 60px; height: 60px; padding: 0; border: none; border-radius: 50%; background: none; transform: translate(-50%, -50%); cursor: pointer; }
-.talent-node.is-large { width: 88px; height: 88px; }
+.talent-node { position: absolute; z-index: 1; width: 44px; height: 44px; padding: 0; border: none; border-radius: 50%; background: none; transform: translate(-50%, -50%); cursor: pointer; }
+.talent-node.is-large { width: 56px; height: 56px; }
 .talent-node-frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .talent-node.no-frame { background: radial-gradient(circle, var(--wood-700) 0 62%, var(--wood-900) 63%); box-shadow: inset 0 0 0 4px var(--branch); }
-.talent-node .talent-node-icon { position: absolute; top: 50%; left: 50%; width: 36px; height: 36px; transform: translate(-50%, -50%); }
-.talent-node.is-large .talent-node-icon { width: 54px; height: 54px; }
-.talent-node .talent-node-lock { position: absolute; top: -8px; left: -8px; width: 24px; height: 24px; font-size: 14px; }
+.talent-node .talent-node-icon { position: absolute; top: 50%; left: 50%; width: 28px; height: 28px; transform: translate(-50%, -50%); }
+.talent-node.is-large .talent-node-icon { width: 36px; height: 36px; }
+.talent-node .talent-node-lock { position: absolute; top: -7px; left: -7px; width: 20px; height: 20px; font-size: 12px; }
 .talent-node[data-state="locked"] .talent-node-icon { filter: grayscale(1) brightness(0.55); }
 .talent-node[data-state="available"] { box-shadow: 0 0 0 3px var(--branch), 0 0 16px 6px var(--branch); }
 .talent-node[data-state="maxed"] { box-shadow: 0 0 0 2px var(--wood-900), 0 0 0 5px var(--gold-200); }
@@ -2412,9 +2412,9 @@ button.bag-card:hover:not(:disabled) {
 .talent-node[data-state="maxed"][aria-pressed="true"] { outline-offset: 8px; }
 /* A seal in the top left corner says the state without the branch colour: a gold star when maxed, a "+" when the points pay the next level (the lock takes the same corner when locked) */
 .talent-node[data-state="maxed"]::after,
-.talent-node[data-state="available"]::after { position: absolute; top: -8px; left: -8px; display: grid; place-items: center; box-sizing: border-box; width: 22px; height: 22px; font-family: var(--font-heading); font-weight: 700; line-height: 1; border-radius: 50%; pointer-events: none; }
-.talent-node[data-state="maxed"]::after { content: "★"; font-size: 13px; color: var(--wood-900); background: var(--gold-200); border: 2px solid var(--wood-900); }
-.talent-node[data-state="available"]::after { content: "+"; font-size: 17px; color: var(--branch-ink); background: var(--parchment-100); border: 2px solid var(--branch); }
+.talent-node[data-state="available"]::after { position: absolute; top: -6px; left: -6px; display: grid; place-items: center; box-sizing: border-box; width: 18px; height: 18px; font-family: var(--font-heading); font-weight: 700; line-height: 1; border-radius: 50%; pointer-events: none; }
+.talent-node[data-state="maxed"]::after { content: "★"; font-size: 11px; color: var(--wood-900); background: var(--gold-200); border: 2px solid var(--wood-900); }
+.talent-node[data-state="available"]::after { content: "+"; font-size: 14px; color: var(--branch-ink); background: var(--parchment-100); border: 2px solid var(--branch); }
 @keyframes talent-available-pulse {
     from { box-shadow: 0 0 0 3px var(--branch), 0 0 16px 6px var(--branch); }
     to { box-shadow: 0 0 0 3px var(--branch), 0 0 24px 11px var(--branch); }
@@ -2433,7 +2433,7 @@ button.bag-card:hover:not(:disabled) {
 .talent-node[data-state="maxed"] .talent-node-level { color: var(--gold-400); border-color: var(--gold-400); }
 .talent-node-caption { position: absolute; top: calc(100% + 9px); left: 50%; display: -webkit-box; width: 80px; overflow: hidden; font-family: var(--font-body); font-size: 12px; font-weight: 700; line-height: 15px; color: var(--parchment-100); text-align: center; text-shadow: 0 1px 2px #000, 0 0 4px #000; transform: translateX(-50%); -webkit-line-clamp: 3; -webkit-box-orient: vertical; pointer-events: none; }
 .talent-tree.is-fallback .talent-node-caption { box-sizing: border-box; padding: 0 3px; background: rgb(28 18 12 / 0.72); border-radius: 6px; }
-.talent-node-grade { position: absolute; top: -4px; right: -4px; display: grid; place-items: center; width: 20px; height: 20px; font-family: var(--font-heading); font-size: 11px; font-weight: 700; color: var(--gold-200); background: var(--wood-900); border: 1px solid var(--gold-400); border-radius: 50%; pointer-events: none; }
+.talent-node-grade { position: absolute; top: -4px; right: -4px; display: grid; place-items: center; width: 18px; height: 18px; font-family: var(--font-heading); font-size: 10px; font-weight: 700; color: var(--gold-200); background: var(--wood-900); border: 1px solid var(--gold-400); border-radius: 50%; pointer-events: none; }
 
 .talent-banner { position: absolute; z-index: 1; display: grid; place-items: center; width: 140px; height: 34px; transform: translate(-50%, -50%); }
 .talent-banner-art,

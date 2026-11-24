@@ -172,7 +172,7 @@ Open questions: none. Q1 to Q6 are answered by the owner (2026-11-24): every rec
 | TTB-01 | P1 Branches: AC 1, AC 2, AC 3 (coordinates, grade order, sides) | Tasks | Pending |
 | TTB-02 | P1 Branches: AC 4, AC 5 (no overlap, every node clickable) | Tasks | Pending |
 | TTB-03 | P1 Branches: AC 6, AC 7, AC 8 (banners, lit ellipses, fallback veins) | Tasks | Pending |
-| TTB-04 | P1 Sizes: AC 1, AC 2, AC 3 (node, icon and mark sizes) | Tasks | Pending |
+| TTB-04 | P1 Sizes: AC 1, AC 2, AC 3 (node, icon and mark sizes) | Tasks | Implementing |
 | TTB-05 | P1 Card: AC 1, AC 2 (descriptions) | Tasks | Implementing |
 | TTB-06 | P1 Card: AC 3, AC 4 (card icon and its fallback) | Tasks | Pending |
 | TTB-07 | P1 Card: AC 5, AC 6, AC 7 (card size, layout, empty state, kept texts) | Tasks | Pending |

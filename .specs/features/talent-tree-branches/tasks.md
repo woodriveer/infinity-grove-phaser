@@ -137,7 +137,7 @@ export const talentDescription = (talent) => TALENT_DESCRIPTIONS[talent.baseId ?
 
 ---
 
-#### T2: Smaller talent nodes [ ]
+#### T2: Smaller talent nodes [x]
 
 **Owner**: game-dev
 **Goal**: Nodes are 44 px (Fúria crescente 56 px) with 28 px (36 px) icons, and the badge, seal and lock shrink with them (TTB-04; spec P1 Sizes AC 1, AC 2, D3).
@@ -180,7 +180,7 @@ Update the comment above the seal rule if it names a size. The level chip, the c
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/talentTreeRework.spec.js`
 **Done when**:
 
-- [ ] The three re-pinned assertions pass and every other test of `talentTreeRework.spec.js` passes unchanged (the old coordinates still hold in this task).
+- [x] The three re-pinned assertions pass and every other test of `talentTreeRework.spec.js` passes unchanged (the old coordinates still hold in this task).
 
 **Commit**: `feat(game): draw smaller talent nodes`
 
