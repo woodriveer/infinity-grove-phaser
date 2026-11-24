@@ -109,15 +109,111 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <code>.specs/features/talent-tree-rework</code> · commits <code>até 8fae5cb</code> · 2026-11-23 · local (npm run dev, porta 5175, backend falso, arte talent-* roteada como ausente)
                 </div>
             </div>
-            <span class="chip verdict ok">APROVADO (rodada 2)</span>
+            <span class="chip verdict changes">MUDANÇAS PEDIDAS (rodada 3)</span>
         </div>
-        <p style="margin-top:16px"><strong>Rodada 2:</strong> os achados 1, 2, 3, 4, 6 e 7 foram corrigidos (T25 a T30) e reverificados com capturas novas em desktop e celular; os achados 5 (TD-010) e 8 (nome do elemento em inglês, anterior à feature) ficam com o dono e não bloqueiam. Sem achados novos. Rodada 1 (MUDANÇAS PEDIDAS) logo abaixo, com as capturas originais em <code>ui-review/round1/</code>.<br><br>Rodada 1: A árvore sem arte (fallback) é coerente com o Grove, cabe na janela e não tem sobreposição entre nós, legendas e faixas; a linha "Seu crítico" e o painel de atributos estão corretos. Um defeito bloqueia: o estado "no máximo" some no ramo Poder do clique. Outros sete achados são médios e baixos. Reprovado só por esse ponto: corrigindo o #1 o fallback pode ser entregue como está, e o layout em % aceita a arte e a calibração quando o fundo chegar.</p>
+        <p style="margin-top:16px"><strong>Rodada 3:</strong> com a arte pintada a árvore lê como a referência, mas o layout calibrado (T31) tem cinco achados (3 médios, 2 baixos), na seção da rodada 3. As rodadas 1 e 2 seguem abaixo.<br><br><strong>Rodada 2:</strong> os achados 1, 2, 3, 4, 6 e 7 foram corrigidos (T25 a T30) e reverificados com capturas novas em desktop e celular; os achados 5 (TD-010) e 8 (nome do elemento em inglês, anterior à feature) ficam com o dono e não bloqueiam. Sem achados novos. Rodada 1 (MUDANÇAS PEDIDAS) logo abaixo, com as capturas originais em <code>ui-review/round1/</code>.<br><br>Rodada 1: A árvore sem arte (fallback) é coerente com o Grove, cabe na janela e não tem sobreposição entre nós, legendas e faixas; a linha "Seu crítico" e o painel de atributos estão corretos. Um defeito bloqueia: o estado "no máximo" some no ramo Poder do clique. Outros sete achados são médios e baixos. Reprovado só por esse ponto: corrigindo o #1 o fallback pode ser entregue como está, e o layout em % aceita a arte e a calibração quando o fundo chegar.</p>
         <div class="stats">
             <div class="stat"><div class="n">13</div><div class="l">telas e estados verificados</div></div>
             <div class="stat"><div class="n">26</div><div class="l">capturas (desktop + celular)</div></div>
             <div class="stat"><div class="n">1</div><div class="l">achados de severidade alta</div></div>
             <div class="stat"><div class="n">7</div><div class="l">achados médios e baixos</div></div>
         </div>
+    </section>
+    <section class="panel">
+        <h2>Rodada 3: calibração da árvore à arte pintada (T31, commit 1a47c99)</h2>
+        <p>Veredito: <strong>MUDANÇAS PEDIDAS</strong>. A árvore agora lê como a referência: quatro ramos coloridos (azul-turquesa Caça aos chefes, vermelho Quebra de defesa, dourado Poder do clique, violeta Combo), as faixas de Tempo, Quebra e Combo sobre a folhagem do seu ramo, e a hierarquia (placa, faixas, nós, legendas) é clara. Os cinco pontos do orquestrador foram verificados nas capturas abaixo; os achados são três de severidade média e dois baixos. As capturas de estados 01 a 09 seguem com a arte roteada como ausente (fallback); só a 11 renderiza a arte real.</p>
+        <ul class="checks">
+            <li class="no"><span class="mark">–</span><span>Ponto 1 (faixas cortadas pela borda superior): <strong>rejeitado</strong>. As faixas "Quebra de defesa" e "Poder do clique" aparecem inteiras; ficam a cerca de 5 px da linha dourada da janela, apertadas mas sem corte (achado #5, baixo).</span></li>
+            <li class="yes"><span class="mark">✓</span><span>Ponto 2 (Dano crítico G3 colado no Fechar): <strong>confirmado</strong>, achado #1. O anel do nó termina em x 1004 e o Fechar começa em x 1005, na mesma altura; no celular o nó Chance de crítico G3 e sua pílula 10/10 encostam no Fechar.</span></li>
+            <li class="yes"><span class="mark">✓</span><span>Ponto 3 (duas colunas Poder sobre a folhagem violeta): <strong>confirmado</strong>, achado #2.</span></li>
+            <li class="yes"><span class="mark">✓</span><span>Ponto 4 (faixa Combo longe da coluna Combo): <strong>confirmado em parte</strong>, achado #3. A faixa fica sobre Fúria crescente (que é do Combo), mas a coluna Combo a 92 % fica 130 px adiante sem rótulo, e a faixa encosta na legenda "Dano direto de clique".</span></li>
+            <li class="yes"><span class="mark">✓</span><span>Ponto 5 (quatro colunas douradas escalonadas apertadas): <strong>confirmado</strong>, achado #4 (baixo): legíveis, sem sobreposição de nós, mas o escalonamento deixa o bloco denso ao lado da placa.</span></li>
+            <li class="yes"><span class="mark">✓</span><span>Celular: o quadro é rolável com zoom 2x e o nó selecionado é revelado; funciona, mas o Fechar fixo cobre o grau 3 da coluna Chance de crítico e o botão Reiniciar cobre a legenda "0/4" de Fúria crescente (achado #1).</span></li>
+        </ul>
+        <div class="screen">
+            <h3>Talentos: arte pintada real (rodada 3)</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/11-real-art-desktop.png" target="_blank"><img src="ui-review/11-real-art-desktop.png" alt="Árvore com arte real" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Árvore com a arte pintada</span>
+                        <span class="d">Fundo talent-tree-bg com molduras e ícones pintados; Chance de crítico selecionado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #1</span><span class="chip sev-media">achado #2</span><span class="chip sev-media">achado #3</span><span class="chip sev-baixa">achado #4</span><span class="chip sev-baixa">achado #5</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="shots phone" style="margin-top:16px">
+                <figure>
+                    <a href="ui-review/11-real-art-phone.png" target="_blank"><img src="ui-review/11-real-art-phone.png" alt="Árvore com arte real no celular" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Árvore com a arte pintada</span>
+                        <span class="d">Quadro com zoom 2x, rolado até o nó selecionado; Fechar sobre o grau 3, Reiniciar sobre "0/4".</span>
+                        <span class="tags"><span class="chip vp">Celular 390×844</span><span class="chip sev-media">achado #1</span><span class="chip sev-media">achado #3</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <h2 style="margin-top:24px">Achados da rodada 3</h2>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#1 · Média</span><strong>O grau 3 da coluna Dano crítico encosta no botão Fechar</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (desktop e celular)</dd>
+                    <dt>O que está errado</dt><dd>CRIT_DAMAGE_G3 está em x 84,6 / y 8,5 e o seu anel termina um pixel antes do Fechar (Fechar x 1005 a 1108, y 98 a 133 no desktop). No celular o Fechar fixo cobre o grau 3 de Chance de crítico.</dd>
+                    <dt>Como deveria ficar</dt><dd>Folga de pelo menos 12 px. Baixar o topo das duas últimas colunas Poder: grau 1 em y 36 e passo 11,5 (graus 2 e 3 em 24,5 e 13), ou reduzir x de CRIT_DAMAGE para 83. Vale também para a solução do achado #2.</dd>
+                    <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/talentTreeLayout.js (CHAINS, CRIT_CHANCE e CRIT_DAMAGE)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/11-real-art-desktop.png" target="_blank"><img src="ui-review/11-real-art-desktop.png" alt="Captura do achado #1"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#2 · Média</span><strong>As colunas Chance de crítico e Dano crítico estão sobre a folhagem violeta e azul, não sobre a dourada</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (desktop)</dd>
+                    <dt>O que está errado</dt><dd>A folhagem dourada ocupa de x 55 a 72 % do quadro; as colunas em x 76,3 e 84,6 caem sobre a copa violeta/azul-escura, ao lado do ramo Combo. A cor do fundo diz "Combo" para 6 dos 12 nós de Poder do clique, contra o pedido do dono de cada ramo no seu galho colorido.</dd>
+                    <dt>Como deveria ficar</dt><dd>Os 4 nós de cada coluna Poder dentro da folhagem dourada: mover as quatro colunas para x 56, 62, 68 e 74 (em vez de 59,3 / 67,8 / 76,3 / 84,6), com a faixa Poder centralizada nelas (x 65). Isso também libera a borda direita para o Combo.</dd>
+                    <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/talentTreeLayout.js (CHAINS, x das quatro cadeias Poder; BANNER_POSITIONS.POWER)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/11-real-art-desktop.png" target="_blank"><img src="ui-review/11-real-art-desktop.png" alt="Captura do achado #2"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#3 · Média</span><strong>A faixa Combo não aponta a coluna Combo e encosta numa legenda</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (desktop e celular)</dd>
+                    <dt>O que está errado</dt><dd>A faixa está em x 77 / y 49,7, sobre Fúria crescente, mas a coluna Limite de dano do combo (x 92) fica sem rótulo, e a borda esquerda da faixa (x 838) toca a legenda "Dano direto de clique" (que termina em x 840). No celular a faixa é cortada pela borda direita da janela.</dd>
+                    <dt>Como deveria ficar</dt><dd>Com as colunas Poder movidas (achado #2), centralizar a faixa entre Fúria e a coluna: x 85 / y 49,7, e Fúria crescente em x 80. A faixa passa a rotular os dois grupos e fica longe da legenda dourada.</dd>
+                    <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/talentTreeLayout.js (BANNER_POSITIONS.COMBO, NODE_POSITIONS.COMBO_FURY)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/11-real-art-phone.png" target="_blank"><img src="ui-review/11-real-art-phone.png" alt="Captura do achado #3"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#4 · Baixa</span><strong>Colunas douradas escalonadas e densas ao lado da placa</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (desktop)</dd>
+                    <dt>O que está errado</dt><dd>Quatro colunas de Poder com topos em alturas diferentes formam uma escada irregular, e o grau 3 de Dano de clique fica a 20 px da placa "Talentos".</dd>
+                    <dt>Como deveria ficar</dt><dd>Depois do #2, topos regulares: grau 1 em y 50, 44, 38 e 32 com passo 12; a escada sobe de modo uniforme para a direita, acompanhando o galho, e a placa fica livre.</dd>
+                    <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/talentTreeLayout.js (rise das cadeias Poder)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/11-real-art-desktop.png" target="_blank"><img src="ui-review/11-real-art-desktop.png" alt="Captura do achado #4"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#5 · Baixa</span><strong>Faixas Quebra de defesa e Poder do clique coladas ao topo</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos (desktop)</dd>
+                    <dt>O que está errado</dt><dd>Em y 3,2 % as faixas ficam a 5 px da borda dourada da janela e a de Poder do clique está sobre a copa escura, não sobre a dourada. Não há corte; só aperto.</dd>
+                    <dt>Como deveria ficar</dt><dd>y 5 % para as duas faixas, com a de Poder em x 64 / y 5, se os nós de grau 3 descerem o bastante (achados #1 e #4).</dd>
+                    <dt>Arquivo</dt><dd><code>game/src/adapters/phaser/views/talentTreeLayout.js (BANNER_POSITIONS.BREAK e POWER)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/11-real-art-desktop.png" target="_blank"><img src="ui-review/11-real-art-desktop.png" alt="Captura do achado #5"></a>
+        </article>
     </section>
     <section class="panel">
         <h2>Rodada 2: reverificação das correções</h2>
