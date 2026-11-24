@@ -1,36 +1,34 @@
-//  Where the talent tree sits, in percent of the 16:9 board (origin top left). Provisional: recalibrated on talent-tree-bg.jpg once it exists,
-//  like mapLayout.js (spec talent-tree-rework D14). Four boughs: far left TIME, upper left BREAK, upper right POWER, far right COMBO.
+//  Where the talent tree sits, in percent of the 16:9 board (origin top left). Calibrated on talent-tree-bg.jpg, like mapLayout.js (spec talent-tree-rework D14, task T31). Four boughs: far left TIME, upper left BREAK, upper right POWER, far right COMBO.
 export const TREE_SIZE = { width: 1024, height: 576 };
 
 export const TREE_IMAGE = 'assets/talent-tree-bg.jpg';
 
-//  Grade 1 lowest: the upper boughs (BREAK, POWER) and the far boughs (TIME, COMBO) have their own rows
-const UPPER_ROWS = { 1: 46, 2: 33, 3: 20 };
-const FAR_ROWS = { 1: 66, 2: 53, 3: 40 };
+//  Grade 1 lowest, one grade every 12.5 % of the height (12 % in the last POWER column, which has less crown above it): `rise` gives the three rows of a column from its grade 1 row
+const rise = (grade1, step = 12.5) => ({ 1: grade1, 2: grade1 - step, 3: grade1 - 2 * step });
 const CHAINS = [
-    [ 'MINIBOSS_TIME', 6, FAR_ROWS ], [ 'BOSS_DAMAGE', 15, FAR_ROWS ],
-    [ 'PHYSICAL_BREAK', 26, UPPER_ROWS ], [ 'ARMOR_PIERCE', 35, UPPER_ROWS ],
-    [ 'CLICK_DAMAGE', 55, UPPER_ROWS ], [ 'CLICK_FLAT_DAMAGE', 63.5, UPPER_ROWS ], [ 'CRIT_CHANCE', 72, UPPER_ROWS ], [ 'CRIT_DAMAGE', 80.5, UPPER_ROWS ],
-    [ 'COMBO', 94, FAR_ROWS ]
+    [ 'MINIBOSS_TIME', 9, rise(60) ], [ 'BOSS_DAMAGE', 17.5, rise(60) ],
+    [ 'PHYSICAL_BREAK', 26, rise(37) ], [ 'ARMOR_PIERCE', 34.5, rise(37) ],
+    [ 'CLICK_DAMAGE', 59.3, rise(44) ], [ 'CLICK_FLAT_DAMAGE', 67.8, rise(38, 12) ], [ 'CRIT_CHANCE', 76.3, rise(32.5, 12) ], [ 'CRIT_DAMAGE', 84.6, rise(32.5, 12) ],
+    [ 'COMBO', 92, rise(60) ]
 ];
 
 //  The 27 graded talents and Fúria crescente on the COMBO bough
 export const NODE_POSITIONS = Object.freeze({
     ...Object.fromEntries(CHAINS.flatMap(([ id, x, rows ]) =>
         [ 1, 2, 3 ].map((grade) => [ grade === 1 ? id : `${id}_G${grade}`, { x, y: rows[grade] } ]))),
-    COMBO_FURY: { x: 85, y: 72 }
+    COMBO_FURY: { x: 78, y: 61 }
 });
 
 export const LARGE_NODES = Object.freeze([ 'COMBO_FURY' ]);
 
-export const BANNER_POSITIONS = Object.freeze({ TIME: { x: 10.5, y: 29 }, BREAK: { x: 30.5, y: 11 }, POWER: { x: 68, y: 11 }, COMBO: { x: 91, y: 29 } });
+export const BANNER_POSITIONS = Object.freeze({ TIME: { x: 13.5, y: 25.5 }, BREAK: { x: 30.5, y: 3.2 }, POWER: { x: 66.4, y: 3.2 }, COMBO: { x: 77, y: 49.7 } });
 
 //  The ellipse of each branch's lit veins: centre (x, y) and radii (rx, ry), in percent
 export const BRANCH_GLOWS = Object.freeze({
-    TIME: { x: 10.5, y: 53, rx: 10, ry: 20 },
-    BREAK: { x: 30.5, y: 33, rx: 10, ry: 20 },
-    POWER: { x: 68, y: 33, rx: 18, ry: 20 },
-    COMBO: { x: 90, y: 58, rx: 9, ry: 24 }
+    TIME: { x: 25, y: 50, rx: 22, ry: 24 },
+    BREAK: { x: 34, y: 22, rx: 18, ry: 25 },
+    POWER: { x: 66, y: 24, rx: 18, ry: 26 },
+    COMBO: { x: 72, y: 53, rx: 23, ry: 24 }
 });
 
 export const TRUNK = Object.freeze({ base: { x: 50, y: 100 }, fork: { x: 50, y: 58 } });

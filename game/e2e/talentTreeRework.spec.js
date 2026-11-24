@@ -125,7 +125,7 @@ test.describe('Talentos tree: nodes', () => {
         expect((await size(page.getByTestId('talent-CLICK_DAMAGE')))[0]).toBe(60);
         expect((await size(page.getByTestId('talent-COMBO_FURY')))[0]).toBe(88);
 
-        //  CLICK_DAMAGE sits at 55 % x 1024 and 46 % x 576 of the board
+        //  CLICK_DAMAGE sits at 59.3 % x 1024 and 44 % x 576 of the board
         const centre = await page.getByTestId('talent-CLICK_DAMAGE').evaluate((node) =>
         {
             const tree = document.querySelector('[data-testid="talent-tree"]').getBoundingClientRect();
@@ -134,8 +134,8 @@ test.describe('Talentos tree: nodes', () => {
             return [ (box.x + box.width / 2 - tree.x) * (1024 / tree.width), (box.y + box.height / 2 - tree.y) * (576 / tree.height) ];
         });
 
-        expect(Math.abs(centre[0] - 563)).toBeLessThanOrEqual(1);
-        expect(Math.abs(centre[1] - 265)).toBeLessThanOrEqual(1);
+        expect(Math.abs(centre[0] - 607.2)).toBeLessThanOrEqual(1);
+        expect(Math.abs(centre[1] - 253.4)).toBeLessThanOrEqual(1);
     });
 
     test('captions grade 1 nodes and badges grades 2 and 3', async ({ page }) => {
@@ -511,11 +511,11 @@ test.describe('Talentos tree: phones and desktops', () => {
         expect(await read('scrollTop')).toBe(288);
 
         //  A node in view is selected: the scroll the player chose stays
-        await scroll.evaluate((node) => { node.scrollLeft = 200; });
+        await scroll.evaluate((node) => { node.scrollLeft = 700; });
         await select(page, 'CLICK_DAMAGE');
 
         await expect(page.getByTestId('talent-detail-name')).toHaveText('Dano de clique (%)');
-        expect(await read('scrollLeft')).toBe(200);
+        expect(await read('scrollLeft')).toBe(700);
         expect(await read('scrollTop')).toBe(288);
         expect((await page.getByTestId('talent-points').evaluate((node) => node.offsetLeft))).toBe(12);
         expect((await size(page.getByTestId('talent-detail')))[0]).toBe(380);

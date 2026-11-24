@@ -123,6 +123,12 @@ T23
 T25 → T26 → T27 → T28 → T29 → T30
 ```
 
+### Phase 6d: art calibration (game-dev)
+
+```
+T31
+```
+
 ---
 
 ## Task Breakdown
@@ -1890,6 +1896,32 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 
 ---
 
+### Phase 6d: art calibration
+
+The painted board (`talent-tree-bg.jpg` and `talent-tree-bg-lit.jpg`, 2048 x 1152, added in de8550d) exists, so the provisional coordinates of the layout are fitted to it.
+
+#### T31: calibrate the talent tree layout to the painted background [x]
+
+**Owner**: game-dev
+**Goal**: Every branch's nodes, captions and banner sit over its own painted foliage and branch, and nothing overlaps the plaque, the Fechar button, another node or caption, or the fixed bottom UI (TTR-20; spec D14).
+**Where**: `game/src/adapters/phaser/views/talentTreeLayout.js` (`CHAINS` rows, `COMBO_FURY`, `BANNER_POSITIONS`, `BRANCH_GLOWS`)
+**Also changes**: `game/src/adapters/phaser/views/talentTreeLayout.test.js`, `talentsView.test.js`, `game/src/adapters/phaser/HeroUi.test.js` and `game/e2e/talentTreeRework.spec.js` (re-pin the coordinates), the `11-real-art-*` shots in `.specs/features/talent-tree-rework/ui-review/`
+**Read first**: `game/src/adapters/phaser/views/talentTreeLayout.js`, `game/ui-review/talentTreeRework.shots.js` (`11 real art`), `game/public/assets/talent-tree-bg.jpg` and `talent-tree-bg-lit.jpg`
+**Depends on**: None (the art and T30 are done)
+**Requirement**: TTR-20
+
+**What**: fit the layout to the painting, checked on the `11-real-art` desktop and phone shots. Teal (TIME) over the left foliage, red (BREAK) under the red crown, gold (POWER) over the gold crown, violet (COMBO) at the right edge with Fúria crescente on the violet foliage; grade 1 lowest in each column; every node and its caption ends above 76 % of the height; the banners sit on their foliage; each lit ellipse covers its branch's veins and foliage with as little overlap as possible. The phone keeps the reveal logic (`FIXED_TOP`, `FIXED_BOTTOM`) unchanged.
+
+**Tests**: unit: layout rows, columns, banners and glows re-pinned; new checks that no two node boxes touch, no node touches the plaque, every grade 1 caption ends above 76 %; `talentsView.test.js` and `HeroUi.test.js` positions and reveal values re-pinned; e2e: the `CLICK_DAMAGE` coordinate and the phone scroll re-pinned
+**Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
+**Done when**:
+
+- [x] The `11-real-art` desktop and phone shots show each branch over its own foliage with no overlap, and the three gates are green.
+
+**Commit**: `fix(game): calibrate the talent tree layout to the painted background`
+
+---
+
 ## Validation Tables
 
 ### Task Granularity Check
@@ -1926,6 +1958,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 | T28 | 1 function + 1 call | ✅ Granular |
 | T29 | 1 stylesheet rule | ✅ Granular |
 | T30 | 1 stylesheet rule | ✅ Granular |
+| T31 | 1 layout file (+ its re-pinned tests) | ⚠️ Cohesive (the coordinates are one table, the tests pin it) |
 
 ### Diagram-Definition Cross-Check
 
@@ -1961,6 +1994,7 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 | T28 | T27 | T27 → T28 | ✅ Match |
 | T29 | T28 | T28 → T29 | ✅ Match |
 | T30 | T29 | T29 → T30 | ✅ Match |
+| T31 | None | (none) | ✅ Match |
 
 ### Test Co-location Validation
 
@@ -1996,3 +2030,4 @@ Findings of `.specs/features/talent-tree-rework/ui-review.html` (verdict MUDANÇ
 | T29 | Stylesheet | e2e | e2e | ✅ OK |
 | T30 | Stylesheet | e2e | e2e | ✅ OK |
 | T28 | Game view and scene | unit (jsdom) + e2e | unit + e2e | ✅ OK |
+| T31 | Game view layout | unit (jsdom) + e2e | unit + e2e | ✅ OK |

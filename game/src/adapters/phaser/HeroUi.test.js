@@ -1500,10 +1500,10 @@ describe('HeroUi Talentos', () => {
             await open(ctx, 'talents');
             expect([ ctx.testid('talent-tree-scroll').scrollLeft, ctx.testid('talent-tree-scroll').scrollTop ]).toEqual([ 512, 288 ]);
 
-            ctx.testid('talent-tree-scroll').scrollLeft = 200;
+            ctx.testid('talent-tree-scroll').scrollLeft = 700;
             pick(ctx, 'CLICK_DAMAGE');
 
-            expect(ctx.testid('talent-tree-scroll').scrollLeft).toBe(200);
+            expect(ctx.testid('talent-tree-scroll').scrollLeft).toBe(700);
         }
         finally
         {
