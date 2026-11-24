@@ -12,3 +12,5 @@ gha-creds-*.json
 # coverage summaries the Verifier leaves for the release report (.claude/agents/verifier.md)
 .specs/features/*/coverage/
 graphify-out/.rebuild.lock
+graphify-out/cache/hook_sessions/
+

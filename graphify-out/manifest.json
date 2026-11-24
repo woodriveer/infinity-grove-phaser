@@ -11262,9 +11262,9 @@
     "semantic_hash": ""
   },
   "game/ui-review/talentTreeRework.shots.js": {
-    "mtime": 1795476165.5958812,
-    "seen": 1795476592.3467267,
-    "ast_hash": "20d92b907e8d60273f87695855c290ae",
+    "mtime": 1795543294.2530708,
+    "seen": 1795543782.0910926,
+    "ast_hash": "ef0f3eb8cdd66fc7738967401f8b0613",
     "semantic_hash": ""
   },
   ".specs/features/black-awareness-staff/design.md": {
@@ -11820,87 +11820,99 @@
     "semantic_hash": ""
   },
   "game/public/assets/talent-armor-pierce.png": {
-    "mtime": 1795542758.6290758,
-    "seen": 1795542950.6118872,
-    "ast_hash": "3b691d0b6bb1dfb126d445d5b96bbf3a",
+    "mtime": 1795543256.2695494,
+    "seen": 1795543782.0953572,
+    "ast_hash": "5e97ee75725e7ba2cafc77c5e18bf96c",
     "semantic_hash": ""
   },
   "game/public/assets/talent-banner.png": {
-    "mtime": 1795542650.6699193,
-    "seen": 1795542950.611891,
-    "ast_hash": "532a76a58a1ade78dce8854ec308ebcc",
+    "mtime": 1795543268.560967,
+    "seen": 1795543782.0953605,
+    "ast_hash": "d26bc5994f6c4a6e1eec266f83beac84",
     "semantic_hash": ""
   },
   "game/public/assets/talent-boss-damage-g2.png": {
-    "mtime": 1795542796.460143,
-    "seen": 1795542950.6118941,
-    "ast_hash": "8a8eadd91cabdd668b3fdc716c825d7d",
+    "mtime": 1795543259.7778227,
+    "seen": 1795543782.095364,
+    "ast_hash": "6e9601a7630f68223dcf7e82a62acd4a",
     "semantic_hash": ""
   },
   "game/public/assets/talent-boss-damage-g3.png": {
-    "mtime": 1795542813.8556135,
-    "seen": 1795542950.6118965,
-    "ast_hash": "8ddf37e49fdfc8ba24b44daeb6771a22",
+    "mtime": 1795543260.9002857,
+    "seen": 1795543782.0953672,
+    "ast_hash": "439103fd9215d0c80c68c066f0f815b2",
     "semantic_hash": ""
   },
   "game/public/assets/talent-boss-damage.png": {
-    "mtime": 1795542782.4011147,
-    "seen": 1795542950.6118991,
-    "ast_hash": "29d43a88f3966812daae8196e02ee487",
+    "mtime": 1795543257.8314319,
+    "seen": 1795543782.09537,
+    "ast_hash": "0961093a28e793e62a46fe1a86c8f272",
     "semantic_hash": ""
   },
   "game/public/assets/talent-close-button.png": {
-    "mtime": 1795542699.8670888,
-    "seen": 1795542950.6119614,
-    "ast_hash": "6d5685a43dc078054581418edb91009d",
+    "mtime": 1795543271.0789514,
+    "seen": 1795543782.0954258,
+    "ast_hash": "6a2815acd388d5ecfef53238d3ee782a",
     "semantic_hash": ""
   },
   "game/public/assets/talent-node-frame-large.png": {
-    "mtime": 1795542581.6048236,
-    "seen": 1795542950.6120105,
-    "ast_hash": "a5ac39924d628371fa4767ddd828df31",
+    "mtime": 1795543264.9491148,
+    "seen": 1795543782.0954676,
+    "ast_hash": "91b5da6bc4b336b4b9344d0c336f2415",
     "semantic_hash": ""
   },
   "game/public/assets/talent-node-frame.png": {
-    "mtime": 1795542456.5093744,
-    "seen": 1795542950.6120138,
-    "ast_hash": "a0516fe64fc3ebcd1e358f1d9ad537bb",
+    "mtime": 1795543263.6149776,
+    "seen": 1795543782.0954707,
+    "ast_hash": "ef79c971cf74d7e02d0c617f299efd52",
     "semantic_hash": ""
   },
   "game/public/assets/talent-node-lock.png": {
-    "mtime": 1795542624.9985456,
-    "seen": 1795542950.6120167,
-    "ast_hash": "2137060b15175e607c35402788174eac",
-    "semantic_hash": ""
-  },
-  "game/public/assets/talent-points-medallion.png.png": {
-    "mtime": 1795542719.5857377,
-    "seen": 1795542950.6120195,
-    "ast_hash": "c105dd4e24f8c34f95c9db24a17b0c9a",
+    "mtime": 1795543262.3065994,
+    "seen": 1795543782.0954733,
+    "ast_hash": "d4c8e0833ba132dfca9bc99561053b38",
     "semantic_hash": ""
   },
   "game/public/assets/talent-reset-button.png": {
-    "mtime": 1795542738.6880817,
-    "seen": 1795542950.612022,
-    "ast_hash": "e3f47ad699fee5c1a13a80cf05520371",
+    "mtime": 1795543267.2881556,
+    "seen": 1795543782.09548,
+    "ast_hash": "51ccd0db445241011ab3f57fcafb99f3",
     "semantic_hash": ""
   },
   "game/public/assets/talent-title-plaque.png": {
-    "mtime": 1795542668.924767,
-    "seen": 1795542950.612025,
-    "ast_hash": "b6f1c7c91ff11f5a400cddf44c551337",
+    "mtime": 1795543269.7290604,
+    "seen": 1795543782.0954826,
+    "ast_hash": "9ec4c879c251a9d050921587d1b3a13b",
     "semantic_hash": ""
   },
   "game/public/assets/talent-tree-bg-lit.jpg": {
-    "mtime": 1795542527.4756932,
-    "seen": 1795542950.6120288,
-    "ast_hash": "cba446ec2298874d3771a30f8e5f7bae",
+    "mtime": 1795543271.6550355,
+    "seen": 1795543782.0954862,
+    "ast_hash": "b2fc8629ce342329ff71c2943e63c59e",
     "semantic_hash": ""
   },
   "game/public/assets/talent-tree-bg.jpg": {
-    "mtime": 1795542497.4479573,
-    "seen": 1795542950.612032,
-    "ast_hash": "9e70e39360c1e275eae9451fe020ab72",
+    "mtime": 1795543271.3732512,
+    "seen": 1795543782.0954897,
+    "ast_hash": "0be9e08324e4504401e56ff1e1fdd329",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/11-real-art-desktop.png": {
+    "mtime": 1795543323.8645964,
+    "seen": 1795543782.0945005,
+    "ast_hash": "8a0ee6045b81489f3d7660d000dea537",
+    "semantic_hash": ""
+  },
+  ".specs/features/talent-tree-rework/ui-review/11-real-art-phone.png": {
+    "mtime": 1795543324.1697884,
+    "seen": 1795543782.0945039,
+    "ast_hash": "ba761e597a710d6e522389a8d62f274e",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-points-medallion.png": {
+    "mtime": 1795543266.3114066,
+    "seen": 1795543782.0954764,
+    "ast_hash": "d5a639202852a62f2350578fabcd2c8a",
     "semantic_hash": ""
   },
   "game/package-lock.json": {
