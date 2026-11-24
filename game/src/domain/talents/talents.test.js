@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CHAPTER_BOSS, FARM, MINIBOSS, PHASE } from '../campaign/campaign';
 import {
     addBonuses, BRANCH_TITLES, BRANCHES, branchGlow, describeTalentEffect, monsterAfterBreak, talentAttackerBonus, talentComboCap, talentComboStep, talentFullName, talentIconName,
-    talentLockText, talentTimeBonusMs, talentValue
+    TALENT_DESCRIPTIONS, talentDescription, talentLockText, talentTimeBonusMs, talentValue
 } from './talents';
 
 //  The tree as the backend answers it: value is level x perLevel
@@ -344,5 +344,53 @@ describe('monsterAfterBreak with the team passives', () => {
         const stats = monster(40, 30);
 
         expect(monsterAfterBreak(stats, tree({ PHYSICAL_BREAK: 5 }))).toEqual(monsterAfterBreak(stats, tree({ PHYSICAL_BREAK: 5 }), {}));
+    });
+});
+
+describe('talentDescription', () => {
+    it('describes each of the 10 talents in the player\'s words', () => {
+        const texts = {
+            MINIBOSS_TIME: 'Você ganha mais segundos para derrotar cada miniboss antes que o tempo acabe.',
+            BOSS_DAMAGE: 'Os golpes do seu líder causam mais dano em minibosses e chefes de capítulo.',
+            PHYSICAL_BREAK: 'Diminui a defesa dos inimigos, então cada golpe tira mais vida deles.',
+            ARMOR_PIERCE: 'Os golpes do seu líder ignoram uma parte da defesa que ainda resta no inimigo.',
+            CLICK_DAMAGE: 'Aumenta em porcentagem o dano de cada clique e de cada habilidade do seu líder.',
+            CLICK_FLAT_DAMAGE: 'Soma um valor fixo ao dano de cada clique do seu líder, antes dos bônus em porcentagem.',
+            CRIT_CHANCE: 'Aumenta a chance de um golpe do seu líder ser crítico; o que passar de 100% contra o inimigo vira dano crítico.',
+            CRIT_DAMAGE: 'Os golpes críticos do seu líder causam ainda mais dano.',
+            COMBO: 'Cliques seguidos somam um bônus de dano; este talento aumenta o limite desse bônus.',
+            COMBO_FURY: 'Cada clique soma mais bônus de combo, então você chega ao limite com menos cliques.'
+        };
+
+        expect(Object.keys(texts)).toHaveLength(10);
+
+        for (const [ id, text ] of Object.entries(texts))
+        {
+            expect(talentDescription({ id, baseId: id })).toBe(text);
+        }
+    });
+
+    it('gives grades 2 and 3 the text of grade 1', () => {
+        expect(talentDescription({ id: 'CLICK_DAMAGE_G3', baseId: 'CLICK_DAMAGE', grade: 3 }))
+            .toBe('Aumenta em porcentagem o dano de cada clique e de cada habilidade do seu líder.');
+        expect(talentDescription({ id: 'COMBO_G2', baseId: 'COMBO', grade: 2 }))
+            .toBe('Cliques seguidos somam um bônus de dano; este talento aumenta o limite desse bônus.');
+    });
+
+    it('reads the id when the talent has no baseId', () => {
+        expect(talentDescription({ id: 'COMBO_FURY' })).toBe('Cada clique soma mais bônus de combo, então você chega ao limite com menos cliques.');
+    });
+
+    it('answers null for a talent it does not know', () => {
+        expect(talentDescription({ id: 'NEW_ONE', baseId: 'NEW_ONE' })).toBeNull();
+    });
+
+    it('writes no catalog number in any text', () => {
+        expect(Object.keys(TALENT_DESCRIPTIONS)).toHaveLength(10);
+
+        for (const text of Object.values(TALENT_DESCRIPTIONS))
+        {
+            expect(text.replace('100%', '')).not.toMatch(/\d/);
+        }
     });
 });

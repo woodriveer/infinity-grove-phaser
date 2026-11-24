@@ -11,7 +11,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 **Spec**: `.specs/features/talent-tree-branches/spec.md`
 **Design**: `.specs/features/talent-tree-branches/design.md`
 **Pictures**: `.specs/features/talent-tree-branches/owner-sketch.webp` (the owner's request), `.specs/features/talent-tree-branches/layout-target.png` (the target coordinates on the painting)
-**Status**: Draft. Waiting for the owner's approval of spec, design and tasks and the answers to Q1 to Q6 of the spec (each task is written with the recommended default).
+**Status**: Approved by the owner on 2026-11-24 with the recommended default of every open question (Q1 to Q6). In execution.
 
 Rules for every task:
 
@@ -80,7 +80,7 @@ T9
 
 ### Phase 1: Game code
 
-#### T1: Talent descriptions [ ]
+#### T1: Talent descriptions [x]
 
 **Owner**: game-dev
 **Goal**: The game knows, for each of the 10 talents, one plain sentence that says what it does in combat (TTB-05; spec P1 Card AC 1, AC 2, D4).
@@ -131,7 +131,7 @@ export const talentDescription = (talent) => TALENT_DESCRIPTIONS[talent.baseId ?
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 5 new cases pass and every other unit test passes unchanged.
+- [x] The 5 new cases pass and every other unit test passes unchanged.
 
 **Commit**: `feat(game): describe each talent in the player's words`
 

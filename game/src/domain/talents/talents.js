@@ -60,6 +60,24 @@ export const addBonuses = (a, b) => ({
 export const BRANCH_TITLES = { TIME: 'Caça aos chefes', BREAK: 'Quebra de defesa', POWER: 'Poder do clique', COMBO: 'Combo' };
 export const BRANCHES = [ 'TIME', 'BREAK', 'POWER', 'COMBO' ];
 
+//  What each talent does, in the player's words (spec talent-tree-branches P1 Card AC 1): one text per talent, the same for its three grades.
+//  No catalog number here (AD-011): the effect line of the card shows the value.
+export const TALENT_DESCRIPTIONS = Object.freeze({
+    MINIBOSS_TIME: 'Você ganha mais segundos para derrotar cada miniboss antes que o tempo acabe.',
+    BOSS_DAMAGE: 'Os golpes do seu líder causam mais dano em minibosses e chefes de capítulo.',
+    PHYSICAL_BREAK: 'Diminui a defesa dos inimigos, então cada golpe tira mais vida deles.',
+    ARMOR_PIERCE: 'Os golpes do seu líder ignoram uma parte da defesa que ainda resta no inimigo.',
+    CLICK_DAMAGE: 'Aumenta em porcentagem o dano de cada clique e de cada habilidade do seu líder.',
+    CLICK_FLAT_DAMAGE: 'Soma um valor fixo ao dano de cada clique do seu líder, antes dos bônus em porcentagem.',
+    CRIT_CHANCE: 'Aumenta a chance de um golpe do seu líder ser crítico; o que passar de 100% contra o inimigo vira dano crítico.',
+    CRIT_DAMAGE: 'Os golpes críticos do seu líder causam ainda mais dano.',
+    COMBO: 'Cliques seguidos somam um bônus de dano; este talento aumenta o limite desse bônus.',
+    COMBO_FURY: 'Cada clique soma mais bônus de combo, então você chega ao limite com menos cliques.'
+});
+
+//  The description of `talent` (by `baseId`, or `id` when there is none), or null when the game has none for it (a talent of a newer backend)
+export const talentDescription = (talent) => TALENT_DESCRIPTIONS[talent.baseId ?? talent.id] ?? null;
+
 //  "+6 s", "-3 pontos", "+9%", "+3 pontos"; "nenhum" at level 0. A BREAK talent lowers a stat, so its points read as a reduction.
 export const describeTalentEffect = ({ branch, unit, value }) =>
 {
