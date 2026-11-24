@@ -186,7 +186,7 @@ Update the comment above the seal rule if it names a size. The level chip, the c
 
 ---
 
-#### T3: Chains along the painted boughs [ ]
+#### T3: Chains along the painted boughs [x]
 
 **Owner**: game-dev
 **Goal**: Every chain starts on the trunk where its vein leaves it and climbs along its bough, Fúria crescente sits after its prerequisite, and the banners, glows, veins and size constants follow (TTB-01, TTB-02, TTB-03, TTB-08; spec P1 Branches, P2 Fúria AC 1, AC 2, design § Layout map).
@@ -314,8 +314,8 @@ export const REVEAL_MARGIN = 6;
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/talentTreeRework.spec.js e2e/talents.spec.js`
 **Done when**:
 
-- [ ] The 12 cases of `talentTreeLayout.test.js` and every re-pinned case pass; every other unit test passes unchanged (`HeroUi.test.js` included).
-- [ ] `talentTreeRework.spec.js` and `talents.spec.js` pass, the three phone tests of spec § Edge Cases included, with only the re-pin above.
+- [x] The 12 cases of `talentTreeLayout.test.js` and every re-pinned case pass; every other unit test passes unchanged (`HeroUi.test.js` included).
+- [x] `talentTreeRework.spec.js` and `talents.spec.js` pass, the three phone tests of spec § Edge Cases included, with only the re-pin above.
 
 **Commit**: `feat(game): grow the talent chains along the painted boughs`
 

@@ -125,7 +125,7 @@ test.describe('Talentos tree: nodes', () => {
         expect((await size(page.getByTestId('talent-CLICK_DAMAGE')))[0]).toBe(44);
         expect((await size(page.getByTestId('talent-COMBO_FURY')))[0]).toBe(56);
 
-        //  CLICK_DAMAGE sits at 55 % x 1024 and 50 % x 576 of the board
+        //  CLICK_DAMAGE sits at 53 % x 1024 and 49.5 % x 576 of the board
         const centre = await page.getByTestId('talent-CLICK_DAMAGE').evaluate((node) =>
         {
             const tree = document.querySelector('[data-testid="talent-tree"]').getBoundingClientRect();
@@ -134,8 +134,8 @@ test.describe('Talentos tree: nodes', () => {
             return [ (box.x + box.width / 2 - tree.x) * (1024 / tree.width), (box.y + box.height / 2 - tree.y) * (576 / tree.height) ];
         });
 
-        expect(Math.abs(centre[0] - 563.2)).toBeLessThanOrEqual(1);
-        expect(Math.abs(centre[1] - 288)).toBeLessThanOrEqual(1);
+        expect(Math.abs(centre[0] - 542.72)).toBeLessThanOrEqual(1);
+        expect(Math.abs(centre[1] - 285.12)).toBeLessThanOrEqual(1);
     });
 
     test('captions grade 1 nodes and badges grades 2 and 3', async ({ page }) => {

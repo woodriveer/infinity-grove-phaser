@@ -62,9 +62,9 @@ describe('the nodes', () => {
     it('centres each node on its map coordinates', () => {
         const screen = show();
 
-        expect([ find(screen, 'talent-CLICK_DAMAGE').style.left, find(screen, 'talent-CLICK_DAMAGE').style.top ]).toEqual([ '55%', '50%' ]);
-        expect([ find(screen, 'talent-COMBO_FURY').style.left, find(screen, 'talent-COMBO_FURY').style.top ]).toEqual([ '80%', '61%' ]);
-        expect([ find(screen, 'talent-MINIBOSS_TIME').style.left, find(screen, 'talent-MINIBOSS_TIME').style.top ]).toEqual([ '9%', '60%' ]);
+        expect([ find(screen, 'talent-CLICK_DAMAGE').style.left, find(screen, 'talent-CLICK_DAMAGE').style.top ]).toEqual([ '53%', '49.5%' ]);
+        expect([ find(screen, 'talent-COMBO_FURY').style.left, find(screen, 'talent-COMBO_FURY').style.top ]).toEqual([ '76%', '62%' ]);
+        expect([ find(screen, 'talent-MINIBOSS_TIME').style.left, find(screen, 'talent-MINIBOSS_TIME').style.top ]).toEqual([ '43.5%', '58%' ]);
     });
 
     it('marks Fúria crescente large and gives it the large frame', () => {
@@ -228,23 +228,24 @@ describe('the board', () => {
         const screen = show();
 
         expect([ ...screen.querySelectorAll('.talent-branch-title') ].map((node) => node.textContent)).toEqual([ 'Caça aos chefes', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
-        expect([ find(screen, 'talent-branch-POWER').style.left, find(screen, 'talent-branch-POWER').style.top ]).toEqual([ '66%', '5%' ]);
+        expect([ find(screen, 'talent-branch-POWER').style.left, find(screen, 'talent-branch-POWER').style.top ]).toEqual([ '66.5%', '3.5%' ]);
     });
 
     it('gives each lit layer its ellipse and its opacity', () => {
         const screen = show({ MINIBOSS_TIME: 5 });
         const lit = find(screen, 'talent-lit-TIME');
 
-        expect([ '--cx', '--cy', '--rx', '--ry' ].map((name) => lit.style.getPropertyValue(name))).toEqual([ '25%', '50%', '22%', '24%' ]);
+        expect([ '--cx', '--cy', '--rx', '--ry' ].map((name) => lit.style.getPropertyValue(name))).toEqual([ '29%', '52%', '18%', '17%' ]);
         expect(lit.style.opacity).toBe('0.27');
         expect(find(screen, 'talent-lit-POWER').style.opacity).toBe('0');
     });
 
-    it('draws the trunk and 9 veins', () => {
+    it('draws the trunk, 9 chain veins and the twig of Fúria crescente', () => {
         const lines = [ ...find(show(), 'talent-tree-veins').querySelectorAll('polyline') ];
 
-        expect(lines).toHaveLength(10);
+        expect(lines).toHaveLength(11);
         expect(lines[0].getAttribute('points')).toBe('50,100 50,58');
+        expect(lines[10].getAttribute('points')).toBe('60,61 76,62');
     });
 
     it('shows the points on the medallion and the reset button', () => {
@@ -344,7 +345,7 @@ describe('the scroll of the tree', () => {
 });
 
 describe('revealTalent', () => {
-    //  A phone board: 2048 x 1152 in a 1024 x 576 viewport, opened centred (scroll 512, 288); the plaque is fixed on the top 76 px, the card on the bottom 136 px
+    //  A phone board: 2048 x 1152 in a 1024 x 576 viewport, opened centred (scroll 512, 288); the plaque is fixed on the top 76 px, the card on the bottom 144 px
     const phone = (scrollLeft, scrollTop, clientHeight = 576) =>
     {
         const screen = show();
@@ -363,9 +364,9 @@ describe('revealTalent', () => {
 
         revealTalent(screen, 'COMBO_FURY');
 
-        //  Its centre (80 %, 61 %) is at (1638.4, 702.72) of the board: the right edge keeps 88 + 12 px, the bottom keeps 88 px of node and 108 px of caption above the card
-        expect(scroll.scrollLeft).toBeCloseTo(1638.4 - (1024 - 88 - 12), 5);
-        expect(scroll.scrollTop).toBeCloseTo(702.72 - (576 - 136 - 88 - 108), 5);
+        //  Its centre (76 %, 62 %) is at (1556.48, 714.24) of the board: the right edge keeps 56 + 12 px, the bottom keeps 56 px of node and 108 px of caption above the card
+        expect(scroll.scrollLeft).toBeCloseTo(1556.48 - (1024 - 56 - 12), 5);
+        expect(scroll.scrollTop).toBeCloseTo(714.24 - (576 - 144 - 56 - 108), 5);
     });
 
     it('scrolls a grade 3 node out from under the plaque and keeps its caption room above the card for a grade 1 node', () => {
@@ -373,17 +374,17 @@ describe('revealTalent', () => {
 
         revealTalent(screen, 'CLICK_DAMAGE_G3');
 
-        //  (55 %, 26 %) is at (1126.4, 299.52): 76 + 60 px under the top edge
+        //  (58 %, 24.5 %) is at (1187.84, 282.24): 76 + 44 px under the top edge
         expect(scroll.scrollLeft).toBe(512);
-        expect(scroll.scrollTop).toBeCloseTo(299.52 - (76 + 60), 5);
+        expect(scroll.scrollTop).toBeCloseTo(282.24 - (76 + 44), 5);
 
         const low = phone(0, 0);
 
         revealTalent(low.screen, 'MINIBOSS_TIME');
 
-        //  (9 %, 60 %) is at (184.32, 691.2): left edge 60 + 12 px, bottom edge 576 - 136 - 60 - 108 px
+        //  (43.5 %, 58 %) is at (890.88, 668.16): inside the side edges, bottom edge 576 - 144 - 44 - 108 px
         expect(low.scroll.scrollLeft).toBe(0);
-        expect(low.scroll.scrollTop).toBeCloseTo(691.2 - (576 - 136 - 60 - 108), 5);
+        expect(low.scroll.scrollTop).toBeCloseTo(668.16 - (576 - 144 - 44 - 108), 5);
     });
 
     it('leaves the scroll alone when the node is already in the free area', () => {
@@ -394,18 +395,18 @@ describe('revealTalent', () => {
         expect([ scroll.scrollLeft, scroll.scrollTop ]).toEqual([ 700, 400 ]);
     });
 
-    //  A column (grade 3 node and its seal down to the caption of grade 1) is 520 to 532 px tall at 2x, the free area of a 1024 x 576 window 440 px (the card and the
-    //  buttons take 136 px): it never fits there, so these cases use a taller window of 800 px (664 px free)
+    //  A column (grade 3 node and its seal down to the caption of grade 1) is about 500 px tall at 2x (498 px for CLICK_DAMAGE), the free area of a 1024 x 576 window
+    //  432 px (the card and the buttons take 144 px): it never fits there, so these cases use a taller window of 800 px (664 px free)
     describe('the whole column', () => {
-        it('brings a column under Fechar 48 px under the top of the window, grade 3 seal included', () => {
-            const { screen, scroll } = phone(1024, 400, 800);
+        it('brings a column under Fechar 48 px under the top of the window, grade 3 seal included, up to the top of the board', () => {
+            const { screen, scroll } = phone(700, 400, 800);
 
-            revealTalent(screen, 'COMBO');
+            revealTalent(screen, 'CRIT_DAMAGE');
 
-            //  COMBO sits at x 92 % = 1884.16 of the board, 860 px across the window (its caption reaches 940 px, over Fechar from 896); its grade 3 (35 % = 403.2) loses 60 px of
-            //  node and 16 px of seal, and must start 48 px down
-            expect(scroll.scrollLeft).toBe(1024);
-            expect(scroll.scrollTop).toBeCloseTo(403.2 - 60 - 16 - 48, 5);
+            //  CRIT_DAMAGE sits at x 78.5 % = 1607.68 of the board, 907.68 px across the window (its caption reaches 987.68 px, over Fechar from 896); its grade 3 (8 % = 92.16)
+            //  keeps 44 px of node and 14 px of seal and must start 48 px down: 92.16 - 44 - 14 - 48 is below 0, so the scroll stops at 0 (without the Fechar room it would be 34.16)
+            expect(scroll.scrollLeft).toBe(700);
+            expect(scroll.scrollTop).toBe(0);
         });
 
         it('brings a column under the plaque 76 px under the top of the window', () => {
@@ -413,8 +414,8 @@ describe('revealTalent', () => {
 
             revealTalent(screen, 'CLICK_DAMAGE');
 
-            //  (55 %: 1126.4 across the board, 614.4 across the window); grade 3 at 26 % = 299.52
-            expect(scroll.scrollTop).toBeCloseTo(299.52 - 60 - 16 - 76, 5);
+            //  (53 %: 1085.44 across the board, 573.44 across the window); grade 3 at 24.5 % = 282.24
+            expect(scroll.scrollTop).toBeCloseTo(282.24 - 44 - 14 - 76, 5);
         });
 
         it('brings a column clear of every fixed part to the top of the window when it fits', () => {
@@ -422,8 +423,8 @@ describe('revealTalent', () => {
 
             revealTalent(screen, 'CLICK_FLAT_DAMAGE');
 
-            //  (62 %: 757.8 across the window, between the plaque and Fechar); grade 3 at 20 % = 230.4 keeps its 60 px and 16 px of seal above the window edge
-            expect(scroll.scrollTop).toBeCloseTo(230.4 - 60 - 16, 5);
+            //  (61.5 %: 747.52 across the window, between the plaque and Fechar); grade 3 at 19 % = 218.88 keeps its 44 px and 14 px of seal above the window edge
+            expect(scroll.scrollTop).toBeCloseTo(218.88 - 44 - 14, 5);
         });
 
         it('keeps the scroll the player chose when the whole column is already in the free area', () => {
@@ -442,7 +443,7 @@ describe('revealTalent', () => {
             expect([ scroll.scrollLeft, scroll.scrollTop ]).toEqual([ 512, 288 ]);
 
             revealTalent(screen, 'COMBO_FURY');
-            expect(scroll.scrollTop).toBeCloseTo(702.72 - (576 - 136 - 88 - 108), 5);
+            expect(scroll.scrollTop).toBeCloseTo(714.24 - (576 - 144 - 56 - 108), 5);
         });
     });
 
