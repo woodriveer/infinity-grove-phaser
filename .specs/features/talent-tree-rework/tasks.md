@@ -126,7 +126,7 @@ T25 → T26 → T27 → T28 → T29 → T30
 ### Phase 6d: art calibration (game-dev)
 
 ```
-T31
+T31 → T32
 ```
 
 ---
@@ -1922,6 +1922,28 @@ The painted board (`talent-tree-bg.jpg` and `talent-tree-bg-lit.jpg`, 2048 x 115
 
 ---
 
+#### T32: apply the round 3 findings of the UI review to the layout [x]
+
+**Owner**: game-dev
+**Goal**: The POWER nodes sit over the gold foliage in a regular staircase, the banners sit clear of nodes, captions, the plaque and the right edge, and no grade 3 node touches Fechar (TTR-20; ui-review round 3, findings 1 to 5).
+**Where**: `game/src/adapters/phaser/views/talentTreeLayout.js` (`CHAINS`, `COMBO_FURY`, `BANNER_POSITIONS`)
+**Also changes**: `talentTreeLayout.test.js`, `talentsView.test.js`, `game/e2e/talentTreeRework.spec.js` (re-pin the coordinates), the `11-real-art-*` shots
+**Read first**: `.specs/features/talent-tree-rework/ui-review.html` (round 3), `game/src/adapters/phaser/views/talentTreeLayout.js`
+**Depends on**: T31
+**Requirement**: TTR-20
+
+**What**: POWER columns at x 55, 62, 69 and 76 (the review asked for 56, 62, 68 and 74; a 6 % spacing makes a grade 1 caption of 80 px touch the next column's node, so the spacing is 7 %), grade 1 at y 50, 44, 38 and 32 with a step of 12; POWER banner (66, 5); Fúria crescente at x 80; COMBO banner (81.8, 49.7), clear of the COMBO column's grade 2 node (the review's x 85 would cover it); BREAK grade 1 at 38.5 and banner y 5.
+
+**Tests**: unit: rows, columns and banners re-pinned; new checks that no grade 1 caption touches another node or caption, no node is within 12 px of Fechar, and no banner touches a node, a caption, the plaque or the board edge
+**Gate**: `cd game && npm test`, `cd game && npm run build`, `cd game && npx playwright test e2e/talentTreeRework.spec.js`
+**Done when**:
+
+- [x] The `11-real-art` desktop and phone shots show the POWER columns on the gold foliage and no overlap, and the three gates are green.
+
+**Commit**: `fix(game): apply the round 3 review findings to the talent tree layout`
+
+---
+
 ## Validation Tables
 
 ### Task Granularity Check
@@ -1959,6 +1981,7 @@ The painted board (`talent-tree-bg.jpg` and `talent-tree-bg-lit.jpg`, 2048 x 115
 | T29 | 1 stylesheet rule | ✅ Granular |
 | T30 | 1 stylesheet rule | ✅ Granular |
 | T31 | 1 layout file (+ its re-pinned tests) | ⚠️ Cohesive (the coordinates are one table, the tests pin it) |
+| T32 | 1 layout file (+ its re-pinned tests) | ⚠️ Cohesive (same table as T31) |
 
 ### Diagram-Definition Cross-Check
 
@@ -1995,6 +2018,7 @@ The painted board (`talent-tree-bg.jpg` and `talent-tree-bg-lit.jpg`, 2048 x 115
 | T29 | T28 | T28 → T29 | ✅ Match |
 | T30 | T29 | T29 → T30 | ✅ Match |
 | T31 | None | (none) | ✅ Match |
+| T32 | T31 | T31 → T32 | ✅ Match |
 
 ### Test Co-location Validation
 
@@ -2031,3 +2055,4 @@ The painted board (`talent-tree-bg.jpg` and `talent-tree-bg-lit.jpg`, 2048 x 115
 | T30 | Stylesheet | e2e | e2e | ✅ OK |
 | T28 | Game view and scene | unit (jsdom) + e2e | unit + e2e | ✅ OK |
 | T31 | Game view layout | unit (jsdom) + e2e | unit + e2e | ✅ OK |
+| T32 | Game view layout | unit (jsdom) + e2e | unit + e2e | ✅ OK |

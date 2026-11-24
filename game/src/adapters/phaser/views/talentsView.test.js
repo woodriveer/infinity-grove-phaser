@@ -62,8 +62,8 @@ describe('the nodes', () => {
     it('centres each node on its map coordinates', () => {
         const screen = show();
 
-        expect([ find(screen, 'talent-CLICK_DAMAGE').style.left, find(screen, 'talent-CLICK_DAMAGE').style.top ]).toEqual([ '59.3%', '44%' ]);
-        expect([ find(screen, 'talent-COMBO_FURY').style.left, find(screen, 'talent-COMBO_FURY').style.top ]).toEqual([ '78%', '61%' ]);
+        expect([ find(screen, 'talent-CLICK_DAMAGE').style.left, find(screen, 'talent-CLICK_DAMAGE').style.top ]).toEqual([ '55%', '50%' ]);
+        expect([ find(screen, 'talent-COMBO_FURY').style.left, find(screen, 'talent-COMBO_FURY').style.top ]).toEqual([ '80%', '61%' ]);
         expect([ find(screen, 'talent-MINIBOSS_TIME').style.left, find(screen, 'talent-MINIBOSS_TIME').style.top ]).toEqual([ '9%', '60%' ]);
     });
 
@@ -228,7 +228,7 @@ describe('the board', () => {
         const screen = show();
 
         expect([ ...screen.querySelectorAll('.talent-branch-title') ].map((node) => node.textContent)).toEqual([ 'Caça aos chefes', 'Quebra de defesa', 'Poder do clique', 'Combo' ]);
-        expect([ find(screen, 'talent-branch-POWER').style.left, find(screen, 'talent-branch-POWER').style.top ]).toEqual([ '66.4%', '3.2%' ]);
+        expect([ find(screen, 'talent-branch-POWER').style.left, find(screen, 'talent-branch-POWER').style.top ]).toEqual([ '66%', '5%' ]);
     });
 
     it('gives each lit layer its ellipse and its opacity', () => {
@@ -363,8 +363,8 @@ describe('revealTalent', () => {
 
         revealTalent(screen, 'COMBO_FURY');
 
-        //  Its centre (78 %, 61 %) is at (1597.44, 702.72) of the board: the right edge keeps 88 + 12 px, the bottom keeps 88 px of node and 108 px of caption above the card
-        expect(scroll.scrollLeft).toBeCloseTo(1597.44 - (1024 - 88 - 12), 5);
+        //  Its centre (80 %, 61 %) is at (1638.4, 702.72) of the board: the right edge keeps 88 + 12 px, the bottom keeps 88 px of node and 108 px of caption above the card
+        expect(scroll.scrollLeft).toBeCloseTo(1638.4 - (1024 - 88 - 12), 5);
         expect(scroll.scrollTop).toBeCloseTo(702.72 - (576 - 136 - 88 - 108), 5);
     });
 
@@ -373,9 +373,9 @@ describe('revealTalent', () => {
 
         revealTalent(screen, 'CLICK_DAMAGE_G3');
 
-        //  (59.3 %, 19 %) is at (1214.464, 218.88): 76 + 60 px under the top edge
+        //  (55 %, 26 %) is at (1126.4, 299.52): 76 + 60 px under the top edge
         expect(scroll.scrollLeft).toBe(512);
-        expect(scroll.scrollTop).toBeCloseTo(218.88 - (76 + 60), 5);
+        expect(scroll.scrollTop).toBeCloseTo(299.52 - (76 + 60), 5);
 
         const low = phone(0, 0);
 
@@ -387,11 +387,11 @@ describe('revealTalent', () => {
     });
 
     it('leaves the scroll alone when the node is already in the free area', () => {
-        const { screen, scroll } = phone(700, 288);
+        const { screen, scroll } = phone(700, 400);
 
         revealTalent(screen, 'CLICK_DAMAGE');
 
-        expect([ scroll.scrollLeft, scroll.scrollTop ]).toEqual([ 700, 288 ]);
+        expect([ scroll.scrollLeft, scroll.scrollTop ]).toEqual([ 700, 400 ]);
     });
 
     it('does nothing on a board that does not scroll, for a talent without a node or without a screen', () => {
