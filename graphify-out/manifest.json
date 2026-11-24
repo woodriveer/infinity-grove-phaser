@@ -775,44 +775,44 @@
   },
   "backend/src/main/resources/db/migration/V1__schema.sql": {
     "mtime": 1792449784.960996,
-    "seen": 1794670352.4552066,
-    "ast_hash": "",
+    "seen": 1795542950.6059804,
+    "ast_hash": "d917e3338c9056d8aaac8f370bd390df",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V2__lyra_leader_bonus.sql": {
     "mtime": 1792605371.3499,
-    "seen": 1794670352.4552119,
-    "ast_hash": "",
+    "seen": 1795542950.6059844,
+    "ast_hash": "9a51abca3b1491c33d5977907b01ba3e",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V3__player_talents.sql": {
     "mtime": 1792605849.9148004,
-    "seen": 1794670352.4552176,
-    "ast_hash": "",
+    "seen": 1795542950.6059878,
+    "ast_hash": "b10217e52a9247c45a433db9d75fe079",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V4__monster_health_growth.sql": {
     "mtime": 1792630598.0998406,
-    "seen": 1794670352.4552238,
-    "ast_hash": "",
+    "seen": 1795542950.6059914,
+    "ast_hash": "1e48e5f4faf4c160984a351b3fa92fb1",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V5__talent_point_awards.sql": {
     "mtime": 1792670884.5568101,
-    "seen": 1794670352.4552293,
-    "ast_hash": "",
+    "seen": 1795542950.605994,
+    "ast_hash": "9514a4aa17b5c5bde5c3d1a77e6ed100",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V6__auto_click.sql": {
     "mtime": 1793095910.2761598,
-    "seen": 1794670352.455234,
-    "ast_hash": "",
+    "seen": 1795542950.6059978,
+    "ast_hash": "33e41fc800e62d651ab8a37983a65d34",
     "semantic_hash": ""
   },
   "backend/src/main/resources/db/migration/V7__player_resets.sql": {
     "mtime": 1793130651.1664734,
-    "seen": 1794670352.4552379,
-    "ast_hash": "",
+    "seen": 1795542950.6060011,
+    "ast_hash": "0f56b51412fb5f300cf56a15036d3de9",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/Fakes.kt": {
@@ -8677,14 +8677,14 @@
   },
   ".agents/skills/impeccable/scripts/data/font-index.json": {
     "mtime": 1794482528.8788726,
-    "seen": 1794670352.4535182,
-    "ast_hash": "",
+    "seen": 1795542950.6045542,
+    "ast_hash": "4a4426c85ec12df1d9a487a39d656ff4",
     "semantic_hash": ""
   },
   ".claude/skills/impeccable/scripts/data/font-index.json": {
     "mtime": 1794482528.8788726,
-    "seen": 1794670352.4540522,
-    "ast_hash": "",
+    "seen": 1795542950.6049788,
+    "ast_hash": "4a4426c85ec12df1d9a487a39d656ff4",
     "semantic_hash": ""
   },
   ".specs/features/ui-redesign/design.md": {
@@ -9361,8 +9361,8 @@
   },
   "backend/src/main/resources/db/migration/V8__health_hit_points_expand.sql": {
     "mtime": 1794625035.328517,
-    "seen": 1794670352.455242,
-    "ast_hash": "",
+    "seen": 1795542950.6060052,
+    "ast_hash": "6b9a3c8faa32c2acb44f1b179c5b9658",
     "semantic_hash": ""
   },
   "backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/HealthHitPointsMigrationIT.kt": {
@@ -9397,8 +9397,8 @@
   },
   "backend/src/main/resources/db/migration/V9__coin_drop_rebalance.sql": {
     "mtime": 1794626818.338048,
-    "seen": 1794670352.4552457,
-    "ast_hash": "",
+    "seen": 1795542950.606009,
+    "ast_hash": "5a8741c43238d1978562d8845d63bdf3",
     "semantic_hash": ""
   },
   "game/e2e/campaignChapters.spec.js": {
@@ -11781,6 +11781,126 @@
     "mtime": 1795476165.4393446,
     "seen": 1795476592.34823,
     "ast_hash": "0f2594cc7b936b3e7931b1608fd9636e",
+    "semantic_hash": ""
+  },
+  "backend/src/main/resources/db/migration/V10__health_legacy_columns_drop.sql": {
+    "mtime": 1794670834.3327236,
+    "seen": 1795542950.6059613,
+    "ast_hash": "0c3b3edc9abbaf3f46d4df7458e6f0f3",
+    "semantic_hash": ""
+  },
+  "backend/src/main/resources/db/migration/V11__unified_damage.sql": {
+    "mtime": 1795476165.2468667,
+    "seen": 1795542950.6059654,
+    "ast_hash": "bc26a3991775b1fdc78e5394a1bbd79b",
+    "semantic_hash": ""
+  },
+  "backend/src/main/resources/db/migration/V12__hero_team.sql": {
+    "mtime": 1795476165.2468667,
+    "seen": 1795542950.605969,
+    "ast_hash": "2a1fe3bab0983b371b0a1e895b01f96b",
+    "semantic_hash": ""
+  },
+  "backend/src/main/resources/db/migration/V13__miniboss_adds.sql": {
+    "mtime": 1795476165.2478652,
+    "seen": 1795542950.605971,
+    "ast_hash": "a0751817f03c4df2ac9410cbfb1fe93b",
+    "semantic_hash": ""
+  },
+  "backend/src/main/resources/db/migration/V14__black_awareness_staff.sql": {
+    "mtime": 1795476165.248866,
+    "seen": 1795542950.6059737,
+    "ast_hash": "4f858535ae4045df50b316b5d213a0b2",
+    "semantic_hash": ""
+  },
+  "backend/src/main/resources/db/migration/V15__talent_tree_rework.sql": {
+    "mtime": 1795476165.2498674,
+    "seen": 1795542950.6059766,
+    "ast_hash": "0d93a2e214cd50c263f4f26f7bb4dd5e",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-armor-pierce.png": {
+    "mtime": 1795542758.6290758,
+    "seen": 1795542950.6118872,
+    "ast_hash": "3b691d0b6bb1dfb126d445d5b96bbf3a",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-banner.png": {
+    "mtime": 1795542650.6699193,
+    "seen": 1795542950.611891,
+    "ast_hash": "532a76a58a1ade78dce8854ec308ebcc",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-boss-damage-g2.png": {
+    "mtime": 1795542796.460143,
+    "seen": 1795542950.6118941,
+    "ast_hash": "8a8eadd91cabdd668b3fdc716c825d7d",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-boss-damage-g3.png": {
+    "mtime": 1795542813.8556135,
+    "seen": 1795542950.6118965,
+    "ast_hash": "8ddf37e49fdfc8ba24b44daeb6771a22",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-boss-damage.png": {
+    "mtime": 1795542782.4011147,
+    "seen": 1795542950.6118991,
+    "ast_hash": "29d43a88f3966812daae8196e02ee487",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-close-button.png": {
+    "mtime": 1795542699.8670888,
+    "seen": 1795542950.6119614,
+    "ast_hash": "6d5685a43dc078054581418edb91009d",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-node-frame-large.png": {
+    "mtime": 1795542581.6048236,
+    "seen": 1795542950.6120105,
+    "ast_hash": "a5ac39924d628371fa4767ddd828df31",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-node-frame.png": {
+    "mtime": 1795542456.5093744,
+    "seen": 1795542950.6120138,
+    "ast_hash": "a0516fe64fc3ebcd1e358f1d9ad537bb",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-node-lock.png": {
+    "mtime": 1795542624.9985456,
+    "seen": 1795542950.6120167,
+    "ast_hash": "2137060b15175e607c35402788174eac",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-points-medallion.png.png": {
+    "mtime": 1795542719.5857377,
+    "seen": 1795542950.6120195,
+    "ast_hash": "c105dd4e24f8c34f95c9db24a17b0c9a",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-reset-button.png": {
+    "mtime": 1795542738.6880817,
+    "seen": 1795542950.612022,
+    "ast_hash": "e3f47ad699fee5c1a13a80cf05520371",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-title-plaque.png": {
+    "mtime": 1795542668.924767,
+    "seen": 1795542950.612025,
+    "ast_hash": "b6f1c7c91ff11f5a400cddf44c551337",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-tree-bg-lit.jpg": {
+    "mtime": 1795542527.4756932,
+    "seen": 1795542950.6120288,
+    "ast_hash": "cba446ec2298874d3771a30f8e5f7bae",
+    "semantic_hash": ""
+  },
+  "game/public/assets/talent-tree-bg.jpg": {
+    "mtime": 1795542497.4479573,
+    "seen": 1795542950.612032,
+    "ast_hash": "9e70e39360c1e275eae9451fe020ab72",
     "semantic_hash": ""
   },
   "game/package-lock.json": {
