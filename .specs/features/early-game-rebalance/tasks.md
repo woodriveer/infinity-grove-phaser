@@ -1193,7 +1193,7 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 
 ---
 
-#### T15: The affix chip in the browser [ ]
+#### T15: The affix chip in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: The chip shows every text, sits where the spec puts it, has its style and hides when it should (EGR-08; spec Display AC 1 to 6, § Affix Display, § Player-Facing Texts).
@@ -1220,7 +1220,7 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 **Gate**: `cd game && npm test && npx playwright test e2e/monsterAffixesHud.spec.js`
 **Done when**:
 
-- [ ] The 10 cases pass.
+- [x] The 10 cases pass (12 are written: the chip host, and the dying miniboss and the failed countdown are one case each).
 
 **Commit**: `test(game): pin the monster affix chip in the browser`
 
