@@ -260,6 +260,31 @@ test.describe('Talentos card: size and layout', () => {
     });
 });
 
+test.describe('Talentos card: the text styles', () => {
+    test('the card text keeps the fonts, sizes and colours of the spec', async ({ page }) => {
+        await startGame(page, { art: 'present' });
+        await openTalents(page);
+        await select(page, 'CLICK_DAMAGE');
+
+        //  The name in Cinzel 16 px; the level and the effect at 13 px, 12 px apart on one row; the description in Figtree 12 px on a 15 px line in --ink-900
+        const name = page.getByTestId('talent-detail-name');
+        const description = page.getByTestId('talent-description-CLICK_DAMAGE');
+
+        await expect(name).toHaveCSS('font-size', '16px');
+        expect(await name.evaluate((node) => getComputedStyle(node).fontFamily)).toContain('Cinzel');
+        await expect(page.getByTestId('talent-level-CLICK_DAMAGE')).toHaveCSS('font-size', '13px');
+        await expect(page.getByTestId('talent-effect-CLICK_DAMAGE')).toHaveCSS('font-size', '13px');
+        await expect(page.locator('.talent-detail-stats')).toHaveCSS('column-gap', '12px');
+        await expect(description).toHaveCSS('font-size', '12px');
+        await expect(description).toHaveCSS('line-height', '15px');
+        await expect(description).toHaveCSS('color', 'rgb(42, 26, 16)');
+        expect(await description.evaluate((node) => getComputedStyle(node).fontFamily)).toContain('Figtree');
+
+        //  The ring on the wood: a radial wood background
+        expect(await icon(page).evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('radial-gradient');
+    });
+});
+
 test.describe('Talentos card: the kept texts', () => {
     test('the card keeps its texts and its button', async ({ page }) => {
         await startGame(page, { art: 'missing', points: 1 });

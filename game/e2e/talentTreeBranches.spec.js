@@ -304,6 +304,8 @@ test.describe('Talentos branches: node sizes', () => {
 
         expect(await size(badge)).toEqual([ 18, 18 ]);
         await expect(badge).toHaveCSS('font-size', '10px');
+        await expect(badge).toHaveCSS('top', '-4px');
+        await expect(badge).toHaveCSS('right', '-4px');
 
         //  The seal of a maxed (star) and of an available (plus) node
         await expect(page.getByTestId('talent-CLICK_DAMAGE')).toHaveAttribute('data-state', 'maxed');

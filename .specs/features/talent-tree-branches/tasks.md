@@ -545,7 +545,7 @@ P1 Card AC 2 (a talent with no text) cannot be reached in the browser: every nod
 
 ---
 
-#### T8: Author check of the feature [ ]
+#### T8: Author check of the feature [x]
 
 **Owner**: test-engineer
 **Goal**: Every AC of the spec has a test that asserts its spec value, and the riskiest code is guarded by tests that kill mutants (TTB-01 to TTB-09; `.claude/agents/test-engineer.md` § author check).
@@ -572,7 +572,62 @@ P1 Card AC 2 (a talent with no text) cannot be reached in the browser: every nod
 **Gate**: `cd game && npm test && npx playwright test e2e/talentTreeBranches.spec.js e2e/talentTreeBranchesCard.spec.js e2e/talentTreeRework.spec.js` and `node scripts/sensor.mjs <mutants.json>` exits 0
 **Done when**:
 
-- [ ] Every AC of the spec maps to at least one test asserting its spec value, and the sensor reports 5 of 5 killed.
+- [x] Every AC of the spec maps to at least one test asserting its spec value, and the sensor reports 5 of 5 killed.
+
+**Result** (test-engineer, 2026-11-25):
+
+AC map (unit = `talentTreeLayout.test.js` L, `talents.test.js` T, `talentsView.test.js` V; e2e = `talentTreeBranches.spec.js` B, `talentTreeBranchesCard.spec.js` C, `talentTreeRework.spec.js` R):
+
+| AC | Spec value | Unit | e2e |
+| -- | ---------- | ---- | --- |
+| Branches AC 1 | 28 centres; `CLICK_DAMAGE` (542.72, 285.12), `MINIBOSS_TIME` (445.44, 334.08), `COMBO_FURY` (778.24, 357.12) within 1 px | L:43 (all 28 literal), V `centres each node` | B:90 (6 nodes), R:120 |
+| Branches AC 2 | grade distances grow; `CLICK_DAMAGE` 57.8, 133.4, 209.6 | L:76 | B:112 |
+| Branches AC 3 | sides x 512, grade 3 y < 144, grade 1 y > 316.8 | L:88 | B:131 |
+| Branches AC 4 | no node, caption, banner or fixed part touches another; all inside the tree | L:105, :112, :121 | B:153 (counts 28, 10, 4, 5; pairs `[]`) |
+| Branches AC 5 | element at every centre belongs to its node; click selects | n/a | B:195 |
+| Branches AC 6 | banners (138.24, 172.8), (245.76, 34.56), (680.96, 20.16), (901.12, 334.08), 140 x 34 | L:142, V banners | B:221, R banners 140 x 34 |
+| Branches AC 7 | ellipses `29 52 18 17`, `38 27 14 21`, `68 28 19 24`, `71 58 18 17` | L:164, V lit layer | B:245, R opacity 0, 0.27, 0.44, 1 |
+| Branches AC 8 | the 11 `points` strings | L:174, V `draws the trunk, 9 chain veins ...` | B:257 |
+| Sizes AC 1 | 44 x 44, icon 28; Fúria 56 x 56, icon 36 | L:191 (NODE_HALF) | B:282 |
+| Sizes AC 2 | badge 18 x 18, 10 px, top and right -4 px; seal 18 x 18, -6 px, 11 and 14 px; lock 20 x 20, -7 px, 12 px; chip 11 px; caption 80 px, 12 px | n/a | B:298 (the badge offset assertions were added by this check) |
+| Sizes AC 3 | 19 locked nodes, lock clear of chip | n/a | R:231 (desktop and phone) |
+| Card AC 1 | the 10 texts, grades 2 and 3 read grade 1 | T `talentDescription`, V:225, :237, :245 | C:75, :87 |
+| Card AC 2 | no text, no element, no error | T `answers null`, V:251 | n/a (not reachable in the browser, spec) |
+| Card AC 3 | 88 x 88, 3 px solid, 4 branch colours, ring 2 px `rgb(28, 18, 12)`, glow 14 px 4 px, art 64 x 64, `-g2.png` | V:268 | C:116, :98 |
+| Card AC 4 | grade 1 file, then glyph at 34 px `rgb(244, 230, 200)` | V:276 | C:158, :171 |
+| Card AC 5 | 460 x 136, bottom 8 px, centred within 1 px, level and effect same top, no clipped text in 5 states | V:260 | C:190, :214 |
+| Card AC 6 | only the hint, no icon, no description | V:294 | C:251 |
+| Card AC 7 | name, level, effect, button, `Nível máximo`, lock text kept | V card cases | C:289, :214, R card tests |
+| Card D5 text styles | name Cinzel 16 px; level and effect 13 px, 12 px apart; description Figtree 12 px, 15 px line, `rgb(42, 26, 16)` | n/a | C:264 (added by this check) |
+| Fúria AC 1 | (76, 62); 267.2 against 103.8 px | L:97 | B:342 |
+| Fúria AC 2 | `60,61 76,62` and `50,58 60,61 69.5,56 86,42` | L:174 | B:257 |
+| Fúria AC 3 | DOM order `COMBO`, `COMBO_G2`, `COMBO_G3`, `COMBO_FURY`; Tab | n/a | B:342 |
+| Fúria AC 4 | locked at COMBO 9, available at COMBO 10 | n/a | B:361, R Fúria tests |
+| Edge Cases | 27 nodes without Fúria; unknown talent draws no node; grade text; selection change; 1280 x 720; phone tests | V `draws no node for a talent outside the map` | B:382, C:98, R phone tests |
+
+Gaps found and closed: (1) the badge offset `top: -4px; right: -4px` of D3 was not asserted (B:298 now asserts both); (2) the card text styles of D5 (Cinzel 16 px name, 13 px level and effect with a 12 px gap, Figtree 12 px description on a 15 px line in `--ink-900`, radial wood background) were not asserted (C:264, new test). M6 and M10 of the second batch target those two gaps.
+
+Sensor (`node scripts/sensor.mjs`, exit 0 both times):
+
+| Id | Mutant | Outcome | Killed by |
+| -- | ------ | ------- | --------- |
+| M1 | `Diminui` to `Aumenta a defesa` | killed | `talents.test.js` `describes each of the 10 talents` |
+| M2 | twig vein from `TRUNK.fork` | killed | `talentTreeLayout.test.js` `draws the trunk, one vein per chain ...` |
+| M3 | card icon without the grade 1 fallback | killed | `talentsView.test.js` `falls back on the card to the grade 1 icon` |
+| M4 | ring border 2 px | killed | C `the card shows the talent icon in a ring` |
+| M5 | `.is-large` 60 px | killed | B `nodes are 44 px with 28 px icons` |
+| M6 | description 13 px | killed | C `the card text keeps the fonts, sizes and colours` |
+| M7 | card width 440 px | killed | C `the card is 460 x 136` |
+| M8 | glow blur 10 px | killed | C `the card shows the talent icon in a ring` |
+| M9 | description by `id` only | killed | `talents.test.js` `gives grades 2 and 3 the text of grade 1` |
+| M10 | badge top -5 px | killed | B `the marks shrink with the nodes` |
+| M11 | `MINIBOSS_TIME_G2` on `BOSS_DAMAGE_G2` (e2e run only) | killed | B `no node, caption or banner touches another` or B `a click at the centre of every node` (the run held both) |
+| M12 | `COMBO_FURY` at x 56 (e2e run only) | killed | B `Fúria crescente comes after the chain` |
+| M13 | icon before the body (e2e run only) | killed | C `the card shows the talent icon in a ring` |
+
+13 of 13 killed, 0 survived. The sensor does not name the killing test: for M1, M2, M3 and M9 it was read from a manual run of the mutant, for the e2e mutants it is the test the `-g` filter selects.
+
+Gate run: `npm test` 90 files, 2301 tests passed; `talentTreeBranches.spec.js` + `talentTreeBranchesCard.spec.js` + `talentTreeRework.spec.js` 58 passed.
 
 **Commit**: `test(game): author check of the talent tree branches`
 
