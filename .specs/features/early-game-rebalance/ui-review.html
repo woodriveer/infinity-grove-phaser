@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Rebalanceamento do início do jogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Rebalanceamento do início do jogo</h1>
+                <div class="meta">
+                    <code>.specs/features/early-game-rebalance</code> · commits <code>até b80aebd8</code> · 2026-11-25 · desktop local (npm run dev + Playwright)
+                </div>
+            </div>
+            <span class="chip verdict ok">APROVADO</span>
+        </div>
+        <p style="margin-top:16px">O chip de afixo dos quatro tipos e seus estados, os cartões de talento com os valores novos e o HUD do capítulo 1 (8 fases, 45 s e 90 s) estão legíveis, alinhados ao estilo do jogo e fiéis à spec. Nenhum defeito encontrado. O monstro aparece como retângulo cinza porque o backend falso não serve o sprite; isso vem da fixture, não da feature.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">12</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">15</div><div class="l">capturas (desktop)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Chip no topo do corpo do monstro, centrado em x 670, dentro de y 322 a 350, sem sobrepor a barra de vida (topo y 281), o alvo nem a caixa do inimigo (y 556 a 636). <code>Affix Display</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Texto Figtree 700 de 12 px em pergaminho sobre chip escuro, borda e ícone na cor do tipo (#b07a3a, #5aa0d8, #4f9a3c, #8a9aa6), texto nunca cortado. <code>Affix Display</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Quatro tipos com ícone próprio (hexágono, anel, cruz, placa) e um chip por estado do Escudo (cheio, parcial, caído). <code>Affix Display</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Textos em português exatamente como na spec: Carapaça, Escudo de golpes, Regeneração (vírgula decimal), Blindado, formato curto 1.2K. <code>Player-Facing Texts</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Chip oculto quando o monstro não tem afixo; chefe do capítulo 11 mostra o afixo. <code>Display AC 5</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Cartões de talento com os valores novos: +10 de dano, +50 pontos, +150%. <code>Talent Change</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Rótulo Stage 1/10  Phase 1/8 e cronômetros 45 s e 90 s do capítulo 1. <code>Chapter Table</code></span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>Luta: chip de afixo</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/01-shell-miniboss-desktop.png" target="_blank"><img src="ui-review/01-shell-miniboss-desktop.png" alt="Carapaça no miniboss" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Carapaça no miniboss</span>
+                        <span class="d">Chip Carapaça: -6 por golpe, ícone hexágono âmbar, centrado sobre o corpo do monstro, abaixo da barra de vida.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/02-shield-full-desktop.png" target="_blank"><img src="ui-review/02-shield-full-desktop.png" alt="Escudo de golpes, 7/10" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Escudo de golpes, 7/10</span>
+                        <span class="d">Após 3 golpes o chip lê Escudo de golpes: 7/10 (ícone anel azul).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/03-shield-down-desktop.png" target="_blank"><img src="ui-review/03-shield-down-desktop.png" alt="Escudo de golpes caído" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Escudo de golpes caído</span>
+                        <span class="d">Chip lê Escudo de golpes: volta em 6 s; o golpe que esgota o escudo mostra o número 0.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/04-regeneration-miniboss-desktop.png" target="_blank"><img src="ui-review/04-regeneration-miniboss-desktop.png" alt="Regeneração no miniboss" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Regeneração no miniboss</span>
+                        <span class="d">Regeneração: 0,5% da vida/s, ícone cruz verde, vírgula decimal.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/05-regeneration-boss-desktop.png" target="_blank"><img src="ui-review/05-regeneration-boss-desktop.png" alt="Regeneração no chefe do capítulo" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Regeneração no chefe do capítulo</span>
+                        <span class="d">Regeneração: 0,25% da vida/s no chefe, mesmo lugar e estilo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/06-armored-miniboss-desktop.png" target="_blank"><img src="ui-review/06-armored-miniboss-desktop.png" alt="Blindado no miniboss" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Blindado no miniboss</span>
+                        <span class="d">Blindado: +20 de defesa; a linha do inimigo mostra Defesa 53% (33 + 20), ícone placa cinza.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/07-shell-1200-desktop.png" target="_blank"><img src="ui-review/07-shell-1200-desktop.png" alt="Carapaça 1200 (formato curto)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Carapaça 1200 (formato curto)</span>
+                        <span class="d">Carapaça: -1.2K por golpe; o chip cresce sem cortar texto nem tocar a barra de vida.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/08-no-affix-desktop.png" target="_blank"><img src="ui-review/08-no-affix-desktop.png" alt="Sem afixo" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Sem afixo</span>
+                        <span class="d">Sem chip: nenhum resíduo visível entre a barra de vida e o monstro.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/09-boss-affix-chapter-11-desktop.png" target="_blank"><img src="ui-review/09-boss-affix-chapter-11-desktop.png" alt="Chefe do capítulo 11 com Escudo 30" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Chefe do capítulo 11 com Escudo 30</span>
+                        <span class="d">Escudo de golpes: 30/30 no chefe, título Chapter Boss.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Talentos</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/10-talent-card-flat-desktop.png" target="_blank"><img src="ui-review/10-talent-card-flat-desktop.png" alt="Cartão Dano direto de clique" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão Dano direto de clique</span>
+                        <span class="d">Nível 10/10, Efeito: +10 de dano.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/11-talent-card-crit-chance-desktop.png" target="_blank"><img src="ui-review/11-talent-card-crit-chance-desktop.png" alt="Cartão Chance de crítico" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão Chance de crítico</span>
+                        <span class="d">Nível 10/10, Efeito: +50 pontos.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/11-talent-card-crit-damage-desktop.png" target="_blank"><img src="ui-review/11-talent-card-crit-damage-desktop.png" alt="Cartão Dano crítico" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão Dano crítico</span>
+                        <span class="d">Nível 10/10, Efeito: +150%.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>HUD do capítulo 1</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/12-stage-label-8-phases-desktop.png" target="_blank"><img src="ui-review/12-stage-label-8-phases-desktop.png" alt="Rótulo do estágio com 8 fases" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Rótulo do estágio com 8 fases</span>
+                        <span class="d">Stage 1/10  Phase 1/8, sem cronômetro nas fases comuns.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/13-chapter-1-miniboss-45s-desktop.png" target="_blank"><img src="ui-review/13-chapter-1-miniboss-45s-desktop.png" alt="Miniboss do capítulo 1: 45 s" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Miniboss do capítulo 1: 45 s</span>
+                        <span class="d">Cronômetro do miniboss do capítulo 1 (fixture de 45 s).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/14-chapter-1-boss-90s-desktop.png" target="_blank"><img src="ui-review/14-chapter-1-boss-90s-desktop.png" alt="Chefe do capítulo 1: 90 s" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Chefe do capítulo 1: 90 s</span>
+                        <span class="d">Time: 90 no chefe do capítulo 1.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <p class="empty">Nenhum achado.</p>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>O chip de Escudo caído (volta em 6 s) é o mais largo dos textos fixos; se um dia passar de 240 px com números grandes, vale revisar o formato curto nele também.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <p class="empty">Nenhum erro nem recurso faltando. Todas as imagens carregaram antes de cada captura; o console do navegador não foi lido pelo Playwright.</p>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-25</footer>
+</main>
+</body>
+</html>
