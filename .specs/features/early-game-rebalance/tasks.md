@@ -726,7 +726,7 @@ JSON of a chapter 3 stage 6:
 
 ### Phase 3: Game
 
-#### T7: monsterAffix domain module [ ]
+#### T7: monsterAffix domain module [x]
 
 **Owner**: game-dev
 **Goal**: The game reads an affix of the payload, runs its state per monster and writes its chip text (EGR-06, EGR-07; spec § Affix Rules, § Player-Facing Texts, Affixes AC 4 to 8, 12, Edge Cases).
@@ -794,7 +794,7 @@ export const affixText = (state) => { /* ... */ };
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] Every case passes and every other unit test passes unchanged (the hexagonal import test included).
+- [x] Every case passes and every other unit test passes unchanged (the hexagonal import test included).
 
 **Commit**: `feat(game): read and run monster affixes`
 

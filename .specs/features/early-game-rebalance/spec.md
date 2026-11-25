@@ -356,8 +356,8 @@ A strike that an affix brings to 0 shows the damage number `0`, as any other dam
 | EGR-03 | P1: Critical path - AC 3, 6, 7 (seeded resistances, chip) | Tasks T2, T13 | In Tasks |
 | EGR-04 | P1: Curve - AC 5 to 7; Critical path - AC 4, 5 (migration V16) | Tasks T3 | In Tasks |
 | EGR-05 | P1: Affixes - AC 1 to 3 (backend domain, seed, storage, V17, payload) | Tasks T4, T5, T6 | In Tasks |
-| EGR-06 | P1: Affixes - AC 11, 12 (game data, fallback, farm) | Tasks T7, T10, T14 | In Tasks |
-| EGR-07 | P1: Affixes - AC 4 to 10 and the Edge Cases (combat rules) | Tasks T7, T8, T9, T11, T14 | In Tasks |
+| EGR-06 | P1: Affixes - AC 11, 12 (game data, fallback, farm) | Tasks T7, T10, T14 | Implementing |
+| EGR-07 | P1: Affixes - AC 4 to 10 and the Edge Cases (combat rules) | Tasks T7, T8, T9, T11, T14 | Implementing |
 | EGR-08 | P1: Display - AC 1 to 6 (chip) | Tasks T11, T15, T17 | In Tasks |
 
 **Coverage:** 8 total, 8 mapped to tasks, 0 unmapped
