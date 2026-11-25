@@ -1122,7 +1122,7 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 
 ---
 
-#### T13: Chapter 1 numbers, 8 phases and the live critical chip in the browser [ ]
+#### T13: Chapter 1 numbers, 8 phases and the live critical chip in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: The browser shows chapter 1 of the Chapter Table with 8 phases, miniboss 1-1 with its 45 s countdown and the critical chip against the new resistances (EGR-02, EGR-03; spec Curve AC 9, 10, Critical path AC 6, 7).
@@ -1147,7 +1147,7 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 **Gate**: `cd game && npm test && npx playwright test e2e/earlyGameRebalance.spec.js`
 **Done when**:
 
-- [ ] The 6 cases pass.
+- [x] The 6 cases pass.
 
 **Commit**: `test(game): pin the chapter 1 curve, 8 phases and the live critical chip in the browser`
 
