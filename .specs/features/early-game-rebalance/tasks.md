@@ -283,7 +283,7 @@ The `3_000_000_000` case of `ProgressControllerIT` (`:101`) writes its own value
 
 ---
 
-#### T3: V16 rewrites the stored chapters [ ]
+#### T3: V16 rewrites the stored chapters [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: A database seeded before this feature gets the Chapter Table numbers, 8 phases and the new add health on the rows that still hold today's seed; tuned rows stay; a second run changes nothing (EGR-04; spec P1 Curve AC 5 to 7, Critical path AC 4, 5).
@@ -426,7 +426,7 @@ T5 adds V17 and raises each of these four counts by 1. If the boss assertion at 
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 10 cases of `EarlyGameRebalanceMigrationIT` and the new compatibility case pass; every other backend test passes.
+- [x] The 10 cases of `EarlyGameRebalanceMigrationIT` and the new compatibility case pass; every other backend test passes.
 
 **Commit**: `feat(backend): move the stored chapters to the fitted table`
 
