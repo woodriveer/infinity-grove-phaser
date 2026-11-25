@@ -35,6 +35,43 @@ data class StageAdd(
     }
 }
 
+/** What an affix does (spec early-game-rebalance, Affix Rules). Named Monster... because Affix and AffixType are equipment affixes. */
+enum class MonsterAffixType { SHELL, HIT_SHIELD, REGENERATION, ARMORED }
+
+/**
+ * The affix of one miniboss or chapter boss. [amount] is the points a strike loses (SHELL), the charges (HIT_SHIELD), the basis points of the
+ * maximum health healed a second (REGENERATION) or the defense added (ARMORED); [periodMs] is how long a broken shield stays down (HIT_SHIELD only).
+ */
+data class MonsterAffix(
+    val type: MonsterAffixType,
+    val amount: Long,
+    val periodMs: Long? = null,
+) {
+    init {
+        require(amount >= 1) { "affix amount $amount must be at least 1" }
+        when (type) {
+            MonsterAffixType.HIT_SHIELD -> {
+                require(amount <= MAX_SHIELD_CHARGES) { "shield charges $amount must be at most $MAX_SHIELD_CHARGES" }
+                require(periodMs != null && periodMs in 1..MAX_SHIELD_PERIOD_MS) {
+                    "shield period-ms $periodMs must be between 1 and $MAX_SHIELD_PERIOD_MS"
+                }
+            }
+            MonsterAffixType.REGENERATION ->
+                require(amount <= MAX_REGENERATION_BP) { "regeneration $amount must be at most $MAX_REGENERATION_BP basis points" }
+            MonsterAffixType.ARMORED ->
+                require(amount <= EnemyStats.MAX_DEFENSE) { "armored defense $amount must be at most ${EnemyStats.MAX_DEFENSE}" }
+            MonsterAffixType.SHELL -> Unit
+        }
+        require(type == MonsterAffixType.HIT_SHIELD || periodMs == null) { "only a shield has a period-ms, got $periodMs on $type" }
+    }
+
+    companion object {
+        private const val MAX_SHIELD_CHARGES = 1000L
+        private const val MAX_SHIELD_PERIOD_MS = 600_000L
+        private const val MAX_REGENERATION_BP = 10_000L
+    }
+}
+
 /** The numbers of one stage: its phase monsters, its miniboss, the miniboss time limit and the drop rule each one pays. */
 data class StageDefinition(
     val number: Int,
@@ -47,6 +84,7 @@ data class StageDefinition(
     val monsterDropRuleId: Int = 1,
     val minibossDropRuleId: Int = 1,
     val adds: List<StageAdd> = emptyList(),
+    val minibossAffix: MonsterAffix? = null,
 ) {
     init {
         require(number >= 1) { "Stage number $number must be at least 1" }
@@ -70,6 +108,7 @@ data class ChapterDefinition(
     val stages: List<StageDefinition>,
     val boss: EnemyStats = EnemyStats.DEFAULT,
     val bossDropRuleId: Int = 1,
+    val bossAffix: MonsterAffix? = null,
 ) {
     init {
         require(number >= 1) { "Chapter number $number must be at least 1" }
@@ -157,6 +196,76 @@ data class ChapterDefinition(
         private const val KILL_INTERVAL_MS = 1500L
         private const val ADDS_PER_MINIBOSS = 2
         private const val ADD_HEALTH_FACTOR = 3
+
+        private const val SHIELD_CHARGES_BASE = 10
+        private const val SHIELD_CHARGES_PER_CHAPTER = 5
+        private const val SHIELD_CHARGES_STEPS = 4
+        private const val SHIELD_PERIOD_MS = 6000L
+        private const val SHELL_PER_MILLE = 4
+        private const val PER_MILLE = 1000
+        private const val MINIBOSS_REGENERATION_BP = 50L
+        private const val BOSS_REGENERATION_BP = 25L
+        private const val ARMORED_DEFENSE = 20L
+
+        /** The affix types of minibosses 3, 6, 9 and of the chapter boss, chapters 2 to 15 (spec Affix Table). Chapter 1 has none. */
+        private val AFFIX_TYPES: Map<Int, List<MonsterAffixType?>> =
+            run {
+                val shield = MonsterAffixType.HIT_SHIELD
+                val shell = MonsterAffixType.SHELL
+                val regeneration = MonsterAffixType.REGENERATION
+                val armored = MonsterAffixType.ARMORED
+                val rotation = listOf(shield, shell, regeneration, armored)
+                mapOf(
+                    2 to listOf(shield, shield, shield, shield),
+                    3 to listOf(shell, shield, shell, shell),
+                    4 to listOf(regeneration, shell, regeneration, regeneration),
+                    5 to listOf(armored, regeneration, armored, armored),
+                ) +
+                    (6..10).associateWith { c ->
+                        listOf(rotation[(c - 6) % 4], rotation[(c - 5) % 4], rotation[(c - 4) % 4], rotation[(c - 3) % 4])
+                    } +
+                    (11..15).associateWith { c -> listOf(null, null, null, rotation[(c - 3) % 4]) }
+            }
+        private val AFFIX_STAGES = listOf(3, 6, 9)
+
+        /**
+         * The affix of [type] for chapter [number] (spec Affix Table): the shield charges grow by 5 a chapter from 10 to 30, Carapaça loses
+         * 4 per mille of [phaseHealth] rounded up, Regeneração heals 50 basis points of a miniboss and 25 of a boss, Blindado adds 20 defense.
+         */
+        fun affixOf(
+            type: MonsterAffixType,
+            chapter: Int,
+            phaseHealth: Long,
+            boss: Boolean,
+        ): MonsterAffix =
+            when (type) {
+                MonsterAffixType.HIT_SHIELD ->
+                    MonsterAffix(
+                        type,
+                        (SHIELD_CHARGES_BASE + SHIELD_CHARGES_PER_CHAPTER * minOf(chapter - 2, SHIELD_CHARGES_STEPS)).toLong(),
+                        SHIELD_PERIOD_MS,
+                    )
+                MonsterAffixType.SHELL -> MonsterAffix(type, (phaseHealth * SHELL_PER_MILLE + PER_MILLE - 1) / PER_MILLE)
+                MonsterAffixType.REGENERATION -> MonsterAffix(type, if (boss) BOSS_REGENERATION_BP else MINIBOSS_REGENERATION_BP)
+                MonsterAffixType.ARMORED -> MonsterAffix(type, ARMORED_DEFENSE)
+            }
+
+        /** The affix of miniboss [stage] of chapter [number] (minibosses 3, 6 and 9 only), null when it has none. */
+        fun minibossAffixOf(
+            number: Int,
+            stage: Int,
+            phaseHealth: Long,
+        ): MonsterAffix? {
+            val index = AFFIX_STAGES.indexOf(stage)
+            val type = if (index < 0) null else AFFIX_TYPES[number]?.get(index)
+            return type?.let { affixOf(it, number, phaseHealth, boss = false) }
+        }
+
+        /** The affix of the chapter boss of chapter [number], with the health of its last stage's phase monster, null when it has none. */
+        fun bossAffixOf(
+            number: Int,
+            lastPhaseHealth: Long,
+        ): MonsterAffix? = AFFIX_TYPES[number]?.get(AFFIX_STAGES.size)?.let { affixOf(it, number, lastPhaseHealth, boss = true) }
 
         /** The buff of each add by chapter (spec miniboss-adds, Add Table); chapters not listed have no adds. */
         private val ADD_BUFFS = mapOf(11 to 30, 12 to 35, 13 to 40, 14 to 45, 15 to 50)

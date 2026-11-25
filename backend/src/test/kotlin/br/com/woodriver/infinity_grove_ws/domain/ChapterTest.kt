@@ -582,4 +582,134 @@ class ChapterTest {
         assertEquals(emptyList(), ChapterDefinition.addsOf(16, 100))
         assertEquals(emptyList(), ChapterDefinition.addsOf(1, 100))
     }
+
+    // affixes
+
+    private val shield10 = MonsterAffix(MonsterAffixType.HIT_SHIELD, 10, 6000)
+    private val shield15 = MonsterAffix(MonsterAffixType.HIT_SHIELD, 15, 6000)
+    private val shield30 = MonsterAffix(MonsterAffixType.HIT_SHIELD, 30, 6000)
+    private val miniboss50 = MonsterAffix(MonsterAffixType.REGENERATION, 50)
+    private val boss25 = MonsterAffix(MonsterAffixType.REGENERATION, 25)
+    private val armored20 = MonsterAffix(MonsterAffixType.ARMORED, 20)
+
+    private fun shell(amount: Long) = MonsterAffix(MonsterAffixType.SHELL, amount)
+
+    /** The affixes of minibosses 3, 6, 9 and of the chapter boss of chapter [c], in that order. */
+    private fun affixesOf(c: Int): List<MonsterAffix?> {
+        val health = tablePhaseHealth.getValue(c)
+        return listOf(3, 6, 9).map { ChapterDefinition.minibossAffixOf(c, it, health[it - 1]) } +
+            ChapterDefinition.bossAffixOf(c, health.last())
+    }
+
+    @Test
+    fun `chapter 1 seeds no affix`() {
+        assertEquals(List(10) { null }, (1..10).map { ChapterDefinition.minibossAffixOf(1, it, tablePhaseHealth.getValue(1)[it - 1]) })
+        assertEquals(null, ChapterDefinition.bossAffixOf(1, tablePhaseHealth.getValue(1).last()))
+    }
+
+    @Test
+    fun `chapter 2 seeds Escudo de golpes of 10 charges and 6000 ms on minibosses 3, 6, 9 and the boss`() {
+        assertEquals(listOf(shield10, shield10, shield10, shield10), affixesOf(2))
+    }
+
+    @Test
+    fun `chapter 3 seeds Carapaça 6 and 14, Escudo of 15 and a Carapaça 16 boss`() {
+        assertEquals(listOf(shell(6), shield15, shell(14), shell(16)), affixesOf(3))
+    }
+
+    @Test
+    fun `chapter 4 seeds Regeneração 50, Carapaça 24, Regeneração 50 and a Regeneração 25 boss`() {
+        assertEquals(listOf(miniboss50, shell(24), miniboss50, boss25), affixesOf(4))
+    }
+
+    @Test
+    fun `chapter 5 seeds Blindado 20 on minibosses 3 and 9 and the boss and Regeneração 50 on miniboss 6`() {
+        assertEquals(listOf(armored20, miniboss50, armored20, armored20), affixesOf(5))
+    }
+
+    @Test
+    fun `chapters 6 to 10 rotate the four types`() {
+        assertEquals(listOf(shield30, shell(49), miniboss50, armored20), affixesOf(6))
+        assertEquals(listOf(shell(122), miniboss50, armored20, shield30), affixesOf(7))
+        assertEquals(listOf(shield30, shell(346), miniboss50, armored20), affixesOf(10))
+    }
+
+    @Test
+    fun `chapters 11 to 15 seed an affix on the boss only`() {
+        (11..15).forEach { c ->
+            assertEquals(
+                List(10) {
+                    null
+                },
+                (1..10).map { ChapterDefinition.minibossAffixOf(c, it, tablePhaseHealth.getValue(c)[it - 1]) },
+                "chapter $c",
+            )
+        }
+        assertEquals(
+            listOf(shield30, shell(365), boss25, armored20, shield30),
+            (11..15).map { ChapterDefinition.bossAffixOf(it, tablePhaseHealth.getValue(it).last()) },
+        )
+    }
+
+    @Test
+    fun `minibosses other than 3, 6 and 9 carry no affix`() {
+        (2..10).forEach { c ->
+            listOf(1, 2, 4, 5, 7, 8, 10).forEach { n ->
+                assertEquals(null, ChapterDefinition.minibossAffixOf(c, n, tablePhaseHealth.getValue(c)[n - 1]), "chapter $c stage $n")
+            }
+        }
+    }
+
+    @Test
+    fun `the shield has 10, 15, 20, 25 and then 30 charges`() {
+        assertEquals(
+            listOf(10L, 15L, 20L, 25L, 30L, 30L),
+            listOf(2, 3, 4, 5, 6, 15).map { ChapterDefinition.affixOf(MonsterAffixType.HIT_SHIELD, it, 1, false).amount },
+        )
+    }
+
+    @Test
+    fun `Carapaça rounds up 4 per mille of the phase health`() {
+        assertEquals(6L, ChapterDefinition.affixOf(MonsterAffixType.SHELL, 3, 1346, false).amount)
+        assertEquals(4L, ChapterDefinition.affixOf(MonsterAffixType.SHELL, 3, 1000, false).amount)
+        assertEquals(5L, ChapterDefinition.affixOf(MonsterAffixType.SHELL, 3, 1001, false).amount)
+    }
+
+    @Test
+    fun `an affix amount of 0 is rejected and 1 is accepted`() {
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.SHELL, 0) }
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.HIT_SHIELD, 0, 6000) }
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.REGENERATION, 0) }
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.ARMORED, 0) }
+        assertEquals(1L, MonsterAffix(MonsterAffixType.SHELL, 1).amount)
+        assertEquals(1L, MonsterAffix(MonsterAffixType.HIT_SHIELD, 1, 6000).amount)
+        assertEquals(1L, MonsterAffix(MonsterAffixType.REGENERATION, 1).amount)
+        assertEquals(1L, MonsterAffix(MonsterAffixType.ARMORED, 1).amount)
+    }
+
+    @Test
+    fun `a shield needs a period between 1 and 600000 ms`() {
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.HIT_SHIELD, 10, null) }
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.HIT_SHIELD, 10, 0) }
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.HIT_SHIELD, 10, 600_001) }
+        assertEquals(1L, MonsterAffix(MonsterAffixType.HIT_SHIELD, 10, 1).periodMs)
+        assertEquals(600_000L, MonsterAffix(MonsterAffixType.HIT_SHIELD, 10, 600_000).periodMs)
+    }
+
+    @Test
+    fun `a shield has at most 1000 charges, a regeneration at most 10000 and an armor at most 90`() {
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.HIT_SHIELD, 1001, 6000) }
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.REGENERATION, 10_001) }
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.ARMORED, 91) }
+        assertEquals(1000L, MonsterAffix(MonsterAffixType.HIT_SHIELD, 1000, 6000).amount)
+        assertEquals(10_000L, MonsterAffix(MonsterAffixType.REGENERATION, 10_000).amount)
+        assertEquals(90L, MonsterAffix(MonsterAffixType.ARMORED, 90).amount)
+    }
+
+    @Test
+    fun `only a shield carries a period`() {
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.SHELL, 5, 6000) }
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.REGENERATION, 5, 6000) }
+        assertFailsWith<IllegalArgumentException> { MonsterAffix(MonsterAffixType.ARMORED, 5, 6000) }
+    }
 }

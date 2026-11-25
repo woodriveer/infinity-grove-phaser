@@ -434,7 +434,7 @@ T5 adds V17 and raises each of these four counts by 1. If the boss assertion at 
 
 ### Phase 2: Backend affixes
 
-#### T4: MonsterAffix domain and seed [ ]
+#### T4: MonsterAffix domain and seed [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: `ChapterDefinition.of(c)` seeds the affixes of the spec Affix Table for chapters 2 to 15, with the bounds of the spec (EGR-05; spec P1 Affixes AC 1).
@@ -533,7 +533,9 @@ private val AFFIX_STAGES = listOf(3, 6, 9)
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 14 new cases pass; every other backend test passes unchanged.
+- [x] The 14 new cases pass; every other backend test passes unchanged.
+
+**Deviation (orchestrator, 2026-11-25)**: `of(number)` is not wired in this task. Wiring it here left 5 read-back tests red (`ChapterSeederIT`, `ChapterRepositoryIT`) until T5 stores the affixes, and every backend commit on main is deployed. T4 adds the types, constants and the three functions, and its tests call `minibossAffixOf`, `bossAffixOf` and `affixOf` directly; T5 wires them into `of(number)` and moves the chapter-level assertions to `of(c)`.
 
 **Commit**: `feat(backend): seed monster affixes for chapters 2 to 15`
 
