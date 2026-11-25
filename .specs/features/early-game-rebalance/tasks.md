@@ -1155,7 +1155,7 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 
 ---
 
-#### T14: Affix rules in the browser [ ]
+#### T14: Affix rules in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: Each affix rule works in a real fight for every strike kind, in the campaign and the farm, and a bad payload means no affix (EGR-06, EGR-07; spec Affixes AC 4 to 12, Edge Cases).
@@ -1187,7 +1187,7 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 **Gate**: `cd game && npm test && npx playwright test e2e/monsterAffixes.spec.js`
 **Done when**:
 
-- [ ] The 13 cases pass.
+- [x] The 13 cases pass (15 are written: the shield back in one step and Regeneração 50 of 1000 health are extra).
 
 **Commit**: `test(game): pin the monster affix rules in the browser`
 
