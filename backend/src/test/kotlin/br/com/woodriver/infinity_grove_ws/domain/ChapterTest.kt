@@ -596,15 +596,16 @@ class ChapterTest {
 
     /** The affixes of minibosses 3, 6, 9 and of the chapter boss of chapter [c], in that order. */
     private fun affixesOf(c: Int): List<MonsterAffix?> {
-        val health = tablePhaseHealth.getValue(c)
-        return listOf(3, 6, 9).map { ChapterDefinition.minibossAffixOf(c, it, health[it - 1]) } +
-            ChapterDefinition.bossAffixOf(c, health.last())
+        val chapter = ChapterDefinition.of(c)
+        return listOf(3, 6, 9).map { chapter.stage(it).minibossAffix } + chapter.bossAffix
     }
 
     @Test
     fun `chapter 1 seeds no affix`() {
-        assertEquals(List(10) { null }, (1..10).map { ChapterDefinition.minibossAffixOf(1, it, tablePhaseHealth.getValue(1)[it - 1]) })
-        assertEquals(null, ChapterDefinition.bossAffixOf(1, tablePhaseHealth.getValue(1).last()))
+        val chapter = ChapterDefinition.of(1)
+
+        assertEquals(List(10) { null }, chapter.stages.map { it.minibossAffix })
+        assertEquals(null, chapter.bossAffix)
     }
 
     @Test
@@ -637,17 +638,11 @@ class ChapterTest {
     @Test
     fun `chapters 11 to 15 seed an affix on the boss only`() {
         (11..15).forEach { c ->
-            assertEquals(
-                List(10) {
-                    null
-                },
-                (1..10).map { ChapterDefinition.minibossAffixOf(c, it, tablePhaseHealth.getValue(c)[it - 1]) },
-                "chapter $c",
-            )
+            assertEquals(List(10) { null }, ChapterDefinition.of(c).stages.map { it.minibossAffix }, "chapter $c")
         }
         assertEquals(
             listOf(shield30, shell(365), boss25, armored20, shield30),
-            (11..15).map { ChapterDefinition.bossAffixOf(it, tablePhaseHealth.getValue(it).last()) },
+            (11..15).map { ChapterDefinition.of(it).bossAffix },
         )
     }
 
@@ -655,7 +650,7 @@ class ChapterTest {
     fun `minibosses other than 3, 6 and 9 carry no affix`() {
         (2..10).forEach { c ->
             listOf(1, 2, 4, 5, 7, 8, 10).forEach { n ->
-                assertEquals(null, ChapterDefinition.minibossAffixOf(c, n, tablePhaseHealth.getValue(c)[n - 1]), "chapter $c stage $n")
+                assertEquals(null, ChapterDefinition.of(c).stage(n).minibossAffix, "chapter $c stage $n")
             }
         }
     }

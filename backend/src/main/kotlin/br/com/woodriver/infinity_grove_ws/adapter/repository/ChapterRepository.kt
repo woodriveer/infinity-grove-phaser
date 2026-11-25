@@ -13,19 +13,27 @@ interface JpaStageRepository : JpaRepository<StageEntity, String> {
     fun findAllByChapterOrderByNumber(chapter: Int): List<StageEntity>
 }
 
+interface JpaStageAffixRepository : JpaRepository<StageAffixEntity, String> {
+    fun findAllByStageIdIn(stageIds: Collection<String>): List<StageAffixEntity>
+}
+
+interface JpaChapterAffixRepository : JpaRepository<ChapterAffixEntity, Int>
+
 interface JpaStageAddRepository : JpaRepository<StageAddEntity, String> {
     fun findAllByStageIdIn(stageIds: Collection<String>): List<StageAddEntity>
 }
 
 /**
  * Assembles a chapter from its row, its stage rows, their adds and the enemies they point at; saving resolves each enemy to its
- * catalog row and replaces the adds of the chapter.
+ * catalog row and replaces the adds and the affixes of the chapter.
  */
 @Repository
 class ChapterRepository(
     private val jpaChapterRepository: JpaChapterRepository,
     private val jpaStageRepository: JpaStageRepository,
     private val jpaStageAddRepository: JpaStageAddRepository,
+    private val jpaStageAffixRepository: JpaStageAffixRepository,
+    private val jpaChapterAffixRepository: JpaChapterAffixRepository,
     private val jpaEnemyRepository: JpaEnemyRepository,
     private val enemyRepository: EnemyRepository,
 ) : ChapterRepositoryPort {
@@ -40,7 +48,10 @@ class ChapterRepository(
                 .findAllByStageIdIn(stages.map { it.id })
                 .groupBy { it.stageId }
                 .mapValues { (_, rows) -> rows.sortedBy { it.slot }.map { it.toDomain() } }
-        return chapter.toDomain(stages, enemies, adds)
+        val stageAffixes =
+            jpaStageAffixRepository.findAllByStageIdIn(stages.map { it.id }).associate { it.stageId to it.toDomain() }
+        val bossAffix = jpaChapterAffixRepository.findById(number).orElse(null)?.toDomain()
+        return chapter.toDomain(stages, enemies, adds, stageAffixes, bossAffix)
     }
 
     @Transactional(readOnly = true)
@@ -63,6 +74,20 @@ class ChapterRepository(
         // a save replaces the adds of the chapter: rows of a slot the new chapter no longer has are deleted, the others are written over
         jpaStageAddRepository.deleteAll(jpaStageAddRepository.findAllByStageIdIn(stageIds).filterNot { it.id in wantedIds })
         jpaStageAddRepository.saveAll(wanted)
+        // the affixes are replaced the same way: a stage without an affix now loses its row, the others are written over
+        val wantedAffixes =
+            chapter.stages.mapNotNull { stage ->
+                stage.minibossAffix?.let { StageAffixEntity.from(StageEntity.idOf(chapter.number, stage.number), it) }
+            }
+        val wantedAffixIds = wantedAffixes.map { it.stageId }.toSet()
+        jpaStageAffixRepository.deleteAll(jpaStageAffixRepository.findAllByStageIdIn(stageIds).filterNot { it.stageId in wantedAffixIds })
+        jpaStageAffixRepository.saveAll(wantedAffixes)
+        val bossAffix = chapter.bossAffix
+        if (bossAffix != null) {
+            jpaChapterAffixRepository.save(ChapterAffixEntity.from(chapter.number, bossAffix))
+        } else if (jpaChapterAffixRepository.existsById(chapter.number)) {
+            jpaChapterAffixRepository.deleteById(chapter.number)
+        }
         return chapter
     }
 }

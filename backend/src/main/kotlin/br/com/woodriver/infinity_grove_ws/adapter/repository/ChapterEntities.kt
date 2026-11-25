@@ -3,6 +3,8 @@ package br.com.woodriver.infinity_grove_ws.adapter.repository
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.EnemyStats
+import br.com.woodriver.infinity_grove_ws.domain.MonsterAffix
+import br.com.woodriver.infinity_grove_ws.domain.MonsterAffixType
 import br.com.woodriver.infinity_grove_ws.domain.StageAdd
 import br.com.woodriver.infinity_grove_ws.domain.StageDefinition
 import jakarta.persistence.Column
@@ -64,9 +66,11 @@ class ChapterEntity(
         stages: List<StageEntity>,
         enemies: Map<Long, EnemyStats>,
         adds: Map<String, List<StageAdd>> = emptyMap(),
+        stageAffixes: Map<String, MonsterAffix> = emptyMap(),
+        bossAffix: MonsterAffix? = null,
     ): ChapterDefinition {
-        val ordered = stages.sortedBy { it.number }.map { it.toDomain(enemies, adds[it.id] ?: emptyList()) }
-        return ChapterDefinition(number, bossHitPoints, bossTimeLimitMs, ordered, enemies.enemy(bossEnemyId), bossDropRuleId)
+        val ordered = stages.sortedBy { it.number }.map { it.toDomain(enemies, adds[it.id] ?: emptyList(), stageAffixes[it.id]) }
+        return ChapterDefinition(number, bossHitPoints, bossTimeLimitMs, ordered, enemies.enemy(bossEnemyId), bossDropRuleId, bossAffix)
     }
 
     companion object {
@@ -118,6 +122,7 @@ class StageEntity(
     fun toDomain(
         enemies: Map<Long, EnemyStats>,
         adds: List<StageAdd> = emptyList(),
+        minibossAffix: MonsterAffix? = null,
     ) = StageDefinition(
         number = number,
         phasesPerStage = phasesPerStage,
@@ -129,6 +134,7 @@ class StageEntity(
         monsterDropRuleId = monsterDropRuleId,
         minibossDropRuleId = minibossDropRuleId,
         adds = adds,
+        minibossAffix = minibossAffix,
     )
 
     companion object {
@@ -192,5 +198,53 @@ class StageAddEntity(
             slot: Int,
             add: StageAdd,
         ) = StageAddEntity(idOf(chapter, stage, slot), StageEntity.idOf(chapter, stage), slot, add.health, add.defenseBuff)
+    }
+}
+
+/** The affix of a stage's miniboss (spec early-game-rebalance), keyed by the stage id. */
+@Entity
+@Table(name = "stage_affixes")
+class StageAffixEntity(
+    @Id
+    @Column(name = "stage_id", nullable = false, updatable = false)
+    var stageId: String,
+    @Column(nullable = false, length = 32)
+    var affix: String,
+    @Column(nullable = false)
+    var amount: Long,
+    @Column(name = "period_ms")
+    var periodMs: Long?,
+) {
+    fun toDomain() = MonsterAffix(MonsterAffixType.valueOf(affix), amount, periodMs)
+
+    companion object {
+        fun from(
+            stageId: String,
+            affix: MonsterAffix,
+        ) = StageAffixEntity(stageId, affix.type.name, affix.amount, affix.periodMs)
+    }
+}
+
+/** The affix of a chapter boss, keyed by the chapter number. */
+@Entity
+@Table(name = "chapter_affixes")
+class ChapterAffixEntity(
+    @Id
+    @Column(nullable = false, updatable = false)
+    var chapter: Int,
+    @Column(nullable = false, length = 32)
+    var affix: String,
+    @Column(nullable = false)
+    var amount: Long,
+    @Column(name = "period_ms")
+    var periodMs: Long?,
+) {
+    fun toDomain() = MonsterAffix(MonsterAffixType.valueOf(affix), amount, periodMs)
+
+    companion object {
+        fun from(
+            chapter: Int,
+            affix: MonsterAffix,
+        ) = ChapterAffixEntity(chapter, affix.type.name, affix.amount, affix.periodMs)
     }
 }

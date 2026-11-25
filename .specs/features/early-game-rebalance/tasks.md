@@ -541,7 +541,7 @@ private val AFFIX_STAGES = listOf(3, 6, 9)
 
 ---
 
-#### T5: Affix tables, V17 and the chapter repository [ ]
+#### T5: Affix tables, V17 and the chapter repository [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Affixes are stored in `stage_affixes` and `chapter_affixes`, filled for stored chapters 2 to 15 by V17 and written by the seeder for a new database, and read back with the chapter (EGR-05; spec P1 Affixes AC 1, 3).
@@ -665,7 +665,9 @@ Repository (`ChapterRepository.kt`): `interface JpaStageAffixRepository : JpaRep
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 5 migration cases and 4 repository cases pass; `SchemaValidationIT` and every other backend test pass.
+- [x] The 5 migration cases and 4 repository cases pass; `SchemaValidationIT` and every other backend test pass.
+
+**Deviation (orchestrator, 2026-11-25)**: this task also wires `minibossAffixOf` and `bossAffixOf` into `ChapterDefinition.of(number)` (moved here from T4) and moves the chapter-level assertions of `ChapterTest` to `of(c)`. `ChapterSeederIT.removeChapter` and `ChapterRepositoryIT.clean` also delete the affix rows of the chapter they remove, because of the new foreign keys.
 
 **Commit**: `feat(backend): store monster affixes`
 

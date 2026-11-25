@@ -4,6 +4,8 @@ import br.com.woodriver.infinity_grove_ws.IntegrationTestBase
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.Element
 import br.com.woodriver.infinity_grove_ws.domain.EnemyStats
+import br.com.woodriver.infinity_grove_ws.domain.MonsterAffix
+import br.com.woodriver.infinity_grove_ws.domain.MonsterAffixType
 import br.com.woodriver.infinity_grove_ws.domain.StageAdd
 import br.com.woodriver.infinity_grove_ws.domain.StageDefinition
 import org.springframework.beans.factory.annotation.Autowired
@@ -58,6 +60,8 @@ class ChapterRepositoryIT : IntegrationTestBase() {
 
     private fun clean() {
         jdbc.update("delete from stage_adds where stage_id like ?", "$number/%")
+        jdbc.update("delete from stage_affixes where stage_id like ?", "$number/%")
+        jdbc.update("delete from chapter_affixes where chapter = ?", number)
         jpaStageRepository.deleteAll(jpaStageRepository.findAllByChapterOrderByNumber(number))
         jpaChapterRepository.deleteById(number)
         removeUnusedEnemies()
@@ -280,5 +284,50 @@ class ChapterRepositoryIT : IntegrationTestBase() {
         assertEquals(listOf(StageAdd(483_000, 50), StageAdd(483_000, 50)), repository.findByNumber(15)!!.stage(1).adds)
         repository.findByNumber(10)!!.stages.forEach { assertEquals(emptyList(), it.adds) }
         assertEquals(100, jdbc.queryForObject("select count(*) from stage_adds", Int::class.java))
+    }
+
+    private fun affixRows() = jdbc.queryForObject("select count(*) from stage_affixes where stage_id like '3/%'", Int::class.java)
+
+    @Test
+    fun `a seeded chapter 3 reads back its affixes`() {
+        val read = repository.findByNumber(3)!!
+
+        assertEquals(MonsterAffix(MonsterAffixType.SHELL, 6), read.stage(3).minibossAffix)
+        assertEquals(MonsterAffix(MonsterAffixType.HIT_SHIELD, 15, 6000), read.stage(6).minibossAffix)
+        assertEquals(MonsterAffix(MonsterAffixType.SHELL, 16), read.bossAffix)
+        assertNull(read.stage(1).minibossAffix)
+    }
+
+    @Test
+    fun `saving a chapter without affixes deletes its affix rows`() {
+        val seed = ChapterDefinition.of(3)
+        try {
+            repository.save(seed.copy(bossAffix = null, stages = seed.stages.map { it.copy(minibossAffix = null) }))
+
+            assertEquals(0, affixRows())
+            assertEquals(0, jdbc.queryForObject("select count(*) from chapter_affixes where chapter = 3", Int::class.java))
+            assertNull(repository.findByNumber(3)!!.bossAffix)
+        } finally {
+            repository.save(seed)
+        }
+    }
+
+    @Test
+    fun `saving it again with the seed puts them back`() {
+        val seed = ChapterDefinition.of(3)
+        repository.save(seed.copy(bossAffix = null, stages = seed.stages.map { it.copy(minibossAffix = null) }))
+
+        repository.save(seed)
+
+        assertEquals(3, affixRows())
+        assertEquals(seed, repository.findByNumber(3))
+    }
+
+    @Test
+    fun `chapter 1 reads no affix`() {
+        val read = repository.findByNumber(1)!!
+
+        assertEquals(List(10) { null }, read.stages.map { it.minibossAffix })
+        assertNull(read.bossAffix)
     }
 }

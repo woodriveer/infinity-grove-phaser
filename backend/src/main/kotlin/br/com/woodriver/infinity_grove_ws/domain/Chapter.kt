@@ -366,6 +366,7 @@ data class ChapterDefinition(
                             monsterDropRuleId = monsterRuleId(number),
                             minibossDropRuleId = minibossRuleId(number),
                             adds = addsOf(number, monsterHealth),
+                            minibossAffix = minibossAffixOf(number, n, monsterHealth),
                         )
                     },
                 boss =
@@ -379,6 +380,7 @@ data class ChapterDefinition(
                         },
                     ),
                 bossDropRuleId = bossRuleId(number),
+                bossAffix = bossAffixOf(number, PHASE_HEALTH[number - 1].last()),
             )
         }
     }

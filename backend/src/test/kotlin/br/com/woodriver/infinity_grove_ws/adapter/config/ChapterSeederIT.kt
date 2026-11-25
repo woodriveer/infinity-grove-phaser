@@ -45,6 +45,8 @@ class ChapterSeederIT : IntegrationTestBase() {
     /** Removes chapter [number] with its stages, if it is stored. */
     private fun removeChapter(number: Int) {
         jdbc.update("delete from stage_adds where stage_id in (select id from stages where chapter = ?)", number)
+        jdbc.update("delete from stage_affixes where stage_id in (select id from stages where chapter = ?)", number)
+        jdbc.update("delete from chapter_affixes where chapter = ?", number)
         jpaStageRepository.deleteAll(jpaStageRepository.findAllByChapterOrderByNumber(number))
         if (jpaChapterRepository.existsById(number)) jpaChapterRepository.deleteById(number)
     }
