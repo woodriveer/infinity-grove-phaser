@@ -81,17 +81,17 @@ class ProgressControllerIT : IntegrationTestBase() {
             .body("encounter", equalTo("PHASE"))
             .body("phase", equalTo(1))
             .body("completed", equalTo(false))
-            .body("definition.bossHealth", equalTo(2000))
-            .body("definition.bossTimeLimitMs", equalTo(60_000))
+            .body("definition.bossHealth", equalTo(6000))
+            .body("definition.bossTimeLimitMs", equalTo(90_000))
             .body("definition.stages", hasSize<Int>(10))
             .body("definition.stages[0].number", equalTo(1))
-            .body("definition.stages[0].phasesPerStage", equalTo(5))
-            .body("definition.stages[0].monsterHealth", equalTo(40))
-            .body("definition.stages[0].minibossHealth", equalTo(200))
-            .body("definition.stages[0].minibossTimeLimitMs", equalTo(30_000))
+            .body("definition.stages[0].phasesPerStage", equalTo(8))
+            .body("definition.stages[0].monsterHealth", equalTo(69))
+            .body("definition.stages[0].minibossHealth", equalTo(207))
+            .body("definition.stages[0].minibossTimeLimitMs", equalTo(45_000))
             .body("definition.stages[9].number", equalTo(10))
-            .body("definition.stages[9].monsterHealth", equalTo(76))
-            .body("definition.stages[9].minibossHealth", equalTo(380))
+            .body("definition.stages[9].monsterHealth", equalTo(898))
+            .body("definition.stages[9].minibossHealth", equalTo(2694))
     }
 
     @Test
@@ -119,7 +119,7 @@ class ProgressControllerIT : IntegrationTestBase() {
             .body("definition.boss.defense", equalTo(30))
             .body("definition.boss.physicalDefense", equalTo(30))
             .body("definition.boss.magicalDefense", equalTo(30))
-            .body("definition.boss.critResistance", equalTo(30))
+            .body("definition.boss.critResistance", equalTo(5))
             .body("definition.stages[0].monster.element", equalTo("FIRE"))
             .body("definition.stages[0].monster.defense", equalTo(0))
             .body("definition.stages[0].monster.physicalDefense", equalTo(0))
@@ -129,9 +129,9 @@ class ProgressControllerIT : IntegrationTestBase() {
             .body("definition.stages[0].miniboss.defense", equalTo(11))
             .body("definition.stages[0].miniboss.physicalDefense", equalTo(11))
             .body("definition.stages[0].miniboss.magicalDefense", equalTo(11))
-            .body("definition.stages[0].miniboss.critResistance", equalTo(12))
+            .body("definition.stages[0].miniboss.critResistance", equalTo(0))
             .body("definition.stages[4].monster.element", equalTo("DARKNESS"))
-            .body("definition.stages[9].miniboss.critResistance", equalTo(30))
+            .body("definition.stages[9].miniboss.critResistance", equalTo(9))
     }
 
     @Test
@@ -171,7 +171,7 @@ class ProgressControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `clearing every encounter walks 10 stages of 5 phases, 10 minibosses and the chapter boss into chapter 2`() {
+    fun `clearing every encounter walks 10 stages of 8 phases, 10 minibosses and the chapter boss into chapter 2`() {
         user()
         var current = getProgress()
         var clears = 0
@@ -184,15 +184,15 @@ class ProgressControllerIT : IntegrationTestBase() {
                     .extract()
                     .response()
             clears++
-            if (clears == 5) assertEquals(listOf(1, "MINIBOSS", 1, false), position(current))
-            if (clears == 6) assertEquals(listOf(2, "PHASE", 1, false), position(current))
-            if (clears == 60) assertEquals(listOf(10, "CHAPTER_BOSS", 1, false), position(current))
+            if (clears == 8) assertEquals(listOf(1, "MINIBOSS", 1, false), position(current))
+            if (clears == 9) assertEquals(listOf(2, "PHASE", 1, false), position(current))
+            if (clears == 90) assertEquals(listOf(10, "CHAPTER_BOSS", 1, false), position(current))
         }
 
-        assertEquals(61, clears)
+        assertEquals(91, clears)
         assertEquals(2, current.path<Int>("chapter"))
         assertEquals(listOf(1, "PHASE", 1, false), position(current))
-        assertEquals(8000, current.path<Int>("definition.bossHealth"))
+        assertEquals(12500, current.path<Int>("definition.bossHealth"))
     }
 
     @Test
@@ -222,19 +222,19 @@ class ProgressControllerIT : IntegrationTestBase() {
             .body("stage", equalTo(1))
             .body("encounter", equalTo("PHASE"))
             .body("completed", equalTo(false))
-            .body("definition.bossHealth", equalTo(1_024_000))
-            .body("definition.bossTimeLimitMs", equalTo(60_000))
+            .body("definition.bossHealth", equalTo(130_000))
+            .body("definition.bossTimeLimitMs", equalTo(90_000))
             .body("definition.bossDropRuleId", equalTo(18))
             .body("definition.boss.defense", equalTo(53))
             .body("definition.boss.physicalDefense", equalTo(53))
             .body("definition.boss.magicalDefense", equalTo(53))
             .body("definition.stages.size()", equalTo(10))
-            .body("definition.stages[0].monsterHealth", equalTo(20_480))
+            .body("definition.stages[0].monsterHealth", equalTo(10_000))
         assertEquals(6, jpaProgressRepository.findById("yan").get().chapter)
     }
 
     @Test
-    fun `clearing the chapter 5 boss answers chapter 6 with boss health 1024000`() {
+    fun `clearing the chapter 5 boss answers chapter 6 with boss health 130000`() {
         user()
         jpaProgressRepository.save(ProgressEntity("yan", 5, 10, "CHAPTER_BOSS", 1, false))
 
@@ -246,15 +246,15 @@ class ProgressControllerIT : IntegrationTestBase() {
             .body("encounter", equalTo("PHASE"))
             .body("phase", equalTo(1))
             .body("completed", equalTo(false))
-            .body("definition.bossHealth", equalTo(1_024_000))
+            .body("definition.bossHealth", equalTo(130_000))
     }
 
     @Test
     fun `clearing the last phase of a stage moves to its miniboss and clearing that moves to the next stage`() {
         user()
-        store(4, "PHASE", 5)
+        store(4, "PHASE", 8)
 
-        report(body(4, "PHASE", 5, "CLEARED"))
+        report(body(4, "PHASE", 8, "CLEARED"))
             .then()
             .statusCode(200)
             .body("encounter", equalTo("MINIBOSS"))
@@ -268,7 +268,7 @@ class ProgressControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `failing a miniboss returns to phase 5 of the same stage and the answer carries the definition`() {
+    fun `failing a miniboss returns to phase 8 of the same stage and the answer carries the definition`() {
         user()
         store(3, "MINIBOSS", 1)
 
@@ -277,12 +277,12 @@ class ProgressControllerIT : IntegrationTestBase() {
             .statusCode(200)
             .body("stage", equalTo(3))
             .body("encounter", equalTo("PHASE"))
-            .body("phase", equalTo(5))
+            .body("phase", equalTo(8))
             .body("definition.stages", hasSize<Int>(10))
     }
 
     @Test
-    fun `failing the chapter boss returns to phase 5 of stage 10`() {
+    fun `failing the chapter boss returns to phase 8 of stage 10`() {
         user()
         store(10, "CHAPTER_BOSS", 1)
 
@@ -291,7 +291,7 @@ class ProgressControllerIT : IntegrationTestBase() {
             .statusCode(200)
             .body("stage", equalTo(10))
             .body("encounter", equalTo("PHASE"))
-            .body("phase", equalTo(5))
+            .body("phase", equalTo(8))
             .body("completed", equalTo(false))
     }
 
@@ -559,7 +559,7 @@ class ProgressControllerIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `GET progress at chapter 11 answers two adds of 30 with 1966080 health on stage 1`() {
+    fun `GET progress at chapter 11 answers two adds of 30 with 114000 health on stage 1`() {
         user()
         jpaProgressRepository.save(ProgressEntity("yan", 11, 1, "PHASE", 1, false))
 
@@ -567,22 +567,22 @@ class ProgressControllerIT : IntegrationTestBase() {
             .then()
             .statusCode(200)
             .body("definition.stages[0].adds", hasSize<Any>(2))
-            .body("definition.stages[0].adds[0].health", equalTo(1_966_080))
+            .body("definition.stages[0].adds[0].health", equalTo(114_000))
             .body("definition.stages[0].adds[0].defenseBuff", equalTo(30))
-            .body("definition.stages[0].adds[1].health", equalTo(1_966_080))
+            .body("definition.stages[0].adds[1].health", equalTo(114_000))
             .body("definition.stages[0].adds[1].defenseBuff", equalTo(30))
-            .body("definition.stages[9].adds[0].health", equalTo(3_735_552))
+            .body("definition.stages[9].adds[0].health", equalTo(162_258))
     }
 
     @Test
-    fun `GET progress at chapter 15 answers adds of 31457280 health and 50 defense`() {
+    fun `GET progress at chapter 15 answers adds of 483000 health and 50 defense`() {
         user()
         jpaProgressRepository.save(ProgressEntity("yan", 15, 1, "PHASE", 1, false))
 
         getProgress()
             .then()
             .statusCode(200)
-            .body("definition.stages[0].adds[1].health", equalTo(31_457_280))
+            .body("definition.stages[0].adds[1].health", equalTo(483_000))
             .body("definition.stages[0].adds[1].defenseBuff", equalTo(50))
     }
 

@@ -15,12 +15,12 @@ class MonsterHealthMigrationIT : IntegrationTestBase() {
     private lateinit var jdbc: JdbcTemplate
 
     @Test
-    fun `a new database seeds the grown health`() {
-        assertEquals(40L, jdbc.queryForObject("select monster_hit_points from stages where chapter = 1 and number = 1", Long::class.java))
+    fun `a new database seeds the table`() {
+        assertEquals(69L, jdbc.queryForObject("select monster_hit_points from stages where chapter = 1 and number = 1", Long::class.java))
         assertEquals(
-            4864L,
+            6761L,
             jdbc.queryForObject("select monster_hit_points from stages where chapter = 4 and number = 10", Long::class.java),
         )
-        assertEquals(512_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 5", Long::class.java))
+        assertEquals(80_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 5", Long::class.java))
     }
 }

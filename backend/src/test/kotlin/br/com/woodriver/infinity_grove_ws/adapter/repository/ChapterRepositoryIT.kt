@@ -276,8 +276,8 @@ class ChapterRepositoryIT : IntegrationTestBase() {
 
     @Test
     fun `the seeded chapters 11 to 15 read two adds on every stage and chapters 1 to 10 none`() {
-        assertEquals(listOf(StageAdd(1_966_080, 30), StageAdd(1_966_080, 30)), repository.findByNumber(11)!!.stage(1).adds)
-        assertEquals(listOf(StageAdd(31_457_280, 50), StageAdd(31_457_280, 50)), repository.findByNumber(15)!!.stage(1).adds)
+        assertEquals(listOf(StageAdd(114_000, 30), StageAdd(114_000, 30)), repository.findByNumber(11)!!.stage(1).adds)
+        assertEquals(listOf(StageAdd(483_000, 50), StageAdd(483_000, 50)), repository.findByNumber(15)!!.stage(1).adds)
         repository.findByNumber(10)!!.stages.forEach { assertEquals(emptyList(), it.adds) }
         assertEquals(100, jdbc.queryForObject("select count(*) from stage_adds", Int::class.java))
     }

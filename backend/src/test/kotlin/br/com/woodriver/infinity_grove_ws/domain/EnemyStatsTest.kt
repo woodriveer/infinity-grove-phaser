@@ -54,7 +54,7 @@ class EnemyStatsTest {
 
         assertEquals(stages.map { it.monster.element }, stages.map { it.miniboss.element })
         assertEquals((11..20).toList(), stages.map { it.miniboss.defense })
-        assertEquals((12..30 step 2).toList(), stages.map { it.miniboss.critResistance })
+        assertEquals((0..9).toList(), stages.map { it.miniboss.critResistance })
     }
 
     @Test
@@ -65,7 +65,7 @@ class EnemyStatsTest {
     }
 
     @Test
-    fun `the seeded chapter boss is darkness with defense 30 and resistance 30`() {
-        assertEquals(EnemyStats(Element.DARKNESS, 30, 30), ChapterDefinition.first().boss)
+    fun `the seeded chapter boss is darkness with defense 30 and resistance 5`() {
+        assertEquals(EnemyStats(Element.DARKNESS, 30, 5), ChapterDefinition.first().boss)
     }
 }

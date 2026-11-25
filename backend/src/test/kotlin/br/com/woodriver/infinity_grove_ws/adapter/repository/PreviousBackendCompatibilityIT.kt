@@ -112,10 +112,10 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
                 }.toMap()
 
         assertEquals((1..15).toList(), bossHealth.keys.toList())
-        assertEquals(2_000L, bossHealth[1])
-        assertEquals(512_000L, bossHealth[5])
-        assertEquals(16_384_000L, bossHealth[10])
-        assertEquals(524_288_000L, bossHealth[15])
+        assertEquals(6_000L, bossHealth[1])
+        assertEquals(80_000L, bossHealth[5])
+        assertEquals(900_000L, bossHealth[10])
+        assertEquals(4_265_000L, bossHealth[15])
         assertEquals(
             0,
             jdbc.queryForObject(
@@ -123,9 +123,9 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
                 Int::class.java,
             ),
         )
-        assertEquals(19_456L to 97_280L, stageHealth[5])
-        assertEquals(622_592L to 3_112_960L, stageHealth[10])
-        assertEquals(19_922_944L to 99_614_720L, stageHealth[15])
+        assertEquals(10_319L to 30_957L, stageHealth[5])
+        assertEquals(101_055L to 303_165L, stageHealth[10])
+        assertEquals(229_153L to 687_459L, stageHealth[15])
     }
 
     @Test
@@ -163,7 +163,7 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
             assertEquals(20, jdbc.queryForObject("select min_copper from drop_rules where id = 5", Int::class.java))
         }
 
-        assertEquals(2_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 1", Long::class.java))
+        assertEquals(6_000L, jdbc.queryForObject("select boss_hit_points from chapters where number = 1", Long::class.java))
         assertEquals(16, jdbc.queryForObject("select min_copper from drop_rules where id = 5", Int::class.java))
     }
 

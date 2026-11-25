@@ -83,33 +83,38 @@ class ChapterTest {
     }
 
     @Test
-    fun `the seeded first chapter has 10 stages of 5 phases`() {
+    fun `the seeded first chapter has 10 stages of 8 phases`() {
         val first = ChapterDefinition.first()
 
         assertEquals(1, first.number)
         assertEquals(10, first.stageCount)
-        assertEquals(List(10) { 5 }, first.stages.map { it.phasesPerStage })
+        assertEquals(List(10) { 8 }, first.stages.map { it.phasesPerStage })
     }
 
     @Test
-    fun `the seeded phase monster health grows from 40 to 76 in steps of 4`() {
-        assertEquals((40L..76L step 4L).toList(), ChapterDefinition.first().stages.map { it.monsterHealth })
+    fun `the seeded phase monster health of chapter 1 grows from 69 to 898`() {
+        assertEquals(
+            listOf(69L, 92L, 122L, 162L, 216L, 287L, 382L, 508L, 676L, 898L),
+            ChapterDefinition.first().stages.map { it.monsterHealth },
+        )
     }
 
     @Test
-    fun `the seeded miniboss has 5 times the phase monster health and a 30 second limit`() {
-        val stages = ChapterDefinition.first().stages
+    fun `the seeded miniboss has 3 times the phase monster health and a 45 second limit`() {
+        (1..15).forEach { c ->
+            val stages = ChapterDefinition.of(c).stages
 
-        assertEquals(stages.map { it.monsterHealth * 5 }, stages.map { it.minibossHealth })
-        assertEquals(List(10) { 30_000L }, stages.map { it.minibossTimeLimitMs })
+            assertEquals(stages.map { it.monsterHealth * 3 }, stages.map { it.minibossHealth }, "chapter $c")
+            assertEquals(List(10) { 45_000L }, stages.map { it.minibossTimeLimitMs }, "chapter $c")
+        }
     }
 
     @Test
-    fun `the seeded chapter boss has 2000 health and a 60 second limit`() {
+    fun `the seeded chapter boss of chapter 1 has 6000 health and a 90 second limit`() {
         val first = ChapterDefinition.first()
 
-        assertEquals(2000L, first.bossHealth)
-        assertEquals(60_000L, first.bossTimeLimitMs)
+        assertEquals(6000L, first.bossHealth)
+        assertEquals(90_000L, first.bossTimeLimitMs)
     }
 
     @Test
@@ -121,9 +126,10 @@ class ChapterTest {
 
             assertEquals(it, chapter.number)
             assertTrue(chapter.bossHealth > before.bossHealth)
-            assertTrue(chapter.stage(1).monsterHealth > before.stage(1).monsterHealth)
             assertTrue(chapter.boss.defense > before.boss.defense)
         }
+        // the table restarts the phase health at chapters 6 and 11 (spec Chapter Table), so the stage 1 health is compared at chapter 2 only
+        assertTrue(ChapterDefinition.of(2).stage(1).monsterHealth > ChapterDefinition.of(1).stage(1).monsterHealth)
     }
 
     @Test
@@ -132,20 +138,10 @@ class ChapterTest {
     }
 
     @Test
-    fun `health doubles each chapter from chapter 6`() {
-        assertEquals(256L, ChapterDefinition.healthFactor(5))
-        assertEquals(512L, ChapterDefinition.healthFactor(6))
-        assertEquals(262_144L, ChapterDefinition.healthFactor(15))
-    }
-
-    @Test
-    fun `chapter 6 has twice the health of chapter 5`() {
-        val chapter = ChapterDefinition.of(6)
-
-        assertEquals(1_024_000L, chapter.bossHealth)
-        assertEquals(20_480L, chapter.stage(1).monsterHealth)
-        assertEquals(38_912L, chapter.stage(10).monsterHealth)
-        assertEquals(194_560L, chapter.stage(10).minibossHealth)
+    fun `chapter 6 starts where chapter 5 ends`() {
+        assertEquals(10_319L, ChapterDefinition.of(5).stage(10).monsterHealth)
+        assertEquals(10_000L, ChapterDefinition.of(6).stage(1).monsterHealth)
+        assertEquals(130_000L, ChapterDefinition.of(6).bossHealth)
     }
 
     @Test
@@ -153,8 +149,9 @@ class ChapterTest {
         val chapter = ChapterDefinition.of(10)
         val miniboss = chapter.stage(10).miniboss
 
-        assertEquals(16_384_000L, chapter.bossHealth)
-        assertEquals(3_112_960L, chapter.stage(10).minibossHealth)
+        assertEquals(900_000L, chapter.bossHealth)
+        assertEquals(71_000L, chapter.stage(1).monsterHealth)
+        assertEquals(303_165L, chapter.stage(10).minibossHealth)
         assertEquals(65, chapter.boss.defense)
         assertEquals(65, chapter.boss.critResistance)
         assertEquals(55, miniboss.defense)
@@ -174,41 +171,42 @@ class ChapterTest {
         val chapter = ChapterDefinition.of(15)
         val miniboss = chapter.stage(10).miniboss
 
-        assertEquals(524_288_000L, chapter.bossHealth)
+        assertEquals(4_265_000L, chapter.bossHealth)
         assertEquals(80, chapter.boss.defense)
         assertEquals(70, chapter.boss.critResistance)
-        assertEquals(19_922_944L, chapter.stage(10).monsterHealth)
-        assertEquals(99_614_720L, chapter.stage(10).minibossHealth)
+        assertEquals(161_000L, chapter.stage(1).monsterHealth)
+        assertEquals(229_153L, chapter.stage(10).monsterHealth)
+        assertEquals(687_459L, chapter.stage(10).minibossHealth)
         assertEquals(70, miniboss.defense)
         assertEquals(70, miniboss.critResistance)
     }
 
     @Test
-    fun `chapters 6 to 15 keep phase monsters defenseless and the 30 and 60 second limits`() {
+    fun `chapters 6 to 15 keep phase monsters defenseless and seed 90 and 45 second limits`() {
         (6..15).forEach { c ->
             val chapter = ChapterDefinition.of(c)
 
             chapter.stages.forEach { stage ->
                 assertEquals(0, stage.monster.defense, "chapter $c stage ${stage.number}")
                 assertEquals(0, stage.monster.critResistance, "chapter $c stage ${stage.number}")
-                assertEquals(30_000L, stage.minibossTimeLimitMs, "chapter $c stage ${stage.number}")
+                assertEquals(45_000L, stage.minibossTimeLimitMs, "chapter $c stage ${stage.number}")
             }
-            assertEquals(60_000L, chapter.bossTimeLimitMs, "chapter $c boss")
+            assertEquals(90_000L, chapter.bossTimeLimitMs, "chapter $c boss")
         }
     }
 
     @Test
-    fun `chapters 1 to 5 keep their numbers`() {
+    fun `chapters 1 to 5 seed the table`() {
         val first = ChapterDefinition.of(1)
         val fifth = ChapterDefinition.of(5)
 
-        assertEquals(2000L, first.bossHealth)
-        assertEquals(40L, first.stage(1).monsterHealth)
-        assertEquals(512_000L, fifth.bossHealth)
+        assertEquals(6000L, first.bossHealth)
+        assertEquals(69L, first.stage(1).monsterHealth)
+        assertEquals(80_000L, fifth.bossHealth)
         assertEquals(50, fifth.boss.defense)
-        assertEquals(50, fifth.boss.critResistance)
+        assertEquals(45, fifth.boss.critResistance)
         assertEquals(40, fifth.stage(10).miniboss.defense)
-        assertEquals(50, fifth.stage(10).miniboss.critResistance)
+        assertEquals(41, fifth.stage(10).miniboss.critResistance)
     }
 
     @Test
@@ -282,19 +280,18 @@ class ChapterTest {
     }
 
     @Test
-    fun `the health multiplies by 4 each chapter`() {
+    fun `the health factor still multiplies by 4 to chapter 5 and by 2 after`() {
         assertEquals(listOf(1L, 4L, 16L, 64L, 256L), (1..5).map { ChapterDefinition.healthFactor(it) })
-        assertEquals(40L * 16, ChapterDefinition.of(3).stage(1).monsterHealth)
-        assertEquals(76L * 256, ChapterDefinition.of(5).stage(10).monsterHealth)
-        assertEquals(2000L * 64, ChapterDefinition.of(4).bossHealth)
+        assertEquals(listOf(512L, 1_024L, 2_048L), (6..8).map { ChapterDefinition.healthFactor(it) })
+        assertEquals(262_144L, ChapterDefinition.healthFactor(15))
     }
 
     @Test
     fun `a stage keeps a health above the 32-bit limit`() {
-        val stage = StageDefinition(1, 5, 3_000_000_000L, 15_000_000_000L, 30_000)
+        val stage = StageDefinition(1, 8, 3_000_000_000L, 9_000_000_000L, 45_000)
 
         assertEquals(3_000_000_000L, stage.monsterHealth)
-        assertEquals(15_000_000_000L, stage.minibossHealth)
+        assertEquals(9_000_000_000L, stage.minibossHealth)
     }
 
     /** One row of the Chapter Table of the spec, every column. */
@@ -314,26 +311,46 @@ class ChapterTest {
 
     private val chapterTable =
         listOf(
-            ChapterTableRow(6, 512, 1_024_000, 20_480, 38_912, 194_560, 23, 53, 53, 43, 53),
-            ChapterTableRow(7, 1_024, 2_048_000, 40_960, 77_824, 389_120, 26, 56, 56, 46, 56),
-            ChapterTableRow(8, 2_048, 4_096_000, 81_920, 155_648, 778_240, 29, 59, 59, 49, 59),
-            ChapterTableRow(9, 4_096, 8_192_000, 163_840, 311_296, 1_556_480, 32, 62, 62, 52, 62),
-            ChapterTableRow(10, 8_192, 16_384_000, 327_680, 622_592, 3_112_960, 35, 65, 65, 55, 65),
-            ChapterTableRow(11, 16_384, 32_768_000, 655_360, 1_245_184, 6_225_920, 38, 68, 68, 58, 68),
-            ChapterTableRow(12, 32_768, 65_536_000, 1_310_720, 2_490_368, 12_451_840, 41, 71, 70, 61, 70),
-            ChapterTableRow(13, 65_536, 131_072_000, 2_621_440, 4_980_736, 24_903_680, 44, 74, 70, 64, 70),
-            ChapterTableRow(14, 131_072, 262_144_000, 5_242_880, 9_961_472, 49_807_360, 47, 77, 70, 67, 70),
-            ChapterTableRow(15, 262_144, 524_288_000, 10_485_760, 19_922_944, 99_614_720, 50, 80, 70, 70, 70),
+            ChapterTableRow(6, 512, 130_000, 10_000, 14_233, 42_699, 23, 53, 53, 43, 53),
+            ChapterTableRow(7, 1_024, 139_000, 28_000, 39_853, 119_559, 26, 56, 56, 46, 56),
+            ChapterTableRow(8, 2_048, 313_000, 36_000, 51_239, 153_717, 29, 59, 59, 49, 59),
+            ChapterTableRow(9, 4_096, 475_000, 58_000, 82_552, 247_656, 32, 62, 62, 52, 62),
+            ChapterTableRow(10, 8_192, 900_000, 71_000, 101_055, 303_165, 35, 65, 65, 55, 65),
+            ChapterTableRow(11, 16_384, 956_000, 38_000, 54_086, 162_258, 38, 68, 68, 58, 68),
+            ChapterTableRow(12, 32_768, 1_850_000, 64_000, 91_092, 273_276, 41, 71, 70, 61, 70),
+            ChapterTableRow(13, 65_536, 1_940_000, 90_000, 128_098, 384_294, 44, 74, 70, 64, 70),
+            ChapterTableRow(14, 131_072, 2_837_000, 133_000, 189_300, 567_900, 47, 77, 70, 67, 70),
+            ChapterTableRow(15, 262_144, 4_265_000, 161_000, 229_153, 687_459, 50, 80, 70, 70, 70),
         )
 
-    /** Chapters 1 to 5 as the release before this feature (commit `91e3111`) seeded them; the Chapter Table row of chapter 5. */
+    /** Chapters 1 to 5 as the spec Chapter Table seeds them: health, defenses and the early critical resistances. */
     private val firstFiveChapters =
         listOf(
-            ChapterTableRow(1, 1, 2_000, 40, 76, 380, 0, 30, 30, 20, 30),
-            ChapterTableRow(2, 4, 8_000, 160, 304, 1_520, 5, 35, 35, 25, 35),
-            ChapterTableRow(3, 16, 32_000, 640, 1_216, 6_080, 10, 40, 40, 30, 40),
-            ChapterTableRow(4, 64, 128_000, 2_560, 4_864, 24_320, 15, 45, 45, 35, 45),
-            ChapterTableRow(5, 256, 512_000, 10_240, 19_456, 97_280, 20, 50, 50, 40, 50),
+            ChapterTableRow(1, 1, 6_000, 69, 898, 2_694, 0, 30, 5, 20, 9),
+            ChapterTableRow(2, 4, 12_500, 265, 2_622, 7_866, 5, 35, 15, 25, 17),
+            ChapterTableRow(3, 16, 13_000, 1_000, 3_803, 11_409, 10, 40, 25, 30, 25),
+            ChapterTableRow(4, 64, 34_000, 4_750, 6_761, 20_283, 15, 45, 35, 35, 33),
+            ChapterTableRow(5, 256, 80_000, 7_250, 10_319, 30_957, 20, 50, 45, 40, 41),
+        )
+
+    /** The phase monster health of every stage by chapter, written out from the spec Chapter Table. */
+    private val tablePhaseHealth: Map<Int, List<Long>> =
+        mapOf(
+            1 to listOf(69L, 92L, 122L, 162L, 216L, 287L, 382L, 508L, 676L, 898L),
+            2 to listOf(265L, 342L, 441L, 569L, 734L, 947L, 1221L, 1575L, 2032L, 2622L),
+            3 to listOf(1000L, 1160L, 1346L, 1561L, 1811L, 2100L, 2436L, 2826L, 3278L, 3803L),
+            4 to listOf(4750L, 4940L, 5138L, 5343L, 5557L, 5779L, 6010L, 6251L, 6501L, 6761L),
+            5 to listOf(7250L, 7540L, 7842L, 8155L, 8481L, 8821L, 9174L, 9541L, 9922L, 10319L),
+            6 to listOf(10000L, 10400L, 10816L, 11249L, 11699L, 12167L, 12653L, 13159L, 13686L, 14233L),
+            7 to listOf(28000L, 29120L, 30285L, 31496L, 32756L, 34066L, 35429L, 36846L, 38320L, 39853L),
+            8 to listOf(36000L, 37440L, 38938L, 40495L, 42115L, 43800L, 45551L, 47374L, 49268L, 51239L),
+            9 to listOf(58000L, 60320L, 62733L, 65242L, 67852L, 70566L, 73389L, 76324L, 79377L, 82552L),
+            10 to listOf(71000L, 73840L, 76794L, 79865L, 83060L, 86382L, 89838L, 93431L, 97168L, 101055L),
+            11 to listOf(38000L, 39520L, 41101L, 42745L, 44455L, 46233L, 48082L, 50005L, 52006L, 54086L),
+            12 to listOf(64000L, 66560L, 69222L, 71991L, 74871L, 77866L, 80980L, 84220L, 87588L, 91092L),
+            13 to listOf(90000L, 93600L, 97344L, 101238L, 105287L, 109499L, 113879L, 118434L, 123171L, 128098L),
+            14 to listOf(133000L, 138320L, 143853L, 149607L, 155591L, 161815L, 168287L, 175019L, 182020L, 189300L),
+            15 to listOf(161000L, 167440L, 174138L, 181103L, 188347L, 195881L, 203716L, 211865L, 220340L, 229153L),
         )
 
     private fun assertChapterTableRow(row: ChapterTableRow) {
@@ -359,26 +376,26 @@ class ChapterTest {
     }
 
     @Test
-    fun `every stage of chapters 6 to 15 follows the spec formulas`() {
+    fun `every stage of chapters 6 to 15 follows the table`() {
         (6..15).forEach { c ->
-            // Spec Chapter Table: health factor 256 x 2^(c-5), defense bonus 20 + 3 x (c-5)
-            assertStageFormulas(c, factor = 256L * (1L shl (c - 5)), bonus = 20 + 3 * (c - 5))
+            // Spec Chapter Table: defense bonus 20 + 3 x (c-5), critical resistance min(10 + 2n + bonus, 70)
+            assertStageFormulas(c, bonus = 20 + 3 * (c - 5)) { n, bonus -> minOf(10 + 2 * n + bonus, 70) }
         }
     }
 
     @Test
-    fun `every stage of chapters 1 to 5 follows the release formulas`() {
+    fun `every stage of chapters 1 to 5 follows the table`() {
         (1..5).forEach { c ->
-            // Release formulas (spec Context, line 19): health factor 4^(c-1), defense bonus 5 x (c-1)
-            assertStageFormulas(c, factor = 1L shl (2 * (c - 1)), bonus = 5 * (c - 1))
+            // Spec Chapter Table: defense bonus 5 x (c-1), critical resistance (n - 1) + 8(c - 1)
+            assertStageFormulas(c, bonus = 5 * (c - 1)) { n, _ -> (n - 1) + 8 * (c - 1) }
         }
     }
 
-    /** Every stage of chapter [c] against the spec formulas, for the chapter's health [factor] and defense [bonus]. */
+    /** Every stage of chapter [c] against the table health and the defense [bonus]; [critResistance] is the miniboss one by stage and bonus. */
     private fun assertStageFormulas(
         c: Int,
-        factor: Long,
         bonus: Int,
+        critResistance: (Int, Int) -> Int,
     ) {
         val elements = listOf(Element.FIRE, Element.WATER, Element.NATURE, Element.LIGHT, Element.DARKNESS)
         val chapter = ChapterDefinition.of(c)
@@ -387,13 +404,12 @@ class ChapterTest {
         (1..10).forEach { n ->
             val stage = chapter.stage(n)
             val label = "chapter $c stage $n"
-            // phase monster health (40 + 4(n-1)) x factor, miniboss health 5 times it
-            val phaseHealth = (40L + 4L * (n - 1)) * factor
+            val phaseHealth = tablePhaseHealth.getValue(c)[n - 1]
             assertEquals(phaseHealth, stage.monsterHealth, "$label phase monster health")
-            assertEquals(5L * phaseHealth, stage.minibossHealth, "$label miniboss health")
-            // miniboss defense min(10 + n + bonus, 80), critical resistance min(10 + 2n + bonus, 70)
+            assertEquals(3L * phaseHealth, stage.minibossHealth, "$label miniboss health")
+            // miniboss defense min(10 + n + bonus, 80)
             assertEquals(minOf(10 + n + bonus, 80), stage.miniboss.defense, "$label miniboss defense")
-            assertEquals(minOf(10 + 2 * n + bonus, 70), stage.miniboss.critResistance, "$label miniboss crit resistance")
+            assertEquals(critResistance(n, bonus), stage.miniboss.critResistance, "$label miniboss crit resistance")
             // elements cycle by stage number and shift by one per chapter (campaign-chapters Q16 keeps the rotating formula)
             val element = elements[(n - 1 + c - 1) % elements.size]
             assertEquals(element, stage.monster.element, "$label phase monster element")
@@ -424,13 +440,13 @@ class ChapterTest {
     }
 
     @Test
-    fun `chapters 1 to 5 keep the 60 and 30 second limits`() {
-        (1..5).forEach { c ->
+    fun `every chapter seeds 90 and 45 second limits`() {
+        (1..15).forEach { c ->
             val chapter = ChapterDefinition.of(c)
 
-            assertEquals(60_000L, chapter.bossTimeLimitMs, "chapter $c boss")
+            assertEquals(90_000L, chapter.bossTimeLimitMs, "chapter $c boss")
             chapter.stages.forEach { stage ->
-                assertEquals(30_000L, stage.minibossTimeLimitMs, "chapter $c stage ${stage.number}")
+                assertEquals(45_000L, stage.minibossTimeLimitMs, "chapter $c stage ${stage.number}")
             }
         }
     }
@@ -486,8 +502,8 @@ class ChapterTest {
     fun `chapter 11 seeds two adds of 30 with 3 times the phase monster health on every stage`() {
         val chapter = ChapterDefinition.of(11)
 
-        assertEquals(listOf(StageAdd(1_966_080, 30), StageAdd(1_966_080, 30)), chapter.stage(1).adds)
-        assertEquals(listOf(StageAdd(3_735_552, 30), StageAdd(3_735_552, 30)), chapter.stage(10).adds)
+        assertEquals(listOf(StageAdd(114_000, 30), StageAdd(114_000, 30)), chapter.stage(1).adds)
+        assertEquals(listOf(StageAdd(162_258, 30), StageAdd(162_258, 30)), chapter.stage(10).adds)
         chapter.stages.forEach { stage ->
             assertEquals(List(2) { StageAdd(3 * stage.monsterHealth, 30) }, stage.adds, "stage ${stage.number}")
         }
@@ -503,8 +519,61 @@ class ChapterTest {
     }
 
     @Test
-    fun `chapter 15 stage 1 seeds adds of 31457280 health`() {
-        assertEquals(listOf(StageAdd(31_457_280, 50), StageAdd(31_457_280, 50)), ChapterDefinition.of(15).stage(1).adds)
+    fun `chapter 15 stage 1 seeds adds of 483000 health`() {
+        assertEquals(listOf(StageAdd(483_000, 50), StageAdd(483_000, 50)), ChapterDefinition.of(15).stage(1).adds)
+    }
+
+    @Test
+    fun `every add of chapters 11 to 15 has 3 times the table health of its stage and today's buff`() {
+        val buffs = mapOf(11 to 30, 12 to 35, 13 to 40, 14 to 45, 15 to 50)
+
+        buffs.forEach { (c, buff) ->
+            tablePhaseHealth.getValue(c).forEachIndexed { index, health ->
+                val stage = ChapterDefinition.of(c).stage(index + 1)
+
+                assertEquals(List(2) { StageAdd(3 * health, buff) }, stage.adds, "chapter $c stage ${stage.number}")
+            }
+        }
+    }
+
+    @Test
+    fun `no boss has less health than the boss before it`() {
+        assertTrue((2..15).all { ChapterDefinition.of(it).bossHealth >= ChapterDefinition.of(it - 1).bossHealth })
+    }
+
+    @Test
+    fun `miniboss 1-1 asks 207 health in 45 seconds with critical resistance 0`() {
+        val miniboss = ChapterDefinition.of(1).stage(1)
+
+        assertEquals(207L, miniboss.minibossHealth)
+        assertEquals(45_000L, miniboss.minibossTimeLimitMs)
+        assertEquals(0, miniboss.miniboss.critResistance)
+        assertEquals(11, miniboss.miniboss.defense)
+    }
+
+    @Test
+    fun `the chapter 1 boss has critical resistance 5 and the chapter 5 boss 45`() {
+        assertEquals(5, ChapterDefinition.of(1).boss.critResistance)
+        assertEquals(45, ChapterDefinition.of(5).boss.critResistance)
+    }
+
+    @Test
+    fun `chapters 6 to 15 keep their critical resistances, defenses and elements`() {
+        (6..15).forEach { c ->
+            val bonus = ChapterDefinition.defenseBonus(c)
+            val chapter = ChapterDefinition.of(c)
+
+            (1..10).forEach { n ->
+                val miniboss = chapter.stage(n).miniboss
+
+                assertEquals(minOf(10 + 2 * n + bonus, 70), miniboss.critResistance, "chapter $c stage $n crit resistance")
+                assertEquals(minOf(10 + n + bonus, 80), miniboss.defense, "chapter $c stage $n defense")
+                assertEquals(Element.entries[(n - 1 + c - 1) % 5], miniboss.element, "chapter $c stage $n element")
+            }
+            assertEquals(minOf(30 + bonus, 70), chapter.boss.critResistance, "chapter $c boss crit resistance")
+            assertEquals(minOf(30 + bonus, 80), chapter.boss.defense, "chapter $c boss defense")
+            assertEquals(Element.entries[(c + 3) % 5], chapter.boss.element, "chapter $c boss element")
+        }
     }
 
     @Test

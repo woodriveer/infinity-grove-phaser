@@ -278,9 +278,9 @@ class FarmControllerIT : IntegrationTestBase() {
             .body("chapter", equalTo(3))
             .body("chapters", equalTo(listOf(1, 2, 3)))
             .body("bosses.stage", equalTo(listOf(1, 2, 3)))
-            .body("definition.bossHealth", equalTo(32000))
+            .body("definition.bossHealth", equalTo(13000))
             .body("definition.stages", hasSize<Any>(10))
-            .body("definition.stages[0].minibossHealth", equalTo(3200))
+            .body("definition.stages[0].minibossHealth", equalTo(3000))
     }
 
     @Test
@@ -296,8 +296,8 @@ class FarmControllerIT : IntegrationTestBase() {
             .body("bosses", hasSize<Any>(11))
             .body("bosses[10].kind", equalTo("CHAPTER_BOSS"))
             .body("bosses[10].stage", nullValue())
-            .body("definition.bossHealth", equalTo(8000))
-            .body("definition.stages[0].minibossHealth", equalTo(800))
+            .body("definition.bossHealth", equalTo(12500))
+            .body("definition.stages[0].minibossHealth", equalTo(795))
             .body("definition.boss.element", equalTo("FIRE"))
             .body("definition.boss.defense", equalTo(35))
             .body("definition.boss.physicalDefense", equalTo(35))
@@ -445,7 +445,7 @@ class FarmControllerIT : IntegrationTestBase() {
             .then()
             .statusCode(200)
             .body("definition.stages[0].adds", hasSize<Any>(2))
-            .body("definition.stages[0].adds[0].health", equalTo(1_966_080))
+            .body("definition.stages[0].adds[0].health", equalTo(114_000))
             .body("definition.stages[0].adds[0].defenseBuff", equalTo(30))
     }
 

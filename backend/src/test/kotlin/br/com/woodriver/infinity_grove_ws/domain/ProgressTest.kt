@@ -145,7 +145,7 @@ class ProgressTest {
     }
 
     @Test
-    fun `each seeded chapter takes 61 clears and the fifteenth one completes the progress`() {
+    fun `each seeded chapter takes 91 clears and the fifteenth one completes the progress`() {
         var progress = Progress.start("yan")
         var clears = 0
 
@@ -154,7 +154,7 @@ class ProgressTest {
             clears++
         }
 
-        assertEquals(61 * 15, clears)
+        assertEquals(91 * 15, clears)
         assertEquals(ProgressPosition(15, 10, Encounter.CHAPTER_BOSS, 1), progress.position)
     }
 

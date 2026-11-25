@@ -146,7 +146,7 @@ class ProgressServiceTest {
 
         val view = service.report("yan", ProgressPosition(1, 3, Encounter.MINIBOSS, 1), Outcome.FAILED).view
 
-        assertEquals(ProgressPosition(1, 3, Encounter.PHASE, 5), view.progress.position)
+        assertEquals(ProgressPosition(1, 3, Encounter.PHASE, 8), view.progress.position)
     }
 
     @Test
@@ -226,10 +226,10 @@ class ProgressServiceTest {
     }
 
     @Test
-    fun `walking a whole chapter pays 10 minibosses and the boss once each, and its 50 phases nothing`() {
+    fun `walking a whole chapter pays 10 minibosses and the boss once each, and its 80 phases nothing`() {
         existingUser()
         var position = start
-        repeat(50 + 10 + 1) {
+        repeat(80 + 10 + 1) {
             val view = service.report("yan", position, Outcome.CLEARED).view
             position = view.progress.position
         }
@@ -240,9 +240,9 @@ class ProgressServiceTest {
     @Test
     fun `the last phase replayed after a failed miniboss pays nothing`() {
         existingUser()
-        progresses.save(Progress("yan", ProgressPosition(1, 1, Encounter.PHASE, 5)))
+        progresses.save(Progress("yan", ProgressPosition(1, 1, Encounter.PHASE, 8)))
         playerCards.save(PlayerCards.start("yan", Element.FIRE, HeroSeed.heroes()))
-        val lastPhase = ProgressPosition(1, 1, Encounter.PHASE, 5)
+        val lastPhase = ProgressPosition(1, 1, Encounter.PHASE, 8)
 
         assertEquals(0, service.report("yan", lastPhase, Outcome.CLEARED).talentPoints)
         service.report("yan", miniboss, Outcome.FAILED)
@@ -258,7 +258,7 @@ class ProgressServiceTest {
 
         assertEquals(0, service.report("yan", miniboss, Outcome.FAILED).talentPoints)
         assertEquals(0, earned())
-        service.report("yan", ProgressPosition(1, 1, Encounter.PHASE, 5), Outcome.CLEARED)
+        service.report("yan", ProgressPosition(1, 1, Encounter.PHASE, 8), Outcome.CLEARED)
         assertEquals(2, service.report("yan", miniboss, Outcome.CLEARED).talentPoints)
         assertEquals(2, earned())
     }

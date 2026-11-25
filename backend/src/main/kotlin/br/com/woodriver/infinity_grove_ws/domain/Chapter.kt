@@ -86,14 +86,58 @@ data class ChapterDefinition(
 
     companion object {
         private const val FIRST_CHAPTER_STAGES = 10
-        private const val PHASES_PER_STAGE = 5
-        private const val BASE_MONSTER_HEALTH = 40
-        private const val MONSTER_HEALTH_PER_STAGE = 4
+        private const val PHASES_PER_STAGE = 8
         private const val HEALTH_GROWTH_PER_CHAPTER = 4
-        private const val MINIBOSS_HEALTH_FACTOR = 5
-        private const val MINIBOSS_TIME_LIMIT_MS = 30_000L
-        private const val BOSS_HEALTH = 2000
-        private const val BOSS_TIME_LIMIT_MS = 60_000L
+        private const val MINIBOSS_HEALTH_FACTOR = 3
+        private const val MINIBOSS_TIME_LIMIT_MS = 45_000L
+        private const val BOSS_TIME_LIMIT_MS = 90_000L
+
+        /** The last chapter with the early critical resistances (spec early-game-rebalance, Chapter Table); later chapters keep the release formula. */
+        const val LAST_EARLY_CHAPTER = 5
+        private const val EARLY_CRIT_RESISTANCE_PER_CHAPTER = 8
+        private const val EARLY_BOSS_CRIT_RESISTANCE_PER_CHAPTER = 10
+        private const val EARLY_BOSS_CRIT_RESISTANCE_OFFSET = 5
+
+        /** Phase monster health of chapters 1 to 15, stage 1 first: round(B x g^(n-1)) of the spec Chapter Table, written out. */
+        private val PHASE_HEALTH: List<List<Long>> =
+            listOf(
+                listOf(69L, 92L, 122L, 162L, 216L, 287L, 382L, 508L, 676L, 898L),
+                listOf(265L, 342L, 441L, 569L, 734L, 947L, 1221L, 1575L, 2032L, 2622L),
+                listOf(1000L, 1160L, 1346L, 1561L, 1811L, 2100L, 2436L, 2826L, 3278L, 3803L),
+                listOf(4750L, 4940L, 5138L, 5343L, 5557L, 5779L, 6010L, 6251L, 6501L, 6761L),
+                listOf(7250L, 7540L, 7842L, 8155L, 8481L, 8821L, 9174L, 9541L, 9922L, 10319L),
+                listOf(10000L, 10400L, 10816L, 11249L, 11699L, 12167L, 12653L, 13159L, 13686L, 14233L),
+                listOf(28000L, 29120L, 30285L, 31496L, 32756L, 34066L, 35429L, 36846L, 38320L, 39853L),
+                listOf(36000L, 37440L, 38938L, 40495L, 42115L, 43800L, 45551L, 47374L, 49268L, 51239L),
+                listOf(58000L, 60320L, 62733L, 65242L, 67852L, 70566L, 73389L, 76324L, 79377L, 82552L),
+                listOf(71000L, 73840L, 76794L, 79865L, 83060L, 86382L, 89838L, 93431L, 97168L, 101055L),
+                listOf(38000L, 39520L, 41101L, 42745L, 44455L, 46233L, 48082L, 50005L, 52006L, 54086L),
+                listOf(64000L, 66560L, 69222L, 71991L, 74871L, 77866L, 80980L, 84220L, 87588L, 91092L),
+                listOf(90000L, 93600L, 97344L, 101238L, 105287L, 109499L, 113879L, 118434L, 123171L, 128098L),
+                listOf(133000L, 138320L, 143853L, 149607L, 155591L, 161815L, 168287L, 175019L, 182020L, 189300L),
+                listOf(161000L, 167440L, 174138L, 181103L, 188347L, 195881L, 203716L, 211865L, 220340L, 229153L),
+            )
+
+        /** Chapter boss health of chapters 1 to 15 (spec Chapter Table). */
+        private val BOSS_HEALTH_TABLE: List<Long> =
+            listOf(
+                6000L,
+                12_500L,
+                13_000L,
+                34_000L,
+                80_000L,
+                130_000L,
+                139_000L,
+                313_000L,
+                475_000L,
+                900_000L,
+                956_000L,
+                1_850_000L,
+                1_940_000L,
+                2_837_000L,
+                4_265_000L,
+            )
+
         private const val MINIBOSS_BASE_DEFENSE = 10
         private const val MINIBOSS_BASE_CRIT_RESISTANCE = 10
         private const val MINIBOSS_CRIT_RESISTANCE_PER_STAGE = 2
@@ -170,32 +214,38 @@ data class ChapterDefinition(
                 defenseBonus(LAST_QUADRUPLED_CHAPTER) + DEFENSE_PER_CHAPTER_FROM_6 * (number - LAST_QUADRUPLED_CHAPTER)
             }
 
-        /** Chapter 1 as seeded: reachable with 1 damage per click, tunable in the database afterwards. */
+        /** Chapter 1 as seeded (the spec Chapter Table: 69 health a phase monster, 6000 for the boss), tunable in the database afterwards. */
         fun first() = of(1)
 
         /**
-         * Chapter [number] as seeded: the same shape as chapter 1 with the health and the defenses growing each chapter, and the
-         * stage elements shifted by one per chapter. Which enemies belong to which chapter is still open (AD-006).
+         * Chapter [number] as seeded: the health of the spec Chapter Table ([PHASE_HEALTH] for the phase monsters, 3 times that for the
+         * minibosses, [BOSS_HEALTH_TABLE] for the boss), 8 phases a stage, the defenses growing each chapter, the critical resistances of
+         * the spec for chapters 1 to 5 and the release formula after them, and the stage elements shifted by one per chapter. Which
+         * enemies belong to which chapter is still open (AD-006).
          */
         fun of(number: Int): ChapterDefinition {
-            require(number >= 1) { "Chapter $number must be at least 1" }
+            require(number in 1..ChapterOrder.MAX_CHAPTER) { "Chapter $number must be between 1 and ${ChapterOrder.MAX_CHAPTER}" }
             val defenseBonus = defenseBonus(number)
-            val healthFactor = healthFactor(number)
+            val early = number <= LAST_EARLY_CHAPTER
             return ChapterDefinition(
                 number = number,
-                bossHealth = BOSS_HEALTH * healthFactor,
+                bossHealth = BOSS_HEALTH_TABLE[number - 1],
                 bossTimeLimitMs = BOSS_TIME_LIMIT_MS,
                 stages =
                     (1..FIRST_CHAPTER_STAGES).map { n ->
-                        val monsterHealth = (BASE_MONSTER_HEALTH + MONSTER_HEALTH_PER_STAGE * (n - 1)) * healthFactor
+                        val monsterHealth = PHASE_HEALTH[number - 1][n - 1]
                         // the elements take turns by stage, so every multiplier shows up in the chapter
                         val element = Element.entries[(n - 1 + number - 1) % Element.entries.size]
                         val defense = minOf(MINIBOSS_BASE_DEFENSE + n + defenseBonus, MAX_SEEDED_DEFENSE)
                         val critResistance =
-                            minOf(
-                                MINIBOSS_BASE_CRIT_RESISTANCE + MINIBOSS_CRIT_RESISTANCE_PER_STAGE * n + defenseBonus,
-                                MAX_SEEDED_CRIT_RESISTANCE,
-                            )
+                            if (early) {
+                                (n - 1) + EARLY_CRIT_RESISTANCE_PER_CHAPTER * (number - 1)
+                            } else {
+                                minOf(
+                                    MINIBOSS_BASE_CRIT_RESISTANCE + MINIBOSS_CRIT_RESISTANCE_PER_STAGE * n + defenseBonus,
+                                    MAX_SEEDED_CRIT_RESISTANCE,
+                                )
+                            }
                         StageDefinition(
                             number = n,
                             phasesPerStage = PHASES_PER_STAGE,
@@ -213,7 +263,11 @@ data class ChapterDefinition(
                     EnemyStats(
                         Element.entries[(number + 3) % Element.entries.size],
                         minOf(BOSS_DEFENSE + defenseBonus, MAX_SEEDED_DEFENSE),
-                        minOf(BOSS_CRIT_RESISTANCE + defenseBonus, MAX_SEEDED_CRIT_RESISTANCE),
+                        if (early) {
+                            EARLY_BOSS_CRIT_RESISTANCE_PER_CHAPTER * number - EARLY_BOSS_CRIT_RESISTANCE_OFFSET
+                        } else {
+                            minOf(BOSS_CRIT_RESISTANCE + defenseBonus, MAX_SEEDED_CRIT_RESISTANCE)
+                        },
                     ),
                 bossDropRuleId = bossRuleId(number),
             )

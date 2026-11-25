@@ -67,8 +67,8 @@ class ChapterSeederIT : IntegrationTestBase() {
     @Test
     fun `application start seeds chapters 1 to 15`() {
         (1..15).forEach { assertEquals(ChapterDefinition.of(it), repository.findByNumber(it)) }
-        assertEquals(524_288_000L, repository.findByNumber(15)!!.bossHealth)
-        assertEquals(3_112_960L, repository.findByNumber(10)!!.stage(10).minibossHealth)
+        assertEquals(4_265_000L, repository.findByNumber(15)!!.bossHealth)
+        assertEquals(303_165L, repository.findByNumber(10)!!.stage(10).minibossHealth)
         val rules = dropRules.findAll()
         assertTrue((1..45).all { rules.ruleFor(it) != null })
         assertEquals(DropRule(45, 10_560, 24_640, 1500), rules.ruleFor(45))

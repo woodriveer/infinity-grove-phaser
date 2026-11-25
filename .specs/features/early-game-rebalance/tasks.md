@@ -155,7 +155,7 @@ keeping their positions in the list. Update the KDoc above `TalentCatalog` if it
 
 ---
 
-#### T2: Every chapter seeds the fitted curve, 8 phases, 3x minibosses and the new limits [ ]
+#### T2: Every chapter seeds the fitted curve, 8 phases, 3x minibosses and the new limits [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: `ChapterDefinition.of(c)` for c from 1 to 15 seeds the spec Chapter Table (EGR-02, EGR-03; spec P1 Curve AC 1 to 4, 8; Critical path AC 3).
@@ -277,7 +277,7 @@ The `3_000_000_000` case of `ProgressControllerIT` (`:101`) writes its own value
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] Every re-pinned and new case passes; every other backend test passes unchanged (or is re-pinned under step 4 and named in the commit body).
+- [x] Every re-pinned and new case passes; every other backend test passes unchanged (or is re-pinned under step 4 and named in the commit body).
 
 **Commit**: `feat(backend): seed every chapter with the fitted health curve`
 

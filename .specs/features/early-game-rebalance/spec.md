@@ -352,8 +352,8 @@ A strike that an affix brings to 0 shows the damage number `0`, as any other dam
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
 | EGR-01 | P1: Flat talent - AC 1 to 5; P1: Critical path - AC 1, 2, 8, 9 (catalog, cards, damage) | Tasks T1, T12 | Implementing |
-| EGR-02 | P1: Curve - AC 1 to 4, 8 to 10 (seeded numbers, payload, countdown, label) | Tasks T2, T13 | In Tasks |
-| EGR-03 | P1: Critical path - AC 3, 6, 7 (seeded resistances, chip) | Tasks T2, T13 | In Tasks |
+| EGR-02 | P1: Curve - AC 1 to 4, 8 to 10 (seeded numbers, payload, countdown, label) | Tasks T2, T13 | Implementing |
+| EGR-03 | P1: Critical path - AC 3, 6, 7 (seeded resistances, chip) | Tasks T2, T13 | Implementing |
 | EGR-04 | P1: Curve - AC 5 to 7; Critical path - AC 4, 5 (migration V16) | Tasks T3 | In Tasks |
 | EGR-05 | P1: Affixes - AC 1 to 3 (backend domain, seed, storage, V17, payload) | Tasks T4, T5, T6 | In Tasks |
 | EGR-06 | P1: Affixes - AC 11, 12 (game data, fallback, farm) | Tasks T7, T10, T14 | Implementing |

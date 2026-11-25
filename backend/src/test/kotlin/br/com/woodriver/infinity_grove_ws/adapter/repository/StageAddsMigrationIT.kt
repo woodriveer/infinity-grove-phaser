@@ -43,7 +43,7 @@ class StageAddsMigrationIT : IntegrationTestBase() {
     @AfterTest
     fun restore() {
         jdbc.update("delete from stage_adds")
-        jdbc.update("update stages set monster_hit_points = 1572864 where id = '12/3'")
+        jdbc.update("update stages set monster_hit_points = 69222 where id = '12/3'")
         migrate()
     }
 
@@ -57,10 +57,10 @@ class StageAddsMigrationIT : IntegrationTestBase() {
         val first = row("11/1/1")
         assertEquals("11/1", first["stage_id"])
         assertEquals(1, first["slot"])
-        assertEquals(1_966_080L, first["hit_points"])
+        assertEquals(114_000L, first["hit_points"])
         assertEquals(30, first["defense_buff"])
         val last = row("15/10/2")
-        assertEquals(59_768_832L, last["hit_points"])
+        assertEquals(687_459L, last["hit_points"])
         assertEquals(50, last["defense_buff"])
         assertEquals(40, row("13/5/1")["defense_buff"])
     }
