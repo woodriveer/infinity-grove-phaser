@@ -891,7 +891,7 @@ After the edit, `grep -n "\.hit(" game/src/domain/skills/skillCombat.js` finds n
 
 ---
 
-#### T10: Encounters carry their affix [ ]
+#### T10: Encounters carry their affix [x]
 
 **Owner**: game-dev
 **Goal**: Every encounter of the campaign and of the farm carries `affix` read from the payload (EGR-06; spec Affixes AC 11, 12).
@@ -922,7 +922,7 @@ After the edit, `grep -n "\.hit(" game/src/domain/skills/skillCombat.js` finds n
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 5 new cases and the re-pinned cases pass; every other unit test passes.
+- [x] The 5 new cases and the re-pinned cases pass; every other unit test passes.
 
 **Commit**: `feat(game): give every encounter its affix`
 

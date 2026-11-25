@@ -4,13 +4,16 @@
 //
 //  Built from the backend progress payload:
 //  { chapter, stage, encounter, phase, completed,
-//    definition: { bossHealth, bossTimeLimitMs, boss, bossDropRuleId,
-//                  stages: [{ number, phasesPerStage, monsterHealth, minibossHealth, minibossTimeLimitMs, monster, miniboss, monsterDropRuleId, minibossDropRuleId }] } }
+//    definition: { bossHealth, bossTimeLimitMs, boss, bossDropRuleId, bossAffix,
+//                  stages: [{ number, phasesPerStage, monsterHealth, minibossHealth, minibossTimeLimitMs, monster, miniboss, monsterDropRuleId, minibossDropRuleId,
+//                            minibossAffix }] } }
 //  where boss, monster and miniboss are { element, defense, critResistance } (an older backend sends physicalDefense and magicalDefense
 //  instead of defense, read by defenseOf); a payload without them means DEFAULT_STATS. The drop rule ids name the wallet queue a kill takes its copper from,
-//  and each stage may carry adds: [{ health, defenseBuff }] (spec miniboss-adds)
+//  and each stage may carry adds: [{ health, defenseBuff }] (spec miniboss-adds); a miniboss (stage.minibossAffix) and a chapter boss (bossAffix) may
+//  carry an affix { type, amount, periodMs } (spec early-game-rebalance), read by affixOf: a missing or malformed one means none
 import { addsOf } from '../combat/adds';
 import { DEFAULT_STATS } from '../combat/monster';
+import { affixOf } from '../combat/monsterAffix';
 import { bossLabel } from '../heroes/heroes';
 
 export const PHASE = 'PHASE';
@@ -32,6 +35,7 @@ export const farmEncounterOf = (definition, boss) =>
     let stats;
     let timeLimitMs;
     let adds = [];
+    let affix = null;
 
     if (kind === MINIBOSS)
     {
@@ -45,18 +49,20 @@ export const farmEncounterOf = (definition, boss) =>
         ({ minibossHealth: health, minibossTimeLimitMs: timeLimitMs } = stageDefinition);
         stats = stageDefinition.miniboss ?? DEFAULT_STATS;
         adds = addsOf(stageDefinition);
+        affix = affixOf(stageDefinition.minibossAffix);
     }
     else if (kind === CHAPTER_BOSS)
     {
         ({ bossHealth: health, bossTimeLimitMs: timeLimitMs } = definition);
         stats = definition.boss ?? DEFAULT_STATS;
+        affix = affixOf(definition.bossAffix);
     }
     else
     {
         throw new Error(`Unknown boss: ${kind}`);
     }
 
-    return { kind: FARM, boss, phase: 1, health, stats, dropRuleId: null, timeLimitMs, label: farmLabel(boss), adds };
+    return { kind: FARM, boss, phase: 1, health, stats, dropRuleId: null, timeLimitMs, label: farmLabel(boss), adds, affix };
 };
 
 export class Campaign
@@ -113,7 +119,8 @@ export class Campaign
                 dropRuleId: stage.monsterDropRuleId ?? null,
                 timeLimitMs: null,
                 label: `Stage ${this.stage}/${this.stageCount}  Phase ${this.phase}/${stage.phasesPerStage}`,
-                adds: []
+                adds: [],
+                affix: null
             };
         }
 
@@ -128,7 +135,8 @@ export class Campaign
                 dropRuleId: stage.minibossDropRuleId ?? null,
                 timeLimitMs: stage.minibossTimeLimitMs,
                 label: `Stage ${this.stage}/${this.stageCount}  Miniboss`,
-                adds: addsOf(stage)
+                adds: addsOf(stage),
+                affix: affixOf(stage.minibossAffix)
             };
         }
 
@@ -141,7 +149,8 @@ export class Campaign
             dropRuleId: this.definition.bossDropRuleId ?? null,
             timeLimitMs: this.definition.bossTimeLimitMs,
             label: 'Chapter Boss',
-            adds: []
+            adds: [],
+            affix: affixOf(this.definition.bossAffix)
         };
     }
 
