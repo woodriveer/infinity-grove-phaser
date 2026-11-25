@@ -152,17 +152,17 @@ test.describe('Critical chance minus critical resistance', () => {
         await context.close();
     });
 
-    test('a 9-star Kael with the three CRIT_CHANCE grades at 10 reads Seu crítico: 100% against 10 and deals 13.44', async ({ page }) => {
-        //  C is 10 + 60 (nine stars) + 10 + 20 + 30 (the talents) = 130; the multiplier is 2 + 2 (stars) + the overflow 20 / 100; the base is 1 + 2.2
+    test('a 9-star Kael with the three CRIT_CHANCE grades at 10 reads Seu crítico: 100% against 10 and deals 21.12', async ({ page }) => {
+        //  C is 10 + 60 + 50 + 100 + 150 = 370; the multiplier is 2 + 2 (stars) + the overflow 260 / 100; the base is 1 + 2.2
         const menu = await startGame(page, { stars: 9, monster: monsterOf(0, 10), talents: { CRIT_CHANCE: 10, CRIT_CHANCE_G2: 10, CRIT_CHANCE_G3: 10 } });
 
         await expect(page.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Seu crítico: 100%');
         await menu.canvas.click();
 
-        await expect.poll(() => dealt(page)).toBeCloseTo(13.44, 5);
+        await expect.poll(() => dealt(page)).toBeCloseTo(21.12, 5);
     });
 
-    test('the chip follows a talent upgrade: 10% then 11% after a CRIT_CHANCE level', async ({ page }) => {
+    test('the chip follows a talent upgrade: 10% then 15% after a CRIT_CHANCE level', async ({ page }) => {
         await startGame(page, { talentPoints: 1 });
 
         await expect(page.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Seu crítico: 10%');
@@ -173,7 +173,7 @@ test.describe('Critical chance minus critical resistance', () => {
         await expect(page.getByTestId('talent-level-CRIT_CHANCE')).toHaveText('Nível 1/10');
         await page.getByTestId('hero-close').click();
 
-        await expect(page.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Seu crítico: 11%');
+        await expect(page.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Seu crítico: 15%');
     });
 
     test('the chip follows a leader change: 10% for a blank Kael, 40% for a 3-star Lyra', async ({ page }) => {

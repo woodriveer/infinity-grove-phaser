@@ -1078,7 +1078,7 @@ Check that `.hud-box` already gives `pointer-events: none` (it does for every HU
 
 ### Phase 4: Tests in the browser and author check
 
-#### T12: The fake backend mirrors the new flat and critical talents [ ]
+#### T12: The fake backend mirrors the new flat and critical talents [x]
 
 **Owner**: test-engineer
 **Goal**: The e2e fake backend answers `CLICK_FLAT_DAMAGE`, `CRIT_CHANCE` and `CRIT_DAMAGE` as the backend of T1 does, and the browser shows the new values, damage and critical chip (EGR-01; spec P1 Flat AC 4, 5, P1 Critical path AC 8, 9).
@@ -1116,7 +1116,7 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 **Gate**: `cd game && npm test && npx playwright test e2e/earlyGameRebalanceTalents.spec.js e2e/talentTreeRework.spec.js e2e/talentTreeReworkCombat.spec.js e2e/talentTreeBranches.spec.js e2e/talentTreeBranchesCard.spec.js e2e/talents.spec.js e2e/clickPower.spec.js`
 **Done when**:
 
-- [ ] The 5 new cases and the 2 re-pinned cases pass; the six listed files pass (with any other re-pin named in the commit body).
+- [x] The 5 new cases and the 2 re-pinned cases pass; the six listed files pass (with any other re-pin named in the commit body).
 
 **Commit**: `test(game): mirror the flat and critical talents in the browser`
 

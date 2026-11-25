@@ -210,8 +210,8 @@ const TALENT_CATALOG = [
     [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_DAMAGE', 'TIME', 'Dano contra chefes', '%', 2 ],
     [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa', 'points', 1 ],
     [ 'ARMOR_PIERCE', 'BREAK', 'Perfuração de armadura', '%', 1 ],
-    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique (%)', '%', 5 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 1 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 5 ],
-    [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ], [ 'CLICK_FLAT_DAMAGE', 'POWER', 'Dano direto de clique', 'dmg', 2 ]
+    [ 'CLICK_DAMAGE', 'POWER', 'Dano de clique (%)', '%', 5 ], [ 'CRIT_CHANCE', 'POWER', 'Chance de crítico', 'points', 5 ], [ 'CRIT_DAMAGE', 'POWER', 'Dano crítico', '%', 15 ],
+    [ 'COMBO', 'COMBO', 'Limite de dano do combo', '%', 5 ], [ 'CLICK_FLAT_DAMAGE', 'POWER', 'Dano direto de clique', 'dmg', 1 ]
 ];
 const TALENT_MAX_LEVEL = 10;
 const TALENT_POINTS = { PHASE: 0, MINIBOSS: 2, CHAPTER_BOSS: 5 };
@@ -232,10 +232,9 @@ const isUnlocked = (talent, levels) => talent.requiredId === null || (levels[tal
 const talentsView = (levels) => TALENTS.map((talent) => {
     const { id, baseId, grade, branch, label, unit, perLevel, maxLevel, cost, requiredId, requiredLevel } = talent;
     const level = levels[id] ?? 0;
-    const flat = baseId === 'CLICK_FLAT_DAMAGE' ? grade : 0;
 
     return {
-        id, baseId, grade, branch, label, unit, perLevel, maxLevel, level, value: level === 0 ? 0 : perLevel * level - flat,
+        id, baseId, grade, branch, label, unit, perLevel, maxLevel, level, value: level === 0 ? 0 : perLevel * level,
         nextCost: level >= maxLevel ? null : cost, unlocked: isUnlocked(talent, levels), requiredId, requiredLevel
     };
 });
