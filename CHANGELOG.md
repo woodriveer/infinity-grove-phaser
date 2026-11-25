@@ -3,6 +3,22 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.10.0] - 2026-11-25
+
+Ramos da árvore de talentos (`talent-tree-branches`): os talentos seguem os galhos pintados, ficam menores e o cartão passa a explicar cada talento.
+
+### Adicionado
+
+- O cartão de detalhes da tela **Talentos** agora explica, em uma ou duas linhas e em português simples, o que o talento selecionado faz. Os graus 2 e 3 de uma cadeia leem o mesmo texto do grau 1.
+- O cartão mostra o **ícone do talento** dentro de um anel na cor do ramo. Se o ícone do grau não existir, usa o do grau 1; sem ícones, aparece o símbolo do ramo.
+
+### Alterado
+
+- As cadeias de talentos nascem junto ao tronco e sobem pelos galhos pintados: o grau 1 fica mais perto da bifurcação e o grau 3 mais longe. Tempo e Quebra crescem à esquerda do tronco, Poder e Combo à direita, e as veias acesas seguem os novos caminhos.
+- Os nós ficaram menores (44 px, e 56 px para **Fúria crescente**) e nenhum nó, legenda ou faixa se sobrepõe na tela.
+- **Fúria crescente** agora aparece depois de **Limite de dano do combo**, o talento que a abre, e a veia dela sai desse nó.
+- O cartão de detalhes foi reorganizado (460 x 136, nível e efeito na mesma linha) para caber o ícone e a descrição.
+
 ## [0.9.0] - 2026-11-23
 
 Reforma da árvore de talentos (`talent-tree-rework`): a tela Talentos virou uma árvore desenhada, o crítico passou a valer acima de 100% e os talentos de chefe, perfuração e combo ganharam novas regras.

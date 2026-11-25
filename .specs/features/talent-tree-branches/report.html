@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ramos da árvore de talentos</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+:root[data-theme="dark"] { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Ramos da árvore de talentos (talent-tree-branches)</h1>
+<p class="sub">Relatório de release v0.10.0 &middot; faixa de commits <code>d4c2775..c259e88</code> (10 commits) &middot; 2026-11-25</p>
+<p><span class="verdict">PASS</span> &nbsp;Todas as tarefas de <code>tasks.md</code> estão marcadas, o author check do <code>test-engineer</code> fechou sem lacunas e o <code>ui-artist</code> aprovou (<code>ui-review.html</code>, <code>c259e88</code>). Não há Verifier nem aceite do product-owner neste projeto.</p>
+
+<h2>Author check do test-engineer</h2>
+<div class="cards">
+<div class="card"><div class="n">13</div><div class="l">mutantes (sensor)</div></div>
+<div class="card"><div class="n">13</div><div class="l">mortos</div></div>
+<div class="card"><div class="n">0</div><div class="l">sobreviveram</div></div>
+<div class="card"><div class="n">0</div><div class="l">lacunas de critério de aceite</div></div>
+</div>
+<p>Detalhes na tarefa T8 de <code>tasks.md</code>.</p>
+
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Parte</th><th>Linhas +</th><th>Linhas -</th><th>Arquivos</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes, <code>game/public/*.css</code>)</td><td class="num">94</td><td class="num">47</td><td class="num">4</td></tr>
+<tr><td><strong>Total</strong></td><td class="num">94</td><td class="num">47</td><td class="num">4</td></tr>
+</table></div>
+<p>Arquivos: <code>talentTreeLayout.js</code> (+33 -30), <code>talentsView.js</code> (+24 -7), <code>talents.js</code> (+18 -0), <code>style.css</code> (+19 -10). Fonte: <code>git diff --numstat d4c2775..c259e88</code>.</p>
+
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th>Linhas +</th><th>Linhas -</th><th>Testes adicionados (net)</th><th>Total após a execução</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1254</td></tr>
+<tr><td>Jogo, unitário (<code>game/src/**/*.test.js</code>)</td><td class="num">304</td><td class="num">137</td><td class="num">+13</td><td class="num">2301 (90 arquivos)</td></tr>
+<tr><td>e2e (<code>game/e2e</code>)</td><td class="num">712</td><td class="num">8</td><td class="num">+24</td><td class="num">634 (43 arquivos)</td></tr>
+</table></div>
+<p>Testes adicionados: unitários = linhas <code>it(</code> adicionadas menos removidas (talentTreeLayout +11 -11, talentsView +10 -2, talents +5); e2e = 13 em <code>talentTreeBranches.spec.js</code> e 11 em <code>talentTreeBranchesCard.spec.js</code>. O arquivo <code>talentTreeRework.spec.js</code> só teve valores ajustados.</p>
+
+<h2>Cobertura dos testes unitários</h2>
+<div class="scroll"><table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Backend inteiro (JaCoCo)</td><td class="num">98,56% (3158/3204)</td><td class="num">93,52% (1007/1077)</td></tr>
+<tr><td>Jogo inteiro (Vitest v8)</td><td class="num">98,9% (3713/3754)</td><td class="num">95,34% (1842/1932)</td></tr>
+<tr><td><code>talentTreeLayout.js</code></td><td class="num">100% (22/22)</td><td class="num">100% (2/2)</td></tr>
+<tr><td><code>talentsView.js</code></td><td class="num">99,37% (160/161)</td><td class="num">96,62% (86/89)</td></tr>
+<tr><td><code>domain/talents/talents.js</code></td><td class="num">100%</td><td class="num">93,93%</td></tr>
+<tr><td>Scripts de deploy (<code>node --test</code>)</td><td class="num" colspan="2">96,15% linhas, 95,46% ramos, 94,44% funções</td></tr>
+</table></div>
+<p>Backend: sem arquivos alterados pela feature. O <code>style.css</code> não entra na cobertura unitária.</p>
+
+<h2>Cobertura e2e</h2>
+<div class="cards">
+<div class="card"><div class="n">94,46%</div><div class="l">linhas do código do jogo (3552/3760)</div></div>
+<div class="card"><div class="n">79,92%</div><div class="l">ramos (1266/1584)</div></div>
+<div class="card"><div class="n">634</div><div class="l">testes e2e (622 passaram na primeira execução; os 12 que falharam passaram sozinhos)</div></div>
+</div>
+<p>Por arquivo alterado: <code>talentTreeLayout.js</code> 100% linhas (22/22); <code>talentsView.js</code> 99,39% (165/166), ramos 86,07%; <code>talents.js</code> 97,67% (42/43), ramos 73,33%. O número é um limite inferior: uma página recarregada dentro de um teste perde o que contou antes. A suíte foi dividida em 19 partes de cerca de 35 testes (a primeira sem <code>--keep</code>, as demais com).</p>
+
+<h2>Cenários e2e da feature</h2>
+<p>Todos passam (24 de 24). <code>talentTreeBranches.spec.js</code>, 13: nós centrados nos galhos pintados; cadeias subindo do tronco (grau 1 perto, grau 3 longe); TEMPO e QUEBRA à esquerda, PODER e COMBO à direita; nada se sobrepõe; clique no centro de cada nó cai no nó; faixas sobre a folhagem; veias acesas seguem os novos caminhos; sem a arte, 11 veias tracejadas chegam a Fúria crescente; nós de 44 px (Fúria 56 px); marcas encolhem; Fúria depois da cadeia que a abre; Fúria travada até Limite de dano do combo no nível 10; lista sem Fúria desenha 27 nós e 11 veias.</p>
+<p><code>talentTreeBranchesCard.spec.js</code>, 11: o cartão explica os 10 talentos; graus 2 e 3 leem o texto do grau 1; trocar a seleção troca ícone e descrição; ícone em anel da cor do ramo; ícone de grau ausente cai no grau 1; sem ícones mostra o glifo do ramo; cartão 460 x 136, 8 px acima do fundo, centrado; nenhum texto cortado; sem seleção só a dica; fontes, tamanhos e cores da spec; textos e botão preservados.</p>
+
+<h2>Falhas que a feature não causou</h2>
+<ul>
+<li><strong>e2e, 12 testes falharam na execução completa e passaram sozinhos</strong> (<code>--workers=1</code>): <code>auth.spec.js:138</code>, <code>auth.spec.js:159</code>, <code>autoClick.spec.js:36</code> (o jogo não passou do Boot em 60 s), <code>blackAwarenessStaffDamage.spec.js:154</code> e <code>:172</code>, <code>clickPower.spec.js:41</code>, <code>dragEquip.spec.js:586</code> e <code>:670</code>, <code>heroTeam.spec.js:442</code>, <code>splash.spec.js:25</code>, <code>uiRedesign.spec.js:1219</code>, <code>wake.spec.js:56</code>. Nenhum toca a árvore de talentos; a causa é carga (3 workers, tempos de 60 s estourados). Os testes das duas specs da feature passaram todos.</li>
+<li><strong>deploy, 2 de 289 testes</strong> (<code>regression.test.mjs:385</code> e <code>:410</code>, "the CLI exits 0 / exits 1"): o processo filho do CLI sai com o código 3221226505 (0xC0000409) neste Windows em vez de 0/1. A feature não toca em <code>deploy/</code>; falha independente dela, a investigar à parte.</li>
+</ul>
+
+<h2>Deploy e produção</h2>
+<ul>
+<li>Tudo em <code>origin/main</code>. O <code>publish.sh</code> já rodava na máquina de publicação (<code>DESKTOP-RCMC353</code>): Docker (postgres, slot green, proxy, Dozzle) e <code>cloudflared</code> ativos; o watcher registrou <code>2b79c8b</code> (commit com o jogo da feature) como tratado e o Worker foi republicado. Túnel: <code>https://owner-julian-home-lay.trycloudflare.com</code>.</li>
+<li>Nenhum commit de backend na faixa: não houve troca de slot; slot ativo green.</li>
+<li>Verificação em produção: o Worker responde 200 em <code>https://infinity-grove.yan-tapajos.workers.dev/</code> e o bundle servido (<code>index-kqx-wMRc.js</code>) contém as descrições novas dos talentos. <strong>Não medido no navegador</strong>: a extensão Claude in Chrome não estava conectada, então o caminho jogado na tela Talentos (nós sobre os galhos, cartão com descrição) e o console não foram inspecionados em produção.</li>
+<li>O site fica no ar somente enquanto o <code>publish.sh</code> roda.</li>
+</ul>
+</main>
+</body>
+</html>
