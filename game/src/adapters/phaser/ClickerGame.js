@@ -13,6 +13,7 @@ import { Fight } from '../../domain/combat/fight';
 import { leaderAttacker } from '../../domain/combat/leaderAttacker';
 import { bossTimeBonusMs, walletCopper, wornBy } from '../../domain/equipment/equipment';
 import { defenseOf, healthText, Monster } from '../../domain/combat/monster';
+import { AffixState, affixDefense, affixText } from '../../domain/combat/monsterAffix';
 import { clickHits } from '../../domain/heroes/leaderBonus';
 import { ELEMENT_LABELS } from '../../domain/heroes/heroes';
 import { activePassives, fightingAllies, teamActive } from '../../domain/heroes/team';
@@ -86,6 +87,8 @@ const STAGE_HUD_LEFT = STAGE_HUD.x - 200;
 const BOSS_TIMER_GAP = 12;
 //  Under the monster, clear of the damage numbers that rise above its health bar
 const ENEMY_STATS = { x: 670, y: 596 };
+//  The affix chip at the top of the monster body (spec early-game-rebalance, Affix Display): clicks go through it to the monster
+const AFFIX = { x: 670, y: 336 };
 //  The running skill effects, under the stage and countdown pills
 const EFFECTS = { x: 512, y: 96 };
 //  Phaser key names of the skill keys and the slot each one uses: 1, 2, 3 and Q, W, E
@@ -105,6 +108,7 @@ const STAGE_HUD_HTML = '<div class="hud-box hud-stage"><div class="stage-hud"></
 const BOSS_TIMER_HTML = '<div class="hud-box hud-timer"><div class="boss-timer"></div></div>';
 //  The weak element chip sits above the enemy line in the same click-through box (spec ui-redesign UIR-08)
 const ENEMY_STATS_HTML = '<div class="hud-box hud-enemy"><div class="target-chip" data-testid="target-chip"></div><div class="weak-chip" data-testid="weak-chip"></div><div class="enemy-stats"></div></div>';
+const AFFIX_HTML = '<div class="hud-box hud-affix"><div class="affix-chip" data-testid="affix-chip"></div></div>';
 const EFFECTS_HTML = '<div class="hud-box hud-effects"><div class="effect-tags"></div></div>';
 const STAGE_MESSAGE_HTML = '<div class="hud-box hud-message"><div class="stage-message"></div></div>';
 //  The round farm button at the right end of the bar, right of the auto click button
@@ -238,6 +242,7 @@ export class ClickerGame extends Scene
         this.enemyStats = this.createHtml(ENEMY_STATS, ENEMY_STATS_HTML, '.enemy-stats');
         this.weakChip = this.enemyStats.parentElement.querySelector('.weak-chip');
         this.targetChip = this.enemyStats.parentElement.querySelector('.target-chip');
+        this.affixChip = this.createHtml(AFFIX, AFFIX_HTML, '.affix-chip');
         this.effectTags = this.createHtml(EFFECTS, EFFECTS_HTML, '.effect-tags');
         this.stageMessage = this.createHtml(STAGE_MESSAGE, STAGE_MESSAGE_HTML, '.stage-message');
         this.createControls();
@@ -854,7 +859,8 @@ export class ClickerGame extends Scene
 
         //  A new encounter replaces any message, the completion of the previous chapter included
         this.stageMessage.textContent = '';
-        this.monster = new Monster(encounter.health, encounter.dropRuleId, encounter.stats);
+        this.monster = new Monster(encounter.health, encounter.dropRuleId, affixDefense(encounter.stats, encounter.affix));
+        this.monster.affix = encounter.affix ? new AffixState(encounter.affix) : null;
         this.clearAdds();
         this.fight = new Fight(this.monster, encounter.adds ?? []);
         this.showAdds();
@@ -864,6 +870,7 @@ export class ClickerGame extends Scene
         this.chapterHud.textContent = `Capítulo ${this.session.chapter}`;
         this.showAutoClick();
         this.refreshEnemyStats();
+        this.showAffix();
 
         if (encounter.timeLimitMs)
         {
@@ -1077,11 +1084,37 @@ export class ClickerGame extends Scene
         this.targetChip.textContent = '';
     }
 
+    //  "Carapaça: -6 por golpe" while the monster with an affix lives; empty otherwise (spec early-game-rebalance, Affix Display)
+    showAffix ()
+    {
+        const state = this.monster && !this.monster.dead ? this.monster.affix : null;
+        const text = state ? affixText(state) : '';
+
+        if (this.affixChip.textContent !== text)
+        {
+            this.affixChip.textContent = text;
+        }
+
+        const type = state ? state.affix.type : '';
+
+        if (this.affixChip.getAttribute('data-affix') !== type)
+        {
+            this.affixChip.setAttribute('data-affix', type);
+        }
+    }
+
+    clearAffix ()
+    {
+        this.affixChip.textContent = '';
+        this.affixChip.setAttribute('data-affix', '');
+    }
+
     completeChapter ()
     {
         this.monster = null;
         this.clearAdds();
         this.clearEnemyStats();
+        this.clearAffix();
         this.monsterParts.forEach((part) => part.setAlpha(0));
         this.stageHud.textContent = '';
         this.monsterHp.textContent = '';
@@ -1141,6 +1174,13 @@ export class ClickerGame extends Scene
         const allyTicks = this.allyFrame(delta);
         //  The stop of Stun and Root is read before the skills use it up with this frame
         const countdownMs = this.skills.countdownMs(delta);
+
+        //  Regeneração and the Escudo recharge follow the countdown time: they stop with the pause, Stun and Root (spec early-game-rebalance)
+        if (this.countdown && alive && this.monster.affix && this.monster.affix.advance(countdownMs, this.monster) > 0)
+        {
+            this.updateHealthBar();
+        }
+
         const { hits, targets } = this.skills.advance(delta, { monster: this.monster, adds: this.livingAddMonsters(), boss: this.countdown !== null });
 
         hits.forEach(({ damage, critical }, index) =>
@@ -1153,6 +1193,7 @@ export class ClickerGame extends Scene
         }
 
         this.refreshSkillUi();
+        this.showAffix();
 
         if (!this.countdown)
         {
@@ -1339,6 +1380,7 @@ export class ClickerGame extends Scene
         this.monster = null;
         this.clearAdds();
         this.clearEnemyStats();
+        this.clearAffix();
         this.monsterParts.forEach((part) => part.setAlpha(0));
 
         //  A farmed boss that survives its time limit just comes back; nothing is reported and the campaign does not move
@@ -1574,11 +1616,13 @@ export class ClickerGame extends Scene
     //  click, the skills and their ticks.
     afterDamage ()
     {
+        this.showAffix();
         this.updateHealthBar();
 
         if (this.monster.dead)
         {
             this.clearEnemyStats();
+            this.clearAffix();
 
             //  The adds still standing fade out with the miniboss; their tween goes first, so the miniboss fade stays the last one
             this.fadeOutAdds();

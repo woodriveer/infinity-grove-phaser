@@ -928,7 +928,7 @@ After the edit, `grep -n "\.hit(" game/src/domain/skills/skillCombat.js` finds n
 
 ---
 
-#### T11: The scene runs and shows the affix [ ]
+#### T11: The scene runs and shows the affix [x]
 
 **Owner**: game-dev
 **Goal**: The spawned monster gets its affix state, Regeneração and the Escudo recharge follow the countdown time, and the chip shows the affix (EGR-07, EGR-08; spec § Affix Display, Display AC 1 to 6, Affixes AC 7 to 9).
@@ -1070,7 +1070,7 @@ Check that `.hud-box` already gives `pointer-events: none` (it does for every HU
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/stages.spec.js e2e/minibossAdds.spec.js e2e/skills.spec.js e2e/farm.spec.js`
 **Done when**:
 
-- [ ] Unit tests and build pass; the four e2e files pass unchanged (their payloads carry no affix, so no chip shows).
+- [x] Unit tests and build pass; the four e2e files pass unchanged (their payloads carry no affix, so no chip shows).
 
 **Commit**: `feat(game): run and show the monster affix in the fight`
 

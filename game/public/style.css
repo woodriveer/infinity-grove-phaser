@@ -780,6 +780,61 @@ button:disabled {
     font-size: 11px;
 }
 
+/* The affix of a miniboss or chapter boss at the top of its body (spec early-game-rebalance, Affix Display) */
+.hud-affix {
+    width: 240px;
+    height: 28px;
+}
+
+.affix-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px 3px 8px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: pre;
+    color: var(--parchment-100);
+    border-radius: 999px;
+    background: var(--chip-bg);
+    border: 1px solid var(--affix-color, var(--bronze-500));
+}
+
+.affix-chip:empty {
+    display: none;
+}
+
+.affix-chip::before {
+    content: '';
+    flex: none;
+    width: 12px;
+    height: 12px;
+    background-color: var(--affix-color);
+    -webkit-mask: var(--affix-icon) center / contain no-repeat;
+    mask: var(--affix-icon) center / contain no-repeat;
+}
+
+.affix-chip[data-affix="SHELL"] {
+    --affix-color: #b07a3a;
+    --affix-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 21 7v10l-9 5-9-5V7z'/%3E%3C/svg%3E");
+}
+
+.affix-chip[data-affix="HIT_SHIELD"] {
+    --affix-color: #5aa0d8;
+    --affix-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='%23000' stroke-width='3'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+}
+
+.affix-chip[data-affix="REGENERATION"] {
+    --affix-color: #4f9a3c;
+    --affix-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z'/%3E%3C/svg%3E");
+}
+
+.affix-chip[data-affix="ARMORED"] {
+    --affix-color: #8a9aa6;
+    --affix-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 4h16v9c0 4-3.6 7.3-8 9-4.4-1.7-8-5-8-9z'/%3E%3C/svg%3E");
+}
+
 /* The element dot of the enemy chip and of the weak element chip */
 :is(.tag-element, .weak-chip)::before {
     content: '';
