@@ -407,7 +407,7 @@ Keep the three branches of the action (`talent-lock`, `talent-max`, `talent-upgr
 
 ---
 
-#### T5: Card layout and icon ring [ ]
+#### T5: Card layout and icon ring [x]
 
 **Owner**: game-dev
 **Goal**: The card is 460 x 136 px with the text column on the left and the 88 px ringed icon on the right, nothing clipped (TTB-06, TTB-07; spec P1 Card AC 3 to AC 6, D5, D6).
@@ -450,7 +450,7 @@ Keep the three branches of the action (`talent-lock`, `talent-max`, `talent-upgr
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/talentTreeRework.spec.js e2e/talents.spec.js && npx playwright test e2e/uiRedesign.spec.js -g "talent|Nível máximo|contrast pairs|inner card"`
 **Done when**:
 
-- [ ] The two re-pinned assertions pass and every other test of the three files passes unchanged.
+- [x] The two re-pinned assertions pass and every other test of the three files passes unchanged.
 
 **Commit**: `feat(game): lay out the talent card with its icon ring`
 

@@ -89,7 +89,7 @@ test.describe('Talentos tree: the window', () => {
         await expect(page.getByTestId('talent-reset')).toBeDisabled();
         await expect(page.getByTestId('talent-reset')).toHaveCSS('right', '12px');
         await expect(page.getByTestId('talent-reset')).toHaveCSS('bottom', '12px');
-        expect((await size(page.getByTestId('talent-detail')))[0]).toBe(380);
+        expect((await size(page.getByTestId('talent-detail')))[0]).toBe(460);
         await expect(page.getByTestId('talent-detail-empty')).toHaveText('Escolha um talento na árvore para ver os detalhes.');
         await expect(page.getByTestId('hero-close')).toBeVisible();
 
@@ -518,7 +518,7 @@ test.describe('Talentos tree: phones and desktops', () => {
         expect(await read('scrollLeft')).toBe(700);
         expect(await read('scrollTop')).toBe(400);
         expect((await page.getByTestId('talent-points').evaluate((node) => node.offsetLeft))).toBe(12);
-        expect((await size(page.getByTestId('talent-detail')))[0]).toBe(380);
+        expect((await size(page.getByTestId('talent-detail')))[0]).toBe(460);
     });
 
     test('on a phone the selected Fúria crescente ends above the detail card', async ({ page }) => {
