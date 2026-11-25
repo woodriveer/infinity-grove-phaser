@@ -95,7 +95,7 @@ T17
 
 ### Phase 1: Backend numbers
 
-#### T1: Talent catalog: flat 1, critical chance 5, critical damage 15 a level [ ]
+#### T1: Talent catalog: flat 1, critical chance 5, critical damage 15 a level [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: `CLICK_FLAT_DAMAGE` gives 1 a level, `CRIT_CHANCE` 5 points a level and `CRIT_DAMAGE` 15 % a level, each times its grade (EGR-01; spec P1 Flat AC 1 to 3, P1 Critical path AC 1, 2, § Talent Change).
@@ -149,7 +149,7 @@ keeping their positions in the list. Update the KDoc above `TalentCatalog` if it
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 3 re-pinned and 4 new cases pass; every other backend test passes unchanged (except a `TalentControllerIT` re-pin of step 3, named in the commit body).
+- [x] The 3 re-pinned and 4 new cases pass; every other backend test passes unchanged (except a `TalentControllerIT` re-pin of step 3, named in the commit body).
 
 **Commit**: `feat(backend): rebalance the flat and critical talents`
 

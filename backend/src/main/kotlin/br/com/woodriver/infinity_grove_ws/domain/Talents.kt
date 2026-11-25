@@ -79,10 +79,10 @@ object TalentCatalog {
             TalentDefinition("PHYSICAL_BREAK", TalentBranch.BREAK, "Quebra de defesa", "points", 1),
             TalentDefinition("ARMOR_PIERCE", TalentBranch.BREAK, "Perfuração de armadura", "%", 1),
             TalentDefinition("CLICK_DAMAGE", TalentBranch.POWER, "Dano de clique (%)", "%", 5),
-            TalentDefinition("CRIT_CHANCE", TalentBranch.POWER, "Chance de crítico", "points", 1),
-            TalentDefinition("CRIT_DAMAGE", TalentBranch.POWER, "Dano crítico", "%", 5),
+            TalentDefinition("CRIT_CHANCE", TalentBranch.POWER, "Chance de crítico", "points", 5),
+            TalentDefinition("CRIT_DAMAGE", TalentBranch.POWER, "Dano crítico", "%", 15),
             TalentDefinition("COMBO", TalentBranch.COMBO, "Limite de dano do combo", "%", 5),
-            TalentDefinition("CLICK_FLAT_DAMAGE", TalentBranch.POWER, "Dano direto de clique", "dmg", 2, firstLevel = 1),
+            TalentDefinition("CLICK_FLAT_DAMAGE", TalentBranch.POWER, "Dano direto de clique", "dmg", 1),
         )
 
     /** Talents with one grade and an explicit prerequisite: Fúria crescente, +1 combo step a level, opens at level 10 of COMBO. */

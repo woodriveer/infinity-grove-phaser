@@ -21,10 +21,10 @@ class TalentsTest {
                 Triple("PHYSICAL_BREAK", TalentBranch.BREAK, 1),
                 Triple("ARMOR_PIERCE", TalentBranch.BREAK, 1),
                 Triple("CLICK_DAMAGE", TalentBranch.POWER, 5),
-                Triple("CRIT_CHANCE", TalentBranch.POWER, 1),
-                Triple("CRIT_DAMAGE", TalentBranch.POWER, 5),
+                Triple("CRIT_CHANCE", TalentBranch.POWER, 5),
+                Triple("CRIT_DAMAGE", TalentBranch.POWER, 15),
                 Triple("COMBO", TalentBranch.COMBO, 5),
-                Triple("CLICK_FLAT_DAMAGE", TalentBranch.POWER, 2),
+                Triple("CLICK_FLAT_DAMAGE", TalentBranch.POWER, 1),
             ),
             TalentCatalog.all.take(9).map { Triple(it.id, it.branch, it.perLevel) },
         )
@@ -52,10 +52,44 @@ class TalentsTest {
     }
 
     @Test
-    fun `the flat click damage talent gives 1, 3, 5 and so on up to 19`() {
+    fun `the flat click damage talent gives 1 a level up to 10`() {
         val flat = TalentCatalog.find("CLICK_FLAT_DAMAGE")
 
-        assertEquals(listOf(0, 1, 3, 5, 19), listOf(0, 1, 2, 3, 10).map(flat::valueAt))
+        assertEquals(listOf(0, 1, 2, 3, 10), listOf(0, 1, 2, 3, 10).map(flat::valueAt))
+    }
+
+    @Test
+    fun `grade 2 and 3 of the flat click damage give 2 and 3 a level`() {
+        val g2 = TalentCatalog.find("CLICK_FLAT_DAMAGE_G2")
+        val g3 = TalentCatalog.find("CLICK_FLAT_DAMAGE_G3")
+
+        assertEquals(listOf(2, 10), listOf(1, 5).map(g2::valueAt))
+        assertEquals(listOf(3, 21), listOf(1, 7).map(g3::valueAt))
+    }
+
+    @Test
+    fun `the critical chance talent gives 5 points a level, 50, 100 and 150 at level 10 of its grades`() {
+        assertEquals(5, TalentCatalog.find("CRIT_CHANCE").valueAt(1))
+        assertEquals(
+            listOf(50, 100, 150),
+            listOf("CRIT_CHANCE", "CRIT_CHANCE_G2", "CRIT_CHANCE_G3").map { TalentCatalog.find(it).valueAt(10) },
+        )
+    }
+
+    @Test
+    fun `the critical damage talent gives 15 percent a level, 150, 300 and 450 at level 10 of its grades`() {
+        assertEquals(15, TalentCatalog.find("CRIT_DAMAGE").valueAt(1))
+        assertEquals(
+            listOf(150, 300, 450),
+            listOf("CRIT_DAMAGE", "CRIT_DAMAGE_G2", "CRIT_DAMAGE_G3").map { TalentCatalog.find(it).valueAt(10) },
+        )
+    }
+
+    @Test
+    fun `the points of a first clear stay 2 for a miniboss and 5 for a chapter boss`() {
+        assertEquals(2, rules.pointsPerMiniboss)
+        assertEquals(5, rules.pointsPerChapterBoss)
+        assertEquals(0, rules.pointsPerPhase)
     }
 
     @Test
@@ -65,7 +99,7 @@ class TalentsTest {
         assertEquals(listOf("COMBO", "COMBO_G2", "COMBO_G3"), TalentCatalog.all.filter { it.baseId == "COMBO" }.map { it.id })
         assertEquals(listOf(50, 100, 150), listOf("COMBO", "COMBO_G2", "COMBO_G3").map { TalentCatalog.find(it).valueAt(10) })
         assertEquals(
-            listOf(19, 38, 57),
+            listOf(10, 20, 30),
             listOf("CLICK_FLAT_DAMAGE", "CLICK_FLAT_DAMAGE_G2", "CLICK_FLAT_DAMAGE_G3").map {
                 TalentCatalog.find(it).valueAt(10)
             },
@@ -228,7 +262,7 @@ class TalentsTest {
         assertEquals(50, clickDamage.valueAt(10))
         assertEquals(0, clickDamage.valueAt(0))
         assertEquals(8, TalentCatalog.find("BOSS_DAMAGE").valueAt(4))
-        assertEquals(30, TalentCatalog.find("CRIT_DAMAGE").valueAt(6))
+        assertEquals(90, TalentCatalog.find("CRIT_DAMAGE").valueAt(6))
     }
 
     @Test

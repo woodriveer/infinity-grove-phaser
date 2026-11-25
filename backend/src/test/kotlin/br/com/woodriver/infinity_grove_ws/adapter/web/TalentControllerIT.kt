@@ -110,7 +110,7 @@ class TalentControllerIT : IntegrationTestBase() {
             .body("talents[7].perLevel", equalTo(5))
             .body("talents[8].label", equalTo("Dano direto de clique"))
             .body("talents[8].unit", equalTo("dmg"))
-            .body("talents[8].perLevel", equalTo(2))
+            .body("talents[8].perLevel", equalTo(1))
             .body("points.earned", equalTo(0))
             .body("points.spent", equalTo(0))
             .body("points.available", equalTo(0))
