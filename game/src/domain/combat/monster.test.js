@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DAMAGE_PER_CLICK, DEFAULT_STATS, defenseOf, healthText, MONSTER_MAX_HEALTH, Monster } from './monster';
+import { AffixState } from './monsterAffix';
 
 describe('Monster', () => {
     it('starts at 10 health and alive', () => {
@@ -234,5 +235,45 @@ describe('defenseOf', () => {
 
     it('reads 0 without any defense field', () => {
         expect(defenseOf({ element: 'FIRE' })).toBe(0);
+    });
+});
+
+describe('land', () => {
+    it('without an affix lands the whole strike', () => {
+        const monster = new Monster(10);
+
+        expect(monster.land(3)).toBe(3);
+        expect(monster.health).toBe(7);
+    });
+
+    it('a Carapaça 2 monster lands 1 of a strike of 3', () => {
+        const monster = new Monster(10);
+
+        monster.affix = new AffixState({ type: 'SHELL', amount: 2, periodMs: null });
+
+        expect(monster.land(3)).toBe(1);
+        expect(monster.health).toBe(9);
+    });
+
+    it('a shielded monster loses no health while charges are left', () => {
+        const monster = new Monster(10);
+
+        monster.affix = new AffixState({ type: 'HIT_SHIELD', amount: 2, periodMs: 6000 });
+
+        expect(monster.land(5)).toBe(0);
+        expect(monster.land(5)).toBe(0);
+        expect(monster.health).toBe(10);
+
+        expect(monster.land(5)).toBe(5);
+        expect(monster.health).toBe(5);
+    });
+
+    it('a dead monster lands 0 and keeps health 0', () => {
+        const monster = new Monster(10);
+
+        monster.hit(10);
+
+        expect(monster.land(4)).toBe(0);
+        expect(monster.health).toBe(0);
     });
 });

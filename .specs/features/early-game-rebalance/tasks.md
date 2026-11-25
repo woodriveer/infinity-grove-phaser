@@ -800,7 +800,7 @@ export const affixText = (state) => { /* ... */ };
 
 ---
 
-#### T8: Monster.land applies the affix [ ]
+#### T8: Monster.land applies the affix [x]
 
 **Owner**: game-dev
 **Goal**: A strike on a monster goes through its affix and reports what landed (EGR-07; spec Affixes AC 4, 5).
@@ -843,7 +843,7 @@ export const affixText = (state) => { /* ... */ };
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 4 cases pass and every other unit test passes unchanged.
+- [x] The 4 cases pass and every other unit test passes unchanged.
 
 **Commit**: `feat(game): land strikes through the monster affix`
 

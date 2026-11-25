@@ -30,6 +30,7 @@ export class Monster
         this.dropRuleId = dropRuleId;
         this.stats = stats;
         this.health = maxHealth;
+        this.affix = null;
     }
 
     get dead ()
@@ -48,6 +49,21 @@ export class Monster
         this.health = Math.max(0, Math.round((this.health - damage) * HEALTH_PRECISION) / HEALTH_PRECISION);
 
         return true;
+    }
+
+    //  A strike through the monster's affix (spec early-game-rebalance): returns the damage that landed, 0 on a dead monster
+    land (damage)
+    {
+        if (this.dead)
+        {
+            return 0;
+        }
+
+        const dealt = this.affix ? this.affix.land(damage) : damage;
+
+        this.hit(dealt);
+
+        return dealt;
     }
 
     respawn ()
