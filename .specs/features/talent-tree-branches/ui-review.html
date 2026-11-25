@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Ramos da árvore de talentos e cartão do talento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Ramos da árvore de talentos e cartão do talento</h1>
+                <div class="meta">
+                    <code>.specs/features/talent-tree-branches</code> · commits <code>5b2e88b..2b79c8b</code> · 2026-11-25 · local, arte real do jogo
+                </div>
+            </div>
+            <span class="chip verdict ok">APROVADO</span>
+        </div>
+        <p style="margin-top:16px">As cadeias agora saem do tronco pela veia colorida de cada galho e sobem até a ponta, os nós ficaram menores, Fúria crescente vem depois da cadeia do combo e o cartão explica o talento com um ícone grande no anel do ramo. Não encontrei sobreposição nem texto cortado; só sugestões de gosto.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">12</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">12</div><div class="l">capturas (desktop)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Cada ramo sai do tronco pela sua veia e sobe pelo galho, grau 1 perto do tronco e grau 3 na ponta (compara com layout-target.png) <code>P1 Ramos AC 1-3</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Nenhum nó, legenda, banner ou parte fixa se sobrepõe (métricas do Playwright: 0 sobreposições, 0 banners sobre nós ou título) <code>P1 Ramos AC 4, 6</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Nós de 44 px (Fúria 56 px) com selos, cadeados e emblemas legíveis <code>P1 Tamanhos AC 1-3</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Veias acesas seguem os galhos; fallback com 11 veias tracejadas <code>P1 Ramos AC 7, 8</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Cartão de 460×136 com descrição em português, nível e efeito na mesma linha, texto sem cortes <code>P1 Cartão AC 1, 5, 7</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Ícone de 88 px em anel da cor do ramo (ciano, vermelho, dourado, roxo) com brilho; glifo quando falta a arte <code>P1 Cartão AC 3, 4</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Cartão vazio mostra só o texto de escolha <code>P1 Cartão AC 6</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Fúria crescente depois de Limite de dano do combo, em galho próprio, ligada a ele <code>P2 Fúria AC 1, 2</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Todo o texto novo está em português <code>AD-007</code></span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>Árvore (arte real)</h3>
+            <div class="shots">
+<figure>
+                    <a href="ui-review/01-tree-real-art-desktop.png" target="_blank"><img src="ui-review/01-tree-real-art-desktop.png" alt="Árvore, conta nova" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Árvore, conta nova</span>
+                        <span class="d">Arte real, 1 ponto, nada selecionado: cada cadeia sai do tronco pela sua veia colorida e sobe pelo galho.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+<figure>
+                    <a href="ui-review/02-tree-real-art-levels-desktop.png" target="_blank"><img src="ui-review/02-tree-real-art-levels-desktop.png" alt="Árvore com níveis" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Árvore com níveis</span>
+                        <span class="d">POWER no 10, COMBO 10, Fúria 2, Tempo do miniboss 5: nós maximizados, disponíveis, abertos e bloqueados, veias acesas.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+<div class="screen">
+            <h3>Árvore (arte ausente)</h3>
+            <div class="shots">
+<figure>
+                    <a href="ui-review/03-tree-fallback-desktop.png" target="_blank"><img src="ui-review/03-tree-fallback-desktop.png" alt="Árvore sem arte" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Árvore sem arte</span>
+                        <span class="d">Tabuleiro em gradiente e 11 veias tracejadas; Fúria crescente ligada a Limite de dano do combo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+<div class="screen">
+            <h3>Cartão do talento</h3>
+            <div class="shots">
+<figure>
+                    <a href="ui-review/04-card-open-desktop.png" target="_blank"><img src="ui-review/04-card-open-desktop.png" alt="Aberto (1 ponto)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Aberto (1 ponto)</span>
+                        <span class="d">Dano de clique (%): descrição, botão Melhorar e ícone de 88 px em anel dourado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+<figure>
+                    <a href="ui-review/05-card-maxed-desktop.png" target="_blank"><img src="ui-review/05-card-maxed-desktop.png" alt="Nível máximo" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Nível máximo</span>
+                        <span class="d">Dano de clique (%) no 10: texto Nível máximo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+<figure>
+                    <a href="ui-review/06-card-locked-grade-desktop.png" target="_blank"><img src="ui-review/06-card-locked-grade-desktop.png" alt="Grau bloqueado" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Grau bloqueado</span>
+                        <span class="d">Dano de clique (%) grau 2 selecionado sem o grau 1.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+<figure>
+                    <a href="ui-review/07-card-fury-locked-desktop.png" target="_blank"><img src="ui-review/07-card-fury-locked-desktop.png" alt="Fúria bloqueada" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fúria bloqueada</span>
+                        <span class="d">Texto Bloqueado: chegue ao nível 10 de Limite de dano do combo; anel roxo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+<figure>
+                    <a href="ui-review/08-card-time-desktop.png" target="_blank"><img src="ui-review/08-card-time-desktop.png" alt="Ramo TIME" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Ramo TIME</span>
+                        <span class="d">Tempo do miniboss: anel ciano.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+<figure>
+                    <a href="ui-review/09-card-break-desktop.png" target="_blank"><img src="ui-review/09-card-break-desktop.png" alt="Ramo BREAK" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Ramo BREAK</span>
+                        <span class="d">Quebra de defesa: anel vermelho, nível máximo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+<figure>
+                    <a href="ui-review/10-card-combo-desktop.png" target="_blank"><img src="ui-review/10-card-combo-desktop.png" alt="Ramo COMBO" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Ramo COMBO</span>
+                        <span class="d">Limite de dano do combo selecionado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+<figure>
+                    <a href="ui-review/11-card-fury-unlocked-desktop.png" target="_blank"><img src="ui-review/11-card-fury-unlocked-desktop.png" alt="Fúria desbloqueada" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fúria desbloqueada</span>
+                        <span class="d">Fúria crescente com Limite de dano do combo no 10: botão Melhorar em roxo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+<figure>
+                    <a href="ui-review/12-card-glyph-desktop.png" target="_blank"><img src="ui-review/12-card-glyph-desktop.png" alt="Glifo sem arte" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Glifo sem arte</span>
+                        <span class="d">Chance de crítico sem ícones: glifo no anel, descrição mais longa em 2 linhas.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <p class="empty">Nenhum achado.</p>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>Os ícones dos nós bloqueados com arte real ficam bem escuros (cinza sobre anel escuro) e quase não se distinguem; um leve aumento de brilho ajudaria a ler qual talento é. Não é defeito: o estado bloqueado já está marcado pelo cadeado.</span></li>
+            <li><span class="mark">✦</span><span>Descrição do cartão em 12 px é pequena na tela de 1280×720; 13 px caberia nas 2 linhas do cartão de 460 px.</span></li>
+            <li><span class="mark">✦</span><span>No fallback sem arte, as veias convergem sobre a legenda de Dano de clique (%) e a cruzam; só aparece sem a arte, então é cosmético.</span></li>
+            <li><span class="mark">✦</span><span>O cartão mostra Efeito: nenhum no nível 0; Sem efeito ainda seria mais natural em português. Texto herdado da feature anterior.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <p class="empty">Nenhum erro nem recurso faltando.</p>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-25</footer>
+</main>
+</body>
+</html>

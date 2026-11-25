@@ -635,7 +635,7 @@ Gate run: `npm test` 90 files, 2301 tests passed; `talentTreeBranches.spec.js` +
 
 ### Phase 3: UI review
 
-#### T9: UI review of the branches and the card [ ]
+#### T9: UI review of the branches and the card [x]
 
 **Owner**: ui-artist
 **Goal**: The tree and the card match the owner's request and the Grove theme (AD-022) on the desktop with the real art (TTB-01 to TTB-08).
@@ -670,7 +670,7 @@ Gate run: `npm test` 90 files, 2301 tests passed; `talentTreeBranches.spec.js` +
 **Gate**: `cd game && npm run ui:shots -- talentTreeBranches`
 **Done when**:
 
-- [ ] `ui-review.html` has a verdict (APROVADO or REPROVADO) and every finding is listed for the product owner to turn into tasks.
+- [x] `ui-review.html` has a verdict (APROVADO or REPROVADO) and every finding is listed for the product owner to turn into tasks.
 
 **Commit**: `docs(ui): review the talent tree branches`
 
