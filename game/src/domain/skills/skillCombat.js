@@ -177,9 +177,9 @@ export class SkillCombat
             factors: this.factors(monster)
         });
 
-        monster.hit(result.damage);
+        const dealt = monster.land(result.damage);
 
-        return result;
+        return { ...result, damage: dealt };
     }
 
     //  One ally hit on `monster` (spec hero-team): the ally's attacker through the strike of a tick at 100 %, so it is never critical, gets
@@ -192,9 +192,9 @@ export class SkillCombat
             attacker, percent: 100, buffs: this.buffIds(), debuffs: this.debuffIds(monster), defender: this.statsOf(monster), boss, factors: this.factors(monster)
         });
 
-        monster.hit(damage);
+        const dealt = monster.land(damage);
 
-        return { damage, critical: false };
+        return { damage: dealt, critical: false };
     }
 
     //  Uses a skill: refused while locked, cooling or without a living monster; otherwise it lands its hits and starts the cooldown.
@@ -248,8 +248,9 @@ export class SkillCombat
                     factors: this.factors(victim)
                 });
 
-                victim.hit(result.damage);
-                hits.push(result);
+                const dealt = victim.land(result.damage);
+
+                hits.push({ ...result, damage: dealt });
                 targets.push(victim);
             }
         }
@@ -396,8 +397,9 @@ export class SkillCombat
                 factors: this.factors(victim)
             });
 
-            victim.hit(result.damage);
-            hits.push(result);
+            const dealt = victim.land(result.damage);
+
+            hits.push({ ...result, damage: dealt });
             targets.push(victim);
         }
 
@@ -412,8 +414,8 @@ export class SkillCombat
             buffs: this.buffIds(), debuffs: this.debuffIds(monster), defender: this.statsOf(monster), boss, factors: this.factors(monster)
         });
 
-        monster.hit(damage);
+        const dealt = monster.land(damage);
 
-        return { damage, critical: false };
+        return { damage: dealt, critical: false };
     }
 }

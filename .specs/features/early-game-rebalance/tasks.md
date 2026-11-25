@@ -849,7 +849,7 @@ export const affixText = (state) => { /* ... */ };
 
 ---
 
-#### T9: Every SkillCombat strike lands through the affix [ ]
+#### T9: Every SkillCombat strike lands through the affix [x]
 
 **Owner**: game-dev
 **Goal**: The click, the ally hit, every skill hit, the aimed shot and every damage-over-time tick land with `Monster.land` and return what landed (EGR-07; spec Affixes AC 10, Edge Cases on Lyra and multi-hit skills).
@@ -885,7 +885,7 @@ After the edit, `grep -n "\.hit(" game/src/domain/skills/skillCombat.js` finds n
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 6 new cases pass; every existing `skillCombat.test.js` case passes unchanged.
+- [x] The 6 new cases pass; every existing `skillCombat.test.js` case passes unchanged.
 
 **Commit**: `feat(game): land every skill, ally and tick strike through the affix`
 

@@ -3,6 +3,7 @@ import { allyAttacker } from '../combat/allyAttacker';
 import { leaderAttacker } from '../combat/leaderAttacker';
 import { Fight } from '../combat/fight';
 import { DEFAULT_STATS, Monster } from '../combat/monster';
+import { AffixState } from '../combat/monsterAffix';
 import { PLAYER } from '../combat/damage';
 import { monsterAfterBreak } from '../talents/talents';
 import { SkillCombat } from './skillCombat';
@@ -1524,5 +1525,81 @@ describe('skills on every monster', () => {
 
         expect(result.hits).toEqual([ { damage: 25, critical: false } ]);
         expect(result.targets).toEqual([ main ]);
+    });
+});
+
+describe('affixes', () => {
+    const withAffix = (affix, health = 1000) =>
+    {
+        const monster = monsterOf(health);
+
+        monster.affix = new AffixState(affix);
+
+        return monster;
+    };
+    const shell = (amount) => ({ type: 'SHELL', amount, periodMs: null });
+    const shield = (amount) => ({ type: 'HIT_SHIELD', amount, periodMs: 6000 });
+
+    it('a click on a Carapaça monster returns and deals the damage minus the shell', () => {
+        const monster = withAffix(shell(6));
+
+        expect(combat().click({ attacker: { ...PLAYER, baseDamage: 10 }, monster, boss: false })).toEqual({ damage: 4, critical: false });
+        expect(monster.health).toBe(996);
+    });
+
+    it('an ally hit on a shielded monster takes a charge and returns 0', () => {
+        const attacker = allyAttacker({ ally: { stars: 0 }, pieces: [], leaderElement: 'FIRE', allyFactor: 1 });
+        const monster = withAffix(shield(1));
+        const skills = combat();
+
+        expect(skills.allyHit({ attacker, monster, boss: false })).toEqual({ damage: 0, critical: false });
+        expect(monster.health).toBe(1000);
+        expect(monster.affix.charges).toBe(0);
+        expect(skills.allyHit({ attacker, monster, boss: false }).damage).toBe(2);
+        expect(monster.health).toBe(998);
+    });
+
+    it('each hit of Flecha Dupla takes one charge in order', () => {
+        const monster = withAffix(shield(1));
+
+        const result = use(combat(), monster, 'lyra', 1);
+
+        expect(result.hits).toEqual([ { damage: 0, critical: false }, { damage: 3, critical: false } ]);
+        expect(monster.health).toBe(997);
+    });
+
+    it('a damage-over-time tick on a Carapaça monster returns the tick minus the shell, 0 when the tick is smaller', () => {
+        const skills = combat();
+        const monster = withAffix(shell(1));
+
+        use(skills, monster, 'orina', 2);
+
+        expect(skills.advance(1000, { monster }).hits).toEqual([ { damage: 1, critical: false } ]);
+        expect(monster.health).toBe(999);
+
+        const heavy = withAffix(shell(5));
+        const other = combat();
+
+        use(other, heavy, 'orina', 2);
+
+        expect(other.advance(1000, { monster: heavy }).hits).toEqual([ { damage: 0, critical: false } ]);
+        expect(heavy.health).toBe(1000);
+    });
+
+    it('the aimed shot of Tiro Preciso goes through Carapaça', () => {
+        const skills = combat();
+        const monster = withAffix(shell(16));
+
+        use(skills, monster, 'lyra', 2);
+
+        expect(skills.advance(2000, { monster }).hits).toEqual([ { damage: 44, critical: true } ]);
+        expect(monster.health).toBe(956);
+    });
+
+    it('without an affix every result is unchanged', () => {
+        const monster = monsterOf();
+
+        expect(combat().click({ attacker: PLAYER, monster, boss: false })).toEqual({ damage: 1, critical: false });
+        expect(monster.health).toBe(999);
     });
 });
