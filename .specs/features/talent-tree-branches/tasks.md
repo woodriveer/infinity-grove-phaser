@@ -458,7 +458,7 @@ Keep the three branches of the action (`talent-lock`, `talent-max`, `talent-upgr
 
 ### Phase 2: e2e and author check
 
-#### T6: e2e of the branches, the node sizes and Fúria crescente [ ]
+#### T6: e2e of the branches, the node sizes and Fúria crescente [x]
 
 **Owner**: test-engineer
 **Goal**: Every player-visible rule of P1 Branches, P1 Sizes and P2 Fúria is pinned in the browser (TTB-01, TTB-02, TTB-03, TTB-04, TTB-08, TTB-09).
@@ -496,7 +496,7 @@ Keep the three branches of the action (`talent-lock`, `talent-max`, `talent-upgr
 **Gate**: `cd game && npx playwright test e2e/talentTreeBranches.spec.js`
 **Done when**:
 
-- [ ] The 13 tests pass, alone and twice in a row (`--repeat-each=2`).
+- [x] The 13 tests pass, alone and twice in a row (`--repeat-each=2`).
 
 **Commit**: `test(game): pin the talent branches, node sizes and Fúria crescente in the browser`
 
