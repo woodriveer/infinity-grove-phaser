@@ -502,7 +502,7 @@ Keep the three branches of the action (`talent-lock`, `talent-max`, `talent-upgr
 
 ---
 
-#### T7: e2e of the detail card [ ]
+#### T7: e2e of the detail card [x]
 
 **Owner**: test-engineer
 **Goal**: The card's description, icon, fallback, size and kept texts are pinned in the browser (TTB-05, TTB-06, TTB-07).
@@ -539,7 +539,7 @@ P1 Card AC 2 (a talent with no text) cannot be reached in the browser: every nod
 **Gate**: `cd game && npx playwright test e2e/talentTreeBranchesCard.spec.js`
 **Done when**:
 
-- [ ] The 10 tests pass, alone and twice in a row (`--repeat-each=2`).
+- [x] The 10 tests pass, alone and twice in a row (`--repeat-each=2`).
 
 **Commit**: `test(game): pin the talent card description and icon in the browser`
 
