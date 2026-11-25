@@ -673,7 +673,7 @@ Repository (`ChapterRepository.kt`): `interface JpaStageAffixRepository : JpaRep
 
 ---
 
-#### T6: Affixes in the progress and farm payloads [ ]
+#### T6: Affixes in the progress and farm payloads [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Every stage of the progress and farm payloads carries `minibossAffix` and the definition `bossAffix` (EGR-05; spec P1 Affixes AC 2).
@@ -722,7 +722,9 @@ JSON of a chapter 3 stage 6:
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 3 new cases pass; every other backend test passes.
+- [x] The 3 new cases pass; every other backend test passes.
+
+**Deviation**: the response class is named `MonsterAffixResponse`, not `AffixResponse`, because `AffixResponse` already exists in `EquipmentResponses.kt` (equipment affixes). The JSON (`type`, `amount`, `periodMs`) is the one in the contract.
 
 **Commit**: `feat(backend): answer monster affixes in the progress and farm payloads`
 

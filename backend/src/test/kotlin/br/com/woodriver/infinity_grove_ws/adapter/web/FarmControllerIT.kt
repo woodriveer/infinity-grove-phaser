@@ -284,6 +284,21 @@ class FarmControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `the farm of chapter 3 answers Carapaça 6 on miniboss 3 and Carapaça 16 on the boss`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+
+        asUser(token)
+            .get("/farm")
+            .then()
+            .statusCode(200)
+            .body("definition.stages[2].minibossAffix.type", equalTo("SHELL"))
+            .body("definition.stages[2].minibossAffix.amount", equalTo(6))
+            .body("definition.stages[2].minibossAffix.periodMs", nullValue())
+            .body("definition.bossAffix.amount", equalTo(16))
+    }
+
+    @Test
     fun `GET farm of an earlier chapter answers its eleven bosses and its definition`() {
         val token = register()
         progressAt(4, "PHASE", chapter = 3)

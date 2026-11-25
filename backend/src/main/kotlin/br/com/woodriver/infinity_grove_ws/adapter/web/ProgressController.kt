@@ -6,6 +6,7 @@ import br.com.woodriver.infinity_grove_ws.domain.Encounter
 import br.com.woodriver.infinity_grove_ws.domain.EnemyStats
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.InvalidOutcomeException
+import br.com.woodriver.infinity_grove_ws.domain.MonsterAffix
 import br.com.woodriver.infinity_grove_ws.domain.Outcome
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
 import br.com.woodriver.infinity_grove_ws.domain.ProgressView
@@ -52,6 +53,17 @@ data class AddResponse(
     }
 }
 
+/** The affix of a miniboss or chapter boss in the progress and farm payloads (spec early-game-rebalance). */
+data class MonsterAffixResponse(
+    val type: String,
+    val amount: Long,
+    val periodMs: Long?,
+) {
+    companion object {
+        fun from(affix: MonsterAffix) = MonsterAffixResponse(affix.type.name, affix.amount, affix.periodMs)
+    }
+}
+
 data class StageResponse(
     val number: Int,
     val phasesPerStage: Int,
@@ -63,6 +75,7 @@ data class StageResponse(
     val monsterDropRuleId: Int,
     val minibossDropRuleId: Int,
     val adds: List<AddResponse>,
+    val minibossAffix: MonsterAffixResponse?,
 ) {
     companion object {
         fun from(stage: StageDefinition) =
@@ -77,6 +90,7 @@ data class StageResponse(
                 monsterDropRuleId = stage.monsterDropRuleId,
                 minibossDropRuleId = stage.minibossDropRuleId,
                 adds = stage.adds.map(AddResponse::from),
+                minibossAffix = stage.minibossAffix?.let(MonsterAffixResponse::from),
             )
     }
 }
@@ -87,6 +101,7 @@ data class ChapterResponse(
     val boss: EnemyStatsResponse,
     val bossDropRuleId: Int,
     val stages: List<StageResponse>,
+    val bossAffix: MonsterAffixResponse?,
 ) {
     companion object {
         fun from(chapter: ChapterDefinition): ChapterResponse {
@@ -97,6 +112,7 @@ data class ChapterResponse(
                 boss = EnemyStatsResponse.from(chapter.boss),
                 bossDropRuleId = chapter.bossDropRuleId,
                 stages = stages,
+                bossAffix = chapter.bossAffix?.let(MonsterAffixResponse::from),
             )
         }
     }

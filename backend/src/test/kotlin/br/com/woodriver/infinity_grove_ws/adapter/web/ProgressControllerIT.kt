@@ -95,6 +95,33 @@ class ProgressControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `a chapter 1 progress answers no affix`() {
+        user()
+
+        getProgress()
+            .then()
+            .statusCode(200)
+            .body("definition.stages[2].minibossAffix", nullValue())
+            .body("definition.bossAffix", nullValue())
+    }
+
+    @Test
+    fun `a chapter 2 progress answers the Escudo de golpes of miniboss 3 and of the boss`() {
+        user()
+        jpaProgressRepository.save(ProgressEntity("yan", 2, 1, "PHASE", 1, false))
+
+        getProgress()
+            .then()
+            .statusCode(200)
+            .body("chapter", equalTo(2))
+            .body("definition.stages[2].minibossAffix.type", equalTo("HIT_SHIELD"))
+            .body("definition.stages[2].minibossAffix.amount", equalTo(10))
+            .body("definition.stages[2].minibossAffix.periodMs", equalTo(6000))
+            .body("definition.stages[0].minibossAffix", nullValue())
+            .body("definition.bossAffix.type", equalTo("HIT_SHIELD"))
+    }
+
+    @Test
     fun `GET progress answers a boss health above the 32-bit limit as a JSON integer`() {
         user()
         val saved = jdbc.queryForObject("select boss_hit_points from chapters where number = 1", Long::class.java)
