@@ -190,6 +190,15 @@ class AccountResetServiceTest {
     }
 
     @Test
+    fun `a first reset from chapter 2 stores 50 percent of chapter 2 and nothing else`() {
+        player(chapter = 2)
+
+        service.reset("yan", 2)
+
+        assertEquals(legacyOf(2 to 50), legacies.find("yan"))
+    }
+
+    @Test
     fun `a second reset from chapter 5 stores 100`() {
         player(chapter = 5)
         legacies.save(legacyOf(5 to 50))

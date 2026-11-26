@@ -528,7 +528,7 @@ If `.auto-click-popover` is not a grid, drop `grid-column` and give both lines `
 
 ---
 
-#### T10: Author check [ ]
+#### T10: Author check [x]
 
 **Owner**: test-engineer
 **Goal**: Every AC and edge case of the spec has a test asserting its spec value, and the tests kill the injected faults (RLD-01 to RLD-06).
@@ -544,7 +544,7 @@ If `.auto-click-popover` is not a grid, drop `grid-column` and give both lines `
 **Gate**: `cd backend && ./gradlew test && cd ../game && npm test && npx playwright test e2e/resetLegacy.spec.js`
 **Done when**:
 
-- [ ] Every AC and edge case maps to a test; every mutant is killed or a fix task is listed.
+- [x] Every AC and edge case maps to a test; every mutant is killed or a fix task is listed.
 
 **Commit**: `test: author check of the reset legacy`
 
@@ -552,7 +552,7 @@ If `.auto-click-popover` is not a grid, drop `grid-column` and give both lines `
 
 ### Phase 4: UI review
 
-#### T11: UI review of the legacy lines [ ]
+#### T11: UI review of the legacy lines [x]
 
 **Owner**: ui-artist
 **Goal**: The legacy line, its detail and the dialog line read well in the auto click window and the reset dialog (RLD-06).
@@ -571,7 +571,7 @@ If `.auto-click-popover` is not a grid, drop `grid-column` and give both lines `
 **Gate**: `cd game && npm run ui:shots -- resetLegacy`
 **Done when**:
 
-- [ ] `ui-review.html` lists the 6 shots with `APROVADO` or the findings as new tasks.
+- [x] `ui-review.html` lists the 6 shots with `APROVADO` or the findings as new tasks. (ui-artist, `3faf964d`; ticked by test-engineer in T10 as agreed.)
 
 **Commit**: `docs(ui): review the reset legacy lines`
 
@@ -610,3 +610,85 @@ If `.auto-click-popover` is not a grid, drop `grid-column` and give both lines `
 | T9 | e2e | e2e | e2e | ✅ OK |
 | T10 | check | - | e2e + unit runs | ✅ OK |
 | T11 | UI review artifact | none | none | ✅ OK |
+
+---
+
+## Author check
+
+Run on 2026-11-26 by `test-engineer` (T10). Paths: `B` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`, `G` = `game/src/`, `E` = `game/e2e/resetLegacy.spec.js`.
+
+### AC to assertion table
+
+| AC | Spec value | Unit / integration test (`file:line`) | e2e (`E:line`) |
+| --- | --- | --- | --- |
+| Legacy 1 | no legacy, reset at 5 -> `L(5) = 50` | `B service/AccountResetServiceTest.kt:184`; `B domain/ResetLegacyTest.kt:18` | n/a (no player-visible value; the window reads the answer in `E:139`) |
+| Legacy 2 | `L(5)` 50 -> 100 | `B service/AccountResetServiceTest.kt:202`; `B domain/ResetLegacyTest.kt:18` | `E:164` (window reads `Legado: 100% do capítulo 5`) |
+| Legacy 3 | 100 stays 100, 5 crystals paid | `B service/AccountResetServiceTest.kt:212`; `B domain/ResetLegacyTest.kt:27` | n/a |
+| Legacy 4 | completed campaign counts chapter 15 | `B service/AccountResetServiceTest.kt:224` | n/a |
+| Legacy 5 | reset at 10 changes only `L(10)` | `B service/AccountResetServiceTest.kt:233`; `B domain/ResetLegacyTest.kt:32` | n/a |
+| Legacy 6 | refused reset (409 `RESET_LOCKED`, 409 `RESET_CHAPTER_MISMATCH`, 400) leaves the legacy as it was | `B service/AccountResetServiceTest.kt:243`, `:252`; `B adapter/web/AccountResetControllerIT.kt:221` (400, asserts an empty legacy; added by T10) | n/a |
+| Legacy 7 | kept by every later reset, deleted with the user | `B service/AccountResetServiceTest.kt:202`, `:212`; `B adapter/repository/LegacyRepositoryIT.kt:55` (cascade, count 0) | n/a |
+| Legacy 8 | players with `player_resets` rows start with no legacy | `B adapter/repository/LegacyRepositoryIT.kt:74` | n/a |
+| Best 1 | `{5: 100, 10: 50}` -> 50 % of chapter 10 | `B domain/ResetLegacyTest.kt:49`; `B adapter/web/AccountResetControllerIT.kt:322` | `E:92` (`Legado: 50% do capítulo 10`) |
+| Best 2 | `{10: 100, 15: 50}` -> 100 % of chapter 10 | `B domain/ResetLegacyTest.kt:54` | n/a |
+| Best 3 | tie -> the higher chapter (`{1: 100, 2: 50}` -> 2) | `B domain/ResetLegacyTest.kt:64` | n/a |
+| Best 4 | no legacy -> no best | `B domain/ResetLegacyTest.kt:59`; `B adapter/web/AccountResetControllerIT.kt:308` | `E:63` (`Legado: nenhum`) |
+| Best 5 | `GET /account/legacy`: chapters ascending, best, `afterReset {chapter, percent, best}` | `B adapter/web/AccountResetControllerIT.kt:308` (`{3, 50, {3, 50}}`), `:320` (`{12, 50, {12, 50}}`); `B domain/ResetLegacyTest.kt:69` (ascending) | `E:99`, `E:123`, `E:132` (the fake mirrors the payload) |
+| Best 6 | chapter 1 not completed -> `afterReset: null` | `B adapter/web/AccountResetControllerIT.kt:339`; `G domain/campaign/resetLegacy.test.js:97` | `E:139` (after the reset the window has no `Resetar conta`) |
+| Best 7 | `POST /account/reset` answers `legacy` `{chapters [{5, 50}], best {5, 50}, afterReset null}` | `B adapter/web/AccountResetControllerIT.kt:351`; `B service/AccountResetServiceTest.kt:261` | `E:139` |
+| Copper 1 | 50 % of chapter 15: rule 1 354..1062, rule 2 1416..3540, rule 3 5310..12390 | `B domain/ResetLegacyTest.kt:74`; `B service/WalletServiceTest.kt:151`; `B adapter/web/WalletControllerIT.kt:104` | n/a (no coin number is typed in the game, AD-011) |
+| Copper 2 | 100 % of chapter 5, 3 kills of rule 1 credit 3 values inside 34..102 | `B service/WalletServiceTest.kt:214`; `B domain/ResetLegacyTest.kt:83` | n/a |
+| Copper 3 | a changed legacy re-rolls the queues on the next load | `B service/WalletServiceTest.kt:189` | n/a |
+| Copper 4 | no legacy -> today's ranges | `B service/WalletServiceTest.kt:167`; `B domain/ResetLegacyTest.kt:100` | n/a |
+| Copper 5 | allowance 20, one per 1500 ms | `B service/WalletServiceTest.kt:227` | n/a |
+| Copper 6 | a rule above 45 keeps its range | `B domain/ResetLegacyTest.kt:93` | n/a |
+| Copper 7 | the public drop table has no legacy | `B service/WalletServiceTest.kt:239` (see note 1) | n/a |
+| Pieces 1 | chapter 2 boss piece, 50 % of chapter 5, roll 0.2 -> chapter 5 weights (LEGENDARY at 0.97) | `B service/EquipmentRewardsTest.kt:130`; `B domain/ResetLegacyTest.kt:122` | n/a |
+| Pieces 2 | roll 0.5 -> chapter 2 weights (UNCOMMON at 0.97) | `B service/EquipmentRewardsTest.kt:140`; `B domain/ResetLegacyTest.kt:122` | n/a |
+| Pieces 3 | best at or below the chapter, or no legacy: no legacy roll | `B service/EquipmentRewardsTest.kt:150`, `:164`; `B domain/ResetLegacyTest.kt:113` (a `chance` that fails the test when read) | n/a |
+| Pieces 4 | farm piece of chapter 1 with 100 % of chapter 5 -> chapter 5 weights | `B service/EquipmentRewardsTest.kt:172` | n/a |
+| Pieces 5 | drop rates 0.5 / 1.0 | `B service/EquipmentRewardsTest.kt:182` | n/a |
+| Display 1 | window shows the line and detail above `Resetar conta` (texts of the spec) | `G domain/campaign/resetLegacy.test.js:30`, `:34`, `:40`, `:45`; `G adapters/phaser/views/resetView.test.js:12`, `:23` | `E:63` (order and inside the window by bounding box), `E:82` (`Legado: 100% do capítulo 5` and the full detail) |
+| Display 2 | the dialog shows case A, B or C under the question | `G adapters/phaser/views/resetView.test.js:33`, `:50` | `E:99` (between the question and the buttons), `E:116`, `E:123`, `E:132` |
+| Display 3 | `{}` in chapter 3: `Legado depois do reset: 50% do capítulo 3 (hoje: nenhum).` | `G domain/campaign/resetLegacy.test.js:51` | `E:99` |
+| Display 4 | `{10: 50}` in chapter 5: `Este reset sobe o legado do capítulo 5 para 50%. O melhor legado continua 50% do capítulo 10.` | `G domain/campaign/resetLegacy.test.js:67` | `E:123` |
+| Display 5 | `{5: 100}` in chapter 5: `O legado do capítulo 5 já está em 100%: este reset não muda o seu legado.` | `G domain/campaign/resetLegacy.test.js:77`, `:87` (C before A) | `E:132` |
+| Display 6 | a successful reset shows the legacy of the answer at once, no reload | `G application/accountReset/accountReset.test.js:38`, `:49`; `G application/accountReset/resetLegacy.test.js:72` | `E:139` (`Legado: 50% do capítulo 5`, no `GET /account/legacy` between the confirm and the window), `E:164` |
+| Display 7 | `GET /account/legacy` fails or 404: no line, no dialog line, the reset works | `G application/accountReset/resetLegacy.test.js:23`, `:32`, `:40` | `E:174` (counts 0 lines, the `+3 cristais` notice and chapter 1 after the reset) |
+| CSS (Display 1, 2) | `.legacy-line` 13px / 700 / `--ink-900` `rgb(42, 26, 16)`; `.legacy-detail` 12px / 400 / line-height 16.2px / `--ink-600` `rgb(107, 74, 43)`; `.reset-legacy` 15px / 700 / line-height 21px / `--ember-800` `rgb(138, 53, 16)`; Figtree | n/a | `E:193` (`toHaveCSS`, also against the computed token) |
+| Edge 1 | reset from chapter 2 with no legacy -> `{2: 50}`; chapter 1 phase kill 4..12 | `B service/AccountResetServiceTest.kt:193`; `B domain/ResetLegacyTest.kt:156` (added by T10) | n/a |
+| Edge 2 | best 50 % of chapter 2, chapter 8 rule 22 -> 258..774 | `B domain/ResetLegacyTest.kt:88` | n/a |
+| Edge 3 | two resets at once: the second is refused, the legacy rises once | `B adapter/web/AccountResetControllerIT.kt:243` (asserts `{3: 50}` after the race; added by T10) | n/a |
+| Edge 4 | a reset that makes chapter `r` the best re-rolls the queues | `B service/WalletServiceTest.kt:189` | n/a |
+| Edge 5 | deleting the user deletes its rows | `B adapter/repository/LegacyRepositoryIT.kt:55` | n/a |
+| Legacy Table | the 7 table rows (ranges of rules 1 to 3 and the chapter 1 copper 780, 3 510, 6 630, 37 830, 69 030, 75 270, 137 670) | `B domain/ResetLegacyTest.kt:133` (added by T10) | n/a |
+
+Gaps closed by T10 (tests only): Legacy 6 (the 400 case did not look at the legacy), Edge 1 (chapter 2 had no test), Edge 3 (the race test did not read the legacy), and the Legacy Table (only 3 of its values were pinned). Tests added: 4 backend cases (`ResetLegacyTest` 3, `AccountResetServiceTest` 1) and 2 assertions in `AccountResetControllerIT`; 11 e2e cases in `E` (the 8 of T9 plus the best of two chapters, case A with a best, and a second reset).
+
+### Mutants (`node scripts/sensor.mjs`, scratch file `mutants.json`)
+
+| Mutant | Fault | Command | Result |
+| --- | --- | --- | --- |
+| M1 | `afterReset` without the cap 100 (`ResetLegacy.kt`) | `ResetLegacyTest` | killed |
+| M2 | `best()` by percent only, no `coinFactor` (`ResetLegacy.kt`) | `ResetLegacyTest` | killed |
+| M3 | `boost` legacy rule kind `id % 3` instead of `(id - 1) % 3` (`ResetLegacy.kt`) | `ResetLegacyTest` | killed |
+| M4 | `rarityChapter` reads `chance` when `best <= chapter` (`ResetLegacy.kt`) | `ResetLegacyTest` | killed |
+| M5 | the reset saves the legacy before the `fromChapter` check (`AccountResetService.kt`) | `AccountResetServiceTest` | killed |
+| M6 | `resetLegacyText` chooses case A before case C (`resetLegacy.js`) | `resetLegacy.test.js` | killed |
+| M7 | the wallet ignores the legacy (`WalletService.kt`) | `WalletServiceTest` | killed |
+| M8 | the legacy roll of a piece is fixed at 0.99 (`EquipmentRewards.kt`) | `EquipmentRewardsTest` | killed |
+| M9 | `.legacy-line` 13px -> 14px (`style.css`) | `resetLegacy.spec.js` (fonts and colours) | killed |
+| M10 | `.reset-legacy` colour `--ember-800` -> `--ink-900` (`style.css`) | `resetLegacy.spec.js` (fonts and colours) | killed |
+| M11 | the reset answer's legacy is not adopted (`accountReset.js`) | `resetLegacy.spec.js` (at once) | killed |
+| M12 | the legacy lines drawn below `Resetar conta` (`ClickerGame.js`) | `resetLegacy.spec.js` (reset hint) | killed |
+
+12 mutants, 12 killed, 0 survived, isolation ok. A first run used a command (`gradlew.bat` without `.\`) that cmd.exe could not find, so every backend mutant "died" by a missing command; it was discarded, each backend mutant was compiled to prove it is valid and the whole group was run again with `.\gradlew.bat`.
+
+### Suites after the last change
+
+Backend `./gradlew ktlintCheck test`: 1356 passed, 0 failed. Game `npm test` (Vitest): 2373 passed, 0 failed. `e2e/resetLegacy.spec.js` 11 passed, `e2e/accountReset.spec.js` 2 passed.
+
+### Notes and fix tasks
+
+1. Copper AC 7 and the spec Facts name `GET /wallet/drop-table`, which does not exist: `WalletController` has no such route. The plain table is `GetDropTableUseCase.dropTable()` (`WalletService.kt:37`), pinned at the service (`WalletServiceTest.kt:239`). No production gap (nothing public shows a boosted table); the spec wording should name the use case. Owner: `product-owner`, a wording fix only.
+2. Fix tasks for production code: none.

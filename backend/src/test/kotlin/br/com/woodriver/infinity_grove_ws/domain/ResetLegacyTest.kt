@@ -128,4 +128,40 @@ class ResetLegacyTest {
         assertEquals(2, high)
         assertEquals(2, reads)
     }
+
+    @Test
+    fun `the legacy table of the spec boosts the chapter 1 rules and pays its chapter 1 copper`() {
+        //  best legacy: phase range, miniboss range, boss range, expected copper of 50 phase kills, 10 minibosses and the boss
+        val rows =
+            listOf(
+                Triple(legacy(2 to 50), listOf(4..12, 16..40, 60..140), 780),
+                Triple(legacy(5 to 50), listOf(18..54, 72..180, 270..630), 3510),
+                Triple(legacy(5 to 100), listOf(34..102, 136..340, 510..1190), 6630),
+                Triple(legacy(10 to 50), listOf(194..582, 776..1940, 2910..6790), 37830),
+                Triple(legacy(15 to 50), listOf(354..1062, 1416..3540, 5310..12390), 69030),
+                Triple(legacy(10 to 100), listOf(386..1158, 1544..3860, 5790..13510), 75270),
+                Triple(legacy(15 to 100), listOf(706..2118, 2824..7060, 10590..24710), 137670),
+            )
+
+        rows.forEach { (legacy, ranges, copper) ->
+            val boosted = legacy.boost(table)
+
+            assertEquals(ranges, listOf(1, 2, 3).map { boosted.range(it) }, "ranges of ${legacy.percents}")
+            val expected = ranges.zip(listOf(50, 10, 1)).sumOf { (range, kills) -> kills * (range.first + range.last) / 2 }
+            assertEquals(copper, expected, "chapter 1 copper of ${legacy.percents}")
+        }
+    }
+
+    @Test
+    fun `a reset at chapter 2 with no legacy leaves chapter 2 at 50 and a chapter 1 phase kill drops 4 to 12`() {
+        val after = legacy().afterReset(2)
+
+        assertEquals(mapOf(2 to 50), after.percents)
+        assertEquals(4..12, after.boost(table).range(1))
+    }
+
+    @Test
+    fun `the best of 5 at 100 and 10 at 50 raises the copper of chapter 1 by the chapter 10 share and not the chapter 5 one`() {
+        assertEquals(194..582, legacy(5 to 100, 10 to 50).boost(table).range(1))
+    }
 }

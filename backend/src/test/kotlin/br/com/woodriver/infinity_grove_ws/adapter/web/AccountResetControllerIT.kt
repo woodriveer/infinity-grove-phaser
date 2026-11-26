@@ -225,6 +225,7 @@ class AccountResetControllerIT : IntegrationTestBase() {
         reset("3").statusCode(400).body("code", equalTo("INVALID_RESET_REQUEST"))
 
         assertEquals(3, progress().chapter)
+        assertEquals(emptyMap(), legacyRepository.find("yan").percents)
     }
 
     @Test
@@ -256,6 +257,7 @@ class AccountResetControllerIT : IntegrationTestBase() {
         assertEquals("RESET_CHAPTER_MISMATCH", answers.single { it.statusCode == 409 }.path<String>("code"))
         assertEquals(3L, crystalRepository.balance("yan"))
         assertEquals(1, resetRepository.count("yan"))
+        assertEquals(mapOf(3 to 50), legacyRepository.find("yan").percents)
     }
 
     @Test
