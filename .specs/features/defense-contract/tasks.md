@@ -81,7 +81,7 @@ T9 → T10
 
 ### Phase 1: Release 1, expand
 
-#### T1: V19 adds the defense column and the trigger that bridges the old backend [ ]
+#### T1: V19 adds the defense column and the trigger that bridges the old backend [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The `enemies` table gets `defense`, filled for every row and every insert of either backend, with its check and unique key (DEF-01; spec One defense column AC 1 to 8, Edge 1, 2, 4).
@@ -155,8 +155,8 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The backend suite passes, including `SchemaValidationIT`, `EnemyRepositoryIT`, `ChapterRepositoryIT`, `SchemaConstraintsIT`, `EarlyGameRebalanceMigrationIT` (they still use the old columns, which the trigger keeps filled).
-- [ ] The commit touches exactly the migration, the 2 test files and this file; no Kotlin file under `backend/src/main` changes.
+- [x] The backend suite passes, including `SchemaValidationIT`, `EnemyRepositoryIT`, `ChapterRepositoryIT`, `SchemaConstraintsIT`, `EarlyGameRebalanceMigrationIT` (they still use the old columns, which the trigger keeps filled).
+- [x] The commit touches exactly the migration, the 2 test files and this file; no Kotlin file under `backend/src/main` changes.
 - [ ] After the push, the watcher deploys it (`node -e "console.log(JSON.parse(require('fs').readFileSync('.deploy-state','utf8')).active.commit)"` prints this commit or a later one within 5 minutes), or the deploy is reported pending with the reason.
 
 **Commit**: `feat(backend): add the enemy defense column with a bridge for the previous backend`
