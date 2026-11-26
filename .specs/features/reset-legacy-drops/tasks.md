@@ -259,7 +259,7 @@ data class LegacyResponse(val chapters: List<LegacyChapterResponse>, val best: L
 
 ---
 
-#### T4: Wallet queues carry the copper legacy [ ]
+#### T4: Wallet queues carry the copper legacy [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The wallet of a player with a legacy rolls and credits from the boosted ranges; the public drop table stays plain (RLD-04; spec Copper AC 1 to 7).

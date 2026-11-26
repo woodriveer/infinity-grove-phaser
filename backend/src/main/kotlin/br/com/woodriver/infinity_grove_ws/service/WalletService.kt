@@ -6,6 +6,7 @@ import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import br.com.woodriver.infinity_grove_ws.port.DropRollerPort
 import br.com.woodriver.infinity_grove_ws.port.DropRuleRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.LegacyRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.WalletRepositoryPort
 import br.com.woodriver.infinity_grove_ws.usecase.GetDropTableUseCase
@@ -24,12 +25,13 @@ class WalletService(
     private val dropRules: DropRuleRepositoryPort,
     private val dropRoller: DropRollerPort,
     private val clock: Clock,
+    private val legacyRepository: LegacyRepositoryPort,
 ) : GetWalletUseCase,
     SyncKillsUseCase,
     GetDropTableUseCase {
     override fun get(username: String): Wallet {
         logger.info("Getting wallet username={}", username)
-        return walletRepository.save(load(username, dropRules.findAll()))
+        return walletRepository.save(load(username, tableOf(username)))
     }
 
     override fun dropTable() = dropRules.findAll()
@@ -39,11 +41,14 @@ class WalletService(
         kills: Map<Int, Int>,
     ): SyncResult {
         logger.info("Syncing kills username={}", username)
-        val table = dropRules.findAll()
+        val table = tableOf(username)
         val result = load(username, table).credit(kills, table, dropRoller, clock.millis())
         walletRepository.save(result.wallet)
         return result
     }
+
+    /** The drop table the player rolls and is credited from: the seeded ranges plus their best reset legacy (spec reset-legacy-drops). */
+    private fun tableOf(username: String): DropTable = legacyRepository.find(username).boost(dropRules.findAll())
 
     /** Returns the locked wallet with its queues up to date, creating it first when the player has none. */
     private fun load(

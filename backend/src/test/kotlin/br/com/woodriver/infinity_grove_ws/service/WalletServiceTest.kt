@@ -1,12 +1,15 @@
 package br.com.woodriver.infinity_grove_ws.service
 
 import br.com.woodriver.infinity_grove_ws.InMemoryDropRuleRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryLegacyRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
 import br.com.woodriver.infinity_grove_ws.MutableClock
 import br.com.woodriver.infinity_grove_ws.SequenceDropRoller
+import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.DropRule
 import br.com.woodriver.infinity_grove_ws.domain.DropTable
+import br.com.woodriver.infinity_grove_ws.domain.ResetLegacy
 import br.com.woodriver.infinity_grove_ws.domain.UnknownDropRuleException
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
@@ -24,7 +27,8 @@ class WalletServiceTest {
     private val table = DropTable(listOf(DropRule(1, 1, 5, 1500)))
     private val rules = InMemoryDropRuleRepository(DropRule(1, 1, 5, 1500))
     private val roller = SequenceDropRoller(1, 2, 3, 4, 5)
-    private val service = WalletService(wallets, users, rules, roller, clock)
+    private val legacies = InMemoryLegacyRepository()
+    private val service = WalletService(wallets, users, rules, roller, clock, legacies)
 
     /** Rolls the top of each range, so a queue shows which rule rolled it. */
     private val topRoller =
@@ -34,7 +38,7 @@ class WalletServiceTest {
                 max: Int,
             ) = max
         }
-    private val tuned = WalletService(wallets, users, rules, topRoller, clock)
+    private val tuned = WalletService(wallets, users, rules, topRoller, clock, legacies)
 
     private fun existingUser(name: String = "yan") = users.save(User(name, "hash", 1L, 1L))
 
@@ -124,6 +128,118 @@ class WalletServiceTest {
         rules.save(DropRule(2, 5, 15, 1500))
 
         assertEquals(listOf(DropRule(1, 1, 5, 1500), DropRule(2, 5, 15, 1500)), service.dropTable().rules)
+    }
+
+    /** Rolls the bottom of each range. */
+    private val bottomRoller =
+        object : DropRollerPort {
+            override fun roll(
+                min: Int,
+                max: Int,
+            ) = min
+        }
+
+    private val seeded = (1..15).flatMap(ChapterDefinition::dropRules)
+
+    /** A service over the seeded drop table of the 15 chapters, with its own wallets, rolling with [dropRoller]. */
+    private fun seededService(dropRoller: DropRollerPort) =
+        WalletService(InMemoryWalletRepository(), users, InMemoryDropRuleRepository(*seeded.toTypedArray()), dropRoller, clock, legacies)
+
+    private fun legacyOf(vararg percents: Pair<Int, Int>) = legacies.save(ResetLegacy("yan", mapOf(*percents)))
+
+    @Test
+    fun `a player with 50 percent of chapter 15 gets queues of rule 1 inside 354 to 1062`() {
+        existingUser()
+        legacyOf(15 to 50)
+
+        val bottom = seededService(bottomRoller).get("yan")
+        val top = seededService(topRoller).get("yan")
+
+        assertEquals(List(20) { 354 }, bottom.queues.getValue(1).queue)
+        assertEquals(List(20) { 1062 }, top.queues.getValue(1).queue)
+        assertEquals(List(20) { 1416 }, bottom.queues.getValue(2).queue)
+        assertEquals(List(20) { 3540 }, top.queues.getValue(2).queue)
+        assertEquals(List(20) { 5310 }, bottom.queues.getValue(3).queue)
+        assertEquals(List(20) { 12390 }, top.queues.getValue(3).queue)
+    }
+
+    @Test
+    fun `a player with no legacy keeps today's ranges`() {
+        existingUser()
+
+        assertEquals(
+            List(20) { 2 },
+            seededService(bottomRoller)
+                .get("yan")
+                .queues
+                .getValue(1)
+                .queue,
+        )
+        assertEquals(
+            List(20) { 6 },
+            seededService(topRoller)
+                .get("yan")
+                .queues
+                .getValue(1)
+                .queue,
+        )
+    }
+
+    @Test
+    fun `a legacy raised after the wallet was opened re-rolls the queues on the next get`() {
+        existingUser()
+        val seededTop = seededService(topRoller)
+        assertEquals(
+            List(20) { 6 },
+            seededTop
+                .get("yan")
+                .queues
+                .getValue(1)
+                .queue,
+        )
+
+        legacyOf(5 to 100)
+
+        assertEquals(
+            List(20) { 102 },
+            seededTop
+                .get("yan")
+                .queues
+                .getValue(1)
+                .queue,
+        )
+    }
+
+    @Test
+    fun `a sync of 3 kills of rule 1 with 100 percent of chapter 5 credits 3 values inside 34 to 102`() {
+        existingUser()
+        legacyOf(5 to 100)
+
+        val bottom = seededService(bottomRoller).sync("yan", mapOf(1 to 3))
+        val top = seededService(topRoller).sync("yan", mapOf(1 to 3))
+
+        assertEquals(mapOf(1 to 3), bottom.accepted)
+        assertEquals(3 * 34L, bottom.wallet.copper)
+        assertEquals(3 * 102L, top.wallet.copper)
+    }
+
+    @Test
+    fun `the allowance stays 20 and refills one per 1500 ms with a legacy`() {
+        existingUser()
+        legacyOf(15 to 50)
+        val boosted = seededService(bottomRoller)
+
+        assertEquals(mapOf(1 to 20), boosted.sync("yan", mapOf(1 to 500)).accepted)
+        clock.millis += 3_000
+
+        assertEquals(mapOf(1 to 2), boosted.sync("yan", mapOf(1 to 10)).accepted)
+    }
+
+    @Test
+    fun `the drop table answers the plain ranges with a legacy`() {
+        legacyOf(15 to 50)
+
+        assertEquals(seeded, seededService(bottomRoller).dropTable().rules)
     }
 
     @Test

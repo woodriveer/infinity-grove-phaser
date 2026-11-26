@@ -11,12 +11,17 @@ import io.restassured.specification.RequestSpecification
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.jdbc.core.JdbcTemplate
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class WalletControllerIT : IntegrationTestBase() {
+    @Autowired
+    private lateinit var jdbc: JdbcTemplate
+
     private fun user(name: String = "yan") = jpaUserRepository.save(UserEntity(name, "hash", 1L, 1L))
 
     private fun asUser(name: String = "yan"): RequestSpecification = given().header("Authorization", bearerToken(name))
@@ -93,6 +98,17 @@ class WalletControllerIT : IntegrationTestBase() {
             .body("wallet.copper", equalTo(before.take(2).sum()))
         assertTrue(before.take(2).all { it in seedRange(2) }, "credited values ${before.take(2)} are inside ${seedRange(2)}")
         assertEquals(before.drop(2), response.path<List<Int>>("drops.2").take(18))
+    }
+
+    @Test
+    fun `GET wallet of a player with legacy 15 at 50 answers drops 1 all inside 354 to 1062`() {
+        user()
+        jdbc.update("insert into player_legacy (username, chapter, percent) values ('yan', 15, 50)")
+
+        val queue = drops(getWallet())
+
+        assertEquals(20, queue.size)
+        assertTrue(queue.all { it in 354..1062 }, "queue $queue is inside 354..1062")
     }
 
     @Test
