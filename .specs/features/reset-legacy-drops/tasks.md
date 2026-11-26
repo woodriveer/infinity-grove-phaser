@@ -494,7 +494,7 @@ If `.auto-click-popover` is not a grid, drop `grid-column` and give both lines `
 
 ### Phase 3: Tests in the browser and author check
 
-#### T9: The legacy in the browser [ ]
+#### T9: The legacy in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: The legacy line, the three dialog cases and the update after a reset work in the browser, and an old backend shows nothing (RLD-06; spec Display AC 1 to 7).
@@ -522,7 +522,7 @@ If `.auto-click-popover` is not a grid, drop `grid-column` and give both lines `
 **Gate**: `cd game && npm test && npx playwright test e2e/resetLegacy.spec.js e2e/accountReset.spec.js`
 **Done when**:
 
-- [ ] The 8 cases pass; `accountReset.spec.js` passes.
+- [x] The 8 cases pass; `accountReset.spec.js` passes.
 
 **Commit**: `test(game): pin the reset legacy in the browser`
 

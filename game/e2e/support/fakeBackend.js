@@ -260,6 +260,8 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  talentPoints {name: n} (points available at the start, on top of the ones the starting levels cost; first clears pay more) and
 //  autoClick {name: { level, crystals }} (default level 0 and 0 crystals; the upgrade follows AutoClickController) and
 //  lastChapter (the last chapter a cleared chapter boss opens, default 1: the boss of that chapter completes the campaign).
+//  legacy {name: {chapter: percent}} (the legacy of the account resets, default none; GET /account/legacy and the reset answer follow reset-legacy-drops, a reset raises its
+//  reward chapter by 50 up to 100) and legacyEndpoint (false answers 404 to GET /account/legacy and leaves `legacy` out of the reset answer, like a backend without the feature).
 //  team {name: { boughtSlots, allies: [ 4 hero ids or null ] }} (starting teams, default no slot bought and no ally; the team is unlocked once the player has cleared chapter 5) and
 //  holdTeam() -> release() holds PUT /team, POST /team/slots and PUT /leader, failNextTeamRequest({ status = 500, code }) makes the next one of them answer that problem, teamOf(name) reads a stored team.
 //  gifts {name: true | 'fail'} (POST /gifts/claim of GiftController: true grants GIFT_STAFF on the first claim of that player and { granted: false } after, 'fail' answers 500 on every claim,
@@ -270,7 +272,8 @@ export async function mockBackend (page, {
     users = {}, delayMs = 0, accessTtlMs = DAY_MS, refreshTtlMs = 30 * DAY_MS, wallets: startingWallets = {}, drops = DEFAULT_DROPS, progress: startingProgress = {}, definition = seededDefinition(),
     chapterDefinitions = {},
     cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = [],
-    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1, healthDelayMs = 0, team: startingTeam = {}, gifts: startingGifts = {}
+    talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1, healthDelayMs = 0, team: startingTeam = {}, gifts: startingGifts = {},
+    legacy: startingLegacy = {}, legacyEndpoint = true
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -445,12 +448,50 @@ export async function mockBackend (page, {
         return route.fulfill(problem(404, 'Not found'));
     };
 
+    //  The legacy of the account resets (spec reset-legacy-drops): a percent (50 or 100) per chapter. The best is the chapter with the largest
+    //  percent x coinFactor, the higher chapter on a tie; coinFactor(c) = 2^(c - 1) up to chapter 8, then 128 + 32 (c - 8) (AD-019)
+    const legacies = new Map();
+    const legacyOf = (username) => {
+        if (!legacies.has(username)) {
+            legacies.set(username, { ...startingLegacy[username] });
+        }
+
+        return legacies.get(username);
+    };
+    const coinFactor = (chapter) => (chapter <= 8 ? 2 ** (chapter - 1) : 128 + 32 * (chapter - 8));
+    const bestOf = (percents) => Object.entries(percents)
+        .map(([ chapter, percent ]) => ({ chapter: Number(chapter), percent }))
+        .reduce((best, entry) => {
+            if (best === null) { return entry; }
+
+            const score = entry.percent * coinFactor(entry.chapter);
+            const bestScore = best.percent * coinFactor(best.chapter);
+
+            return score > bestScore || (score === bestScore && entry.chapter > best.chapter) ? entry : best;
+        }, null);
+    //  { chapters, best, afterReset } as GET /account/legacy answers it: afterReset is null while the reset is closed (chapter 1, not completed)
+    const legacyView = (percents, progress) => {
+        const chapter = progress.chapter ?? 1;
+        const reward = progress.completed ? 15 : (chapter >= 2 ? Math.min(chapter, 15) : null);
+        const after = reward === null ? null : { ...percents, [reward]: Math.min(100, (percents[reward] ?? 0) + 50) };
+
+        return {
+            chapters: Object.entries(percents).map(([ number, percent ]) => ({ chapter: Number(number), percent })).sort((a, b) => a.chapter - b.chapter),
+            best: bestOf(percents),
+            afterReset: reward === null ? null : { chapter: reward, percent: after[reward], best: bestOf(after) }
+        };
+    };
+
     //  Account reset contract (AccountResetController): from chapter 2 the campaign goes back to its start, the talents and their points
     //  are wiped, and the chapter left (up to 15) is paid in crystals; the crystals and the auto click level stay
     const handleAccountReset = (route, method, path, body, now) => {
         const username = authenticated(route, now);
 
         if (!username) { return null; }
+
+        if (method === 'GET' && path === '/account/legacy' && legacyEndpoint) {
+            return route.fulfill({ json: legacyView(legacyOf(username), progressOf(username)) });
+        }
 
         if (method !== 'POST' || path !== '/account/reset') { return route.fulfill(problem(404, 'Not found')); }
 
@@ -469,7 +510,9 @@ export async function mockBackend (page, {
 
         const reward = progress.completed ? 15 : Math.min(chapter, 15);
         const state = autoClickOf(username);
+        const percents = legacyOf(username);
 
+        percents[reward] = Math.min(100, (percents[reward] ?? 0) + 50);
         state.crystals += reward;
         state.resets = (state.resets ?? 0) + 1;
         progresses.set(username, { ...startOfCampaign(), chapter: 1 });
@@ -477,7 +520,9 @@ export async function mockBackend (page, {
         earnedByUser.set(username, 0);
         clearedByUser.set(username, new Set());
 
-        return route.fulfill({ json: { reward, crystals: state.crystals, resets: state.resets, progress: progressBody(progressOf(username)) } });
+        const answer = { reward, crystals: state.crystals, resets: state.resets, progress: progressBody(progressOf(username)) };
+
+        return route.fulfill({ json: legacyEndpoint ? { ...answer, legacy: legacyView(percents, progressOf(username)) } : answer });
     };
 
     const handleTalents = (route, method, path, body, now) => {
