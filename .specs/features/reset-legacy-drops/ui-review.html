@@ -1,0 +1,231 @@
+<!doctype html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Linhas do legado de reset</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Linhas do legado de reset</h1>
+                <div class="meta">
+                    <code>.specs/features/reset-legacy-drops</code> · commits <code>171f5184</code> · 2026-11-26 · local (Playwright, GET /account/legacy simulado)
+                </div>
+            </div>
+            <span class="chip verdict ok">APROVADO</span>
+        </div>
+        <p style="margin-top:16px">A linha "Legado: …" com seu detalhe na janela do auto clique e a linha do diálogo de reset (casos A, B e C) seguem a spec e o design: texto inteiro, sem corte, hierarquia clara (negrito escuro na linha, tom mais claro no detalhe, brasa em negrito no diálogo) e mesma paleta do jogo. Sem legado, a janela mostra "Legado: nenhum" com a dica; com o endpoint fora do ar, nada aparece.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">8</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">8</div><div class="l">capturas (desktop)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Linha "Legado: nenhum" / "Legado: &lt;p&gt;% do capítulo &lt;c&gt;" e detalhe na janela, acima de Resetar conta <code>spec § Player-Facing Texts</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Textos do detalhe com e sem legado, exatamente como na spec <code>spec § Player-Facing Texts</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Linha do diálogo nos casos A, B e C com os textos da spec <code>RLD-06 AC 3 a 5</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Linha do diálogo em 15 px brasa (--ember-800) entre a pergunta e os botões, dentro do cartão de 420 px <code>design § Layout</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Janela mostra o legado da resposta do reset sem recarregar <code>RLD-06 AC 6</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Sem linha de legado quando GET /account/legacy responde 404 <code>RLD-06 AC 7</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Todo o texto novo em português <code>AD-007</code></span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>Janela do auto clique e diálogo de reset</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/01-window-no-legacy-desktop.png" target="_blank"><img src="ui-review/01-window-no-legacy-desktop.png" alt="Janela do auto clique, sem legado" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Janela do auto clique, sem legado</span>
+                        <span class="d">Capítulo 3, sem legado: "Legado: nenhum" e a dica em 12 px acima de Resetar conta; sem corte, dentro dos 240 px.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/02-window-legacy-100-ch5-desktop.png" target="_blank"><img src="ui-review/02-window-legacy-100-ch5-desktop.png" alt="Janela com legado de 100% do capítulo 5" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Janela com legado de 100% do capítulo 5</span>
+                        <span class="d">Linha em negrito e detalhe em 4 linhas, em cor mais clara; o botão Resetar conta continua inteiro e visível.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/02b-window-legacy-popover-desktop.png" target="_blank"><img src="ui-review/02b-window-legacy-popover-desktop.png" alt="Janela com legado, recorte" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Janela com legado, recorte</span>
+                        <span class="d">Recorte da janela para ver o contraste da linha (tinta escura) e do detalhe (tinta média) sobre o pergaminho.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/03-dialog-case-a-none-desktop.png" target="_blank"><img src="ui-review/03-dialog-case-a-none-desktop.png" alt="Diálogo, caso A (sem legado hoje)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Diálogo, caso A (sem legado hoje)</span>
+                        <span class="d">"Legado depois do reset: 50% do capítulo 3 (hoje: nenhum)." em 15 px brasa, entre a pergunta e os botões.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/04-dialog-case-b-desktop.png" target="_blank"><img src="ui-review/04-dialog-case-b-desktop.png" alt="Diálogo, caso B" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Diálogo, caso B</span>
+                        <span class="d">Duas linhas, sem corte: sobe o capítulo 5 para 50% e o melhor continua 50% do capítulo 10.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/05-dialog-case-c-desktop.png" target="_blank"><img src="ui-review/05-dialog-case-c-desktop.png" alt="Diálogo, caso C (capítulo já em 100%)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Diálogo, caso C (capítulo já em 100%)</span>
+                        <span class="d">"O legado do capítulo 5 já está em 100%: este reset não muda o seu legado."</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/06-window-after-reset-desktop.png" target="_blank"><img src="ui-review/06-window-after-reset-desktop.png" alt="Janela depois do reset" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Janela depois do reset</span>
+                        <span class="d">Sem recarregar: linha "Legado: 50% do capítulo 3" e detalhe atualizados; aviso "+3 cristais" visível.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/07-window-no-endpoint-desktop.png" target="_blank"><img src="ui-review/07-window-no-endpoint-desktop.png" alt="Janela com o endpoint fora do ar (404)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Janela com o endpoint fora do ar (404)</span>
+                        <span class="d">Nenhuma linha de legado; Resetar conta continua como antes.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <p class="empty">Nenhum achado.</p>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>O detalhe com legado ocupa 4 linhas e deixa a janela mais alta (cresce para cima, sem tocar o botão do auto clique); se vierem mais linhas, vale encurtar o texto.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <p class="empty">Nenhum recurso faltando nas execuções do Playwright (imagens carregadas; o console não foi lido à parte). GET /account/legacy e a resposta do reset foram simulados no arquivo de capturas, pois o fake backend não tem a rota.</p>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-26</footer>
+</main>
+</body>
+</html>
