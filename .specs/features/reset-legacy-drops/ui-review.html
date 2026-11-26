@@ -108,12 +108,12 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
             <div>
                 <h1>Linhas do legado de reset</h1>
                 <div class="meta">
-                    <code>.specs/features/reset-legacy-drops</code> · commits <code>171f5184</code> · 2026-11-26 · local (Playwright, GET /account/legacy simulado)
+                    <code>.specs/features/reset-legacy-drops</code> · commits <code>171f5184</code>, <code>e82584e5</code> (T12) · 2026-11-26 · local (Playwright, GET /account/legacy simulado)
                 </div>
             </div>
             <span class="chip verdict ok">APROVADO</span>
         </div>
-        <p style="margin-top:16px">A linha "Legado: …" com seu detalhe na janela do auto clique e a linha do diálogo de reset (casos A, B e C) seguem a spec e o design: texto inteiro, sem corte, hierarquia clara (negrito escuro na linha, tom mais claro no detalhe, brasa em negrito no diálogo) e mesma paleta do jogo. Sem legado, a janela mostra "Legado: nenhum" com a dica; com o endpoint fora do ar, nada aparece.</p>
+        <p style="margin-top:16px">Revisão refeita depois do T12 (<code>e82584e5</code>), que tirou a linha de detalhe da janela do auto clique: agora a janela mostra só a linha "Legado: …" (13 px, negrito, tinta escura), e o detalhe virou o tooltip (<code>title</code>) da linha. A linha cabe inteira nos 240 px (a mais longa, "Legado: 100% do capítulo 5", ocupa cerca de 150 px), tem o mesmo ritmo de espaçamento das linhas vizinhas e a janela, mais baixa, fica abaixo do centro do monstro. O diálogo de reset (casos A, B e C) não mudou. Sem legado, a janela mostra "Legado: nenhum"; com o endpoint fora do ar, nada aparece.</p>
         <div class="stats">
             <div class="stat"><div class="n">8</div><div class="l">telas e estados verificados</div></div>
             <div class="stat"><div class="n">8</div><div class="l">capturas (desktop)</div></div>
@@ -125,8 +125,8 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
     <section class="panel">
         <h2>Fidelidade à spec</h2>
         <ul class="checks">
-            <li class="yes"><span class="mark">✓</span><span>Linha "Legado: nenhum" / "Legado: &lt;p&gt;% do capítulo &lt;c&gt;" e detalhe na janela, acima de Resetar conta <code>spec § Player-Facing Texts</code></span></li>
-            <li class="yes"><span class="mark">✓</span><span>Textos do detalhe com e sem legado, exatamente como na spec <code>spec § Player-Facing Texts</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Linha "Legado: nenhum" / "Legado: &lt;p&gt;% do capítulo &lt;c&gt;" na janela, acima de Resetar conta <code>spec § Player-Facing Texts</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Detalhe com e sem legado fora da janela, só como tooltip (<code>title</code>) da linha, por decisão do dono em 2026-11-26 (T12); o texto do tooltip segue a spec <code>spec § Player-Facing Texts</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Linha do diálogo nos casos A, B e C com os textos da spec <code>RLD-06 AC 3 a 5</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Linha do diálogo em 15 px brasa (--ember-800) entre a pergunta e os botões, dentro do cartão de 420 px <code>design § Layout</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Janela mostra o legado da resposta do reset sem recarregar <code>RLD-06 AC 6</code></span></li>
@@ -144,7 +144,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <a href="ui-review/01-window-no-legacy-desktop.png" target="_blank"><img src="ui-review/01-window-no-legacy-desktop.png" alt="Janela do auto clique, sem legado" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Janela do auto clique, sem legado</span>
-                        <span class="d">Capítulo 3, sem legado: "Legado: nenhum" e a dica em 12 px acima de Resetar conta; sem corte, dentro dos 240 px.</span>
+                        <span class="d">Capítulo 3, sem legado: só a linha "Legado: nenhum" acima de Resetar conta, sem linha de detalhe; cabe nos 240 px e a janela, mais baixa, deixa o monstro livre.</span>
                         <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
@@ -152,7 +152,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <a href="ui-review/02-window-legacy-100-ch5-desktop.png" target="_blank"><img src="ui-review/02-window-legacy-100-ch5-desktop.png" alt="Janela com legado de 100% do capítulo 5" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Janela com legado de 100% do capítulo 5</span>
-                        <span class="d">Linha em negrito e detalhe em 4 linhas, em cor mais clara; o botão Resetar conta continua inteiro e visível.</span>
+                        <span class="d">Só a linha em negrito, sem detalhe; janela de 192 px de altura, abaixo do centro do monstro; Resetar conta inteiro e visível.</span>
                         <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
@@ -160,7 +160,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <a href="ui-review/02b-window-legacy-popover-desktop.png" target="_blank"><img src="ui-review/02b-window-legacy-popover-desktop.png" alt="Janela com legado, recorte" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Janela com legado, recorte</span>
-                        <span class="d">Recorte da janela para ver o contraste da linha (tinta escura) e do detalhe (tinta média) sobre o pergaminho.</span>
+                        <span class="d">Recorte da janela para ver o contraste da linha (tinta escura) sobre o pergaminho e a sua largura dentro dos 240 px.</span>
                         <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
@@ -192,7 +192,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <a href="ui-review/06-window-after-reset-desktop.png" target="_blank"><img src="ui-review/06-window-after-reset-desktop.png" alt="Janela depois do reset" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Janela depois do reset</span>
-                        <span class="d">Sem recarregar: linha "Legado: 50% do capítulo 3" e detalhe atualizados; aviso "+3 cristais" visível.</span>
+                        <span class="d">Sem recarregar: linha "Legado: 50% do capítulo 3" atualizada; aviso "+3 cristais" visível; sem o botão Resetar conta (capítulo 1), a janela fica ainda mais baixa.</span>
                         <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
@@ -200,7 +200,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <a href="ui-review/07-window-no-endpoint-desktop.png" target="_blank"><img src="ui-review/07-window-no-endpoint-desktop.png" alt="Janela com o endpoint fora do ar (404)" loading="lazy"></a>
                     <figcaption>
                         <span class="t">Janela com o endpoint fora do ar (404)</span>
-                        <span class="d">Nenhuma linha de legado; Resetar conta continua como antes.</span>
+                        <span class="d">Nenhuma linha de legado; Resetar conta continua como antes (recaptura depois do T12).</span>
                         <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
@@ -216,7 +216,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
     <section class="panel">
         <h2>Sugestões</h2>
         <ul class="checks">
-            <li><span class="mark">✦</span><span>O detalhe com legado ocupa 4 linhas e deixa a janela mais alta (cresce para cima, sem tocar o botão do auto clique); se vierem mais linhas, vale encurtar o texto.</span></li>
+            <li><span class="mark">✦</span><span>Com o detalhe só no tooltip, quem joga com o mouse o descobre ao passar sobre a linha, mas nada indica que ele existe; um cursor de ajuda (<code>cursor: help</code>) na linha deixaria isso discreto e claro. Não bloqueia.</span></li>
         </ul>
     </section>
 
