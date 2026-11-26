@@ -157,7 +157,7 @@ data class ResetLegacy(
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] Every case passes; every other backend test passes.
+- [x] Every case passes; every other backend test passes.
 
 **Commit**: `feat(backend): add the reset legacy rules`
 
@@ -217,7 +217,7 @@ interface LegacyRepositoryPort {
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 6 cases and the compatibility cases pass; `SchemaValidationIT` passes.
+- [x] The 6 cases and the compatibility cases pass; `SchemaValidationIT` passes.
 
 **Commit**: `feat(backend): store the reset legacy`
 
@@ -257,7 +257,7 @@ data class LegacyResponse(val chapters: List<LegacyChapterResponse>, val best: L
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 13 new cases pass; every existing reset test passes unchanged except the constructor wiring.
+- [x] The 13 new cases pass; every existing reset test passes unchanged except the constructor wiring.
 
 **Deviation (done)**: `LegacyService` is `@Transactional`, not `readOnly = true`: it reads the progress with `findForUpdate`, which Postgres refuses in a read-only transaction (`GET /account/legacy` answered 500 in the IT). The lock lasts one request, like `GET /progress`. `ResetResult.legacy` is the `ResetLegacy`; the controller builds the reset answer with `LegacyView.of(result.legacy, result.view.progress)`. Re-pinned: `AccountResetServiceTest` log case now expects `legacyChapter=4 legacyPercent=50` (the log line gains them, as this task says).
 
@@ -287,7 +287,7 @@ data class LegacyResponse(val chapters: List<LegacyChapterResponse>, val best: L
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 7 new cases pass; every existing wallet test passes.
+- [x] The 7 new cases pass; every existing wallet test passes.
 
 **Commit**: `feat(backend): pay the copper legacy on every kill`
 
@@ -319,7 +319,7 @@ data class LegacyResponse(val chapters: List<LegacyChapterResponse>, val best: L
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 6 cases pass; every existing equipment, farm and progress test passes unchanged except the constructor wiring.
+- [x] The 6 cases pass; every existing equipment, farm and progress test passes unchanged except the constructor wiring.
 
 **Commit**: `feat(backend): roll pieces with the legacy rarity`
 

@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/supabase-postgres/spec.md`
 **Design**: `.specs/features/supabase-postgres/design.md`
-**Status**: Approved 2026-11-16, revision 3 (backend on Google Cloud Run), with the recommended defaults of Q9 to Q11 and Q13 to Q15. T1 to T19 done; Verifier PASS in round 3 (`74e3315`); accepted by `product-owner` for the pre-cutover scope on 2026-11-16 (see "Acceptance"). T20 to T22 pending.
+**Status**: On hold by the owner on 2026-11-26 before T20 (the cutover); T1 to T19 are done and production stays on `publish.sh`. Approved 2026-11-16, revision 3 (backend on Google Cloud Run), with the recommended defaults of Q9 to Q11 and Q13 to Q15. T1 to T19 done; Verifier PASS in round 3 (`74e3315`); accepted by `product-owner` for the pre-cutover scope on 2026-11-16 (see "Acceptance"). T20 to T22 pending.
 
 Rules for every task:
 

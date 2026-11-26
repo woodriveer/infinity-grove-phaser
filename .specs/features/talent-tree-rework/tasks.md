@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/talent-tree-rework/spec.md`
 **Design**: `.specs/features/talent-tree-rework/design.md`
-**Status**: Draft. Waiting for the owner's approval of spec, design and tasks and the answers to Q1 to Q11 of the spec (each task is written with the recommended default).
+**Status**: Done. Approved with the recommended defaults of Q1 to Q11; released (see `report.html` and `CHANGELOG.md`).
 
 Rules for every task:
 
@@ -413,8 +413,8 @@ Update the header comment of `calculateDamage` (the critical sentence and `force
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 10 new cases and the re-pinned scene test pass; the existing cases `never crits a monster with critical resistance 100, not even on the lowest roll` and `is critical against a defender with critical resistance 100, which never crits otherwise` pass unchanged.
-- [ ] Every other unit test passes unchanged (if another fails, stop and report it).
+- [x] The 10 new cases and the re-pinned scene test pass; the existing cases `never crits a monster with critical resistance 100, not even on the lowest roll` and `is critical against a defender with critical resistance 100, which never crits otherwise` pass unchanged.
+- [x] Every other unit test passes unchanged (if another fails, stop and report it).
 
 **Commit**: `feat(game): subtract the critical resistance and turn the chance past 100 into critical damage`
 
@@ -479,7 +479,7 @@ Update the comment above `attackerFor` (no cap; the two new bonus fields).
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 3 new cases and the 6 re-pinned tests pass; every other unit test passes unchanged.
+- [x] The 3 new cases and the 6 re-pinned tests pass; every other unit test passes unchanged.
 
 **Commit**: `feat(game): let the critical chance pass 100 and take armor pierce and boss damage bonuses`
 
@@ -528,7 +528,7 @@ The `Math.min(100, ...)` of `armorPierce` stays.
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 2 new cases and the 2 re-pinned tests pass; every other unit test passes unchanged.
+- [x] The 2 new cases and the 2 re-pinned tests pass; every other unit test passes unchanged.
 
 **Commit**: `feat(game): let Fumaça raise the critical chance past 100`
 
@@ -626,7 +626,7 @@ export const addBonuses = (a, b) => ({
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 9 new cases and every re-pinned test pass; every other unit test passes unchanged.
+- [x] The 9 new cases and every re-pinned test pass; every other unit test passes unchanged.
 
 **Commit**: `feat(game): feed boss damage and armor pierce from the talents and drop the retired effects`
 
@@ -680,7 +680,7 @@ export const addBonuses = (a, b) => ({
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 5 new cases pass; every existing combo test passes unchanged.
+- [x] The 5 new cases pass; every existing combo test passes unchanged.
 
 **Commit**: `feat(game): let the combo add a step set by the scene`
 
@@ -779,7 +779,7 @@ export const branchGlow = (talents, branch) =>
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 10 new cases and the 2 re-pinned tests pass; every other unit test passes unchanged.
+- [x] The 10 new cases and the 2 re-pinned tests pass; every other unit test passes unchanged.
 
 **Commit**: `feat(game): name the boss hunt branch and add the texts and glow of the talent tree`
 
@@ -822,7 +822,7 @@ export const RETIRED_TALENT_IDS = [
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 3 new cases and the re-pinned test pass.
+- [x] The 3 new cases and the re-pinned test pass.
 
 **Commit**: `feat(game): drop the retired chapter boss time and critical break from the talent list`
 
@@ -867,7 +867,7 @@ Update the comment above `leaderStats` (Kael in both time lines, Vex alone in th
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 2 new cases and the re-pinned tests pass.
+- [x] The 2 new cases and the re-pinned tests pass.
 
 **Commit**: `feat(game): show the boss damage and armor pierce talents in the attribute panel`
 
@@ -946,8 +946,8 @@ Update the comment above `leaderStats` (Kael in both time lines, Vex alone in th
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 10 new cases and every re-pinned assertion pass; `grep -n "Crit res" game/src/adapters/phaser/ClickerGame.js game/src/adapters/phaser/ClickerGame.test.js` prints nothing.
-- [ ] Every other unit test passes unchanged.
+- [x] The 10 new cases and every re-pinned assertion pass; `grep -n "Crit res" game/src/adapters/phaser/ClickerGame.js game/src/adapters/phaser/ClickerGame.test.js` prints nothing.
+- [x] Every other unit test passes unchanged.
 
 **Commit**: `feat(game): show Seu crítico on the enemy line and use the step of Fúria crescente`
 
@@ -1032,7 +1032,7 @@ export const VEINS = Object.freeze([
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 7 cases pass.
+- [x] The 7 cases pass.
 
 **Commit**: `feat(game): add the layout map of the talent tree`
 
@@ -1165,8 +1165,8 @@ div.talent-screen                           testid talent-screen
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 36 cases pass; `talentsView.test.js` holds no `.talent-card`, `.talent-column` or `talent-grade-` selector.
-- [ ] Every other unit test passes except the `HeroUi.test.js` Talentos cases T16 re-pins (list them in the commit body).
+- [x] The 36 cases pass; `talentsView.test.js` holds no `.talent-card`, `.talent-column` or `talent-grade-` selector.
+- [x] Every other unit test passes except the `HeroUi.test.js` Talentos cases T16 re-pins (list them in the commit body).
 
 **Commit**: `feat(game): draw the talent tree on a painted board`
 
@@ -1279,8 +1279,8 @@ div.talent-screen                           testid talent-screen
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The build exits 0; `grep -nE "talent-(column|card|text|name|grade-title)|\.talent-locked" game/public/style.css` prints nothing.
-- [ ] Every rule of the contract is in the file with its values.
+- [x] The build exits 0; `grep -nE "talent-(column|card|text|name|grade-title)|\.talent-locked" game/public/style.css` prints nothing.
+- [x] Every rule of the contract is in the file with its values.
 
 **Commit**: `feat(game): style the painted talent tree, its states, fallbacks and phone zoom`
 
@@ -1363,8 +1363,8 @@ div.talent-screen                           testid talent-screen
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 10 new cases and the re-pinned tests pass; every other unit test passes.
-- [ ] `graphify update .` has run after the code change.
+- [x] The 10 new cases and the re-pinned tests pass; every other unit test passes.
+- [x] `graphify update .` has run after the code change.
 
 **Commit**: `feat(game): open Talentos as a tree window that keeps the selection and the scroll`
 

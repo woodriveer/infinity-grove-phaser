@@ -30,6 +30,8 @@
 
 # Agent team
 
+The game targets PC only: no agent writes phone layout requirements, phone findings or phone debts.
+
 The main session is the orchestrator; the agents live in `.claude/agents/`. For a new feature:
 
 1. `product-owner` (Opus, high) writes spec, design and fully detailed tasks with `tlc-spec-driven`; the user approves them.

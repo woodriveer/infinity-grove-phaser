@@ -647,7 +647,7 @@ Header comment: the spec, AD-019, "same columns, so the previous backend keeps c
 - [x] The backend suite passes, including `SchemaValidationIT`, `HealthHitPointsMigrationIT`, `PreviousBackendCompatibilityIT`, `ProgressControllerIT`, `AccountResetControllerIT`, `CardsFlowIT`, `EquipmentDropFlowIT`, `FarmControllerIT` and `MonsterHealthMigrationIT`.
 - [x] `grep -rnE "_hit_points = (boss|monster|miniboss)_health" backend/src/test` prints nothing.
 - [x] The commit touches exactly `ChapterEntities.kt`, the five test files named above and this file.
-- [ ] The commit is pushed alone, and T14 waits for it to be deployed: V10 drops columns that the release before T13 still maps and writes, so V10 must never run while that release is the rollback target.
+- [x] The commit is pushed alone, and T14 waits for it to be deployed: V10 drops columns that the release before T13 still maps and writes, so V10 must never run while that release is the rollback target.
 
 **Commit**: `refactor(backend): stop mapping the legacy health columns`
 
@@ -726,7 +726,7 @@ alter table stages alter column miniboss_hit_points set not null;
 - [x] The backend suite passes, `SchemaValidationIT` included.
 - [x] `cd backend && ./gradlew build` passes.
 - [x] `grep -rnE "(boss|monster|miniboss)_health([^_]|$)" backend/src/main/kotlin backend/src/test` prints only the query line of `the legacy health columns are gone`.
-- [ ] The commit is pushed alone, after the T13 deploy is `active.commit` with `previous` null.
+- [x] The commit is pushed alone, after the T13 deploy is `active.commit` with `previous` null.
 
 **Commit**: `feat(backend): drop the legacy 32-bit health columns`
 

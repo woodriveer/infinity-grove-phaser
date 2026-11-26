@@ -1,7 +1,7 @@
 # Talent Tree Rework Design
 
 **Spec**: `.specs/features/talent-tree-rework/spec.md`
-**Status**: Draft (waiting for the owner's approval with the spec)
+**Status**: Approved; implemented
 
 ---
 
