@@ -408,7 +408,7 @@ export const createResetLegacy = ({ gateway }) =>
 
 ---
 
-#### T8: The legacy line and the reset dialog line [ ]
+#### T8: The legacy line and the reset dialog line [x]
 
 **Owner**: game-dev
 **Goal**: The auto click window shows the legacy line and its detail above `Resetar conta`, and the reset dialog shows what the reset changes (RLD-06; spec Display AC 1 to 7, design § Layout).
@@ -461,7 +461,7 @@ If `.auto-click-popover` is not a grid, drop `grid-column` and give both lines `
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/accountReset.spec.js e2e/autoClick.spec.js`
 **Done when**:
 
-- [ ] The 3 cases pass; `accountReset.spec.js` and `autoClick.spec.js` pass unchanged (the fake backend answers 404 to `GET /account/legacy` until T9, so no line shows there).
+- [x] The 3 cases pass; `accountReset.spec.js` and `autoClick.spec.js` pass unchanged (the fake backend answers 404 to `GET /account/legacy` until T9, so no line shows there).
 
 **Commit**: `feat(game): show the reset legacy`
 

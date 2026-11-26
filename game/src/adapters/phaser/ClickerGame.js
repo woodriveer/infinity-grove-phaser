@@ -4,6 +4,7 @@ import { BossCountdown } from '../../domain/campaign/bossCountdown';
 import { MINIBOSS, farmEncounterOf } from '../../domain/campaign/campaign';
 import { AutoClicker, autoClickUnlocked } from '../../domain/combat/autoClick';
 import { resetReward } from '../../domain/campaign/accountReset';
+import { resetLegacyText } from '../../domain/campaign/resetLegacy';
 import { allyAttacker } from '../../domain/combat/allyAttacker';
 import { AllyCombat } from '../../domain/combat/allyCombat';
 import { Combo, comboText } from '../../domain/combat/combo';
@@ -22,7 +23,7 @@ import { skillLevelOf } from '../../domain/skills/skillLevel';
 import { monsterAfterBreak, talentComboCap, talentComboStep, talentTimeBonusMs } from '../../domain/talents/talents';
 import { HeroUi } from './HeroUi';
 import { autoClickIntervalText, renderAutoClick } from './views/autoClickView';
-import { RESET_ERROR_TEXT, renderResetButton, renderResetDialog, resetNoticeText } from './views/resetView';
+import { RESET_ERROR_TEXT, renderLegacyLine, renderResetButton, renderResetDialog, resetNoticeText } from './views/resetView';
 import { el } from './views/dom';
 import { renderElementWheel } from './views/elementWheel';
 import { renderEffectTags, updateEffectTags } from './views/skillEffects';
@@ -186,6 +187,7 @@ export class ClickerGame extends Scene
         this.autoClicker = new AutoClicker();
         this.upgradingAutoClick = false;
         this.accountReset = services.createAccountReset({ session: this.session, autoClick: this.autoClick, talents: this.talents });
+        this.legacy = services.resetLegacy;
         this.resetting = false;
         this.resetError = null;
         this.session.onRealign((encounter) => this.realign(encounter));
@@ -328,13 +330,14 @@ export class ClickerGame extends Scene
     showAutoClick ()
     {
         const reward = this.resetReward;
+        const legacy = this.legacy.state();
         //  The window is drawn again on every change; a keyboard user keeps the control that had focus
         const focused = this.autoClickWindow.contains(document.activeElement) ? document.activeElement.getAttribute('data-testid') : null;
 
         this.autoClickElement.setVisible(this.autoClickOpen);
         this.autoClickWindow.replaceChildren(...renderAutoClick({
             enabled: this.autoClickEnabled, intervalMs: this.autoClick.intervalMs(), state: this.autoClick.state(), busy: this.upgradingAutoClick
-        }), ...(reward === null ? [] : [ renderResetButton(reward) ]));
+        }), ...(legacy === null ? [] : renderLegacyLine(legacy)), ...(reward === null ? [] : [ renderResetButton(reward) ]));
         this.autoClickButton.setAttribute('data-on', String(this.autoClickEnabled));
         this.autoClickRate.textContent = autoClickIntervalText(this.autoClick.intervalMs());
 
@@ -432,11 +435,18 @@ export class ClickerGame extends Scene
 
         //  The dialog was hidden when Phaser measured it, so the size it centres on is 0 until measured again
         this.resetDialogElement.updateSize();
+
+        //  The preview of the legacy follows the chapter: read it again and redraw the dialog when it answers
+        this.legacy.load().then(() => this.sys.isActive() && !this.resetDialog.hidden && this.showResetDialog());
     }
 
     showResetDialog ()
     {
-        this.resetCard.replaceChildren(...renderResetDialog({ reward: this.resetReward, busy: this.resetting, error: this.resetError }));
+        const legacy = this.legacy.state();
+
+        this.resetCard.replaceChildren(...renderResetDialog({
+            reward: this.resetReward, busy: this.resetting, error: this.resetError, legacyText: legacy ? resetLegacyText(legacy) : null
+        }));
     }
 
     closeResetDialog ()
@@ -501,6 +511,9 @@ export class ClickerGame extends Scene
 
     async loadAutoClick ()
     {
+        //  The legacy line of the window; a backend without the endpoint leaves it out (the service keeps null)
+        this.legacy.load().then(() => this.sys.isActive() && this.showAutoClick());
+
         try
         {
             await this.autoClick.load();

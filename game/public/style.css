@@ -1093,6 +1093,32 @@ button:disabled {
     box-shadow: var(--btn-shadow);
 }
 
+/* The legacy of the account resets in the auto click window (spec reset-legacy-drops); the window is a flex row, so each line takes the full width */
+.legacy-line {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-900);
+}
+
+.legacy-detail {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--ink-600);
+}
+
+.reset-legacy {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--ember-800);
+}
+
 .reset-question {
     font-size: 17px;
     line-height: 1.4;

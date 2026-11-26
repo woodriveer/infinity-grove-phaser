@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClickerGame } from './ClickerGame';
 import { ApiError } from '../../application/ApiError';
 import { createAccountReset } from '../../application/accountReset/accountReset';
+import { createResetLegacy } from '../../application/accountReset/resetLegacy';
 import { createAutoClickState } from '../../application/autoClick/autoClickState';
 import { createCampaignSession } from '../../application/campaign/campaignSession';
 import { createEquipmentCollection } from '../../application/equipment/equipmentCollection';
@@ -27,6 +28,8 @@ const talentGateway = { list: vi.fn(), upgrade: vi.fn(), reset: vi.fn() };
 const autoClickGateway = { get: vi.fn(), upgrade: vi.fn() };
 //  The real account reset over a mocked gateway, working on the services of the scene
 const resetGateway = { reset: vi.fn() };
+//  The reset legacy over a gateway that answers 404 (an old backend): the scenes of these tests show no legacy line
+const legacyGateway = { legacy: () => Promise.reject(new ApiError('not found', { status: 404 })) };
 const autoClickPreference = { on: true, stored: [], enabled () { return this.on; }, setEnabled (on) { this.on = on; this.stored.push(on); } };
 const equipmentGateway = { list: vi.fn(), equip: vi.fn(), unequip: vi.fn(), refine: vi.fn(), reroll: vi.fn(), sell: vi.fn() };
 //  The gift claim: by default nothing is granted; a test gives the answer, or an Error to reject with
@@ -43,6 +46,7 @@ const services = {
     createFarmSession: () => createFarmSession({ gateway: farmGateway }),
     createAutoClickState: () => createAutoClickState({ gateway: autoClickGateway }),
     createAccountReset: (ports) => createAccountReset({ gateway: resetGateway, ...ports }),
+    resetLegacy: createResetLegacy({ gateway: legacyGateway }),
     gifts: giftGateway,
     autoClickPreference
 };
