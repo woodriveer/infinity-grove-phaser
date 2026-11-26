@@ -217,7 +217,7 @@ interface LegacyRepositoryPort {
 
 ---
 
-#### T3: The reset writes the legacy and the API answers it [ ]
+#### T3: The reset writes the legacy and the API answers it [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: A successful reset adds 50 to the chapter it counts; `GET /account/legacy` and the reset answer carry the legacy with the preview of the next reset (RLD-02, RLD-03; spec Legacy AC 1 to 6, Best AC 5 to 7).
@@ -252,6 +252,8 @@ data class LegacyResponse(val chapters: List<LegacyChapterResponse>, val best: L
 **Done when**:
 
 - [ ] The 13 new cases pass; every existing reset test passes unchanged except the constructor wiring.
+
+**Deviation (done)**: `LegacyService` is `@Transactional`, not `readOnly = true`: it reads the progress with `findForUpdate`, which Postgres refuses in a read-only transaction (`GET /account/legacy` answered 500 in the IT). The lock lasts one request, like `GET /progress`. `ResetResult.legacy` is the `ResetLegacy`; the controller builds the reset answer with `LegacyView.of(result.legacy, result.view.progress)`. Re-pinned: `AccountResetServiceTest` log case now expects `legacyChapter=4 legacyPercent=50` (the log line gains them, as this task says).
 
 **Commit**: `feat(backend): leave a legacy on every account reset`
 

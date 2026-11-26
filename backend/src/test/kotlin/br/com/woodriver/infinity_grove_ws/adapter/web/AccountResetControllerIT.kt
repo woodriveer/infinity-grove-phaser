@@ -5,6 +5,7 @@ import br.com.woodriver.infinity_grove_ws.adapter.repository.AutoClickRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.CardCopyEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.CrystalRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.EquipmentRepository
+import br.com.woodriver.infinity_grove_ws.adapter.repository.LegacyRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.ProgressEntity
 import br.com.woodriver.infinity_grove_ws.adapter.repository.ResetRepository
 import br.com.woodriver.infinity_grove_ws.adapter.repository.TalentRepository
@@ -14,12 +15,15 @@ import br.com.woodriver.infinity_grove_ws.domain.AffixType
 import br.com.woodriver.infinity_grove_ws.domain.CopyKey
 import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.Rarity
+import br.com.woodriver.infinity_grove_ws.domain.ResetLegacy
 import br.com.woodriver.infinity_grove_ws.domain.Slot
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.response.ValidatableResponse
 import io.restassured.specification.RequestSpecification
+import org.hamcrest.Matchers.empty
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
@@ -42,6 +46,9 @@ class AccountResetControllerIT : IntegrationTestBase() {
 
     @Autowired
     private lateinit var equipmentRepository: EquipmentRepository
+
+    @Autowired
+    private lateinit var legacyRepository: LegacyRepository
 
     private lateinit var token: String
 
@@ -291,5 +298,63 @@ class AccountResetControllerIT : IntegrationTestBase() {
             .statusCode(200)
             .body("heroes[0].stars", equalTo(9))
             .body("heroes[0].skills.level", equalTo(listOf(3, 3, 3)))
+    }
+
+    private fun legacy(): ValidatableResponse = asUser().get("/account/legacy").then()
+
+    @Test
+    fun `GET account legacy of a player without legacy in chapter 3 answers no chapters, no best and the preview of chapter 3`() {
+        atChapter(3)
+
+        legacy()
+            .statusCode(200)
+            .body("chapters", empty<Any>())
+            .body("best", nullValue())
+            .body("afterReset.chapter", equalTo(3))
+            .body("afterReset.percent", equalTo(50))
+            .body("afterReset.best.chapter", equalTo(3))
+            .body("afterReset.best.percent", equalTo(50))
+    }
+
+    @Test
+    fun `GET account legacy of 5 at 100 and 10 at 50 in chapter 12 answers best 10 at 50 and the preview of chapter 12`() {
+        atChapter(12)
+        legacyRepository.save(ResetLegacy("yan", mapOf(10 to 50, 5 to 100)))
+
+        legacy()
+            .statusCode(200)
+            .body("chapters.chapter", equalTo(listOf(5, 10)))
+            .body("chapters.percent", equalTo(listOf(100, 50)))
+            .body("best.chapter", equalTo(10))
+            .body("best.percent", equalTo(50))
+            .body("afterReset.chapter", equalTo(12))
+            .body("afterReset.percent", equalTo(50))
+            .body("afterReset.best.chapter", equalTo(12))
+            .body("afterReset.best.percent", equalTo(50))
+    }
+
+    @Test
+    fun `GET account legacy in chapter 1 answers afterReset null`() {
+        atChapter(1)
+
+        legacy().statusCode(200).body("afterReset", nullValue())
+    }
+
+    @Test
+    fun `GET account legacy without a token answers 401`() {
+        given().get("/account/legacy").then().statusCode(401)
+    }
+
+    @Test
+    fun `POST account reset from chapter 5 answers the legacy with chapter 5 at 50 as best and no preview`() {
+        atChapter(5)
+
+        reset(5)
+            .statusCode(200)
+            .body("legacy.chapters.chapter", equalTo(listOf(5)))
+            .body("legacy.chapters.percent", equalTo(listOf(50)))
+            .body("legacy.best.chapter", equalTo(5))
+            .body("legacy.best.percent", equalTo(50))
+            .body("legacy.afterReset", nullValue())
     }
 }

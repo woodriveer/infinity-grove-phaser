@@ -3,6 +3,7 @@ package br.com.woodriver.infinity_grove_ws.service
 import br.com.woodriver.infinity_grove_ws.InMemoryAutoClickRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryChapterRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryCrystalRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryLegacyRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryResetRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryTalentRepository
@@ -13,6 +14,7 @@ import br.com.woodriver.infinity_grove_ws.domain.Encounter
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
 import br.com.woodriver.infinity_grove_ws.domain.ResetChapterMismatchException
+import br.com.woodriver.infinity_grove_ws.domain.ResetLegacy
 import br.com.woodriver.infinity_grove_ws.domain.ResetLockedException
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
@@ -29,7 +31,8 @@ class AccountResetServiceTest {
     private val crystals = InMemoryCrystalRepository()
     private val resets = InMemoryResetRepository()
     private val autoClick = InMemoryAutoClickRepository()
-    private val service = AccountResetService(progress, chapters, users, talents, crystals, resets)
+    private val legacies = InMemoryLegacyRepository()
+    private val service = AccountResetService(progress, chapters, users, talents, crystals, resets, legacies)
 
     private val start = Progress("yan", ProgressPosition(1, 1, Encounter.PHASE, 1))
 
@@ -137,13 +140,15 @@ class AccountResetServiceTest {
     }
 
     @Test
-    fun `an applied reset logs the username, the chapter, the reward, the crystals and the resets at info`() {
+    fun `an applied reset logs the username, the chapter, the reward, the crystals, the resets and the legacy at info`() {
         player(chapter = 4, crystalBalance = 1, resetCount = 2)
 
         LogCapture(AccountResetService::class.java).use { logs ->
             service.reset("yan", 4)
 
-            assertTrue("Account reset username=yan chapter=4 reward=4 crystals=5 resets=3" in logs.infos)
+            val line = "Account reset username=yan chapter=4 reward=4 crystals=5 resets=3 legacyChapter=4 legacyPercent=50"
+
+            assertTrue(line in logs.infos)
         }
     }
 
@@ -171,5 +176,85 @@ class AccountResetServiceTest {
         service.reset("yan", 3)
 
         assertEquals(emptyMap(), talents.findAll("yan"))
+    }
+
+    private fun legacyOf(vararg percents: Pair<Int, Int>) = ResetLegacy("yan", mapOf(*percents))
+
+    @Test
+    fun `a first reset from chapter 5 stores 50 percent of chapter 5`() {
+        player(chapter = 5)
+
+        service.reset("yan", 5)
+
+        assertEquals(legacyOf(5 to 50), legacies.find("yan"))
+    }
+
+    @Test
+    fun `a second reset from chapter 5 stores 100`() {
+        player(chapter = 5)
+        legacies.save(legacyOf(5 to 50))
+
+        service.reset("yan", 5)
+
+        assertEquals(legacyOf(5 to 100), legacies.find("yan"))
+    }
+
+    @Test
+    fun `a third reset from chapter 5 keeps 100 and still pays 5 crystals`() {
+        player(chapter = 5)
+        legacies.save(legacyOf(5 to 100))
+
+        val result = service.reset("yan", 5)
+
+        assertEquals(legacyOf(5 to 100), legacies.find("yan"))
+        assertEquals(5, result.reward)
+        assertEquals(5L, crystals.balance("yan"))
+    }
+
+    @Test
+    fun `a completed campaign counts chapter 15 in the legacy`() {
+        player(chapter = 15, completed = true)
+
+        service.reset("yan", 15)
+
+        assertEquals(legacyOf(15 to 50), legacies.find("yan"))
+    }
+
+    @Test
+    fun `a reset from chapter 10 changes only chapter 10`() {
+        player(chapter = 10)
+        legacies.save(legacyOf(5 to 100))
+
+        service.reset("yan", 10)
+
+        assertEquals(legacyOf(5 to 100, 10 to 50), legacies.find("yan"))
+    }
+
+    @Test
+    fun `a refused reset from chapter 1 writes no legacy`() {
+        player(chapter = 1)
+
+        assertFailsWith<ResetLockedException> { service.reset("yan", 1) }
+
+        assertEquals(emptyMap(), legacies.legacies)
+    }
+
+    @Test
+    fun `a reset sent from another chapter writes no legacy`() {
+        player(chapter = 3)
+
+        assertFailsWith<ResetChapterMismatchException> { service.reset("yan", 4) }
+
+        assertEquals(emptyMap(), legacies.legacies)
+    }
+
+    @Test
+    fun `the result carries the legacy after the reset`() {
+        player(chapter = 10)
+        legacies.save(legacyOf(5 to 100))
+
+        val result = service.reset("yan", 10)
+
+        assertEquals(legacyOf(5 to 100, 10 to 50), result.legacy)
     }
 }

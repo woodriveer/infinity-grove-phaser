@@ -7,6 +7,7 @@ import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.port.ChapterRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.CrystalRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.LegacyRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ResetRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.TalentRepositoryPort
@@ -31,6 +32,7 @@ class AccountResetService(
     private val talentRepository: TalentRepositoryPort,
     private val crystalRepository: CrystalRepositoryPort,
     private val resetRepository: ResetRepositoryPort,
+    private val legacyRepository: LegacyRepositoryPort,
 ) : ResetAccountUseCase {
     override fun reset(
         username: String,
@@ -51,16 +53,20 @@ class AccountResetService(
         crystalRepository.save(username, crystals)
         val resets = resetRepository.count(username) + 1
         resetRepository.save(username, resets)
+        val legacy = legacyRepository.find(username).afterReset(reward)
+        legacyRepository.save(legacy)
 
         logger.info(
-            "Account reset username={} chapter={} reward={} crystals={} resets={}",
+            "Account reset username={} chapter={} reward={} crystals={} resets={} legacyChapter={} legacyPercent={}",
             username,
             progress.position.chapter,
             reward,
             crystals,
             resets,
+            reward,
+            legacy.percents[reward],
         )
-        return ResetResult(reward, crystals, resets, start.view(chapterOf(start)))
+        return ResetResult(reward, crystals, resets, start.view(chapterOf(start)), legacy)
     }
 
     /** Returns the locked progress, created first when the player has none, with the next chapter opened like `ProgressService` does. */
