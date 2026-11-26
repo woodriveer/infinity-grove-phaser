@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reequilíbrio do início do jogo</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+:root[data-theme="dark"] { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Reequilíbrio do início do jogo (early-game-rebalance)</h1>
+<p class="sub">Relatório de release v0.11.0 &middot; 17 commits de <code>4201d6a6</code> a <code>14e4cbbb</code> mais <code>4e3288a8</code>, separados dos do legado pelo assunto (os commits se intercalam em <code>main</code> depois de <code>23b01b2</code>; o commit de specs <code>9bf534da</code> é comum e fica fora das contagens) &middot; 2026-11-26</p>
+<p><span class="verdict">PASS</span> &nbsp;Todas as tarefas de <code>tasks.md</code> estão marcadas, o author check fechou sem lacunas e o <code>ui-artist</code> aprovou (<code>4e3288a8</code>).</p>
+<h2>Author check do test-engineer</h2>
+<div class="cards"><div class="card"><div class="n">14</div><div class="l">mutantes (sensor)</div></div><div class="card"><div class="n">14</div><div class="l">mortos</div></div><div class="card"><div class="n">0</div><div class="l">sobreviveram</div></div></div>
+<p>14 de 14 mutantes mortos, nenhuma lacuna de critério de aceite (tarefa T16 de <code>tasks.md</code>).</p>
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Parte</th><th>Linhas +</th><th>Linhas -</th><th>Arquivos</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>, inclui migrações SQL)</td><td class="num">+420</td><td class="num">-26</td><td class="num">7</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes, <code>game/public/*.css</code>)</td><td class="num">+283</td><td class="num">-18</td><td class="num">6</td></tr>
+<tr><td><strong>Total</strong></td><td class="num">+703</td><td class="num">-44</td><td class="num">13</td></tr>
+</table></div>
+<p>Fonte: <code>git diff --numstat</code> somado commit a commit.</p>
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th>Linhas +</th><th>Linhas -</th><th>Arquivos</th><th>Testes declarados +</th><th>Total da suíte depois da execução</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td class="num">+905</td><td class="num">-181</td><td class="num">15</td><td class="num">48</td><td class="num">1356 testes, 0 falhas</td></tr>
+<tr><td>Jogo unitário (<code>game/src/**/*.test.js</code>)</td><td class="num">+374</td><td class="num">-6</td><td class="num">4</td><td class="num">40</td><td class="num">2373 testes, 0 falhas (94 arquivos)</td></tr>
+<tr><td>e2e (<code>game/e2e</code>)</td><td class="num">+867</td><td class="num">-9</td><td class="num">7</td><td class="num">42</td><td class="num">685 testes: 673 passaram, 12 falharam (ver abaixo)</td></tr>
+</table></div>
+<p>&quot;Testes declarados +&quot; conta no diff as linhas novas com <code>@Test</code>, <code>it(</code> ou <code>test(</code> (um teste parametrizado conta uma vez); é uma contagem do diff, não do executor.</p>
+<h2>Cobertura dos testes unitários</h2>
+<div class="scroll"><table>
+<tr><th>Escopo</th><th>Linhas</th><th>% linhas</th><th>Branches</th><th>% branches</th></tr>
+<tr><td>Backend (JaCoCo), projeto todo</td><td class="num">3421/3473</td><td class="num">98,5%</td><td class="num">1121/1197</td><td class="num">93,7%</td></tr>
+<tr><td>Jogo (Vitest v8), projeto todo</td><td class="num">3850/3893</td><td class="num">98,89%</td><td class="num">1951/2051</td><td class="num">95,12%</td></tr>
+</table></div>
+<h3>Arquivos de produção que a feature alterou</h3>
+<div class="scroll"><table>
+<tr><th>Arquivo</th><th>Linhas</th><th>% linhas</th><th>Branches</th><th>% branches</th></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ChapterEntities.kt</td><td class="num">122/139</td><td class="num">87.8%</td><td class="num">1/2</td><td class="num">50.0%</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/ChapterRepository.kt</td><td class="num">47/47</td><td class="num">100.0%</td><td class="num">10/10</td><td class="num">100.0%</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/ProgressController.kt</td><td class="num">115/115</td><td class="num">100.0%</td><td class="num">14/14</td><td class="num">100.0%</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Chapter.kt</td><td class="num">198/198</td><td class="num">100.0%</td><td class="num">137/142</td><td class="num">96.5%</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/domain/Talents.kt</td><td class="num">139/139</td><td class="num">100.0%</td><td class="num">84/95</td><td class="num">88.4%</td></tr>
+<tr><td>adapters/phaser/ClickerGame.js</td><td class="num">741/758</td><td class="num">97.8%</td><td class="num">329/366</td><td class="num">89.9%</td></tr>
+<tr><td>domain/campaign/campaign.js</td><td class="num">53/53</td><td class="num">100.0%</td><td class="num">45/45</td><td class="num">100.0%</td></tr>
+<tr><td>domain/combat/monster.js</td><td class="num">24/24</td><td class="num">100.0%</td><td class="num">13/13</td><td class="num">100.0%</td></tr>
+<tr><td>domain/combat/monsterAffix.js</td><td class="num">53/53</td><td class="num">100.0%</td><td class="num">42/42</td><td class="num">100.0%</td></tr>
+<tr><td>domain/skills/skillCombat.js</td><td class="num">146/148</td><td class="num">98.6%</td><td class="num">108/111</td><td class="num">97.3%</td></tr>
+</table></div>
+<p>Medido em <code>04693485</code>. Arquivos sem linhas executáveis (interfaces) aparecem com 0/0.</p>
+<h2>Cobertura e2e</h2>
+<div class="cards"><div class="card"><div class="n">94,74%</div><div class="l">linhas do jogo (3694/3899)</div></div><div class="card"><div class="n">81,16%</div><div class="l">branches (1362/1678)</div></div><div class="card"><div class="n">93,45%</div><div class="l">funções (1057/1131)</div></div></div>
+<p>Execução completa com <code>npm run test:e2e:coverage</code> em 15 partes (a primeira sem <code>--keep</code>, as demais com <code>--keep</code>), instrumentação istanbul. O número é um limite inferior: uma página recarregada dentro de um teste perde o que contou antes do recarregamento. Medido em <code>04693485</code>, antes de <code>e82584e5</code>, que só mexe no legado.</p>
+<h3>Arquivos de jogo que a feature alterou (e2e)</h3>
+<div class="scroll"><table>
+<tr><th>Arquivo</th><th>Linhas</th><th>% linhas</th></tr>
+<tr><td>adapters/phaser/ClickerGame.js</td><td class="num">715/758</td><td class="num">94.3%</td></tr>
+<tr><td>domain/campaign/campaign.js</td><td class="num">49/53</td><td class="num">92.5%</td></tr>
+<tr><td>domain/combat/monster.js</td><td class="num">21/24</td><td class="num">87.5%</td></tr>
+<tr><td>domain/combat/monsterAffix.js</td><td class="num">52/53</td><td class="num">98.1%</td></tr>
+<tr><td>domain/skills/skillCombat.js</td><td class="num">140/148</td><td class="num">94.6%</td></tr>
+</table></div>
+<h2>Cenários e2e da feature</h2>
+<div class="scroll"><table>
+<tr><th>Arquivo</th><th>Cenário</th><th>Resultado</th></tr>
+<tr><td><code>earlyGameRebalance.spec.js</code></td><td>Chapter 1 of the fitted curve › miniboss 1-1 starts at HP 207/207 with Time: 45</td><td class="ok">passou</td></tr>
+<tr><td><code>earlyGameRebalance.spec.js</code></td><td>Chapter 1 of the fitted curve › the chapter boss starts at HP 6K/6K with Time: 90</td><td class="ok">passou</td></tr>
+<tr><td><code>earlyGameRebalance.spec.js</code></td><td>Chapter 1 of the fitted curve › a leader with no critical bonus reads Seu crítico: 10% against miniboss 1-1</td><td class="ok">passou</td></tr>
+<tr><td><code>earlyGameRebalance.spec.js</code></td><td>Chapter 1 of the fitted curve › the same leader reads Seu crítico: 1% against miniboss 1-10</td><td class="ok">passou</td></tr>
+<tr><td><code>earlyGameRebalance.spec.js</code></td><td>Chapter 1 of the fitted curve › a phase monster of stage 1 starts at HP 69/69 and the label reads Stage 1/10  Phase 1/8</td><td class="ok">passou</td></tr>
+<tr><td><code>earlyGameRebalance.spec.js</code></td><td>Chapter 1 of the fitted curve › phase 8 of stage 1 is the last phase before the miniboss</td><td class="ok">passou</td></tr>
+<tr><td><code>earlyGameRebalanceTalents.spec.js</code></td><td>Dano direto de clique › the card of Dano direto de clique at level 10 reads +10 de dano</td><td class="ok">passou</td></tr>
+<tr><td><code>earlyGameRebalanceTalents.spec.js</code></td><td>Dano direto de clique › grade 2 at level 10 reads +20 de dano and grade 3 +30 de dano</td><td class="ok">passou</td></tr>
+<tr><td><code>earlyGameRebalanceTalents.spec.js</code></td><td>Dano direto de clique › Kael with Dano direto de clique at 10 deals 11 to a FIRE monster with defense 0 and critical resistance 100</td><td class="ok">passou</td></tr>
+<tr><td><code>earlyGameRebalanceTalents.spec.js</code></td><td>Chance de crítico and Dano crítico › the card of Chance de crítico at level 10 reads +50 pontos and Dano crítico +150%</td><td class="ok">passou</td></tr>
+<tr><td><code>earlyGameRebalanceTalents.spec.js</code></td><td>Chance de crítico and Dano crítico › one level of Chance de crítico moves the chip from Seu crítico: 10% to Seu crítico: 15%</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Carapaça › a click of 3 on a Carapaça 2 miniboss takes 1 health</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Carapaça › a click of 1 on a Carapaça 2 miniboss takes nothing and shows 0</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Escudo de golpes › 3 clicks on a 3-charge shield take nothing, the 4th takes 1</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Escudo de golpes › 6000 ms of countdown after the last charge bring the shield back and the next click takes nothing</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Escudo de golpes › a shield that went down 6000 ms ago in one step is back for the next click</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Escudo de golpes › the recharge does not run while the game is paused</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Regeneração › Regeneração 1000 on a miniboss at 50 of 100 heals 10 a second</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Regeneração › Regeneração 50 on a miniboss of 1000 health heals 5 a second, in proportion to the time</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Regeneração › Regeneração does not heal above the maximum</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Regeneração › Regeneração stops while Stun stops the countdown</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Blindado › Blindado +20 on a defense 33 miniboss reads Defesa 53% and a click deals 0.47</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Every strike goes through the affix › an ally hit on a shielded miniboss takes a charge</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Every strike goes through the affix › a damage-over-time tick on a Carapaça miniboss loses the shell</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Adds › a strike on an add of an affix miniboss takes no charge and loses nothing to the shell</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Farm and payload › a farm fight of a miniboss with Escudo de golpes applies the shield</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Farm and payload › a farm fight that is left takes its shield state with it and the next farm fight starts a full shield</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixes.spec.js</code></td><td>Farm and payload › a payload with minibossAffix null, missing or of an unknown type fights with no affix</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip texts › the Carapaça chip reads Carapaça: -6 por golpe with data-affix SHELL</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip texts › the Escudo chip reads 10/10, then 7/10 after 3 clicks, then volta em 6 s after the last charge, then volta em 1 s 5000 ms later</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip texts › the Regeneração chips read 0,5% da vida/s for 50 and 0,25% da vida/s for 25</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip texts › the Blindado chip reads Blindado: +20 de defesa</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip texts › a Carapaça of 1200 reads Carapaça: -1.2K por golpe</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip place and style › the chip is centred on x 670 and its box spans y 322 to 350 in scene px</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip place and style › the host is a 240 x 28 hud-box that lets a click through</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip place and style › the chip has the type colour border and the Grove chip style</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip hides › the chip is hidden in a fight without affix and on a phase monster</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip hides › the chip empties when the affix miniboss dies</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip hides › the chip empties when the countdown fails the fight</td><td class="ok">passou</td></tr>
+<tr><td><code>monsterAffixesHud.spec.js</code></td><td>The affix chip hides › a click on the chip hits the monster</td><td class="ok">passou</td></tr>
+</table></div>
+<h2>Falhas que não vêm da feature</h2>
+<p>Na execução completa do e2e (685 testes: 673 passaram, 12 falharam) cada falha foi repetida sozinha uma vez. Nove passaram sozinhas, então são falhas de carga da máquina e não da feature: <code>autoClick.spec.js:45</code>, <code>blackAwarenessStaffDamage.spec.js:154</code> e <code>:172</code>, <code>dragEquip.spec.js:586</code>, <code>minibossAdds.spec.js:245</code>, <code>skills.spec.js:49</code>, <code>splash.spec.js:25</code>, <code>talentTreeBranches.spec.js:361</code> e <code>wake.spec.js:56</code>.</p>
+<p>As outras três falharam também sozinhas e eram causadas pela feature <code>reset-legacy-drops</code>, porque a janela do clique automático ganhou as linhas de legado: <code>uiRedesign.spec.js:1228</code>, <code>:1294</code> e <code>:2138</code>. Foram corrigidas em <code>e82584e5</code> (a linha de detalhe saiu da janela e virou uma dica <code>title</code>).</p>
+<p>Testes de deploy (<code>node --test</code>, 289 testes, 287 passaram): dois testes de <code>regression.test.mjs</code> (&quot;the CLI exits 0 when every check passes&quot; e &quot;the CLI exits 1 when a check fails&quot;) saem com o código 3221226505 (0xC0000409, queda do processo Node filho no Windows). Falharam também sozinhos. Nenhum arquivo de <code>deploy/</code>, <code>publish.sh</code>, <code>deploy.sh</code> ou <code>start.sh</code> mudou desde <code>23b01b2</code>. Cobertura de deploy: 96,15% das linhas, 95,46% dos branches, 94,44% das funções.</p>
+<h2>Deploy</h2>
+<p>As migrações V16, V17 e V18 já estão aplicadas no backend ativo (slot green, Flyway na versão 18). O deploy fica no ar apenas enquanto <code>./publish.sh</code> roda na máquina de publicação. Verificação no navegador: pendente, a extensão Claude in Chrome não estava conectada; conferido só por curl: o Worker responde 200 e o túnel responde 401 sem token, como o resto da API</p>
+</main>
+</body>
+</html>

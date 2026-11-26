@@ -3,6 +3,21 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.11.0] - 2026-11-26
+
+Reequilíbrio do início do jogo (`early-game-rebalance`): os primeiros capítulos deixam de passar voando, não há mais paredes até o capítulo 15 e minichefes e chefes ganham modificadores de combate.
+
+### Adicionado
+
+- **Modificadores de monstro** nos minichefes 3, 6 e 9 e no chefe de cada capítulo, do capítulo 2 ao 15: **Escudo de golpes** (os primeiros golpes não causam dano e o escudo volta depois de 6 s), **Carapaça** (cada golpe perde uma quantidade fixa de dano), **Regeneração** (o monstro recupera uma parte da vida por segundo) e **Blindado** (defesa extra). O modificador aparece como uma etiqueta no combate, com os números ao vivo (por exemplo `Escudo de golpes: 7/10`). Ele vale em toda a luta, contra cliques, aliados, habilidades e dano ao longo do tempo, mas nunca nos ajudantes do minichefe.
+
+### Alterado
+
+- Cada fase tem **8 monstros** por etapa (eram 5), em todos os capítulos.
+- A vida dos monstros e dos chefes dos 15 capítulos foi refeita: o capítulo 1 leva cerca de 12 minutos e a dificuldade sobe sem paredes até o capítulo 15. Minichefes têm 3 vezes a vida do monstro da fase (eram 5) e 45 s de limite (eram 30 s).
+- A resistência a crítico dos minichefes dos capítulos 1 a 5 ficou menor, e o crítico base de 10 agora vence todos os minichefes do capítulo 1.
+- Talentos: **Dano direto de clique** dá +1 por nível (era +2, com +1 no primeiro), **Chance de crítico** dá +5 pontos por nível (era +1) e **Dano crítico** dá +15% por nível (era +5%). Os pontos já gastos continuam valendo e **Reiniciar pontos** deixa refazer a escolha.
+
 ## [0.10.0] - 2026-11-25
 
 Ramos da árvore de talentos (`talent-tree-branches`): os talentos seguem os galhos pintados, ficam menores e o cartão passa a explicar cada talento.
