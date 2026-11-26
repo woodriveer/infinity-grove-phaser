@@ -158,7 +158,7 @@ Every new text, exactly (AD-007, L-010). `<p>` is the percent (50 or 100), `<c>`
 4. WHEN a player with no legacy loads the wallet THEN every queue SHALL hold values of today's ranges.  <!-- event-driven -->
 5. The backend SHALL keep the kill allowance (20, one per 1500 ms) unchanged.  <!-- ubiquitous -->
 6. WHEN the drop table holds a rule outside ids 1 to 45 THEN that rule SHALL keep its range.  <!-- event-driven -->
-7. WHEN `GET /wallet/drop-table` answers THEN it SHALL answer the seeded ranges without any legacy.  <!-- event-driven -->
+7. WHEN the plain drop table is read (`GetDropTableUseCase.dropTable()`) THEN it SHALL answer the seeded ranges without any legacy.  <!-- event-driven -->
 
 **Independent Test**: A wallet IT with legacy `{15: 50}` reads `drops["1"]` all inside 354..1062.
 
