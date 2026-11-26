@@ -35,6 +35,27 @@ describe('accountReset', () => {
         expect(talents.load).toHaveBeenCalledTimes(1);
     });
 
+    it('a successful reset hands its legacy to the legacy service', async () => {
+        const legacy = { adopt: vi.fn() };
+        const answer = { ...ANSWER, legacy: { chapters: [{ chapter: 3, percent: 50 }], best: { chapter: 3, percent: 50 }, afterReset: null } };
+        gateway.reset.mockResolvedValue(answer);
+        accountReset = createAccountReset({ gateway, session, autoClick, talents, legacy });
+
+        await accountReset.reset();
+
+        expect(legacy.adopt).toHaveBeenCalledWith(answer.legacy);
+    });
+
+    it('a refused reset hands nothing', async () => {
+        const legacy = { adopt: vi.fn() };
+        gateway.reset.mockRejectedValue(new ApiError('locked', { status: 409, code: 'RESET_LOCKED', body: { code: 'RESET_LOCKED' } }));
+        accountReset = createAccountReset({ gateway, session, autoClick, talents, legacy });
+
+        await expect(accountReset.reset()).rejects.toThrow('locked');
+
+        expect(legacy.adopt).not.toHaveBeenCalled();
+    });
+
     it('still resolves when the talents cannot be read again', async () => {
         talents.load.mockRejectedValue(new ApiError('down'));
 

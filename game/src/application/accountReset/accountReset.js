@@ -7,7 +7,8 @@
 //    session    the campaign session: `chapter`, `restart(progress)`
 //    autoClick  the auto click state: `adoptReset({ crystals, resets })`
 //    talents    the talent collection: `load()`
-export const createAccountReset = ({ gateway, session, autoClick, talents }) => ({
+//    legacy     the reset legacy: `adopt(answer.legacy)` (optional; spec reset-legacy-drops)
+export const createAccountReset = ({ gateway, session, autoClick, talents, legacy }) => ({
     //  Resolves with the answer; rejects with the refusal after realigning the campaign to the stored progress, if the refusal carried it
     reset: async () =>
     {
@@ -29,6 +30,7 @@ export const createAccountReset = ({ gateway, session, autoClick, talents }) => 
 
         session.restart(answer.progress);
         autoClick.adoptReset(answer);
+        legacy?.adopt(answer.legacy);
         talents.load().catch(() => {});
 
         return answer;

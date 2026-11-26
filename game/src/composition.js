@@ -15,6 +15,7 @@ import { createWalletApi } from './adapters/http/walletApi';
 import { autoClickPreference } from './adapters/storage/autoClickPreference';
 import { sessionStore } from './adapters/storage/sessionStore';
 import { createAccountReset as createAccountResetService } from './application/accountReset/accountReset';
+import { createResetLegacy as createResetLegacyService } from './application/accountReset/resetLegacy';
 import { createAutoClickState as createAutoClickStateService } from './application/autoClick/autoClickState';
 import { createCampaignSession as createCampaignSessionService } from './application/campaign/campaignSession';
 import { createEquipmentCollection as createEquipmentCollectionService } from './application/equipment/equipmentCollection';
@@ -49,8 +50,10 @@ export const createFarmSession = () => createFarmSessionService({ gateway: farmA
 export const createEquipmentCollection = () => createEquipmentCollectionService({ gateway: equipmentApi });
 export const createTalentCollection = () => createTalentCollectionService({ gateway: talentApi });
 export const createAutoClickState = () => createAutoClickStateService({ gateway: autoClickApi });
+//  The legacy of the account resets is one value for the whole game, shared by the reset and the scene (spec reset-legacy-drops)
+export const resetLegacy = createResetLegacyService({ gateway: accountResetApi });
 //  The reset works on the session, the auto click state and the talent collection of the scene that asks for it
-export const createAccountReset = ({ session, autoClick, talents }) => createAccountResetService({ gateway: accountResetApi, session, autoClick, talents });
+export const createAccountReset = ({ session, autoClick, talents }) => createAccountResetService({ gateway: accountResetApi, session, autoClick, talents, legacy: resetLegacy });
 
 //  What the scenes receive through the game registry (see main.js); backend.wake() waits for a backend Cloud Run is starting
 export const services = {
@@ -66,5 +69,6 @@ export const services = {
     createFarmSession,
     createAutoClickState,
     createAccountReset,
+    resetLegacy,
     autoClickPreference
 };

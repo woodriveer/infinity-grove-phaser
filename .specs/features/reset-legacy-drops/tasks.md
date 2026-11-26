@@ -362,7 +362,7 @@ Case C when `chapters` holds `{ chapter: afterReset.chapter, percent: 100 }`; ca
 
 ---
 
-#### T7: The game loads and keeps the legacy [ ]
+#### T7: The game loads and keeps the legacy [x]
 
 **Owner**: game-dev
 **Goal**: The game reads `GET /account/legacy`, keeps the last good value, and takes the legacy of a reset answer (RLD-06; spec Display AC 6, 7).
@@ -402,7 +402,7 @@ export const createResetLegacy = ({ gateway }) =>
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 6 cases pass; every other unit test passes.
+- [x] The 6 cases pass; every other unit test passes.
 
 **Commit**: `feat(game): load and keep the reset legacy`
 
