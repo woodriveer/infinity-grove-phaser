@@ -319,7 +319,7 @@ data class LegacyResponse(val chapters: List<LegacyChapterResponse>, val best: L
 
 ### Phase 2: Game
 
-#### T6: Legacy texts in the game domain [ ]
+#### T6: Legacy texts in the game domain [x]
 
 **Owner**: game-dev
 **Goal**: The game reads the legacy payload and writes every text of the spec, with the case choice of the reset dialog (RLD-06; spec § Player-Facing Texts, Display AC 3 to 5).
@@ -356,7 +356,7 @@ Case C when `chapters` holds `{ chapter: afterReset.chapter, percent: 100 }`; ca
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] Every case passes; every other unit test passes.
+- [x] Every case passes; every other unit test passes.
 
 **Commit**: `feat(game): write the reset legacy texts`
 

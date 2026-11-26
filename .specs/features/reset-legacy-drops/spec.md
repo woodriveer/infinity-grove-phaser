@@ -217,7 +217,7 @@ Every new text, exactly (AD-007, L-010). `<p>` is the percent (50 or 100), `<c>`
 | RLD-03 | P1: Best - AC 5 to 7 (API) | Tasks T3 | In Tasks |
 | RLD-04 | P1: Copper - AC 1 to 7 | Tasks T1, T4 | In Tasks |
 | RLD-05 | P1: Pieces - AC 1 to 5 | Tasks T1, T5 | In Tasks |
-| RLD-06 | P1: Display - AC 1 to 7 | Tasks T6, T7, T8, T9, T11 | In Tasks |
+| RLD-06 | P1: Display - AC 1 to 7 | Tasks T6, T7, T8, T9, T11 | Implementing |
 
 **Coverage:** 6 total, 6 mapped to tasks, 0 unmapped
 
