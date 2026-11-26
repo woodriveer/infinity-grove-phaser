@@ -1230,7 +1230,7 @@ test.describe('Grove theme', () => {
         await openAutoClick(page);
 
         expect(await page.locator('#auto-click-popover [data-testid]').evaluateAll((nodes) => nodes.map((node) => node.dataset.testid)))
-            .toEqual([ 'auto-click-toggle', 'auto-click-interval', 'auto-click-crystals', 'auto-click-upgrade', 'reset-account' ]);
+            .toEqual([ 'auto-click-toggle', 'auto-click-interval', 'auto-click-crystals', 'auto-click-upgrade', 'legacy-line', 'reset-account' ]);
         await expect(page.getByTestId('auto-click-toggle')).toBeChecked();
         await expect(page.getByTestId('auto-click-interval')).toHaveText('500 ms');
         await expect(page.getByTestId('auto-click-crystals')).toHaveText('Cristais: 0');

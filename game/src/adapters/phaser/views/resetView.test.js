@@ -10,21 +10,22 @@ const box = (nodes) =>
 };
 
 describe('renderLegacyLine', () => {
-    it('writes the line and the detail with their test ids', () => {
+    it('writes the line with its test id and the detail as its tooltip, with no detail row', () => {
         const root = box(renderLegacyLine({ chapters: [ { chapter: 10, percent: 50 } ], best: { chapter: 10, percent: 50 }, afterReset: null }));
 
         expect(root.querySelector('[data-testid="legacy-line"]').textContent).toBe('Legado: 50% do capítulo 10');
         expect(root.querySelector('[data-testid="legacy-line"]').className).toBe('legacy-line');
-        expect(root.querySelector('[data-testid="legacy-detail"]').textContent)
+        expect(root.querySelector('[data-testid="legacy-line"]').title)
             .toBe('Cada abate rende mais 50% das moedas do capítulo 10, e cada peça tem 50% de chance de vir com a raridade do capítulo 10.');
-        expect(root.querySelector('[data-testid="legacy-detail"]').className).toBe('legacy-detail');
+        expect(root.querySelector('[data-testid="legacy-detail"]')).toBeNull();
+        expect(root.children.length).toBe(1);
     });
 
     it('writes nenhum and the invitation without a legacy', () => {
         const root = box(renderLegacyLine({ chapters: [], best: null, afterReset: null }));
 
         expect(root.querySelector('[data-testid="legacy-line"]').textContent).toBe('Legado: nenhum');
-        expect(root.querySelector('[data-testid="legacy-detail"]').textContent)
+        expect(root.querySelector('[data-testid="legacy-line"]').title)
             .toBe('Resete a conta para ganhar moedas e peças melhores nas próximas jornadas.');
     });
 });

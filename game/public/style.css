@@ -1093,22 +1093,13 @@ button:disabled {
     box-shadow: var(--btn-shadow);
 }
 
-/* The legacy of the account resets in the auto click window (spec reset-legacy-drops); the window is a flex row, so each line takes the full width */
+/* The legacy of the account resets in the auto click window (spec reset-legacy-drops); the window is a flex row, so the line takes the full width; its detail is its tooltip */
 .legacy-line {
     width: 100%;
     font-family: var(--font-body);
     font-size: 13px;
     font-weight: 700;
     color: var(--ink-900);
-}
-
-.legacy-detail {
-    width: 100%;
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 1.35;
-    color: var(--ink-600);
 }
 
 .reset-legacy {

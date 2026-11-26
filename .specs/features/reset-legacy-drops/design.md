@@ -24,7 +24,7 @@ graph TD
     end
     subgraph Game
         API --> APP[resetLegacy service<br/>load, adopt]
-        APP --> LINE[auto click window<br/>Legado line + detail]
+        APP --> LINE[auto click window<br/>Legado line, detail as tooltip]
         APP --> DLG[reset dialog line<br/>case A / B / C]
         WS --> LEDGER[walletLedger queues<br/>coins show the boosted values]
     end
@@ -119,12 +119,12 @@ data class LegacyResponse(val chapters: List<LegacyChapterResponse>, val best: L
 - `game/src/adapters/http/accountResetApi.js`: `legacy: async () => (await httpClient.get('/account/legacy')).data`.
 - `game/src/application/accountReset/resetLegacy.js`: `createResetLegacy({ gateway })` with `load()` (keeps the last good value; a failure leaves `null`), `adopt(payload)`, `state()`.
 - `accountReset.js`: after a successful reset, `legacy.adopt(answer.legacy)` (new port `legacy`).
-- `resetView.js`: `renderLegacyLine(legacy)` -> `[div.legacy-line (data-testid legacy-line), div.legacy-detail (data-testid legacy-detail)]`; `renderResetDialog({ ..., legacyText })` adds `div.reset-legacy` (data-testid reset-legacy) after the question when `legacyText` is not null.
+- `resetView.js`: `renderLegacyLine(legacy)` -> `[div.legacy-line (data-testid legacy-line, title = the detail text)]`, with no detail row (amended 2026-11-26, owner decision 2026-11-26: the detail row covered the monster); `renderResetDialog({ ..., legacyText })` adds `div.reset-legacy` (data-testid reset-legacy) after the question when `legacyText` is not null.
 - `ClickerGame`: loads the legacy when it loads the auto click state; `showAutoClick` puts the legacy line before the reset button when the legacy loaded; `showResetDialog` passes `resetLegacyText(this.legacy.state())`.
 
 ### Layout
 
-- Auto click window (`.auto-click-popover`, 240 px wide, 13 px text, `--ink-900` on parchment): the legacy line `div.legacy-line` Figtree 700 13 px `--ink-900`; the detail `div.legacy-detail` Figtree 400 12 px, color `--ink-600`, line-height 1.35, both full width (`grid-column: 1 / -1`), placed right before `Resetar conta`.
+- Auto click window (`.auto-click-popover`, 240 px wide, 13 px text, `--ink-900` on parchment): the legacy line `div.legacy-line` Figtree 700 13 px `--ink-900`; the detail is its `title` tooltip, not a row (amended 2026-11-26, owner decision 2026-11-26: the detail row covered the monster), full width, placed right before `Resetar conta`.
 - Reset dialog (`.reset-card`, 420 px): `div.reset-legacy` Figtree 700 15 px, color `--ember-800`, line-height 1.4, between the question and the buttons.
 
 ---

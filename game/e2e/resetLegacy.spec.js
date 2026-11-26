@@ -65,26 +65,42 @@ test.describe('Reset legacy', () => {
         await openAutoClick(page);
 
         await expect(page.getByTestId('legacy-line')).toHaveText('Legado: nenhum');
-        await expect(page.getByTestId('legacy-detail')).toHaveText('Resete a conta para ganhar moedas e peças melhores nas próximas jornadas.');
+        await expect(page.getByTestId('legacy-line')).toHaveAttribute('title', 'Resete a conta para ganhar moedas e peças melhores nas próximas jornadas.');
+        //  Owner decision 2026-11-26: the detail is the tooltip of the line, there is no detail row
+        await expect(page.getByTestId('legacy-detail')).toHaveCount(0);
 
-        //  The line and its detail sit above Resetar conta, inside the window
+        //  The line sits above Resetar conta, inside the window
         const line = await page.getByTestId('legacy-line').boundingBox();
-        const detail = await page.getByTestId('legacy-detail').boundingBox();
         const button = await page.getByTestId('reset-account').boundingBox();
         const popover = await page.getByTestId('auto-click-popover').boundingBox();
 
-        expect(line.y).toBeLessThan(detail.y);
-        expect(detail.y + detail.height).toBeLessThanOrEqual(button.y);
-        expect(detail.x).toBeGreaterThanOrEqual(popover.x);
-        expect(detail.x + detail.width).toBeLessThanOrEqual(popover.x + popover.width);
+        expect(line.y + line.height).toBeLessThanOrEqual(button.y);
+        expect(line.x).toBeGreaterThanOrEqual(popover.x);
+        expect(line.x + line.width).toBeLessThanOrEqual(popover.x + popover.width);
     });
 
-    test('the window reads Legado: 100% do capítulo 5 and its detail with {5: 100}', async ({ page }) => {
+    test('the open window leaves the centre of the monster, (670, 440), to the canvas', async ({ page }) => {
+        await startGame(page, 3, { legacy: { yan: { 5: 100 } } });
+        await openAutoClick(page);
+
+        //  Owner decision 2026-11-26: the legacy detail row made the window cover the monster, so the detail is a tooltip
+        const hit = await page.locator('#game-container canvas').evaluate((canvas) => {
+            const box = canvas.getBoundingClientRect();
+            const node = document.elementFromPoint(box.x + (box.width * 670) / 1024, box.y + (box.height * 440) / 768);
+
+            return node === canvas;
+        });
+
+        expect(hit).toBe(true);
+    });
+
+    test('the window reads Legado: 100% do capítulo 5 and its detail as tooltip with {5: 100}', async ({ page }) => {
         await startGame(page, 3, { legacy: { yan: { 5: 100 } } });
         await openAutoClick(page);
 
         await expect(page.getByTestId('legacy-line')).toHaveText('Legado: 100% do capítulo 5');
-        await expect(page.getByTestId('legacy-detail')).toHaveText(
+        await expect(page.getByTestId('legacy-line')).toHaveAttribute(
+            'title',
             'Cada abate rende mais 100% das moedas do capítulo 5, e cada peça tem 100% de chance de vir com a raridade do capítulo 5.'
         );
     });
@@ -152,7 +168,8 @@ test.describe('Reset legacy', () => {
         await openAutoClick(page);
 
         await expect(page.getByTestId('legacy-line')).toHaveText('Legado: 50% do capítulo 5');
-        await expect(page.getByTestId('legacy-detail')).toHaveText(
+        await expect(page.getByTestId('legacy-line')).toHaveAttribute(
+            'title',
             'Cada abate rende mais 50% das moedas do capítulo 5, e cada peça tem 50% de chance de vir com a raridade do capítulo 5.'
         );
         //  The window took the legacy of the reset answer: no GET /account/legacy in between
@@ -195,20 +212,12 @@ test.describe('Reset legacy', () => {
         await openAutoClick(page);
 
         const line = page.getByTestId('legacy-line');
-        const detail = page.getByTestId('legacy-detail');
 
         await expect(line).toHaveCSS('font-size', '13px');
         await expect(line).toHaveCSS('font-weight', '700');
         await expect(line).toHaveCSS('font-family', /Figtree/);
         await expect(line).toHaveCSS('color', await tokenColor(page, '--ink-900'));
         await expect(line).toHaveCSS('color', 'rgb(42, 26, 16)');
-
-        await expect(detail).toHaveCSS('font-size', '12px');
-        await expect(detail).toHaveCSS('font-weight', '400');
-        await expect(detail).toHaveCSS('line-height', '16.2px');
-        await expect(detail).toHaveCSS('font-family', /Figtree/);
-        await expect(detail).toHaveCSS('color', await tokenColor(page, '--ink-600'));
-        await expect(detail).toHaveCSS('color', 'rgb(107, 74, 43)');
 
         await page.getByTestId('reset-account').click();
 

@@ -70,6 +70,12 @@ T9 → T10
 T11
 ```
 
+### Phase 5: Fix of the release findings (game-dev)
+
+```
+T12
+```
+
 ---
 
 ## Task Breakdown
@@ -577,6 +583,33 @@ If `.auto-click-popover` is not a grid, drop `grid-column` and give both lines `
 
 ---
 
+#### T12: The window shows the legacy line only, the detail is a tooltip [x]
+
+**Owner**: game-dev
+**Goal**: The open auto click window leaves the centre of the monster, (670, 440), to the canvas again (found by the gitops release: `uiRedesign.spec.js` "closes the window on a click on the monster, and the click still hits" timed out).
+**Where**: `game/src/adapters/phaser/views/resetView.js`, `game/public/style.css`
+**Files**:
+- Also edits: `game/src/adapters/phaser/views/resetView.test.js`, `game/e2e/resetLegacy.spec.js`, `game/e2e/uiRedesign.spec.js` (order of the controls), `spec.md` (Player-Facing Texts, Q6, Display 1), `design.md` (§ Layout, views)
+- Read first: spec § Player-Facing Texts, design § Layout
+**Depends on**: T11
+**Requirement**: RLD-06
+
+**Cause**: the two legacy rows made the window 249 px tall (top at y 390, x 663..903), so it covered the monster hit area (x 560..780, y 315..565) at (670, 440); without them the top was at y 477. Owner decision 2026-11-26: the detail row covered the monster.
+
+**What changed**: `renderLegacyLine` draws only `div.legacy-line` and puts the detail text in its `title` (the `legacy-detail` row and its CSS are gone); spec Display 1 and design say so. The reset dialog line (Display 2) is unchanged.
+
+**Tests**: the unit tests of `renderLegacyLine` (line text, tooltip text, no `legacy-detail`); `resetLegacy.spec.js` (title of the line in the three texts, no detail row, the line above `Resetar conta` inside the window, fonts and colours of the line, the canvas at (670, 440) with the window open); `uiRedesign.spec.js` (order of the controls with only `legacy-line`).
+**Gate**: `cd game && npm test`, `npx playwright test e2e/uiRedesign.spec.js e2e/resetLegacy.spec.js`
+**Done when**:
+
+- [x] The window shows `legacy-line` with the detail as its `title`; no `legacy-detail` row.
+- [x] `document.elementFromPoint` at scene (670, 440) is the canvas while the window is open.
+- [x] The unit suite and the two e2e files pass.
+
+**Commit**: `fix(game): keep the legacy detail out of the auto click window`
+
+---
+
 ## Validation Tables
 
 ### Diagram-Definition Cross-Check
@@ -594,6 +627,7 @@ If `.auto-click-popover` is not a grid, drop `grid-column` and give both lines `
 | T9 | T8, T3 (phase 1) | Phase 3 start | ✅ Match |
 | T10 | T9 | T9 → T10 | ✅ Match |
 | T11 | T10 (phase 3) | Phase 4 | ✅ Match |
+| T12 | T11 (phase 4) | Phase 5 | ✅ Match |
 
 ### Test Co-location Validation
 

@@ -71,8 +71,8 @@ Every new text, exactly (AD-007, L-010). `<p>` is the percent (50 or 100), `<c>`
 | --- | --- |
 | Legacy line, no legacy | `Legado: nenhum` |
 | Legacy line, best legacy | `Legado: <p>% do capítulo <c>` |
-| Legacy detail under the line, best legacy | `Cada abate rende mais <p>% das moedas do capítulo <c>, e cada peça tem <p>% de chance de vir com a raridade do capítulo <c>.` |
-| Legacy detail, no legacy | `Resete a conta para ganhar moedas e peças melhores nas próximas jornadas.` |
+| Legacy detail, best legacy (the `title` tooltip of the legacy line) | `Cada abate rende mais <p>% das moedas do capítulo <c>, e cada peça tem <p>% de chance de vir com a raridade do capítulo <c>.` |
+| Legacy detail, no legacy (the `title` tooltip of the legacy line) | `Resete a conta para ganhar moedas e peças melhores nas próximas jornadas.` |
 | Reset dialog, the reset makes its chapter the best (case A) | `Legado depois do reset: <p'>% do capítulo <r> (hoje: <best>).` where `<best>` is `<p>% do capítulo <c>` or `nenhum` |
 | Reset dialog, the chapter rises but another stays best (case B) | `Este reset sobe o legado do capítulo <r> para <p'>%. O melhor legado continua <p>% do capítulo <c>.` |
 | Reset dialog, the chapter is already at 100 (case C) | `O legado do capítulo <r> já está em 100%: este reset não muda o seu legado.` |
@@ -93,7 +93,7 @@ Every new text, exactly (AD-007, L-010). `<p>` is the percent (50 or 100), `<c>`
 | **Q3** Copper legacy above the best chapter | **Recommended**: applies in every chapter (a player in chapter 12 with 100 % of chapter 5 also gets +16x the chapter 5 roll) | The owner's formula is "every kill"; one rule is easier to read | y (owner, 2026-11-25: recommended default) |
 | **Q4** Piece legacy at or above the best chapter | **Recommended**: no effect (`b <= k` uses chapter k as today) | The chapter's own weights are already as good | y (owner, 2026-11-25: recommended default) |
 | **Q5** Farm | **Recommended**: farm pieces get the piece legacy; farm kills drop no copper as today | Same award path (`EquipmentRewards`) | y (owner, 2026-11-25: recommended default) |
-| **Q6** Where the player sees it | **Recommended**: a legacy line and its detail in the auto click window above `Resetar conta`, and one line in the reset dialog under its question | Both live next to the reset today; no new screen | y (owner, 2026-11-25: recommended default) |
+| **Q6** Where the player sees it | **Recommended**: a one-line legacy line in the auto click window above `Resetar conta`, its detail in the `title` tooltip of that line (amended 2026-11-26, owner decision 2026-11-26: the detail row covered the monster), and one line in the reset dialog under its question | Both live next to the reset today; no new screen | y (owner, 2026-11-25: recommended default) |
 | **Q7** Chapter 1 after a high reset | Accept. The legacy changes no damage, health or talent number of `early-game-rebalance`. Chapter 1 gets faster after a reset because the player keeps the gear: the `early-game-rebalance` simulation (revision 2) with a kept +10 weapon ends chapter 1 at 6.6 min for Kael at 8 clicks/s (12.0 without), chapter 3 at 20.4 (30.3). The legacy adds copper (up to 353x in chapter 1) and better piece rarity below the best chapter | Faster runs after a reset are the point of a reset | y (owner, 2026-11-25: recommended default) |
 | Storage | `player_legacy (username -> users on delete cascade, chapter 1 to 15, percent 50 or 100, primary key (username, chapter))`, expand only; version V18 after `early-game-rebalance` (V16, V17), else the next free one | AD-016; a row per chapter keeps the per-chapter value the owner described || y (owner, 2026-11-25: recommended defaults accepted) |
 | API | `GET /account/legacy` answers `{ chapters: [{ chapter, percent }], best: { chapter, percent } or null, afterReset: { chapter, percent, best } or null }` (`afterReset` null while the reset is closed); `POST /account/reset` answers the same object as `legacy` | The game types no catalog number (AD-011): the best and the preview come from the backend, which knows `coinFactor` || y (owner, 2026-11-25: recommended defaults accepted) |
@@ -186,7 +186,7 @@ Every new text, exactly (AD-007, L-010). `<p>` is the percent (50 or 100), `<c>`
 
 **Acceptance Criteria**:
 
-1. WHILE the auto click window is open the game SHALL show the legacy line and its detail above `Resetar conta` with the texts of § Player-Facing Texts.  <!-- state-driven -->
+1. WHILE the auto click window is open the game SHALL show the legacy line above `Resetar conta` with the text of § Player-Facing Texts and SHALL carry its detail as the `title` tooltip of that line, with no detail row (amended 2026-11-26, owner decision 2026-11-26: the detail row covered the monster: the taller window covered the centre of the monster).  <!-- state-driven -->
 2. WHEN the player opens the reset dialog THEN the game SHALL show the legacy line of case A, B or C under the question.  <!-- event-driven -->
 3. WHEN the legacy is `{}` and the player opens the reset dialog in chapter 3 THEN the line SHALL read `Legado depois do reset: 50% do capítulo 3 (hoje: nenhum).`  <!-- event-driven -->
 4. WHEN the legacy is `{10: 50}` and the player opens the reset dialog in chapter 5 THEN the line SHALL read `Este reset sobe o legado do capítulo 5 para 50%. O melhor legado continua 50% do capítulo 10.`  <!-- event-driven -->

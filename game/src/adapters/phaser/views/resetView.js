@@ -14,10 +14,10 @@ export const RESET_ERROR_TEXT = 'Não foi possível resetar. Tente de novo.';
 
 export const renderResetButton = (reward) => el('button', 'reset-account', resetButtonText(reward), { type: 'button', testid: 'reset-account' });
 
-//  The legacy of the account resets (spec reset-legacy-drops): the line and its detail above the reset button of the auto click window
+//  The legacy of the account resets (spec reset-legacy-drops): the line above the reset button of the auto click window, its detail in the
+//  `title` tooltip (owner decision 2026-11-26: a detail row made the window cover the monster)
 export const renderLegacyLine = (legacy) => [
-    el('div', 'legacy-line', legacyLineText(legacy), { testid: 'legacy-line' }),
-    el('div', 'legacy-detail', legacyDetailText(legacy), { testid: 'legacy-detail' })
+    el('div', 'legacy-line', legacyLineText(legacy), { testid: 'legacy-line', title: legacyDetailText(legacy) })
 ];
 
 //  `legacyText` is what the reset changes in the legacy (resetLegacyText), shown right after the question; null draws no line
