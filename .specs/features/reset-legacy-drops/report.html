@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legado do reset</title>
+<style>
+:root {
+    --bg: #faf7f2; --surface: #ffffff; --text: #2b2622; --muted: #6f655c; --line: #e4dcd1;
+    --ok: #2f7a4a; --warn: #a3621b; --accent: #b4552d;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+}
+:root[data-theme="dark"] { --bg: #1d1a17; --surface: #27231f; --text: #efe8df; --muted: #a99d90; --line: #3a342e; --ok: #6cc28c; --warn: #e0a35c; --accent: #e08259; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 36px 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.verdict { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--ok); color: var(--bg); font-weight: 700; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.card .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.card .l { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.na { color: var(--warn); font-weight: 600; }
+.ok { color: var(--ok); font-weight: 600; }
+ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Legado do reset (reset-legacy-drops)</h1>
+<p class="sub">Relatório de release v0.12.0 &middot; 15 commits: os 13 do legado até <code>04693485</code> mais <code>e82584e5</code> e <code>70768821</code>; a faixa termina em <code>70768821</code> (separados dos do rebalance pelo assunto) &middot; 2026-11-26</p>
+<p><span class="verdict">PASS</span> &nbsp;Todas as tarefas de <code>tasks.md</code> estão marcadas, o author check fechou sem lacunas e o <code>ui-artist</code> aprovou (<code>3faf964d</code>, e de novo em <code>70768821</code> depois que a linha de detalhe saiu da janela).</p>
+<h2>Author check do test-engineer</h2>
+<div class="cards"><div class="card"><div class="n">12</div><div class="l">mutantes (sensor)</div></div><div class="card"><div class="n">12</div><div class="l">mortos</div></div><div class="card"><div class="n">0</div><div class="l">sobreviveram</div></div></div>
+<p>12 de 12 mutantes mortos, nenhuma lacuna (commit <code>6e807982</code>). O author check é anterior a <code>e82584e5</code>.</p>
+<h2>Código de produção</h2>
+<div class="scroll"><table>
+<tr><th>Parte</th><th>Linhas +</th><th>Linhas -</th><th>Arquivos</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>, inclui migrações SQL)</td><td class="num">+343</td><td class="num">-11</td><td class="num">11</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes, <code>game/public/*.css</code>)</td><td class="num">+198</td><td class="num">-22</td><td class="num">9</td></tr>
+<tr><td><strong>Total</strong></td><td class="num">+541</td><td class="num">-33</td><td class="num">20</td></tr>
+</table></div>
+<p>Fonte: <code>git diff --numstat</code> somado commit a commit.</p>
+<h2>Código de teste</h2>
+<div class="scroll"><table>
+<tr><th>Suíte</th><th>Linhas +</th><th>Linhas -</th><th>Arquivos</th><th>Testes declarados +</th><th>Total da suíte depois da execução</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td class="num">+640</td><td class="num">-10</td><td class="num">11</td><td class="num">55</td><td class="num">1356 testes, 0 falhas</td></tr>
+<tr><td>Jogo unitário (<code>game/src/**/*.test.js</code>)</td><td class="num">+330</td><td class="num">-6</td><td class="num">8</td><td class="num">33</td><td class="num">2373 testes, 0 falhas (medido em <code>04693485</code>; segundo o game-dev <code>e82584e5</code> não muda o total; não repeti a suíte)</td></tr>
+<tr><td>e2e (<code>game/e2e</code>)</td><td class="num">+300</td><td class="num">-21</td><td class="num">3</td><td class="num">13</td><td class="num">685 testes na execução completa (673 passaram); repetição no HEAD: 129 testes (uiRedesign 117 + resetLegacy 12): 128 passaram; 1 (<code>uiRedesign.spec.js:1269</code>, fechar com Escape) falhou e passou ao ser repetido sozinho</td></tr>
+</table></div>
+<p>&quot;Testes declarados +&quot; conta no diff as linhas novas com <code>@Test</code>, <code>it(</code> ou <code>test(</code> (um teste parametrizado conta uma vez); é uma contagem do diff, não do executor.</p>
+<h2>Cobertura dos testes unitários</h2>
+<div class="scroll"><table>
+<tr><th>Escopo</th><th>Linhas</th><th>% linhas</th><th>Branches</th><th>% branches</th></tr>
+<tr><td>Backend (JaCoCo), projeto todo</td><td class="num">3421/3473</td><td class="num">98,5%</td><td class="num">1121/1197</td><td class="num">93,7%</td></tr>
+<tr><td>Jogo (Vitest v8), projeto todo</td><td class="num">3850/3893</td><td class="num">98,89%</td><td class="num">1951/2051</td><td class="num">95,12%</td></tr>
+</table></div>
+<h3>Arquivos de produção que a feature alterou</h3>
+<div class="scroll"><table>
+<tr><th>Arquivo</th><th>Linhas</th><th>% linhas</th><th>Branches</th><th>% branches</th></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/repository/LegacyRepository.kt</td><td class="num">22/22</td><td class="num">100.0%</td><td class="num">0/0</td><td>n/a</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/adapter/web/AccountResetController.kt</td><td class="num">38/38</td><td class="num">100.0%</td><td class="num">9/10</td><td class="num">90.0%</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/domain/ResetLegacy.kt</td><td class="num">39/39</td><td class="num">100.0%</td><td class="num">34/36</td><td class="num">94.4%</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/port/LegacyRepositoryPort.kt</td><td class="num">0/0</td><td>n/a</td><td class="num">0/0</td><td>n/a</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/service/AccountResetService.kt</td><td class="num">40/40</td><td class="num">100.0%</td><td class="num">5/8</td><td class="num">62.5%</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/service/EquipmentRewards.kt</td><td class="num">32/32</td><td class="num">100.0%</td><td class="num">4/4</td><td class="num">100.0%</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/service/LegacyService.kt</td><td class="num">10/12</td><td class="num">83.3%</td><td class="num">2/4</td><td class="num">50.0%</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/service/WalletService.kt</td><td class="num">27/27</td><td class="num">100.0%</td><td class="num">5/6</td><td class="num">83.3%</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/AccountResetUseCase.kt</td><td class="num">6/6</td><td class="num">100.0%</td><td class="num">0/0</td><td>n/a</td></tr>
+<tr><td>main/kotlin/br/com/woodriver/infinity_grove_ws/usecase/LegacyUseCase.kt</td><td class="num">12/12</td><td class="num">100.0%</td><td class="num">2/2</td><td class="num">100.0%</td></tr>
+<tr><td>adapters/http/accountResetApi.js</td><td class="num">3/3</td><td class="num">100.0%</td><td class="num">0/0</td><td>n/a</td></tr>
+<tr><td>adapters/phaser/ClickerGame.js</td><td class="num">741/758</td><td class="num">97.8%</td><td class="num">329/366</td><td class="num">89.9%</td></tr>
+<tr><td>adapters/phaser/views/resetView.js</td><td class="num">16/16</td><td class="num">100.0%</td><td class="num">7/7</td><td class="num">100.0%</td></tr>
+<tr><td>application/accountReset/accountReset.js</td><td class="num">11/11</td><td class="num">100.0%</td><td class="num">4/4</td><td class="num">100.0%</td></tr>
+<tr><td>application/accountReset/resetLegacy.js</td><td class="num">14/14</td><td class="num">100.0%</td><td class="num">5/6</td><td class="num">83.3%</td></tr>
+<tr><td>application/session/sessionManager.js</td><td class="num">50/50</td><td class="num">100.0%</td><td class="num">18/19</td><td class="num">94.7%</td></tr>
+<tr><td>composition.js</td><td class="num">24/24</td><td class="num">100.0%</td><td class="num">0/0</td><td>n/a</td></tr>
+<tr><td>domain/campaign/resetLegacy.js</td><td class="num">25/25</td><td class="num">100.0%</td><td class="num">34/35</td><td class="num">97.1%</td></tr>
+</table></div>
+<p>Backend e unitário do jogo foram medidos em <code>04693485</code>, antes de <code>e82584e5</code> (que mexe em <code>ClickerGame.js</code> e no popover). Não repeti essas suítes, então os números por arquivo do jogo podem ter mudado um pouco. Arquivos sem linhas executáveis (interfaces) aparecem com 0/0.</p>
+<h2>Cobertura e2e</h2>
+<div class="cards"><div class="card"><div class="n">94,74%</div><div class="l">linhas do jogo (3694/3899)</div></div><div class="card"><div class="n">81,16%</div><div class="l">branches (1362/1678)</div></div><div class="card"><div class="n">93,45%</div><div class="l">funções (1057/1131)</div></div></div>
+<p>Execução completa com <code>npm run test:e2e:coverage</code> em 15 partes (a primeira sem <code>--keep</code>, as demais com <code>--keep</code>), instrumentação istanbul. O número é um limite inferior: uma página recarregada dentro de um teste perde o que contou antes do recarregamento. A execução completa foi medida em <code>04693485</code>, antes de <code>e82584e5</code>. Depois do commit repeti só <code>uiRedesign.spec.js</code> e <code>resetLegacy.spec.js</code> no HEAD: 129 testes (uiRedesign 117 + resetLegacy 12): 128 passaram; 1 (<code>uiRedesign.spec.js:1269</code>, fechar com Escape) falhou e passou ao ser repetido sozinho. Totais e cobertura por arquivo são da execução completa, não dessa repetição.</p>
+<h3>Arquivos de jogo que a feature alterou (e2e)</h3>
+<div class="scroll"><table>
+<tr><th>Arquivo</th><th>Linhas</th><th>% linhas</th></tr>
+<tr><td>adapters/http/accountResetApi.js</td><td class="num">3/3</td><td class="num">100.0%</td></tr>
+<tr><td>adapters/phaser/ClickerGame.js</td><td class="num">715/758</td><td class="num">94.3%</td></tr>
+<tr><td>adapters/phaser/views/resetView.js</td><td class="num">15/16</td><td class="num">93.8%</td></tr>
+<tr><td>application/accountReset/accountReset.js</td><td class="num">8/11</td><td class="num">72.7%</td></tr>
+<tr><td>application/accountReset/resetLegacy.js</td><td class="num">14/14</td><td class="num">100.0%</td></tr>
+<tr><td>application/session/sessionManager.js</td><td class="num">41/50</td><td class="num">82.0%</td></tr>
+<tr><td>composition.js</td><td class="num">24/24</td><td class="num">100.0%</td></tr>
+<tr><td>domain/campaign/resetLegacy.js</td><td class="num">23/25</td><td class="num">92.0%</td></tr>
+</table></div>
+<h2>Cenários e2e da feature</h2>
+<div class="scroll"><table>
+<tr><th>Arquivo</th><th>Cenário</th><th>Resultado</th></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › the window reads Legado: nenhum and the reset hint with no legacy</td><td class="ok">passou</td></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › the open window leaves the centre of the monster, (670, 440), to the canvas</td><td class="ok">passou</td></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › the window reads Legado: 100% do capítulo 5 and its detail as tooltip with {5: 100}</td><td class="ok">passou</td></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › the window shows the best legacy of {5: 100, 10: 50}, the one of the largest percent times coin factor</td><td class="ok">passou</td></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › the dialog in chapter 3 with no legacy reads Legado depois do reset: 50% do capítulo 3 (hoje: nenhum).</td><td class="ok">passou</td></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › the dialog in chapter 10 with {5: 50} reads case A with the best of today</td><td class="ok">passou</td></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › the dialog in chapter 5 with {10: 50} reads case B</td><td class="ok">passou</td></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › the dialog in chapter 5 with {5: 100} reads case C</td><td class="ok">passou</td></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › after a reset from chapter 5 the window reads Legado: 50% do capítulo 5 at once</td><td class="ok">passou</td></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › a second reset from chapter 5 raises the window to 100%</td><td class="ok">passou</td></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › with the endpoint missing the window and the dialog show no legacy line and the reset works</td><td class="ok">passou</td></tr>
+<tr><td><code>resetLegacy.spec.js</code></td><td>Reset legacy › the legacy lines use their fonts and colours</td><td class="ok">passou</td></tr>
+</table></div>
+<p>Depois de <code>e82584e5</code> o <code>resetLegacy.spec.js</code> ganhou um teste novo (a dica <code>title</code> com o detalhe do legado); a lista acima é a do HEAD e inclui esse teste, que passou na repetição.</p>
+<h2>Falhas que não vêm da feature</h2>
+<p>Na execução completa do e2e (685 testes: 673 passaram, 12 falharam) cada falha foi repetida sozinha uma vez. Nove passaram sozinhas, então são falhas de carga da máquina e não da feature: <code>autoClick.spec.js:45</code>, <code>blackAwarenessStaffDamage.spec.js:154</code> e <code>:172</code>, <code>dragEquip.spec.js:586</code>, <code>minibossAdds.spec.js:245</code>, <code>skills.spec.js:49</code>, <code>splash.spec.js:25</code>, <code>talentTreeBranches.spec.js:361</code> e <code>wake.spec.js:56</code>.</p>
+<p>As outras três falharam também sozinhas e eram causadas pela feature <code>reset-legacy-drops</code>, porque a janela do clique automático ganhou as linhas de legado: <code>uiRedesign.spec.js:1228</code>, <code>:1294</code> e <code>:2138</code>. Foram corrigidas em <code>e82584e5</code> (a linha de detalhe saiu da janela e virou uma dica <code>title</code>).</p>
+<p>Testes de deploy (<code>node --test</code>, 289 testes, 287 passaram): dois testes de <code>regression.test.mjs</code> (&quot;the CLI exits 0 when every check passes&quot; e &quot;the CLI exits 1 when a check fails&quot;) saem com o código 3221226505 (0xC0000409, queda do processo Node filho no Windows). Falharam também sozinhos. Nenhum arquivo de <code>deploy/</code>, <code>publish.sh</code>, <code>deploy.sh</code> ou <code>start.sh</code> mudou desde <code>23b01b2</code>. Cobertura de deploy: 96,15% das linhas, 95,46% dos branches, 94,44% das funções.</p>
+<h2>Deploy</h2>
+<p>As migrações V16, V17 e V18 já estão aplicadas no backend ativo (slot green, Flyway na versão 18). O deploy fica no ar apenas enquanto <code>./publish.sh</code> roda na máquina de publicação. Verificação no navegador: pendente, a extensão Claude in Chrome não estava conectada; conferido só por curl: o Worker responde 200 e o túnel responde 401 sem token, como o resto da API</p>
+</main>
+</body>
+</html>

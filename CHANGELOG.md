@@ -3,6 +3,25 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.12.0] - 2026-11-26
+
+Legado do reset (`reset-legacy-drops`): resetar a conta agora deixa um legado que melhora as moedas e as peças das próximas jornadas, conforme o capítulo em que você resetou.
+
+### Adicionado
+
+- Cada reset soma **+50% de legado** ao capítulo em que foi feito (capítulo 15 se a campanha estava completa), até 100% por capítulo. Só o melhor legado vale.
+- **Moedas**: cada abate rende, além da sua própria rolagem, a parte do legado nas moedas do mesmo tipo de abate do capítulo do legado. Depois de um reset no capítulo 15, um monstro de fase do capítulo 1 passa a render de 354 a 1062 moedas (eram 2 a 6).
+- **Peças**: uma peça que cai abaixo do capítulo do legado tem a chance do legado de vir com a raridade daquele capítulo.
+- A janela do clique automático mostra a linha `Legado` com o melhor legado; o que ele faz aparece como dica ao passar o mouse. O diálogo de reset diz, antes de confirmar, o que aquele reset vai mudar no seu legado.
+
+### Alterado
+
+- O legado vem de onde você resetou, não de quantos resets fez. Resets feitos antes desta versão não geram legado.
+
+### Corrigido
+
+- Ao sair da conta, o legado da sessão anterior deixa de aparecer para o próximo jogador.
+
 ## [0.11.0] - 2026-11-26
 
 Reequilíbrio do início do jogo (`early-game-rebalance`): os primeiros capítulos deixam de passar voando, não há mais paredes até o capítulo 15 e minichefes e chefes ganham modificadores de combate.
