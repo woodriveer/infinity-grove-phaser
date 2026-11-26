@@ -2,6 +2,7 @@ package br.com.woodriver.infinity_grove_ws.service
 
 import br.com.woodriver.infinity_grove_ws.InMemoryDropRuleRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryEquipmentRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryLegacyRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
 import br.com.woodriver.infinity_grove_ws.MutableClock
 import br.com.woodriver.infinity_grove_ws.SequenceChanceRoller
@@ -16,6 +17,7 @@ import br.com.woodriver.infinity_grove_ws.domain.EquipmentDrop
 import br.com.woodriver.infinity_grove_ws.domain.EquipmentRules
 import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.Rarity
+import br.com.woodriver.infinity_grove_ws.domain.ResetLegacy
 import br.com.woodriver.infinity_grove_ws.domain.Slot
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
 import kotlin.test.Test
@@ -26,6 +28,7 @@ import kotlin.test.assertTrue
 class EquipmentRewardsTest {
     private val pieces = InMemoryEquipmentRepository()
     private val wallets = InMemoryWalletRepository()
+    private val legacies = InMemoryLegacyRepository()
     private val table = DropTable(listOf(DropRule(1, 1, 5, 1500)))
     private val walletAccess =
         WalletAccess(wallets, InMemoryDropRuleRepository(*table.rules.toTypedArray()), SequenceDropRoller(1), MutableClock(1_000L))
@@ -34,7 +37,7 @@ class EquipmentRewardsTest {
     private fun rewards(
         rules: EquipmentRules = EquipmentRules(),
         chance: SequenceChanceRoller = SequenceChanceRoller(0.0),
-    ) = EquipmentRewards(pieces, walletAccess, chance, SequenceIds(), rules)
+    ) = EquipmentRewards(pieces, walletAccess, chance, SequenceIds(), rules, legacies)
 
     private fun ring(id: String) = Piece(id, "yan", Slot.RING, Rarity.COMMON, null, 0, listOf(Affix(AffixType.CRIT_CHANCE, 2)))
 
@@ -119,5 +122,70 @@ class EquipmentRewardsTest {
 
         assertEquals(false, drop!!.sold)
         assertTrue(wallets.wallets.isEmpty())
+    }
+
+    private fun legacyOf(vararg percents: Pair<Int, Int>) = legacies.save(ResetLegacy("yan", mapOf(*percents)))
+
+    @Test
+    fun `a chapter 2 boss piece with 50 percent of chapter 5 and legacy roll 0 point 2 rolls the chapter 5 weights`() {
+        legacyOf(5 to 50)
+
+        // the legacy roll, the drop, then the rarity: 0.97 is LEGENDARY in the chapter 5 table (40 / 40 / 15 / 5)
+        val drop = rewards(chance = SequenceChanceRoller(0.2, 0.0, 0.97, 0.0)).award("yan", Encounter.CHAPTER_BOSS, 2)
+
+        assertEquals(Rarity.LEGENDARY, drop!!.piece.rarity)
+    }
+
+    @Test
+    fun `the same piece with legacy roll 0 point 5 rolls the chapter 2 weights`() {
+        legacyOf(5 to 50)
+
+        // 0.97 is UNCOMMON in the chapter 2 table (30 / 70)
+        val drop = rewards(chance = SequenceChanceRoller(0.5, 0.0, 0.97, 0.0)).award("yan", Encounter.CHAPTER_BOSS, 2)
+
+        assertEquals(Rarity.UNCOMMON, drop!!.piece.rarity)
+    }
+
+    @Test
+    fun `a piece in chapter 6 with 100 percent of chapter 5 makes no legacy roll`() {
+        legacyOf(5 to 100)
+        val chance = SequenceChanceRoller(0.0)
+
+        val drop = rewards(chance = chance).award("yan", Encounter.CHAPTER_BOSS, 6)
+
+        assertEquals(EquipmentDrop(uncommonWeapon, sold = false), drop)
+        val plain = SequenceChanceRoller(0.0)
+        EquipmentRewards(InMemoryEquipmentRepository(), walletAccess, plain, SequenceIds(), EquipmentRules(), InMemoryLegacyRepository())
+            .award("yan", Encounter.CHAPTER_BOSS, 6)
+        assertEquals(plain.reads, chance.reads)
+    }
+
+    @Test
+    fun `a player without legacy makes no legacy roll`() {
+        // the first read is the drop, the second the rarity: 0.97 is UNCOMMON in the chapter 2 table
+        val drop = rewards(chance = SequenceChanceRoller(0.0, 0.97, 0.0)).award("yan", Encounter.CHAPTER_BOSS, 2)
+
+        assertEquals(Rarity.UNCOMMON, drop!!.piece.rarity)
+    }
+
+    @Test
+    fun `a farm piece of chapter 1 with 100 percent of chapter 5 uses the chapter 5 weights`() {
+        legacyOf(5 to 100)
+
+        // legacy roll 0.99 is below 1.0, so the rarity 0.97 is LEGENDARY in the chapter 5 table
+        val drop = rewards(chance = SequenceChanceRoller(0.99, 0.0, 0.97, 0.0)).award("yan", Encounter.CHAPTER_BOSS, 1)
+
+        assertEquals(Rarity.LEGENDARY, drop!!.piece.rarity)
+    }
+
+    @Test
+    fun `the drop rate stays 0 point 5 for a miniboss with a legacy`() {
+        legacyOf(5 to 50)
+
+        // the legacy roll 0.0 passes, the drop chance 0.5 is not below the miniboss rate 0.5
+        val drop = rewards(chance = SequenceChanceRoller(0.0, 0.5)).award("yan", Encounter.MINIBOSS, 1)
+
+        assertNull(drop)
+        assertTrue(pieces.pieces.isEmpty())
     }
 }

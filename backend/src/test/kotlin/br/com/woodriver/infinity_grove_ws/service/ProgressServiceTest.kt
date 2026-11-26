@@ -4,6 +4,7 @@ import br.com.woodriver.infinity_grove_ws.InMemoryChapterRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryDropRuleRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryEquipmentRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryHeroRepository
+import br.com.woodriver.infinity_grove_ws.InMemoryLegacyRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryPlayerCardsRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryTalentRepository
@@ -65,6 +66,7 @@ class ProgressServiceTest {
             equipmentChance,
             SequenceIds(),
             EquipmentRules(),
+            InMemoryLegacyRepository(),
         )
 
     private val service get() =

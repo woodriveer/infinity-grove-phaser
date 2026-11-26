@@ -287,7 +287,7 @@ data class LegacyResponse(val chapters: List<LegacyChapterResponse>, val best: L
 
 ---
 
-#### T5: Pieces roll with the legacy rarity [ ]
+#### T5: Pieces roll with the legacy rarity [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: A piece that drops below the best legacy chapter uses that chapter's rarity weights with the legacy's chance (RLD-05; spec Pieces AC 1 to 5).
