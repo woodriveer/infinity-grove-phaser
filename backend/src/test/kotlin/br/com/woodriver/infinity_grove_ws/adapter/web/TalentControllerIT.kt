@@ -422,6 +422,32 @@ class TalentControllerIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `the flat damage, critical chance and critical damage rows carry 1, 5 and 15 a level times their grade`() {
+        asUser()
+            .get("/talents")
+            .then()
+            .statusCode(200)
+            .body("talents[8].id", equalTo("CLICK_FLAT_DAMAGE"))
+            .body("talents[8].perLevel", equalTo(1))
+            .body("talents[17].id", equalTo("CLICK_FLAT_DAMAGE_G2"))
+            .body("talents[17].perLevel", equalTo(2))
+            .body("talents[26].id", equalTo("CLICK_FLAT_DAMAGE_G3"))
+            .body("talents[26].perLevel", equalTo(3))
+            .body("talents[5].id", equalTo("CRIT_CHANCE"))
+            .body("talents[5].perLevel", equalTo(5))
+            .body("talents[14].id", equalTo("CRIT_CHANCE_G2"))
+            .body("talents[14].perLevel", equalTo(10))
+            .body("talents[23].id", equalTo("CRIT_CHANCE_G3"))
+            .body("talents[23].perLevel", equalTo(15))
+            .body("talents[6].id", equalTo("CRIT_DAMAGE"))
+            .body("talents[6].perLevel", equalTo(15))
+            .body("talents[15].id", equalTo("CRIT_DAMAGE_G2"))
+            .body("talents[15].perLevel", equalTo(30))
+            .body("talents[24].id", equalTo("CRIT_DAMAGE_G3"))
+            .body("talents[24].perLevel", equalTo(45))
+    }
+
+    @Test
     fun `the boss damage, armor pierce and Fúria crescente rows carry their labels and values`() {
         asUser()
             .get("/talents")

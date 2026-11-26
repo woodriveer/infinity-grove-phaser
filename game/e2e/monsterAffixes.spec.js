@@ -185,6 +185,24 @@ test.describe('Every strike goes through the affix', () => {
     });
 });
 
+test.describe('Adds', () => {
+    test('a strike on an add of an affix miniboss takes no charge and loses nothing to the shell', async ({ page }) => {
+        const base = affixChapter({ affix: SHIELD(3) });
+        const definition = { ...base, stages: [ { ...base.stages[0], adds: [ { health: 30, defenseBuff: 0 } ] } ] };
+
+        await startFight(page, { definition });
+
+        await expect(chip(page)).toHaveText('Escudo de golpes: 3/3');
+
+        //  The first add stands at (480, 360) (ADD_BOXES of ClickerGame.js)
+        await scene(page, '(s) => s.hitMonster({ x: 480, y: 360 })');
+
+        expect(await scene(page, '(s) => s.fight.adds.map((a) => a.monster.health)')).toEqual([ 29 ]);
+        expect(await health(page)).toBe(100);
+        await expect(chip(page)).toHaveText('Escudo de golpes: 3/3');
+    });
+});
+
 test.describe('Farm and payload', () => {
     test('a farm fight of a miniboss with Escudo de golpes applies the shield', async ({ page }) => {
         await startFight(page, { definition: affixChapter({ affix: SHIELD(3) }), progress: COMPLETED, stop: false, monster: false });
@@ -202,6 +220,36 @@ test.describe('Farm and payload', () => {
         await clickMonster(page);
 
         expect(await health(page)).toBe(99);
+    });
+
+    test('a farm fight that is left takes its shield state with it and the next farm fight starts a full shield', async ({ page }) => {
+        await startFight(page, { definition: affixChapter({ affix: SHIELD(3) }), progress: COMPLETED, stop: false, monster: false });
+
+        await page.getByTestId('hud-farm').click();
+        await page.getByTestId('farm-entry-miniboss-1').click();
+        await expect(chip(page)).toHaveText('Escudo de golpes: 3/3');
+        await freeze(page);
+        await clickMonster(page, 2);
+
+        await expect(chip(page)).toHaveText('Escudo de golpes: 1/3');
+
+        await page.evaluate(() => window.__PHASER_GAME__.loop.wake());
+        await page.keyboard.press('Escape');
+        await page.locator('.pause-leave').click();
+        await page.locator('.pause-confirm-yes').click();
+
+        await expect(page.locator('.stage-message')).toHaveText('Chapter complete!');
+        await expect(chip(page)).toHaveText('');
+        await expect(chip(page)).toBeHidden();
+
+        await page.getByTestId('hud-farm').click();
+        await page.getByTestId('farm-entry-miniboss-1').click();
+        await expect(chip(page)).toHaveText('Escudo de golpes: 3/3');
+        await freeze(page);
+        await clickMonster(page);
+
+        await expect(chip(page)).toHaveText('Escudo de golpes: 2/3');
+        expect(await health(page)).toBe(100);
     });
 
     test('a payload with minibossAffix null, missing or of an unknown type fights with no affix', async ({ browser }) => {

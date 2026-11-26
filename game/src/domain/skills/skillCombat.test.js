@@ -3,7 +3,7 @@ import { allyAttacker } from '../combat/allyAttacker';
 import { leaderAttacker } from '../combat/leaderAttacker';
 import { Fight } from '../combat/fight';
 import { DEFAULT_STATS, Monster } from '../combat/monster';
-import { AffixState } from '../combat/monsterAffix';
+import { AffixState, affixDefense } from '../combat/monsterAffix';
 import { PLAYER } from '../combat/damage';
 import { monsterAfterBreak } from '../talents/talents';
 import { SkillCombat } from './skillCombat';
@@ -1594,6 +1594,26 @@ describe('affixes', () => {
 
         expect(skills.advance(2000, { monster }).hits).toEqual([ { damage: 44, critical: true } ]);
         expect(monster.health).toBe(956);
+    });
+
+    it('a Blindado +20 monster of seeded defense 33 takes 0.47 from a Base-1 click and one of seeded defense 80 takes 0', () => {
+        const armor = { type: 'ARMORED', amount: 20, periodMs: null };
+        const light = monsterOf(1000, affixDefense(stats('FIRE', 33, 33), armor));
+        const heavy = monsterOf(1000, affixDefense(stats('FIRE', 80, 80), armor));
+
+        expect(combat().click({ attacker: PLAYER, monster: light, boss: false }).damage).toBeCloseTo(0.47, 10);
+        expect(light.health).toBeCloseTo(999.53, 6);
+        expect(combat().click({ attacker: PLAYER, monster: heavy, boss: false })).toEqual({ damage: 0, critical: false });
+        expect(heavy.health).toBe(1000);
+    });
+
+    it('the double click of Lyra on a shield with 1 charge takes the charge with the first hit and lands the second', () => {
+        const monster = withAffix(shield(1));
+        const skills = combat();
+
+        expect(skills.click({ attacker: PLAYER, monster, boss: false, forceCritical: true })).toEqual({ damage: 0, critical: true });
+        expect(skills.click({ attacker: PLAYER, monster, boss: false, forceCritical: true })).toEqual({ damage: 2, critical: true });
+        expect(monster.health).toBe(998);
     });
 
     it('without an affix every result is unchanged', () => {

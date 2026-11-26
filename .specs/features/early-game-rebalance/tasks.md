@@ -1230,7 +1230,7 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 
 ---
 
-#### T16: Author check [ ]
+#### T16: Author check [x]
 
 **Owner**: test-engineer
 **Goal**: Every AC and edge case of the spec has a test that asserts its spec value, and the tests kill the injected faults (EGR-01 to EGR-08; `.claude/agents/test-engineer.md` author check).
@@ -1250,7 +1250,7 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 **Gate**: `cd backend && ./gradlew test && cd ../game && npm test && npx playwright test e2e/earlyGameRebalanceTalents.spec.js e2e/earlyGameRebalance.spec.js e2e/monsterAffixes.spec.js e2e/monsterAffixesHud.spec.js`
 **Done when**:
 
-- [ ] Every AC and edge case maps to a test; every mutant of step 2 is killed or a fix task is listed.
+- [x] Every AC and edge case maps to a test; every mutant of step 2 is killed or a fix task is listed.
 
 **Commit**: `test: author check of the early game rebalance`
 
@@ -1258,7 +1258,7 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 
 ### Phase 5: UI review
 
-#### T17: UI review of the affix chip and the talent card [ ]
+#### T17: UI review of the affix chip and the talent card [x]
 
 **Owner**: ui-artist
 **Goal**: The chip of each affix type and state and the talent card value read well on the fight and Talentos screens (EGR-08; spec § Affix Display).
@@ -1277,7 +1277,7 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 **Gate**: `cd game && npm run ui:shots -- earlyGameRebalance`
 **Done when**:
 
-- [ ] `ui-review.html` lists the 12 shots with a verdict `APROVADO` or the findings as new tasks.
+- [x] `ui-review.html` lists the 12 shots with a verdict `APROVADO` or the findings as new tasks.
 
 **Commit**: `docs(ui): review the monster affix chip`
 
@@ -1344,3 +1344,108 @@ Run every e2e file that reads talent values to check the mirror change: `npx pla
 | T12 to T15 | e2e | e2e | e2e | ✅ OK |
 | T16 | none (check) | - | e2e + unit runs | ✅ OK |
 | T17 | UI review artifact | none | none | ✅ OK |
+
+---
+
+## Author check
+
+T16, run on 2026-11-26 on `origin/main` at `4e3288a8` plus the three tests of § Gaps closed. `B` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`, `G` = `game/`.
+
+### AC to assertion
+
+| AC | Test (`file:line`) | Exact value asserted |
+| -- | ------------------ | -------------------- |
+| Flat 1 | `B domain/TalentsTest.kt:55`, `B adapter/web/TalentControllerIT.kt:113` | `valueAt` 0, 1, 2, 3, 10 at levels 0, 1, 2, 3, 10; `/talents` row `perLevel` 1 |
+| Flat 2 | `TalentsTest.kt:62`, `:96`, `TalentControllerIT.kt` (new `the flat damage, critical chance and critical damage rows ...`) | G2 `valueAt(1)` 2, G3 3; level 10 `10, 20, 30`; `/talents` `perLevel` 2 and 3 |
+| Flat 3 | `TalentsTest.kt:89` | `pointsPerMiniboss` 2, `pointsPerChapterBoss` 5, `pointsPerPhase` 0 |
+| Flat 4 | `G e2e/earlyGameRebalanceTalents.spec.js:57`, `:64` | card reads `+10 de dano`, grade 2 `+20 de dano`, grade 3 `+30 de dano` |
+| Flat 5 | `earlyGameRebalanceTalents.spec.js:72` | dealt `toBeCloseTo(11, 5)` |
+| Critical 1, 2 | `TalentsTest.kt:71`, `:80`, `TalentControllerIT.kt` (new case) | 5 and 15 at level 1; `50, 100, 150` and `150, 300, 450` at level 10; `/talents` `perLevel` 5, 10, 15 and 15, 30, 45 |
+| Critical 3 | `B domain/ChapterTest.kt:545`, `:555`, `:561`, `:387` | miniboss 1-1 `critResistance` 0, chapter 1 boss 5, chapter 5 boss 45, `(n - 1) + 8(c - 1)` for every stage of chapters 1 to 5; chapters 6 to 15 `min(10 + 2n + defenseBonus, 70)` |
+| Critical 4, 5 | `B adapter/repository/EarlyGameRebalanceMigrationIT.kt:153`, `:171`, `:200` | stage `1/1` resistance 0 and defense 11 FIRE, `2/10` 17 and 25, `5/10` 41 and 40 LIGHT; bosses 5, 15, 25, 35, 45 with defense 30 to 50; a tuned enemy (50) keeps its id |
+| Critical 6, 7 | `earlyGameRebalance.spec.js:84`, `:90` | `Seu crítico: 10%` against miniboss 1-1, `Seu crítico: 1%` against 1-10 |
+| Critical 8 | `earlyGameRebalanceTalents.spec.js:90`, `G e2e/talentTreeReworkCombat.spec.js:176` | `Seu crítico: 10%` then `Seu crítico: 15%` |
+| Critical 9 | `earlyGameRebalanceTalents.spec.js:82` | cards `+50 pontos` and `+150%` |
+| Curve 1 | `ChapterTest.kt:86`, `:95`, `:374`, `:379`, `:387` | 10 stages of 8 phases; chapter 1 health 69 ... 898; every chapter from the literal table |
+| Curve 2, 3 | `ChapterTest.kt:103`, `:113`, `:421`, `:443` | miniboss 3 x, 45 000 ms; boss 6000, 12500, 13000, 34000, 80000 ..., 90 000 ms; defenses unchanged |
+| Curve 4 | `ChapterTest.kt:185`, `:527`, `:561` | chapters 6 to 15 keep resistances, elements and buffs; adds 3 x the stage health (chapter 15 stage 1: 483000) |
+| Curve 5 | `EarlyGameRebalanceMigrationIT.kt:99`, `:106`, `:117`, `:125`, `:141` | 8 phases; `1/1` 69 and 207, `1/10` 898 and 2694, `3/5` 1811 and 5433, `6/1` 10000 and 30000, `15/10` 229153 and 687459; 45 000 and 90 000; bosses 6000, 80000, 130000, 4265000; adds `11/1/1` 114000, `15/10/2` 687459 |
+| Curve 6, 7 | `EarlyGameRebalanceMigrationIT.kt:181`, `:200`, `:222` | tuned 999, 6 phases, 31000, add 77, boss 7777 stay; a second run changes nothing |
+| Curve 8 | `B adapter/web/ProgressControllerIT.kt:84-91` | `phasesPerStage` 8, `monsterHealth` 69, `minibossHealth` 207, `minibossTimeLimitMs` 45000, `bossHealth` 6000, `bossTimeLimitMs` 90000 |
+| Curve 9, 10 | `earlyGameRebalance.spec.js:65`, `:75`, `:98`, `:105` | `HP 207/207` and `Time: 45`; `HP 6K/6K` and `Time: 90`; `Stage 1/10  Phase 1/8`, `Phase 8/8` then the miniboss |
+| Affixes 1 | `ChapterTest.kt:604-705` | every row of the Affix Table, the bounds, chapters 11 to 15 boss only, no affix on the other minibosses |
+| Affixes 2 | `ProgressControllerIT.kt:98-121`, `B adapter/web/FarmControllerIT.kt:295-298`, `B adapter/repository/ChapterRepositoryIT.kt:292` | `HIT_SHIELD`, 10, 6000; chapter 3 `SHELL` 6 with `periodMs` null, boss 16; `null` on chapter 1 |
+| Affixes 3 | `B adapter/repository/MonsterAffixesMigrationIT.kt:60`, `:96` | 27 and 14 rows, `3/3` `SHELL 6`, `3/6` `HIT_SHIELD 15 6000`, `10/6` `SHELL 346`; second run equal |
+| Affixes 4 | `G src/domain/combat/monsterAffix.test.js:50`, `:54`, `G e2e/monsterAffixes.spec.js:16`, `:26` | 10 on Carapaça 6 lands 4, 5 lands 0; HP 100 to 99; `0` shown |
+| Affixes 5 | `monsterAffix.test.js:64`, `monsterAffixes.spec.js:38` | 10 strikes land 0, the 11th of 5 lands 5; 3 clicks take nothing, the 4th takes 1 |
+| Affixes 6 | `monsterAffix.test.js:83`, `:99`, `monsterAffixes.spec.js:52`, `:70` | 5999 ms still down, 6000 ms back full, next strike 0 |
+| Affixes 7 | `monsterAffix.test.js:122`, `:136`, `monsterAffixes.spec.js:98`, `:108`, `:119` | 5 a second of 1000, never above the maximum, 10 a second at 1000 basis points |
+| Affixes 8 | `monsterAffixes.spec.js:81`, `:133` | paused: shield still down after 10 000 ms; Stun: health unchanged, then +10 |
+| Affixes 9 | `monsterAffix.test.js:34`, `G src/domain/skills/skillCombat.test.js:1599`, `monsterAffixes.spec.js:152` | defense 53, enemy line `Defesa 53%`, a click deals 0.47; defense 80 + 20 deals 0 |
+| Affixes 10 | `skillCombat.test.js:1550`, `:1562`, `:1571`, `:1589`, `monsterAffixes.spec.js:164`, `:177` | ally hit takes a charge, Flecha Dupla hits in order, tick minus the shell, aimed shot 44 on Carapaça 16; chip `2/3`; tick 0.4 |
+| Affixes 11 | `G src/domain/campaign/campaign.test.js:360`, `monsterAffixes.spec.js:207` | farm encounter carries the affix; farm shield `3/3`, 3 clicks take nothing |
+| Affixes 12 | `monsterAffix.test.js:18`, `campaign.test.js:354`, `monsterAffixes.spec.js:255` | `null`, missing and unknown type: a click takes 1, chip hidden |
+| Display 1 | `G e2e/monsterAffixesHud.spec.js:36`, `:43`, `:66`, `:88`, `:95`, `:103`, `:120`, `:131` | the texts `Carapaça: -6 por golpe`, `Escudo de golpes: 10/10`, `Regeneração: 0,5% da vida/s` and `0,25%`, `Blindado: +20 de defesa`, `-1.2K`; centre x 670, box y 322 to 350; 240 x 28 and `pointer-events: none`; `font-size` 12px, `font-weight` 700, `padding` 3px 10px 3px 8px, `column-gap` 5px, `border-radius` 999px, border colours `rgb(176, 122, 58)`, `rgb(90, 160, 216)`, `rgb(79, 154, 60)`, `rgb(138, 154, 166)`, `::before` 12 x 12 |
+| Display 2, 3 | `monsterAffixesHud.spec.js:43` | `7/10` after 3 clicks, `volta em 6 s`, `volta em 1 s` 5000 ms later |
+| Display 4, 5 | `monsterAffixesHud.spec.js:217`, `:230`, `:190` | empty and `display: none` after the kill and after the failed countdown; hidden without an affix and on a phase monster |
+| Display 6 | `monsterAffixesHud.spec.js:241` | a click at the chip hits the monster (HP down by 1) |
+
+| Edge case | Test | Value |
+| --------- | ---- | ----- |
+| Critical 30 on Carapaça 16 | `monsterAffix.test.js:58` | 14 |
+| Lyra double click on a 1-charge shield | `skillCombat.test.js:1610` (new) | first `{ damage: 0, critical: true }`, second `{ damage: 2, critical: true }`, health 998 |
+| A skill with several hits | `skillCombat.test.js:1562` | each hit takes a charge in order: 0 then 3 |
+| The shield comes back while strikes land | `monsterAffix.test.js:99`, `monsterAffixes.spec.js:52` | the next strike deals 0 |
+| Regeneração at full health | `monsterAffix.test.js:136`, `monsterAffixes.spec.js:119` | stays at the maximum |
+| Regeneração and a failed countdown | `monsterAffixesHud.spec.js:230` | chip empty after the failure; a heal after it cannot be observed (the monster is gone), the guards are `this.countdown &&` in `ClickerGame.update` and `monster.dead` in `AffixState.advance` |
+| Defense of 100 or more | `skillCombat.test.js:1599` (new) | defense 80 + 20 deals 0 |
+| Carapaça 1200 | `monsterAffixesHud.spec.js:95`, `monsterAffix.test.js:152` | `Carapaça: -1.2K por golpe` |
+| Unknown type in the payload | `monsterAffixes.spec.js:255`, `monsterAffix.test.js:18` | no affix |
+| Fight replaced (farm left, farm started again) | `monsterAffixes.spec.js:225` (new) | the old `1/3` goes, the next fight starts `3/3` and absorbs the first click |
+| Chapter 11 to 15 miniboss with adds | `ChapterTest.kt:639`, `monsterAffixes.spec.js:189` (new) | no miniboss affix seeded; a strike on an add of an affix miniboss takes no charge (add 30 to 29) |
+| Critical overflow (AD-029) | `talentTreeReworkCombat.spec.js:155` | `Seu crítico: 100%`, dealt `toBeCloseTo(21.12, 5)` |
+
+### Gaps closed in this task
+
+| Gap | Test added | Result |
+| --- | ---------- | ------ |
+| `perLevel` of the flat, critical chance and critical damage talents in the three grades was pinned on the domain only (the wire had the flat grade 1) | `TalentControllerIT.kt` `the flat damage, critical chance and critical damage rows carry 1, 5 and 15 a level times their grade` | passes |
+| Lyra's double click on a 1-charge shield and a Blindado defense of 100 had no test | `skillCombat.test.js:1599`, `:1610` | pass |
+| A fight replaced by leaving a farm fight, and a strike on an add of an affix miniboss, had no browser test | `monsterAffixes.spec.js:225`, `:189` | pass |
+
+### Mutants (`node scripts/sensor.mjs`, 14 run, 14 killed, 0 survived)
+
+| Id | Fault | Command | Outcome |
+| -- | ----- | ------- | ------- |
+| a | `CLICK_FLAT_DAMAGE` perLevel back to 2 | `TalentsTest` | killed |
+| a2 | `CRIT_CHANCE` perLevel back to 1 | `TalentsTest` | killed |
+| a3 | `PHASES_PER_STAGE` back to 5 | `ChapterTest` | killed |
+| b | V16 step 1 without the `phases_per_stage = 5` guard | `EarlyGameRebalanceMigrationIT` | killed |
+| c | `AffixState.land` SHELL without `Math.max(0, ...)` | `monsterAffix.test.js` | killed |
+| d | Escudo recharge `periodMs / 2` | `monsterAffix.test.js` | killed |
+| e | `tickHit` back to `monster.hit(damage)` | `skillCombat.test.js` | killed |
+| f | Regeneração and recharge advance by `delta`, not `countdownMs` | `monsterAffixes.spec.js` | killed |
+| g | CSS chip `font-weight` 700 to 600 | `monsterAffixesHud.spec.js` (Grove chip style) | killed |
+| h | CSS SHELL colour `#b07a3a` to `#b07a3b` | `monsterAffixesHud.spec.js` (Grove chip style) | killed |
+| i | Carapaça floors instead of rounding up | `ChapterTest` | killed |
+| j | Escudo seconds floored instead of rounded up | `monsterAffix.test.js` | killed |
+| k | V17 chapter 3 miniboss 3 `SHELL 7` | `MonsterAffixesMigrationIT` | killed |
+| l | Blindado adds `amount - 1` | `monsterAffix.test.js` | killed |
+
+Mutant g's multi-line `find` was reported not found in the first run, so it ran again alone as the 14th `font-weight: 700;` of `style.css` (line 796, the `.affix-chip` rule). The files were restored after every mutant (isolation ok).
+
+### Suites (run now)
+
+| Suite | Result |
+| ----- | ------ |
+| Backend `./gradlew ktlintCheck test` | 1301 tests, 0 failures |
+| Game unit `npm test` | 91 files, 2341 tests, 0 failures |
+| e2e `earlyGameRebalanceTalents`, `earlyGameRebalance`, `monsterAffixes`, `monsterAffixesHud` | 40 passed, 0 failed |
+
+### Observation of T12 to T15: the fake backend still seeds 5 phases
+
+`seededDefinition()` in `game/e2e/support/fakeBackend.js:28` has `phasesPerStage: 5`, and `campaignChapters.spec.js:60`, `:83` read `Phase 1/5`. **Not a gap.** The fake is a test-sized chapter (boss 300, phase monsters 10 + i, 60 s limit), never a copy of the seed: every number differs from the real chapter 1, not only the phases. Those two tests assert that chapter 6 opens and that the label follows the payload, so they pin the game printing the `phasesPerStage` of the payload, not a seed number. The game reads the count from the payload only (`campaign.js:121`, `:174`, `:193`, no literal 5). The real 8-phase label is pinned against a chapter 1 builder at `earlyGameRebalance.spec.js:98`, `:105` and against the real backend at `ProgressControllerIT.kt:88`. Moving the fake to 8 would re-pin dozens of specs (`stages.spec.js`, `drops.spec.js`, `minibossAdds*.spec.js` and others read `Phase n/5`) and add no protection. The only defect is the comment above `seededDefinition` ("chapter 1 as seeded by the backend"), now untrue; cosmetic, no task.
+
+### Verdict
+
+Every AC and edge case maps to a test with the spec value; 14 of 14 mutants killed; no fix task. T17 (`ui-review.html`, APROVADO, commit `4e3288a8`) was already on `origin/main` and is ticked in the same commit.
