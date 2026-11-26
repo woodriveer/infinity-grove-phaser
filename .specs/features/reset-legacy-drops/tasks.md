@@ -76,7 +76,7 @@ T11
 
 ### Phase 1: Backend
 
-#### T1: ResetLegacy domain value [ ]
+#### T1: ResetLegacy domain value [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: One pure value holds every legacy rule: the step, the cap, the best, the copper boost and the rarity chapter (RLD-01, RLD-04, RLD-05; spec § Legacy Rules).
