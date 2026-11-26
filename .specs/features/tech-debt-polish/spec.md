@@ -116,7 +116,7 @@ Checked on `main` at `55caf5b` (2026-11-26).
 | --- | --- | --- | --- |
 | TDP-01 | P1: Break lines - AC 1 to 4, Edge 1 | Tasks T1, T4 | Implementing |
 | TDP-02 | P1: Test debt - AC 1 to 4 | Tasks T3 | Pending |
-| TDP-03 | P1: Ally number - AC 1 to 3, Edge 2, 3 | Tasks T2, T5 | Pending |
+| TDP-03 | P1: Ally number - AC 1 to 3, Edge 2, 3 | Tasks T2, T5 | Implementing |
 
 **Coverage:** 3 total, 3 mapped to tasks, 0 unmapped
 

@@ -5350,7 +5350,7 @@ describe('ClickerGame hero team', () => {
         expect(ctx.scene.monster.health).toBe(8);
     });
 
-    it('the ally tick shows one light-blue 2 at x 740 in the damage font', async () => {
+    it('the ally tick shows one light-blue 2 at x 740 in the damage font with the dark 10 px outline', async () => {
         const ctx = await open([ 'lyra', null, null, null ]);
 
         ctx.scene.update(0, 1000);
@@ -5360,7 +5360,7 @@ describe('ClickerGame hero team', () => {
         expect(text.text).toBe('2');
         expect(text.x).toBe(740);
         expect(text.y).toBe(ctx.scene.damageTextY);
-        expect(text.style).toMatchObject({ color: ALLY_BLUE, fontSize: 28, fontFamily: 'Cinzel', fontStyle: '700', stroke: '#2a1408', strokeThickness: 8 });
+        expect(text.style).toMatchObject({ color: ALLY_BLUE, fontSize: 28, fontFamily: 'Cinzel', fontStyle: '700', stroke: '#1c120c', strokeThickness: 10 });
     });
 
     it('two allies show one number with the sum of the tick', async () => {
@@ -6369,6 +6369,16 @@ describe('ClickerGame miniboss target', () => {
 
         expect(healthOf(ctx, 1)).toBeCloseTo(27, 9);
         expect([ lastText(ctx).text, lastText(ctx).x, lastText(ctx).y, lastText(ctx).style.color ]).toEqual([ '2', 520, 360, '#7fd4ff' ]);
+    });
+
+    it('an ally number on an add uses the same dark 10 px outline', async () => {
+        const ctx = await allyScene([ 'lyra', null, null, null ]);
+
+        ctx.click(lacaio1);
+        ctx.scene.update(0, 1000);
+
+        expect([ lastText(ctx).text, lastText(ctx).x, lastText(ctx).style.color ]).toEqual([ '2', 520, '#7fd4ff' ]);
+        expect(lastText(ctx).style).toMatchObject({ stroke: '#1c120c', strokeThickness: 10 });
     });
 
     it('an ally tick that kills the target add lands its later hits on the miniboss with one number each', async () => {

@@ -361,6 +361,31 @@ test.describe('Hero team: ally hits', () => {
         await expect(page.getByTestId('combo-hud')).toHaveText(streak);
     });
 
+    //  The last Text of a colour on the scene, as its style (spec tech-debt-polish, TD-013)
+    const lastTextStyle = (page, color) => scene(page, `(s) => {
+        const text = s.children.list.filter((o) => o.type === "Text" && o.style.color === "${color}").at(-1);
+
+        return text && { color: text.style.color, fontSize: text.style.fontSize, fontFamily: text.style.fontFamily, fontStyle: text.style.fontStyle, stroke: text.style.stroke, strokeThickness: text.style.strokeThickness };
+    }`);
+
+    test('an ally number has the light-blue fill and the dark 10 px outline', async ({ page }) => {
+        await startTeam(page, { team: LYRA_IN_SLOT_1 });
+
+        await advance(page, 1_000);
+
+        expect(await lastTextStyle(page, ALLY_COLOR)).toEqual({
+            color: '#7fd4ff', fontSize: '28px', fontFamily: 'Cinzel', fontStyle: '700', stroke: '#1c120c', strokeThickness: 10
+        });
+    });
+
+    test('a click number keeps the gold fill and the 8 px outline', async ({ page }) => {
+        await startTeam(page, { team: LYRA_IN_SLOT_1 });
+
+        await strike(page);
+
+        expect(await lastTextStyle(page, '#ffd35c')).toMatchObject({ stroke: '#2a1408', strokeThickness: 8, fontSize: '32px' });
+    });
+
     test('ally hits keep landing while Heróis is open', async ({ page }) => {
         await startTeam(page, { health: 10, team: LYRA_IN_SLOT_1 });
 

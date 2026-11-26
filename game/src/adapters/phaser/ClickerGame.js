@@ -97,7 +97,9 @@ const SKILL_KEYS = [ [ 'ONE', 1 ], [ 'TWO', 2 ], [ 'THREE', 3 ], [ 'Q', 1 ], [ '
 const DAMAGE_FONT = { fontFamily: 'Cinzel', fontStyle: '700', stroke: '#2a1408', strokeThickness: 8 };
 const CRITICAL_TEXT = { color: '#ff8a1f', fontSize: 48 };
 const NORMAL_TEXT = { color: '#ffd35c', fontSize: 32 };
-const ALLY_TEXT = { color: '#7fd4ff', fontSize: 28 };
+//  The light-blue ally number (spec hero-team Q12) with a darker, thicker outline than the click numbers, so it reads over the light
+//  forest (spec tech-debt-polish, TD-013): --wood-900 at 10 px
+const ALLY_TEXT = { color: '#7fd4ff', fontSize: 28, stroke: '#1c120c', strokeThickness: 10 };
 //  The ally number stands right of the monster centre so it does not cover the click numbers (spec hero-team)
 const ALLY_TEXT_OFFSET = 70;
 const STAGE_MESSAGE = { x: 512, y: 384 };

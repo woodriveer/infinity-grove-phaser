@@ -117,7 +117,7 @@ T5
 
 ---
 
-#### T2: The ally number gets the dark 10 px outline [ ]
+#### T2: The ally number gets the dark 10 px outline [x]
 
 **Owner**: game-dev
 **Goal**: The light-blue ally number keeps its fill and size and draws a `#1c120c` outline 10 px thick; the click numbers keep theirs (TDP-03; spec Ally number AC 1, 2, Edge 2, 3, Q4).
@@ -157,9 +157,9 @@ const ALLY_TEXT = { color: '#7fd4ff', fontSize: 28, stroke: '#1c120c', strokeThi
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/heroTeamCombat.spec.js e2e/minibossAddsTarget.spec.js`
 **Done when**:
 
-- [ ] The re-pinned case and the 3 new cases pass; every other unit test passes unchanged.
-- [ ] `heroTeamCombat.spec.js` and `minibossAddsTarget.spec.js` pass (they filter the ally texts by the colour `#7fd4ff`, which is unchanged).
-- [ ] The commit touches exactly `ClickerGame.js`, `ClickerGame.test.js`, `heroTeamCombat.spec.js` and this file.
+- [x] The re-pinned case and the 3 new cases pass; every other unit test passes unchanged.
+- [x] `heroTeamCombat.spec.js` and `minibossAddsTarget.spec.js` pass (they filter the ally texts by the colour `#7fd4ff`, which is unchanged).
+- [x] The commit touches exactly `ClickerGame.js`, `ClickerGame.test.js`, `heroTeamCombat.spec.js` and this file.
 
 **Commit**: `fix(game): give the ally damage number a darker, thicker outline`
 
