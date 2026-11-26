@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { services } from './composition';
+import { resetLegacy, services, sessionManager } from './composition';
 
 describe('composition root', () => {
     it('hands the scenes the session, the user api and one factory per game service', () => {
@@ -10,6 +10,15 @@ describe('composition root', () => {
         expect(typeof services.users.signUp).toBe('function');
         expect(typeof services.session.restore).toBe('function');
         expect(typeof services.backend.wake).toBe('function');
+    });
+
+    it('drops the reset legacy of the previous player on a login', () => {
+        const legacy = { chapters: [ { chapter: 5, percent: 50 } ], best: { chapter: 5, percent: 50 }, afterReset: null };
+        const login = { user: { username: 'yan' }, accessToken: 'a', refreshToken: 'r', accessTokenExpiresAt: 1, refreshTokenExpiresAt: 2 };
+
+        resetLegacy.adopt(legacy);
+        sessionManager.start(login);
+        expect(resetLegacy.state()).toBeNull();
     });
 
     it('builds a fresh hero collection with its own state on every call', () => {

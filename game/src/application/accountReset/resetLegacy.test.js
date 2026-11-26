@@ -37,6 +37,38 @@ describe('resetLegacy', () => {
         expect(resetLegacy.state()).toBeNull();
     });
 
+    it('clear drops the legacy of the previous player, and a failed load of the next one leaves null', async () => {
+        await resetLegacy.load();
+        resetLegacy.clear();
+
+        expect(resetLegacy.state()).toBeNull();
+
+        gateway.legacy.mockRejectedValue(new ApiError('not found', { status: 404 }));
+
+        await expect(resetLegacy.load()).resolves.toBeNull();
+    });
+
+    it('a load that answers after a clear belongs to the previous player and is dropped', async () => {
+        let answer;
+        gateway.legacy.mockReturnValue(new Promise((resolve) => { answer = resolve; }));
+
+        const loading = resetLegacy.load();
+
+        resetLegacy.clear();
+        answer(FIVE);
+
+        await expect(loading).resolves.toBeNull();
+        expect(resetLegacy.state()).toBeNull();
+    });
+
+    it('a load started after the clear keeps its answer', async () => {
+        resetLegacy.clear();
+
+        await resetLegacy.load();
+
+        expect(resetLegacy.state()).toEqual(FIVE);
+    });
+
     it('adopt takes a valid payload and ignores a malformed one', () => {
         resetLegacy.adopt(NONE);
         expect(resetLegacy.state()).toEqual(NONE);

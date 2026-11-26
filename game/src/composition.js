@@ -52,6 +52,8 @@ export const createTalentCollection = () => createTalentCollectionService({ gate
 export const createAutoClickState = () => createAutoClickStateService({ gateway: autoClickApi });
 //  The legacy of the account resets is one value for the whole game, shared by the reset and the scene (spec reset-legacy-drops)
 export const resetLegacy = createResetLegacyService({ gateway: accountResetApi });
+//  The legacy is of one player: a login or a logout drops it, so the next player never sees it
+sessionManager.onChange(resetLegacy.clear);
 //  The reset works on the session, the auto click state and the talent collection of the scene that asks for it
 export const createAccountReset = ({ session, autoClick, talents }) => createAccountResetService({ gateway: accountResetApi, session, autoClick, talents, legacy: resetLegacy });
 

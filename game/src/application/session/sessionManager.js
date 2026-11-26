@@ -4,15 +4,21 @@ import { ApiError } from '../ApiError';
 //  Ports (ADR 0007):
 //    store        { fromAuthResponse(response), save(session), load(), clear() }  persistence of the session
 //    authGateway  { refresh(refreshToken), logout(refreshToken) }                  the backend /auth calls, rejecting with ApiError
+//  `onChange(listener)` tells the listener when the player changes: a login (`start`) and the end of the session (logout, an expired one).
+//  Whatever is kept per player (the reset legacy) is dropped there, so one player never sees what belongs to the previous one.
 export const createSessionManager = ({ store, authGateway }) =>
 {
     let session = null;
     let inFlightRefresh = null;
+    const listeners = [];
+
+    const notify = () => listeners.forEach((listener) => listener());
 
     const forget = () =>
     {
         session = null;
         store.clear();
+        notify();
     };
 
     const doRefresh = async () =>
@@ -45,6 +51,12 @@ export const createSessionManager = ({ store, authGateway }) =>
         {
             session = store.fromAuthResponse(authResponse);
             store.save(session);
+            notify();
+        },
+
+        onChange: (listener) =>
+        {
+            listeners.push(listener);
         },
 
         restore: async (now = Date.now()) =>

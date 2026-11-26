@@ -225,6 +225,50 @@ describe('sessionManager', () => {
         });
     });
 
+    describe('onChange', () => {
+        it('tells the listener on a login', () => {
+            const listener = vi.fn();
+
+            sessionManager.onChange(listener);
+            sessionManager.start(authResponse());
+
+            expect(listener).toHaveBeenCalledTimes(1);
+        });
+
+        it('tells the listener on a logout, also when the call to the server fails', async () => {
+            const listener = vi.fn();
+
+            sessionManager.start(authResponse());
+            sessionManager.onChange(listener);
+            authApi.logout.mockRejectedValue(new ApiError('down'));
+            await sessionManager.logout();
+
+            expect(listener).toHaveBeenCalledTimes(1);
+        });
+
+        it('tells the listener when the session ends by a 401 on refresh', async () => {
+            const listener = vi.fn();
+
+            sessionManager.start(authResponse());
+            sessionManager.onChange(listener);
+            authApi.refresh.mockRejectedValue(new ApiError('expired', { status: 401 }));
+
+            await expect(sessionManager.refresh()).rejects.toThrow('expired');
+
+            expect(listener).toHaveBeenCalledTimes(1);
+        });
+
+        it('stays quiet on a refresh that works and on a restore of a live session', async () => {
+            const listener = vi.fn();
+
+            sessionStore.save(sessionStore.fromAuthResponse(authResponse()));
+            sessionManager.onChange(listener);
+            await sessionManager.restore(NOW);
+
+            expect(listener).not.toHaveBeenCalled();
+        });
+    });
+
     describe('logout', () => {
         it('calls the api with the refresh token and clears the session', async () => {
             sessionManager.start(authResponse());

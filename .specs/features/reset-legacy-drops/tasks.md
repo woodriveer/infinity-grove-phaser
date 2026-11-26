@@ -469,6 +469,29 @@ If `.auto-click-popover` is not a grid, drop `grid-column` and give both lines `
 
 ---
 
+#### T8a: Clear the reset legacy on logout [x]
+
+**Owner**: game-dev
+**Goal**: The shared `resetLegacy` (T7) belongs to one player: a logout or a login as another player drops it, so no line shows until the new player's own load answers; "keep the last good value" holds only within one session of one player (RLD-06; spec Display AC 7). Fix of a defect of T7 found while reporting it: the previous player's legacy stayed on screen after a logout and login.
+**Where**: `game/src/application/accountReset/resetLegacy.js`
+**Files**:
+- Also changes: `game/src/application/session/sessionManager.js` (`onChange(listener)`, called by `start` and by the end of a session: logout, a 401 on refresh), `game/src/composition.js` (`sessionManager.onChange(resetLegacy.clear)`), `game/src/application/accountReset/resetLegacy.test.js`, `game/src/application/session/sessionManager.test.js`, `game/src/composition.test.js`
+**Depends on**: T8
+**Requirement**: RLD-06
+
+**Contract**: `resetLegacy.clear()` sets the state to `null` and discards a `load` that was still in flight (it belongs to the previous player). `sessionManager.onChange(listener)` calls the listener on `start` and whenever the session is forgotten; `restore` and a refresh that works stay quiet.
+
+**Tests**: unit (`resetLegacy.test.js`: clear drops the value and a failed load of the next player leaves null; a load answering after a clear is dropped; a load started after the clear keeps its answer. `sessionManager.test.js`: the listener hears a login, a logout also when the server call fails, a 401 on refresh; not a restore. `composition.test.js`: a login drops the legacy of the shared service.)
+
+**Gate**: `cd game && npm test && npx playwright test e2e/accountReset.spec.js e2e/autoClick.spec.js`
+**Done when**:
+
+- [x] The new cases pass; every other unit test and the two e2e files pass.
+
+**Commit**: `fix(game): clear the reset legacy on logout`
+
+---
+
 ### Phase 3: Tests in the browser and author check
 
 #### T9: The legacy in the browser [ ]
