@@ -213,7 +213,7 @@ Every new text, exactly (AD-007, L-010). `<p>` is the percent (50 or 100), `<c>`
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
 | RLD-01 | P1: Legacy - AC 1 to 5; Best - AC 1 to 4 (domain rules) | Tasks T1 | Implementing |
-| RLD-02 | P1: Legacy - AC 6 to 8 (storage, migration, reset writes it) | Tasks T2, T3 | In Tasks |
+| RLD-02 | P1: Legacy - AC 6 to 8 (storage, migration, reset writes it) | Tasks T2, T3 | Implementing |
 | RLD-03 | P1: Best - AC 5 to 7 (API) | Tasks T3 | In Tasks |
 | RLD-04 | P1: Copper - AC 1 to 7 | Tasks T1, T4 | Implementing |
 | RLD-05 | P1: Pieces - AC 1 to 5 | Tasks T1, T5 | Implementing |

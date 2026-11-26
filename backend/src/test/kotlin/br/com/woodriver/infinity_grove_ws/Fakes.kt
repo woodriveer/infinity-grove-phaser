@@ -9,6 +9,7 @@ import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
+import br.com.woodriver.infinity_grove_ws.domain.ResetLegacy
 import br.com.woodriver.infinity_grove_ws.domain.Team
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
@@ -25,6 +26,7 @@ import br.com.woodriver.infinity_grove_ws.port.GiftCalendarPort
 import br.com.woodriver.infinity_grove_ws.port.GiftRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.HeroRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.IdGeneratorPort
+import br.com.woodriver.infinity_grove_ws.port.LegacyRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PasswordHasherPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
@@ -348,6 +350,16 @@ class InMemoryResetRepository : ResetRepositoryPort {
         resets: Int,
     ) {
         counts[username] = resets
+    }
+}
+
+class InMemoryLegacyRepository : LegacyRepositoryPort {
+    val legacies = linkedMapOf<String, ResetLegacy>()
+
+    override fun find(username: String) = legacies[username] ?: ResetLegacy(username)
+
+    override fun save(legacy: ResetLegacy) {
+        legacies[legacy.username] = legacy
     }
 }
 

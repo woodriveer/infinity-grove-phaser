@@ -157,7 +157,7 @@ data class ResetLegacy(
 
 ---
 
-#### T2: player_legacy table and repository [ ]
+#### T2: player_legacy table and repository [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The legacy of each player is stored per chapter, deleted with the user, and starts empty for every player (RLD-02; spec Legacy AC 7, 8, owner decision 2).
