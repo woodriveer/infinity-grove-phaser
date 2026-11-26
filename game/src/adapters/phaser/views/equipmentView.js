@@ -57,7 +57,7 @@ export const renderLeaderStats = ({ name, lines }) =>
     const panel = el('div', 'leader-stats', '', { testid: 'leader-stats' });
 
     panel.append(el('strong', 'leader-stats-title', `Atributos de ${name}`));
-    lines.forEach(({ id, text }) => panel.append(el('div', 'stat-line', text, { testid: `stat-${id}` })));
+    lines.forEach(({ id, text }) => panel.append(el('div', 'stat-line', text, { testid: `stat-${id}`, 'data-stat': id })));
 
     return panel;
 };

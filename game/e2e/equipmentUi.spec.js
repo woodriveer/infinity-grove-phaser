@@ -52,6 +52,38 @@ test.describe('Equipment UI', () => {
         await expect(page.getByTestId('piece-detail')).toBeVisible();
     });
 
+    test('the two break lines share the last row and the two time lines the row above', async ({ page }) => {
+        await startGame(page);
+        await openEquipment(page);
+
+        const box = (id) => page.getByTestId(`stat-${id}`).boundingBox();
+        const [ element, clickDamage, minibossTime, bossTime, breakDefense, breakCrit ] = await Promise.all(
+            [ 'element', 'clickDamage', 'minibossTime', 'bossTime', 'breakDefense', 'breakCrit' ].map(box)
+        );
+
+        expect(breakDefense.y).toBe(breakCrit.y);
+        expect(breakDefense.x).toBe(element.x);
+        expect(breakCrit.x).toBe(clickDamage.x);
+        expect(minibossTime.y).toBe(bossTime.y);
+        expect(minibossTime.x).toBe(element.x);
+        expect(bossTime.x).toBe(clickDamage.x);
+        expect(minibossTime.y).toBeLessThan(breakDefense.y);
+
+        //  Edge 1: no passives, both break lines read 0
+        await expect(page.getByTestId('stat-breakDefense')).toHaveText('Quebra de defesa: 0');
+        await expect(page.getByTestId('stat-breakCrit')).toHaveText('Quebra de resistência a crítico: 0');
+    });
+
+    test('every attribute line fits on one line', async ({ page }) => {
+        await startGame(page);
+        await openEquipment(page);
+
+        const fits = await page.getByTestId('leader-stats').locator('.stat-line').evaluateAll((lines) => lines.map((line) => line.scrollWidth <= line.clientWidth));
+
+        expect(fits).toHaveLength(10);
+        expect(fits.every(Boolean)).toBe(true);
+    });
+
     test('shows the bag as tiles with a frame per rarity', async ({ page }) => {
         await startGame(page);
         await openEquipment(page);

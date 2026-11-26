@@ -65,7 +65,7 @@ T5
 
 ### Phase 1: Game
 
-#### T1: The two break lines share the last row of the attribute panel [ ]
+#### T1: The two break lines share the last row of the attribute panel [x]
 
 **Owner**: game-dev
 **Goal**: `breakDefense` starts a new row of the 3-column grid, so the two break lines sit side by side and the two time lines form the row above (TDP-01; spec Break lines AC 1 to 4, Q1).
@@ -109,9 +109,9 @@ T5
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/equipmentUi.spec.js e2e/unifiedDamage.spec.js e2e/heroTeamPassives.spec.js`
 **Done when**:
 
-- [ ] The 3 new cases pass; `leaderStats.test.js` passes unchanged (order case `gives the lines in the order of the spec`).
-- [ ] `equipmentUi.spec.js`, `unifiedDamage.spec.js` (`the attribute panel shows Quebra de defesa: 3 and no damage type`, count 10) and `heroTeamPassives.spec.js` (`the attribute panel counts the passives`) pass.
-- [ ] The commit touches exactly the 4 files above and this file.
+- [x] The 3 new cases pass; `leaderStats.test.js` passes unchanged (order case `gives the lines in the order of the spec`).
+- [x] `equipmentUi.spec.js`, `unifiedDamage.spec.js` (`the attribute panel shows Quebra de defesa: 3 and no damage type`, count 10) and `heroTeamPassives.spec.js` (`the attribute panel counts the passives`) pass.
+- [x] The commit touches exactly the 4 files above and this file.
 
 **Commit**: `fix(game): put the two break lines side by side in the attribute panel`
 

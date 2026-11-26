@@ -79,6 +79,12 @@ describe('renderLeaderStats', () => {
         expect(text(panel, 'stat-clickDamage')).toBe('Dano de clique: 1.0');
     });
 
+    it('gives every line a data-stat equal to its id', () => {
+        const panel = renderLeaderStats(stats);
+
+        expect([ ...panel.querySelectorAll('.stat-line') ].map((line) => line.getAttribute('data-stat'))).toEqual([ 'clickDamage', 'critChance' ]);
+    });
+
     it('shows above the slots and the bag in the screen', () => {
         const screen = renderEquipment([ ring() ], heroes, { onSelect: vi.fn(), stats });
 

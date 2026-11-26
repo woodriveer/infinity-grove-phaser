@@ -2628,6 +2628,12 @@ button.bag-card:hover:not(:disabled) {
     color: var(--color-neutral-800);
 }
 
+/* The two break lines share the last row (spec tech-debt-polish, TD-011): the defense break starts a new row, so the 10 lines fill
+   rows of 3, 3, 2 (the two time lines) and 2 (the two break lines) */
+.stat-line[data-stat="breakDefense"] {
+    grid-column-start: 1;
+}
+
 /* ══ Piece tiles: a frame per rarity. The five frames differ by shape (ring, gems, glow, motion), not by colour alone ══ */
 
 .piece-tile {
