@@ -343,7 +343,7 @@ Every existing case passes unchanged (`sends the level the player saw and adopts
 
 ---
 
-#### T6: The Shift mode follows the key, the pointer and the window [ ]
+#### T6: The Shift mode follows the key, the pointer and the window [x]
 
 **Owner**: game-dev
 **Goal**: `createShiftKey` holds one boolean that the key, pointer, blur and visibility events keep true to the Shift key (UIP-10 AC 1 to 6, 9; Edge 1).
@@ -378,7 +378,7 @@ Every existing case passes unchanged (`sends the level the player saw and adopts
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 9 cases pass; the whole unit suite (including `architecture.test.js`) passes.
+- [x] The 9 cases pass; the whole unit suite (including `architecture.test.js`) passes.
 
 **Commit**: `feat(game): follow the Shift key for the talent shortcut`
 
