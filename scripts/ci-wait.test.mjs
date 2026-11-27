@@ -29,8 +29,9 @@ test('a very long failed log is cut with a pointer to the full one', () =>
 
 test('the ref is positional and the options take values', () =>
 {
-    assert.deepEqual(parseArgs([]), { ref: 'HEAD', workflow: 'tests.yml', appear: 180, out: null });
-    assert.deepEqual(parseArgs([ 'ci/x', '--appear', '30', '--out', 'd' ]), { ref: 'ci/x', workflow: 'tests.yml', appear: 30, out: 'd' });
+    assert.deepEqual(parseArgs([]), { ref: 'HEAD', workflow: 'tests.yml', event: null, appear: 180, out: null });
+    assert.deepEqual(parseArgs([ 'ci/x', '--appear', '30', '--out', 'd', '--event', 'workflow_dispatch' ]),
+        { ref: 'ci/x', workflow: 'tests.yml', event: 'workflow_dispatch', appear: 30, out: 'd' });
     assert.throws(() => parseArgs([ '--appear' ]), /missing value/);
     assert.throws(() => parseArgs([ '--nope' ]), /unknown option/);
 });

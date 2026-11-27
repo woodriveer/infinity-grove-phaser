@@ -1,6 +1,7 @@
 # Git workflow
 
-- Always push right after you commit something.
+- Always push right after you commit something. Pushing to a feature branch counts.
+- The deploy watcher deploys `origin/main`, so a commit whose tests have not passed in CI yet (backend, e2e, coverage, mutants: see Agent team §4) goes to a branch first, e.g. `ci/<feature>-<topic>`: push it, run `node scripts/ci-wait.mjs <branch>`, and only when it is green `git pull --rebase origin main && git push origin HEAD:main`. Commits checked by the fast local suites alone (game code with its Vitest gate, docs, specs) can go straight to `main`.
 
 # Release report
 
@@ -12,8 +13,8 @@
   - **unit test coverage**: line and branch percentage of backend (JaCoCo) and game (Vitest `--coverage`, v8), for the whole project and for the files the feature changed;
   - **e2e coverage**: the line percentage of game code that the Playwright suite exercises (istanbul instrumentation), and the feature's e2e scenarios with pass/fail;
   - failing tests that are not caused by the feature, and why.
-- Coverage commands: backend `cd backend && ./gradlew cleanTest test` (JaCoCo, `build/reports/jacoco/test/jacocoTestReport.xml`); game unit `cd game && npm run test:coverage` (`coverage/unit/coverage-summary.json`); e2e `cd game && npm run test:e2e:coverage` (`coverage/e2e/coverage-summary.json`); deploy `node --test --experimental-test-coverage "deploy/**/*.test.mjs"` (printed in the run output). The e2e number is a lower bound: a page reloaded inside a test loses what it counted before the reload.
-- Every number comes from a command run for that report. If a coverage tool is not configured, write `não medido` with the reason. Never estimate a number.
+- Coverage and suite totals come from the Tests workflow (`.github/workflows/tests.yml`) run of the release commit, not from a local run: `node scripts/ci-wait.mjs <commit> --out <dir>` waits for it, prints each job's summary (totals, failed tests, coverage) and saves every artifact in `<dir>`. The jobs run: backend `./gradlew ktlintCheck cleanTest test` (artifact `backend-reports`: JaCoCo `jacocoTestReport.xml`, JUnit XML); game unit `npm run test:coverage` (`game-unit-coverage`: `coverage-summary.json`, per file); e2e `npm run test:e2e:coverage -- --shard=<n>/8` in 8 shards, merged by the `e2e` job (`e2e-coverage`: `coverage-summary.json`, the JUnit XML of every shard with every scenario); deploy `node --test --experimental-test-coverage "deploy/**/*.test.mjs"` (lcov totals in `summary-deploy-scripts`). The e2e number is a lower bound: a page reloaded inside a test loses what it counted before the reload.
+- Every number comes from a run made for that report: the CI run of the release commit (cite its run id), or a command run now. If a coverage tool is not configured, write `não medido` with the reason. Never estimate a number.
 
 # Deploy
 
@@ -38,12 +39,13 @@ The main session is the orchestrator; the agents live in `.claude/agents/`. For 
 2. Each task goes to its owner: `kotlin-backend-dev` (Sonnet, high) for `backend/` and the deploy scripts (`deploy/`, `publish.sh`, `deploy.sh`, `start.sh`), `game-dev` (Sonnet, high) for `game/`, `test-engineer` (Sonnet, high) for test tasks.
 3. `ui-artist` reviews every change the player can see and writes `ui-review.html` from `.claude/templates/ui-review.html`, with Playwright screenshots of every changed screen (`npm run ui:shots` in `game/`); findings become tasks.
 4. There is no Verifier agent. The `test-engineer` author check (`.claude/agents/test-engineer.md`) is the test gate, and the `verifier` step of `tlc-spec-driven` (validation.md, `validate_state.py`) is off in this project. Mutants run with `node scripts/sensor.mjs`.
-   - During a feature, agents run only the unit suites and the feature's own e2e spec files. The full e2e suite runs once per feature, by `gitops` with the coverage commands for `report.html`.
+   - The heavy suites run in GitHub Actions (`.github/workflows/tests.yml`, on every push of any branch), not on this machine, which also serves production. Locally agents run only fast suites: Vitest (`cd game && npm test`, or one test file), one backend test class that needs no Testcontainers (`./gradlew test --tests <Class>`), the node tests of `deploy/` and `scripts/`, and at most the one Playwright spec file they are iterating on. The full backend suite, every Testcontainers test, the full e2e suite, coverage and mutants run only in CI.
+   - To get a CI result, push (to a branch, see Git workflow) and call `node scripts/ci-wait.mjs <branch|commit>` once, in the foreground with `timeout: 600000`. It blocks until the run ends and prints the jobs, their summaries and the failing tests (exit 0 green, 1 red or cancelled, 3 no run: not pushed or a docs-only push). If the Bash call times out first, call it once more: it reattaches to the same run. Never poll: no sleep loops, no repeated `gh run list` or `gh run view`.
+   - Mutants run in CI: `gh workflow run tests.yml --ref <branch> -f mutants="$(cat <mutants.json>)" -f suites=false [-f only=M1,M2]`, then `node scripts/ci-wait.mjs <branch> --event workflow_dispatch`. The mutants file has the format at the top of `scripts/sensor.mjs`.
    - No agent leaves a test suite running in the background or runs two suites at once in the same checkout.
-   - The `gitops` full e2e and coverage run for `report.html` runs alone on the machine: no other agent runs a test suite at that time, worktrees included (parallel Testcontainers and Playwright runs saturate the CPU and time out the suites).
-   - Work of different features that touches different files (for example test-only fixes) runs in parallel, each agent in its own worktree (`isolation: "worktree"`); each rebases on `origin/main` before it pushes (`git pull --rebase origin main && git push origin HEAD:main`).
+   - Work of different features that touches different files (for example test-only fixes) runs in parallel, each agent in its own worktree (`isolation: "worktree"`); each rebases on `origin/main` before it pushes to `main` (`git pull --rebase origin main && git push origin HEAD:main`).
 5. There is no acceptance step. The orchestrator checks that every task of `tasks.md` is ticked, the `test-engineer` author check has no gaps or surviving mutants and the `ui-artist` review is APROVADO (when the player sees a change); any gap becomes a task for its owner. Scope questions still go to `product-owner`.
-6. `gitops` pushes, makes sure the deploy is live, checks production, writes `report.html`, updates `CHANGELOG.md` and cuts the release tag.
+6. `gitops` pushes, makes sure the deploy is live, checks production, writes `report.html` from the CI run of the release commit, updates `CHANGELOG.md` and cuts the release tag.
 
 ## graphify
 

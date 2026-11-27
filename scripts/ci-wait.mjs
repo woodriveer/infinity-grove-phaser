@@ -3,11 +3,13 @@
 //  the jobs with their result and time, each job's summary (totals, failed test names, coverage) and, on failure,
 //  the failed log trimmed to the failing tests. One blocking call: agents never poll `gh run list` or sleep in a loop.
 //
-//  node scripts/ci-wait.mjs [<commit|branch>] [--workflow tests.yml] [--appear 180] [--out <dir>]
+//  node scripts/ci-wait.mjs [<commit|branch>] [--workflow tests.yml] [--event push|workflow_dispatch] [--appear 180] [--out <dir>]
 //
 //  <commit|branch>: default HEAD. A branch name uses origin/<branch> when it exists (what CI runs is what was pushed).
 //  --appear: seconds to wait for GitHub to start the run after a push (default 180).
-//  --out: directory for the downloaded summary and coverage artifacts (default: a temp dir, removed at the end).
+//  --event: only runs started by that event (a sensor run by hand is `workflow_dispatch`); default: the newest run of any event.
+//  --out: download every artifact of the run there (coverage JSON, JaCoCo XML, JUnit XML, Playwright report), e.g. for report.html.
+//         Without it only the job summaries are fetched, into a temp dir removed at the end.
 //  Exit: 0 green, 1 red or cancelled, 3 no run for the commit (not pushed, or a docs-only push skipped by paths-ignore), 2 bad usage.
 
 import { spawnSync } from 'node:child_process';
@@ -78,19 +80,22 @@ const resolveCommit = (ref) =>
     return local.stdout.trim();
 };
 
-const findRun = (workflow, sha) =>
+const findRun = (workflow, sha, event) =>
 {
-    const list = run('gh', [ 'run', 'list', '--workflow', workflow, '--commit', sha, '--limit', '5', '--json', 'databaseId,createdAt' ]);
+    const filter = event ? [ '--event', event ] : [];
+    const list = run('gh', [ 'run', 'list', '--workflow', workflow, '--commit', sha, ...filter, '--limit', '5', '--json', 'databaseId,createdAt' ]);
     if (list.status !== 0) throw new Error(`gh run list failed: ${list.stderr.trim()}`);
     const runs = JSON.parse(list.stdout || '[]').sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return runs[0]?.databaseId;
 };
 
-const printSummaries = (id, dir) =>
+const printSummaries = (id, dir, everything) =>
 {
-    const download = run('gh', [ 'run', 'download', String(id), '--pattern', 'summary-*', '--dir', dir ]);
-    if (download.status !== 0) { console.log(`(no job summaries downloaded: ${download.stderr.trim()})`); return; }
-    for (const name of readdirSync(dir).sort())
+    const download = run('gh', [ 'run', 'download', String(id), ...(everything ? [] : [ '--pattern', 'summary-*' ]), '--dir', dir ]);
+    if (download.status !== 0) { console.log(`(no artifacts downloaded: ${download.stderr.trim()})`); return; }
+    if (everything) console.log(`Artifacts of run ${id} saved in ${dir}
+`);
+    for (const name of readdirSync(dir).filter((entry) => entry.startsWith('summary-')).sort())
     {
         const folder = join(dir, name);
         if (!statSync(folder).isDirectory()) continue;
@@ -101,11 +106,11 @@ const printSummaries = (id, dir) =>
 
 export const parseArgs = (argv) =>
 {
-    const options = { ref: 'HEAD', workflow: 'tests.yml', appear: 180, out: null };
+    const options = { ref: 'HEAD', workflow: 'tests.yml', event: null, appear: 180, out: null };
     for (let i = 0; i < argv.length; i += 1)
     {
         const arg = argv[i];
-        if (arg === '--workflow' || arg === '--appear' || arg === '--out')
+        if ([ '--workflow', '--event', '--appear', '--out' ].includes(arg))
         {
             const value = argv[++i];
             if (value === undefined) throw new Error(`missing value for ${arg}`);
@@ -120,14 +125,14 @@ export const parseArgs = (argv) =>
 
 const main = (argv) =>
 {
-    const { ref, workflow, appear, out } = parseArgs(argv);
+    const { ref, workflow, event, appear, out } = parseArgs(argv);
     const sha = resolveCommit(ref);
 
-    let id = findRun(workflow, sha);
+    let id = findRun(workflow, sha, event);
     for (let waited = 0; !id && waited < appear; waited += 10)
     {
         sleep(10);
-        id = findRun(workflow, sha);
+        id = findRun(workflow, sha, event);
     }
     if (!id)
     {
@@ -142,12 +147,12 @@ const main = (argv) =>
     if (view.status !== 0) throw new Error(`gh run view failed: ${view.stderr.trim()}`);
     const { conclusion, url, headBranch, jobs } = JSON.parse(view.stdout);
 
-    console.log(`${workflow} ${conclusion?.toUpperCase() ?? '?'} for ${sha.slice(0, 10)} (${headBranch}) ${url}`);
+    console.log(`${workflow} ${conclusion?.toUpperCase() ?? '?'} for ${sha.slice(0, 10)} (${headBranch}), run ${id}: ${url}`);
     for (const job of jobs) console.log(`- ${job.name}: ${job.conclusion || job.status} ${duration(job)}`);
     console.log('');
 
     const dir = out ?? mkdtempSync(join(tmpdir(), 'ci-wait-'));
-    try { printSummaries(id, dir); }
+    try { printSummaries(id, dir, Boolean(out)); }
     finally { if (!out) rmSync(dir, { recursive: true, force: true }); }
 
     if (conclusion === 'success') return 0;

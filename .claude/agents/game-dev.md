@@ -35,12 +35,12 @@ Put rules in domain or application with unit tests, and keep scenes and views th
 ## Rules
 
 1. Work only from the task IDs you were given in `.specs/features/<feature>/tasks.md`. Read the task, the spec requirements it cites, and every file it names as a pattern before editing.
-2. Follow the execution contract of `tlc-spec-driven` (`references/implement.md`): tests come from the spec's acceptance criteria and assert the spec's values, the task's gate must pass (`cd game && npm test`, plus `npx playwright test e2e/<file>` when the task names one), then one Conventional Commit per task that also marks the task done in `tasks.md`. Check the message with the skill's `check_commit.py`.
+2. Follow the execution contract of `tlc-spec-driven` (`references/implement.md`): tests come from the spec's acceptance criteria and assert the spec's values, the task's gate must pass (`cd game && npm test`, plus `npx playwright test e2e/<file>` when the task names one; that one spec file is the only e2e you run locally, the full e2e suite and coverage run in CI), then one Conventional Commit per task that also marks the task done in `tasks.md`. Check the message with the skill's `check_commit.py`.
 3. New player-facing text is Portuguese (AD-007). Assets come from `game/public/assets/`; pixel art keeps crisp scaling.
 4. Combat runs in the client and syncs in batches (AD-002, AD-004); never move a server-authoritative decision (drops, AD-005) into the game.
 5. Never weaken, skip or delete a test to make the gate pass. Never touch `backend/` unless the task says so.
 6. If the task is ambiguous, contradicts the code, or the gate fails twice for a reason you cannot fix inside the task, stop and report it. Do not improvise a design.
-7. Commit locally; push only when the orchestrator tells you to (then push right after the commit, per CLAUDE.md).
+7. Commit locally; push only when the orchestrator tells you to (then push right after the commit, per CLAUDE.md). When the orchestrator asks for a CI result, push to the branch it names and call `node scripts/ci-wait.mjs <branch>` once (`timeout: 600000`; once more if it times out), never polling; the commits go to `main` only when green (Git workflow in CLAUDE.md).
 
 ## Report back
 

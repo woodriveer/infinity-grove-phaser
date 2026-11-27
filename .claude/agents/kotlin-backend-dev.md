@@ -21,7 +21,8 @@ You are a senior Kotlin and Spring Boot developer working on the Infinity Grove 
 5. Use Context7 for Spring Boot, Kotlin, Gradle, Flyway or library questions instead of guessing an API.
 6. Never weaken, skip or delete a test to make the gate pass. Never touch `game/` unless the task says so.
 7. If the task is ambiguous, contradicts the code, or the gate fails twice for a reason you cannot fix inside the task, stop and report it. Do not improvise a design.
-8. Commit locally; push only when the orchestrator tells you to (then push right after the commit, per CLAUDE.md).
+8. Locally run only `./gradlew ktlintCheck` and the test class you are iterating on when it needs no Testcontainers (`./gradlew test --tests <Class>`); deploy script tests run locally with `node --test <file>`. The full backend suite and every Testcontainers test run in CI: the gate of a backend task is the `backend` job of `.github/workflows/tests.yml`.
+9. Commit locally; push only when the orchestrator tells you to (then push right after the commit, per CLAUDE.md). Backend commits go to a branch first (`ci/<feature>-<task>`): push, call `node scripts/ci-wait.mjs <branch>` once in the foreground with `timeout: 600000` (once more if it times out; never poll), and report the result; they go to `main` (`git pull --rebase origin main && git push origin HEAD:main`) only when green.
 
 ## Report back
 

@@ -117,10 +117,15 @@ jobs:
             game/reports/unit-junit.xml
           if-no-files-found: ignore
 
-  e2e:
+  # The e2e suite (700+ scenarios, each boots the game in Chromium) is split into shards; the `e2e` job merges their coverage
+  e2e-shard:
     if: github.event_name == 'push' || inputs.suites
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
     env:
       # the backend is faked per test (game/e2e/support/fakeBackend.js); Playwright starts the instrumented Vite dev server itself
       PLAYWRIGHT_JUNIT_OUTPUT_FILE: reports/e2e-junit.xml
@@ -149,36 +154,77 @@ jobs:
         run: |
           if [ "${{ steps.browsers.outputs.cache-hit }}" = "true" ]; then npx playwright install-deps chromium
           else npx playwright install --with-deps chromium; fi
-      - name: Playwright with istanbul coverage
+      - name: Playwright shard ${{ matrix.shard }}/8 with istanbul coverage
         working-directory: game
-        run: npm run test:e2e:coverage -- --reporter=github,junit,html
-      - name: Summary
+        run: npm run test:e2e:coverage -- --shard=${{ matrix.shard }}/8 --reporter=github,junit,html
+      - uses: actions/upload-artifact@v6
         if: always()
+        with:
+          name: e2e-shard-${{ matrix.shard }}
+          # raw per-test coverage (.nyc_output) for the merge, and the scenarios of this shard
+          path: |
+            game/.nyc_output/
+            game/reports/e2e-junit.xml
+          include-hidden-files: true
+          retention-days: 3
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: playwright-report-${{ matrix.shard }}
+          path: |
+            game/playwright-report/
+            game/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  e2e:
+    needs: e2e-shard
+    if: always() && (github.event_name == 'push' || inputs.suites)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: game/package.json
+      - name: Install
+        working-directory: game
+        run: npm install --no-audit --no-fund
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: e2e-shard-*
+          path: shards
+      - name: Merge the coverage of every shard
+        run: |
+          mkdir -p game/.nyc_output game/reports
+          for dir in shards/e2e-shard-*; do
+            n="${dir##*-}"
+            cp "$dir"/.nyc_output/*.json game/.nyc_output/ 2>/dev/null || true
+            cp "$dir/reports/e2e-junit.xml" "game/reports/e2e-junit-$n.xml" 2>/dev/null || true
+          done
+          cd game && npx nyc report --temp-dir .nyc_output --report-dir coverage/e2e --reporter=text-summary --reporter=json-summary
+      - name: Summary
         run: >-
-          node scripts/ci-summary.mjs --title e2e --junit game/reports/e2e-junit.xml
-          --istanbul game/coverage/e2e/coverage-summary.json --out summary/summary.md
+          node scripts/ci-summary.mjs --title e2e --junit game/reports --istanbul game/coverage/e2e/coverage-summary.json
+          --out summary/summary.md
       - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: summary-e2e
           path: summary/summary.md
       - uses: actions/upload-artifact@v6
-        if: always()
         with:
           name: e2e-coverage
           path: |
             game/coverage/e2e/coverage-summary.json
-            game/reports/e2e-junit.xml
+            game/reports/
           if-no-files-found: ignore
-      - uses: actions/upload-artifact@v6
-        if: failure()
-        with:
-          name: playwright-report
-          path: |
-            game/playwright-report/
-            game/test-results/
-          retention-days: 7
-          if-no-files-found: ignore
+      - name: Fail when a shard failed
+        if: needs.e2e-shard.result != 'success'
+        run: echo "::error::e2e shards ended ${{ needs.e2e-shard.result }}" && exit 1
 
   deploy-scripts:
     if: github.event_name == 'push' || inputs.suites
