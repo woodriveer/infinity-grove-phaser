@@ -1,6 +1,7 @@
 import { expect, test } from './support/coverage';
 import { mockBackend } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
+import { openLeaderList } from './support/leader';
 
 //  Hero team (spec hero-team): the ally hits on the real scene. The allies hit once every 1000 ms of fight time, never critical, with the one
 //  damage of every strike. The player owns one blank card of each of the five heroes; `stars` adds a card of that many stars.
@@ -308,7 +309,7 @@ test.describe('Hero team: ally hits', () => {
         expect(await dealt(page)).toBeCloseTo(4, 5);
         expect(await lastAllyText(page)).toBe('4');
 
-        await page.getByTestId('hud-leader').click();
+        await openLeaderList(page);
         await page.getByTestId('leader-entry-orina').click();
         await expect(page.getByTestId('leader-card')).toContainText('Orina');
         await page.getByTestId('hero-close').click();

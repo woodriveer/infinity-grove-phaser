@@ -808,7 +808,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 
 ---
 
-#### T14: Existing browser tests open the leader list from Equipe [ ]
+#### T14: Existing browser tests open the leader list from Equipe [x]
 
 **Owner**: test-engineer
 **Goal**: Every e2e test and review shot that opened Líder or listed `hud-leader` uses Equipe instead, keeping every value it asserts (UIP-13 AC 1, 4, 5, 9).
@@ -841,8 +841,8 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/heroBagCards.spec.js e2e/heroTeam.spec.js e2e/uiRedesign.spec.js e2e/heroes.spec.js e2e/heroTeamCombat.spec.js e2e/talentTreeReworkCombat.spec.js`
 **Done when**:
 
-- [ ] The six files pass; `git grep -n "hud-leader\|openScreen(page, 'leader')" -- game/e2e game/ui-review` prints nothing.
-- [ ] `uiRedesign.spec.js` `shows no magenta in the detail of any of the five heroes` (STATE Handoff note 2) is split into one test per hero or marked `test.slow()` in this task, without changing an asserted value, because this task touches the file.
+- [x] The six files pass; `git grep -n "hud-leader\|openScreen(page, 'leader')" -- game/e2e game/ui-review` prints nothing.
+- [x] `uiRedesign.spec.js` `shows no magenta in the detail of any of the five heroes` (STATE Handoff note 2) is split into one test per hero or marked `test.slow()` in this task, without changing an asserted value, because this task touches the file.
 
 **Commit**: `test(game): open the leader list from Equipe in the browser tests`
 

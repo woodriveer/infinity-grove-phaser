@@ -1,6 +1,7 @@
 import { expect, test } from './support/coverage';
 import { mockBackend } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
+import { openLeaderList } from './support/leader';
 
 //  Monsters of 1000 health, no defense and the element given, so a click is read exactly
 const bare = (element, defense = 0, critResistance = 0) => ({ element, defense, critResistance });
@@ -626,7 +627,7 @@ test.describe('Grove theme', () => {
         const quiet = { 'animation-name': 'none', 'transition-duration': '0s' };
 
         //  UIR-03 AC15: every rail button is restyled, so every rail button is still
-        for (const id of [ 'hud-heroes', 'hud-bag', 'hud-leader', 'hud-equipment', 'hud-talents', 'hud-farm' ])
+        for (const id of [ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm' ])
         {
             await expectStyle(page.getByTestId(id), quiet);
         }
@@ -957,7 +958,7 @@ test.describe('Grove theme', () => {
     test('draws the rail as framed wood squares on parchment', async ({ page }) => {
         await startAs(page, {});
         const rail = [
-            [ 'hud-heroes', 'Heróis' ], [ 'hud-bag', 'Mochila' ], [ 'hud-leader', 'Líder' ],
+            [ 'hud-heroes', 'Heróis' ], [ 'hud-bag', 'Mochila' ], [ 'hud-team', 'Equipe' ],
             [ 'hud-equipment', 'Equipamento' ], [ 'hud-talents', 'Talentos' ], [ 'hud-farm', 'Rever chefes' ]
         ];
 
@@ -968,7 +969,7 @@ test.describe('Grove theme', () => {
             'border-top-left-radius': '10px',
             'column-gap': '6px'
         });
-        expect(await page.locator('.hero-hud [data-testid^="hud-"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.testid))).toEqual(rail.map(([ id ]) => id));
+        expect(await page.locator('.hero-hud button[data-testid^="hud-"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.testid))).toEqual(rail.map(([ id ]) => id));
 
         for (const [ id, label ] of rail)
         {
@@ -1050,11 +1051,11 @@ test.describe('Grove theme', () => {
         const names = { kael: 'Kael Raizférrea', lyra: 'Lyra Folhaveloz', orina: 'Orina Brumaestrela', seraphine: 'Seraphine Aurora', vex: 'Vex Sombraespinho' };
 
         await startAs(page, { copies: Object.fromEntries(Object.keys(names).map((hero) => [ `${hero}:3`, 1 ])) });
-        await openScreen(page, 'leader');
+        await openLeaderList(page);
 
         for (const [ hero, name ] of Object.entries(names))
         {
-            //  The Líder screen stays open after a pick; Kael is already the leader, so his click changes nothing
+            //  The leader list stays open after a pick; Kael is already the leader, so his click changes nothing
             await page.getByTestId(`leader-entry-${hero}`).click();
             await expect(page.getByTestId(`leader-entry-${hero}`)).toHaveClass(/is-current/);
 
@@ -1553,8 +1554,8 @@ test.describe('Grove theme', () => {
         await expectStyle(page.locator('.fusion-row').first(), INSET);
         await page.getByTestId('hero-close').click();
 
-        //  Líder: a leader row that is not the current one
-        await openScreen(page, 'leader');
+        //  Equipe leader list: a row that is not the current one
+        await openLeaderList(page);
         await expectStyle(page.locator('.leader-entry:not(.is-current)').first(), INSET);
         await page.getByTestId('hero-close').click();
 
@@ -1657,9 +1658,9 @@ test.describe('Grove theme', () => {
         await expectStyle(page.getByTestId('hero-card-orina').locator('.hero-stars'), { 'background-color': 'rgb(217, 165, 33)', color: 'rgb(32, 30, 29)' });
     });
 
-    test('draws the Líder rows in dark ink, the current one too', async ({ page }) => {
+    test('draws the leader list rows in dark ink, the current one too', async ({ page }) => {
         await startAs(page, { copies: { 'kael:5': 1, 'lyra:4': 1 } });
-        await openScreen(page, 'leader');
+        await openLeaderList(page);
 
         //  Kael leads, so his row is the current one (parchment-100); Lyra's row is an inset card (parchment-300)
         for (const [ hero, background, expected ] of [ [ 'kael', 'rgb(244, 230, 200)', 13.56 ], [ 'lyra', 'rgb(230, 208, 162)', 11.09 ] ])
@@ -2093,22 +2094,22 @@ test.describe('Grove theme', () => {
         for (const slot of [ 1, 2, 3 ]) { await expectNoMagenta(page.getByTestId(`skill-slot-${slot}`).locator('img')); }
     });
 
-    test('shows no magenta in the detail of any of the five heroes', async ({ page }) => {
-        const heroes = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
+    //  One test for each of the five heroes, so that none of them runs the five detail screens of one test inside its timeout
+    const HEROES = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 
-        await startAs(page, { copies: Object.fromEntries(heroes.map((hero) => [ `${hero}:3`, 1 ])) });
-        await openScreen(page, 'heroes');
+    for (const hero of HEROES)
+    {
+        test(`shows no magenta in the detail of ${hero}`, async ({ page }) => {
+            await startAs(page, { copies: Object.fromEntries(HEROES.map((id) => [ `${id}:3`, 1 ])) });
+            await openScreen(page, 'heroes');
 
-        for (const hero of heroes)
-        {
             await page.getByTestId(`hero-card-${hero}`).click();
             const arts = page.locator('img.skill-art, .skill-art img');
 
             await expect(arts).toHaveCount(3);
             for (const art of await arts.all()) { await expectNoMagenta(art); }
-            await page.getByTestId('hero-back').click();
-        }
-    });
+        });
+    }
 
     test('shows no magenta in a bag entry and a skill tooltip', async ({ page }) => {
         await startAs(page, { copies: { 'lyra:3': 1 } });

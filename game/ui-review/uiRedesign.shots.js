@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { mockBackend } from '../e2e/support/fakeBackend';
 import { SESSION_KEY, activeSceneKeys, fillCredentials, openMainMenu, skipSplash } from '../e2e/support/game';
+import { openLeaderList } from '../e2e/support/leader';
 import { shot } from './support/shots';
 
 //  Screenshots of the Grove theme review (.specs/features/ui-redesign/ui-review/, design § Review Screenshots). Everything runs on the
@@ -277,7 +278,7 @@ test('hero screens', async ({ page }, testInfo) => {
     await shot(page, testInfo, '24-fusion');
 
     await page.getByTestId('hero-close').click();
-    await page.getByTestId('hud-leader').click();
+    await openLeaderList(page);
     await expect(page.getByTestId('leader-entry-lyra')).toBeVisible();
     await page.mouse.move(0, 0);
     await settleImages(page);

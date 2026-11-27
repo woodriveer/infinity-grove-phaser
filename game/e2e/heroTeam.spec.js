@@ -79,18 +79,18 @@ const tick = (page, ms) => page.evaluate((delta) => {
 const slot = (page, index) => page.getByTestId(`team-slot-${index}`);
 
 test.describe('Hero team: Equipe screen', () => {
-    test('the Equipe button is absent before the chapter 5 boss is won and the rail keeps six buttons', async ({ page }) => {
+    test('the Equipe button is in the rail before the chapter 5 boss is won and the rail keeps six buttons', async ({ page }) => {
         await startTeam(page, { cleared: [ 1, 2, 3, 4 ] });
 
-        await expect(page.getByTestId('hud-team')).toHaveCount(0);
+        await expect(page.getByTestId('hud-team')).toHaveCount(1);
         await expect(page.locator('.hero-hud button')).toHaveCount(6);
     });
 
-    test('the Equipe button sits right after Líder once the chapter 5 boss is won and the rail stays above the battle bar', async ({ page }) => {
+    test('the Equipe button sits right after Mochila once the chapter 5 boss is won and the rail stays above the battle bar', async ({ page }) => {
         await startTeam(page, { cleared: [ 5 ] });
 
-        expect(await page.locator('.hero-hud [data-testid^="hud-"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.testid)))
-            .toEqual([ 'hud-heroes', 'hud-bag', 'hud-leader', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm' ]);
+        expect(await page.locator('.hero-hud button[data-testid^="hud-"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.testid)))
+            .toEqual([ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm' ]);
         await expect(page.getByTestId('hud-team')).toHaveText('Equipe');
 
         const icon = page.getByTestId('hud-team').locator('svg');
@@ -414,16 +414,21 @@ test.describe('Hero team: Equipe screen', () => {
         await context.close();
     });
 
-    test('winning the chapter 5 boss shows the Equipe button without a reload', async ({ page }) => {
+    test('winning the chapter 5 boss makes slot 1 buyable without a reload', async ({ page }) => {
         await startTeam(page, {
             chapter: 5, encounter: 'CHAPTER_BOSS', cleared: [], lastChapter: 6, definition: bossOfOneHealth
         });
 
-        await expect(page.getByTestId('hud-team')).toHaveCount(0);
+        await expect(page.getByTestId('hud-team')).toBeVisible();
+        await openTeam(page);
+        await expect(slot(page, 1)).toHaveAttribute('data-state', 'locked');
+        await page.getByTestId('hero-close').click();
         await page.evaluate(() => { window.__sameDocument = true; });
         await page.locator('#game-container canvas').click();
 
-        await expect(page.getByTestId('hud-team')).toBeVisible();
+        await expect(page.getByTestId('chapter-hud')).toHaveText('Capítulo 6');
+        await openTeam(page);
+        await expect(slot(page, 1)).toHaveAttribute('data-state', 'buyable');
         expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
     });
 

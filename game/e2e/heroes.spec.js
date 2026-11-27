@@ -1,6 +1,7 @@
 import { expect, test } from './support/coverage';
 import { mockBackend } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
+import { openLeaderList } from './support/leader';
 
 //  One stage that a fire click clears fast: phase monsters of 20 health and a nature miniboss of 2 (fire hits nature for double)
 const SMALL_CHAPTER = {
@@ -149,7 +150,7 @@ test.describe('Hero screens', () => {
         await expect(page.getByTestId('skill-slot-1').locator('img')).toHaveAttribute('src', 'assets/heroes/kael_dimensional_cut.jpg');
         await expect(page.locator('.skill-slot.is-locked')).toHaveCount(3);
 
-        await page.getByTestId('hud-leader').click();
+        await openLeaderList(page);
         await expect(page.getByTestId('leader-entry-kael')).toHaveClass(/is-current/);
         await expect(page.getByTestId('leader-entry-vex')).toHaveCount(0);
         await page.getByTestId('leader-entry-lyra').click();

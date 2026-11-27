@@ -1,6 +1,7 @@
 import { expect, test } from './support/coverage';
 import { mockBackend } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
+import { openLeaderList } from './support/leader';
 
 //  The reworked combat (spec talent-tree-rework): boss damage, the subtractive critical chance with its overflow, armor pierce, the chip
 //  `Seu crítico`, Fúria crescente and the attribute panel. The leader is Kael (fire) against fire monsters, so an element is neutral and a
@@ -181,7 +182,7 @@ test.describe('Critical chance minus critical resistance', () => {
 
         await expect(page.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Seu crítico: 10%');
 
-        await page.getByTestId('hud-leader').click();
+        await openLeaderList(page);
         await page.getByTestId('leader-entry-lyra').click();
         await expect(page.getByTestId('leader-entry-lyra')).toHaveClass(/is-current/);
         await page.getByTestId('hero-close').click();
