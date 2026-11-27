@@ -19,7 +19,7 @@ describe('hitDamage', () => {
         expect(hitDamage({ attacker, percent: 100, armorPierce: 30, defender: enemy('FIRE', 50), random: never, ...none }).damage).toBe(1);
     });
 
-    it('meets the one defense with every hit: 2500 % against physicalDefense 90 deals 2.5', () => {
+    it('meets the one defense with every hit: 2500 % against defense 90 deals 2.5', () => {
         expect(hitDamage({ attacker: PLAYER, percent: 2500, defender: enemy('FIRE', 90), random: never, ...none }).damage).toBeCloseTo(2.5, 10);
     });
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { calculateDamage, critOverflow, effectiveCritChance, formatDamage, PLAYER } from './damage';
 
-const enemy = (element, physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element, physicalDefense, magicalDefense, critResistance });
+const enemy = (element, defense = 0, critResistance = 0) => ({ element, defense, critResistance });
 const never = () => 0.99;
 const always = () => 0;
 
@@ -28,14 +28,16 @@ describe('calculateDamage', () => {
         expect(calculateDamage({ defender: { element: 'FIRE', defense: 50, critResistance: 0 }, random: never }).damage).toBe(0.5);
     });
 
-    it('never reads magicalDefense: an old payload with physicalDefense 0 and magicalDefense 80 deals 1', () => {
-        expect(calculateDamage({ defender: enemy('FIRE', 0, 80), random: never }).damage).toBe(1);
+    it('never reads magicalDefense: a payload with only magicalDefense 80 deals 1', () => {
+        const defender = { element: 'FIRE', magicalDefense: 80, critResistance: 0 };
+
+        expect(calculateDamage({ defender, random: never }).damage).toBe(1);
     });
 
-    it('meets the same defense whatever damageType an older attacker carries: physicalDefense 80 deals 0.2', () => {
+    it('meets the same defense whatever damageType an older attacker carries: defense 80 deals 0.2', () => {
         const attacker = { ...PLAYER, damageType: 'MAGICAL' };
 
-        expect(calculateDamage({ attacker, defender: enemy('FIRE', 80, 20), random: never }).damage).toBeCloseTo(0.2, 10);
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 80), random: never }).damage).toBeCloseTo(0.2, 10);
     });
 
     it('reads defense before physicalDefense: defense 40 and physicalDefense 70 deal 0.6', () => {
@@ -79,19 +81,19 @@ describe('calculateDamage', () => {
     it('40 against resistance 30 crits on a roll of 0.09 and not on 0.10', () => {
         const attacker = { ...PLAYER, critChance: 40 };
 
-        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 30), random: () => 0.09 })).toEqual({ damage: 2, critical: true });
-        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 30), random: () => 0.10 })).toEqual({ damage: 1, critical: false });
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 30), random: () => 0.09 })).toEqual({ damage: 2, critical: true });
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 30), random: () => 0.10 })).toEqual({ damage: 1, critical: false });
     });
 
     it('never crits on a roll when the resistance reaches the chance: 30 against 50 on a roll of 0', () => {
         const attacker = { ...PLAYER, critChance: 30 };
 
-        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 50), random: always })).toEqual({ damage: 1, critical: false });
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 50), random: always })).toEqual({ damage: 1, critical: false });
     });
 
     it('adds the chance past 100 as critical damage: 130 against 10 with a x2.5 critical deals 2.7', () => {
         const attacker = { ...PLAYER, critChance: 130, critMultiplier: 2.5 };
-        const result = calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 10), random: never });
+        const result = calculateDamage({ attacker, defender: enemy('FIRE', 0, 10), random: never });
 
         expect(result.damage).toBeCloseTo(2.7, 10);
         expect(result.critical).toBe(true);
@@ -100,18 +102,18 @@ describe('calculateDamage', () => {
     it('adds no overflow at exactly 100 after the resistance: 110 against 10 deals 2', () => {
         const attacker = { ...PLAYER, critChance: 110 };
 
-        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 10), random: never }).damage).toBe(2);
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 10), random: never }).damage).toBe(2);
     });
 
     it('adds 1 % for one point of overflow: 111 against 10 deals 2.01', () => {
         const attacker = { ...PLAYER, critChance: 111 };
 
-        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 10), random: never }).damage).toBeCloseTo(2.01, 10);
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 10), random: never }).damage).toBeCloseTo(2.01, 10);
     });
 
     it('clamps the chance at 100 and keeps the overflow: 250 against 100 deals 2.5', () => {
         const attacker = { ...PLAYER, critChance: 250 };
-        const result = calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 100), random: never });
+        const result = calculateDamage({ attacker, defender: enemy('FIRE', 0, 100), random: never });
 
         expect(result.damage).toBeCloseTo(2.5, 10);
         expect(result.critical).toBe(true);
@@ -120,7 +122,7 @@ describe('calculateDamage', () => {
     it('a forced critical keeps the overflow: 150 against 20 deals 2.3', () => {
         const attacker = { ...PLAYER, critChance: 150 };
 
-        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 0, 20), random: never, forceCritical: true }).damage).toBeCloseTo(2.3, 10);
+        expect(calculateDamage({ attacker, defender: enemy('FIRE', 0, 20), random: never, forceCritical: true }).damage).toBeCloseTo(2.3, 10);
     });
 
     it('reads a missing critical resistance as 0: 40 crits on a roll of 0.39', () => {
@@ -130,7 +132,7 @@ describe('calculateDamage', () => {
     });
 
     it('never crits a monster with critical resistance 100, not even on the lowest roll', () => {
-        expect(calculateDamage({ defender: enemy('FIRE', 0, 0, 100), random: always }).critical).toBe(false);
+        expect(calculateDamage({ defender: enemy('FIRE', 0, 100), random: always }).critical).toBe(false);
     });
 
     it('does not round: defense 90 against a half-damage element deals 0.05', () => {
@@ -252,7 +254,7 @@ describe('calculateDamage at a defense of 100 or more', () => {
 
 describe('calculateDamage with a forced critical', () => {
     it('is critical against a defender with critical resistance 100, which never crits otherwise', () => {
-        const defender = enemy('FIRE', 0, 0, 100);
+        const defender = enemy('FIRE', 0, 100);
 
         expect(calculateDamage({ defender, random: always }).critical).toBe(false);
         expect(calculateDamage({ defender, random: never, forceCritical: true })).toEqual({ damage: 2, critical: true });

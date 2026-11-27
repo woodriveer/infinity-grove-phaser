@@ -1985,7 +1985,7 @@ describe('ClickerGame pause and leave fight', () => {
 });
 
 describe('ClickerGame elements', () => {
-    const stats = (element, physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element, physicalDefense, magicalDefense, critResistance });
+    const stats = (element, defense = 0, critResistance = 0) => ({ element, defense, critResistance });
     const withStats = (monster, miniboss = monster, boss = monster) => ({
         ...progress(),
         definition: { ...definition, boss, stages: definition.stages.map((stage) => ({ ...stage, monster, miniboss })) }
@@ -2043,7 +2043,7 @@ describe('ClickerGame elements', () => {
     });
 
     it('applies the defense of the monster: physicalDefense 50 of an old payload', async () => {
-        const ctx = await createScene({ start: withStats(stats('FIRE', 50, 10)) });
+        const ctx = await createScene({ start: withStats(stats('FIRE', 50)) });
 
         ctx.click();
 
@@ -2051,7 +2051,7 @@ describe('ClickerGame elements', () => {
     });
 
     it('applies the defense of a new payload: defense 50 takes half of a click', async () => {
-        const ctx = await createScene({ start: withStats({ element: 'FIRE', defense: 50, physicalDefense: 50, magicalDefense: 50, critResistance: 0 }) });
+        const ctx = await createScene({ start: withStats({ element: 'FIRE', defense: 50, critResistance: 0 }) });
 
         ctx.click();
 
@@ -2109,7 +2109,7 @@ describe('ClickerGame elements', () => {
     });
 
     it('never crits a monster with critical resistance 100', async () => {
-        const ctx = await createScene({ start: withStats(stats('FIRE', 0, 0, 100)) });
+        const ctx = await createScene({ start: withStats(stats('FIRE', 0, 100)) });
         ctx.dice.value = 0;
 
         ctx.click();
@@ -2127,19 +2127,19 @@ describe('ClickerGame elements', () => {
     });
 
     it('shows the element, the defense of the monster and Seu crítico on screen', async () => {
-        const ctx = await createScene({ start: withStats(stats('WATER', 11, 22, 33)) });
+        const ctx = await createScene({ start: withStats(stats('WATER', 11, 33)) });
 
         expect(enemyText(ctx)).toBe('Water  Defesa 11%  Seu crítico: 0%');
     });
 
     it('shows the miniboss attributes when the miniboss spawns', async () => {
-        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT', 1, 2, 3)), encounter: 'MINIBOSS' } });
+        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT', 1, 3)), encounter: 'MINIBOSS' } });
 
         expect(enemyText(ctx)).toBe('Light  Defesa 1%  Seu crítico: 7%');
     });
 
     it('shows the chapter boss attributes', async () => {
-        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
+        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
 
         expect(enemyText(ctx)).toBe('Darkness  Defesa 30%  Seu crítico: 0%');
     });
@@ -2152,7 +2152,7 @@ describe('ClickerGame elements', () => {
 
     it('shows Seu crítico: 10% for a 3-star Kael against critical resistance 30', async () => {
         const heroes = { leaderId: 'kael', heroes: [ heroEntry('kael', { 3: 1 }, 3) ] };
-        const ctx = await createScene({ start: withStats(stats('FIRE', 0, 0, 30)), heroes });
+        const ctx = await createScene({ start: withStats(stats('FIRE', 0, 30)), heroes });
 
         expect(enemyText(ctx)).toBe('Fire  Defesa 0%  Seu crítico: 10%');
     });
@@ -2160,13 +2160,13 @@ describe('ClickerGame elements', () => {
     it('shows Seu crítico: 100% for a leader of critical chance 130 against resistance 10', async () => {
         const heroes = { leaderId: 'kael', heroes: [ heroEntry('kael', { 9: 1 }, 9) ] };
         const talents = [ COMBO_MAXED, { id: 'CRIT_CHANCE', baseId: 'CRIT_CHANCE', value: 60 } ];
-        const ctx = await createScene({ start: withStats(stats('FIRE', 0, 0, 10)), heroes, talents });
+        const ctx = await createScene({ start: withStats(stats('FIRE', 0, 10)), heroes, talents });
 
         expect(enemyText(ctx)).toBe('Fire  Defesa 0%  Seu crítico: 100%');
     });
 
     it('marks the element chip with data-element and the defense and crit chips with data-stat', async () => {
-        const ctx = await createScene({ start: withStats(stats('WATER', 11, 22, 33)) });
+        const ctx = await createScene({ start: withStats(stats('WATER', 11, 33)) });
 
         expect(ctx.hud('.enemy-stats .tag-element').getAttribute('data-element')).toBe('WATER');
         expect([ ...ctx.hud('.enemy-stats').querySelectorAll('[data-stat]') ].map((tag) => [ tag.getAttribute('data-stat'), tag.textContent ]))
@@ -2174,7 +2174,7 @@ describe('ClickerGame elements', () => {
     });
 
     it('keeps the element chip and the one-defense line on a chapter boss', async () => {
-        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
+        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
 
         expect(enemyText(ctx)).toBe('Darkness  Defesa 30%  Seu crítico: 0%');
         expect(ctx.hud('.enemy-stats .tag-element').getAttribute('data-element')).toBe('DARKNESS');
@@ -2227,13 +2227,13 @@ describe('ClickerGame elements', () => {
     });
 
     it('shows no weak element for a LIGHT miniboss', async () => {
-        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT', 1, 2, 3)), encounter: 'MINIBOSS' } });
+        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT', 1, 3)), encounter: 'MINIBOSS' } });
 
         expect(weak(ctx).textContent).toBe('');
     });
 
     it('shows no weak element for a DARKNESS chapter boss', async () => {
-        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
+        const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
 
         expect(weak(ctx).textContent).toBe('');
     });
@@ -2279,7 +2279,7 @@ describe('ClickerGame elements', () => {
     });
 
     it('keeps the attributes on a farmed boss that respawns', async () => {
-        const ctx = await createScene({ start: { ...withStats(stats('NATURE'), stats('LIGHT', 4, 5, 6)), encounter: 'MINIBOSS' } });
+        const ctx = await createScene({ start: { ...withStats(stats('NATURE'), stats('LIGHT', 4, 6)), encounter: 'MINIBOSS' } });
 
         ctx.control('.farm-toggle input').checked = true;
         killAll(ctx);
@@ -2743,7 +2743,7 @@ describe('ClickerGame farm mode', () => {
 });
 
 describe('ClickerGame equipment', () => {
-    const stats = (element, physicalDefense = 0) => ({ element, physicalDefense, magicalDefense: 0, critResistance: 0 });
+    const stats = (element, defense = 0) => ({ element, defense, critResistance: 0 });
     const monsterOf = (monster, miniboss = monster) => ({
         ...progress(),
         definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monster, miniboss })) }
@@ -3468,7 +3468,7 @@ describe('ClickerGame Lyra double click', () => {
     });
 
     it('makes both hits critical against a critical resistance of 100', async () => {
-        const start = big({ monster: { element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 100 } });
+        const start = big({ monster: { element: 'FIRE', defense: 0, critResistance: 100 } });
         const ctx = await createScene({ start, heroes: leaderOf('lyra') });
 
         ctx.dice.value = 0.29;
@@ -3648,7 +3648,7 @@ describe('ClickerGame talents in combat', () => {
         ...progress(1, 'PHASE', 1),
         definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000, monster, ...extra })) }
     });
-    const fire = (physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element: 'FIRE', physicalDefense, magicalDefense, critResistance });
+    const fire = (defense = 0, critResistance = 0) => ({ element: 'FIRE', defense, critResistance });
 
     it('adds CLICK_DAMAGE 5 (+15 %) to the click: 1.15 damage', async () => {
         const ctx = await createScene({ start: bigMonsters(fire()), talents: tree({ CLICK_DAMAGE: 5 }) });
@@ -3688,16 +3688,16 @@ describe('ClickerGame talents in combat', () => {
     });
 
     it('shows the lowered defense on the enemy chips and keeps the stats of the monster itself', async () => {
-        const ctx = await createScene({ start: bigMonsters(fire(20, 20, 20)), talents: tree({ PHYSICAL_BREAK: 5 }) });
+        const ctx = await createScene({ start: bigMonsters(fire(20, 20)), talents: tree({ PHYSICAL_BREAK: 5 }) });
 
         expect(ctx.hud('.enemy-stats').textContent).toContain('Defesa 15%');
         expect(ctx.hud('.enemy-stats').textContent).toContain('Seu crítico: 0%');
         expect(ctx.hud('.enemy-stats').textContent).not.toContain('Magical def');
-        expect(ctx.scene.monster.stats.physicalDefense).toBe(20);
+        expect(ctx.scene.monster.stats.defense).toBe(20);
     });
 
     it('ARMOR_PIERCE 10 ignores 10 % of the defense: a click on defense 50 deals 0.55', async () => {
-        const ctx = await createScene({ start: bigMonsters(fire(50, 50, 0)), talents: tree({ ARMOR_PIERCE: 10 }) });
+        const ctx = await createScene({ start: bigMonsters(fire(50)), talents: tree({ ARMOR_PIERCE: 10 }) });
 
         ctx.click();
 

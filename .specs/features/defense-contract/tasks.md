@@ -288,7 +288,7 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 
 ### Phase 3: Game
 
-#### T5: Game unit fixtures in the new enemy shape [ ]
+#### T5: Game unit fixtures in the new enemy shape [x]
 
 **Owner**: test-engineer
 **Goal**: Every unit test builds enemies as `{ element, defense, critResistance }`, keeping every asserted value, except the legacy payload tests that T7 rewrites (DEF-05; spec Fixtures AC 1, 2).
@@ -319,9 +319,9 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The unit suite passes with the same number of tests as before the task.
-- [ ] `git grep -n -E "physicalDefense|magicalDefense" -- game/src` prints only lines of `monster.js` (the `defenseOf` comment and code), `campaign.js` (comment) and of these tests: `monster.test.js` `describe('defenseOf')`; `damage.test.js` `never reads magicalDefense: a payload with only magicalDefense 80 deals 1`, `reads defense before physicalDefense ...`; `fight.test.js` `statsOf reads a legacy physicalDefense payload`; `monsterAffix.test.js` `reads physicalDefense of an old payload`; `talents.test.js` `reads physicalDefense of an old payload and writes defense`, `an old payload with physicalDefense 50 and Orina's passive reads defense 35`; `ClickerGame.test.js` `applies the defense of the monster: physicalDefense 50 of an old payload` (title only), `shows defense over physicalDefense ...`, `shows Defesa 50% for an old payload ...`.
-- [ ] The commit touches exactly the 6 test files above and this file.
+- [x] The unit suite passes with the same number of tests as before the task.
+- [x] `git grep -n -E "physicalDefense|magicalDefense" -- game/src` prints only lines of `monster.js` (the `defenseOf` comment and code), `campaign.js` (comment) and of these tests: `monster.test.js` `describe('defenseOf')`; `damage.test.js` `never reads magicalDefense: a payload with only magicalDefense 80 deals 1`, `reads defense before physicalDefense ...`; `fight.test.js` `statsOf reads a legacy physicalDefense payload`; `monsterAffix.test.js` `reads physicalDefense of an old payload`; `talents.test.js` `reads physicalDefense of an old payload and writes defense`, `an old payload with physicalDefense 50 and Orina's passive reads defense 35`; `ClickerGame.test.js` `applies the defense of the monster: physicalDefense 50 of an old payload` (title only), `shows defense over physicalDefense ...`, `shows Defesa 50% for an old payload ...`.
+- [x] The commit touches exactly the 6 test files above and this file.
 
 **Commit**: `test(game): build unit test enemies with one defense`
 

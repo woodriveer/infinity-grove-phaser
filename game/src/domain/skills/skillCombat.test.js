@@ -8,7 +8,7 @@ import { PLAYER } from '../combat/damage';
 import { monsterAfterBreak } from '../talents/talents';
 import { SkillCombat } from './skillCombat';
 
-const stats = (element = 'FIRE', physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element, physicalDefense, magicalDefense, critResistance });
+const stats = (element = 'FIRE', defense = 0, critResistance = 0) => ({ element, defense, critResistance });
 const never = () => 0.99;
 const monsterOf = (health = 1000, defender = stats()) => new Monster(health, null, defender);
 const combat = (random = never) => new SkillCombat({ random });
@@ -55,8 +55,8 @@ describe('using a skill', () => {
         expect(use(combat(), monsterOf(), 'vex', 3).hits).toEqual([ { damage: 6, critical: false } ]);
     });
 
-    it('meets the one defense of an older payload with every Orina hit: physicalDefense 50 and magicalDefense 10 make Chuva de Meteoros 12.5 (E2)', () => {
-        const monster = monsterOf(1000, stats('FIRE', 50, 10));
+    it('meets the one defense with every Orina hit: defense 50 makes Chuva de Meteoros 12.5 (E2)', () => {
+        const monster = monsterOf(1000, stats('FIRE', 50));
 
         expect(use(combat(), monster, 'orina', 3).hits).toEqual([ { damage: 12.5, critical: false } ]);
     });
@@ -181,12 +181,12 @@ describe('break talents', () => {
 
         withBreak({ PHYSICAL_BREAK: 5 }).click({ attacker: base100, monster, boss: false });
 
-        expect(monster.stats.physicalDefense).toBe(20);
+        expect(monster.stats.defense).toBe(20);
     });
 
     it('lowers the one defense of every hit with PHYSICAL_BREAK: Chuva de Meteoros 2250 and Investida 360 against defense 20 with PHYSICAL_BREAK 10', () => {
-        const magic = monsterOf(100000, stats('FIRE', 20, 20));
-        const physical = monsterOf(100000, stats('FIRE', 20, 20));
+        const magic = monsterOf(100000, stats('FIRE', 20));
+        const physical = monsterOf(100000, stats('FIRE', 20));
 
         withBreak({ PHYSICAL_BREAK: 10 }).use({ heroId: 'orina', slot: 3, unlocked: true, attacker: base100, monster: magic, boss: false });
         withBreak({ PHYSICAL_BREAK: 10 }).use({ heroId: 'kael', slot: 2, unlocked: true, attacker: base100, monster: physical, boss: false });
@@ -226,11 +226,11 @@ describe('break talents', () => {
     });
 
     it('ignores CRIT_RESIST_BREAK of an older list: resistance 5 and CRIT_RESIST_BREAK 20 leave a roll of 9 plain at 10 %', () => {
-        const monster = monsterOf(1000, stats('FIRE', 0, 0, 5));
+        const monster = monsterOf(1000, stats('FIRE', 0, 5));
         const roll = () => 0.09;
 
         expect(withBreak({ CRIT_RESIST_BREAK: 20 }, roll).click({ attacker: PLAYER, monster, boss: false })).toEqual({ damage: 1, critical: false });
-        expect(new SkillCombat({ random: roll }).click({ attacker: PLAYER, monster: monsterOf(1000, stats('FIRE', 0, 0, 0)), boss: false }).critical).toBe(true);
+        expect(new SkillCombat({ random: roll }).click({ attacker: PLAYER, monster: monsterOf(1000, stats('FIRE', 0, 0)), boss: false }).critical).toBe(true);
     });
 });
 
@@ -611,7 +611,7 @@ describe('the aimed shot', () => {
 
     it('is critical against critical resistance 100 and applies the boss damage', () => {
         const skills = combat();
-        const monster = monsterOf(1000, stats('FIRE', 0, 0, 100));
+        const monster = monsterOf(1000, stats('FIRE', 0, 100));
 
         use(skills, monster, 'lyra', 2, { attacker: { ...PLAYER, bossDamage: 50 }, boss: true });
 
@@ -1598,8 +1598,8 @@ describe('affixes', () => {
 
     it('a Blindado +20 monster of seeded defense 33 takes 0.47 from a Base-1 click and one of seeded defense 80 takes 0', () => {
         const armor = { type: 'ARMORED', amount: 20, periodMs: null };
-        const light = monsterOf(1000, affixDefense(stats('FIRE', 33, 33), armor));
-        const heavy = monsterOf(1000, affixDefense(stats('FIRE', 80, 80), armor));
+        const light = monsterOf(1000, affixDefense(stats('FIRE', 33), armor));
+        const heavy = monsterOf(1000, affixDefense(stats('FIRE', 80), armor));
 
         expect(combat().click({ attacker: PLAYER, monster: light, boss: false }).damage).toBeCloseTo(0.47, 10);
         expect(light.health).toBeCloseTo(999.53, 6);

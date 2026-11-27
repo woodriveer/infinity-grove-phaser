@@ -116,7 +116,7 @@ describe('Monster', () => {
     });
 
     it('carries the stats it was given, fire without defense by default', () => {
-        const stats = { element: 'WATER', physicalDefense: 5, magicalDefense: 6, critResistance: 7 };
+        const stats = { element: 'WATER', defense: 5, critResistance: 7 };
 
         expect(new Monster(10, 1, stats).stats).toBe(stats);
         expect(new Monster().stats).toEqual(DEFAULT_STATS);
@@ -124,7 +124,7 @@ describe('Monster', () => {
     });
 
     it('keeps its stats when it respawns', () => {
-        const stats = { element: 'NATURE', physicalDefense: 5, magicalDefense: 6, critResistance: 7 };
+        const stats = { element: 'NATURE', defense: 5, critResistance: 7 };
         const monster = new Monster(10, 1, stats);
 
         monster.hit(10);

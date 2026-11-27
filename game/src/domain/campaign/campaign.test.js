@@ -120,18 +120,18 @@ describe('Campaign encounter', () => {
     });
 
     describe('enemy stats', () => {
-        const monster = { element: 'WATER', physicalDefense: 1, magicalDefense: 2, critResistance: 3 };
-        const miniboss = { element: 'LIGHT', physicalDefense: 21, magicalDefense: 22, critResistance: 23 };
-        const boss = { element: 'DARKNESS', physicalDefense: 31, magicalDefense: 32, critResistance: 33 };
+        const monster = { element: 'WATER', defense: 1, critResistance: 3 };
+        const miniboss = { element: 'LIGHT', defense: 21, critResistance: 23 };
+        const boss = { element: 'DARKNESS', defense: 31, critResistance: 33 };
         const withStats = {
             ...definition,
             boss,
-            stages: definition.stages.map((stage) => ({ ...stage, monster: { ...monster, physicalDefense: stage.number }, miniboss }))
+            stages: definition.stages.map((stage) => ({ ...stage, monster: { ...monster, defense: stage.number }, miniboss }))
         };
         const statsAt = (stage, encounter) => Campaign.fromProgress({ chapter: 1, stage, encounter, phase: 1, completed: false, definition: withStats }).encounter().stats;
 
         it('a phase monster carries the monster stats of its stage', () => {
-            expect(statsAt(2, PHASE)).toEqual({ ...monster, physicalDefense: 2 });
+            expect(statsAt(2, PHASE)).toEqual({ ...monster, defense: 2 });
         });
 
         it('a miniboss carries the miniboss stats of its stage', () => {
@@ -183,8 +183,8 @@ describe('Campaign encounter', () => {
 describe('Campaign farm encounters', () => {
     const farmDefinition = {
         ...definition,
-        boss: { element: 'DARKNESS', physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
-        stages: definition.stages.map((stage) => ({ ...stage, miniboss: { element: 'WATER', physicalDefense: 11, magicalDefense: 12, critResistance: 13 } }))
+        boss: { element: 'DARKNESS', defense: 30, critResistance: 30 },
+        stages: definition.stages.map((stage) => ({ ...stage, miniboss: { element: 'WATER', defense: 11, critResistance: 13 } }))
     };
     const done = Campaign.fromProgress({ chapter: 1, stage: 3, encounter: CHAPTER_BOSS, phase: 1, completed: true, definition: farmDefinition });
 
@@ -194,7 +194,7 @@ describe('Campaign farm encounters', () => {
             boss: { kind: MINIBOSS, stage: 2 },
             phase: 1,
             health: 55,
-            stats: { element: 'WATER', physicalDefense: 11, magicalDefense: 12, critResistance: 13 },
+            stats: { element: 'WATER', defense: 11, critResistance: 13 },
             dropRuleId: null,
             timeLimitMs: 31000,
             label: 'Rever chefe: Miniboss 2',
@@ -209,7 +209,7 @@ describe('Campaign farm encounters', () => {
             boss: { kind: CHAPTER_BOSS },
             phase: 1,
             health: 300,
-            stats: { element: 'DARKNESS', physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
+            stats: { element: 'DARKNESS', defense: 30, critResistance: 30 },
             dropRuleId: null,
             timeLimitMs: 60000,
             label: 'Rever chefe: Chefe do capítulo',
@@ -238,8 +238,8 @@ describe('Campaign farm encounters', () => {
 });
 
 describe('farm labels and farm fights of any chapter definition', () => {
-    const S3 = { element: 'NATURE', physicalDefense: 7, magicalDefense: 7, critResistance: 9 };
-    const SB = { element: 'FIRE', physicalDefense: 35, magicalDefense: 35, critResistance: 35 };
+    const S3 = { element: 'NATURE', defense: 7, critResistance: 9 };
+    const SB = { element: 'FIRE', defense: 35, critResistance: 35 };
     const D2 = {
         bossHealth: 4321,
         bossTimeLimitMs: 50_000,
