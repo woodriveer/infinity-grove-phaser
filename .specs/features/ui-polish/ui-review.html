@@ -110,14 +110,14 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <code>.specs/features/ui-polish</code> · commits <code>até a9031ded</code> · 2026-11-27 · local (vite dev, backend falso, Chromium do Playwright)
                 </div>
             </div>
-            <span class="chip verdict changes">MUDANÇAS PEDIDAS</span>
+            <span class="chip verdict ok">APROVADO</span>
         </div>
-        <p style="margin-top:16px">A funcionalidade está pronta e fiel à spec: sem seleção de texto, árvore de talentos remendada sem piscar, botões sem escurecer durante o pedido, forma Shift do botão de melhoria, trilho de seis botões com chips B e T e a lista de líder em Equipe. Dois ajustes de CSS pedidos: o cartão do líder precisa do cursor de mão e o anel dourado do Shift precisa de contraste de 3:1 contra o pergaminho. Nenhum texto novo em inglês, nenhum 404 nem erro de console nas capturas. Nota fora do escopo: <code>unifiedDamage.shots.js</code> S1/S2 falham por uma asserção velha de <code>Crit res 33%</code>; não bloqueia.</p>
+        <p style="margin-top:16px">Aprovado na segunda rodada. A funcionalidade segue a spec e os dois achados da primeira rodada foram corrigidos: o cartão do líder agora usa o cursor de mão (<code>cursor: pointer</code>, confirmado no CSS e com <code>default</code> quando desabilitado) e o anel do botão Shift usa <code>--gold-700: #8a6a1c</code>, que lê contra o pergaminho (4,09:1) e continua legível contra o roxo e o dourado do botão. Nenhum texto novo em inglês, nenhum 404 nem erro de console. Nota fora do escopo: <code>unifiedDamage.shots.js</code> S1/S2 falham por uma asserção velha de <code>Crit res 33%</code>; não bloqueia.</p>
         <div class="stats">
             <div class="stat"><div class="n">4</div><div class="l">telas e estados verificados</div></div>
             <div class="stat"><div class="n">18</div><div class="l">capturas (desktop)</div></div>
             <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
-            <div class="stat"><div class="n">2</div><div class="l">achados médios e baixos</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados médios e baixos</div></div>
         </div>
     </section>
 
@@ -132,7 +132,7 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
             <li class="yes"><span class="mark">✓</span><span>Trilho com seis botões, Líder removido; chips B e T com a mesma aparência do A (16 px, Cinzel 10 px, <code>#f3d58a</code> sobre <code>#1c120c</code>, borda <code>#e0b45a</code>) <code>UIP-12 AC 10</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Cartão do líder é um botão com <code>Trocar líder</code> (11 px, 800, <code>#643312</code>, sublinhado, contraste 8,4:1 sobre <code>#f4e6c8</code>) <code>UIP-13</code></span></li>
             <li class="yes"><span class="mark">✓</span><span>Lista <code>Escolher líder</code> com <code>Voltar</code>; escolha reflete no cartão do líder <code>UIP-13</code></span></li>
-            <li class="no"><span class="mark">✗</span><span>Anel dourado do botão Shift deve ler contra o pergaminho do cartão com pelo menos 3:1 <code>tasks.md T17, WCAG 1.4.11</code> — medido <code>#e0b45a</code> sobre <code>#f4e6c8</code> = 1,57:1 (contra o roxo do botão: 3,79:1)</span></li>
+            <li class="yes"><span class="mark">✓</span><span>Anel do botão Shift lê contra o pergaminho do cartão com pelo menos 3:1 <code>tasks.md T17, WCAG 1.4.11</code> — corrigido em F3: <code>#8a6a1c</code> sobre <code>#f4e6c8</code> = 4,09:1</span></li>
         </ul>
     </section>
 
@@ -154,15 +154,15 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">02 · Shift segurado</span>
                         <span class="d"><code>Melhorar até o nível 5 (5 pontos)</code> com o anel dourado de 2 px.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #2</span></span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/02b-card-shift-detail-desktop.png" target="_blank"><img src="ui-review/02b-card-shift-detail-desktop.png" alt="02b · Shift, só o cartão" loading="lazy"></a>
                     <figcaption>
                         <span class="t">02b · Shift, só o cartão</span>
-                        <span class="d">Recorte do cartão: o anel dourado contra o roxo do botão lê bem, contra o pergaminho quase some.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #2</span></span>
+                        <span class="d">Recorte do cartão após F3: o anel dourado escuro se destaca contra o pergaminho.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
@@ -265,15 +265,15 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
                     <figcaption>
                         <span class="t">11 · Equipe no capítulo 1</span>
                         <span class="d">Cartão do líder com <code>Trocar líder</code>, quatro vagas bloqueadas, linha de status.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #1</span></span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
                     <a href="ui-review/11b-equipe-leader-hover-desktop.png" target="_blank"><img src="ui-review/11b-equipe-leader-hover-desktop.png" alt="11b · Cartão do líder com o mouse em cima" loading="lazy"></a>
                     <figcaption>
                         <span class="t">11b · Cartão do líder com o mouse em cima</span>
-                        <span class="d">O cartão clicável mostra só um leve brilho; o cursor segue sendo a seta.</span>
-                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #1</span></span>
+                        <span class="d">Cartão clicável com leve brilho e cursor de mão (após F2).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
                     </figcaption>
                 </figure>
                 <figure>
@@ -306,36 +306,13 @@ footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: 
 
     <section class="panel">
         <h2>Achados</h2>
-        <article class="finding">
-            <div>
-                <div class="top"><span class="chip sev-media">#1 · Média</span><strong>O cartão do líder é clicável mas mantém o cursor de seta</strong></div>
-                <dl>
-                    <dt>Tela</dt><dd>Equipe (desktop)</dd>
-                    <dt>O que está errado</dt><dd>O cartão do líder agora é um <code>button</code> que abre <code>Escolher líder</code>, mas a regra <code>.team-slot[data-state="leader"]</code> fixa <code>cursor: default</code>; medido no navegador: <code>cursor: default</code>. Os outros cartões clicáveis (aliado, herói) usam a mão. O único sinal de que o cartão clica é o texto sublinhado de 11 px e um brilho de 6% ao passar o mouse.</dd>
-                    <dt>Como deveria ficar</dt><dd>Cursor <code>pointer</code> no cartão do líder enquanto ele está habilitado (<code>:disabled</code> continua <code>default</code>, como já faz <code>.team-slot:disabled</code>).</dd>
-                    <dt>Arquivo</dt><dd><code>game/public/style.css (linha da regra <code>.team-slot[data-state="leader"]</code>: trocar <code>cursor: default</code> por <code>cursor: pointer</code>; e atualizar o teste e2e que fixa o cursor, se houver)</code></dd>
-                </dl>
-            </div>
-            <a href="ui-review/11b-equipe-leader-hover-desktop.png" target="_blank"><img src="ui-review/11b-equipe-leader-hover-desktop.png" alt="Captura do achado #1"></a>
-        </article>
-        <article class="finding">
-            <div>
-                <div class="top"><span class="chip sev-media">#2 · Média</span><strong>O anel dourado do botão Shift quase some sobre o pergaminho</strong></div>
-                <dl>
-                    <dt>Tela</dt><dd>Talentos, cartão do talento com Shift (desktop)</dd>
-                    <dt>O que está errado</dt><dd>O anel de 2 px <code>#e0b45a</code> fica sobre o pergaminho <code>#f4e6c8</code> do cartão: contraste medido 1,57:1, abaixo dos 3:1 que a tarefa T17 pede para parte de interface sem texto (WCAG 1.4.11). Ele só se destaca contra o roxo do botão (3,79:1), e o texto do botão também muda, então a informação não depende só do anel, mas o contorno externo some.</dd>
-                    <dt>Como deveria ficar</dt><dd>Anel de 2 px com contraste de pelo menos 3:1 contra o pergaminho, por exemplo dourado escuro (ouro com <code>#8a6a1c</code> ou mais escuro, ~4,4:1) ou anel duplo (interno ouro, externo de 1 px em tinta escura <code>--wood-900</code>). Atualizar o valor esperado de <code>box-shadow</code> nos testes e2e (<code>GOLD_RING</code> em uiPolishShift.spec.js) e na spec UIP-09 AC 10.</dd>
-                    <dt>Arquivo</dt><dd><code>game/public/style.css (<code>.talent-upgrade[data-max="true"]</code>), game/e2e/uiPolishShift.spec.js</code></dd>
-                </dl>
-            </div>
-            <a href="ui-review/02b-card-shift-detail-desktop.png" target="_blank"><img src="ui-review/02b-card-shift-detail-desktop.png" alt="Captura do achado #2"></a>
-        </article>
+        <p class="empty">Nenhum achado aberto. Os achados #1 (cursor do cartão do líder, F2) e #2 (contraste do anel Shift, F3) da primeira rodada foram corrigidos e conferidos.</p>
     </section>
 
     <section class="panel">
         <h2>Sugestões</h2>
         <ul class="checks">
-            <li><span class="mark">✦</span><span>O rótulo <code>Trocar líder</code> está no fundo do cartão e em 11 px; se o cursor de mão (achado #1) não bastar, um fundo levemente mais quente ao passar o mouse reforçaria que o cartão é um botão.</span></li>
+            <li><span class="mark">✦</span><span>O rótulo <code>Trocar líder</code> está no fundo do cartão e em 11 px; se o cursor de mão não bastar, um fundo levemente mais quente ao passar o mouse reforçaria que o cartão é um botão.</span></li>
             <li><span class="mark">✦</span><span>Em Equipe do capítulo 1, <code>Remover</code> e <code>Tornar líder</code> aparecem apagados sem nenhuma vaga selecionada; é o comportamento anterior, mas uma dica curta ajudaria. Fora do escopo.</span></li>
         </ul>
     </section>
