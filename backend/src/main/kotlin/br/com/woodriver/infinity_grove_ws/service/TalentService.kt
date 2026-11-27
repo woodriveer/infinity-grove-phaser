@@ -40,20 +40,29 @@ class TalentService(
         username: String,
         talentId: String,
         fromLevel: Int,
+        levels: Int,
     ): PlayerTalents {
-        logger.info("Talent upgrade requested username={} talent={} fromLevel={}", username, talentId, fromLevel)
+        logger.info("Talent upgrade requested username={} talent={} fromLevel={} levels={}", username, talentId, fromLevel, levels)
         requireUser(username)
         val definition = TalentCatalog.find(talentId)
         definition.requireSeenLevel(fromLevel)
+        definition.requireLevelCount(levels)
 
         progressRepository.createIfAbsent(Progress.start(username))
         progressRepository.findForUpdate(username)
-        val upgrade = load(username).upgrade(definition, fromLevel, rules)
+        val upgrade = load(username).upgrade(definition, fromLevel, rules, levels)
 
         val level = upgrade.talents.level(talentId)
 
         talentRepository.save(username, talentId, level)
-        logger.info("Talent upgraded username={} talent={} level={} points={}", username, talentId, level, upgrade.cost)
+        logger.info(
+            "Talent upgraded username={} talent={} levels={} level={} points={}",
+            username,
+            talentId,
+            levels,
+            level,
+            upgrade.cost,
+        )
         return upgrade.talents
     }
 

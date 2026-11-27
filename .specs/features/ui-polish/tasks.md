@@ -148,7 +148,7 @@ Every existing `TalentsTest` case passes unchanged (the one-level path keeps its
 
 ---
 
-#### T2: POST /talents/{id}/upgrade reads an optional levels [ ]
+#### T2: POST /talents/{id}/upgrade reads an optional levels [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The upgrade body takes `levels` (absent or null = 1) and buys that many levels in one transaction under the `progress` lock (UIP-08 AC 1 to 10).
@@ -199,9 +199,9 @@ Every existing `TalentControllerIT` and `TalentServiceTest` case passes unchange
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 11 new cases pass and the whole backend suite passes.
-- [ ] `git diff --stat` shows no file under `backend/src/main/resources/db/migration` (UIP-08 AC 10).
-- [ ] `backend/docs/adr/0016-multi-level-talent-upgrade.md` exists with the five sections.
+- [x] The 11 new cases pass and the whole backend suite passes.
+- [x] `git diff --stat` shows no file under `backend/src/main/resources/db/migration` (UIP-08 AC 10).
+- [x] `backend/docs/adr/0016-multi-level-talent-upgrade.md` exists with the five sections.
 
 **Commit**: `feat(backend): accept a level count on the talent upgrade`
 

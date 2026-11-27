@@ -82,6 +82,37 @@ class TalentServiceTest {
     }
 
     @Test
+    fun `an upgrade of 3 levels stores level 3 once and leaves no point`() {
+        player(3)
+
+        val upgraded = service.upgrade("yan", "COMBO", 0, 3)
+
+        assertEquals(3, upgraded.level("COMBO"))
+        assertEquals(3, talents.levels.getValue("yan" to "COMBO"))
+        assertEquals(0, upgraded.points(rules).available)
+    }
+
+    @Test
+    fun `an upgrade of 0 or 11 levels is refused and stores nothing`() {
+        player(20)
+
+        listOf(0, 11).forEach { levels ->
+            assertFailsWith<TalentRequestException> { service.upgrade("yan", "COMBO", 0, levels) }
+        }
+
+        assertEquals(emptyMap(), talents.levels)
+    }
+
+    @Test
+    fun `an upgrade without levels still raises one level`() {
+        player(3)
+
+        val upgraded = service.upgrade("yan", "COMBO", 0)
+
+        assertEquals(1, upgraded.level("COMBO"))
+    }
+
+    @Test
     fun `an upgrade locks the progress of the player, creating it first`() {
         player(1)
 

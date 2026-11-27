@@ -103,6 +103,12 @@ class TalentController(
         @RequestBody body: Map<String, Any?>,
     ): TalentsResponse {
         val fromLevel = body["fromLevel"] as? Int ?: throw TalentRequestException("fromLevel must be an integer")
-        return TalentsResponse.from(upgradeTalent.upgrade(principal.name, id, fromLevel), rules)
+        val levels =
+            when (val raw = body["levels"]) {
+                null -> 1
+                is Int -> raw
+                else -> throw TalentRequestException("levels must be an integer")
+            }
+        return TalentsResponse.from(upgradeTalent.upgrade(principal.name, id, fromLevel, levels), rules)
     }
 }

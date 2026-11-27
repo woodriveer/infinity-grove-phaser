@@ -9,13 +9,14 @@ interface ListTalentsUseCase {
 
 interface UpgradeTalentUseCase {
     /**
-     * Raises [talentId] by one level for the talent points it costs, under the progress lock of the player. [fromLevel] is the level the
-     * player saw: a request made for another stored level changes and costs nothing.
+     * Raises [talentId] by [levels] levels (1 by default) for the talent points they cost, all or nothing, under the progress lock of the
+     * player. [fromLevel] is the level the player saw: a request made for another stored level changes and costs nothing.
      */
     fun upgrade(
         username: String,
         talentId: String,
         fromLevel: Int,
+        levels: Int = 1,
     ): PlayerTalents
 }
 

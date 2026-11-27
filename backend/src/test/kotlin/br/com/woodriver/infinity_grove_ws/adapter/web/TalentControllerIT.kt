@@ -63,6 +63,16 @@ class TalentControllerIT : IntegrationTestBase() {
             .post("/talents/$id/upgrade")
             .then()
 
+    private fun upgradeWith(
+        id: String,
+        body: Map<String, Any?>,
+    ): ValidatableResponse =
+        asUser()
+            .contentType(ContentType.JSON)
+            .body(body)
+            .post("/talents/$id/upgrade")
+            .then()
+
     @Test
     fun `a new player gets the 28 talents at level 0 with a next cost of 1, 2, 3 and 2 points and no points`() {
         asUser()
@@ -247,6 +257,118 @@ class TalentControllerIT : IntegrationTestBase() {
             "COMBO",
             1,
         ).statusCode(200).body("talents[7].level", equalTo(2)).body("talents[7].value", equalTo(10)).body("points.available", equalTo(0))
+    }
+
+    @Test
+    fun `upgrading COMBO by 5 levels from 0 with 5 points answers level 5, value 25 and no point left`() {
+        earned(5)
+
+        upgradeWith("COMBO", mapOf("fromLevel" to 0, "levels" to 5))
+            .statusCode(200)
+            .body("talents.find { it.id == 'COMBO' }.level", equalTo(5))
+            .body("talents.find { it.id == 'COMBO' }.value", equalTo(25))
+            .body("talents.find { it.id == 'COMBO' }.nextCost", equalTo(1))
+            .body("points.spent", equalTo(5))
+            .body("points.available", equalTo(0))
+
+        assertEquals(5, level("COMBO"))
+    }
+
+    @Test
+    fun `upgrading COMBO_G2 by 2 levels spends 4 points`() {
+        jpaTalentRepository.save(TalentEntity("yan", "COMBO", 10))
+        earned(14)
+
+        upgradeWith("COMBO_G2", mapOf("fromLevel" to 0, "levels" to 2))
+            .statusCode(200)
+            .body("talents.find { it.id == 'COMBO_G2' }.level", equalTo(2))
+            .body("points.available", equalTo(0))
+    }
+
+    @Test
+    fun `a null levels raises one level`() {
+        earned(3)
+
+        upgradeWith("COMBO", mapOf("fromLevel" to 0, "levels" to null))
+            .statusCode(200)
+            .body("talents.find { it.id == 'COMBO' }.level", equalTo(1))
+    }
+
+    @Test
+    fun `a levels that is a string, a decimal or a boolean is 400 INVALID_TALENT_REQUEST and spends nothing`() {
+        earned(5)
+
+        listOf("2", 1.5, true).forEach { sent ->
+            upgradeWith("COMBO", mapOf("fromLevel" to 0, "levels" to sent))
+                .statusCode(400)
+                .body("code", equalTo("INVALID_TALENT_REQUEST"))
+                .body("detail", equalTo("levels must be an integer"))
+        }
+
+        asUser().get("/talents").then().body("points.available", equalTo(5))
+    }
+
+    @Test
+    fun `a levels of 0, -1 or 11 is 400 with the range and spends nothing`() {
+        earned(5)
+
+        listOf(0, -1, 11).forEach { sent ->
+            upgradeWith("COMBO", mapOf("fromLevel" to 0, "levels" to sent))
+                .statusCode(400)
+                .body("code", equalTo("INVALID_TALENT_REQUEST"))
+                .body("detail", equalTo("levels must be an integer between 1 and 10"))
+        }
+
+        upgradeWith("COMBO_FURY", mapOf("fromLevel" to 0, "levels" to 5))
+            .statusCode(400)
+            .body("detail", equalTo("levels must be an integer between 1 and 4"))
+        asUser().get("/talents").then().body("points.available", equalTo(5))
+    }
+
+    @Test
+    fun `levels past the top level is 409 TALENT_MAX_LEVEL and changes nothing`() {
+        jpaTalentRepository.save(TalentEntity("yan", "CLICK_DAMAGE", 8))
+        earned(20)
+
+        upgradeWith("CLICK_DAMAGE", mapOf("fromLevel" to 8, "levels" to 3))
+            .statusCode(409)
+            .body("code", equalTo("TALENT_MAX_LEVEL"))
+            .body("detail", equalTo("Talent 'CLICK_DAMAGE' at level 8 cannot rise 3 levels"))
+
+        assertEquals(8, level("CLICK_DAMAGE"))
+    }
+
+    @Test
+    fun `levels costing more than the points is 409 NOT_ENOUGH_TALENT_POINTS and changes nothing`() {
+        earned(4)
+
+        upgradeWith("COMBO", mapOf("fromLevel" to 0, "levels" to 5))
+            .statusCode(409)
+            .body("code", equalTo("NOT_ENOUGH_TALENT_POINTS"))
+            .body("detail", equalTo("5 talent levels cost 5 points, the player has 4"))
+
+        assertEquals(0, level("COMBO"))
+        asUser().get("/talents").then().body("points.available", equalTo(4))
+    }
+
+    @Test
+    fun `two requests with the same fromLevel and levels succeed once and answer 409 to the other`() {
+        withProgress()
+        earned(10)
+        val pool = Executors.newFixedThreadPool(2)
+
+        val statuses =
+            try {
+                List(2) { Callable { upgradeWith("CLICK_DAMAGE", mapOf("fromLevel" to 0, "levels" to 3)).extract().statusCode() } }
+                    .map(pool::submit)
+                    .map { it.get() }
+            } finally {
+                pool.shutdown()
+            }
+
+        assertEquals(listOf(200, 409), statuses.sorted())
+        assertEquals(3, level("CLICK_DAMAGE"))
+        asUser().get("/talents").then().body("points.spent", equalTo(3))
     }
 
     @Test
