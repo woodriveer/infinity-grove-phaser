@@ -1346,6 +1346,249 @@ describe('HeroUi Talentos', () => {
         expect(down.talentGateway.list).toHaveBeenCalledTimes(1);
     });
 
+    describe('in place and with Shift', () => {
+        const shiftDown = () => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Shift', shiftKey: true }));
+        const shiftUp = () => window.dispatchEvent(new KeyboardEvent('keyup', { key: 'Shift', shiftKey: false }));
+        const bought = (levels, available, spent) => ({ talents: talentTree(levels), points: pointsOf(available, spent) });
+
+        it('keeps the board image and the nodes after a level bought', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+
+            ctx.talentGateway.upgrade.mockResolvedValue(bought({ COMBO: 1 }, 0, 1));
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+
+            const image = ctx.query('.talent-tree-image');
+            const node = ctx.testid('talent-COMBO');
+
+            ctx.testid('talent-upgrade-COMBO').click();
+            await flush();
+
+            expect(ctx.query('.talent-tree-image')).toBe(image);
+            expect(ctx.testid('talent-COMBO')).toBe(node);
+            expect(ctx.testid('talent-node-level-COMBO').textContent).toBe('1/10');
+            ctx.ui.destroy();
+        });
+
+        it('keeps them after a node click', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+
+            const image = ctx.query('.talent-tree-image');
+            const node = ctx.testid('talent-COMBO');
+
+            pick(ctx, 'CLICK_DAMAGE');
+
+            expect(ctx.query('.talent-tree-image')).toBe(image);
+            expect(ctx.testid('talent-COMBO')).toBe(node);
+            expect(ctx.testid('talent-detail').getAttribute('data-selected-id')).toBe('CLICK_DAMAGE');
+            ctx.ui.destroy();
+        });
+
+        it('keeps them after Reiniciar pontos', async () => {
+            const ctx = createUi({ talentList: { talents: talentTree({ COMBO: 1 }), points: pointsOf(0, 1) } });
+
+            ctx.talentGateway.reset.mockResolvedValue(talentsAnswer({}, 1));
+            await open(ctx, 'talents');
+
+            const image = ctx.query('.talent-tree-image');
+            const node = ctx.testid('talent-COMBO');
+
+            ctx.testid('talent-reset').click();
+            await flush();
+
+            expect(ctx.talentGateway.reset).toHaveBeenCalledTimes(1);
+            expect(ctx.query('.talent-tree-image')).toBe(image);
+            expect(ctx.testid('talent-COMBO')).toBe(node);
+            expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 1');
+            ctx.ui.destroy();
+        });
+
+        it('keeps them after the points reload', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+
+            await open(ctx, 'talents');
+
+            const image = ctx.query('.talent-tree-image');
+            const node = ctx.testid('talent-COMBO');
+
+            ctx.talentGateway.list.mockResolvedValue(talentsAnswer({}, 3));
+            ctx.ui.showTalentPoints();
+            await flush();
+
+            expect(ctx.query('.talent-tree-image')).toBe(image);
+            expect(ctx.testid('talent-COMBO')).toBe(node);
+            expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 3');
+            ctx.ui.destroy();
+        });
+
+        it('Shift held: COMBO with 5 points sends one upgrade of 5 levels', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 5) });
+
+            ctx.talentGateway.upgrade.mockResolvedValue(bought({ COMBO: 5 }, 0, 5));
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+            shiftDown();
+            ctx.testid('talent-upgrade-COMBO').click();
+            await flush();
+
+            expect(ctx.talentGateway.upgrade).toHaveBeenCalledTimes(1);
+            expect(ctx.talentGateway.upgrade).toHaveBeenCalledWith('COMBO', 0, 5);
+            expect(ctx.testid('talent-level-COMBO').textContent).toBe('Nível 5/10');
+            expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 0');
+            ctx.ui.destroy();
+        });
+
+        it('a click with the event shiftKey and the Shift mode off sends 5 levels', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 5) });
+
+            ctx.talentGateway.upgrade.mockResolvedValue(bought({ COMBO: 5 }, 0, 5));
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+            ctx.testid('talent-upgrade-COMBO').dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }));
+            await flush();
+
+            expect(ctx.talentGateway.upgrade).toHaveBeenCalledWith('COMBO', 0, 5);
+            ctx.ui.destroy();
+        });
+
+        it('Shift held with one affordable level sends two arguments', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 1) });
+
+            ctx.talentGateway.upgrade.mockResolvedValue(bought({ COMBO: 1 }, 0, 1));
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+            shiftDown();
+            ctx.testid('talent-upgrade-COMBO').click();
+            await flush();
+
+            expect(ctx.talentGateway.upgrade).toHaveBeenCalledWith('COMBO', 0);
+            expect(ctx.talentGateway.upgrade.mock.calls[0]).toHaveLength(2);
+            ctx.ui.destroy();
+        });
+
+        it('a click without Shift sends one level', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 5) });
+
+            ctx.talentGateway.upgrade.mockResolvedValue(bought({ COMBO: 1 }, 4, 1));
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+            ctx.testid('talent-upgrade-COMBO').click();
+            await flush();
+
+            expect(ctx.talentGateway.upgrade.mock.calls[0]).toEqual([ 'COMBO', 0 ]);
+            ctx.ui.destroy();
+        });
+
+        it('the button text follows Shift on the same element', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 5) });
+
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+
+            const button = ctx.testid('talent-upgrade-COMBO');
+
+            shiftDown();
+            expect(ctx.testid('talent-upgrade-COMBO')).toBe(button);
+            expect(button.textContent).toBe('Melhorar até o nível 5 (5 pontos)');
+
+            shiftUp();
+            expect(ctx.testid('talent-upgrade-COMBO')).toBe(button);
+            expect(button.textContent).toBe('Melhorar (1 ponto)');
+
+            shiftDown();
+            window.dispatchEvent(new Event('blur'));
+            expect(ctx.testid('talent-upgrade-COMBO')).toBe(button);
+            expect(button.textContent).toBe('Melhorar (1 ponto)');
+            ctx.ui.destroy();
+        });
+
+        it('Shift held, selecting another talent shows its Shift text at once', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 5) });
+
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+            shiftDown();
+            pick(ctx, 'CLICK_DAMAGE');
+
+            expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').textContent).toBe('Melhorar até o nível 5 (5 pontos)');
+            ctx.ui.destroy();
+        });
+
+        it('ignores a second upgrade click while the request runs', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 5) });
+
+            ctx.talentGateway.upgrade.mockReturnValue(new Promise(() => {}));
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+            ctx.testid('talent-upgrade-COMBO').click();
+            ctx.testid('talent-upgrade-COMBO').click();
+
+            expect(ctx.talentGateway.upgrade).toHaveBeenCalledTimes(1);
+            ctx.ui.destroy();
+        });
+
+        it('ignores Reiniciar pontos while an upgrade runs', async () => {
+            const ctx = createUi({ talentList: { talents: talentTree({ CLICK_DAMAGE: 1 }), points: pointsOf(4, 1) } });
+
+            ctx.talentGateway.upgrade.mockReturnValue(new Promise(() => {}));
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+            ctx.testid('talent-upgrade-COMBO').click();
+            ctx.testid('talent-reset').click();
+
+            expect(ctx.talentGateway.upgrade).toHaveBeenCalledTimes(1);
+            expect(ctx.talentGateway.reset).not.toHaveBeenCalled();
+            ctx.ui.destroy();
+        });
+
+        it('shows the answered tree with no error when the backend buys one level of a Shift purchase', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 5) });
+
+            ctx.talentGateway.upgrade.mockResolvedValue(bought({ COMBO: 1 }, 4, 1));
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+            shiftDown();
+            ctx.testid('talent-upgrade-COMBO').click();
+            await flush();
+
+            expect(ctx.talentGateway.upgrade).toHaveBeenCalledWith('COMBO', 0, 5);
+            expect(ctx.testid('talent-level-COMBO').textContent).toBe('Nível 1/10');
+            expect(ctx.query('.hero-error').hidden).toBe(true);
+            ctx.ui.destroy();
+        });
+
+        it('says Pontos de talento insuficientes when a Shift purchase is refused and shows the tree read again', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 5) });
+
+            ctx.talentGateway.upgrade.mockRejectedValue(new ApiError('Not enough', { status: 409, code: 'NOT_ENOUGH_TALENT_POINTS' }));
+            await open(ctx, 'talents');
+            ctx.talentGateway.list.mockResolvedValue(talentsAnswer({ COMBO: 2 }, 3));
+            pick(ctx, 'COMBO');
+            shiftDown();
+            ctx.testid('talent-upgrade-COMBO').click();
+            await flush();
+
+            expect(ctx.query('.hero-error').textContent).toBe('Pontos de talento insuficientes');
+            expect(ctx.testid('talent-level-COMBO').textContent).toBe('Nível 2/10');
+            expect(ctx.testid('talent-points').textContent).toBe('Pontos de talento: 3');
+            ctx.ui.destroy();
+        });
+
+        it('destroy removes the Shift listeners', async () => {
+            const ctx = createUi({ talentList: talentsAnswer({}, 5) });
+
+            await open(ctx, 'talents');
+            pick(ctx, 'COMBO');
+            ctx.ui.destroy();
+            shiftDown();
+
+            expect(ctx.testid('talent-upgrade-COMBO').textContent).toBe('Melhorar (1 ponto)');
+        });
+    });
+
     it('clears the error line after the next successful upgrade', async () => {
         const ctx = createUi({ talentList: talentsAnswer({}, 2) });
 

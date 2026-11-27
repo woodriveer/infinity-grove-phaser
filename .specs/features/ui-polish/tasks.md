@@ -457,7 +457,7 @@ Every other existing `talentsView.test.js` case passes unchanged.
 
 ---
 
-#### T8: HeroUi patches Talentos and buys with Shift [ ]
+#### T8: HeroUi patches Talentos and buys with Shift [x]
 
 **Owner**: game-dev
 **Goal**: Every later render of an open Talentos patches it; a click buys k levels with Shift; clicks are ignored while a request runs; the Shift listeners go away with the scene (UIP-06, UIP-07 AC 2, UIP-09 AC 3 to 8, UIP-10 AC 7 to 9).
@@ -504,8 +504,8 @@ Every other existing `HeroUi.test.js` and `ClickerGame.test.js` case passes unch
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 15 new cases and the re-pinned case pass; the whole unit suite passes.
-- [ ] `git grep -n "replaceChildren(screen)" -- game/src/adapters/phaser/HeroUi.js` shows the call only inside the build branch of `render_talents`.
+- [x] The 15 new cases and the re-pinned case pass (re-pinned in the T7 commit, see its body); the whole unit suite passes.
+- [x] `git grep -n "replaceChildren(screen)" -- game/src/adapters/phaser/HeroUi.js` shows the call only inside the build branch of `render_talents`.
 
 **Commit**: `feat(game): patch the open Talentos screen and buy the most levels with Shift`
 

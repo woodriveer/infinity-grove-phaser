@@ -69,6 +69,20 @@ describe('createShiftKey', () => {
         expect(shift.held()).toBe(false);
     });
 
+    it('the blur of an element inside the page does not turn it off', () => {
+        const page = createShiftKey({ win: document, doc });
+        const field = document.createElement('input');
+
+        document.body.append(field);
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Shift', shiftKey: true }));
+        field.dispatchEvent(new Event('blur'));
+
+        expect(page.held()).toBe(true);
+
+        page.dispose();
+        field.remove();
+    });
+
     it('a hidden document turns it off and a visible one does not', () => {
         keydown('Shift', { shiftKey: true });
 

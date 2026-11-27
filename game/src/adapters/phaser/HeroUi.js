@@ -6,6 +6,8 @@ import { GIFT_NOTICE, GIFT_NOTICE_MS } from '../../domain/equipment/specials';
 import { raisedSkills } from '../../domain/heroes/bagCards';
 import { activePassives, slotStates } from '../../domain/heroes/team';
 import { raisedSkillSlot, skillLevelOf } from '../../domain/skills/skillLevel';
+import { maxPurchase } from '../../domain/talents/talents';
+import { createShiftKey } from './shiftKey';
 import { renderBagCards } from './views/bagView';
 import { renderCatalog, renderHeroDetail } from './views/catalogView';
 import { renderEquipment, renderEquipmentUnavailable, renderLeaderStats, renderPieceDetail } from './views/equipmentView';
@@ -16,7 +18,7 @@ import { renderFusionResult } from './views/fusionView';
 import { renderLeaderPicker } from './views/leaderView';
 import { refreshSkillBar, renderLeaderCard, renderSkillBar } from './views/skillBar';
 import { renderTeam, teamModel } from './views/teamView';
-import { placeTalentScroll, renderTalents, renderTalentsUnavailable, revealTalent, talentScrollOf } from './views/talentsView';
+import { placeTalentScroll, renderTalents, renderTalentsUnavailable, revealTalent, updateTalents } from './views/talentsView';
 
 const HUD = { x: 956, y: 370 };
 const PANEL = { x: 512, y: 384 };
@@ -103,6 +105,8 @@ export class HeroUi
         this.talents = talents;
         this.talentBusy = false;
         this.talentSelected = null;
+        //  Whether Shift is held; the card button of Talentos shows the purchase of the most levels while it is (spec ui-polish UIP-10)
+        this.shiftKey = createShiftKey({ onChange: () => this.refreshTalentShift() });
         this.equipBusy = false;
         this.sellMode = null;
         this.fusionBusy = false;
@@ -315,6 +319,12 @@ export class HeroUi
         this.window.classList.remove('is-talents');
         this.panel.hidden = true;
         this.body.replaceChildren();
+    }
+
+    //  The scene ends: the Shift listeners of the window and the document go away with it
+    destroy ()
+    {
+        this.shiftKey.dispose();
     }
 
     //  Leaving Rever chefes or opening a screen over it drops a pending chapter load (TD-009): the chips are enabled again and the
@@ -996,22 +1006,42 @@ export class HeroUi
         }
     }
 
-    //  The talent tree; `busy` disables the buttons while a request runs. The selected node and the scroll of the tree survive a re-render
+    //  Shift went down or up: the card button of an open Talentos screen shows its form of now
+    refreshTalentShift ()
+    {
+        if (this.open && this.screen === 'talents' && this.body.querySelector('[data-testid="talent-screen"]'))
+        {
+            this.render_talents();
+        }
+    }
+
+    //  The talent tree, built once per open and patched by every later render (spec ui-polish UIP-06), so the board image never reloads and the scroll
+    //  and the selected node stay. `busy` marks the buttons aria-disabled while a request runs (they keep their look and ignore clicks).
     render_talents ()
     {
         this.backButton.hidden = true;
 
-        const previous = talentScrollOf(this.body.querySelector('[data-testid="talent-screen"]'));
-        const screen = renderTalents(this.talents.talents(), this.talents.points(), {
+        const current = this.body.querySelector('[data-testid="talent-screen"]');
+        const options = {
             busy: this.talentBusy,
             selectedId: this.talentSelected,
+            shiftHeld: this.shiftKey.held(),
             onSelect: (id) => this.selectTalent(id),
-            onUpgrade: (id) => this.upgradeTalent(this.talents.talents().find((talent) => talent.id === id)),
+            onUpgrade: (id, { shift }) => this.upgradeTalent(id, shift),
             onReset: () => this.resetTalents()
-        });
+        };
+
+        if (current)
+        {
+            updateTalents(current, this.talents.talents(), this.talents.points(), options);
+
+            return;
+        }
+
+        const screen = renderTalents(this.talents.talents(), this.talents.points(), options);
 
         this.body.replaceChildren(screen);
-        placeTalentScroll(screen, previous);
+        placeTalentScroll(screen, null);
     }
 
     //  Shows a talent in the detail card; no request. On a phone the tree scrolls the node clear of the card
@@ -1022,9 +1052,24 @@ export class HeroUi
         revealTalent(this.body.querySelector('[data-testid="talent-screen"]'), id);
     }
 
-    //  Buys the next level of a talent for the level the player saw; a refusal shows its text and the tree the backend answered after it
-    async upgradeTalent (talent)
+    //  Buys the next level of a talent for the level the player saw, or with Shift the most levels the points pay in one request (spec ui-polish UIP-09);
+    //  a refusal shows its text and the tree the backend answered after it. Nothing happens while another request runs.
+    async upgradeTalent (talentId, shift = false)
     {
+        const talent = this.talents.talents().find(({ id }) => id === talentId);
+
+        if (this.talentBusy || !talent)
+        {
+            return;
+        }
+
+        const levels = (shift || this.shiftKey.held()) ? maxPurchase(talent, this.talents.points().available).levels : 1;
+
+        if (levels < 1)
+        {
+            return;
+        }
+
         const view = this.view;
 
         this.talentBusy = true;
@@ -1032,7 +1077,7 @@ export class HeroUi
 
         try
         {
-            await this.talents.upgrade(talent.id, talent.level);
+            await (levels === 1 ? this.talents.upgrade(talent.id, talent.level) : this.talents.upgrade(talent.id, talent.level, levels));
 
             if (view === this.view)
             {
@@ -1057,9 +1102,14 @@ export class HeroUi
         }
     }
 
-    //  Takes back every talent level so the player can spend the points again
+    //  Takes back every talent level so the player can spend the points again; nothing happens while another request runs
     async resetTalents ()
     {
+        if (this.talentBusy)
+        {
+            return;
+        }
+
         const view = this.view;
 
         this.talentBusy = true;

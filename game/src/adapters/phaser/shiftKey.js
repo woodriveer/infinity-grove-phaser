@@ -21,8 +21,8 @@ export const createShiftKey = ({ win = window, doc = document, onChange = () => 
     const onKeyDown = (event) => set(event.key === 'Shift' ? true : event.shiftKey === true);
     const onKeyUp = (event) => set(event.key === 'Shift' ? false : event.shiftKey === true);
     const onPointer = (event) => set(event.shiftKey === true);
-    //  A capture listener also sees the blur of every element inside the page; only the window losing focus ends Shift
-    const onBlur = (event) => set(event.target === win ? false : held);
+    //  A capture listener also sees the blur of every element inside the page (a node); only the window losing focus ends Shift
+    const onBlur = (event) => set(event.target?.nodeType ? held : false);
     const onVisibility = () =>
     {
         if (doc.visibilityState === 'hidden')

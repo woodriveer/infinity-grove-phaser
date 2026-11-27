@@ -258,6 +258,7 @@ export class ClickerGame extends Scene
         {
             this.syncOnExit();
             document.removeEventListener('pointerdown', this.onPressOutsideAutoClick, true);
+            this.heroUi?.destroy?.();
         });
     }
 
