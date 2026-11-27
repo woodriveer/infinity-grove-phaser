@@ -92,11 +92,11 @@ const open = async (ctx, screen) => {
 };
 
 describe('HeroUi HUD', () => {
-    it('shows the six buttons Heróis, Mochila, Líder, Equipamento, Talentos and Rever chefes', () => {
+    it('shows the six buttons Heróis, Mochila, Equipe, Equipamento, Talentos and Rever chefes', () => {
         const { testid } = createUi();
 
-        expect([ 'heroes', 'bag', 'leader', 'equipment', 'talents', 'farm' ].map((id) => testid(`hud-${id}`).textContent)).toEqual([
-            'Heróis', 'Mochila', 'Líder', 'Equipamento', 'Talentos', 'Rever chefes'
+        expect([ 'heroes', 'bag', 'team', 'equipment', 'talents', 'farm' ].map((id) => testid(`hud-${id}`).textContent)).toEqual([
+            'Heróis', 'Mochila', 'Equipe', 'Equipamento', 'Talentos', 'Rever chefes'
         ]);
         expect(testid('hud-fusion')).toBeNull();
     });
@@ -515,11 +515,12 @@ describe('HeroUi Mochila fusion', () => {
     });
 });
 
-describe('HeroUi Líder', () => {
+describe('HeroUi Equipe leader list', () => {
     it('lists the owned heroes, changes the leader and replaces the three skills on the bar', async () => {
         const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 1 }), hero('lyra', { 1: 1 }) ] } });
         ctx.heroesGateway.setLeader.mockResolvedValue({ leaderId: 'lyra' });
-        await open(ctx, 'leader');
+        await open(ctx, 'team');
+        ctx.testid('team-slot-0').click();
 
         expect(ctx.testid('leader-entry-kael').classList.contains('is-current')).toBe(true);
         expect(ctx.testid('skill-slot-1').getAttribute('data-unlocked')).toBe('false');
@@ -529,19 +530,78 @@ describe('HeroUi Líder', () => {
 
         expect(ctx.heroesGateway.setLeader).toHaveBeenCalledWith('lyra');
         expect(ctx.testid('leader-entry-lyra').classList.contains('is-current')).toBe(true);
+        expect(ctx.testid('leader-picker')).not.toBeNull();
         expect(ctx.testid('skill-slot-1').getAttribute('data-unlocked')).toBe('true');
     });
 
     it('shows a Portuguese error line and keeps the leader when the change fails', async () => {
         const ctx = createUi({ list: { leaderId: 'kael', heroes: [ hero('kael', { 0: 1 }), hero('lyra', { 0: 1 }) ] } });
         ctx.heroesGateway.setLeader.mockRejectedValue(new ApiError('Hero is not owned', { status: 409 }));
-        await open(ctx, 'leader');
+        await open(ctx, 'team');
+        ctx.testid('team-slot-0').click();
 
         ctx.testid('leader-entry-lyra').click();
         await flush();
 
         expect(ctx.query('.hero-error').textContent).toBe('Não foi possível trocar o líder.');
         expect(ctx.heroes.leaderId()).toBe('kael');
+    });
+});
+
+describe('HeroUi Equipe leader card', () => {
+    it('Equipe opens with a locked team and shows the leader card with Trocar líder', async () => {
+        const ctx = createUi();
+
+        await open(ctx, 'team');
+
+        expect(ctx.testid('team-slot-0').tagName).toBe('BUTTON');
+        expect(ctx.testid('team-slot-0').textContent).toContain('Trocar líder');
+        [ 1, 2, 3, 4 ].forEach((slot) => expect(ctx.testid(`team-slot-${slot}`).getAttribute('data-state')).toBe('locked'));
+    });
+
+    it('the leader card opens Escolher líder with Voltar under the title Equipe', async () => {
+        const ctx = createUi();
+
+        await open(ctx, 'team');
+        ctx.testid('team-slot-0').click();
+
+        expect(ctx.testid('leader-picker')).not.toBeNull();
+        expect(ctx.testid('leader-picker').querySelector('h3').textContent).toBe('Escolher líder');
+        expect(ctx.testid('hero-back').hidden).toBe(false);
+        expect(ctx.query('.hero-title').textContent).toBe('Equipe');
+        expect(ctx.testid('leader-entry-kael').classList.contains('is-current')).toBe(true);
+    });
+
+    it('Voltar returns to Equipe with the new leader card', async () => {
+        const ctx = createUi();
+
+        ctx.heroesGateway.setLeader.mockResolvedValue({ leaderId: 'lyra' });
+        await open(ctx, 'team');
+        ctx.testid('team-slot-0').click();
+        ctx.testid('leader-entry-lyra').click();
+        await flush();
+        ctx.testid('hero-back').click();
+
+        expect(ctx.testid('team-screen')).not.toBeNull();
+        expect(ctx.testid('team-slot-0').querySelector('.team-name').textContent).toBe('Hero lyra');
+        expect(ctx.testid('hero-back').hidden).toBe(true);
+    });
+
+    it('the leader card is disabled while a team request runs', async () => {
+        const ctx = createUi({ list: ownedCatalog(teamOf()) });
+        let finish;
+
+        ctx.heroesGateway.setTeam.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+        await open(ctx, 'team');
+        ctx.testid('team-slot-1').click();
+        ctx.testid('team-remove').click();
+
+        expect(ctx.testid('team-slot-0').disabled).toBe(true);
+
+        finish(teamOf({ allies: [ null, null, null, null ] }));
+        await flush();
+
+        expect(ctx.testid('team-slot-0').disabled).toBe(false);
     });
 });
 
@@ -1841,7 +1901,8 @@ describe('HeroUi leader attributes', () => {
         const ctx = createUi({ equipmentList: { capacity: 100, pieces: [ weaponPiece() ] } });
 
         ctx.heroesGateway.setLeader.mockResolvedValue({ leaderId: 'lyra' });
-        await open(ctx, 'leader');
+        await open(ctx, 'team');
+        ctx.testid('team-slot-0').click();
         ctx.testid('leader-entry-lyra').click();
         await flush();
         //  The screen reads the heroes again when it opens: the backend now answers Lyra as the leader
@@ -2931,26 +2992,25 @@ const CHAPTER_5 = { chapter: 5, stage: 1, kind: 'PHASE', stageCount: 10, complet
 const railIds = (ctx) => [ ...ctx.query('.hero-hud').querySelectorAll('button') ].map((button) => button.getAttribute('data-testid'));
 
 describe('HeroUi Equipe', () => {
-    it('the rail has six buttons and no Equipe button while the team is locked', async () => {
+    it('the rail has the six buttons with Equipe in third place while the team is locked', async () => {
         const ctx = createUi();
 
         await ctx.heroes.load();
 
-        expect(railIds(ctx)).toHaveLength(6);
-        expect(ctx.testid('hud-team')).toBeNull();
+        expect(railIds(ctx)).toEqual([ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm' ]);
     });
 
-    it('the Equipe button appears right after Líder once the team is unlocked', async () => {
+    it('the rail keeps the same six buttons once the team is unlocked', async () => {
         const ctx = createUi({ list: ownedCatalog(teamOf()) });
 
         await ctx.heroes.load();
 
-        expect(railIds(ctx)).toEqual([ 'hud-heroes', 'hud-bag', 'hud-leader', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm' ]);
+        expect(railIds(ctx)).toEqual([ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm' ]);
         expect(ctx.testid('hud-team').textContent).toBe('Equipe');
         expect(ctx.testid('hud-team').querySelectorAll('svg path')).toHaveLength(8);
     });
 
-    it('the Equipe button leaves the rail when a load answers a locked team', async () => {
+    it('the Equipe button stays when a load answers a locked team', async () => {
         const ctx = createUi({ list: ownedCatalog(teamOf()) });
 
         await ctx.heroes.load();
@@ -2959,7 +3019,7 @@ describe('HeroUi Equipe', () => {
         ctx.heroesGateway.list.mockImplementation(() => Promise.resolve(catalog()));
         await ctx.heroes.load();
 
-        expect(ctx.testid('hud-team')).toBeNull();
+        expect(ctx.testid('hud-team')).not.toBeNull();
         expect(railIds(ctx)).toHaveLength(6);
     });
 

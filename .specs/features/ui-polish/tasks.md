@@ -511,7 +511,7 @@ Every other existing `HeroUi.test.js` and `ClickerGame.test.js` case passes unch
 
 ---
 
-#### T9: Equipe takes the place of Líder [ ]
+#### T9: Equipe takes the place of Líder [x]
 
 **Owner**: game-dev
 **Goal**: The rail always shows six buttons with Equipe in third place and no Líder; the leader list opens from the leader card of Equipe, so every player can still change the leader from chapter 1 (UIP-13 AC 1 to 8, 10, 11; spec Q20, Q28, Q29).
@@ -579,8 +579,8 @@ Every other existing `HeroUi.test.js` and `ClickerGame.test.js` case passes unch
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 6 new cases and the 8 re-pinned cases pass; the whole unit suite passes.
-- [ ] `git grep -n "hud-leader\|render_leader\|refreshTeamButton\|teamButton" -- game/src` prints nothing.
+- [x] The 6 new cases and the 8 re-pinned cases pass; the whole unit suite passes.
+- [x] `git grep -n "hud-leader\|render_leader\|refreshTeamButton\|teamButton" -- game/src` prints nothing.
 
 **Commit**: `feat(game): open the leader list from Equipe and drop the Líder button`
 

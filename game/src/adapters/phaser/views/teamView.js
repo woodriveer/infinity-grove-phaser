@@ -60,10 +60,11 @@ export const teamModel = ({ team, heroes, leaderId, pieces = [], position, selec
     };
 };
 
-//  The card of the leader: label, sprite, name, stars and the leader bonus
-const renderLeaderCard = (leader) =>
+//  The card of the leader: label, sprite, name, stars, the leader bonus and the caption Trocar líder. A button that asks `onLeader()` to open
+//  the list of heroes to lead with (spec ui-polish UIP-13); disabled while a request runs.
+const renderLeaderCard = (leader, { busy = false, onLeader } = {}) =>
 {
-    const card = el('div', 'team-slot', '', { testid: 'team-slot-0', 'data-state': 'leader', 'data-selected': 'false' });
+    const card = el('button', 'team-slot is-leader', '', { type: 'button', testid: 'team-slot-0', 'data-state': 'leader', 'data-selected': 'false' });
 
     card.append(el('span', 'team-slot-label', 'Líder'));
 
@@ -76,6 +77,10 @@ const renderLeaderCard = (leader) =>
             el('span', 'team-bonus', leader.bonusText)
         );
     }
+
+    card.append(el('span', 'team-leader-change', 'Trocar líder', { testid: 'team-leader-change' }));
+    card.disabled = busy;
+    card.addEventListener('click', () => onLeader?.());
 
     return card;
 };
@@ -169,7 +174,7 @@ const renderAvailable = (hero, { canPick }, { onPick }) =>
     return entry;
 };
 
-//  The Equipe screen of `model`; `handlers` = { onSlot(slot), onPick(heroId), onRemove(), onMakeLeader(), onConfirmBuy(), onCancelBuy() }
+//  The Equipe screen of `model`; `handlers` = { onLeader(), onSlot(slot), onPick(heroId), onRemove(), onMakeLeader(), onConfirmBuy(), onCancelBuy() }
 export const renderTeam = (model, handlers) =>
 {
     const root = el('div', 'team-screen', '', { testid: 'team-screen' });
@@ -183,7 +188,7 @@ export const renderTeam = (model, handlers) =>
 
     status.hidden = model.active;
     notice.hidden = model.notice === null;
-    slots.append(renderLeaderCard(model.leader), ...model.slots.map((slot) => renderSlotCard(slot, model, handlers)));
+    slots.append(renderLeaderCard(model.leader, { busy: model.busy, onLeader: handlers.onLeader }), ...model.slots.map((slot) => renderSlotCard(slot, model, handlers)));
 
     remove.disabled = !model.canAct;
     makeLeader.disabled = !model.canAct;

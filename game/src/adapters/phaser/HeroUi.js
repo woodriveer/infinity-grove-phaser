@@ -35,7 +35,6 @@ const icon = (paths) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="n
 const ICONS = {
     heroes: icon('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>'),
     bag: icon('<path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"></path><path d="M8 10h8"></path><path d="M8 18h8"></path><path d="M8 22v-6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v6"></path><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>'),
-    leader: icon('<path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path><path d="M5 21h14"></path>'),
     equipment: icon('<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>'),
     talents: icon('<path d="M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3"></path><path d="M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4"></path><path d="M5 21h14"></path>'),
     team: icon('<path d="M14.5 17.5 3 6V3h3l11.5 11.5"></path><path d="m13 19 6-6"></path><path d="m16 16 4 4"></path><path d="m19 21 2-2"></path><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"></path><path d="m5 14 4 4"></path><path d="m7 17-3 3"></path><path d="m3 19 2 2"></path>'),
@@ -45,7 +44,6 @@ const ICONS = {
 const SCREENS = [
     { id: 'heroes', label: 'Heróis', title: 'Heróis' },
     { id: 'bag', label: 'Mochila', title: 'Mochila' },
-    { id: 'leader', label: 'Líder', title: 'Líder' },
     { id: 'team', label: 'Equipe', title: 'Equipe' },
     { id: 'equipment', label: 'Equipamento', title: 'Equipamento' },
     { id: 'talents', label: 'Talentos', title: 'Talentos' },
@@ -73,8 +71,8 @@ const BADGED = [ 'bag', 'equipment', 'talents' ];
 const MAX_BADGE_COUNT = 9;
 const badgeHtml = (id) => `<span class="hud-badge" data-testid="${id}-badge" hidden></span>`;
 const buttonHtml = ({ id, label }) => `<button type="button" data-testid="hud-${id}">${ICONS[id]}${label}${BADGED.includes(id) ? badgeHtml(id) : ''}</button>`;
-//  The Equipe button joins the rail only while the team is unlocked (refreshTeamButton), so the rail keeps six buttons for the others
-const RAIL = SCREENS.filter(({ id }) => id !== 'team');
+//  The rail always shows the six buttons; Equipe holds the leader card that opens the leader list (spec ui-polish UIP-13)
+const RAIL = SCREENS;
 const HUD_HTML = `<div class="hero-hud">${RAIL.map(buttonHtml).join('')}</div>`;
 
 const PANEL_HTML = '<div class="hero-panel" hidden><div class="hero-window">'
@@ -87,8 +85,8 @@ const BAR_HTML = '<div class="skill-bar-host"></div>';
 const LEADER_HTML = '<div class="leader-host"></div>';
 const NOTICE_HTML = '<div class="hud-box hud-notice"><div class="card-notice" data-testid="card-notice" hidden></div></div>';
 
-//  The hero screens on top of the combat scene: seven HUD buttons at most (the Equipe button only while the team is unlocked), one panel
-//  that shows the screen that was opened (Heróis, Mochila, Líder, Equipe, Equipamento, Talentos, Rever chefes), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
+//  The hero screens on top of the combat scene: six HUD buttons, one panel
+//  that shows the screen that was opened (Heróis, Mochila, Equipe, Equipamento, Talentos, Rever chefes), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
 //  It is plain DOM placed with scene.add.dom.
 //  Collaborators: heroes (heroCollection), equipment (equipmentCollection), talents (talentCollection), farm (farmSession) and the scene hooks
 //    walletCopper() -> the copper the player holds, to disable what costs more;
@@ -139,12 +137,6 @@ export class HeroUi
 
         RAIL.forEach(({ id }) => hud.querySelector(`[data-testid="hud-${id}"]`).addEventListener('click', () => this.show(id)));
 
-        const holder = document.createElement('div');
-
-        holder.innerHTML = buttonHtml(SCREENS.find(({ id }) => id === 'team'));
-        this.teamButton = holder.firstElementChild;
-        this.teamButton.addEventListener('click', () => this.show('team'));
-
         //  Above the HUD buttons, which are added first
         this.panelElement = scene.add.dom(PANEL.x, PANEL.y).createFromHTML(PANEL_HTML).setDepth(1);
         this.panel = this.panelElement.node.querySelector('.hero-panel');
@@ -167,31 +159,8 @@ export class HeroUi
         this.notice = this.createDom(NOTICE, NOTICE_HTML, false).querySelector('.card-notice');
         this.leaderHost = this.createDom(LEADER, LEADER_HTML, false).querySelector('.leader-host');
 
-        heroes.onChange(() =>
-        {
-            this.updateSkillBar();
-            this.refreshTeamButton();
-        });
+        heroes.onChange(() => this.updateSkillBar());
         this.updateSkillBar();
-        this.refreshTeamButton();
-    }
-
-    //  The Equipe button is in the rail right after Líder while the team is unlocked, and absent otherwise (the rail keeps six buttons)
-    refreshTeamButton ()
-    {
-        const unlocked = this.heroes.team().unlocked;
-        const inRail = this.teamButton.parentNode !== null;
-
-        if (unlocked && !inRail)
-        {
-            this.hudElement.node.querySelector('[data-testid="hud-leader"]').after(this.teamButton);
-            this.hudElement.updateSize?.();
-        }
-        else if (!unlocked && inRail)
-        {
-            this.teamButton.remove();
-            this.hudElement.updateSize?.();
-        }
     }
 
     //  An element placed on the scene; the node returned holds the html. Click-through unless it is a control.
@@ -515,14 +484,20 @@ export class HeroUi
         }
     }
 
-    render_leader ()
+    //  The list of heroes to lead with, opened by the leader card of Equipe (spec ui-polish UIP-13); Voltar goes back to Equipe
+    openLeaderPicker ()
     {
+        const picker = el('div', 'leader-picker', '', { testid: 'leader-picker' });
+
         this.setError('');
-        this.body.replaceChildren(renderLeaderPicker(this.heroes.heroes(), this.heroes.leaderId(), {
-            onPick: (heroId) => this.pickLeader(heroId)
-        }));
+        picker.append(
+            el('h3', 'team-available-title', 'Escolher líder'),
+            renderLeaderPicker(this.heroes.heroes(), this.heroes.leaderId(), { onPick: (heroId) => this.pickLeader(heroId) })
+        );
+        this.showDetail(picker, () => this.render_team());
     }
 
+    //  Makes `heroId` the leader; the list stays open and marks the new one
     async pickLeader (heroId)
     {
         const view = this.view;
@@ -533,7 +508,7 @@ export class HeroUi
 
             if (view === this.view)
             {
-                this.render_leader();
+                this.openLeaderPicker();
             }
         }
         catch
@@ -548,6 +523,7 @@ export class HeroUi
     //  The Equipe screen of the stored team
     render_team ()
     {
+        this.backButton.hidden = true;
         this.body.replaceChildren(renderTeam(teamModel({
             team: this.heroes.team(),
             heroes: this.heroes.heroes(),
@@ -561,6 +537,7 @@ export class HeroUi
             flashSlot: this.teamFlash,
             walletCopper: this.hooks.walletCopper()
         }), {
+            onLeader: () => this.openLeaderPicker(),
             onSlot: (slot) => this.selectTeamSlot(slot),
             onPick: (heroId) => this.pickTeamHero(heroId),
             onRemove: () => this.removeTeamHero(),

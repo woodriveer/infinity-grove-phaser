@@ -85,6 +85,29 @@ describe('renderTeam', () => {
         expect(card.querySelector('img.team-portrait').getAttribute('src')).toBe('assets/heroes/kael_sprite.png');
     });
 
+    it('the leader card is a button with Trocar líder that calls onLeader', () => {
+        const onLeader = vi.fn();
+        const screen = screenOf({}, { ...handlersOf(), onLeader });
+
+        expect(byId(screen, 'team-slot-0').tagName).toBe('BUTTON');
+        expect(byId(screen, 'team-leader-change').textContent).toBe('Trocar líder');
+
+        byId(screen, 'team-slot-0').click();
+
+        expect(onLeader).toHaveBeenCalledTimes(1);
+    });
+
+    it('the leader card is disabled while busy', () => {
+        const onLeader = vi.fn();
+        const screen = screenOf({ busy: true }, { ...handlersOf(), onLeader });
+
+        expect(byId(screen, 'team-slot-0').disabled).toBe(true);
+
+        byId(screen, 'team-slot-0').click();
+
+        expect(onLeader).not.toHaveBeenCalled();
+    });
+
     it('the screen shows a filled ally card with its damage and passive', () => {
         const screen = screenOf();
 

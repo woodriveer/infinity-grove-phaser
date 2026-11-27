@@ -3494,6 +3494,9 @@ body.piece-dragging .piece-tooltip {
 .team-slot[data-state="locked"] { opacity: 0.5; cursor: default; }
 .team-slot[data-selected="true"] { outline: 3px solid var(--ember-500); outline-offset: 2px; }
 .team-slot[data-flash="true"] { background: var(--gold-200); }
+/* The leader card opens the leader list (spec ui-polish UIP-13) */
+.team-slot.is-leader:hover:not(:disabled) { filter: brightness(1.06); }
+.team-leader-change { margin-top: auto; font-size: 11px; font-weight: 800; color: var(--color-accent-800); text-decoration: underline; }
 .team-slot-label { font-family: var(--font-heading); font-weight: 700; font-size: 12px; color: var(--ink-600); }
 .team-portrait { width: 80px; height: 80px; object-fit: contain; }
 .team-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-body); font-weight: 700; font-size: 13px; color: var(--ink-900); }
