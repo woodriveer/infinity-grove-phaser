@@ -155,3 +155,31 @@ export const branchGlow = (talents, branch) =>
 
     return levels === 0 || max === 0 ? 0 : Math.round((0.2 + 0.8 * levels / max) * 100) / 100;
 };
+
+//  "1 ponto", "5 pontos"
+const pointsText = (n) => `${n} ${n === 1 ? 'ponto' : 'pontos'}`;
+
+//  The most levels the points buy at once (spec ui-polish UIP-09): none when the talent is locked or at its top level, else as many as the points pay
+//  and the top level allows, each at the price of the next level. `targetLevel` is the level after the purchase.
+export const maxPurchase = (talent, available) =>
+{
+    if (talent.unlocked === false || talent.nextCost == null)
+    {
+        return { levels: 0, cost: 0, targetLevel: talent.level };
+    }
+
+    const levels = Math.max(0, Math.min(talent.maxLevel - talent.level, Math.floor(available / talent.nextCost)));
+
+    return { levels, cost: levels * talent.nextCost, targetLevel: talent.level + levels };
+};
+
+//  The text of the card button: T2 while Shift is held and a level is affordable, else T1 (spec ui-polish).
+//  T1 = "Melhorar (<price of one level>)"; T2 = "Melhorar até o nível <target> (<total price>)"
+export const upgradeButtonText = (talent, available, shiftHeld) =>
+{
+    const purchase = maxPurchase(talent, available);
+
+    return shiftHeld && purchase.levels >= 1
+        ? `Melhorar até o nível ${purchase.targetLevel} (${pointsText(purchase.cost)})`
+        : `Melhorar (${pointsText(talent.nextCost)})`;
+};

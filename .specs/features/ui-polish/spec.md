@@ -413,7 +413,7 @@ Every row is the product owner's recommended default, waiting for the owner.
 | UIP-06 | P1: Talentos in place - AC 1 to 11, Edge 4 | Tasks T7, T8, T12, T17 | In Tasks |
 | UIP-07 | P1: No dimming - AC 1 to 4, Edge 2 | Tasks T7, T8, T12, T17 | In Tasks |
 | UIP-08 | P1: Backend levels - AC 1 to 10 | Tasks T1, T2, T12 | Implementing |
-| UIP-09 | P1: Shift buys the most - AC 1 to 10, E1 to E7, Edge 3, 5 | Tasks T4, T5, T7, T8, T13, T17 | In Tasks |
+| UIP-09 | P1: Shift buys the most - AC 1 to 10, E1 to E7, Edge 3, 5 | Tasks T4, T5, T7, T8, T13, T17 | Implementing |
 | UIP-10 | P1: Shift mode - AC 1 to 9, Edge 1 | Tasks T6, T8, T13 | In Tasks |
 | UIP-11 | P3: Shortcut hint - AC 1 | Tasks T7, T13, T17 | In Tasks |
 | UIP-12 | P2: T and B - AC 1 to 11, Edge 7 to 9 | Tasks T10, T15, T17 | In Tasks |

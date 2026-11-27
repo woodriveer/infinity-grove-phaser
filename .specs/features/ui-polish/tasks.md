@@ -255,7 +255,7 @@ The `ClickerGame.test.js` cases of the auto click key in a text field pass uncha
 
 ---
 
-#### T4: The rules of the most levels the points buy [ ]
+#### T4: The rules of the most levels the points buy [x]
 
 **Owner**: game-dev
 **Goal**: Pure `maxPurchase` and `upgradeButtonText` give k, the target, the cost and the button texts T1 and T2 (UIP-09, E1 to E7).
@@ -292,7 +292,7 @@ The `ClickerGame.test.js` cases of the auto click key in a text field pass uncha
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 11 cases pass with the exact values above; the whole unit suite passes.
+- [x] The 11 cases pass with the exact values above; the whole unit suite passes.
 
 **Commit**: `feat(game): count the talent levels the points buy at once`
 

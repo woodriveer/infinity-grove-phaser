@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { CHAPTER_BOSS, FARM, MINIBOSS, PHASE } from '../campaign/campaign';
 import {
-    addBonuses, BRANCH_TITLES, BRANCHES, branchGlow, describeTalentEffect, monsterAfterBreak, talentAttackerBonus, talentComboCap, talentComboStep, talentFullName, talentIconName,
-    TALENT_DESCRIPTIONS, talentDescription, talentLockText, talentTimeBonusMs, talentValue
+    addBonuses, BRANCH_TITLES, BRANCHES, branchGlow, describeTalentEffect, maxPurchase, monsterAfterBreak, talentAttackerBonus, talentComboCap, talentComboStep, talentFullName,
+    talentIconName, TALENT_DESCRIPTIONS, talentDescription, talentLockText, talentTimeBonusMs, talentValue, upgradeButtonText
 } from './talents';
 
 //  The tree as the backend answers it: value is level x perLevel
@@ -392,5 +392,72 @@ describe('talentDescription', () => {
         {
             expect(text.replace('100%', '')).not.toMatch(/\d/);
         }
+    });
+});
+
+describe('maxPurchase and upgradeButtonText', () => {
+    const talent = (level, maxLevel, nextCost, unlocked = true) => ({ level, maxLevel, nextCost, unlocked });
+
+    it('E1: COMBO 0 with 5 points buys 5 levels for 5', () => {
+        const combo = talent(0, 10, 1);
+
+        expect(maxPurchase(combo, 5)).toEqual({ levels: 5, cost: 5, targetLevel: 5 });
+        expect(upgradeButtonText(combo, 5, true)).toBe('Melhorar até o nível 5 (5 pontos)');
+    });
+
+    it('E2: level 7 with 20 points stops at the top', () => {
+        const clickDamage = talent(7, 10, 1);
+
+        expect(maxPurchase(clickDamage, 20)).toEqual({ levels: 3, cost: 3, targetLevel: 10 });
+        expect(upgradeButtonText(clickDamage, 20, true)).toBe('Melhorar até o nível 10 (3 pontos)');
+    });
+
+    it('E3: a grade 2 talent with 5 points buys 2 levels for 4', () => {
+        const grade2 = talent(0, 10, 2);
+
+        expect(maxPurchase(grade2, 5)).toEqual({ levels: 2, cost: 4, targetLevel: 2 });
+        expect(upgradeButtonText(grade2, 5, true)).toBe('Melhorar até o nível 2 (4 pontos)');
+    });
+
+    it('E4: a grade 2 talent with 1 point buys nothing and keeps the one level text', () => {
+        const grade2 = talent(0, 10, 2);
+
+        expect(maxPurchase(grade2, 1)).toEqual({ levels: 0, cost: 0, targetLevel: 0 });
+        expect(upgradeButtonText(grade2, 1, true)).toBe('Melhorar (2 pontos)');
+    });
+
+    it('E5: one affordable level reads in the singular', () => {
+        const combo = talent(0, 10, 1);
+
+        expect(maxPurchase(combo, 1)).toEqual({ levels: 1, cost: 1, targetLevel: 1 });
+        expect(upgradeButtonText(combo, 1, true)).toBe('Melhorar até o nível 1 (1 ponto)');
+    });
+
+    it('E6: Fúria crescente with 9 points buys its 4 levels for 8', () => {
+        const fury = talent(0, 4, 2);
+
+        expect(maxPurchase(fury, 9)).toEqual({ levels: 4, cost: 8, targetLevel: 4 });
+        expect(upgradeButtonText(fury, 9, true)).toBe('Melhorar até o nível 4 (8 pontos)');
+    });
+
+    it('E7: a grade 3 talent with 30 points reads Melhorar até o nível 10 (30 pontos)', () => {
+        expect(upgradeButtonText(talent(0, 10, 3), 30, true)).toBe('Melhorar até o nível 10 (30 pontos)');
+    });
+
+    it('a locked talent buys nothing', () => {
+        expect(maxPurchase(talent(0, 10, 2, false), 50)).toEqual({ levels: 0, cost: 0, targetLevel: 0 });
+    });
+
+    it('a talent at its top level buys nothing', () => {
+        expect(maxPurchase(talent(10, 10, null), 50)).toEqual({ levels: 0, cost: 0, targetLevel: 10 });
+    });
+
+    it('0 points buy nothing', () => {
+        expect(maxPurchase(talent(3, 10, 1), 0)).toEqual({ levels: 0, cost: 0, targetLevel: 3 });
+    });
+
+    it('without Shift the text is the one level price', () => {
+        expect(upgradeButtonText(talent(0, 10, 1), 5, false)).toBe('Melhorar (1 ponto)');
+        expect(upgradeButtonText(talent(0, 10, 3), 30, false)).toBe('Melhorar (3 pontos)');
     });
 });
