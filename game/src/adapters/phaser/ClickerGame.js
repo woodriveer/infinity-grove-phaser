@@ -22,6 +22,7 @@ import { SkillCombat } from '../../domain/skills/skillCombat';
 import { skillLevelOf } from '../../domain/skills/skillLevel';
 import { monsterAfterBreak, talentComboCap, talentComboStep, talentTimeBonusMs } from '../../domain/talents/talents';
 import { HeroUi } from './HeroUi';
+import { isTextField } from './pageGuards';
 import { autoClickIntervalText, renderAutoClick } from './views/autoClickView';
 import { RESET_ERROR_TEXT, renderLegacyLine, renderResetButton, renderResetDialog, resetNoticeText } from './views/resetView';
 import { el } from './views/dom';
@@ -126,8 +127,6 @@ const AUTO_CLICK_HUD_HTML = '<div class="hud-box hud-auto-click"><div class="aut
     + ' aria-expanded="false" aria-controls="auto-click-popover"><span class="auto-click-key" data-testid="auto-click-key" aria-hidden="true">A</span></button>'
     + '<span class="auto-click-rate" data-testid="auto-click-rate"></span>'
     + '</div></div>';
-//  A key typed into a text field is text, not a shortcut
-const isTextField = (target) => Boolean(target?.closest?.('textarea, select, [contenteditable]:not([contenteditable="false"]), input:not([type="checkbox"]):not([type="radio"]):not([type="button"])'));
 //  The confirmation of the account reset (spec account-reset) covers the screen like the pause menu
 const RESET_DIALOG_HTML = '<div class="reset-dialog" data-testid="reset-dialog" hidden><div class="reset-card"></div></div>';
 const FARM_TOGGLE_HTML = '<div class="hud-box hud-farm"><label class="farm-toggle"><input type="checkbox"> Farm boss</label></div>';

@@ -209,7 +209,7 @@ Every existing `TalentControllerIT` and `TalentServiceTest` case passes unchange
 
 ### Phase 2: Game
 
-#### T3: The page stops acting like a document [ ]
+#### T3: The page stops acting like a document [x]
 
 **Owner**: game-dev
 **Goal**: No selection, no drag ghost, no context menu and an arrow cursor outside the text fields (UIP-01 to UIP-04; spec Q1 to Q4).
@@ -248,8 +248,8 @@ The `ClickerGame.test.js` cases of the auto click key in a text field pass uncha
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 7 cases pass; the whole unit suite (including `architecture.test.js`) passes.
-- [ ] `git grep -n "const isTextField" -- game/src` prints only `pageGuards.js`.
+- [x] The 7 cases pass; the whole unit suite (including `architecture.test.js`) passes.
+- [x] `git grep -n "const isTextField" -- game/src` prints only `pageGuards.js`.
 
 **Commit**: `feat(game): keep the page from acting like a document outside the text fields`
 

@@ -102,6 +102,26 @@ body {
     font-family: var(--font-body);
 }
 
+/* The game is not a page (spec ui-polish): nothing is selected, dragged or shown with the text cursor outside the text fields */
+html,
+body {
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
+img {
+    -webkit-user-drag: none;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="button"]),
+textarea,
+[contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+    cursor: text;
+}
+
 #app {
     width: 100%;
     height: 100vh;
