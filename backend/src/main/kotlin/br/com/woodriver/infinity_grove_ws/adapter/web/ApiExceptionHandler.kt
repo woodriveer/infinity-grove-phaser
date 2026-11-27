@@ -13,6 +13,7 @@ import br.com.woodriver.infinity_grove_ws.domain.HeroRequestException
 import br.com.woodriver.infinity_grove_ws.domain.InvalidRefreshTokenException
 import br.com.woodriver.infinity_grove_ws.domain.LoginException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.PasswordTooShortException
 import br.com.woodriver.infinity_grove_ws.domain.ProgressConflictException
 import br.com.woodriver.infinity_grove_ws.domain.ProgressRequestException
 import br.com.woodriver.infinity_grove_ws.domain.ResetChapterMismatchException
@@ -51,6 +52,9 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(UserAlreadyExistsException::class)
     fun conflict(e: UserAlreadyExistsException) = problem(HttpStatus.CONFLICT, e)
+
+    @ExceptionHandler(PasswordTooShortException::class)
+    fun passwordTooShort(e: PasswordTooShortException) = problem(HttpStatus.BAD_REQUEST, e).apply { setProperty("minLength", e.minLength) }
 
     @ExceptionHandler(WalletRequestException::class)
     fun walletRequest(e: WalletRequestException) = problem(HttpStatus.BAD_REQUEST, e)

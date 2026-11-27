@@ -71,8 +71,9 @@ data class User(
         }
 
         private fun validatePassword(rawPassword: String) {
-            require(rawPassword.length >= MIN_PASSWORD_LENGTH) {
-                "Password must have at least $MIN_PASSWORD_LENGTH characters"
+            if (rawPassword.length < MIN_PASSWORD_LENGTH) {
+                logger.warn("Password rejected, too short minLength={}", MIN_PASSWORD_LENGTH)
+                throw PasswordTooShortException(MIN_PASSWORD_LENGTH)
             }
         }
     }

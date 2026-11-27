@@ -30,6 +30,11 @@ class UserForbiddenException(
 
 class InvalidPasswordException : LoginException("LOGIN_INVALID_PASSWORD", "Password is invalid")
 
+/** A password shorter than [minLength] (spec portuguese-text): status 400, with [minLength] in the answer so the game can say the number. */
+class PasswordTooShortException(
+    val minLength: Int,
+) : BusinessException("USER_PASSWORD_TOO_SHORT", "Password must have at least $minLength characters")
+
 class InvalidRefreshTokenException : BusinessException("AUTH_INVALID_REFRESH_TOKEN", "Refresh token is invalid")
 
 /** Base type for a wallet request the client built wrongly. */

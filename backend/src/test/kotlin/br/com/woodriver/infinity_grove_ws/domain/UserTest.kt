@@ -32,8 +32,11 @@ class UserTest {
     }
 
     @Test
-    fun `register rejects short password`() {
-        assertFailsWith<IllegalArgumentException> { register(password = "short") }
+    fun `register rejects a short password with the code and the minimum length`() {
+        val error = assertFailsWith<PasswordTooShortException> { register(password = "short") }
+
+        assertEquals("USER_PASSWORD_TOO_SHORT", error.code)
+        assertEquals(8, error.minLength)
     }
 
     @Test
@@ -51,8 +54,11 @@ class UserTest {
     }
 
     @Test
-    fun `changePassword rejects short password`() {
-        assertFailsWith<IllegalArgumentException> { register().changePassword("password123", "short", hasher) }
+    fun `changePassword rejects a short new password with the same error`() {
+        val error = assertFailsWith<PasswordTooShortException> { register().changePassword("password123", "short", hasher) }
+
+        assertEquals("USER_PASSWORD_TOO_SHORT", error.code)
+        assertEquals(8, error.minLength)
     }
 
     @Test

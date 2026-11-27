@@ -73,7 +73,7 @@ T11
 
 ### Phase 1: Backend
 
-#### T1: The short-password error gets the code USER_PASSWORD_TOO_SHORT [ ]
+#### T1: The short-password error gets the code USER_PASSWORD_TOO_SHORT [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: A password under 8 characters answers 400 with `code` `USER_PASSWORD_TOO_SHORT` and `minLength` 8, so the game can say it in Portuguese (PT-03; spec Backend code AC 1 to 3, Q2).
@@ -101,9 +101,9 @@ T11
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The backend suite passes.
-- [ ] `git grep -n "Password must have at least" -- backend/src/main` prints only the `PasswordTooShortException` line.
-- [ ] The commit touches exactly the 5 files above and this file.
+- [x] The backend suite passes.
+- [x] `git grep -n "Password must have at least" -- backend/src/main` prints only the `PasswordTooShortException` line.
+- [x] The commit touches exactly the 5 files above and this file.
 
 **Commit**: `feat(backend): name the short password error with a code and its minimum length`
 

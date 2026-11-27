@@ -91,7 +91,12 @@ class UserControllerIT : IntegrationTestBase() {
 
     @Test
     fun `POST users returns 400 for a short password`() {
-        createUser(password = "short").then().statusCode(400)
+        createUser(password = "short")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo("USER_PASSWORD_TOO_SHORT"))
+            .body("minLength", equalTo(8))
+            .body("detail", equalTo("Password must have at least 8 characters"))
     }
 
     @Test
@@ -178,6 +183,19 @@ class UserControllerIT : IntegrationTestBase() {
             .post("/users/login")
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `PUT password with a short new password returns 400 USER_PASSWORD_TOO_SHORT`() {
+        createUser()
+
+        request(json("currentPassword" to "password123", "password" to "short"))
+            .header("Authorization", bearerToken("yan"))
+            .put("/users/yan/password")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo("USER_PASSWORD_TOO_SHORT"))
+            .body("minLength", equalTo(8))
     }
 
     @Test

@@ -16,6 +16,7 @@ import br.com.woodriver.infinity_grove_ws.domain.HeroSeed
 import br.com.woodriver.infinity_grove_ws.domain.InvalidPasswordException
 import br.com.woodriver.infinity_grove_ws.domain.InvalidStartingElementException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
+import br.com.woodriver.infinity_grove_ws.domain.PasswordTooShortException
 import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.Progress
 import br.com.woodriver.infinity_grove_ws.domain.Rarity
@@ -240,7 +241,7 @@ class UserServiceTest {
         service.create("yan", "password123", Element.FIRE)
         refreshTokens.save(token("y1", "yan"))
 
-        assertFailsWith<IllegalArgumentException> { service.updatePassword("yan", "password123", "short") }
+        assertFailsWith<PasswordTooShortException> { service.updatePassword("yan", "password123", "short") }
 
         assertFalse(refreshTokens.tokens.getValue("y1").revoked)
     }
