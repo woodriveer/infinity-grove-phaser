@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · ui-polish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>ui-polish</h1>
+                <div class="meta">
+                    <code>.specs/features/ui-polish</code> · commits <code>até a9031ded</code> · 2026-11-27 · local (vite dev, backend falso, Chromium do Playwright)
+                </div>
+            </div>
+            <span class="chip verdict changes">MUDANÇAS PEDIDAS</span>
+        </div>
+        <p style="margin-top:16px">A funcionalidade está pronta e fiel à spec: sem seleção de texto, árvore de talentos remendada sem piscar, botões sem escurecer durante o pedido, forma Shift do botão de melhoria, trilho de seis botões com chips B e T e a lista de líder em Equipe. Dois ajustes de CSS pedidos: o cartão do líder precisa do cursor de mão e o anel dourado do Shift precisa de contraste de 3:1 contra o pergaminho. Nenhum texto novo em inglês, nenhum 404 nem erro de console nas capturas. Nota fora do escopo: <code>unifiedDamage.shots.js</code> S1/S2 falham por uma asserção velha de <code>Crit res 33%</code>; não bloqueia.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">4</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">18</div><div class="l">capturas (desktop)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">2</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Texto do botão <code>Melhorar até o nível &lt;alvo&gt; (&lt;custo&gt; pontos)</code> em uma linha, cabe até <code>nível 10 (30 pontos)</code> <code>UIP-09 AC 1, 6</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Botão sem pontos suficientes volta a <code>Melhorar (2 pontos)</code>, desabilitado e sem anel <code>UIP-09 E3</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Cartão e botões não escurecem durante o pedido (só cursor de espera) <code>UIP-07 AC 1</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Árvore remendada no lugar: depois da compra os 28 nós e ícones estão desenhados, sem tabuleiro vazio <code>UIP-06</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Sem seleção de texto fora dos campos (Ctrl+A); campo de usuário continua selecionável; cursor padrão, <code>user-select: none</code> no corpo <code>UIP-01</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Trilho com seis botões, Líder removido; chips B e T com a mesma aparência do A (16 px, Cinzel 10 px, <code>#f3d58a</code> sobre <code>#1c120c</code>, borda <code>#e0b45a</code>) <code>UIP-12 AC 10</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Cartão do líder é um botão com <code>Trocar líder</code> (11 px, 800, <code>#643312</code>, sublinhado, contraste 8,4:1 sobre <code>#f4e6c8</code>) <code>UIP-13</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Lista <code>Escolher líder</code> com <code>Voltar</code>; escolha reflete no cartão do líder <code>UIP-13</code></span></li>
+            <li class="no"><span class="mark">✗</span><span>Anel dourado do botão Shift deve ler contra o pergaminho do cartão com pelo menos 3:1 <code>tasks.md T17, WCAG 1.4.11</code> — medido <code>#e0b45a</code> sobre <code>#f4e6c8</code> = 1,57:1 (contra o roxo do botão: 3,79:1)</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>Talentos: botão Melhorar e Shift</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/01-card-normal-desktop.png" target="_blank"><img src="ui-review/01-card-normal-desktop.png" alt="01 · Cartão normal" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">01 · Cartão normal</span>
+                        <span class="d">COMBO nível 0, 5 pontos: <code>Melhorar (1 ponto)</code>, uma linha, sem anel.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/02-card-shift-desktop.png" target="_blank"><img src="ui-review/02-card-shift-desktop.png" alt="02 · Shift segurado" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">02 · Shift segurado</span>
+                        <span class="d"><code>Melhorar até o nível 5 (5 pontos)</code> com o anel dourado de 2 px.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #2</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/02b-card-shift-detail-desktop.png" target="_blank"><img src="ui-review/02b-card-shift-detail-desktop.png" alt="02b · Shift, só o cartão" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">02b · Shift, só o cartão</span>
+                        <span class="d">Recorte do cartão: o anel dourado contra o roxo do botão lê bem, contra o pergaminho quase some.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #2</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/03-card-shift-longest-desktop.png" target="_blank"><img src="ui-review/03-card-shift-longest-desktop.png" alt="03 · Texto mais longo" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">03 · Texto mais longo</span>
+                        <span class="d"><code>Melhorar até o nível 10 (30 pontos)</code> cabe em uma linha dentro do cartão.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/03b-card-shift-longest-detail-desktop.png" target="_blank"><img src="ui-review/03b-card-shift-longest-detail-desktop.png" alt="03b · Texto mais longo, recorte" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">03b · Texto mais longo, recorte</span>
+                        <span class="d">Botão dourado do ramo Poder, sem corte nem quebra de linha.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/04-card-shift-unaffordable-desktop.png" target="_blank"><img src="ui-review/04-card-shift-unaffordable-desktop.png" alt="04 · Shift sem pontos" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">04 · Shift sem pontos</span>
+                        <span class="d">COMBO_G2 com 1 ponto: <code>Melhorar (2 pontos)</code>, desabilitado, sem anel.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/05-card-busy-desktop.png" target="_blank"><img src="ui-review/05-card-busy-desktop.png" alt="05 · Pedido em andamento" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">05 · Pedido em andamento</span>
+                        <span class="d">Com o pedido retido: nenhum botão ou cartão escurecido.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/05b-card-busy-detail-desktop.png" target="_blank"><img src="ui-review/05b-card-busy-detail-desktop.png" alt="05b · Pedido em andamento, recorte" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">05b · Pedido em andamento, recorte</span>
+                        <span class="d">Botão com a cor cheia (só o cursor de espera muda).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/06-after-shift-purchase-desktop.png" target="_blank"><img src="ui-review/06-after-shift-purchase-desktop.png" alt="06 · Depois da compra com Shift" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">06 · Depois da compra com Shift</span>
+                        <span class="d">Nível 5/10 e árvore inteira desenhada: 28 nós e ícones, sem piscada nem tabuleiro vazio.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Página: seleção de texto</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/07-start-ctrl-a-desktop.png" target="_blank"><img src="ui-review/07-start-ctrl-a-desktop.png" alt="07 · Tela inicial após Ctrl+A" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">07 · Tela inicial após Ctrl+A</span>
+                        <span class="d">Nenhuma cor de seleção no texto da tela.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/08-battle-ctrl-a-desktop.png" target="_blank"><img src="ui-review/08-battle-ctrl-a-desktop.png" alt="08 · Batalha após Ctrl+A" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">08 · Batalha após Ctrl+A</span>
+                        <span class="d">Nenhuma cor de seleção na batalha.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/09-username-selected-desktop.png" target="_blank"><img src="ui-review/09-username-selected-desktop.png" alt="09 · Campo de usuário selecionado" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">09 · Campo de usuário selecionado</span>
+                        <span class="d">Só o texto <code>yan</code> do campo fica destacado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Trilho do HUD</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/10-rail-keys-desktop.png" target="_blank"><img src="ui-review/10-rail-keys-desktop.png" alt="10 · Trilho com seis botões" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">10 · Trilho com seis botões</span>
+                        <span class="d">Heróis, Mochila (B), Equipe, Equipamento, Talentos (T, ponto vermelho 3) e Rever chefes; sem Líder. Chips com Cinzel 10 px <code>#f3d58a</code> sobre <code>#1c120c</code>, borda <code>#e0b45a</code> (contraste 12,9:1), dentro do botão e longe do ponto e do ícone.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Equipe e escolha de líder</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/11-equipe-chapter-1-desktop.png" target="_blank"><img src="ui-review/11-equipe-chapter-1-desktop.png" alt="11 · Equipe no capítulo 1" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">11 · Equipe no capítulo 1</span>
+                        <span class="d">Cartão do líder com <code>Trocar líder</code>, quatro vagas bloqueadas, linha de status.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/11b-equipe-leader-hover-desktop.png" target="_blank"><img src="ui-review/11b-equipe-leader-hover-desktop.png" alt="11b · Cartão do líder com o mouse em cima" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">11b · Cartão do líder com o mouse em cima</span>
+                        <span class="d">O cartão clicável mostra só um leve brilho; o cursor segue sendo a seta.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/12-leader-list-desktop.png" target="_blank"><img src="ui-review/12-leader-list-desktop.png" alt="12 · Escolher líder" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">12 · Escolher líder</span>
+                        <span class="d">Lista com Kael atual (selo Líder) e Lyra; botão <code>Voltar</code> ao lado de Fechar.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/13-equipe-after-pick-desktop.png" target="_blank"><img src="ui-review/13-equipe-after-pick-desktop.png" alt="13 · Depois de escolher Lyra" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">13 · Depois de escolher Lyra</span>
+                        <span class="d">Cartão do líder passa a mostrar Lyra.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/14-equipe-chapter-5-desktop.png" target="_blank"><img src="ui-review/14-equipe-chapter-5-desktop.png" alt="14 · Equipe no capítulo 5" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">14 · Equipe no capítulo 5</span>
+                        <span class="d">Lyra na vaga 1; mesmo visual da revisão hero-team, mais <code>Trocar líder</code> no cartão do líder.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#1 · Média</span><strong>O cartão do líder é clicável mas mantém o cursor de seta</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Equipe (desktop)</dd>
+                    <dt>O que está errado</dt><dd>O cartão do líder agora é um <code>button</code> que abre <code>Escolher líder</code>, mas a regra <code>.team-slot[data-state="leader"]</code> fixa <code>cursor: default</code>; medido no navegador: <code>cursor: default</code>. Os outros cartões clicáveis (aliado, herói) usam a mão. O único sinal de que o cartão clica é o texto sublinhado de 11 px e um brilho de 6% ao passar o mouse.</dd>
+                    <dt>Como deveria ficar</dt><dd>Cursor <code>pointer</code> no cartão do líder enquanto ele está habilitado (<code>:disabled</code> continua <code>default</code>, como já faz <code>.team-slot:disabled</code>).</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (linha da regra <code>.team-slot[data-state="leader"]</code>: trocar <code>cursor: default</code> por <code>cursor: pointer</code>; e atualizar o teste e2e que fixa o cursor, se houver)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/11b-equipe-leader-hover-desktop.png" target="_blank"><img src="ui-review/11b-equipe-leader-hover-desktop.png" alt="Captura do achado #1"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#2 · Média</span><strong>O anel dourado do botão Shift quase some sobre o pergaminho</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Talentos, cartão do talento com Shift (desktop)</dd>
+                    <dt>O que está errado</dt><dd>O anel de 2 px <code>#e0b45a</code> fica sobre o pergaminho <code>#f4e6c8</code> do cartão: contraste medido 1,57:1, abaixo dos 3:1 que a tarefa T17 pede para parte de interface sem texto (WCAG 1.4.11). Ele só se destaca contra o roxo do botão (3,79:1), e o texto do botão também muda, então a informação não depende só do anel, mas o contorno externo some.</dd>
+                    <dt>Como deveria ficar</dt><dd>Anel de 2 px com contraste de pelo menos 3:1 contra o pergaminho, por exemplo dourado escuro (ouro com <code>#8a6a1c</code> ou mais escuro, ~4,4:1) ou anel duplo (interno ouro, externo de 1 px em tinta escura <code>--wood-900</code>). Atualizar o valor esperado de <code>box-shadow</code> nos testes e2e (<code>GOLD_RING</code> em uiPolishShift.spec.js) e na spec UIP-09 AC 10.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (<code>.talent-upgrade[data-max="true"]</code>), game/e2e/uiPolishShift.spec.js</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/02b-card-shift-detail-desktop.png" target="_blank"><img src="ui-review/02b-card-shift-detail-desktop.png" alt="Captura do achado #2"></a>
+        </article>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>O rótulo <code>Trocar líder</code> está no fundo do cartão e em 11 px; se o cursor de mão (achado #1) não bastar, um fundo levemente mais quente ao passar o mouse reforçaria que o cartão é um botão.</span></li>
+            <li><span class="mark">✦</span><span>Em Equipe do capítulo 1, <code>Remover</code> e <code>Tornar líder</code> aparecem apagados sem nenhuma vaga selecionada; é o comportamento anterior, mas uma dica curta ajudaria. Fora do escopo.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <p class="empty">Nenhum erro nem recurso faltando nas capturas. As capturas vêm do Chromium do Playwright (a revisão foi feita sobre elas e sobre estilos medidos no navegador).</p>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-27</footer>
+</main>
+</body>
+</html>

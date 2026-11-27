@@ -922,7 +922,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 
 ### Phase 4: UI review
 
-#### T17: UI review of the page guards, the in-place tree, the Shift button, the HUD keys and the Equipe leader list [ ]
+#### T17: UI review of the page guards, the in-place tree, the Shift button, the HUD keys and the Equipe leader list [x]
 
 **Owner**: ui-artist
 **Goal**: The Shift button reads well and fits, the card does not dim while a request runs, the key chips and the Equipe leader card read well, and nothing else on the start screen, the battle, Talentos and Equipe changed look (UIP-01, UIP-04, UIP-06, UIP-07, UIP-09, UIP-11, UIP-12, UIP-13).
@@ -956,9 +956,27 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 **Gate**: `cd game && npm run ui:shots -- uiPolish`
 **Done when**:
 
-- [ ] `ui-review.html` lists the 14 shots with `APROVADO`, or each finding as a new task in this file with its owner.
+- [x] `ui-review.html` lists the 14 shots with `APROVADO`, or each finding as a new task in this file with its owner.
 
 **Commit**: `docs(ui): review the ui polish`
+
+#### F2: The leader card shows the hand cursor [ ]
+
+**Owner**: game-dev
+**Goal**: The leader card of Equipe is a button that opens `Escolher líder`, so it shows `cursor: pointer` while enabled (ui-review finding #1).
+**Where**: `game/public/style.css`, rule `.team-slot[data-state="leader"]` (change `cursor: default` to `cursor: pointer`; `.team-slot:disabled` keeps `default`).
+**Check**: `toHaveCSS('cursor', 'pointer')` on `team-slot-0` in `game/e2e/uiPolishHud.spec.js` (leader card enabled) and `default` while a team request runs.
+**Depends on**: T17
+**Commit**: `fix(game): the leader card shows the hand cursor`
+
+#### F3: The Shift ring reads against the parchment [ ]
+
+**Owner**: game-dev
+**Goal**: The 2 px ring of `.talent-upgrade[data-max="true"]` has at least 3:1 contrast against `--parchment-100` (`#f4e6c8`); `#e0b45a` measures 1.57:1 (ui-review finding #2). Suggested: a darker gold ring (`#8a6a1c` or darker) or a double ring (inner gold, outer 1 px `--wood-900`).
+**Where**: `game/public/style.css` (`.talent-upgrade[data-max="true"]`), `GOLD_RING` and any `box-shadow` assert in `game/e2e/uiPolishShift.spec.js`, spec UIP-09 AC 10 text.
+**Check**: re-run `uiPolishShift.spec.js`, then `npm run ui:shots -- uiPolish` and re-review shots 02 and 03.
+**Depends on**: T17
+**Commit**: `fix(game): give the Shift ring 3:1 contrast on the card`
 
 ---
 
