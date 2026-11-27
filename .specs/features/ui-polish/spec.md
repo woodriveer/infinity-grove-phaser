@@ -409,7 +409,7 @@ Every row is the product owner's recommended default, waiting for the owner.
 | UIP-02 | P2: No drag ghost - AC 1 to 4 | Tasks T3, T11 | Implementing |
 | UIP-03 | P2: No context menu - AC 1, 2 | Tasks T3, T11 | Implementing |
 | UIP-04 | P2: Arrow cursor - AC 1 to 3 | Tasks T3, T11, T17 | Implementing |
-| UIP-05 | P3: Keyboard focus ring - AC 1, 2 | Tasks T11 | In Tasks |
+| UIP-05 | P3: Keyboard focus ring - AC 1, 2 | Tasks T11 | Implementing |
 | UIP-06 | P1: Talentos in place - AC 1 to 11, Edge 4 | Tasks T7, T8, T12, T17 | Implementing |
 | UIP-07 | P1: No dimming - AC 1 to 4, Edge 2 | Tasks T7, T8, T12, T17 | Implementing |
 | UIP-08 | P1: Backend levels - AC 1 to 10 | Tasks T1, T2, T12 | Implementing |

@@ -660,7 +660,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 
 ### Phase 3: Tests in the browser and author check
 
-#### T11: The page guards in the browser [ ]
+#### T11: The page guards in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: Every AC of UIP-01 to UIP-05 is pinned in Chrome, with the CSS values read by `toHaveCSS` or `getComputedStyle`.
@@ -705,7 +705,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/uiPolishPage.spec.js e2e/dragEquip.spec.js e2e/auth.spec.js`
 **Done when**:
 
-- [ ] The 19 scenarios pass; `dragEquip.spec.js` (UIP-02 AC 4) and `auth.spec.js` pass unchanged.
+- [x] The 19 scenarios pass; `dragEquip.spec.js` (UIP-02 AC 4) and `auth.spec.js` pass unchanged.
 
 **Commit**: `test(game): pin the page guards in the browser`
 
