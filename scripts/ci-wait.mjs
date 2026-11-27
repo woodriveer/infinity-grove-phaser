@@ -43,18 +43,30 @@ export const trimFailedLog = (log, { matched = 60, tail = 15, total = 250 } = {}
     for (const [key, lines] of groups)
     {
         const keep = new Set();
+        const seen = new Set();
         let hits = 0;
         lines.forEach((line, index) =>
         {
-            if (hits < matched && FAILURE.test(line) && !/^##\[group\]|^##\[endgroup\]/.test(line)) { keep.add(index); hits += 1; }
+            //  retries repeat the same failure lines; each one is shown once
+            const text = line.replace(/^##\[error\]/, '').trim();
+            if (hits < matched && FAILURE.test(line) && !/^##\[(end)?group\]/.test(line) && !seen.has(text))
+            {
+                keep.add(index);
+                seen.add(text);
+                hits += 1;
+            }
         });
         for (let index = Math.max(0, lines.length - tail); index < lines.length; index += 1) keep.add(index);
         out.push(`--- ${key}`);
         let last = -1;
+        const printed = new Set();
         for (const index of [...keep].sort((a, b) => a - b))
         {
+            const text = lines[index].replace(/^##\[error\]/, '').trim();
+            if (!text || printed.has(text)) continue;
             if (last !== -1 && index > last + 1) out.push('  …');
-            if (lines[index].trim()) out.push(lines[index]);
+            out.push(lines[index]);
+            printed.add(text);
             last = index;
         }
     }

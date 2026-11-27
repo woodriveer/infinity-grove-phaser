@@ -22,6 +22,7 @@ test('the failed log keeps the failure lines and the tail of each step, without 
 test('a very long failed log is cut with a pointer to the full one', () =>
 {
     const log = Array.from({ length: 500 }, (_, i) => `backend\tTest\t2026-11-27T10:00:00.0000000Z FAILED test ${i}`).join('\n');
+    assert.equal(trimFailedLog(`${log}\n${log}`, { matched: 1000, total: 1000 }).split('\n').length, 501, 'a repeated failure line is shown once');
     const trimmed = trimFailedLog(log, { matched: 1000, total: 50 }).split('\n');
     assert.equal(trimmed.length, 51);
     assert.match(trimmed.at(-1), /more lines: gh run view --log-failed/);
