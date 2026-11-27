@@ -4859,6 +4859,21 @@ describe('ClickerGame auto click', () => {
         remove.mockRestore();
     });
 
+    it('stops following the Shift key when the scene shuts down (UIP-10 AC 9)', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        const shift = (type) => window.dispatchEvent(new KeyboardEvent(type, { key: 'Shift', shiftKey: type === 'keydown' }));
+
+        shift('keydown');
+        expect(ctx.scene.heroUi.shiftKey.held()).toBe(true);
+        shift('keyup');
+        expect(ctx.scene.heroUi.shiftKey.held()).toBe(false);
+
+        ctx.eventHandlers.shutdown();
+        shift('keydown');
+
+        expect(ctx.scene.heroUi.shiftKey.held()).toBe(false);
+    });
+
     it('hits twice in 1000 ms with no click in chapter 2, at the monster centre and with one combo step each', async () => {
         const ctx = await createScene({ start: atChapter(2) });
 

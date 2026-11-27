@@ -894,7 +894,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 
 ---
 
-#### T16: Author check of the UI polish [ ]
+#### T16: Author check of the UI polish [x]
 
 **Owner**: test-engineer
 **Goal**: Every AC and edge case of the spec maps to an exact assertion and the riskiest code kills its mutants (the feature's test gate).
@@ -914,7 +914,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 **Gate**: `cd backend && ./gradlew test` then `cd game && npm test && npx playwright test e2e/uiPolishPage.spec.js e2e/uiPolishTalents.spec.js e2e/uiPolishShift.spec.js e2e/uiPolishHud.spec.js`
 **Done when**:
 
-- [ ] Every AC and edge case maps to a test; every mutant is killed or a fix task is listed.
+- [x] Every AC and edge case maps to a test; every mutant is killed or a fix task is listed (25 of 25 killed; fix task F1 for UIP-07 AC 3, see § Author Check).
 
 **Commit**: `test: author check of the ui polish`
 
@@ -1028,4 +1028,154 @@ No game task needs T1 or T2 to pass its gate: the e2e tests run against the fake
 
 ## Author Check
 
-(Appended by T16.)
+Run on 2026-11-27 by `test-engineer`, tree at `08f8fe1a` plus the T16 commit. Unit file names are relative to `game/src/adapters/phaser/` unless a path is given; e2e files are `game/e2e/uiPolish*.spec.js` (`Page`, `Talents`, `Shift`, `Hud` below); `T:` is `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`.
+
+### AC to assertion table
+
+| AC | Exact value asserted | Unit | E2E |
+| --- | --- | --- | --- |
+| UIP-01 AC 1 | `html` and `body` computed `user-select` `none` | browser only (jsdom has no computed style) | Page:53 |
+| UIP-01 AC 2 | `getSelection().toString()` `''` after Ctrl+A on the start, battle and Talentos screens | browser only | Page:60, 68, 76 |
+| UIP-01 AC 3 | `''` after a double click on the `talent-points` pill and on `talent-detail-name` | browser only | Page:85 |
+| UIP-01 AC 4 | `''` after a drag from the top left to the bottom right corner of `.hero-window` | browser only | Page:96 |
+| UIP-01 AC 5 | `[ selectionStart, selectionEnd ]` `[ 0, 3 ]` after typing `yan`, Ctrl+A; `user-select` `text` | browser only | Page:110 |
+| UIP-01 AC 6 | password field `user-select` `text` | browser only | Page:121 |
+| UIP-02 AC 1 | every `img` of `talent-screen` (at least 60) `-webkit-user-drag` `none` | browser only | Page:129 |
+| UIP-02 AC 2 | `dragstart` on a node icon: `defaultPrevented` true | `pageGuards.test.js:81` | Page:140 |
+| UIP-02 AC 3 | `dragstart` on the username field: false | `pageGuards.test.js:89` | Page:155 |
+| UIP-02 AC 4 | `dragEquip.spec.js` passes unchanged (T11 run: 3 files, 60 passed, 1 flake of `dragEquip` edge scroll passed alone twice) | - | `game/e2e/dragEquip.spec.js` |
+| UIP-03 AC 1 | `contextmenu` on the canvas cancelled (dispatched) and on a talent node (real right click, `__menuCancelled` true) | `pageGuards.test.js:64` | Page:171, 185 |
+| UIP-03 AC 2 | `contextmenu` on the username field: false | `pageGuards.test.js:73` | Page:197 |
+| UIP-04 AC 1 | `body`, `talent-detail-name`, `.talent-pill` `cursor` `default` | browser only | Page:213 |
+| UIP-04 AC 2 | username and password `cursor` `text` | browser only | Page:222 |
+| UIP-04 AC 3 | `talent-COMBO` and `talent-upgrade-COMBO` `cursor` `pointer` | browser only | Page:229 |
+| UIP-05 AC 1, 2 | `outline-style` `none` after a click; after Tab, Shift+Tab: `:focus-visible`, `solid`, `rgb(204, 78, 26)` | browser only | Page:239, 246 |
+| UIP-06 AC 1, 2 | board, `talent-COMBO`, `talent-detail`, card icon `===`; the 28 nodes `===`; `__removedImages` 0 | `talentsView.test.js:583` | Talents:99 |
+| UIP-06 AC 3 | `1/10`, `data-state` `available`, `aria-label` `Limite de dano do combo, nível 1 de 10`, `Pontos de talento: 1`, `Efeito: +5%`, `Melhorar (1 ponto)` enabled, reset enabled, lit opacity `{ TIME: '0', BREAK: '0', POWER: '0', COMBO: '0.22' }`, equal after a fresh open | `talentsView.test.js:601, 620` | Talents:115 |
+| UIP-06 AC 4 | board and node same, card replaced, `__removedImages` equal to the old card's images | `talentsView.test.js:642` | Talents:148 |
+| UIP-06 AC 5 | card `===`, 0 images removed | `talentsView.test.js:656` | Talents:164 |
+| UIP-06 AC 6 | `Pontos de talento: 12`, board and nodes same, `COMBO_G2` `locked` with 1 `.talent-node-lock`, reset disabled, lit all `'0'` | `talentsView.test.js:665` | Talents:177 |
+| UIP-06 AC 7 | lock removed, `data-state` `open`, frame and icon `===` | `talentsView.test.js:681` | Talents:196 |
+| UIP-06 AC 8 | `Pontos de talento: 3` after `showTalentPoints`, board and nodes same, 0 removed | `HeroUi.test.js:1506` | Talents:242 |
+| UIP-06 AC 9 | `Nível máximo`, name, level and icon `===` | `talentsView.test.js:699` | Talents:222 |
+| UIP-06 AC 10 | `Pontos de talento insuficientes`, board and nodes same | `HeroUi.test.js:1405` | Talents:258 |
+| UIP-06 AC 11 | `Escolha um talento na árvore para ver os detalhes.` after close and open | `HeroUi.test.js:1811` | Talents:327 |
+| UIP-06 Edge 4 | close during a request, open: empty card, late answer changes only the collection (`available` 1, board `===`, 0 removed) | `HeroUi.test.js:1451` (the screen keeps its elements) | Talents:274 |
+| UIP-07 AC 1 | `aria-disabled` `true`, `opacity` `1`, `cursor` `progress` on card button and reset, for an upgrade and for a reset | `talentsView.test.js:189, 339` | Talents:353, 404 |
+| UIP-07 AC 2 (Edge 2) | `talentUpgrades()` length 1, `talentResets()` 0 after clicks while it runs | `talentsView.test.js:727` | Talents:366; Shift:228 |
+| UIP-07 AC 3 | `aria-disabled` `false` on both, card `cursor` `pointer` after the answer | `talentsView.test.js:727` | Talents:387; **gap F1**: Talents:305 (`test.fail`) |
+| UIP-07 AC 4 | disabled `opacity` `0.45` only with 0 points; running request sets no `disabled` | `talentsView.test.js:196, 339` | Talents:417 |
+| UIP-08 AC 1 | COMBO 0, 5 points, `levels` 5: level 5, value 25, `nextCost` 1, points `{ 5, 5, 0 }` | `T:domain/TalentsTest.kt:223, 232, 243, 252` | `T:adapter/web/TalentControllerIT.kt:263, 278` |
+| UIP-08 AC 2 | no `levels` or null: one level | `T:service/TalentServiceTest.kt:129` | `T:adapter/web/TalentControllerIT.kt:289` |
+| UIP-08 AC 3, 4 | 400 `INVALID_TALENT_REQUEST`, details `levels must be an integer` and `levels must be an integer between 1 and <maxLevel>` | `T:domain/TalentsTest.kt:315`; `T:service/TalentServiceTest.kt:96` | `T:adapter/web/TalentControllerIT.kt:298, 312` |
+| UIP-08 AC 5 | 409 `TALENT_MAX_LEVEL`, `Talent 'CLICK_DAMAGE' at level 8 cannot rise 3 levels` | `T:domain/TalentsTest.kt:260` | `T:adapter/web/TalentControllerIT.kt:329` |
+| UIP-08 AC 6 | 409 `NOT_ENOUGH_TALENT_POINTS`, `5 talent levels cost 5 points, the player has 4` | `T:domain/TalentsTest.kt:280` | `T:adapter/web/TalentControllerIT.kt:342` |
+| UIP-08 AC 7 | order of the checks: mismatch before count, locked with a count | `T:domain/TalentsTest.kt:300, 307` | - |
+| UIP-08 AC 8 | two equal requests: one 200, one 409 `TALENT_LEVEL_MISMATCH` | - | `T:adapter/web/TalentControllerIT.kt:355` |
+| UIP-08 AC 9 | the three log lines carry `levels=3` (new in T16) | `T:service/TalentServiceTest.kt:109` | - |
+| UIP-08 AC 10 | no file under `db/migration` changed in `ea947f9e~1..HEAD` (`git diff --name-only`, 0 files) | not a test | - |
+| UIP-09 AC 1, E1 | `Melhorar até o nível 5 (5 pontos)`, `data-max` `true`, `box-shadow` `rgb(224, 180, 90) 0px 0px 0px 2px` | `talentsView.test.js:755`; `talents.test.js:401` | Shift:53 |
+| UIP-09 AC 2 | `Melhorar (1 ponto)`, `data-max` `false`, `box-shadow` `none`, same element | `talentsView.test.js:762` | Shift:64 |
+| UIP-09 AC 3, E1 | body `{ fromLevel: 0, levels: 5 }`, `Nível 5/10`, `Efeito: +25%`, `Pontos de talento: 0`, disabled, `Melhorar (1 ponto)` with Shift held (Edge 3); the `Shift` modifier click buys the same | `HeroUi.test.js:1524, 1541` | Shift:79, 95 |
+| UIP-09 E2 | `Melhorar até o nível 10 (3 pontos)`, body `{ fromLevel: 7, levels: 3 }`, `Nível máximo`, `Pontos de talento: 17` | `talents.test.js:408` | Shift:104 |
+| UIP-09 E3 | `Melhorar até o nível 2 (4 pontos)`, body `{ fromLevel: 0, levels: 2 }`, `Nível 2/10`, `Pontos de talento: 1`, disabled | `talents.test.js:415` | Shift:116 |
+| UIP-09 AC 6, E4 | `Melhorar (2 pontos)`, disabled, `data-max` `false`, `box-shadow` `none` | `talentsView.test.js:773`; `talents.test.js:422` | Shift:129 |
+| UIP-09 AC 4, E5 | `Melhorar até o nível 1 (1 ponto)`, body `{ fromLevel: 0 }` (strict, no `levels` key), `Nível 1/10`, `Pontos de talento: 0` | `HeroUi.test.js:1554`; `talents.test.js:429` | Shift:142 |
+| UIP-09 E6 | `Melhorar até o nível 4 (8 pontos)`, body `{ fromLevel: 0, levels: 4 }`, `Nível máximo`, `Pontos de talento: 1` | `talents.test.js:436` | Shift:154 |
+| UIP-09 AC 10, E7 | `Melhorar até o nível 10 (30 pontos)`, `scrollWidth <= clientWidth`, height equal to the T1 height | `talents.test.js:443` | Shift:166 |
+| UIP-09 AC 5 | no Shift: body `{ fromLevel: 0 }`, `Nível 1/10` | `HeroUi.test.js:1569` | Shift:180 |
+| UIP-09 AC 7 (Q19) | backend without `levels`: `Nível 1/10`, `Pontos de talento: 4`, `.hero-error` hidden | `HeroUi.test.js:1644` | Shift:189 |
+| UIP-09 AC 8 | `Pontos de talento insuficientes` and the tree read again (`Pontos de talento: 7` after 2 points were granted behind the screen); unreachable backend: `Não foi possível melhorar o talento.`, `Nível 0/10`, `Pontos de talento: 5` | `HeroUi.test.js:1660`; `talentCollection.test.js:120` | Shift:201, 215 |
+| UIP-09 Edge 2 | second Shift click while a request runs: 1 upgrade recorded | `talentsView.test.js:727` | Shift:228 |
+| UIP-09 AC 9 | `talent-locked-COMBO_G2` visible, no button; `Nível máximo` | `talentsView.test.js:791` | Shift:247 |
+| UIP-09 bodies | `{ fromLevel: 0, levels: 5 }` and `{ fromLevel: 0 }` | `talentApi.test.js:31, 40`; `talentCollection.test.js:101, 110` | Shift:79, 142 |
+| UIP-10 AC 1, 2, 3, 4 | keydown (repeat included), keyup, other keys, `pointermove` and `pointerdown` set the mode | `shiftKey.test.js:25, 37, 45, 55` | Shift:295 (`pointermove` with `shiftKey`) |
+| UIP-10 AC 5 | `blur`: `Melhorar (1 ponto)` at once, a plain click sends `{ fromLevel: 0 }` | `shiftKey.test.js:65, 72` | Shift:263 |
+| UIP-10 AC 6 | hidden `visibilityState`: `Melhorar (1 ponto)` | `shiftKey.test.js:86` | Shift:281 |
+| UIP-10 AC 7, 8 | same button element; another talent shows its Shift text | `talentsView.test.js:762`; `HeroUi.test.js:1582, 1605` | Shift:64, 309 |
+| UIP-10 AC 9 | after the scene `shutdown` a Shift key leaves `held()` false (new in T16) | `HeroUi.test.js:1677`; `ClickerGame.test.js:4862` | - |
+| UIP-10 Edge 1 | releasing one of two Shift keys turns the mode off | `shiftKey.test.js:100` | - |
+| UIP-11 AC 1 | `title` `Segure Shift para melhorar até o máximo`, both forms | `talentsView.test.js:800` | Shift:320 |
+| UIP-12 AC 1, 3 | `t` opens (`is-talents`), `t` again closes | `ClickerGame.test.js:4718, 4736` | Hud:47 |
+| UIP-12 AC 2, 4 | `b` opens Mochila (`.hero-title` `Mochila`), `b` closes it, also from `bag-card-kael` | `ClickerGame.test.js:4727, 4745` | Hud:60, 72 |
+| UIP-12 AC 5 | `t` over Mochila: `is-talents` | `ClickerGame.test.js:4754` | Hud:83 |
+| UIP-12 AC 6 | `Control+b`, `Alt+t`, `Shift+T`: panel stays hidden, a plain `b` then opens | `ClickerGame.test.js:4764, 4775` | Hud:93 |
+| UIP-12 AC 7, Edge 8 | held `t` (second down is a repeat) opens once and stays open | `ClickerGame.test.js:4783` | Hud:110 |
+| UIP-12 AC 8, Edge 7 | `t` typed in the username field: value `t`; `tb` typed in a battle text field opens nothing | `ClickerGame.test.js:4791` | Hud:123, 163 |
+| UIP-12 AC 9 | pause menu visible and panel hidden; reset dialog visible and panel hidden | `ClickerGame.test.js:4801, 4811` | Hud:134, 146 |
+| UIP-12 AC 10 | auto click popover hidden, Talentos open | `ClickerGame.test.js:4820` | Hud:184 |
+| UIP-12 AC 11 | chips `T`, `B`; `font-size` `10px`, `font-weight` `700`, Cinzel, `color` `rgb(243, 213, 138)`, `background-color` `rgb(28, 18, 12)`, border `1px solid rgb(224, 180, 90)`, `height` `16px`; `aria-keyshortcuts` `T`, `B`; chip inside the button, off the badge; 2 `.hud-key` in the rail | `HeroUi.test.js:107` | Hud:196 |
+| UIP-12 Edge | Shift held on Talentos, `T`: Talentos stays open | `ClickerGame.test.js:4764` | Hud:238 |
+| UIP-13 AC 1 | rail ids and labels in order, `hud-leader` count 0 | `HeroUi.test.js:95, 3032` | Hud:270; `heroBagCards.spec.js:408`; `heroTeam.spec.js:82, 89`; `uiRedesign.spec.js:958` |
+| UIP-13 AC 2 | slots 1 to 4 `locked`, `Chefe do capítulo 5` to `8`, `A equipe luta a partir do capítulo 5.` | `HeroUi.test.js:3099, 589` | Hud:289 |
+| UIP-13 AC 3 | `team-slot-0` is a `button`, caption `Trocar líder`, disabled while a team request runs | `teamView.test.js:88, 100`; `HeroUi.test.js:627` | Hud:289, 361 |
+| UIP-13 AC 4 | `Escolher líder`, window title `Equipe`, 2 rows, current row `is-current` and `Líder`, `Voltar` | `HeroUi.test.js:599` | Hud:289 |
+| UIP-13 AC 5 | `leader-entry-lyra` `is-current`, list still shown, `skill-slot-1 img` `src` `assets/heroes/lyra_double_shot.jpg`, battle leader card `Lyra` | `HeroUi.test.js:556` | Hud:289; `heroes.spec.js:144` |
+| UIP-13 AC 6 | `team-slot-0 .team-name` `Lyra Folhaveloz` after `Voltar` | `HeroUi.test.js:612` | Hud:324 |
+| UIP-13 AC 7 | `Não foi possível trocar o líder.`, `leader-entry-kael` keeps `is-current` | `HeroUi.test.js:574` | Hud:336 |
+| UIP-13 AC 8 | after `Voltar` slot 0 `Lyra Folhaveloz`, slot 1 `Kael Raizférrea` | `HeroUi.test.js:3224` | Hud:379 |
+| UIP-13 AC 9 | before the win `team-slot-1` `locked`; after it `buyable`, same document | `HeroUi.test.js:3040` | `heroTeam.spec.js:417` |
+| UIP-13 AC 10 | `PUT /leader` untouched: no backend file of the leader changed in the range | not a test | Hud:289, 391 (the route answers both uses) |
+| UIP-13 AC 11 | `Tornar líder`: slot 0 `Lyra Folhaveloz` | `HeroUi.test.js:3224` | Hud:391 |
+| UIP-13 Edge 10 | one owned hero: one `is-current` row and a click sends no `PUT /leader` | `HeroUi.test.js:556` | Hud:347 |
+| UIP-14 AC 1, 2 | `Control+a` leaves `auto-click-popover` hidden; a plain `a` opens it | `ClickerGame.test.js:4696` | Hud:253 |
+
+### Mutants
+
+`node scripts/sensor.mjs` with three scratch files (not committed), each mutant run against the narrowest command that covers it; a baseline of every command passed.
+
+| Mutant | Fault | Command | Result |
+| --- | --- | --- | --- |
+| M1 | `maxPurchase` without `Math.floor` | `vitest talents.test.js` | killed |
+| M2 | `maxPurchase` without the `maxLevel - level` bound | `vitest talents.test.js` | killed |
+| M3 | `updateTalents` skips the level chip write | `uiPolishTalents -g "the answer shows the values"` | killed |
+| M4 | `updateTalents` rebuilds the card on every call | `uiPolishTalents -g "keeps the card"` | killed |
+| M5 | `shiftKey.js` without the `blur` listener | `uiPolishShift -g "leaving the window"` | killed |
+| M6 | `patchUpgradeButton` sets `disabled = busy \|\| ...` | `uiPolishTalents -g "while a level request runs"` | killed |
+| M7 | `PlayerTalents.upgrade` without `stored + count > maxLevel` | `gradlew test --tests "*TalentsTest"` | killed |
+| M8 | `user-select: none` of `html, body` replaced | `uiPolishPage -g "html and body"` | killed |
+| M9 | Shift ring `1px` | `uiPolishShift -g "E1: Shift shows"` | killed |
+| M10 | `screenKey` without `hasModifier` | `uiPolishHud -g "Alt.t and Shift"` | killed |
+| M11 | `HeroUi.toggle` always shows | `uiPolishHud -g "t opens Talentos and t again closes it"` | killed |
+| M12 | `renderLeaderCard` without the `onLeader` click | `uiPolishHud -g "a chapter 1 player changes the leader"` | killed |
+| M13 | `.hud-key` `font-size: 12px` | `uiPolishHud -g "the keys show on their buttons"` | killed |
+| M14 | page guards also cancel inside text fields | `uiPolishPage -g "on the username field"` | killed |
+| M15 | `autoClickKey` without `hasModifier` | `uiPolishHud -g "Control.a on the battle"` | killed |
+| M16 | `body` `cursor: auto` | `uiPolishPage -g "plain text shows the arrow"` | killed |
+| M17 | `img` `-webkit-user-drag: auto` | `uiPolishPage -g "every image of Talentos"` | killed |
+| M18 | the `requested` log line without `levels` | `gradlew test --tests "*TalentServiceTest"` | killed |
+| M19 | `screenKey` without the repeat guard | `uiPolishHud -g "a held t"` | killed |
+| M20 | `screenKey` without the text field guard | `uiPolishHud -g "text field of the battle"` | killed |
+| M21 | `screenKey` without the reset dialog guard | `uiPolishHud -g "reset dialog is shown"` | killed |
+| M22 | `updateTalents` skips the lit layer opacity | `uiPolishTalents -g "the answer shows the values"` | killed |
+| M23 | `updateTalents` leaves Reiniciar pontos enabled with nothing spent | `uiPolishTalents -g "Reiniciar pontos keeps the board"` | killed |
+| M24 | a 409 no longer reads the tree again | `uiPolishShift -g "a refused Shift purchase"` | killed |
+| M25 | the shutdown hook no longer calls `heroUi.destroy` | `vitest ClickerGame.test.js` | **survived first** (no test of the hook); `ClickerGame.test.js:4862` added, killed on the rerun |
+
+25 mutants: 25 killed (one after a test was added), 0 survived at the end.
+
+### Gaps found and closed in T16
+
+- UIP-08 AC 9 (the `levels=<n>` log fields) had no test: `TalentServiceTest.kt:109` added.
+- UIP-10 AC 9 (the scene shutdown ends the Shift listeners) had no test of the hook in `ClickerGame.js`: `ClickerGame.test.js:4862` added (M25).
+- UIP-06 AC 3 (lit layer opacity, Reiniciar pontos disabled with nothing spent), UIP-09 AC 8 (tree read again after a 409, unreachable backend), UIP-12 AC 8 and 9 (battle text field, reset dialog) and Edge 4 had no browser assertion: added in `uiPolishTalents`, `uiPolishShift` and `uiPolishHud`.
+- Two tests of T12 and T13 read the fake backend before the request reached it (flaky); they now wait with `expect.poll`.
+
+### Fix tasks
+
+| Id | Owner | Task | Evidence |
+| --- | --- | --- | --- |
+| F1 | game-dev | A screen opened while a talent request runs keeps `aria-disabled="true"` on Reiniciar pontos and the card button after the answer, until the next patch. `HeroUi.upgradeTalent` and `HeroUi.resetTalents` repaint in `finally` only when `view === this.view`; a screen opened meanwhile has another `view`, and `render_talents` is the patch that clears the busy flag. UIP-07 AC 3 says both buttons give `aria-disabled` `false` when the request ends. Fix: repaint (in place) whenever `this.open && this.screen === 'talents'`, keeping the error line and the collection-only rule for the rest. Then remove `test.fail` from `game/e2e/uiPolishTalents.spec.js:305`. | `HeroUi.js:1091` (`finally` of `upgradeTalent`) and the same `finally` of `resetTalents`; `uiPolishTalents.spec.js:305` fails on `aria-disabled` `true` (expected `false`) with `test.fail` removed |
+
+### Failures not caused by the feature
+
+- `game/ui-review/uiRedesign.shots.js` `hero screens` fails at the `30-talents` step (`.talent-card` is not in the DOM): the selector is stale since `talent-tree-rework`, it is not touched by this feature. The leader shot (`26-leader`) before it passes with `openLeaderList`. Owner: `ui-artist` (shots). Not a fix task of this feature.
+- Flakes under load, each passed alone: `dragEquip.spec.js` edge scroll (2 of 2), `uiRedesign.spec.js` `opens and closes the window with A`, `ignores A while the pause menu is open` and `shows no magenta in the skill bar` (2 of 2 each).
+
+### Suite totals
+
+- Backend `./gradlew ktlintCheck test`: 1389 passed, 0 failed (ktlint clean).
+- Game unit `npm test`: 2470 passed, 0 failed (96 files).
+- E2E, the four files of this feature: 79 passed, 0 failed (`uiPolishPage` 19, `uiPolishTalents` 17 with one expected failure `test.fail` for F1, `uiPolishShift` 21, `uiPolishHud` 22).
+- E2E, the files T11 to T14 name: `uiPolishPage` + `dragEquip` + `auth` 60 passed; the five talent files 77 passed; the six files of T14 218 passed (the 3 failures of the first run were flakes that passed alone twice; the 3 others were the rail selector, fixed in the same commit).
+- AC count: 83 of 86 ACs exact; 2 are verified by `git diff` and not by a test (UIP-08 AC 10, UIP-13 AC 10); 1 (UIP-07 AC 3, the reopen path) has the fix task F1. Every player-visible AC has an e2e assertion.

@@ -143,6 +143,44 @@ test.describe('T and B (UIP-12)', () => {
         await expect(panel(page)).toBeHidden();
     });
 
+    test('t and b do nothing while the reset dialog is shown', async ({ page }) => {
+        await startGame(page, { chapter: 3 });
+        await page.getByTestId('auto-click-button').click();
+        await expect(page.getByTestId('auto-click-popover')).toBeVisible();
+        await page.getByTestId('reset-account').click();
+        await expect(page.locator('.reset-dialog')).toBeVisible();
+
+        for (const key of [ 't', 'b' ])
+        {
+            await press(page, key);
+            await settle(page);
+
+            await expect(page.locator('.reset-dialog')).toBeVisible();
+            await expect(panel(page)).toBeHidden();
+        }
+    });
+
+    test('t and b typed into a text field of the battle are typed and open nothing', async ({ page }) => {
+        await startGame(page);
+        await page.evaluate(() => {
+            const field = document.createElement('input');
+
+            field.type = 'text';
+            field.dataset.testid = 'probe-field';
+            document.body.appendChild(field);
+        });
+
+        const field = page.getByTestId('probe-field');
+
+        await field.focus();
+        await page.keyboard.press('t');
+        await page.keyboard.press('b');
+        await settle(page);
+
+        await expect(field).toHaveValue('tb');
+        await expect(panel(page)).toBeHidden();
+    });
+
     test('t closes the auto click window and opens Talentos', async ({ page }) => {
         await startGame(page, { chapter: 2 });
 

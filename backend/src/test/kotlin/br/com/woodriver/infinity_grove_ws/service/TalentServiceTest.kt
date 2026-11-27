@@ -3,7 +3,9 @@ package br.com.woodriver.infinity_grove_ws.service
 import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryTalentRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
+import br.com.woodriver.infinity_grove_ws.LogCapture
 import br.com.woodriver.infinity_grove_ws.domain.NotEnoughTalentPointsException
+import br.com.woodriver.infinity_grove_ws.domain.PlayerTalents
 import br.com.woodriver.infinity_grove_ws.domain.TalentLevelMismatchException
 import br.com.woodriver.infinity_grove_ws.domain.TalentMaxLevelException
 import br.com.woodriver.infinity_grove_ws.domain.TalentNotFoundException
@@ -101,6 +103,26 @@ class TalentServiceTest {
         }
 
         assertEquals(emptyMap(), talents.levels)
+    }
+
+    @Test
+    fun `an upgrade logs the levels in the requested, accepted and upgraded lines`() {
+        player(3)
+
+        LogCapture(TalentService::class.java).use { serviceLogs ->
+            LogCapture(PlayerTalents::class.java).use { domainLogs ->
+                service.upgrade("yan", "COMBO", 0, 3)
+
+                assertEquals(
+                    listOf(
+                        "Talent upgrade requested username=yan talent=COMBO fromLevel=0 levels=3",
+                        "Talent upgraded username=yan talent=COMBO levels=3 level=3 points=3",
+                    ),
+                    serviceLogs.infos,
+                )
+                assertEquals(listOf("Talent upgrade accepted username=yan talent=COMBO levels=3 level=3 points=3"), domainLogs.infos)
+            }
+        }
     }
 
     @Test

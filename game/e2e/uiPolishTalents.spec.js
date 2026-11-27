@@ -79,6 +79,10 @@ const same = (page) => page.evaluate(() => {
 });
 
 const removedImages = (page) => page.evaluate(() => window.__removedImages);
+
+//  The opacity of the lit veins of each branch (0 without a level, else 0.2 + 0.8 x levels / max levels of the branch)
+const litOpacities = (page) => page.evaluate(() => Object.fromEntries(
+    [ ...document.querySelectorAll('[data-testid^="talent-lit-"]') ].map((node) => [ node.dataset.branch, node.style.opacity ])));
 const ALL_SAME = { board: true, node: true, card: true, icon: true };
 
 //  Every one of the 28 nodes and its frame, to prove none was rebuilt
@@ -128,11 +132,17 @@ test.describe('Talentos in place (UIP-06)', () => {
 
         await values();
 
+        //  COMBO holds 1 level of the 34 of its branch (3 grades of 10 and Fúria crescente 4): 0.2 + 0.8 x 1 / 34, two decimals; the other branches are dark
+        const lit = { TIME: '0', BREAK: '0', POWER: '0', COMBO: '0.22' };
+
+        expect(await litOpacities(page)).toEqual(lit);
+
         await page.getByTestId('hero-close').click();
         await openTalents(page);
         await pick(page, 'COMBO');
 
         await values();
+        expect(await litOpacities(page)).toEqual(lit);
     });
 
     test('choosing another node replaces only the card', async ({ page }) => {
@@ -179,6 +189,8 @@ test.describe('Talentos in place (UIP-06)', () => {
         expect(await nodesSame(page)).toBe(true);
         await expect(page.getByTestId('talent-COMBO_G2')).toHaveAttribute('data-state', 'locked');
         await expect(page.getByTestId('talent-COMBO_G2').locator('.talent-node-lock')).toHaveCount(1);
+        await expect(page.getByTestId('talent-reset')).toBeDisabled();
+        expect(await litOpacities(page)).toEqual({ TIME: '0', BREAK: '0', POWER: '0', COMBO: '0' });
     });
 
     test('a node that opens loses its lock and keeps its art', async ({ page }) => {
@@ -259,6 +271,59 @@ test.describe('Talentos in place (UIP-06)', () => {
         expect(await nodesSame(page)).toBe(true);
     });
 
+    test('closing Talentos while a request runs and opening it again builds the screen afresh, and the late answer changes only the collection', async ({ page }) => {
+        const { fake } = await startGame(page, { talents: { COMBO: 1 }, points: 2 });
+        await openTalents(page);
+        await pick(page, 'COMBO');
+
+        const release = fake.holdTalents();
+
+        await page.getByTestId('talent-upgrade-COMBO').click();
+        await expect(page.getByTestId('talent-upgrade-COMBO')).toHaveAttribute('aria-disabled', 'true');
+        await page.getByTestId('hero-close').click();
+        await openTalents(page);
+
+        await expect(page.getByTestId('talent-detail-empty')).toHaveText('Escolha um talento na árvore para ver os detalhes.');
+        //  The request still runs, so the new screen is built with both buttons waiting (UIP-07 AC 1)
+        await expect(page.getByTestId('talent-reset')).toHaveAttribute('aria-disabled', 'true');
+        await mark(page);
+        release();
+
+        const available = () => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').heroUi.talents.points().available);
+
+        await expect.poll(available).toBe(1);
+
+        //  The screen that was open when the answer landed is the one built before it: the answer changed no element of it
+        await expect(page.getByTestId('talent-detail-empty')).toBeVisible();
+        await expect(page.getByTestId('talent-node-level-COMBO')).toHaveText('1/10');
+        expect((await same(page)).board).toBe(true);
+        expect(await removedImages(page)).toBe(0);
+    });
+
+    //  FIX TASK F1 (tasks.md § Author check): HeroUi.upgradeTalent repaints only when its `view` is still the current one, so a screen opened while the request ran keeps
+    //  both buttons aria-disabled "true" after the answer. UIP-07 AC 3 says both give aria-disabled "false" when the request ends. Remove `test.fail` once F1 is done.
+    test.fail('a screen opened while a request ran gives both buttons aria-disabled false when the request ends (UIP-07 AC 3)', async ({ page }) => {
+        const { fake } = await startGame(page, { talents: { COMBO: 1 }, points: 2 });
+        await openTalents(page);
+        await pick(page, 'COMBO');
+
+        const release = fake.holdTalents();
+
+        await page.getByTestId('talent-upgrade-COMBO').click();
+        await expect(page.getByTestId('talent-upgrade-COMBO')).toHaveAttribute('aria-disabled', 'true');
+        await page.getByTestId('hero-close').click();
+        await openTalents(page);
+        await pick(page, 'COMBO');
+        release();
+
+        const available = () => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').heroUi.talents.points().available);
+
+        await expect.poll(available).toBe(1);
+
+        await expect(page.getByTestId('talent-reset')).toHaveAttribute('aria-disabled', 'false', { timeout: 2000 });
+        await expect(page.getByTestId('talent-upgrade-COMBO')).toHaveAttribute('aria-disabled', 'false', { timeout: 2000 });
+    });
+
     test('opening Talentos again starts with no node selected', async ({ page }) => {
         await startGame(page, { points: 2 });
         await openTalents(page);
@@ -309,6 +374,10 @@ test.describe('No dimming (UIP-07)', () => {
         await expect(page.getByTestId('talent-upgrade-COMBO')).toHaveAttribute('aria-disabled', 'true');
         await page.getByTestId('talent-upgrade-COMBO').click({ force: true });
         await page.getByTestId('talent-reset').click({ force: true });
+
+        //  The first request reaches the backend, the two clicks after it add none
+        await expect.poll(() => fake.talentUpgrades().length).toBe(1);
+        await page.waitForTimeout(300);
 
         expect(fake.talentUpgrades()).toHaveLength(1);
         expect(fake.talentResets()).toBe(0);

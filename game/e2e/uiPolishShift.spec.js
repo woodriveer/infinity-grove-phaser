@@ -201,12 +201,28 @@ test.describe('Shift buys the most (UIP-09)', () => {
     test('a refused Shift purchase says why', async ({ page }) => {
         const { fake, button } = await startGame(page, { points: 5, select: 'COMBO' });
 
+        //  The backend holds 2 points more than the screen shows: the tree read again after the 409 shows them
+        fake.grantTalentPoints('yan', 2);
         fake.failNextTalentRequest({ status: 409, code: 'NOT_ENOUGH_TALENT_POINTS' });
         await page.keyboard.down('Shift');
         await expect(button).toHaveText('Melhorar até o nível 5 (5 pontos)');
         await button.click();
 
         await expect(page.locator('.hero-error')).toHaveText('Pontos de talento insuficientes');
+        await expect(points(page)).toHaveText('Pontos de talento: 7');
+    });
+
+    test('an unreachable backend says Não foi possível melhorar o talento. and keeps the tree', async ({ page }) => {
+        const { button } = await startGame(page, { points: 5, select: 'COMBO' });
+
+        await page.route('**/api/talents/COMBO/upgrade', (route) => route.abort('connectionrefused'));
+        await page.keyboard.down('Shift');
+        await expect(button).toHaveText('Melhorar até o nível 5 (5 pontos)');
+        await button.click();
+
+        await expect(page.locator('.hero-error')).toHaveText('Não foi possível melhorar o talento.');
+        await expect(page.getByTestId('talent-level-COMBO')).toHaveText('Nível 0/10');
+        await expect(points(page)).toHaveText('Pontos de talento: 5');
     });
 
     test('a second Shift click while the request runs sends nothing', async ({ page }) => {
@@ -218,6 +234,10 @@ test.describe('Shift buys the most (UIP-09)', () => {
         await button.click();
         await expect(button).toHaveAttribute('aria-disabled', 'true');
         await button.click({ force: true });
+
+        //  The first request reaches the backend, the second click adds none
+        await expect.poll(() => fake.talentUpgrades().length).toBe(1);
+        await page.waitForTimeout(300);
 
         expect(fake.talentUpgrades()).toHaveLength(1);
         release();
