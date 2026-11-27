@@ -167,7 +167,7 @@ const ALLY_TEXT = { color: '#7fd4ff', fontSize: 28, stroke: '#1c120c', strokeThi
 
 ### Phase 2: Test debt and author check
 
-#### T3: Hero-team test debt: the respawn record and the E3 title [ ]
+#### T3: Hero-team test debt: the respawn record and the E3 title [x]
 
 **Owner**: test-engineer
 **Goal**: The kill-and-respawn e2e test asserts the respawned monster from a record taken when it is shown, and the E3 domain test names Lyra (TDP-02; spec Test debt AC 1 to 4, Q2, Q3).
@@ -213,11 +213,11 @@ const shownMonsters = (page) => page.evaluate(() => window.__shownMonsters);
 **Gate**: `cd game && npm test && npx playwright test e2e/heroTeamCombat.spec.js && npx playwright test e2e/heroTeamCombat.spec.js --repeat-each=5 --workers=3`
 **Done when**:
 
-- [ ] `grep -n "s.monster && !s.monster.dead" game/e2e/heroTeamCombat.spec.js` prints nothing.
-- [ ] `grep -n "E3: Orina" game/src/domain/skills/skillCombat.test.js` prints nothing; `grep -c "E3: Lyra 3 stars, an ally without a defense passive" game/src/domain/skills/skillCombat.test.js` prints 1.
-- [ ] The repeat run passes 5 of 5 for every test of the file.
-- [ ] Remove `heroTeamCombat.spec.js:324` from the flake list of `.specs/STATE.md` § Handoff, Notes for the resume (1), in the same commit.
-- [ ] The commit touches exactly the 2 test files, `.specs/STATE.md` and this file.
+- [x] `grep -n "s.monster && !s.monster.dead" game/e2e/heroTeamCombat.spec.js` prints nothing.
+- [x] `grep -n "E3: Orina" game/src/domain/skills/skillCombat.test.js` prints nothing; `grep -c "E3: Lyra 3 stars, an ally without a defense passive" game/src/domain/skills/skillCombat.test.js` prints 1.
+- [x] The repeat run passes 5 of 5 for every test of the file.
+- [x] Remove `heroTeamCombat.spec.js:324` from the flake list of `.specs/STATE.md` § Handoff, Notes for the resume (1), in the same commit.
+- [x] The commit touches exactly the 2 test files, `.specs/STATE.md` and this file.
 
 **Commit**: `test(game): read the respawned monster from a record and name Lyra in E3`
 

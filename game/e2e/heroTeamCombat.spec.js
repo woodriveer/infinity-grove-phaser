@@ -39,6 +39,19 @@ const freeze = (page) => page.evaluate(() => {
     game.scene.getScene('ClickerGame').allies.untilTickMs = 1000;
 });
 const wake = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.wake());
+//  Records the main monster at the moment each encounter is shown, inside showEncounter: a respawned monster that the allies kill again a
+//  second later is read from this record, never from the live scene (L-112, TD-012)
+const recordShownMonsters = (page) => page.evaluate(() => {
+    const game = window.__PHASER_GAME__.scene.getScene('ClickerGame');
+    const show = game.showEncounter.bind(game);
+
+    window.__shownMonsters = [];
+    game.showEncounter = (encounter) => {
+        show(encounter);
+        window.__shownMonsters.push(game.monster ? { health: game.monster.health, dead: game.monster.dead } : null);
+    };
+});
+const shownMonsters = (page) => page.evaluate(() => window.__shownMonsters);
 
 const startTeam = async (page, {
     chapter: campaignChapter = 5, stage = 1, encounter = 'PHASE', completed, cleared = [ 5 ], copper = 0, team, leader = 'kael', stars = {}, equipment, talents,
@@ -69,6 +82,12 @@ const startTeam = async (page, {
     await expect(menu.message).toHaveText('Welcome back, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
+    //  The first ally tick lands 1000 ms after the team loads: under load that is shorter than the wait below, so the loop sleeps first
+    if (stop)
+    {
+        await page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
+    }
+
     //  The heroes load in the background; the skill bar of the leader is the sign that they did
     await expect(page.getByTestId('skill-slot-1')).toBeVisible();
 
@@ -333,11 +352,12 @@ test.describe('Hero team: ally hits', () => {
         expect(await allyTexts(page)).toEqual([ { text: '20', x: 740, size: '28px' } ]);
         expect(await scene(page, '(s) => s.monster.dead')).toBe(true);
 
-        //  The respawn, the flying coins and the report run in real time
+        //  The respawn, the flying coins and the report run in real time; the new monster is read from the record of showEncounter (TD-012)
+        await recordShownMonsters(page);
         await wake(page);
 
         await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 0 Copper: 3');
-        await expect.poll(() => scene(page, '(s) => s.monster && !s.monster.dead && s.monster.health')).toBe(10);
+        await expect.poll(() => shownMonsters(page)).toEqual([ { health: 10, dead: false } ]);
     });
 
     test('an ally hit keeps the combo streak', async ({ page }) => {

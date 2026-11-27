@@ -992,7 +992,7 @@ describe('allyHit', () => {
         expect(land(combat(), monsterWith('FIRE', 50), ally())).toBeCloseTo(1, 9);
     });
 
-    it('E3: Orina 3 stars with a 10 click weapon and a +20 % ring deals 105.6 to a NATURE monster with defense 50', () => {
+    it('E3: Lyra 3 stars, an ally without a defense passive, with a 10 click weapon and a +20 % ring deals 105.6 to a NATURE monster with defense 50', () => {
         const pieces = [ piece('WEAPON', [], { clickDamage: 10 }), piece('RING', [ { type: 'CLICK_DAMAGE_PCT', value: 20 } ]) ];
 
         expect(land(combat(), monsterWith('NATURE', 50), ally(3, pieces))).toBeCloseTo(105.6, 9);
