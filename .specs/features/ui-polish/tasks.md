@@ -960,7 +960,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 
 **Commit**: `docs(ui): review the ui polish`
 
-#### F2: The leader card shows the hand cursor [ ]
+#### F2: The leader card shows the hand cursor [x]
 
 **Owner**: game-dev
 **Goal**: The leader card of Equipe is a button that opens `Escolher líder`, so it shows `cursor: pointer` while enabled (ui-review finding #1).

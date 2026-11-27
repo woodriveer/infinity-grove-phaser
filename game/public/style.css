@@ -3489,7 +3489,7 @@ body.piece-dragging .piece-tooltip {
 .team-dps { margin: 0; font-family: var(--font-heading); font-weight: 700; font-size: 18px; color: var(--ink-900); }
 .team-slots { display: flex; gap: 16px; justify-content: center; }
 .team-slot { box-sizing: border-box; width: 132px; height: 210px; padding: 8px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; background: transparent; border: 2px solid var(--wood-600); font: inherit; color: var(--ink-900); cursor: pointer; }
-.team-slot[data-state="leader"] { background: var(--parchment-100); border: 3px solid #e8b64c; cursor: default; }
+.team-slot[data-state="leader"] { background: var(--parchment-100); border: 3px solid #e8b64c; cursor: pointer; }
 .team-slot[data-state="filled"] { background: var(--parchment-100); }
 .team-slot[data-state="empty"] { border-style: dashed; }
 .team-slot[data-state="buyable"] { border-color: var(--gold-400); }

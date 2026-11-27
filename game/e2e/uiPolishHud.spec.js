@@ -370,10 +370,12 @@ test.describe('Equipe replaces Líder (UIP-13)', () => {
         await expect.poll(() => handle.calls.filter((call) => call.method === 'PUT' && call.path === '/team').length).toBe(1);
 
         await expect(slot(page, 0)).toBeDisabled();
+        await expect(slot(page, 0)).toHaveCSS('cursor', 'default');
 
         release();
 
         await expect(slot(page, 0)).toBeEnabled();
+        await expect(slot(page, 0)).toHaveCSS('cursor', 'pointer');
     });
 
     test('a new leader taken from an ally slot puts the old one there', async ({ page }) => {
