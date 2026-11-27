@@ -4143,6 +4143,17 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         expect(ctx.texts.at(-1)).toMatchObject({ text: '14', style: expect.objectContaining({ color: '#ff8a1f', fontSize: 48 }) });
     });
 
+    it('keeps the click outline #2a1408 at 8 px on a normal and a critical skill hit', async () => {
+        const ctx = await createScene({ start: big(), heroes: leaderOf('kael', 3) });
+
+        key(ctx, 'ONE');
+        expect(ctx.texts.at(-1).style).toMatchObject({ color: '#ffd35c', fontSize: 32, stroke: '#2a1408', strokeThickness: 8 });
+
+        ctx.dice.value = 0;
+        key(ctx, 'TWO');
+        expect(ctx.texts.at(-1).style).toMatchObject({ color: '#ff8a1f', fontSize: 48, stroke: '#2a1408', strokeThickness: 8 });
+    });
+
     it('never shows a tick as critical, whatever the roll', async () => {
         const ctx = await createScene({ start: big(), heroes: leaderOf('orina', 2) });
 
@@ -5370,6 +5381,15 @@ describe('ClickerGame hero team', () => {
 
         expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '4' ]);
         expect(ctx.scene.monster.health).toBe(6);
+    });
+
+    it('the one summed number of two allies in the same tick uses the dark 10 px outline', async () => {
+        const ctx = await open([ 'lyra', 'orina', null, null ]);
+
+        ctx.scene.update(0, 1000);
+
+        expect(allyTexts(ctx)).toHaveLength(1);
+        expect(allyTexts(ctx)[0].style).toMatchObject({ color: ALLY_BLUE, fontSize: 28, stroke: '#1c120c', strokeThickness: 10 });
     });
 
     it('Seraphine as an ally multiplies every ally hit by 1.25', async () => {

@@ -84,6 +84,15 @@ test.describe('Equipment UI', () => {
         expect(fits.every(Boolean)).toBe(true);
     });
 
+    test('only the defense break line is pinned to grid column 1', async ({ page }) => {
+        await startGame(page);
+        await openEquipment(page);
+
+        await expect(page.getByTestId('stat-breakDefense')).toHaveCSS('grid-column-start', '1');
+        await expect(page.getByTestId('stat-breakCrit')).toHaveCSS('grid-column-start', 'auto');
+        await expect(page.getByTestId('stat-minibossTime')).toHaveCSS('grid-column-start', 'auto');
+    });
+
     test('shows the bag as tiles with a frame per rarity', async ({ page }) => {
         await startGame(page);
         await openEquipment(page);

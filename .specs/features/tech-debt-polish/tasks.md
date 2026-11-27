@@ -223,7 +223,7 @@ const shownMonsters = (page) => page.evaluate(() => window.__shownMonsters);
 
 ---
 
-#### T4: Author check [ ]
+#### T4: Author check [x]
 
 **Owner**: test-engineer
 **Goal**: Every AC and edge case of the spec has a test that asserts its spec value, and the tests kill the injected faults (TDP-01, TDP-02, TDP-03).
@@ -243,7 +243,7 @@ const shownMonsters = (page) => page.evaluate(() => window.__shownMonsters);
 **Gate**: `cd game && npm test && npx playwright test e2e/equipmentUi.spec.js e2e/heroTeamCombat.spec.js`
 **Done when**:
 
-- [ ] Every AC and edge case maps to a test; every mutant is killed or a fix task is listed.
+- [x] Every AC and edge case maps to a test; every mutant is killed or a fix task is listed.
 
 **Commit**: `test: author check of the tech debt polish`
 
@@ -302,3 +302,50 @@ const shownMonsters = (page) => page.evaluate(() => window.__shownMonsters);
 | T3 | Existing tests | e2e + unit | e2e + unit | ✅ OK |
 | T4 | check | - | e2e + unit runs | ✅ OK |
 | T5 | UI review artifact | none | none | ✅ OK |
+
+---
+
+## Author Check
+
+Run on 2026-11-27 by the `test-engineer` after T1 to T3. Gaps found and closed in this task: Edge 3 had no assertion on the outline (unit and e2e), AC 2 had no assertion on a skill hit or a critical click number (stroke), Edge 2 had no e2e assertion on the add, and the one CSS value the spec names (`grid-column-start: 1`) had no `toHaveCSS`.
+
+### AC to assertion table
+
+| AC | Unit (`file:line`) | E2E (`file:line`) | Exact value asserted |
+| --- | --- | --- | --- |
+| TDP-01 AC 1 | `equipmentView.test.js:82` | `equipmentUi.spec.js:55`, `:87` (`toHaveCSS`) | `breakDefense.y === breakCrit.y`; `breakDefense.x === element.x`; `breakCrit.x === clickDamage.x`; computed `grid-column-start` `1` on `stat-breakDefense`, `auto` on `stat-breakCrit` and `stat-minibossTime` |
+| TDP-01 AC 2 | none (layout is CSS) | `equipmentUi.spec.js:55` | `minibossTime.y === bossTime.y`, `minibossTime.x === element.x`, `bossTime.x === clickDamage.x`, `minibossTime.y < breakDefense.y` |
+| TDP-01 AC 3 | `leaderStats.test.js:13` (order); `equipmentView.test.js:82` (ids) | `unifiedDamage.spec.js:214` (`Quebra de defesa: 3`, 10 lines at `:224`); `heroTeamPassives.spec.js:249` (`15` and `15`) | order, ids and texts unchanged |
+| TDP-01 AC 4 | none (layout is CSS) | `equipmentUi.spec.js:77` | 10 lines, each `scrollWidth <= clientWidth` |
+| TDP-01 Edge 1 | none | `equipmentUi.spec.js:55` | `Quebra de defesa: 0`, `Quebra de resistência a crítico: 0` |
+| TDP-02 AC 1 | test-debt AC: the e2e is the artefact | `heroTeamCombat.spec.js:343` | `shownMonsters` equals `[ { health: 10, dead: false } ]`; `grep "s.monster && !s.monster.dead"` prints nothing |
+| TDP-02 AC 2 | same | `heroTeamCombat.spec.js:343` | `[ { text: '20', x: 740, size: '28px' } ]`, `s.monster.dead` true, wallet `Copper: 0` then `Copper: 3`, health 10 |
+| TDP-02 AC 3 | same | `--repeat-each=5 --workers=3`: 130 of 130 passed (a first run had 1 failure in `startTeam`, see T3 commit; fixed, rerun 130 of 130) | 5 of 5 per test |
+| TDP-02 AC 4 | `skillCombat.test.js:995` | none (domain test) | title `E3: Lyra 3 stars, an ally without a defense passive, ...`; `toBeCloseTo(105.6, 9)` |
+| TDP-03 AC 1 | `ClickerGame.test.js:5364` | `heroTeamCombat.spec.js:391` | `#7fd4ff`, 28 px, `Cinzel`, `700`, stroke `#1c120c`, thickness `10` |
+| TDP-03 AC 2 | `ClickerGame.test.js:2086`, `:2094`, `:2103`, `:4135`, `:4146` | `heroTeamCombat.spec.js:401`, `:409` | click `#ffd35c` 32 px, critical `#ff8a1f` 48 px, stroke `#2a1408`, thickness `8`; skill hit normal and critical the same |
+| TDP-03 AC 3 | none | none | measured by the `ui-artist` in T5 (two ratios at least 3:1) |
+| TDP-03 Edge 2 | `ClickerGame.test.js:6394` | `minibossAddsTarget.spec.js:190` (line `:203`) | x 520, stroke `#1c120c`, thickness `10` |
+| TDP-03 Edge 3 | `ClickerGame.test.js:5386` | `heroTeamCombat.spec.js:417` | one ally text, 28 px, stroke `#1c120c`, thickness `10` |
+
+### Mutants (`node scripts/sensor.mjs`, 11 mutants, 11 killed, 0 survived, 0 invalid)
+
+| Mutant | Change | Killed by |
+| --- | --- | --- |
+| M1 | `style.css`: `grid-column-start: 1;` removed | `equipmentUi.spec.js` `share the last row` |
+| M2 | `style.css`: `grid-column-start: 2;` | `equipmentUi.spec.js` `share the last row` |
+| M3u, M3e | `ALLY_TEXT.strokeThickness` 8 | `ClickerGame.test.js` `10 px outline`; `heroTeamCombat.spec.js` `dark 10 px outline` |
+| M4u, M4e | `ALLY_TEXT.stroke` `#2a1408` | same two |
+| M5u, M5e | `NORMAL_TEXT` given `strokeThickness: 10` | `ClickerGame.test.js` (whole file); `heroTeamCombat.spec.js` `click number keeps` |
+| M5c | `CRITICAL_TEXT` given `strokeThickness: 10` | `ClickerGame.test.js` (whole file) |
+| M6u, M6e | `renderLeaderStats` without `data-stat` | `equipmentView.test.js`; `equipmentUi.spec.js` `share the last row` |
+
+### Suites
+
+- Game unit: 94 files, 2377 tests passed.
+- E2E (own files only): `equipmentUi.spec.js`, `heroTeamCombat.spec.js`, `minibossAddsTarget.spec.js`: 53 passed. `heroTeamCombat.spec.js` repeat run (`--repeat-each=5 --workers=3`): 130 passed.
+- Backend: not run (the feature changes no backend file).
+
+### Fix tasks
+
+None. No surviving mutant and no AC without a test; TDP-03 AC 3 belongs to T5.

@@ -200,6 +200,8 @@ test.describe('Miniboss target', () => {
 
         expect((await state(page)).adds).toEqual([ 27, 30 ]);
         expect(await lastNumber(page)).toMatchObject({ text: '2', x: 520, y: 360, color: ALLY });
+        //  Spec tech-debt-polish Edge 2: the number on an add has the same dark 10 px outline
+        expect(await scene(page, `(s) => s.children.list.filter((o) => o.type === "Text" && o.style.color === "${ALLY}").map((o) => [ o.style.stroke, o.style.strokeThickness ]).at(-1)`)).toEqual([ '#1c120c', 10 ]);
     });
 
     //  The task wrote allies Lyra and Orina with 99.58 and 0.4, but Orina's Erosão Arcana takes 15 points off the defense of every hit (spec

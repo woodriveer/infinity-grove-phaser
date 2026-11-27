@@ -406,6 +406,23 @@ test.describe('Hero team: ally hits', () => {
         expect(await lastTextStyle(page, '#ffd35c')).toMatchObject({ stroke: '#2a1408', strokeThickness: 8, fontSize: '32px' });
     });
 
+    test('a critical click number keeps the orange fill, 48 px and the 8 px outline', async ({ page }) => {
+        await startTeam(page, { team: LYRA_IN_SLOT_1, roll: 0 });
+
+        await strike(page);
+
+        expect(await lastTextStyle(page, '#ff8a1f')).toMatchObject({ color: '#ff8a1f', stroke: '#2a1408', strokeThickness: 8, fontSize: '48px' });
+    });
+
+    test('two allies in one tick draw one number with the dark 10 px outline', async ({ page }) => {
+        await startTeam(page, { team: { boughtSlots: 2, allies: [ 'lyra', 'orina', null, null ] } });
+
+        await advance(page, 1_000);
+
+        expect(await allyTexts(page)).toHaveLength(1);
+        expect(await lastTextStyle(page, ALLY_COLOR)).toMatchObject({ fontSize: '28px', stroke: '#1c120c', strokeThickness: 10 });
+    });
+
     test('ally hits keep landing while Heróis is open', async ({ page }) => {
         await startTeam(page, { health: 10, team: LYRA_IN_SLOT_1 });
 
