@@ -220,6 +220,113 @@ class TalentsTest {
     }
 
     @Test
+    fun `an upgrade of 5 levels with 5 points raises COMBO from 0 to 5 and spends 5`() {
+        val upgrade = PlayerTalents("yan", earned = 5).upgrade(combo, 0, rules, 5)
+
+        assertEquals(5, upgrade.talents.level("COMBO"))
+        assertEquals(5, upgrade.cost)
+        assertEquals(0, upgrade.talents.points(rules).available)
+    }
+
+    @Test
+    fun `an upgrade of 2 grade 2 levels spends 4 points`() {
+        val g2 = TalentCatalog.find("COMBO_G2")
+
+        val upgrade = PlayerTalents("yan", mapOf("COMBO" to 10), earned = 14).upgrade(g2, 0, rules, 2)
+
+        assertEquals(2, upgrade.talents.level("COMBO_G2"))
+        assertEquals(4, upgrade.cost)
+        assertEquals(0, upgrade.talents.points(rules).available)
+    }
+
+    @Test
+    fun `an upgrade of 4 Fúria crescente levels spends 8 points`() {
+        val upgrade = PlayerTalents("yan", mapOf("COMBO" to 10), earned = 19).upgrade(fury, 0, rules, 4)
+
+        assertEquals(4, upgrade.talents.level("COMBO_FURY"))
+        assertEquals(8, upgrade.cost)
+        assertEquals(1, upgrade.talents.points(rules).available)
+    }
+
+    @Test
+    fun `an upgrade that reaches exactly the top level is accepted`() {
+        val upgrade = PlayerTalents("yan", mapOf("CLICK_DAMAGE" to 8), earned = 20).upgrade(clickDamage, 8, rules, 2)
+
+        assertEquals(10, upgrade.talents.level("CLICK_DAMAGE"))
+        assertEquals(2, upgrade.cost)
+    }
+
+    @Test
+    fun `an upgrade past the top level refuses as max level with the level and the count and changes nothing`() {
+        val talents = PlayerTalents("yan", mapOf("CLICK_DAMAGE" to 8), earned = 20)
+
+        val e = assertFailsWith<TalentMaxLevelException> { talents.upgrade(clickDamage, 8, rules, 3) }
+
+        assertEquals("TALENT_MAX_LEVEL", e.code)
+        assertEquals("Talent 'CLICK_DAMAGE' at level 8 cannot rise 3 levels", e.message)
+        assertEquals(8, talents.level("CLICK_DAMAGE"))
+    }
+
+    @Test
+    fun `a stored level at the top keeps the old max level text with a count`() {
+        val talents = PlayerTalents("yan", mapOf("CLICK_DAMAGE" to 10), earned = 30)
+
+        val e = assertFailsWith<TalentMaxLevelException> { talents.upgrade(clickDamage, 10, rules, 2) }
+
+        assertEquals("Talent 'CLICK_DAMAGE' is already at the maximum level", e.message)
+    }
+
+    @Test
+    fun `an upgrade of 5 levels with 4 points refuses with the total cost and changes nothing`() {
+        val talents = PlayerTalents("yan", earned = 4)
+
+        val e = assertFailsWith<NotEnoughTalentPointsException> { talents.upgrade(combo, 0, rules, 5) }
+
+        assertEquals("NOT_ENOUGH_TALENT_POINTS", e.code)
+        assertEquals("5 talent levels cost 5 points, the player has 4", e.message)
+        assertEquals(0, talents.level("COMBO"))
+    }
+
+    @Test
+    fun `one level keeps the one level refusal text`() {
+        val talents = PlayerTalents("yan", mapOf("COMBO" to 2), earned = 2)
+
+        val e = assertFailsWith<NotEnoughTalentPointsException> { talents.upgrade(combo, 2, rules) }
+
+        assertEquals("A talent level costs 1 points, the player has 0", e.message)
+    }
+
+    @Test
+    fun `a mismatch is checked before the count`() {
+        val talents = PlayerTalents("yan", mapOf("CLICK_DAMAGE" to 3), earned = 9)
+
+        assertFailsWith<TalentLevelMismatchException> { talents.upgrade(clickDamage, 2, rules, 5) }
+    }
+
+    @Test
+    fun `a locked grade refuses a count as locked`() {
+        val g2 = TalentCatalog.find("COMBO_G2")
+        val talents = PlayerTalents("yan", mapOf("COMBO" to 5), earned = 20)
+
+        assertFailsWith<TalentLockedException> { talents.upgrade(g2, 0, rules, 2) }
+    }
+
+    @Test
+    fun `requireLevelCount accepts 1 to the top level and refuses the rest`() {
+        assertEquals(1, combo.requireLevelCount(1))
+        assertEquals(10, combo.requireLevelCount(10))
+        assertEquals(4, fury.requireLevelCount(4))
+
+        listOf(0, -1, 11).forEach { levels ->
+            val e = assertFailsWith<TalentRequestException> { combo.requireLevelCount(levels) }
+            assertEquals("levels must be an integer between 1 and 10", e.message)
+        }
+
+        val e = assertFailsWith<TalentRequestException> { fury.requireLevelCount(5) }
+        assertEquals("levels must be an integer between 1 and 4", e.message)
+    }
+
+    @Test
     fun `a request made for another level than the stored one is a mismatch and changes nothing`() {
         val talents = PlayerTalents("yan", mapOf("CLICK_DAMAGE" to 3), earned = 9)
 

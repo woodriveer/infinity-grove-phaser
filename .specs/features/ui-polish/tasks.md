@@ -86,7 +86,7 @@ T17
 
 ### Phase 1: Backend
 
-#### T1: The talent domain buys several levels at once [ ]
+#### T1: The talent domain buys several levels at once [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: `PlayerTalents.upgrade` raises a talent by `count` levels for `count x costPerLevel` points, all or nothing, with the refusals of spec UIP-08 AC 4 to 7.
@@ -141,8 +141,8 @@ Every existing `TalentsTest` case passes unchanged (the one-level path keeps its
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The 11 new cases pass and the whole backend suite passes.
-- [ ] The commit touches exactly `Talents.kt`, `TalentExceptions.kt`, `TalentsTest.kt`, this file and `spec.md`.
+- [x] The 11 new cases pass and the whole backend suite passes.
+- [x] The commit touches exactly `Talents.kt`, `TalentExceptions.kt`, `TalentsTest.kt`, this file and `spec.md`.
 
 **Commit**: `feat(backend): raise a talent by several levels in one upgrade`
 

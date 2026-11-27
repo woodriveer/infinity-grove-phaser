@@ -25,7 +25,16 @@ class TalentLevelMismatchException(
 
 class TalentMaxLevelException(
     talentId: String,
-) : TalentConflictException("TALENT_MAX_LEVEL", "Talent '$talentId' is already at the maximum level")
+    fromLevel: Int? = null,
+    levels: Int? = null,
+) : TalentConflictException(
+        "TALENT_MAX_LEVEL",
+        if (levels == null) {
+            "Talent '$talentId' is already at the maximum level"
+        } else {
+            "Talent '$talentId' at level $fromLevel cannot rise $levels levels"
+        },
+    )
 
 /** The previous grade of the talent is not at its top level yet, so this grade is closed. */
 class TalentLockedException(
@@ -36,4 +45,12 @@ class TalentLockedException(
 class NotEnoughTalentPointsException(
     available: Int,
     cost: Int,
-) : TalentConflictException("NOT_ENOUGH_TALENT_POINTS", "A talent level costs $cost points, the player has $available")
+    levels: Int = 1,
+) : TalentConflictException(
+        "NOT_ENOUGH_TALENT_POINTS",
+        if (levels == 1) {
+            "A talent level costs $cost points, the player has $available"
+        } else {
+            "$levels talent levels cost $cost points, the player has $available"
+        },
+    )

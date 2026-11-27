@@ -56,6 +56,14 @@ data class TalentDefinition(
         return level
     }
 
+    /** How many levels one request may buy: 1 to the top level. */
+    fun requireLevelCount(levels: Int): Int {
+        if (levels !in 1..maxLevel) {
+            throw TalentRequestException("levels must be an integer between 1 and $maxLevel")
+        }
+        return levels
+    }
+
     companion object {
         const val MAX_LEVEL = 10
         const val MAX_GRADE = 3
@@ -199,13 +207,15 @@ data class PlayerTalents(
     ): Int? = definition.costPerLevel(rules).takeIf { level(definition.id) < definition.maxLevel }
 
     /**
-     * Raises [definition] by one level. [fromLevel] is the level the player saw: any other stored level means a repeated or stale request
-     * and nothing changes. Returns the new levels and the points the level costs; they are derived from the levels, so the caller stores only the level.
+     * Raises [definition] by [count] levels (1 by default). [fromLevel] is the level the player saw: any other stored level means a repeated
+     * or stale request. Nothing changes on any refusal. Returns the new levels and the points the levels cost; they are derived from the
+     * levels, so the caller stores only the level.
      */
     fun upgrade(
         definition: TalentDefinition,
         fromLevel: Int,
         rules: TalentRules,
+        count: Int = 1,
     ): TalentUpgrade {
         val stored = level(definition.id)
 
@@ -230,22 +240,41 @@ data class PlayerTalents(
             throw TalentMaxLevelException(definition.id)
         }
 
-        val cost = definition.costPerLevel(rules)
+        if (stored + count > definition.maxLevel) {
+            logger.warn(
+                "Talent upgrade refused, past max level username={} talent={} stored={} levels={}",
+                username,
+                definition.id,
+                stored,
+                count,
+            )
+            throw TalentMaxLevelException(definition.id, stored, count)
+        }
+
+        val cost = definition.costPerLevel(rules) * count
         val available = points(rules).available
 
         if (available < cost) {
             logger.warn(
-                "Talent upgrade refused, not enough points username={} talent={} available={} cost={}",
+                "Talent upgrade refused, not enough points username={} talent={} available={} cost={} levels={}",
                 username,
                 definition.id,
                 available,
                 cost,
+                count,
             )
-            throw NotEnoughTalentPointsException(available, cost)
+            throw NotEnoughTalentPointsException(available, cost, count)
         }
 
-        logger.info("Talent upgrade accepted username={} talent={} level={} points={}", username, definition.id, stored + 1, cost)
-        return TalentUpgrade(copy(levels = levels + (definition.id to stored + 1)), cost)
+        logger.info(
+            "Talent upgrade accepted username={} talent={} levels={} level={} points={}",
+            username,
+            definition.id,
+            count,
+            stored + count,
+            cost,
+        )
+        return TalentUpgrade(copy(levels = levels + (definition.id to stored + count)), cost)
     }
 
     companion object {
