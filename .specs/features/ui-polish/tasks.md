@@ -711,7 +711,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 
 ---
 
-#### T12: Talentos in place and without dimming, in the browser [ ]
+#### T12: Talentos in place and without dimming, in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: UIP-06 and UIP-07 hold in Chrome: no element of the board is rebuilt and no button dims; the fake backend learns `levels`.
@@ -754,7 +754,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/uiPolishTalents.spec.js e2e/talents.spec.js e2e/talentTreeRework.spec.js e2e/talentTreeBranches.spec.js e2e/talentTreeBranchesCard.spec.js e2e/earlyGameRebalanceTalents.spec.js`
 **Done when**:
 
-- [ ] The 15 scenarios pass; the five existing talent files pass unchanged.
+- [x] The 15 scenarios pass; the five existing talent files pass unchanged.
 
 **Commit**: `test(game): pin the in-place Talentos screen in the browser`
 

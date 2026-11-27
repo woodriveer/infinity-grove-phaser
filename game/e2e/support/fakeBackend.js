@@ -205,7 +205,8 @@ const pieceView = (piece) => ({
 
 //  Talent contract (TalentController): the 28 talents of the backend catalog, 9 in 3 grades (level 0 to 10, a level costs its grade in talent points, grade N opens at level 10 of
 //  grade N - 1) and the single Fúria crescente (level 0 to 4, 2 points a level, opens at level 10 of COMBO); every talent answers maxLevel, requiredId and requiredLevel;
-//  the first clear of a phase pays nothing, of a miniboss 2 and of a chapter boss 5; POST /talents/reset takes every level back
+//  the first clear of a phase pays nothing, of a miniboss 2 and of a chapter boss 5; POST /talents/reset takes every level back; an upgrade may carry `levels` (an integer from 1 to
+//  maxLevel, absent or null is 1) and buys exactly that many levels or none (spec ui-polish, UIP-08)
 const TALENT_CATALOG = [
     [ 'MINIBOSS_TIME', 'TIME', 'Tempo do miniboss', 's', 2 ], [ 'BOSS_DAMAGE', 'TIME', 'Dano contra chefes', '%', 2 ],
     [ 'PHYSICAL_BREAK', 'BREAK', 'Quebra de defesa', 'points', 1 ],
@@ -258,6 +259,9 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  equipment {name: [raw pieces]} (starting bags, default empty), equipmentDrops (the pieces the next won bosses drop, one each, in order) and
 //  talents {name: {TALENT_ID: level}} (starting levels, default 0; an upgrade takes one talent point like the backend) and
 //  talentPoints {name: n} (points available at the start, on top of the ones the starting levels cost; first clears pay more) and
+//  talentLevels (default true; false answers every upgrade as a backend without `levels` does: one level whatever was sent) and
+//  holdTalents() -> release() holds POST /talents/{id}/upgrade and POST /talents/reset, failNextTalentRequest({ status = 500, code }) makes the next one of them answer that problem,
+//  talentUpgrades() lists the upgrades received ({ id, body }), talentResets() counts the resets, grantTalentPoints(name, n) pays n points like a first clear and
 //  autoClick {name: { level, crystals }} (default level 0 and 0 crystals; the upgrade follows AutoClickController) and
 //  lastChapter (the last chapter a cleared chapter boss opens, default 1: the boss of that chapter completes the campaign).
 //  legacy {name: {chapter: percent}} (the legacy of the account resets, default none; GET /account/legacy and the reset answer follow reset-legacy-drops, a reset raises its
@@ -273,7 +277,7 @@ export async function mockBackend (page, {
     chapterDefinitions = {},
     cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = [],
     talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1, healthDelayMs = 0, team: startingTeam = {}, gifts: startingGifts = {},
-    legacy: startingLegacy = {}, legacyEndpoint = true
+    legacy: startingLegacy = {}, legacyEndpoint = true, talentLevels = true
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -289,6 +293,12 @@ export async function mockBackend (page, {
     let teamHold = null;
     //  The next team request answers this problem instead ({ status, code }), set by failNextTeamRequest
     let teamFailure = null;
+    //  POST /talents/{id}/upgrade and POST /talents/reset wait on this promise while holdTalents() holds them; the next one answers talentFailure instead ({ status, code })
+    let talentHold = null;
+    let talentFailure = null;
+    //  Every upgrade received, as { id, body }, and the number of resets received
+    const talentUpgrades = [];
+    let talentResets = 0;
 
     const dropsOf = (ruleId) => (Array.isArray(drops) ? drops : drops[ruleId] ?? DEFAULT_DROPS);
     const nextDrop = (ruleId) => {
@@ -525,7 +535,19 @@ export async function mockBackend (page, {
         return route.fulfill({ json: legacyEndpoint ? { ...answer, legacy: legacyView(percents, progressOf(username)) } : answer });
     };
 
-    const handleTalents = (route, method, path, body, now) => {
+    //  Waits for holdTalents() and answers the problem failNextTalentRequest() set, once; null when the request goes on
+    const talentGate = async (route) => {
+        if (talentHold) { await talentHold; }
+
+        if (!talentFailure) { return null; }
+
+        const { status, code } = talentFailure;
+
+        talentFailure = null;
+        return route.fulfill(problem(status, 'Failed', code));
+    };
+
+    const handleTalents = async (route, method, path, body, now) => {
         const username = authenticated(route, now);
 
         if (!username) { return null; }
@@ -537,6 +559,12 @@ export async function mockBackend (page, {
         }
 
         if (method === 'POST' && path === '/talents/reset') {
+            talentResets += 1;
+
+            const failed = await talentGate(route);
+
+            if (failed !== null) { return failed; }
+
             Object.keys(levels).forEach((id) => { delete levels[id]; });
             return route.fulfill({ json: { talents: talentsView(levels), points: pointsView(earnedOf(username), levels) } });
         }
@@ -545,6 +573,12 @@ export async function mockBackend (page, {
 
         if (method !== 'POST' || !action) { return route.fulfill(problem(404, 'Not found')); }
 
+        talentUpgrades.push({ id: decodeURIComponent(action[1]), body: { ...body } });
+
+        const gated = await talentGate(route);
+
+        if (gated !== null) { return gated; }
+
         const id = decodeURIComponent(action[1]);
 
         const talent = TALENTS.find((candidate) => candidate.id === id);
@@ -552,14 +586,21 @@ export async function mockBackend (page, {
         if (!talent) { return route.fulfill(problem(404, `Talent '${id}' not found`, 'TALENT_NOT_FOUND')); }
         if (!Number.isInteger(body.fromLevel) || body.fromLevel < 0 || body.fromLevel > talent.maxLevel) { return route.fulfill(problem(400, `fromLevel must be an integer between 0 and ${talent.maxLevel}`, 'INVALID_TALENT_REQUEST')); }
 
+        //  A backend without the feature ignores `levels` (talentLevels false)
+        const count = talentLevels ? body.levels ?? 1 : 1;
+
+        if (!Number.isInteger(count)) { return route.fulfill(problem(400, 'levels must be an integer', 'INVALID_TALENT_REQUEST')); }
+        if (count < 1 || count > talent.maxLevel) { return route.fulfill(problem(400, `levels must be an integer between 1 and ${talent.maxLevel}`, 'INVALID_TALENT_REQUEST')); }
+
         const level = levels[id] ?? 0;
 
         if (body.fromLevel !== level) { return route.fulfill(problem(409, `Talent '${id}' is at level ${level}`, 'TALENT_LEVEL_MISMATCH')); }
         if (!isUnlocked(talent, levels)) { return route.fulfill(problem(409, 'Talent grade is locked', 'TALENT_LOCKED')); }
         if (level >= talent.maxLevel) { return route.fulfill(problem(409, 'Talent is already at the maximum level', 'TALENT_MAX_LEVEL')); }
-        if (pointsView(earnedOf(username), levels).available < talent.cost) { return route.fulfill(problem(409, 'Not enough talent points', 'NOT_ENOUGH_TALENT_POINTS')); }
+        if (level + count > talent.maxLevel) { return route.fulfill(problem(409, `Talent '${id}' at level ${level} cannot rise ${count} levels`, 'TALENT_MAX_LEVEL')); }
+        if (pointsView(earnedOf(username), levels).available < count * talent.cost) { return route.fulfill(problem(409, 'Not enough talent points', 'NOT_ENOUGH_TALENT_POINTS')); }
 
-        levels[id] = level + 1;
+        levels[id] = level + count;
         return route.fulfill({ json: { talents: talentsView(levels), points: pointsView(earnedOf(username), levels) } });
     };
 
@@ -1220,6 +1261,28 @@ export async function mockBackend (page, {
         //  The next team request (PUT /team, POST /team/slots or PUT /leader) answers this problem instead of its result
         failNextTeamRequest: ({ status = 500, code } = {}) => {
             teamFailure = { status, code };
+        },
+        //  Holds every POST /talents/{id}/upgrade and POST /talents/reset until the returned release() runs
+        holdTalents: () => {
+            let release = () => {};
+            const held = new Promise((resolve) => { release = resolve; });
+
+            talentHold = held;
+            return () => {
+                if (talentHold === held) { talentHold = null; }
+                release();
+            };
+        },
+        //  The next talent request (an upgrade or a reset) answers this problem instead of its result
+        failNextTalentRequest: ({ status = 500, code } = {}) => {
+            talentFailure = { status, code };
+        },
+        //  The upgrades received so far, as { id, body } in order, and the number of resets received
+        talentUpgrades: () => [ ...talentUpgrades ],
+        talentResets: () => talentResets,
+        //  Pays talent points to a player, as a first clear does
+        grantTalentPoints: (username, points) => {
+            earnedByUser.set(username, earnedOf(username) + points);
         },
         //  Holds every POST /farm/outcome until the returned release() runs: the win is applied and answered only then
         holdOutcome: () => {
