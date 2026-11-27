@@ -11,7 +11,7 @@ const CHAPTER = {
     boss: ARMORED,
     stages: [ { number: 1, phasesPerStage: 5, monsterHealth: 1000, minibossHealth: 1000, minibossTimeLimitMs: 30_000, monster: ARMORED, miniboss: ARMORED } ]
 };
-const GOLD_RING = 'rgb(224, 180, 90) 0px 0px 0px 2px';
+const GOLD_RING = 'rgb(138, 106, 28) 0px 0px 0px 2px';
 
 //  `talents` are the starting levels and `points` the unspent talent points on top of them; the selected talent is opened on its card
 const startGame = async (page, { talents, points = 0, select, ...options } = {}) => {

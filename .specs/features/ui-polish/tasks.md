@@ -969,7 +969,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 **Depends on**: T17
 **Commit**: `fix(game): the leader card shows the hand cursor`
 
-#### F3: The Shift ring reads against the parchment [ ]
+#### F3: The Shift ring reads against the parchment [x]
 
 **Owner**: game-dev
 **Goal**: The 2 px ring of `.talent-upgrade[data-max="true"]` has at least 3:1 contrast against `--parchment-100` (`#f4e6c8`); `#e0b45a` measures 1.57:1 (ui-review finding #2). Suggested: a darker gold ring (`#8a6a1c` or darker) or a double ring (inner gold, outer 1 px `--wood-900`).

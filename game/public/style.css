@@ -53,6 +53,7 @@
     --bronze-500: #b07a3a;
     --gold-400: #e0b45a;
     --gold-200: #f3d58a;
+    --gold-700: #8a6a1c;
     --parchment-100: #f4e6c8;
     --parchment-200: #ead6ad;
     --parchment-300: #e6d0a2;
@@ -2596,7 +2597,8 @@ button.bag-card:hover:not(:disabled) {
 }
 
 /* Shift: the button buys the most levels the points pay (spec ui-polish UIP-09) */
-.talent-upgrade[data-max="true"] { box-shadow: 0 0 0 2px var(--gold-400); }
+/* The ring is a dark gold: --gold-400 measures 1.57:1 on the card parchment, #8a6a1c 4.09:1 (ui-review finding 2) */
+.talent-upgrade[data-max="true"] { box-shadow: 0 0 0 2px var(--gold-700); }
 /* A request runs: the buttons keep their look and say "wait" (spec ui-polish UIP-07) */
 .talent-screen[data-busy="true"] .talent-upgrade,
 .talent-screen[data-busy="true"] .talent-reset { cursor: progress; }
