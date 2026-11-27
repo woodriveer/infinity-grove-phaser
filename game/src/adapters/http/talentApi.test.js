@@ -28,6 +28,26 @@ describe('talentApi', () => {
         expect(httpClient.post).toHaveBeenCalledWith('/talents/CLICK_DAMAGE/upgrade', { fromLevel: 0 });
     });
 
+    it('upgrade with 5 levels posts { fromLevel: 0, levels: 5 }', async () => {
+        httpClient.post.mockResolvedValue({ data: { talents } });
+
+        await talentApi.upgrade('COMBO', 0, 5);
+
+        expect(httpClient.post).toHaveBeenCalledWith('/talents/COMBO/upgrade', { fromLevel: 0, levels: 5 });
+        expect(httpClient.post.mock.calls[0][1]).toEqual({ fromLevel: 0, levels: 5 });
+    });
+
+    it('upgrade with 1 level posts only fromLevel', async () => {
+        httpClient.post.mockResolvedValue({ data: { talents } });
+
+        await talentApi.upgrade('COMBO', 3, 1);
+
+        const body = httpClient.post.mock.calls[0][1];
+
+        expect(Object.keys(body)).toEqual([ 'fromLevel' ]);
+        expect(body.fromLevel).toBe(3);
+    });
+
     it('reset posts to /talents/reset and returns the tree', async () => {
         httpClient.post.mockResolvedValue({ data: { talents } });
 

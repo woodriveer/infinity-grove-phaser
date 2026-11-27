@@ -98,6 +98,35 @@ describe('talentCollection', () => {
             expect(changes).toHaveBeenCalledTimes(2);
         });
 
+        it('upgrade with 4 levels calls the gateway with the id, the level and 4 and adopts the answer', async () => {
+            gateway.upgrade.mockResolvedValue({ talents: [ talent('COMBO', 4) ], points: points(6, 4) });
+
+            await collection.upgrade('COMBO', 0, 4);
+
+            expect(gateway.upgrade.mock.calls[0]).toEqual([ 'COMBO', 0, 4 ]);
+            expect(collection.levelOf('COMBO')).toBe(4);
+        });
+
+        it('upgrade with 1 level or none calls the gateway with two arguments', async () => {
+            gateway.upgrade.mockResolvedValue({ talents: [ talent('COMBO', 3) ], points: points(6, 3) });
+
+            await collection.upgrade('COMBO', 2, 1);
+            await collection.upgrade('COMBO', 2);
+
+            expect(gateway.upgrade.mock.calls[0]).toEqual([ 'COMBO', 2 ]);
+            expect(gateway.upgrade.mock.calls[1]).toEqual([ 'COMBO', 2 ]);
+        });
+
+        it('a 409 after a 4 level upgrade reads the tree again and still rejects', async () => {
+            const refusal = new ApiError('Max level', { status: 409, code: 'TALENT_MAX_LEVEL' });
+
+            gateway.upgrade.mockRejectedValue(refusal);
+
+            await expect(collection.upgrade('COMBO', 8, 4)).rejects.toBe(refusal);
+
+            expect(gateway.list).toHaveBeenCalledTimes(1);
+        });
+
         it('reads the tree again after a 409 and still rejects with the refusal', async () => {
             await collection.load();
             gateway.upgrade.mockRejectedValue(new ApiError('Mismatch', { status: 409, code: 'TALENT_LEVEL_MISMATCH' }));

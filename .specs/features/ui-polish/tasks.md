@@ -298,7 +298,7 @@ The `ClickerGame.test.js` cases of the auto click key in a text field pass uncha
 
 ---
 
-#### T5: The talent gateway and collection carry the level count [ ]
+#### T5: The talent gateway and collection carry the level count [x]
 
 **Owner**: game-dev
 **Goal**: `collection.upgrade(id, fromLevel, levels)` posts `{ fromLevel, levels }` for 2 or more levels and `{ fromLevel }` for one (UIP-09 AC 3 to 5).
@@ -337,7 +337,7 @@ Every existing case passes unchanged (`sends the level the player saw and adopts
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 5 cases pass; the whole unit suite passes.
+- [x] The 5 cases pass; the whole unit suite passes.
 
 **Commit**: `feat(game): send the talent level count when more than one level is bought`
 

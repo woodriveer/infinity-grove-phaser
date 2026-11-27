@@ -1,6 +1,6 @@
 //  The talents of the player as the backend sees them, kept in step with every upgrade.
 //  Port (ADR 0007):
-//    gateway  { list(), upgrade(talentId, fromLevel), reset() }  the backend /talents calls.
+//    gateway  { list(), upgrade(talentId, fromLevel, levels?), reset() }  the backend /talents calls.
 //             list and upgrade resolve with { talents: [ { id, level, value, nextCost, ... } ], points: { earned, spent, available } }.
 //             Each rejects with an ApiError.
 
@@ -68,13 +68,13 @@ export const createTalentCollection = ({ gateway }) =>
             adopt(await gateway.reset());
         },
 
-        //  Buys the next level of a talent; `fromLevel` is the level the player saw. After a 409 the tree is read again (it is the truth) and
-        //  the refusal still rejects so the screen can say why.
-        upgrade: async (talentId, fromLevel) =>
+        //  Buys the next `levels` levels of a talent (one by default); `fromLevel` is the level the player saw. One level calls the gateway with
+        //  two arguments, as before. After a 409 the tree is read again (it is the truth) and the refusal still rejects so the screen can say why.
+        upgrade: async (talentId, fromLevel, levels = 1) =>
         {
             try
             {
-                adopt(await gateway.upgrade(talentId, fromLevel));
+                adopt(await (levels === 1 ? gateway.upgrade(talentId, fromLevel) : gateway.upgrade(talentId, fromLevel, levels)));
             }
             catch (error)
             {
