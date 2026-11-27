@@ -244,7 +244,7 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 
 ### Phase 2: Backend test SQL
 
-#### T4: Backend tests write enemies through `defense` [ ]
+#### T4: Backend tests write enemies through `defense` [x]
 
 **Owner**: test-engineer
 **Goal**: The backend tests that build or read enemies with SQL use `defense`, so after T9 only the migration and compatibility tests name the old columns (DEF-05; spec Fixtures AC 2, 3).
@@ -278,9 +278,9 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The backend suite passes.
-- [ ] `git grep -n -E "physical_defense|magical_defense" -- backend/src/test` lists only `EnemyDefenseMigrationIT.kt`, `PreviousBackendCompatibilityIT.kt` and the `EnemyRepositoryIT.kt` case `the defense is stored in the defense column and copied to the old columns until the contract`.
-- [ ] The commit touches exactly the 2 test files and this file.
+- [x] The backend suite passes.
+- [x] `git grep -n -E "physical_defense|magical_defense" -- backend/src/test` lists only `EnemyDefenseMigrationIT.kt`, `PreviousBackendCompatibilityIT.kt` and the `EnemyRepositoryIT.kt` case `the defense is stored in the defense column and copied to the old columns until the contract`.
+- [x] The commit touches exactly the 2 test files and this file.
 
 **Commit**: `test(backend): build and read enemies through the defense column`
 

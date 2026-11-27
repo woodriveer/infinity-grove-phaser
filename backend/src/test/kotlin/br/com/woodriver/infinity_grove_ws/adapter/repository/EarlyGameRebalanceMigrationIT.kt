@@ -38,21 +38,21 @@ class EarlyGameRebalanceMigrationIT : IntegrationTestBase() {
         jdbc.update("update stage_adds a set hit_points = 3 * $oldPhaseHealth from stages s where s.id = a.stage_id")
         jdbc.execute(
             """
-            insert into enemies (element, physical_defense, magical_defense, crit_resistance)
-            select distinct e.element, e.physical_defense, e.magical_defense, 10 + 2 * s.number + 5 * (s.chapter - 1)
+            insert into enemies (element, defense, crit_resistance)
+            select distinct e.element, e.defense, 10 + 2 * s.number + 5 * (s.chapter - 1)
               from stages s join enemies e on e.id = s.miniboss_enemy_id where s.chapter between 1 and 5
-            on conflict on constraint uk_enemies_attributes do nothing;
+            on conflict on constraint uk_enemies_defense do nothing;
             update stages s set miniboss_enemy_id = n.id from enemies e, enemies n
              where e.id = s.miniboss_enemy_id and s.chapter between 1 and 5
-               and n.element = e.element and n.physical_defense = e.physical_defense and n.magical_defense = e.magical_defense
+               and n.element = e.element and n.defense = e.defense
                and n.crit_resistance = 10 + 2 * s.number + 5 * (s.chapter - 1);
-            insert into enemies (element, physical_defense, magical_defense, crit_resistance)
-            select distinct e.element, e.physical_defense, e.magical_defense, 30 + 5 * (c.number - 1)
+            insert into enemies (element, defense, crit_resistance)
+            select distinct e.element, e.defense, 30 + 5 * (c.number - 1)
               from chapters c join enemies e on e.id = c.boss_enemy_id where c.number between 1 and 5
-            on conflict on constraint uk_enemies_attributes do nothing;
+            on conflict on constraint uk_enemies_defense do nothing;
             update chapters c set boss_enemy_id = n.id from enemies e, enemies n
              where e.id = c.boss_enemy_id and c.number between 1 and 5
-               and n.element = e.element and n.physical_defense = e.physical_defense and n.magical_defense = e.magical_defense
+               and n.element = e.element and n.defense = e.defense
                and n.crit_resistance = 30 + 5 * (c.number - 1);
             """.trimIndent(),
         )
@@ -70,13 +70,13 @@ class EarlyGameRebalanceMigrationIT : IntegrationTestBase() {
 
     private fun minibossEnemy(id: String) =
         jdbc.queryForMap(
-            "select e.id, e.element, e.physical_defense, e.crit_resistance from stages s join enemies e on e.id = s.miniboss_enemy_id where s.id = ?",
+            "select e.id, e.element, e.defense, e.crit_resistance from stages s join enemies e on e.id = s.miniboss_enemy_id where s.id = ?",
             id,
         )
 
     private fun bossEnemy(chapter: Int) =
         jdbc.queryForMap(
-            "select e.id, e.element, e.physical_defense, e.crit_resistance from chapters c join enemies e on e.id = c.boss_enemy_id where c.number = ?",
+            "select e.id, e.element, e.defense, e.crit_resistance from chapters c join enemies e on e.id = c.boss_enemy_id where c.number = ?",
             chapter,
         )
 
@@ -161,7 +161,7 @@ class EarlyGameRebalanceMigrationIT : IntegrationTestBase() {
         ).forEach { (id, stats, element) ->
             val enemy = minibossEnemy(id)
             assertEquals(stats.first, enemy["crit_resistance"], "stage $id crit resistance")
-            assertEquals(stats.second, enemy["physical_defense"], "stage $id defense")
+            assertEquals(stats.second, enemy["defense"], "stage $id defense")
             assertEquals(element, enemy["element"], "stage $id element")
         }
         assertEquals(sixth, minibossEnemy("6/1")["id"])
@@ -173,7 +173,7 @@ class EarlyGameRebalanceMigrationIT : IntegrationTestBase() {
         oldSeedThenMigrate()
 
         assertEquals(listOf(5, 15, 25, 35, 45), (1..5).map { bossEnemy(it)["crit_resistance"] })
-        assertEquals(listOf(30, 35, 40, 45, 50), (1..5).map { bossEnemy(it)["physical_defense"] })
+        assertEquals(listOf(30, 35, 40, 45, 50), (1..5).map { bossEnemy(it)["defense"] })
         assertEquals(sixth, bossEnemy(6)["id"])
     }
 
@@ -201,12 +201,12 @@ class EarlyGameRebalanceMigrationIT : IntegrationTestBase() {
         writeOldSeed()
         val element = minibossEnemy("1/4")["element"]
         jdbc.update(
-            "insert into enemies (element, physical_defense, magical_defense, crit_resistance) values (?, 14, 14, 50) on conflict do nothing",
+            "insert into enemies (element, defense, crit_resistance) values (?, 14, 50) on conflict do nothing",
             element,
         )
         val tuned =
             jdbc.queryForObject(
-                "select id from enemies where element = ? and physical_defense = 14 and magical_defense = 14 and crit_resistance = 50",
+                "select id from enemies where element = ? and defense = 14 and crit_resistance = 50",
                 Long::class.java,
                 element,
             )

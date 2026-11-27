@@ -186,7 +186,7 @@ class SchemaConstraintsIT : IntegrationTestBase() {
 
     private fun probeEnemy(critResistance: Int) =
         jdbc.queryForObject(
-            "insert into enemies (element, physical_defense, magical_defense, crit_resistance) values ('DARKNESS', 3, 77, ?) returning id",
+            "insert into enemies (element, defense, crit_resistance) values ('DARKNESS', 3, ?) returning id",
             Long::class.java,
             critResistance,
         )!!
@@ -237,7 +237,7 @@ class SchemaConstraintsIT : IntegrationTestBase() {
         jdbc.update("delete from hero_skills where hero_id like 'probe-%'")
         jdbc.update("delete from stages where chapter = 98")
         jdbc.update("delete from chapters where number in (98, 99)")
-        jdbc.update("delete from enemies where element = 'DARKNESS' and physical_defense = 3 and magical_defense = 77")
+        jdbc.update("delete from enemies where element = 'DARKNESS' and defense = 3")
         jdbc.update("delete from drop_rules where id between 901 and 904")
         jdbc.update("delete from heroes where id like 'probe-%'")
     }
@@ -320,26 +320,24 @@ class SchemaConstraintsIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `a second enemy with the same four attributes is rejected`() {
+    fun `a second enemy with the same element, defense and critical resistance is rejected`() {
         assertRejected(
             "23505",
-            "insert into enemies (element, physical_defense, magical_defense, crit_resistance) " +
-                "select element, physical_defense, magical_defense, crit_resistance from enemies where id = ?",
+            "insert into enemies (element, defense, crit_resistance) " +
+                "select element, defense, crit_resistance from enemies where id = ?",
             enemy,
         )
     }
 
     @Test
     fun `enemy attributes outside their bounds are rejected`() {
-        val insert = "insert into enemies (element, physical_defense, magical_defense, crit_resistance) values (?, ?, ?, ?)"
+        val insert = "insert into enemies (element, defense, crit_resistance) values (?, ?, ?)"
 
-        assertRejected("23514", insert, "FIRE", 91, 0, 0)
-        assertRejected("23514", insert, "FIRE", 0, 91, 0)
-        assertRejected("23514", insert, "FIRE", 0, 0, 101)
-        assertRejected("23514", insert, "FIRE", -1, 0, 0)
-        assertRejected("23514", insert, "FIRE", 0, -1, 0)
-        assertRejected("23514", insert, "FIRE", 0, 0, -1)
-        assertRejected("23514", insert, "PLASMA", 1, 2, 3)
+        assertRejected("23514", insert, "FIRE", 91, 0)
+        assertRejected("23514", insert, "FIRE", 0, 101)
+        assertRejected("23514", insert, "FIRE", -1, 0)
+        assertRejected("23514", insert, "FIRE", 0, -1)
+        assertRejected("23514", insert, "PLASMA", 1, 3)
     }
 
     @Test
