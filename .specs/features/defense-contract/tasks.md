@@ -157,13 +157,13 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 
 - [x] The backend suite passes, including `SchemaValidationIT`, `EnemyRepositoryIT`, `ChapterRepositoryIT`, `SchemaConstraintsIT`, `EarlyGameRebalanceMigrationIT` (they still use the old columns, which the trigger keeps filled).
 - [x] The commit touches exactly the migration, the 2 test files and this file; no Kotlin file under `backend/src/main` changes.
-- [ ] After the push, the watcher deploys it (`node -e "console.log(JSON.parse(require('fs').readFileSync('.deploy-state','utf8')).active.commit)"` prints this commit or a later one within 5 minutes), or the deploy is reported pending with the reason.
+- [x] After the push, the watcher deploys it (`node -e "console.log(JSON.parse(require('fs').readFileSync('.deploy-state','utf8')).active.commit)"` prints this commit or a later one within 5 minutes), or the deploy is reported pending with the reason.
 
 **Commit**: `feat(backend): add the enemy defense column with a bridge for the previous backend`
 
 ---
 
-#### T2: The backend maps and writes only `defense` [ ]
+#### T2: The backend maps and writes only `defense` [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: `EnemyEntity` and `EnemyRepository` know one defense column (DEF-02; spec Backend AC 1 to 4).
@@ -198,9 +198,9 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The backend suite passes.
-- [ ] `git grep -n -E "physical_defense|magical_defense|physicalDefense|magicalDefense" -- backend/src/main/kotlin` prints only lines of `EnemyStatsResponse` in `ProgressController.kt` (its KDoc, its two fields and the two assignments in `from`), which T3 removes.
-- [ ] The commit touches exactly the 4 files above and this file.
+- [x] The backend suite passes.
+- [x] `git grep -n -E "physical_defense|magical_defense|physicalDefense|magicalDefense" -- backend/src/main/kotlin` prints only lines of `EnemyStatsResponse` in `ProgressController.kt` (its KDoc, its two fields and the two assignments in `from`), which T3 removes.
+- [x] The commit touches exactly the 4 files above and this file.
 
 **Commit**: `refactor(backend): read and write the enemy defense through one column`
 

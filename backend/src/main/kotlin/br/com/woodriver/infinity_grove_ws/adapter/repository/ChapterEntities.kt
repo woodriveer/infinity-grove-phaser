@@ -22,8 +22,8 @@ import jakarta.persistence.UniqueConstraint
     name = "enemies",
     uniqueConstraints = [
         UniqueConstraint(
-            name = "uk_enemies_attributes",
-            columnNames = ["element", "physical_defense", "magical_defense", "crit_resistance"],
+            name = "uk_enemies_defense",
+            columnNames = ["element", "defense", "crit_resistance"],
         ),
     ],
 )
@@ -34,14 +34,12 @@ class EnemyEntity(
     @Column(nullable = false, length = 32)
     var element: String,
     @Column(nullable = false)
-    var physicalDefense: Int,
-    @Column(nullable = false)
-    var magicalDefense: Int,
+    var defense: Int,
     @Column(nullable = false)
     var critResistance: Int,
 ) {
-    /** An element name outside the five fails the load instead of dealing a wrong multiplier. The one defense is `physical_defense` (TD-002). */
-    fun toDomain() = EnemyStats(Element.valueOf(element), physicalDefense, critResistance)
+    /** An element name outside the five fails the load instead of dealing a wrong multiplier. */
+    fun toDomain() = EnemyStats(Element.valueOf(element), defense, critResistance)
 }
 
 /** Looks up an enemy the stage or chapter points at; a dangling id fails the load. */

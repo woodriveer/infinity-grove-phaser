@@ -154,15 +154,15 @@ class ChapterRepositoryIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `rows written by SQL read the enemies and drop rules they point at, with physical_defense as the defense`() {
+    fun `rows written by SQL read the enemies and drop rules they point at`() {
         val boss =
             jdbc.queryForObject(
-                "insert into enemies (element, physical_defense, magical_defense, crit_resistance) values ('NATURE', 85, 86, 87) returning id",
+                "insert into enemies (element, defense, crit_resistance) values ('NATURE', 85, 87) returning id",
                 Long::class.java,
             )
         val monster =
             jdbc.queryForObject(
-                "insert into enemies (element, physical_defense, magical_defense, crit_resistance) values ('LIGHT', 88, 89, 90) returning id",
+                "insert into enemies (element, defense, crit_resistance) values ('LIGHT', 88, 90) returning id",
                 Long::class.java,
             )
         jdbc.update(
@@ -193,17 +193,17 @@ class ChapterRepositoryIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `a saved chapter writes each defense to both columns`() {
+    fun `a saved chapter writes each defense to the defense column`() {
         repository.save(chapter())
 
         val boss =
-            jdbc.queryForMap(
-                "select e.physical_defense, e.magical_defense from enemies e join chapters c on c.boss_enemy_id = e.id where c.number = ?",
+            jdbc.queryForObject(
+                "select e.defense from enemies e join chapters c on c.boss_enemy_id = e.id where c.number = ?",
+                Int::class.java,
                 number,
             )
 
-        assertEquals(55, boss["physical_defense"])
-        assertEquals(55, boss["magical_defense"])
+        assertEquals(55, boss)
     }
 
     @Test
@@ -219,12 +219,12 @@ class ChapterRepositoryIT : IntegrationTestBase() {
 
         val monsters =
             jdbc.queryForList(
-                "select distinct e.element, e.physical_defense, e.magical_defense, e.crit_resistance " +
+                "select distinct e.element, e.defense, e.crit_resistance " +
                     "from enemies e join stages s on s.monster_enemy_id = e.id where s.chapter between 1 and 5",
             )
         val zeroRows =
             jdbc.queryForList(
-                "select element from enemies where physical_defense = 0 and magical_defense = 0 and crit_resistance = 0",
+                "select element from enemies where defense = 0 and crit_resistance = 0",
                 String::class.java,
             )
 
@@ -232,8 +232,7 @@ class ChapterRepositoryIT : IntegrationTestBase() {
         assertEquals(Element.entries.map { it.name }.toSet(), zeroRows.toSet())
         assertEquals(5, zeroRows.size)
         monsters.forEach {
-            assertEquals(0, it["physical_defense"])
-            assertEquals(0, it["magical_defense"])
+            assertEquals(0, it["defense"])
             assertEquals(0, it["crit_resistance"])
         }
     }

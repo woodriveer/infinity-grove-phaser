@@ -12,22 +12,20 @@ interface JpaEnemyRepository : JpaRepository<EnemyEntity, Long> {
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(
         value =
-            "insert into enemies (element, physical_defense, magical_defense, crit_resistance) " +
-                "values (:element, :physicalDefense, :magicalDefense, :critResistance) " +
-                "on conflict (element, physical_defense, magical_defense, crit_resistance) do nothing",
+            "insert into enemies (element, defense, crit_resistance) " +
+                "values (:element, :defense, :critResistance) " +
+                "on conflict (element, defense, crit_resistance) do nothing",
         nativeQuery = true,
     )
     fun insertIfAbsent(
         @Param("element") element: String,
-        @Param("physicalDefense") physicalDefense: Int,
-        @Param("magicalDefense") magicalDefense: Int,
+        @Param("defense") defense: Int,
         @Param("critResistance") critResistance: Int,
     ): Int
 
-    fun findByElementAndPhysicalDefenseAndMagicalDefenseAndCritResistance(
+    fun findByElementAndDefenseAndCritResistance(
         element: String,
-        physicalDefense: Int,
-        magicalDefense: Int,
+        defense: Int,
         critResistance: Int,
     ): EnemyEntity?
 }
@@ -41,14 +39,9 @@ class EnemyRepository(
     @Transactional
     fun idOf(stats: EnemyStats): Long {
         val element = stats.element.name
-        jpaEnemyRepository.insertIfAbsent(element, stats.defense, stats.defense, stats.critResistance)
+        jpaEnemyRepository.insertIfAbsent(element, stats.defense, stats.critResistance)
         val row =
-            jpaEnemyRepository.findByElementAndPhysicalDefenseAndMagicalDefenseAndCritResistance(
-                element,
-                stats.defense,
-                stats.defense,
-                stats.critResistance,
-            )
+            jpaEnemyRepository.findByElementAndDefenseAndCritResistance(element, stats.defense, stats.critResistance)
         return checkNotNull(row?.id) { "Enemy $stats was inserted but cannot be read back" }
     }
 }

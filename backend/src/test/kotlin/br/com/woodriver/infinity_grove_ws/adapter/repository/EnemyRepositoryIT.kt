@@ -22,15 +22,14 @@ class EnemyRepositoryIT : IntegrationTestBase() {
 
     @AfterTest
     fun removeTestEnemies() {
-        jdbc.update("delete from enemies where physical_defense >= 81")
+        jdbc.update("delete from enemies where defense >= 81")
     }
 
     private fun rowsWith(stats: EnemyStats) =
         jdbc.queryForObject(
-            "select count(*) from enemies where element = ? and physical_defense = ? and magical_defense = ? and crit_resistance = ?",
+            "select count(*) from enemies where element = ? and defense = ? and crit_resistance = ?",
             Int::class.java,
             stats.element.name,
-            stats.defense,
             stats.defense,
             stats.critResistance,
         )
@@ -62,11 +61,12 @@ class EnemyRepositoryIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `the defense is stored in both columns`() {
+    fun `the defense is stored in the defense column and copied to the old columns until the contract`() {
         val id = repository.idOf(stats)
 
-        val row = jdbc.queryForMap("select physical_defense, magical_defense from enemies where id = ?", id)
+        val row = jdbc.queryForMap("select defense, physical_defense, magical_defense from enemies where id = ?", id)
 
+        assertEquals(81, row["defense"])
         assertEquals(81, row["physical_defense"])
         assertEquals(81, row["magical_defense"])
     }
