@@ -3,6 +3,28 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.13.0] - 2026-11-27
+
+Acabamento da interface (`ui-polish`): o jogo deixa de se comportar como uma página da web, a tela de Talentos para de piscar e comprar vários níveis ficou rápido.
+
+### Adicionado
+
+- Segurar **Shift** na tela de Talentos transforma o botão em "Melhorar até o nível N (X pontos)" e compra o máximo de níveis que os pontos pagam, em um único pedido.
+- Tecla **T** abre e fecha Talentos; tecla **B** abre e fecha a Mochila. As teclas aparecem nos botões.
+- A lista de líder agora abre pelo botão **Equipe**, e vale desde o capítulo 1.
+
+### Alterado
+
+- Talentos atualiza no lugar: comprar um nível, escolher um talento, reiniciar pontos ou ganhar pontos não reconstrói mais a tela, então ela não pisca e os botões não esmaecem enquanto o pedido roda.
+- Fora dos campos de usuário e senha, o texto não pode mais ser selecionado, imagens não geram fantasma ao arrastar, o clique direito não abre o menu do navegador e o cursor sobre texto é a seta.
+- O botão **Líder** foi substituído por **Equipe**, que reúne o líder e os aliados.
+
+### Corrigido
+
+- Ctrl+A não abre mais a janela do clique automático.
+- Uma resposta tardia de talento atualiza a tela de Talentos reaberta.
+- O cartão do líder mostra o cursor de mão e o anel do Shift tem contraste suficiente no cartão.
+
 ## [0.12.0] - 2026-11-26
 
 Legado do reset (`reset-legacy-drops`): resetar a conta agora deixa um legado que melhora as moedas e as peças das próximas jornadas, conforme o capítulo em que você resetou.

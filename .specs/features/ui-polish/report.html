@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Relatório de release: ui-polish (v0.13.0)</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:960px;margin:2rem auto;padding:0 1rem;color:#1c1c1c;line-height:1.5}
+table{border-collapse:collapse;width:100%;margin:.5rem 0 1.5rem}th,td{border:1px solid #ccc;padding:.35rem .6rem;text-align:left}th{background:#f1f1f1}
+.ok{color:#17692b;font-weight:700}code{background:#f4f4f4;padding:0 .25rem}
+</style>
+</head>
+<body>
+<h1>ui-polish: relatório de release v0.13.0</h1>
+<p class="ok">Veredito: APROVADO. Todas as tarefas do <code>tasks.md</code> estão marcadas (T1 a T17, F1 a F3), a verificação de autoria do <code>test-engineer</code> está limpa, o <code>ui-artist</code> aprovou (<code>ui-review.html</code>, commit 561c7b24) e a execução do GitHub Actions passou inteira.</p>
+
+<h2>Escopo e faixa de commits</h2>
+<p>Faixa: <code>dc91a0e7..561c7b24</code> (commit da especificação até o HEAD). Há commits de infraestrutura de CI dentro da faixa (<code>4e6ab94f</code>, <code>6aacbeb9</code>, <code>f22f90b9</code>, <code>856e3033</code>) que não são desta feature. Seleção: os commits da feature são os que tocam tarefas do ui-polish; os 4 commits <code>ci:</code> foram excluídos de todos os números de código abaixo. Nenhum commit de <code>portuguese-text</code> ou de senha está na faixa.</p>
+<p>Commits da feature (24): dc91a0e7, ea947f9e, fb9cf67c, 1cb9f1c7, 0e700b70, bc977e1f, 7385de71, d7e977cf, 028cd76e, e41ebc67, e968eb24, e8a934e7, d1a68537, c74258bb, faf9524d, 08f8fe1a, c60e8ad6, d1ed2c66, 9c777281, a9031ded, d569006c, c5a6a0be, bb27567b, 561c7b24.</p>
+<p>Entrega ao jogador: sem seleção de texto, sem fantasma de imagem, sem menu do navegador, cursor de seta; Talentos atualiza no lugar (sem piscar e sem botões esmaecidos); Shift compra o máximo de níveis em um pedido; teclas T e B; o botão Líder foi substituído por Equipe, que troca o líder desde o capítulo 1; Ctrl+A não abre mais o clique automático.</p>
+
+<h2>Verificação de autoria (test-engineer)</h2>
+<p>25 mutantes gerados com <code>node scripts/sensor.mjs</code>: 25 mortos, 0 sobreviventes (§ Author Check do <code>tasks.md</code>, commit c60e8ad6).</p>
+
+<h2>Origem dos números</h2>
+<p>Totais e cobertura vêm do workflow <strong>Tests</strong> (<code>.github/workflows/tests.yml</code>), execução <strong>46053193755</strong> no commit <code>bb27567b</code>, resultado SUCCESS (<a href="https://github.com/woodriveer/infinity-grove-phaser/actions/runs/46053193755">link</a>). O commit <code>561c7b24</code> (HEAD da feature) só altera documentos, que o workflow ignora (<code>paths-ignore</code>); o código é idêntico ao do <code>bb27567b</code>. As linhas de código foram contadas por <code>git show --numstat</code> sobre os commits da feature. Uma execução local do backend também foi feita antes da mudança de regra (BUILD SUCCESSFUL); os números abaixo são os do CI.</p>
+
+<h2>Código de produção da faixa</h2>
+<table><tr><th>Parte</th><th>Adicionadas</th><th>Removidas</th><th>Arquivos</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td>77</td><td>15</td><td>5</td></tr>
+<tr><td>Game (<code>game/src</code> sem testes, mais <code>game/public/*.css</code>)</td><td>487</td><td>105</td><td>11</td></tr></table>
+
+<h2>Código de teste da faixa</h2>
+<table><tr><th>Suíte</th><th>Adicionadas</th><th>Removidas</th><th>Arquivos</th><th>Testes novos</th><th>Total após a execução (CI)</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td>282</td><td>0</td><td>3</td><td>23</td><td>1389 (1389 passaram)</td></tr>
+<tr><td>Game unitário (<code>*.test.js</code>)</td><td>1203</td><td>32</td><td>9</td><td>98</td><td>2472 (2472 passaram)</td></tr>
+<tr><td>E2E (<code>game/e2e</code>)</td><td>1539</td><td>42</td><td>12</td><td>84</td><td>776 (776 passaram)</td></tr>
+<tr><td>Scripts de deploy (<code>deploy/**/*.test.mjs</code>)</td><td>0</td><td>0</td><td>0</td><td>0</td><td>306 (306 passaram)</td></tr></table>
+<p>Testes novos contados pelas linhas adicionadas <code>@Test</code>/<code>@ParameterizedTest</code> (backend) e <code>test(</code>/<code>it(</code> (game) nos commits da feature.</p>
+
+<h2>Cobertura de testes unitários</h2>
+<table><tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Backend inteiro (JaCoCo)</td><td>98,49%</td><td>93,72%</td></tr>
+<tr><td>Game inteiro (Vitest, v8)</td><td>98,71%</td><td>94,92%</td></tr>
+<tr><td>Deploy (lcov)</td><td>98,47%</td><td>96,79%</td></tr></table>
+<p>Arquivos que a feature alterou:</p>
+<table><tr><th>Arquivo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>TalentController.kt</td><td>100%</td><td>100%</td></tr>
+<tr><td>TalentService.kt</td><td>100%</td><td>100%</td></tr>
+<tr><td>Talents.kt</td><td>100%</td><td>89,3%</td></tr>
+<tr><td>TalentExceptions.kt</td><td>92,0%</td><td>100%</td></tr>
+<tr><td>TalentUseCase.kt (interface)</td><td>66,7%</td><td>sem ramos</td></tr>
+<tr><td>talentApi.js</td><td>100%</td><td>100%</td></tr>
+<tr><td>talentCollection.js</td><td>100%</td><td>100%</td></tr>
+<tr><td>domain/talents/talents.js</td><td>100%</td><td>94,73%</td></tr>
+<tr><td>pageGuards.js</td><td>100%</td><td>100%</td></tr>
+<tr><td>shiftKey.js</td><td>100%</td><td>100%</td></tr>
+<tr><td>talentsView.js</td><td>97,39%</td><td>90,44%</td></tr>
+<tr><td>teamView.js</td><td>98,91%</td><td>96,42%</td></tr>
+<tr><td>HeroUi.js</td><td>98,44%</td><td>88,47%</td></tr>
+<tr><td>ClickerGame.js</td><td>97,78%</td><td>90,26%</td></tr>
+<tr><td>main.js</td><td>0% (ponto de entrada, coberto só pelo e2e)</td><td>0%</td></tr></table>
+
+<h2>Cobertura e2e</h2>
+<p>Game inteiro (Playwright, istanbul, 12 shards mesclados): <strong>94,52%</strong> das linhas e 80,84% dos ramos. É um limite inferior: uma página recarregada dentro de um teste perde o que contou antes do recarregamento.</p>
+<table><tr><th>Arquivo alterado</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>main.js</td><td>100%</td><td>100%</td></tr>
+<tr><td>talentApi.js</td><td>100%</td><td>100%</td></tr>
+<tr><td>ClickerGame.js</td><td>94,12%</td><td>83,1%</td></tr>
+<tr><td>HeroUi.js</td><td>95,33%</td><td>83,14%</td></tr>
+<tr><td>pageGuards.js</td><td>81,81%</td><td>50%</td></tr>
+<tr><td>shiftKey.js</td><td>78,57%</td><td>83,33%</td></tr>
+<tr><td>talentsView.js</td><td>97,87%</td><td>79,27%</td></tr>
+<tr><td>teamView.js</td><td>98,91%</td><td>75,51%</td></tr>
+<tr><td>talentCollection.js</td><td>96,55%</td><td>62,5%</td></tr>
+<tr><td>domain/talents/talents.js</td><td>98,07%</td><td>76,81%</td></tr></table>
+
+<h2>Cenários e2e da feature</h2>
+<p>79 cenários dos quatro arquivos novos, todos passaram na execução 46053193755: <code>uiPolishPage.spec.js</code> (UIP-01 a UIP-05: sem seleção, sem fantasma de imagem, sem menu do navegador, cursor de seta, anel de foco só no teclado), <code>uiPolishTalents.spec.js</code> (UIP-06 e UIP-07: Talentos no lugar, sem esmaecer), <code>uiPolishShift.spec.js</code> (UIP-09 a UIP-11: compra máxima com Shift, modo Shift, dica) e <code>uiPolishHud.spec.js</code> (UIP-12 a UIP-14: teclas T e B, Equipe no lugar de Líder, Ctrl+A). Os testes e2e existentes que abriam Líder foram reajustados para a lista de líder da Equipe e também passaram. A lista completa está nos JUnit XML da execução (artefato <code>e2e-coverage</code>).</p>
+
+<h2>Falhas não causadas pela feature</h2>
+<p>Na execução oficial do CI: nenhuma falha (backend 1389/1389, game 2472/2472, e2e 776/776, deploy 306/306; o job <code>mutants</code> não roda neste fluxo e ficou <em>skipped</em>).</p>
+<ul>
+<li><code>game/ui-review/unifiedDamage.shots.js</code> S1 e S2 (roteiro de capturas de tela, fora da suíte do CI): procuram o texto antigo <code>Crit res 33%</code>, mas a tela mostra <code>Seu crítico: 7%</code>. Defeito do roteiro da feature de dano unificado, não do ui-polish; não medido aqui porque não roda no CI.</li>
+<li>Instabilidades sob carga vistas durante o desenvolvimento, em execuções locais com a máquina ocupada: borda de rolagem de <code>dragEquip</code>, três testes de <code>uiRedesign.spec.js</code> (tecla A e barra de habilidades) e <code>uiPolishHud</code> "t closes the auto click window and opens Talentos". Cada um passou sozinho, e todos passaram na execução do CI.</li>
+</ul>
+
+<h2>Deploy e produção</h2>
+<p>O watcher já tratou o commit 561c7b24 (<code>.deploy-state</code>): backend ativo no slot green (commit 7385de71, o último que muda o backend), Worker republicado pelo túnel <code>https://healing-flux-theater-limited.trycloudflare.com</code>. A verificação de produção foi parcial: a extensão Claude in Chrome não estava conectada, então o caminho do jogador não foi jogado no navegador. Por HTTP: o Worker responde 200, o pacote <code>/assets/index-CqL54zXq.js</code> contém "Segure Shift", o envio de <code>fromLevel</code>/<code>levels</code> e o guarda de <code>contextmenu</code>; o túnel responde 401 sem credenciais (backend vivo) e o log do slot green mostra as requisições sendo atendidas. O site só fica no ar enquanto o <code>publish.sh</code> roda.</p>
+</body>
+</html>
