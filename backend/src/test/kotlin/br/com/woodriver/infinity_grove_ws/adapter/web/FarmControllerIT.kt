@@ -8,7 +8,9 @@ import io.restassured.http.ContentType
 import io.restassured.response.Response
 import io.restassured.specification.RequestSpecification
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasKey
 import org.hamcrest.Matchers.hasSize
+import org.hamcrest.Matchers.not
 import org.hamcrest.Matchers.nullValue
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
@@ -315,8 +317,11 @@ class FarmControllerIT : IntegrationTestBase() {
             .body("definition.stages[0].minibossHealth", equalTo(795))
             .body("definition.boss.element", equalTo("FIRE"))
             .body("definition.boss.defense", equalTo(35))
-            .body("definition.boss.physicalDefense", equalTo(35))
-            .body("definition.boss.magicalDefense", equalTo(35))
+            .body("definition.boss", not(hasKey("physicalDefense")))
+            .body("definition.boss", not(hasKey("magicalDefense")))
+            .body("definition.stages[0].monster", not(hasKey("physicalDefense")))
+            .body("definition.stages[0].miniboss", not(hasKey("magicalDefense")))
+            .body("definition.stages[0].monster.defense", equalTo(0))
             .body("chapterBossWinsLeft", equalTo(10))
     }
 

@@ -170,7 +170,7 @@ Checked on `main` at `55caf5b` and on the production stack on 2026-11-26.
 | --- | --- | --- | --- |
 | DEF-01 | P1: One defense column - AC 1 to 8, Edge 1, 2, 4 | Tasks T1 | Implementing |
 | DEF-02 | P1: Backend - AC 1 to 4 | Tasks T2 | Implementing |
-| DEF-03 | P1: Payload - AC 1 to 3 | Tasks T3 | Pending |
+| DEF-03 | P1: Payload - AC 1 to 3 | Tasks T3 | Implementing |
 | DEF-04 | P1: Game - AC 1 to 5 | Tasks T7 | Pending |
 | DEF-05 | P1: Fixtures - AC 1 to 3 | Tasks T4, T5, T6 | Pending |
 | DEF-06 | P1: Contract - AC 1 to 5, Edge 3 | Tasks T9 | Pending |

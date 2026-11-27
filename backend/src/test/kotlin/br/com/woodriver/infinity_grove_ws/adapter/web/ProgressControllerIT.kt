@@ -14,7 +14,9 @@ import io.restassured.http.ContentType
 import io.restassured.response.Response
 import io.restassured.specification.RequestSpecification
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasKey
 import org.hamcrest.Matchers.hasSize
+import org.hamcrest.Matchers.not
 import org.hamcrest.Matchers.nullValue
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
@@ -144,18 +146,18 @@ class ProgressControllerIT : IntegrationTestBase() {
             .statusCode(200)
             .body("definition.boss.element", equalTo("DARKNESS"))
             .body("definition.boss.defense", equalTo(30))
-            .body("definition.boss.physicalDefense", equalTo(30))
-            .body("definition.boss.magicalDefense", equalTo(30))
+            .body("definition.boss", not(hasKey("physicalDefense")))
+            .body("definition.boss", not(hasKey("magicalDefense")))
             .body("definition.boss.critResistance", equalTo(5))
             .body("definition.stages[0].monster.element", equalTo("FIRE"))
             .body("definition.stages[0].monster.defense", equalTo(0))
-            .body("definition.stages[0].monster.physicalDefense", equalTo(0))
-            .body("definition.stages[0].monster.magicalDefense", equalTo(0))
+            .body("definition.stages[0].monster", not(hasKey("physicalDefense")))
+            .body("definition.stages[0].monster", not(hasKey("magicalDefense")))
             .body("definition.stages[0].monster.critResistance", equalTo(0))
             .body("definition.stages[0].miniboss.element", equalTo("FIRE"))
             .body("definition.stages[0].miniboss.defense", equalTo(11))
-            .body("definition.stages[0].miniboss.physicalDefense", equalTo(11))
-            .body("definition.stages[0].miniboss.magicalDefense", equalTo(11))
+            .body("definition.stages[0].miniboss", not(hasKey("physicalDefense")))
+            .body("definition.stages[0].miniboss", not(hasKey("magicalDefense")))
             .body("definition.stages[0].miniboss.critResistance", equalTo(0))
             .body("definition.stages[4].monster.element", equalTo("DARKNESS"))
             .body("definition.stages[9].miniboss.critResistance", equalTo(9))
@@ -253,8 +255,8 @@ class ProgressControllerIT : IntegrationTestBase() {
             .body("definition.bossTimeLimitMs", equalTo(90_000))
             .body("definition.bossDropRuleId", equalTo(18))
             .body("definition.boss.defense", equalTo(53))
-            .body("definition.boss.physicalDefense", equalTo(53))
-            .body("definition.boss.magicalDefense", equalTo(53))
+            .body("definition.boss", not(hasKey("physicalDefense")))
+            .body("definition.boss", not(hasKey("magicalDefense")))
             .body("definition.stages.size()", equalTo(10))
             .body("definition.stages[0].monsterHealth", equalTo(10_000))
         assertEquals(6, jpaProgressRepository.findById("yan").get().chapter)

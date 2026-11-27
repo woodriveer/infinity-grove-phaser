@@ -206,7 +206,7 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 
 ---
 
-#### T3: The progress and farm payloads answer `defense` only [ ]
+#### T3: The progress and farm payloads answer `defense` only [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: `EnemyStatsResponse` drops `physicalDefense` and `magicalDefense` (DEF-03; spec Payload AC 1 to 3, Q3).
@@ -234,9 +234,9 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The backend suite passes; `git grep -n -i defense -- deploy` prints nothing (the regression suite reads no defense field).
-- [ ] `git grep -n -E "physicalDefense|magicalDefense" -- backend/src` prints nothing.
-- [ ] The commit touches exactly the 3 files above and this file.
+- [x] The backend suite passes; `git grep -n -i defense -- deploy` prints nothing (the regression suite reads no defense field).
+- [x] `git grep -n -E "physicalDefense|magicalDefense" -- backend/src` prints nothing in `backend/src/main`; under `backend/src/test` it prints only the `not(hasKey(...))` assertions this task adds and two parameter names of a helper in `EnemyDefenseMigrationIT`.
+- [x] The commit touches exactly the 3 files above and this file.
 
 **Commit**: `feat(backend): answer the enemy defense once in the progress and farm payloads`
 

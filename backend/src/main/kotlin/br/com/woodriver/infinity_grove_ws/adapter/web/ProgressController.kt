@@ -23,23 +23,14 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.security.Principal
 
-/** One enemy of the progress and farm payloads. [physicalDefense] and [magicalDefense] repeat [defense] for the game of before unified-damage (TD-002). */
+/** One enemy of the progress and farm payloads (spec unified-damage, defense-contract): one defense. */
 data class EnemyStatsResponse(
     val element: String,
     val defense: Int,
-    val physicalDefense: Int,
-    val magicalDefense: Int,
     val critResistance: Int,
 ) {
     companion object {
-        fun from(stats: EnemyStats) =
-            EnemyStatsResponse(
-                element = stats.element.name,
-                defense = stats.defense,
-                physicalDefense = stats.defense,
-                magicalDefense = stats.defense,
-                critResistance = stats.critResistance,
-            )
+        fun from(stats: EnemyStats) = EnemyStatsResponse(stats.element.name, stats.defense, stats.critResistance)
     }
 }
 
