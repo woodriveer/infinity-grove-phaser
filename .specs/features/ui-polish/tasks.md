@@ -384,7 +384,7 @@ Every existing case passes unchanged (`sends the level the player saw and adopts
 
 ---
 
-#### T7: The Talentos view updates in place [ ]
+#### T7: The Talentos view updates in place [x]
 
 **Owner**: game-dev
 **Goal**: `updateTalents` patches the screen `renderTalents` built, the busy state no longer dims, and the card button shows the Shift form (UIP-06 AC 1 to 9, UIP-07 AC 1, 3, 4, UIP-09 AC 1, 2, 6, 9, 10, UIP-11).
@@ -450,8 +450,8 @@ Every other existing `talentsView.test.js` case passes unchanged.
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 16 new cases and the 3 re-pinned cases pass; the whole unit suite passes.
-- [ ] `git grep -n "busy ||" -- game/src/adapters/phaser/views/talentsView.js` prints nothing (busy no longer sets `disabled`).
+- [x] The 16 new cases and the 3 re-pinned cases pass; the whole unit suite passes.
+- [x] `git grep -n "busy ||" -- game/src/adapters/phaser/views/talentsView.js` prints nothing (busy no longer sets `disabled`).
 
 **Commit**: `feat(game): update the Talentos screen in place and show the Shift purchase`
 

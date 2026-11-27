@@ -2584,12 +2584,19 @@ button.bag-card:hover:not(:disabled) {
     border-radius: 999px;
     background: var(--branch-ink);
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .talent-upgrade:disabled {
     opacity: 0.45;
     cursor: not-allowed;
 }
+
+/* Shift: the button buys the most levels the points pay (spec ui-polish UIP-09) */
+.talent-upgrade[data-max="true"] { box-shadow: 0 0 0 2px var(--gold-400); }
+/* A request runs: the buttons keep their look and say "wait" (spec ui-polish UIP-07) */
+.talent-screen[data-busy="true"] .talent-upgrade,
+.talent-screen[data-busy="true"] .talent-reset { cursor: progress; }
 
 /* Phones (spec talent-tree-rework D16): the board is drawn twice as big and scrolls on both axes */
 @media (max-width: 640px) {

@@ -1,4 +1,6 @@
-import { BRANCH_TITLES, BRANCHES, branchGlow, describeTalentEffect, talentDescription, talentFullName, talentIconName, talentLockText } from '../../../domain/talents/talents';
+import {
+    BRANCH_TITLES, BRANCHES, branchGlow, describeTalentEffect, maxPurchase, talentDescription, talentFullName, talentIconName, talentLockText, upgradeButtonText
+} from '../../../domain/talents/talents';
 import { el, iconWithFallback } from './dom';
 import {
     BANNER_POSITIONS, BRANCH_GLOWS, CAPTION_HALF, CAPTION_ROOM, FECHAR_FROM, FECHAR_ROOM, FIXED_BOTTOM, FIXED_TOP, LARGE_NODE_HALF, LARGE_NODES, NODE_HALF, NODE_POSITIONS, PLAQUE_SPAN, REVEAL_MARGIN,
@@ -7,6 +9,8 @@ import {
 
 export const UNAVAILABLE_TEXT = 'Talentos indisponíveis';
 export const EMPTY_DETAIL_TEXT = 'Escolha um talento na árvore para ver os detalhes.';
+//  The tooltip of the card button (spec ui-polish UIP-11)
+export const SHIFT_HINT = 'Segure Shift para melhorar até o máximo';
 
 //  The mark drawn in place of an icon whose file is missing, one per branch
 const GLYPHS = { TIME: '⏳', BREAK: '🛡', POWER: '⚔', COMBO: '✦' };
@@ -143,12 +147,78 @@ const renderNode = (talent, { available, selectedId, onSelect }) =>
     return node;
 };
 
+//  Writes the text, the state and the Shift form of the card button. `busy` marks it aria-disabled (it stays enabled and keeps its look, spec ui-polish UIP-07);
+//  `data-max` is true while Shift is held and the points pay at least one level.
+export const patchUpgradeButton = (button, talent, available, { busy, shiftHeld }) =>
+{
+    button.textContent = upgradeButtonText(talent, available, shiftHeld);
+    button.disabled = available < talent.nextCost;
+    button.setAttribute('aria-disabled', String(busy));
+    button.setAttribute('data-max', String(shiftHeld && maxPurchase(talent, available).levels >= 1));
+};
+
+//  The card button: `onUpgrade(id, { shift })` fires with the shiftKey of the click, and not while the button is aria-disabled
+export const renderUpgradeButton = (talent, available, { busy, shiftHeld, onUpgrade }) =>
+{
+    const button = el('button', 'talent-upgrade', '', { type: 'button', testid: `talent-upgrade-${talent.id}`, title: SHIFT_HINT });
+
+    patchUpgradeButton(button, talent, available, { busy, shiftHeld });
+    button.addEventListener('click', (event) =>
+    {
+        if (button.getAttribute('aria-disabled') !== 'true')
+        {
+            onUpgrade?.(talent.id, { shift: event.shiftKey === true });
+        }
+    });
+
+    return button;
+};
+
+//  What the card of `talent` holds under its description: why it is locked, Nível máximo, or the upgrade button
+const actionKind = (talent) =>
+{
+    if (talent.unlocked === false)
+    {
+        return 'lock';
+    }
+
+    return talent.nextCost == null ? 'max' : 'button';
+};
+
+const kindOf = (element) =>
+{
+    if (element.classList.contains('talent-lock'))
+    {
+        return 'lock';
+    }
+
+    return element.classList.contains('talent-max') ? 'max' : 'button';
+};
+
+const renderAction = (talent, talents, available, options) =>
+{
+    const kind = actionKind(talent);
+
+    if (kind === 'lock')
+    {
+        return el('div', 'talent-lock', talentLockText(talent, talents), { testid: `talent-locked-${talent.id}` });
+    }
+
+    if (kind === 'max')
+    {
+        return el('div', 'talent-max', 'Nível máximo', { testid: `talent-max-${talent.id}` });
+    }
+
+    return renderUpgradeButton(talent, available, options);
+};
+
 //  The card under the tree: on the left the selected talent's name, its level and effect on one row, what it does and its upgrade button (or why it is locked,
 //  or Nível máximo); on the right its icon in a ring of the branch colour (spec talent-tree-branches). With nothing selected, only the hint.
-const renderDetail = (talents, available, { busy, selectedId, onUpgrade }) =>
+//  `data-selected-id` tells `updateTalents` which talent the card shows.
+const renderDetail = (talents, available, { busy, shiftHeld, selectedId, onUpgrade }) =>
 {
     const talent = talents.find(({ id }) => id === selectedId);
-    const detail = el('div', 'talent-detail', '', { testid: 'talent-detail' });
+    const detail = el('div', 'talent-detail', '', { testid: 'talent-detail', 'data-selected-id': selectedId ?? '' });
 
     if (!talent)
     {
@@ -176,23 +246,7 @@ const renderDetail = (talents, available, { busy, selectedId, onUpgrade }) =>
         body.append(el('p', 'talent-detail-description', description, { testid: `talent-description-${talent.id}` }));
     }
 
-    if (talent.unlocked === false)
-    {
-        body.append(el('div', 'talent-lock', talentLockText(talent, talents), { testid: `talent-locked-${talent.id}` }));
-    }
-    else if (talent.nextCost == null)
-    {
-        body.append(el('div', 'talent-max', 'Nível máximo', { testid: `talent-max-${talent.id}` }));
-    }
-    else
-    {
-        const price = `${talent.nextCost} ${talent.nextCost === 1 ? 'ponto' : 'pontos'}`;
-        const button = el('button', 'talent-upgrade', `Melhorar (${price})`, { type: 'button', testid: `talent-upgrade-${talent.id}` });
-
-        button.disabled = busy || available < talent.nextCost;
-        button.addEventListener('click', () => onUpgrade(talent));
-        body.append(button);
-    }
+    body.append(renderAction(talent, talents, available, { busy, shiftHeld, onUpgrade }));
 
     //  The same art as the node: the grade's own file, then grade 1, then the branch glyph
     icon.append(iconWithFallback(talentIconName(baseId, grade), GLYPHS[talent.branch], 'talent-detail-art', grade > 1 ? talentIconName(baseId) : null));
@@ -204,12 +258,14 @@ const renderDetail = (talents, available, { busy, selectedId, onUpgrade }) =>
 //  The talent tree on a painted board (spec talent-tree-rework): a scrolling board with the four banners, the nodes of the talents the layout
 //  places, the lit veins of each branch and the fallback veins, then the fixed plaque "Talentos", the medallion "Pontos de talento: <n>", the
 //  button "Reiniciar pontos" and the detail card. `points` is { earned, spent, available }. A click on a node asks `onSelect(id)` (no
-//  request); the card of `selectedId` holds the upgrade button, disabled when the talent costs more than `available`, and `busy` disables
-//  every button while a request runs. `onUpgrade(talent)` fires when the card button is clicked and `onReset()` when "Reiniciar pontos" is,
-//  which takes every level back and is disabled while nothing is spent. Every art file has a CSS or text fallback.
-export const renderTalents = (talents, points, { busy = false, selectedId = null, onSelect = () => {}, onUpgrade, onReset }) =>
+//  request); the card of `selectedId` holds the upgrade button, disabled when the talent costs more than `available`. The screen is built once
+//  per open and patched by `updateTalents` afterwards (spec ui-polish UIP-06); `busy` marks the two buttons aria-disabled while a request runs
+//  (they keep their look and ignore clicks) and the screen `data-busy`. `shiftHeld` gives the card button its Shift form. `onUpgrade(id, { shift })`
+//  fires when the card button is clicked and `onReset()` when "Reiniciar pontos" is, which takes every level back and is disabled while nothing is
+//  spent. Every art file has a CSS or text fallback.
+export const renderTalents = (talents, points, { busy = false, selectedId = null, shiftHeld = false, onSelect = () => {}, onUpgrade, onReset }) =>
 {
-    const screen = el('div', 'talent-screen', '', { testid: 'talent-screen' });
+    const screen = el('div', 'talent-screen', '', { testid: 'talent-screen', 'data-busy': String(busy) });
     const scroll = el('div', 'talent-tree-scroll', '', { testid: 'talent-tree-scroll' });
     const tree = el('div', 'talent-tree', '', { testid: 'talent-tree' });
 
@@ -237,14 +293,120 @@ export const renderTalents = (talents, points, { busy = false, selectedId = null
 
     const reset = el('button', 'talent-reset', '', { type: 'button', testid: 'talent-reset' });
 
-    reset.disabled = busy || points.spent === 0;
-    reset.addEventListener('click', () => onReset?.());
+    reset.disabled = points.spent === 0;
+    reset.setAttribute('aria-disabled', String(busy));
+    reset.addEventListener('click', () =>
+    {
+        if (reset.getAttribute('aria-disabled') !== 'true')
+        {
+            onReset?.();
+        }
+    });
     art('assets/talent-reset-button.png', 'talent-round-art', reset, 'no-art');
     reset.append(el('span', 'talent-pill', 'Reiniciar pontos'));
 
-    screen.append(scroll, title, medallion, reset, renderDetail(talents, points.available, { busy, selectedId, onUpgrade }));
+    screen.append(scroll, title, medallion, reset, renderDetail(talents, points.available, { busy, shiftHeld, selectedId, onUpgrade }));
 
     return screen;
+};
+
+//  Patches the screen `renderTalents` built to the tree, the points and the options of now, with no element rebuilt but the card of another talent
+//  (spec ui-polish UIP-06): the board image, the nodes and their icons stay, so nothing blinks. In order: the busy mark of the screen; each node's
+//  state, label, pressed mark, level chip and lock; the lit veins; the points; Reiniciar pontos; then the card.
+export const updateTalents = (screen, talents, points, { busy = false, selectedId = null, shiftHeld = false, onUpgrade } = {}) =>
+{
+    const find = (testid) => screen.querySelector(`[data-testid="${testid}"]`);
+
+    screen.dataset.busy = String(busy);
+
+    talents.forEach((talent) =>
+    {
+        const node = find(`talent-${talent.id}`);
+
+        if (!node)
+        {
+            return;
+        }
+
+        const state = stateOf(talent, points.available);
+        const lock = node.querySelector('.talent-node-lock');
+
+        node.setAttribute('data-state', state);
+        node.setAttribute('aria-label', `${talentFullName(talent)}, nível ${talent.level} de ${talent.maxLevel}`);
+        node.setAttribute('aria-pressed', String(talent.id === selectedId));
+        find(`talent-node-level-${talent.id}`).textContent = `${talent.level}/${talent.maxLevel}`;
+
+        if (state === 'locked' && !lock)
+        {
+            node.querySelector('.talent-node-icon')?.after(iconWithFallback('talent-node-lock', '🔒', 'talent-node-lock'));
+        }
+        else if (state !== 'locked' && lock)
+        {
+            lock.remove();
+        }
+    });
+
+    BRANCHES.forEach((branch) =>
+    {
+        const lit = find(`talent-lit-${branch}`);
+
+        if (lit)
+        {
+            lit.style.opacity = String(branchGlow(talents, branch));
+        }
+    });
+
+    const pill = find('talent-points')?.querySelector('.talent-pill');
+    const reset = find('talent-reset');
+
+    if (pill)
+    {
+        pill.textContent = `Pontos de talento: ${points.available}`;
+    }
+
+    if (reset)
+    {
+        reset.disabled = points.spent === 0;
+        reset.setAttribute('aria-disabled', String(busy));
+    }
+
+    const card = find('talent-detail');
+
+    if (!card)
+    {
+        return;
+    }
+
+    if (card.getAttribute('data-selected-id') !== (selectedId ?? ''))
+    {
+        card.replaceWith(renderDetail(talents, points.available, { busy, shiftHeld, selectedId, onUpgrade }));
+
+        return;
+    }
+
+    const talent = talents.find(({ id }) => id === selectedId);
+    const action = card.querySelector('.talent-detail-body .talent-lock, .talent-detail-body .talent-max, .talent-detail-body .talent-upgrade');
+
+    if (!talent || !action)
+    {
+        return;
+    }
+
+    find(`talent-level-${talent.id}`).textContent = `Nível ${talent.level}/${talent.maxLevel}`;
+    find(`talent-effect-${talent.id}`).textContent = `Efeito: ${describeTalentEffect(talent)}`;
+
+    if (kindOf(action) !== actionKind(talent))
+    {
+        action.replaceWith(renderAction(talent, talents, points.available, { busy, shiftHeld, onUpgrade }));
+    }
+    else if (kindOf(action) === 'button')
+    {
+        patchUpgradeButton(action, talent, points.available, { busy, shiftHeld });
+    }
+    else if (kindOf(action) === 'lock')
+    {
+        action.textContent = talentLockText(talent, talents);
+    }
 };
 
 const scrollOf = (screen) => screen?.querySelector('[data-testid="talent-tree-scroll"]') ?? null;

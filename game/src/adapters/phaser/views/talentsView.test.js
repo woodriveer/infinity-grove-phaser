@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { placeTalentScroll, renderTalents, renderTalentsUnavailable, revealTalent, talentScrollOf } from './talentsView';
+import { placeTalentScroll, renderTalents, renderTalentsUnavailable, revealTalent, SHIFT_HINT, talentScrollOf, updateTalents } from './talentsView';
 
 //  [ id, branch, label, unit, perLevel of grade 1 ]: the 9 graded talents in the order of the backend
 const catalog = [
@@ -176,18 +176,21 @@ describe('the detail card', () => {
         expect(text(screen, 'talent-upgrade-COMBO_G2')).toBe('Melhorar (2 pontos)');
     });
 
-    it('calls onUpgrade with the talent when the card button is clicked', () => {
+    it('calls onUpgrade with the talent id and no Shift when the card button is clicked', () => {
         const onUpgrade = vi.fn();
         const screen = show({}, 5, { selectedId: 'CLICK_DAMAGE', onUpgrade });
 
         upgradeButton(screen, 'CLICK_DAMAGE').click();
 
         expect(onUpgrade).toHaveBeenCalledTimes(1);
-        expect(onUpgrade.mock.calls[0][0].id).toBe('CLICK_DAMAGE');
+        expect(onUpgrade).toHaveBeenCalledWith('CLICK_DAMAGE', { shift: false });
     });
 
-    it('disables the card button while busy', () => {
-        expect(upgradeButton(show({}, 5, { selectedId: 'CLICK_DAMAGE', busy: true }), 'CLICK_DAMAGE').disabled).toBe(true);
+    it('marks the card button aria-disabled while busy and leaves it enabled', () => {
+        const button = upgradeButton(show({}, 5, { selectedId: 'CLICK_DAMAGE', busy: true }), 'CLICK_DAMAGE');
+
+        expect(button.disabled).toBe(false);
+        expect(button.getAttribute('aria-disabled')).toBe('true');
     });
 
     it('disables the card button when the talent costs more than the points', () => {
@@ -333,13 +336,14 @@ describe('the board', () => {
         expect(text(screen, 'talent-reset')).toBe('Reiniciar pontos');
     });
 
-    it('disables Reiniciar pontos while nothing is spent and while busy, and calls onReset', () => {
+    it('disables Reiniciar pontos while nothing is spent, marks it aria-disabled while busy, and calls onReset', () => {
         const withSpent = (spent, options = {}) => renderTalents(tree(), points(0, spent), { onUpgrade: vi.fn(), ...options });
         const onReset = vi.fn();
         const screen = withSpent(3, { onReset });
 
         expect(find(withSpent(0), 'talent-reset').disabled).toBe(true);
-        expect(find(withSpent(3, { busy: true }), 'talent-reset').disabled).toBe(true);
+        expect(find(withSpent(3, { busy: true }), 'talent-reset').disabled).toBe(false);
+        expect(find(withSpent(3, { busy: true }), 'talent-reset').getAttribute('aria-disabled')).toBe('true');
         expect(find(screen, 'talent-reset').disabled).toBe(false);
 
         find(screen, 'talent-reset').click();
@@ -546,5 +550,259 @@ describe('revealTalent', () => {
 describe('talents unavailable', () => {
     it('says Talentos indisponíveis', () => {
         expect(renderTalentsUnavailable().textContent).toBe('Talentos indisponíveis');
+    });
+});
+
+describe('updateTalents', () => {
+    //  A screen built with `renderTalents` for `levels`, `available` points and `spent` points spent
+    const fresh = (levels, available, spent, options = {}) => renderTalents(tree(levels), points(available, spent), { onSelect: vi.fn(), onUpgrade: vi.fn(), onReset: vi.fn(), ...options });
+    const patch = (screen, levels, available, spent, options = {}) => updateTalents(screen, tree(levels), points(available, spent), { onUpgrade: vi.fn(), ...options });
+    const snapshot = (screen) =>
+    {
+        const button = screen.querySelector('.talent-upgrade');
+        const detail = find(screen, 'talent-detail');
+
+        return {
+            nodes: nodes(screen).map((node) => [
+                node.getAttribute('data-testid'), node.getAttribute('data-state'), node.getAttribute('aria-label'), node.getAttribute('aria-pressed'),
+                node.querySelector('.talent-node-level').textContent, node.querySelector('.talent-node-lock') !== null
+            ]),
+            lit: [ ...screen.querySelectorAll('.talent-lit') ].map((lit) => lit.style.opacity),
+            points: text(screen, 'talent-points'),
+            reset: [ find(screen, 'talent-reset').disabled, find(screen, 'talent-reset').getAttribute('aria-disabled') ],
+            busy: screen.getAttribute('data-busy'),
+            card: [ detail.getAttribute('data-selected-id'), detail.textContent ],
+            button: button ? [ button.textContent, button.disabled, button.getAttribute('aria-disabled'), button.getAttribute('data-max'), button.getAttribute('title') ] : null
+        };
+    };
+    const kept = (screen) => ({
+        image: screen.querySelector('.talent-tree-image'), nodes: nodes(screen), detail: find(screen, 'talent-detail'), icon: find(screen, 'talent-detail').querySelector('img'),
+        images: [ ...screen.querySelectorAll('img') ]
+    });
+
+    it('keeps the board image, the 28 nodes, the card and the card icon after a level bought', () => {
+        const screen = fresh({}, 5, 0, { selectedId: 'CLICK_DAMAGE' });
+        const before = kept(screen);
+
+        patch(screen, { CLICK_DAMAGE: 1 }, 4, 1, { selectedId: 'CLICK_DAMAGE' });
+
+        const after = kept(screen);
+
+        expect(before.nodes).toHaveLength(28);
+        expect(after.image).toBe(before.image);
+        expect(after.nodes).toHaveLength(28);
+        after.nodes.forEach((node, index) => expect(node).toBe(before.nodes[index]));
+        expect(after.detail).toBe(before.detail);
+        expect(after.icon).toBe(before.icon);
+        expect(after.images).toHaveLength(before.images.length);
+        after.images.forEach((image, index) => expect(image).toBe(before.images[index]));
+    });
+
+    it('writes the new values in place', () => {
+        const screen = fresh({}, 5, 0, { selectedId: 'CLICK_DAMAGE' });
+
+        patch(screen, { CLICK_DAMAGE: 1 }, 4, 1, { selectedId: 'CLICK_DAMAGE' });
+
+        const target = fresh({ CLICK_DAMAGE: 1 }, 4, 0, { selectedId: 'CLICK_DAMAGE' });
+
+        expect(find(screen, 'talent-CLICK_DAMAGE').getAttribute('data-state')).toBe('available');
+        expect(text(screen, 'talent-node-level-CLICK_DAMAGE')).toBe('1/10');
+        expect(find(screen, 'talent-CLICK_DAMAGE').getAttribute('aria-label')).toBe('Dano de clique (%), nível 1 de 10');
+        expect(text(screen, 'talent-points')).toBe('Pontos de talento: 4');
+        expect(text(screen, 'talent-level-CLICK_DAMAGE')).toBe('Nível 1/10');
+        expect(text(screen, 'talent-effect-CLICK_DAMAGE')).toBe('Efeito: +5%');
+        expect(text(screen, 'talent-upgrade-CLICK_DAMAGE')).toBe('Melhorar (1 ponto)');
+        expect(find(screen, 'talent-upgrade-CLICK_DAMAGE').disabled).toBe(false);
+        expect([ ...screen.querySelectorAll('.talent-lit') ].map((lit) => lit.style.opacity)).toEqual([ ...target.querySelectorAll('.talent-lit') ].map((lit) => lit.style.opacity));
+        expect(find(screen, 'talent-lit-POWER').style.opacity).not.toBe('0');
+    });
+
+    describe('a patched screen reads like a fresh build of the same tree', () => {
+        const transitions = [
+            [ '(a) a level bought', [ {}, 5, 0, { selectedId: 'CLICK_DAMAGE' } ], [ { CLICK_DAMAGE: 1 }, 4, 1, { selectedId: 'CLICK_DAMAGE' } ] ],
+            [ '(b) the last level of COMBO', [ { COMBO: 9 }, 1, 9, { selectedId: 'COMBO' } ], [ { COMBO: 10 }, 0, 10, { selectedId: 'COMBO' } ] ],
+            [ '(c) Reiniciar pontos', [ { COMBO: 10, COMBO_G2: 3 }, 0, 16, { selectedId: 'COMBO_G2' } ], [ {}, 16, 0, { selectedId: 'COMBO_G2' } ] ],
+            [ '(d) a node chosen', [ {}, 5, 0, { selectedId: null } ], [ {}, 5, 0, { selectedId: 'COMBO' } ] ],
+            [ '(e) a request starts', [ {}, 5, 0, { selectedId: 'CLICK_DAMAGE' } ], [ {}, 5, 0, { selectedId: 'CLICK_DAMAGE', busy: true } ] ],
+            [ '(f) Shift pressed', [ {}, 5, 0, { selectedId: 'COMBO' } ], [ {}, 5, 0, { selectedId: 'COMBO', shiftHeld: true } ] ]
+        ];
+
+        transitions.forEach(([ name, from, to ]) =>
+        {
+            it(name, () => {
+                const screen = fresh(...from);
+
+                patch(screen, ...to);
+
+                expect(snapshot(screen)).toEqual(snapshot(fresh(...to)));
+            });
+        });
+    });
+
+    it('replaces only the card when another node is selected', () => {
+        const screen = fresh({}, 5, 0, { selectedId: null });
+        const before = kept(screen);
+
+        patch(screen, {}, 5, 0, { selectedId: 'COMBO' });
+
+        const after = kept(screen);
+
+        expect(after.image).toBe(before.image);
+        after.nodes.forEach((node, index) => expect(node).toBe(before.nodes[index]));
+        expect(after.detail).not.toBe(before.detail);
+        expect(after.detail.getAttribute('data-selected-id')).toBe('COMBO');
+    });
+
+    it('keeps the card when the same node stays selected', () => {
+        const screen = fresh({}, 5, 0, { selectedId: 'CLICK_DAMAGE' });
+        const card = find(screen, 'talent-detail');
+
+        patch(screen, { CLICK_DAMAGE: 1 }, 4, 1, { selectedId: 'CLICK_DAMAGE' });
+
+        expect(find(screen, 'talent-detail')).toBe(card);
+    });
+
+    it('adds the lock to the grades that lock again, keeping their frame and icon', () => {
+        const screen = fresh({ COMBO: 10, COMBO_G2: 3 }, 0, 16, { selectedId: 'COMBO_G2' });
+        const parts = [ 'COMBO_G2', 'COMBO_FURY' ].map((id) => [ id, find(screen, `talent-${id}`).querySelector('.talent-node-frame'), find(screen, `talent-${id}`).querySelector('.talent-node-icon') ]);
+
+        patch(screen, {}, 16, 0, { selectedId: 'COMBO_G2' });
+
+        parts.forEach(([ id, frame, icon ]) =>
+        {
+            const node = find(screen, `talent-${id}`);
+
+            expect(node.querySelectorAll('.talent-node-lock')).toHaveLength(1);
+            expect(node.querySelector('.talent-node-frame')).toBe(frame);
+            expect(node.querySelector('.talent-node-icon')).toBe(icon);
+        });
+    });
+
+    it('removes the lock from a node that opens, keeping its frame and icon', () => {
+        const screen = fresh({ COMBO: 9 }, 1, 9, { selectedId: 'COMBO' });
+        const parts = [ 'COMBO_G2', 'COMBO_FURY' ].map((id) => [ id, find(screen, `talent-${id}`).querySelector('.talent-node-frame'), find(screen, `talent-${id}`).querySelector('.talent-node-icon') ]);
+
+        expect(find(screen, 'talent-COMBO_G2').querySelectorAll('.talent-node-lock')).toHaveLength(1);
+
+        patch(screen, { COMBO: 10 }, 0, 10, { selectedId: 'COMBO' });
+
+        parts.forEach(([ id, frame, icon ]) =>
+        {
+            const node = find(screen, `talent-${id}`);
+
+            expect(node.querySelectorAll('.talent-node-lock')).toHaveLength(0);
+            expect(node.querySelector('.talent-node-frame')).toBe(frame);
+            expect(node.querySelector('.talent-node-icon')).toBe(icon);
+        });
+    });
+
+    it('replaces only the action when the button becomes Nível máximo', () => {
+        const screen = fresh({ COMBO: 9 }, 1, 9, { selectedId: 'COMBO' });
+        const ids = [ 'talent-detail-name', 'talent-level-COMBO', 'talent-effect-COMBO', 'talent-detail-icon' ];
+        const before = ids.map((id) => find(screen, id));
+
+        patch(screen, { COMBO: 10 }, 0, 10, { selectedId: 'COMBO' });
+
+        expect(text(screen, 'talent-max-COMBO')).toBe('Nível máximo');
+        expect(find(screen, 'talent-upgrade-COMBO')).toBeNull();
+        ids.forEach((id, index) => expect(find(screen, id)).toBe(before[index]));
+    });
+
+    it('sends the talent id after a patch, with the Shift of the click', () => {
+        const onUpgrade = vi.fn();
+        const screen = fresh({}, 5, 0, { selectedId: 'CLICK_DAMAGE', onUpgrade });
+
+        patch(screen, { CLICK_DAMAGE: 1 }, 4, 1, { selectedId: 'CLICK_DAMAGE' });
+
+        const button = find(screen, 'talent-upgrade-CLICK_DAMAGE');
+
+        button.dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }));
+        expect(onUpgrade).toHaveBeenLastCalledWith('CLICK_DAMAGE', { shift: true });
+
+        button.click();
+        expect(onUpgrade).toHaveBeenLastCalledWith('CLICK_DAMAGE', { shift: false });
+        expect(onUpgrade).toHaveBeenCalledTimes(2);
+    });
+
+    it('ignores clicks on both buttons while busy and takes them again after', () => {
+        const onUpgrade = vi.fn();
+        const onReset = vi.fn();
+        const screen = fresh({ COMBO: 1 }, 5, 0, { selectedId: 'COMBO', busy: true, onUpgrade, onReset });
+
+        find(screen, 'talent-upgrade-COMBO').click();
+        find(screen, 'talent-reset').click();
+
+        expect(onUpgrade).not.toHaveBeenCalled();
+        expect(onReset).not.toHaveBeenCalled();
+        expect(screen.getAttribute('data-busy')).toBe('true');
+
+        patch(screen, { COMBO: 1 }, 5, 1, { selectedId: 'COMBO', busy: false });
+
+        expect(find(screen, 'talent-upgrade-COMBO').getAttribute('aria-disabled')).toBe('false');
+        expect(find(screen, 'talent-reset').getAttribute('aria-disabled')).toBe('false');
+
+        find(screen, 'talent-upgrade-COMBO').click();
+        find(screen, 'talent-reset').click();
+
+        expect(onUpgrade).toHaveBeenCalledTimes(1);
+        expect(onReset).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('the Shift form of the card button', () => {
+    const button = (screen, id) => find(screen, `talent-upgrade-${id}`);
+
+    it('labels the button Melhorar até o nível 5 (5 pontos) with data-max true while Shift is held', () => {
+        const screen = show({}, 5, { selectedId: 'COMBO', shiftHeld: true });
+
+        expect(button(screen, 'COMBO').textContent).toBe('Melhorar até o nível 5 (5 pontos)');
+        expect(button(screen, 'COMBO').getAttribute('data-max')).toBe('true');
+    });
+
+    it('goes back to Melhorar (1 ponto) with data-max false on the same button when Shift ends', () => {
+        const screen = show({}, 5, { selectedId: 'COMBO', shiftHeld: true });
+        const held = button(screen, 'COMBO');
+
+        updateTalents(screen, tree({}), points(5), { selectedId: 'COMBO', shiftHeld: false, onUpgrade: vi.fn() });
+
+        expect(button(screen, 'COMBO')).toBe(held);
+        expect(held.textContent).toBe('Melhorar (1 ponto)');
+        expect(held.getAttribute('data-max')).toBe('false');
+    });
+
+    it('keeps Melhorar (2 pontos), disabled and data-max false when no level is affordable', () => {
+        const screen = show({ COMBO: 10 }, 1, { selectedId: 'COMBO_G2', shiftHeld: true });
+
+        expect(button(screen, 'COMBO_G2').textContent).toBe('Melhorar (2 pontos)');
+        expect(button(screen, 'COMBO_G2').disabled).toBe(true);
+        expect(button(screen, 'COMBO_G2').getAttribute('data-max')).toBe('false');
+    });
+
+    it('reads the Shift texts of E2, E3, E5, E6 and E7', () => {
+        const textOf = (levels, available, selectedId) => button(show(levels, available, { selectedId, shiftHeld: true }), selectedId).textContent;
+
+        expect(textOf({ CLICK_DAMAGE: 7 }, 20, 'CLICK_DAMAGE')).toBe('Melhorar até o nível 10 (3 pontos)');
+        expect(textOf({ COMBO: 10 }, 5, 'COMBO_G2')).toBe('Melhorar até o nível 2 (4 pontos)');
+        expect(textOf({}, 1, 'COMBO')).toBe('Melhorar até o nível 1 (1 ponto)');
+        expect(textOf({ COMBO: 10 }, 9, 'COMBO_FURY')).toBe('Melhorar até o nível 4 (8 pontos)');
+        expect(textOf({ CLICK_DAMAGE: 10, CLICK_DAMAGE_G2: 10 }, 30, 'CLICK_DAMAGE_G3')).toBe('Melhorar até o nível 10 (30 pontos)');
+    });
+
+    it('keeps the lock text and Nível máximo while Shift is held', () => {
+        const locked = show({ COMBO: 5 }, 50, { selectedId: 'COMBO_G2', shiftHeld: true });
+        const maxed = show({ CLICK_DAMAGE: 10 }, 50, { selectedId: 'CLICK_DAMAGE', shiftHeld: true });
+
+        expect(find(locked, 'talent-locked-COMBO_G2')).not.toBeNull();
+        expect(button(locked, 'COMBO_G2')).toBeNull();
+        expect(text(maxed, 'talent-max-CLICK_DAMAGE')).toBe('Nível máximo');
+    });
+
+    it('carries the tooltip Segure Shift para melhorar até o máximo in both forms', () => {
+        const plain = show({}, 5, { selectedId: 'COMBO', shiftHeld: false });
+        const held = show({}, 5, { selectedId: 'COMBO', shiftHeld: true });
+
+        expect(SHIFT_HINT).toBe('Segure Shift para melhorar até o máximo');
+        expect(button(plain, 'COMBO').getAttribute('title')).toBe('Segure Shift para melhorar até o máximo');
+        expect(button(held, 'COMBO').getAttribute('title')).toBe('Segure Shift para melhorar até o máximo');
     });
 });

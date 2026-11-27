@@ -1285,7 +1285,7 @@ describe('HeroUi Talentos', () => {
         expect(buttons.every((button) => button.disabled)).toBe(true);
     });
 
-    it('disables every Melhorar button while the request runs and enables them after', async () => {
+    it('marks every Melhorar button aria-disabled while the request runs and clears it after', async () => {
         const ctx = createUi({ talentList: talentsAnswer({}, 5) });
         let finish;
 
@@ -1294,12 +1294,15 @@ describe('HeroUi Talentos', () => {
         pick(ctx, 'CLICK_DAMAGE');
         ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
 
-        expect(ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-upgrade') ]).every((button) => button.disabled)).toBe(true);
+        const buttons = ctx.root.flatMap((node) => [ ...node.querySelectorAll('.talent-upgrade') ]);
+
+        expect(buttons.length).toBeGreaterThan(0);
+        expect(buttons.every((button) => button.getAttribute('aria-disabled') === 'true' && !button.disabled)).toBe(true);
 
         finish({ talents: talentTree({ CLICK_DAMAGE: 1 }), points: pointsOf(4, 1) });
         await flush();
 
-        expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').disabled).toBe(false);
+        expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').getAttribute('aria-disabled')).toBe('false');
     });
 
     it('says Pontos de talento insuficientes on NOT_ENOUGH_TALENT_POINTS and shows the tree the backend answered', async () => {

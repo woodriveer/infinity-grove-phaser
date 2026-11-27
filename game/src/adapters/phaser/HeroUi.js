@@ -1006,7 +1006,7 @@ export class HeroUi
             busy: this.talentBusy,
             selectedId: this.talentSelected,
             onSelect: (id) => this.selectTalent(id),
-            onUpgrade: (talent) => this.upgradeTalent(talent),
+            onUpgrade: (id) => this.upgradeTalent(this.talents.talents().find((talent) => talent.id === id)),
             onReset: () => this.resetTalents()
         });
 
