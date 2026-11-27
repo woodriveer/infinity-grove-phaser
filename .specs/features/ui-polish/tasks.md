@@ -848,7 +848,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 
 ---
 
-#### T15: The HUD keys and the Equipe leader list in the browser [ ]
+#### T15: The HUD keys and the Equipe leader list in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: UIP-12, UIP-13 and UIP-14 hold in Chrome.
@@ -888,7 +888,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/uiPolishHud.spec.js`
 **Done when**:
 
-- [ ] The 18 scenarios pass with the exact values above.
+- [x] The 18 scenarios pass with the exact values above (plus two more: Edge 10 and UIP-13 AC 3).
 
 **Commit**: `test(game): pin the HUD keys and the Equipe leader list in the browser`
 
