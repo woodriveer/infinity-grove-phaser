@@ -11,7 +11,7 @@ const ELEMENT_OF = { kael: 'FIRE', lyra: 'NATURE', orina: 'WATER', seraphine: 'L
 const CRITICAL_COLOR = '#ff8a1f';
 
 //  A monster of the new payload: the defense and both legacy columns equal
-const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
+const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defense, critResistance });
 
 //  `stageCount` stages of the same monster; phase monsters have `health`, minibosses `minibossHealth`, the chapter boss `bossHealth`
 const chapter = (monster, { health = 1000, minibossHealth = health, bossHealth = 1000, stageCount = 1 } = {}) => ({

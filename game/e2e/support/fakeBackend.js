@@ -28,15 +28,15 @@ const SEED_ELEMENTS = [ 'FIRE', 'WATER', 'NATURE', 'LIGHT', 'DARKNESS' ];
 const seededDefinition = () => ({
     bossHealth: 300,
     bossTimeLimitMs: 60_000,
-    boss: { element: 'DARKNESS', defense: 30, physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
+    boss: { element: 'DARKNESS', defense: 30, critResistance: 30 },
     bossDropRuleId: 3,
     stages: Array.from({ length: 10 }, (_, i) => {
         const element = SEED_ELEMENTS[i % SEED_ELEMENTS.length];
 
         return {
             number: i + 1, phasesPerStage: 5, monsterHealth: 10 + i, minibossHealth: 5 * (10 + i), minibossTimeLimitMs: 30_000,
-            monster: { element, defense: 0, physicalDefense: 0, magicalDefense: 0, critResistance: 0 },
-            miniboss: { element, defense: 11 + i, physicalDefense: 11 + i, magicalDefense: 11 + i, critResistance: 12 + 2 * i },
+            monster: { element, defense: 0, critResistance: 0 },
+            miniboss: { element, defense: 11 + i, critResistance: 12 + 2 * i },
             monsterDropRuleId: 1,
             minibossDropRuleId: 2
         };

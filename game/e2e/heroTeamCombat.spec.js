@@ -10,7 +10,7 @@ const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 const ALLY_COLOR = '#7fd4ff';
 
 //  A monster of the new payload: the defense and both legacy columns equal
-const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
+const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defense, critResistance });
 
 //  One stage whose phase monsters and miniboss have `health`, the chapter boss 1000
 const chapter = (monster, health = 1000, miniboss = monster) => ({

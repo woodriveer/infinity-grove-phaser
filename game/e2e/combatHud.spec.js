@@ -7,11 +7,11 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 const HUD_CHAPTER = {
     bossHealth: 100,
     bossTimeLimitMs: 60_000,
-    boss: { element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 },
+    boss: { element: 'FIRE', defense: 0, critResistance: 0 },
     stages: [ {
         number: 1, phasesPerStage: 5, monsterHealth: 100, minibossHealth: 2, minibossTimeLimitMs: 60_000,
-        monster: { element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 },
-        miniboss: { element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 }
+        monster: { element: 'FIRE', defense: 0, critResistance: 0 },
+        miniboss: { element: 'FIRE', defense: 0, critResistance: 0 }
     } ]
 };
 

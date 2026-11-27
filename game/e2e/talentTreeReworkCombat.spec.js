@@ -6,7 +6,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 //  `Seu crítico`, Fúria crescente and the attribute panel. The leader is Kael (fire) against fire monsters, so an element is neutral and a
 //  number is read as the change of the monster's health (L-091). The roll is fixed by `openMainMenu(page, { random })`, 0.99 unless a case names one.
 const MONSTER_HEALTH = 1000;
-const monsterOf = (defense = 0, critResistance = 0, element = 'FIRE') => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
+const monsterOf = (defense = 0, critResistance = 0, element = 'FIRE') => ({ element, defense, critResistance });
 
 //  Ten stages of the same three monsters: the phase monster, the miniboss and the chapter boss (the last encounter of stage 10)
 const chapter = ({ monster, boss = monster, bossTimeLimitMs = 60_000 }) => ({

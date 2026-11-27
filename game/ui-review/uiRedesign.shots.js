@@ -5,7 +5,7 @@ import { shot } from './support/shots';
 
 //  Screenshots of the Grove theme review (.specs/features/ui-redesign/ui-review/, design § Review Screenshots). Everything runs on the
 //  fake backend; the only stub is the held vex sprite that keeps the Preloader on screen.
-const bare = (element, physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element, physicalDefense, magicalDefense, critResistance });
+const bare = (element, defense = 0, critResistance = 0) => ({ element, defense, critResistance });
 
 const chapter = (monster) => ({
     bossHealth: 1000,
@@ -139,7 +139,7 @@ test('battle', async ({ page }, testInfo) => {
     const problems = watch(page);
 
     await startAs(page, {
-        monster: bare('FIRE', 10, 20, 30),
+        monster: bare('FIRE', 10, 30),
         copies: { 'kael:3': 1 },
         progress: { chapter: 3, stage: 1, encounter: 'MINIBOSS', phase: 1 },
         talents: { COMBO: 10 }

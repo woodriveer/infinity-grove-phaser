@@ -16,7 +16,7 @@ const STAFF_ON = {
 const { special: _special, ...PLAIN_ON } = STAFF_ON;
 const BAG_STAFF = { ...STAFF_ON, id: 'bag-staff', heroId: null };
 
-const monsterOf = (element) => ({ element, defense: 0, physicalDefense: 0, magicalDefense: 0, critResistance: 0 });
+const monsterOf = (element) => ({ element, defense: 0, critResistance: 0 });
 
 const chapter = (monster, health) => ({
     bossHealth: health,

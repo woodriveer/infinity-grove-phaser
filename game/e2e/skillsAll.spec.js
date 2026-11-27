@@ -7,8 +7,8 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 const STAR = 1.4;
 //  The monsters share the element of the leader (an element against itself is neutral) with 1000 health, so no skill kills one. Time moves with scene.update(), not with the clock.
 const ELEMENT_OF = { kael: 'FIRE', lyra: 'NATURE', orina: 'WATER', seraphine: 'LIGHT', vex: 'DARKNESS' };
-const bare = (element) => ({ element, physicalDefense: 0, magicalDefense: 0, critResistance: 0 });
-const ARMORED = { ...bare('FIRE'), physicalDefense: 50 };
+const bare = (element) => ({ element, defense: 0, critResistance: 0 });
+const ARMORED = { ...bare('FIRE'), defense: 50 };
 const DARKNESS = bare('DARKNESS');
 
 const chapter = (monster = NO_DEFENSE) => ({

@@ -8,7 +8,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 
 //  A monster of the payload: the defense and both legacy columns equal
-const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
+const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defense, critResistance });
 
 const ADD = { health: 30, defenseBuff: 30 };
 //  Two adds that guard the defense-49 miniboss up to 90 (49 + 21 + 20), under the 100 where a hit deals 0

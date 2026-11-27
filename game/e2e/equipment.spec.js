@@ -6,11 +6,11 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 const SMALL_CHAPTER = {
     bossHealth: 100,
     bossTimeLimitMs: 60_000,
-    boss: { element: 'DARKNESS', physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
+    boss: { element: 'DARKNESS', defense: 30, critResistance: 30 },
     stages: [ {
         number: 1, phasesPerStage: 5, monsterHealth: 20, minibossHealth: 2, minibossTimeLimitMs: 60_000,
-        monster: { element: 'NATURE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 },
-        miniboss: { element: 'NATURE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 }
+        monster: { element: 'NATURE', defense: 0, critResistance: 0 },
+        miniboss: { element: 'NATURE', defense: 0, critResistance: 0 }
     } ]
 };
 

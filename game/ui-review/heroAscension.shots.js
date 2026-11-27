@@ -5,7 +5,7 @@ import { shot } from './support/shots';
 
 //  Screenshots of the hero-ascension review (.specs/features/hero-ascension/ui-review/). Everything runs on the fake backend, which
 //  already supports cards up to 9 stars and the level of every skill; no route is stubbed here.
-const bare = (element) => ({ element, physicalDefense: 0, magicalDefense: 0, critResistance: 0 });
+const bare = (element) => ({ element, defense: 0, critResistance: 0 });
 
 const chapter = (monster) => ({
     bossHealth: 1000,

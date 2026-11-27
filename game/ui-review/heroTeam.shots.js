@@ -5,7 +5,7 @@ import { shot } from './support/shots';
 
 //  Screenshots of the hero-team review (.specs/features/hero-team/ui-review/). Runs on the fake backend with its `team` option; nothing is stubbed.
 const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
-const monsterOf = (element) => ({ element, defense: 0, physicalDefense: 0, magicalDefense: 0, critResistance: 0 });
+const monsterOf = (element) => ({ element, defense: 0, critResistance: 0 });
 const definition = {
     bossHealth: 1000,
     bossTimeLimitMs: 60_000,

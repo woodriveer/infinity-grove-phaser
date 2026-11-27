@@ -4,7 +4,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
 //  Monsters of 1000 health, no defense and the element of the leader (neutral), so a click can be read exactly
 const ELEMENT_OF = { kael: 'FIRE', lyra: 'NATURE' };
-const bare = (element) => ({ element, physicalDefense: 0, magicalDefense: 0, critResistance: 0 });
+const bare = (element) => ({ element, defense: 0, critResistance: 0 });
 
 const chapter = (monster) => ({
     bossHealth: 1000,

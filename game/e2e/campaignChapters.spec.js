@@ -4,7 +4,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
 //  Chapters past 5 (CHAP-03, CHAP-06, CHAP-07): every monster has no defense and the element of Kael (fire), so a click is neutral and
 //  reads exactly. The chapter boss has the health of the test; the phase monsters and minibosses have 10 000 health
-const bare = { element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 };
+const bare = { element: 'FIRE', defense: 0, critResistance: 0 };
 const chapter = (bossHealth) => ({
     bossHealth,
     bossTimeLimitMs: 60_000,

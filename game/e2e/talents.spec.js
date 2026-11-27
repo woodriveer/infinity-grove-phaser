@@ -3,7 +3,7 @@ import { mockBackend } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
 //  Fire monsters (a fire click is neutral) of 1000 health with defense 20, and a miniboss that takes 30 s
-const ARMORED = { element: 'FIRE', physicalDefense: 20, magicalDefense: 0, critResistance: 0 };
+const ARMORED = { element: 'FIRE', defense: 20, critResistance: 0 };
 const CHAPTER = {
     bossHealth: 1000,
     bossTimeLimitMs: 60_000,

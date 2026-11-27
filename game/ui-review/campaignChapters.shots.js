@@ -5,7 +5,7 @@ import { shot } from './support/shots';
 
 //  Screenshots of the campaign-chapters review (.specs/features/campaign-chapters/ui-review/): abbreviated HP, damage numbers,
 //  chapters past 5 on the HUD plaque and the map title, and the reset label at +15 cristais.
-const bare = { element: 'FIRE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 };
+const bare = { element: 'FIRE', defense: 0, critResistance: 0 };
 const chapter = (bossHealth) => ({
     bossHealth, bossTimeLimitMs: 600_000, boss: bare,
     stages: Array.from({ length: 10 }, (_, index) => ({

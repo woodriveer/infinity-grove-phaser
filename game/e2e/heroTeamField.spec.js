@@ -7,7 +7,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 //  no real tick moves a sprite; the attack motion runs in real time on a woken loop.
 const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 
-const monsterOf = (element) => ({ element, defense: 0, physicalDefense: 0, magicalDefense: 0, critResistance: 0 });
+const monsterOf = (element) => ({ element, defense: 0, critResistance: 0 });
 
 //  Phase monsters, minibosses and the boss with 1000 health, so no hit kills one
 const chapter = (monster) => ({

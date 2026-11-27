@@ -9,7 +9,7 @@ const PIXEL = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQ
 const artMissing = (page) => page.route('**/assets/talent-*', (route) => route.fulfill({ status: 404, body: '' }));
 const artPresent = (page) => page.route('**/assets/talent-*', (route) => route.fulfill({ status: 200, contentType: 'image/png', body: PIXEL }));
 
-const ARMORED = { element: 'FIRE', physicalDefense: 20, magicalDefense: 0, critResistance: 0 };
+const ARMORED = { element: 'FIRE', defense: 20, critResistance: 0 };
 const CHAPTER = {
     bossHealth: 1000,
     bossTimeLimitMs: 60_000,

@@ -4,7 +4,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from '../e2e/support/g
 import { shot } from './support/shots';
 
 //  Screenshots of the unified damage screens (.specs/features/unified-damage/ui-review/). Everything runs on the fake backend.
-const monster = { element: 'WATER', defense: 11, physicalDefense: 11, magicalDefense: 11, critResistance: 33 };
+const monster = { element: 'WATER', defense: 11, critResistance: 33 };
 const chapter = {
     bossHealth: 1000, bossTimeLimitMs: 60_000, boss: monster,
     stages: [ { number: 1, phasesPerStage: 5, monsterHealth: 1000, minibossHealth: 1000, minibossTimeLimitMs: 60_000, monster, miniboss: monster } ]

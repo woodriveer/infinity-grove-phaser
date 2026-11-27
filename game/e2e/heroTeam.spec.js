@@ -6,7 +6,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 //  The player owns one blank card of each of the five heroes; `stars` adds a card of that many stars. A chapter 5 boss win is `cleared: [ 5 ]`.
 const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 
-const enemy = (element) => ({ element, defense: 0, physicalDefense: 0, magicalDefense: 0, critResistance: 0 });
+const enemy = (element) => ({ element, defense: 0, critResistance: 0 });
 
 //  A chapter whose boss has 1 health, to win it with one click
 const bossOfOneHealth = {

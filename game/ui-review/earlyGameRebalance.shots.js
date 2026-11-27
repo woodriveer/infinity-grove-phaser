@@ -61,7 +61,7 @@ test('09 boss affix chapter 11', async ({ page }, testInfo) => {
     await snap(page, testInfo, '09-boss-affix-chapter-11');
 });
 
-const monster = { element: 'FIRE', defense: 0, physicalDefense: 0, magicalDefense: 0, critResistance: 0 };
+const monster = { element: 'FIRE', defense: 0, critResistance: 0 };
 const talentGame = async (page, talents, progress) => {
     await mockBackend(page, {
         users: { yan: 'secret123' },

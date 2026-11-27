@@ -6,7 +6,7 @@ import { shot } from './support/shots';
 //  Screenshots of the talent-tree-rework review (.specs/features/talent-tree-rework/ui-review/). Fake backend; every `talent-*` asset is routed as missing (the way the
 //  feature ships) except in the art-present scenario, which routes a 1 x 1 picture to show the layout with art.
 const PIXEL = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
-const ARMORED = { element: 'FIRE', physicalDefense: 20, magicalDefense: 0, critResistance: 30 };
+const ARMORED = { element: 'FIRE', defense: 20, critResistance: 30 };
 const ADD = { health: 30, defenseBuff: 30 };
 const chapter = (adds = []) => ({
     bossHealth: 1000, bossTimeLimitMs: 60_000, boss: ARMORED,

@@ -8,7 +8,7 @@ const STAR = 1.4;
 //  The monsters share the element of the leader (an element against itself is neutral) with 1000 health, so no hit kills one. Time moves with scene.update(), not with the clock.
 const ELEMENT_OF = { kael: 'FIRE', lyra: 'NATURE', orina: 'WATER', seraphine: 'LIGHT', vex: 'DARKNESS' };
 //  A monster of the new payload: the defense and both legacy columns equal
-const enemy = (element, defense, critResistance = 0) => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
+const enemy = (element, defense, critResistance = 0) => ({ element, defense, critResistance });
 const bare = (element) => enemy(element, 0);
 
 const chapter = (monster) => ({

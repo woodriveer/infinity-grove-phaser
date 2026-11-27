@@ -5,7 +5,7 @@ import { shot } from './support/shots';
 
 //  Screenshots of the boss-replay-chapters review (.specs/features/boss-replay-chapters/ui-review/), same setup as the e2e spec.
 const AT_CHAPTER_3 = { yan: { chapter: 3, stage: 4, encounter: 'PHASE', phase: 1 } };
-const nature = { element: 'NATURE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 };
+const nature = { element: 'NATURE', defense: 0, critResistance: 0 };
 const CHAPTER_2 = {
     bossHealth: 2, bossTimeLimitMs: 50_000, boss: nature, bossDropRuleId: 6,
     stages: Array.from({ length: 10 }, (_, i) => ({ number: i + 1, phasesPerStage: 5, monsterHealth: 20, minibossHealth: 2,

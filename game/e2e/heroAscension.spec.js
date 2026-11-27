@@ -3,7 +3,7 @@ import { mockBackend } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
 //  Monsters of 1000 health, no defense and the element of Kael (fire), so a Kael hit is neutral and can be read exactly
-const bare = (element) => ({ element, physicalDefense: 0, magicalDefense: 0, critResistance: 0 });
+const bare = (element) => ({ element, defense: 0, critResistance: 0 });
 
 const chapter = (monster) => ({
     bossHealth: 1000,

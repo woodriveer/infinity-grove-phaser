@@ -327,7 +327,7 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 
 ---
 
-#### T6: e2e fixtures, fake backend and review shots in the new enemy shape [ ]
+#### T6: e2e fixtures, fake backend and review shots in the new enemy shape [x]
 
 **Owner**: test-engineer
 **Goal**: The e2e fixtures, the fake backend and the review shots send enemies as `{ element, defense, critResistance }`, keeping every asserted value (DEF-05; spec Fixtures AC 1, 2).
@@ -353,9 +353,9 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 **Gate**: `cd game && npm test && npx playwright test e2e/blackAwarenessStaffDamage.spec.js e2e/bossReplayChapters.spec.js e2e/campaignChapters.spec.js e2e/clickPower.spec.js e2e/combatHud.spec.js e2e/earlyGameRebalance.spec.js e2e/earlyGameRebalanceTalents.spec.js e2e/elements.spec.js e2e/equipment.spec.js e2e/farm.spec.js e2e/heroAscension.spec.js e2e/heroes.spec.js e2e/heroTeam.spec.js e2e/heroTeamCombat.spec.js e2e/heroTeamField.spec.js e2e/heroTeamPassives.spec.js e2e/minibossAdds.spec.js e2e/minibossAddsSkills.spec.js e2e/minibossAddsTarget.spec.js e2e/monsterAffixes.spec.js e2e/skills.spec.js e2e/skillsAll.spec.js e2e/talents.spec.js e2e/talentTreeBranches.spec.js e2e/talentTreeBranchesCard.spec.js e2e/talentTreeRework.spec.js e2e/talentTreeReworkCombat.spec.js e2e/uiRedesign.spec.js e2e/unifiedDamage.spec.js` (`monsterAffixes.spec.js` uses `affixFight.js`)
 **Done when**:
 
-- [ ] The listed e2e files pass (a failure outside the changed lines is rerun alone twice with `--workers=1` before it counts as a flake).
-- [ ] `git grep -n -E "physicalDefense|magicalDefense" -- game/e2e game/ui-review` prints only the lines of the three `unifiedDamage.spec.js` / `heroTeamCombat.spec.js` cases of step 5.
-- [ ] The 10 shots files pass `node --check`.
+- [x] The listed e2e files pass (a failure outside the changed lines is rerun alone twice with `--workers=1` before it counts as a flake).
+- [x] `git grep -n -E "physicalDefense|magicalDefense" -- game/e2e game/ui-review` prints only the lines of the three `unifiedDamage.spec.js` / `heroTeamCombat.spec.js` cases of step 5.
+- [x] The 10 shots files pass `node --check`.
 
 **Commit**: `test(game): send e2e and review enemies with one defense`
 

@@ -3,7 +3,7 @@ import { mockBackend } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
 //  Monsters of 1000 health, no defense and the element given, so a click is read exactly
-const bare = (element, physicalDefense = 0, magicalDefense = 0, critResistance = 0) => ({ element, physicalDefense, magicalDefense, critResistance });
+const bare = (element, defense = 0, critResistance = 0) => ({ element, defense, critResistance });
 
 //  One stage of five phases; the miniboss and the chapter boss last `limit` ms
 const chapter = (monster, limit = 60_000) => ({
@@ -842,7 +842,7 @@ test.describe('Grove theme', () => {
     });
 
     test('draws the enemy chips with a dot and two icons: the defense shield and the crit target', async ({ page }) => {
-        await startAs(page, { monster: bare('NATURE', 10, 20, 30) });
+        await startAs(page, { monster: bare('NATURE', 10, 30) });
 
         await expect(page.locator('.enemy-stats')).toHaveText('Nature  Defesa 10%  Seu crítico: 10%');
         await expectStyle(page.locator('.enemy-stats'), { 'background-color': 'rgba(0, 0, 0, 0)' });

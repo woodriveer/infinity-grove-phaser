@@ -6,7 +6,7 @@ import { shot } from './support/shots';
 //  Screenshots of the miniboss-adds review (.specs/features/miniboss-adds/ui-review/). Fake backend with an `addsChapter` definition (as e2e/minibossAddsTarget.spec.js);
 //  nothing is stubbed. The loop sleeps between shots; snap() wakes it for a few frames so the canvas, the DOM and the fading numbers are drawn.
 const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
-const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
+const monsterOf = (element, defense = 0, critResistance = 0) => ({ element, defense, critResistance });
 const ADD = { health: 30, defenseBuff: 30 };
 const addsChapter = ({ adds = [ ADD, ADD ], defense = 49, minibossHealth = 100, element = 'FIRE' } = {}) => ({
     bossHealth: 1000, bossTimeLimitMs: 60_000, boss: monsterOf(element, 30, 30), bossDropRuleId: 3,

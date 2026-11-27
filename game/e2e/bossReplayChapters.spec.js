@@ -4,7 +4,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
 //  Chapter 3, stage 4: the minibosses 1 to 3 of chapter 3 are beaten, chapters 1 and 2 are cleared
 const AT_CHAPTER_3 = { yan: { chapter: 3, stage: 4, encounter: 'PHASE', phase: 1 } };
-const nature = { element: 'NATURE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 };
+const nature = { element: 'NATURE', defense: 0, critResistance: 0 };
 //  Chapter 2 as the farm answers it: every boss has 2 health and is nature, so one fire click wins; the miniboss time limit is 45 s
 const CHAPTER_2 = {
     bossHealth: 2, bossTimeLimitMs: 50_000, boss: nature, bossDropRuleId: 6,

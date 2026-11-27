@@ -4,15 +4,15 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
 //  One stage whose phase monsters are nature (the fire player deals double) and whose miniboss is darkness with
 //  defense 50: health is large enough that a few clicks never kill, so the damage can be read after each click.
-//  The enemies use the payload of the backend before unified-damage on purpose: the game reads physicalDefense as the defense (TD-002).
+//  The enemies use the payload of the backend: { element, defense, critResistance }.
 const ELEMENTS_CHAPTER = {
     bossHealth: 100,
     bossTimeLimitMs: 60_000,
-    boss: { element: 'DARKNESS', physicalDefense: 30, magicalDefense: 30, critResistance: 30 },
+    boss: { element: 'DARKNESS', defense: 30, critResistance: 30 },
     stages: [ {
         number: 1, phasesPerStage: 5, monsterHealth: 20, minibossHealth: 100, minibossTimeLimitMs: 60_000,
-        monster: { element: 'NATURE', physicalDefense: 0, magicalDefense: 0, critResistance: 0 },
-        miniboss: { element: 'DARKNESS', physicalDefense: 50, magicalDefense: 10, critResistance: 100 }
+        monster: { element: 'NATURE', defense: 0, critResistance: 0 },
+        miniboss: { element: 'DARKNESS', defense: 50, critResistance: 100 }
     } ]
 };
 

@@ -6,7 +6,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 //  5 points and Dano crítico 15 %, each times its grade. The leader is a blank Kael (fire) against a fire monster with no defense, so a number is read as the change of
 //  the monster's health. The fake backend answers `value = level x perLevel x grade` like `TalentDefinition.valueAt`.
 const MONSTER_HEALTH = 1000;
-const monsterOf = (critResistance = 0) => ({ element: 'FIRE', defense: 0, physicalDefense: 0, magicalDefense: 0, critResistance });
+const monsterOf = (critResistance = 0) => ({ element: 'FIRE', defense: 0, critResistance });
 
 const chapter = (monster) => ({
     bossHealth: MONSTER_HEALTH,

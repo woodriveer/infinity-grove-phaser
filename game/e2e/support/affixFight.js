@@ -9,7 +9,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './game';
 export const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 
 //  A monster of the payload: the defense and both legacy columns equal
-export const monsterOf = (element = 'FIRE', defense = 0, critResistance = 100) => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
+export const monsterOf = (element = 'FIRE', defense = 0, critResistance = 100) => ({ element, defense, critResistance });
 
 export const SHIELD = (amount) => ({ type: 'HIT_SHIELD', amount, periodMs: 6000 });
 export const SHELL = (amount) => ({ type: 'SHELL', amount, periodMs: null });

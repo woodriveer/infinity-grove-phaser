@@ -8,7 +8,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 const PHASE_HEALTH = [ 69, 92, 122, 162, 216, 287, 382, 508, 676, 898 ];
 const ELEMENTS = [ 'FIRE', 'WATER', 'NATURE', 'LIGHT', 'DARKNESS' ];
 
-const monsterOf = (element, defense, critResistance) => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance });
+const monsterOf = (element, defense, critResistance) => ({ element, defense, critResistance });
 
 //  The payload of chapter 1: no affix field, as the backend of before the affixes sends it
 const chapterOne = () => ({
