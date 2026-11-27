@@ -760,7 +760,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 
 ---
 
-#### T13: The Shift purchase in the browser [ ]
+#### T13: The Shift purchase in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: UIP-09, UIP-10 and UIP-11 hold in Chrome with E1 to E7 and the exact bodies sent.
@@ -802,7 +802,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/uiPolishShift.spec.js`
 **Done when**:
 
-- [ ] The 20 scenarios pass with the exact texts and bodies above.
+- [x] The 20 scenarios pass with the exact texts and bodies above.
 
 **Commit**: `test(game): pin the Shift talent purchase in the browser`
 
