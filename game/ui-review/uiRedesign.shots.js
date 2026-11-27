@@ -314,7 +314,7 @@ test('hero screens', async ({ page }, testInfo) => {
     await page.getByTestId('hero-close').click();
 
     await page.getByTestId('hud-talents').click();
-    await expect(page.locator('.talent-card').first()).toBeVisible();
+    await expect(page.getByTestId('talent-screen')).toBeVisible();
     await page.mouse.move(0, 0);
     await settleImages(page);
     await shot(page, testInfo, '30-talents');
