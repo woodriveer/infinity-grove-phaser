@@ -258,6 +258,22 @@
 - **Date**: 2026-11-26
 - **Status**: accepted 2026-11-26 (spec `portuguese-text`, the owner approved the recommended defaults Q1 to Q10). Conforms to AD-003 (a pure application module), AD-007 and AD-011 (the number of the short-password line comes from the backend)
 
+### AD-033
+- **Decision**: (1) `POST /talents/{id}/upgrade` takes an optional integer `levels` (1 to the talent's `maxLevel`; absent or null = 1) and buys exactly that many levels for `levels x costPerLevel` points in one transaction under the `progress` row lock, all or nothing: a count past the top answers 409 `TALENT_MAX_LEVEL`, a count the points do not pay 409 `NOT_ENOUGH_TALENT_POINTS`, a non-integer or out-of-range count 400 `INVALID_TALENT_REQUEST`; the `fromLevel` guard is unchanged. The game sends `levels` only for 2 or more and computes k = min(maxLevel - level, floor(available / nextCost)) from the API values. (2) A game screen that changes after an action is built once when it opens and then patched in place (attributes and texts of the elements already there); it does not rebuild its images. A running request marks its buttons `aria-disabled` with the `progress` cursor instead of dimming them with `disabled`. Talentos is the first screen (spec `ui-polish`); TD-014 lists the others. (3) Outside the text fields the page selects nothing, drags no image and opens no browser menu (`style.css` page block, `game/src/adapters/phaser/pageGuards.js`).
+- **Reason**: Owner request of 2026-11-27: no text selection or other web-page artifacts, no blink when a talent levels up, Shift to level a talent to the most the points pay.
+- **Trade-off**: A patch must write every field a fresh build writes (an equivalence test guards it); the previous backend buys one level of a Shift purchase during the deploy window; the context menu is gone for players who used it outside the text fields.
+- **Scope**: `backend` `Talents.kt`, `TalentExceptions.kt`, `TalentUseCase.kt`, `TalentService.kt`, `TalentController.kt`, `backend/docs/adr/0016-multi-level-talent-upgrade.md`; `game/src/domain/talents/talents.js`, `game/src/application/talents/talentCollection.js`, `game/src/adapters/http/talentApi.js`, `game/src/adapters/phaser/HeroUi.js`, `shiftKey.js`, `pageGuards.js`, `views/talentsView.js`, `ClickerGame.js`, `game/src/main.js`, `game/public/style.css`
+- **Date**: 2026-11-27
+- **Status**: accepted (spec `ui-polish` revision 2, approved by the owner on 2026-11-27). Extends AD-011 (the upgrade buys a count; `fromLevel` and the server authority unchanged); conforms to AD-003, AD-007, AD-013, AD-016 (no migration; the previous backend keeps working), AD-017, AD-022 and AD-029 (the painted tree, now patched instead of rebuilt)
+
+### AD-034
+- **Decision**: The HUD rail has six buttons at every point of the campaign: Heróis, Mochila, Equipe, Equipamento, Talentos, Rever chefes. The Líder button and screen are gone: the leader card of Equipe opens the leader list (`Escolher líder`, every owned hero, any chapter), and `Tornar líder` stays. Before the first chapter 5 boss win Equipe shows the leader card, the four locked slots and the status line. T toggles Talentos and B toggles Mochila (a Mochila hero detail included); a key with Ctrl, Alt, Meta or Shift, an auto-repeat or a key typed in a text field does nothing, the pause menu and the reset dialog block the keys, and an open auto click window closes first. The two buttons show their key in a chip and carry `aria-keyshortcuts`. The A key follows the same modifier rule.
+- **Reason**: Owner decisions of 2026-11-27 (spec `ui-polish` Q17): remove the duplicate leader screen, add keys for the two screens visited most. Equipe could not replace Líder as it was, because it appeared only after the chapter 5 boss win and promoted only an ally in a bought slot (spec Q20).
+- **Trade-off**: Equipe shows locked slots for four chapters; the leader change takes one more click (leader card, then the row); T and B add two keys a player can press by mistake (the toggle undoes it).
+- **Scope**: `game/src/adapters/phaser/HeroUi.js`, `views/teamView.js`, `ClickerGame.js`, `game/public/style.css`; no backend change (`PUT /leader` unchanged)
+- **Date**: 2026-11-27
+- **Status**: accepted (spec `ui-polish` revision 2, approved by the owner on 2026-11-27). Supersedes the rule of AD-018 that the Equipe button joins the rail only once the team is unlocked; the slot rules, prices and the team in combat of AD-018 are unchanged. Conforms to AD-003, AD-007 and AD-022
+
 ## Technical Debt
 
 TD-001 to TD-008 are recorded in the spec of the feature that found them (`characters`, `unified-damage`, `supabase-postgres`); their status is tracked in the table below. New debts are logged here.
@@ -273,6 +289,7 @@ TD-001 to TD-008 are recorded in the spec of the feature that found them (`chara
 | TD-007 landscape phone legibility of the start screen | same | dropped by the product owner on 2026-11-26 with the TD-010 ruling (the game targets PC only); the owner may reopen it |
 | TD-008 English error lines of the start screen | same | in progress: `portuguese-text` |
 | TD-010 phone layout | dropped by the owner on 2026-11-26 | dropped |
+| TD-014 screens that rebuild on every action | below | open: fixed with the Equipamento redesign (owner, 2026-11-27) |
 
 ### TD-009
 - **Debt**: In Rever chefes, a chapter chip load still pending when the panel is closed and reopened leaves the chips disabled until the panel is reopened again, and its late answer overwrites the farm session (`bosses`, `chapter`) under the map of the current chapter. `game/src/adapters/phaser/HeroUi.js` `selectFarmChapter` (its `finally` clears `farmBusy` but skips the render once `this.view` changed); `game/src/application/farm/farmSession.js` `load`.
@@ -301,6 +318,13 @@ TD-001 to TD-008 are recorded in the spec of the feature that found them (`chara
 - **Fix**: the `ui-artist` measures the contrast in `09b`; if it is below 3:1, a small `game-dev` task darkens or thickens the outline. A different colour needs the owner, because Q12 of `hero-team` fixed light blue.
 - **Found**: `hero-team` ui-artist review round 2 (`a9eb31b`); ruled a low-priority backlog item by the product owner at acceptance (2026-11-19)
 - **Status**: in progress: `tech-debt-polish` (spec and tasks approved by the owner on 2026-11-26 with the recommended defaults)
+
+### TD-014
+- **Debt**: Six views rebuild their whole DOM, images included, on every action, the pattern that made Talentos blink (spec `ui-polish` § Facts): Equipamento (`HeroUi.render_equipment`, about 20 call sites), Equipe (`render_team`), the Mochila hero and its fusion ladder (`openBagHero`), Rever chefes (`render_farm`), the auto click window (`ClickerGame.showAutoClick`) and the leader card and skill bar (`HeroUi.updateSkillBar`). Not measured with a frame capture.
+- **Rule**: AD-033 (2): build once per open, patch in place, `aria-disabled` while a request runs.
+- **Fix**: when the Equipamento screen is redesigned (the owner set that redesign as the trigger on 2026-11-27, spec `ui-polish` Q9), that feature applies AD-033 (2) to Equipamento and to the other screens of this list, one screen per task, each with an element-identity e2e test like `ui-polish` UIP-06 AC 1 and 2. No standalone follow-up feature.
+- **Found**: product owner investigation for spec `ui-polish` (2026-11-27)
+- **Status**: open; waits for the Equipamento redesign (owner decision, 2026-11-27)
 
 ## Handoff
 
