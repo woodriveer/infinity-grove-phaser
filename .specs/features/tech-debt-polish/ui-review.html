@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Polimento de dívida técnica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Polimento de dívida técnica</h1>
+                <div class="meta">
+                    <code>.specs/features/tech-debt-polish</code> · commits <code>40c9c841</code> e <code>d045f4ca</code> · 2026-11-27 · local (vite dev, backend falso)
+                </div>
+            </div>
+            <span class="chip verdict ok">APROVADO</span>
+        </div>
+        <p style="margin-top:16px">As duas linhas de quebra ficam lado a lado na última linha do painel de atributos, sem corte, com e sem passivas. O número do aliado ficou sólido, azul claro com contorno escuro de 10 px, legível sobre a floresta e sobre um lacaio. Medido na captura 03: contorno contra a floresta mais clara 3,83:1 (mínimo exigido 3:1) e preenchimento contra o contorno 11,18:1. Nenhum achado bloqueante; há uma sugestão sobre o lado mais escuro da floresta.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">4</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">6</div><div class="l">capturas (desktop)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Linhas de quebra lado a lado na última linha (3 colunas), tempos na linha acima <code>TDP-01 AC 1, 2, Edge 1</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Ordem, textos e 10 linhas do painel inalterados; nenhuma linha cortada, Figtree 13 px <code>TDP-01 AC 3, 4</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Número do aliado #7fd4ff, 28 px, contorno #1c120c de 10 px, também em um lacaio <code>TDP-03 AC 1, Edge 2</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Contorno contra a amostra mais clara da floresta de pelo menos 3:1 (3,83:1) e preenchimento contra o contorno de pelo menos 3:1 (11,18:1) <code>TDP-03 AC 3, Q5</code></span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Contraste do número do aliado (Q5)</h2>
+        <p>Medido em pixels das capturas 03 e 04 (WCAG 2.x, texto grande de 28 px em negrito pede 3:1). Cores lidas da imagem: preenchimento <code>#7fd4ff</code>, contorno <code>#1c120c</code>.</p>
+        <ul class="checks">
+            <li><span class="mark">03</span><span>Amostras da floresta 2 px fora do contorno: esquerda <code>#6f755c</code> (3,83:1), direita <code>#424f40</code> (2,12:1), topo <code>#4d5847</code> (2,46:1), base <code>#5b634b</code> (2,92:1). Mais clara: esquerda. Contorno contra a mais clara: <strong>3,83:1</strong>. Preenchimento contra contorno: <strong>11,18:1</strong>. Ambas passam de 3:1.</span></li>
+            <li><span class="mark">04</span><span>Número sobre o lacaio (placeholder claro no ambiente de teste): esquerda <code>#d6ede5</code> (14,99:1), direita <code>#cde7df</code> (14,10:1), topo <code>#d6ece3</code> (14,87:1), base <code>#d2e9e0</code> (14,43:1). Preenchimento contra contorno: <strong>11,18:1</strong>.</span></li>
+            <li><span class="mark">cmp</span><span>Comparado com <code>hero-team/ui-review/09b-field-ally-hit-desktop.png</code>: antes o número aparecia cinza e esmaecido, quase fundido à floresta; agora é sólido e se lê de imediato.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>Equipamento: painel de atributos</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/01-attributes-panel-desktop.png" target="_blank"><img src="ui-review/01-attributes-panel-desktop.png" alt="01 · Painel de atributos, Kael sem passivas" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">01 · Painel de atributos, Kael sem passivas</span>
+                        <span class="d">Linhas de quebra com 0 e 0 lado a lado na última linha da grade; nada cortado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/01b-attributes-panel-crop-desktop.png" target="_blank"><img src="ui-review/01b-attributes-panel-crop-desktop.png" alt="01b · Recorte do painel, Kael" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">01b · Recorte do painel, Kael</span>
+                        <span class="d">Linhas 3 e 4: tempo de miniboss e de chefe, depois as duas quebras.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/02-attributes-panel-passives-desktop.png" target="_blank"><img src="ui-review/02-attributes-panel-passives-desktop.png" alt="02 · Painel de atributos com passivas (capítulo 5)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">02 · Painel de atributos com passivas (capítulo 5)</span>
+                        <span class="d">Seraphine líder com Lyra, Kael, Orina e Vex na equipe: quebras 15 e 15.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/02b-attributes-panel-passives-crop-desktop.png" target="_blank"><img src="ui-review/02b-attributes-panel-passives-crop-desktop.png" alt="02b · Recorte do painel com passivas" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">02b · Recorte do painel com passivas</span>
+                        <span class="d">Texto de 13 px legível; a linha mais longa (Quebra de resistência a crítico: 15) cabe na coluna 2.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Campo de batalha: número do aliado</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/03-field-ally-hit-desktop.png" target="_blank"><img src="ui-review/03-field-ally-hit-desktop.png" alt="03 · Golpe de aliado (Lyra) no monstro" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">03 · Golpe de aliado (Lyra) no monstro</span>
+                        <span class="d">Número 2 azul claro com contorno escuro de 10 px sobre a floresta enevoada; alpha 1.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/04-field-ally-hit-add-desktop.png" target="_blank"><img src="ui-review/04-field-ally-hit-add-desktop.png" alt="04 · Golpe de aliado em um lacaio" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">04 · Golpe de aliado em um lacaio</span>
+                        <span class="d">Número 1 azul claro no lacaio 1, ao lado do número dourado do clique (0.5); mesmo contorno.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <p class="empty">Nenhum achado.</p>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>A regra do Q5 mede o contorno contra a amostra mais clara da floresta, que é o caso mais fácil para um contorno escuro. Nas amostras mais escuras (direita 2,12:1, topo 2,46:1, base 2,92:1) o contorno quase se funde ao fundo, e quem carrega a leitura é o preenchimento azul claro (11,18:1 contra o contorno). Não bloqueia, pois a spec foi aprovada assim; numa próxima spec vale medir também contra a amostra mais escura.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <p>Erros do console não foram lidos: a extensão Claude in Chrome não estava conectada. Os cenários do Playwright rodaram sem falha (4 de 4 no desktop) e nenhuma imagem apareceu quebrada nas capturas.</p>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-27</footer>
+</main>
+</body>
+</html>

@@ -251,7 +251,7 @@ const shownMonsters = (page) => page.evaluate(() => window.__shownMonsters);
 
 ### Phase 3: UI review
 
-#### T5: UI review of the attribute panel and the ally number [ ]
+#### T5: UI review of the attribute panel and the ally number [x]
 
 **Owner**: ui-artist
 **Goal**: The attribute panel shows the two break lines side by side with nothing clipped, and the ally number reaches 3:1 against the forest (TDP-01, TDP-03; spec Ally number AC 3, Q5).
@@ -275,7 +275,7 @@ const shownMonsters = (page) => page.evaluate(() => window.__shownMonsters);
 **Gate**: `cd game && npm run ui:shots -- techDebtPolish`
 **Done when**:
 
-- [ ] `ui-review.html` lists the 4 shots with `APROVADO`, or each finding as a new task in this file with its owner.
+- [x] `ui-review.html` lists the 4 shots with `APROVADO`, or each finding as a new task in this file with its owner.
 
 **Commit**: `docs(ui): review the attribute panel rows and the ally number outline`
 
