@@ -391,7 +391,7 @@ Every row is the product owner's recommended default, waiting for the owner.
 - WHEN the player presses and holds both Shift keys and releases one THEN the game SHALL turn the Shift mode off (the browser reports one `keyup` with key `Shift`); the next auto-repeat or pointer move with Shift turns it on again.
 - WHILE an upgrade request runs and the Shift mode is on, WHEN the player Shift-clicks again, THEN the game SHALL send no second request (UIP-07 AC 2).
 - WHEN the answer of a Shift purchase lands while Shift is still held THEN the game SHALL label the button from the answered tree (E1: text T1 `Melhorar (1 ponto)`, disabled).
-- WHEN the player closes Talentos while a request runs and opens it again THEN the game SHALL build the screen afresh (UIP-06 AC 11) and the late answer SHALL change only the collection, as today (`view` check in `HeroUi.upgradeTalent`).
+- WHEN the player closes Talentos while a request runs and opens it again THEN the game SHALL build the screen afresh (UIP-06 AC 11) and the late answer SHALL update the collection and patch the reopened screen in place from it (levels, points and `aria-disabled` cleared, UIP-07 AC 3; fix F1).
 - IF the backend cannot be reached during a Shift purchase THEN the game SHALL show T5 and keep the tree it had.
 - WHEN the player presses Ctrl+A inside the username field THEN only the field's text SHALL be selected (UIP-01 AC 5).
 - WHILE the Shift mode is on Talentos, WHEN the player presses T, THEN Talentos SHALL stay open (Shift+T is a modified key, UIP-12 AC 6).
