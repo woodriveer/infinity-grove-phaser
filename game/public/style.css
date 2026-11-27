@@ -1272,6 +1272,9 @@ button:disabled {
     text-align: center;
 }
 
+/* The key of a HUD button (spec ui-polish UIP-12), in the corner the red dot leaves free */
+.hud-key { position: absolute; top: 3px; left: 4px; display: grid; place-items: center; box-sizing: border-box; min-width: 16px; height: 16px; padding: 0 3px; font-family: var(--font-heading); font-size: 10px; font-weight: 700; line-height: 1; color: var(--gold-200); background: var(--wood-900); border: 1px solid var(--gold-400); border-radius: 4px; pointer-events: none; }
+
 /* The leader on the left of the battle bar */
 .leader-card {
     display: flex;

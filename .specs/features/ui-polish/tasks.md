@@ -586,7 +586,7 @@ Every other existing `HeroUi.test.js` and `ClickerGame.test.js` case passes unch
 
 ---
 
-#### T10: The T and B keys open Talentos and Mochila [ ]
+#### T10: The T and B keys open Talentos and Mochila [x]
 
 **Owner**: game-dev
 **Goal**: T toggles Talentos and B toggles Mochila under the rules of spec UIP-12, the two HUD buttons show their key, and A ignores modifiers too (UIP-12, UIP-14; spec Q21 to Q27).
@@ -652,7 +652,7 @@ Every existing A case of `ClickerGame.test.js` passes unchanged.
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 17 new cases pass; the whole unit suite passes.
+- [x] The 17 new cases pass; the whole unit suite passes.
 
 **Commit**: `feat(game): open Talentos with T and Mochila with B`
 

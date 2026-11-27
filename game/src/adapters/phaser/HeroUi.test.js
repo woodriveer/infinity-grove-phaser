@@ -95,10 +95,47 @@ describe('HeroUi HUD', () => {
     it('shows the six buttons Heróis, Mochila, Equipe, Equipamento, Talentos and Rever chefes', () => {
         const { testid } = createUi();
 
-        expect([ 'heroes', 'bag', 'team', 'equipment', 'talents', 'farm' ].map((id) => testid(`hud-${id}`).textContent)).toEqual([
+        //  The label of a button: its text without the chip of its key
+        const label = (id) => testid(`hud-${id}`).textContent.slice(0, -(testid(`hud-key-${id}`)?.textContent.length ?? 0) || undefined);
+
+        expect([ 'heroes', 'bag', 'team', 'equipment', 'talents', 'farm' ].map(label)).toEqual([
             'Heróis', 'Mochila', 'Equipe', 'Equipamento', 'Talentos', 'Rever chefes'
         ]);
         expect(testid('hud-fusion')).toBeNull();
+    });
+
+    it('the Mochila and Talentos buttons show the keys B and T', () => {
+        const { testid, query } = createUi();
+
+        expect(testid('hud-key-bag').textContent).toBe('B');
+        expect(testid('hud-key-talents').textContent).toBe('T');
+        expect(testid('hud-bag').getAttribute('aria-keyshortcuts')).toBe('B');
+        expect(testid('hud-talents').getAttribute('aria-keyshortcuts')).toBe('T');
+        [ 'heroes', 'team', 'equipment', 'farm' ].forEach((id) =>
+        {
+            expect(testid(`hud-${id}`).querySelector('.hud-key')).toBeNull();
+            expect(testid(`hud-${id}`).hasAttribute('aria-keyshortcuts')).toBe(false);
+        });
+        expect(query('.hero-hud').querySelectorAll('.hud-key')).toHaveLength(2);
+    });
+
+    it('toggle opens a closed screen, closes the same one and switches from another', async () => {
+        const ctx = createUi();
+
+        await ctx.ui.toggle('bag');
+
+        expect(ctx.ui.isOpen).toBe(true);
+        expect(ctx.ui.screen).toBe('bag');
+
+        await ctx.ui.toggle('bag');
+
+        expect(ctx.ui.isOpen).toBe(false);
+
+        await ctx.ui.toggle('bag');
+        await ctx.ui.toggle('talents');
+
+        expect(ctx.ui.isOpen).toBe(true);
+        expect(ctx.ui.screen).toBe('talents');
     });
 
     it('keeps the panel hidden until a button is pressed', () => {

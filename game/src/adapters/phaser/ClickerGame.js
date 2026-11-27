@@ -30,6 +30,9 @@ import { renderElementWheel } from './views/elementWheel';
 import { renderEffectTags, updateEffectTags } from './views/skillEffects';
 import { renderStageLabel } from './views/stageLabel';
 
+//  A shortcut with Ctrl, Alt, Meta or Shift belongs to the browser or to another gesture (spec ui-polish UIP-12)
+const hasModifier = (event) => Boolean(event?.ctrlKey || event?.altKey || event?.metaKey || event?.shiftKey);
+
 //  The leader hero stands on the ground line of the monster; y is its feet
 const CHARACTER = { x: 230, y: 612, height: 320 };
 //  The attack formation (spec hero-team, Q36): fit boxes, bottom centres (origin 0.5, 1) and depths
@@ -95,6 +98,8 @@ const AFFIX = { x: 670, y: 336 };
 const EFFECTS = { x: 512, y: 96 };
 //  Phaser key names of the skill keys and the slot each one uses: 1, 2, 3 and Q, W, E
 const SKILL_KEYS = [ [ 'ONE', 1 ], [ 'TWO', 2 ], [ 'THREE', 3 ], [ 'Q', 1 ], [ 'W', 2 ], [ 'E', 3 ] ];
+//  Phaser key names of the screen keys and the hero screen each one toggles: T opens Talentos, B opens Mochila (spec ui-polish UIP-12)
+const SCREEN_KEYS = [ [ 'T', 'talents' ], [ 'B', 'bag' ] ];
 const DAMAGE_FONT = { fontFamily: 'Cinzel', fontStyle: '700', stroke: '#2a1408', strokeThickness: 8 };
 const CRITICAL_TEXT = { color: '#ff8a1f', fontSize: 48 };
 const NORMAL_TEXT = { color: '#ffd35c', fontSize: 32 };
@@ -295,6 +300,7 @@ export class ClickerGame extends Scene
         this.input.keyboard.on('keydown-ESC', () => this.escape());
         //  A held key fires once: the repeats of the operating system are ignored
         SKILL_KEYS.forEach(([ key, slot ]) => this.input.keyboard.on(`keydown-${key}`, (event) => !event?.repeat && this.useSkill(slot)));
+        SCREEN_KEYS.forEach(([ key, screen ]) => this.input.keyboard.on(`keydown-${key}`, (event) => this.screenKey(screen, event)));
     }
 
     //  The round auto click button and its window are clickable HTML, hidden until the auto click is open; they read their state in the background
@@ -392,16 +398,34 @@ export class ClickerGame extends Scene
         this.autoClickWindowOpen ? this.closeAutoClickWindow() : this.openAutoClickWindow();
     }
 
-    //  The A key opens or closes the window; not while typing, not for the repeats of a held key, and not while a dialog, the pause menu or a
-    //  hero screen covers the battle bar
+    //  The A key opens or closes the window; not while typing, not for the repeats of a held key, not with Ctrl, Alt, Meta or Shift, and not while a
+    //  dialog, the pause menu or a hero screen covers the battle bar
     autoClickKey (event)
     {
-        if (event?.repeat || isTextField(event?.target) || this.paused || !this.resetDialog.hidden || this.heroUi.isOpen || !this.autoClickOpen)
+        if (event?.repeat || hasModifier(event) || isTextField(event?.target) || this.paused || !this.resetDialog.hidden || this.heroUi.isOpen || !this.autoClickOpen)
         {
             return;
         }
 
         this.toggleAutoClickWindow();
+    }
+
+    //  T and B open their hero screen, or close it when it is the one open (spec ui-polish UIP-12); the screen of the other key is replaced. Not for
+    //  a held key, with Ctrl, Alt, Meta or Shift, while typing, nor while the pause menu or the reset dialog covers the game. An open auto click
+    //  window closes first.
+    screenKey (screen, event)
+    {
+        if (event?.repeat || hasModifier(event) || isTextField(event?.target) || this.paused || !this.resetDialog.hidden)
+        {
+            return;
+        }
+
+        if (this.autoClickWindowOpen)
+        {
+            this.closeAutoClickWindow({ returnFocus: false });
+        }
+
+        this.heroUi.toggle(screen);
     }
 
     //  The dialog is clickable HTML above the HUD; its buttons confirm or cancel the reset

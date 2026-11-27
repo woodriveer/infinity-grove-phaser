@@ -416,9 +416,9 @@ Every row is the product owner's recommended default, waiting for the owner.
 | UIP-09 | P1: Shift buys the most - AC 1 to 10, E1 to E7, Edge 3, 5 | Tasks T4, T5, T7, T8, T13, T17 | Implementing |
 | UIP-10 | P1: Shift mode - AC 1 to 9, Edge 1 | Tasks T6, T8, T13 | Implementing |
 | UIP-11 | P3: Shortcut hint - AC 1 | Tasks T7, T13, T17 | Implementing |
-| UIP-12 | P2: T and B - AC 1 to 11, Edge 7 to 9 | Tasks T10, T15, T17 | In Tasks |
+| UIP-12 | P2: T and B - AC 1 to 11, Edge 7 to 9 | Tasks T10, T15, T17 | Implementing |
 | UIP-13 | P1: Equipe replaces Líder - AC 1 to 11, Edge 10 | Tasks T9, T14, T15, T17 | Implementing |
-| UIP-14 | P3: A ignores modifiers [proposed] - AC 1, 2 | Tasks T10, T15 | In Tasks |
+| UIP-14 | P3: A ignores modifiers [proposed] - AC 1, 2 | Tasks T10, T15 | Implementing |
 
 **Coverage:** 14 total, 14 mapped to tasks (`tasks.md`), 0 unmapped
 

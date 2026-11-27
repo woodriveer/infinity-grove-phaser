@@ -2308,7 +2308,10 @@ describe('ClickerGame hero screens', () => {
     it('shows the four hero buttons in the HUD and none of them in the pause menu', async () => {
         const ctx = await createScene();
 
-        expect([ 'heroes', 'bag', 'team', 'farm' ].map((id) => testid(ctx, `hud-${id}`)?.textContent)).toEqual([
+        //  The label of a button: its text without the chip of its key
+        const label = (id) => testid(ctx, `hud-${id}`)?.textContent.slice(0, -(testid(ctx, `hud-key-${id}`)?.textContent.length ?? 0) || undefined);
+
+        expect([ 'heroes', 'bag', 'team', 'farm' ].map(label)).toEqual([
             'Heróis', 'Mochila', 'Equipe', 'Rever chefes'
         ]);
         expect(testid(ctx, 'hud-fusion') ?? null).toBeNull();
@@ -4682,6 +4685,151 @@ describe('ClickerGame auto click', () => {
         expect(button(ctx).getAttribute('aria-expanded')).toBe('false');
     });
 
+    it('ignores Ctrl+A, which is Select All', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        press(ctx, 'A', { repeat: false, target: document.body, ctrlKey: true });
+
+        expect(popover(ctx).hidden).toBe(true);
+    });
+
+    it('ignores Alt+A, Meta+A and Shift+A too', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        [ 'altKey', 'metaKey', 'shiftKey' ].forEach((modifier) =>
+        {
+            press(ctx, 'A', { repeat: false, target: document.body, [modifier]: true });
+
+            expect(popover(ctx).hidden).toBe(true);
+        });
+    });
+
+    it('still opens the window for a plain A', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+
+        press(ctx, 'A', { repeat: false, target: document.body });
+
+        expect(popover(ctx).hidden).toBe(false);
+    });
+
+    describe('Screen keys T and B', () => {
+        const key = (ctx, name, extra = {}) => press(ctx, name, { repeat: false, target: document.body, ...extra });
+
+        it('T opens Talentos', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+
+            key(ctx, 'T');
+
+            expect(ctx.scene.heroUi.isOpen).toBe(true);
+            expect(ctx.scene.heroUi.screen).toBe('talents');
+        });
+
+        it('B opens Mochila', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+
+            key(ctx, 'B');
+
+            expect(ctx.scene.heroUi.isOpen).toBe(true);
+            expect(ctx.scene.heroUi.screen).toBe('bag');
+        });
+
+        it('T closes Talentos when it is open', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+
+            key(ctx, 'T');
+            key(ctx, 'T');
+
+            expect(ctx.scene.heroUi.isOpen).toBe(false);
+        });
+
+        it('B closes Mochila when it is open', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+
+            key(ctx, 'B');
+            key(ctx, 'B');
+
+            expect(ctx.scene.heroUi.isOpen).toBe(false);
+        });
+
+        it('T over Mochila shows Talentos', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+
+            key(ctx, 'B');
+            key(ctx, 'T');
+
+            expect(ctx.scene.heroUi.isOpen).toBe(true);
+            expect(ctx.scene.heroUi.screen).toBe('talents');
+        });
+
+        it('Ctrl, Alt, Meta or Shift with T does nothing', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+
+            [ 'ctrlKey', 'altKey', 'metaKey', 'shiftKey' ].forEach((modifier) =>
+            {
+                key(ctx, 'T', { [modifier]: true });
+
+                expect(ctx.scene.heroUi.isOpen).toBe(false);
+            });
+        });
+
+        it('Ctrl+B does nothing', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+
+            key(ctx, 'B', { ctrlKey: true });
+
+            expect(ctx.scene.heroUi.isOpen).toBe(false);
+        });
+
+        it('a repeated T does nothing', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+
+            key(ctx, 'T', { repeat: true });
+
+            expect(ctx.scene.heroUi.isOpen).toBe(false);
+        });
+
+        it('T typed in a text field does nothing', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+            const field = document.createElement('input');
+
+            field.type = 'text';
+            key(ctx, 'T', { target: field });
+
+            expect(ctx.scene.heroUi.isOpen).toBe(false);
+        });
+
+        it('T does nothing while the fight is paused', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+
+            ctx.handlers['keydown-ESC']();
+            key(ctx, 'T');
+
+            expect(ctx.scene.paused).toBe(true);
+            expect(ctx.scene.heroUi.isOpen).toBe(false);
+        });
+
+        it('T does nothing while the reset dialog is shown', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+
+            ctx.scene.resetDialog.hidden = false;
+            key(ctx, 'T');
+
+            expect(ctx.scene.heroUi.isOpen).toBe(false);
+        });
+
+        it('T closes the auto click window and opens Talentos', async () => {
+            const ctx = await createScene({ start: atChapter(2) });
+
+            key(ctx, 'A');
+            expect(popover(ctx).hidden).toBe(false);
+
+            key(ctx, 'T');
+
+            expect(popover(ctx).hidden).toBe(true);
+            expect(ctx.scene.heroUi.screen).toBe('talents');
+        });
+    });
+
     it('labels the button and the window for assistive tech', async () => {
         const ctx = await createScene({ start: atChapter(2) });
 
@@ -4697,7 +4845,7 @@ describe('ClickerGame auto click', () => {
         const ctx = await createScene({ start: atChapter(2) });
 
         expect(ctx.scene.input.keyboard.on.mock.calls.map(([ name ]) => name).sort()).toEqual([
-            'keydown-A', 'keydown-E', 'keydown-ESC', 'keydown-ONE', 'keydown-Q', 'keydown-THREE', 'keydown-TWO', 'keydown-W'
+            'keydown-A', 'keydown-B', 'keydown-E', 'keydown-ESC', 'keydown-ONE', 'keydown-Q', 'keydown-T', 'keydown-THREE', 'keydown-TWO', 'keydown-W'
         ]);
     });
 

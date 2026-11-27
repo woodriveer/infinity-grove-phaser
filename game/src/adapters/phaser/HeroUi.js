@@ -70,7 +70,10 @@ const NOT_ENOUGH_TALENT_POINTS = 'Pontos de talento insuficientes';
 const BADGED = [ 'bag', 'equipment', 'talents' ];
 const MAX_BADGE_COUNT = 9;
 const badgeHtml = (id) => `<span class="hud-badge" data-testid="${id}-badge" hidden></span>`;
-const buttonHtml = ({ id, label }) => `<button type="button" data-testid="hud-${id}">${ICONS[id]}${label}${BADGED.includes(id) ? badgeHtml(id) : ''}</button>`;
+//  The keys that open a screen (spec ui-polish UIP-12, handled by the scene): shown as a chip on the button and named to assistive technology
+const SHORTCUTS = { bag: 'B', talents: 'T' };
+const keyHtml = (id) => (SHORTCUTS[id] ? `<span class="hud-key" data-testid="hud-key-${id}" aria-hidden="true">${SHORTCUTS[id]}</span>` : '');
+const buttonHtml = ({ id, label }) => `<button type="button" data-testid="hud-${id}"${SHORTCUTS[id] ? ` aria-keyshortcuts="${SHORTCUTS[id]}"` : ''}>${ICONS[id]}${label}${keyHtml(id)}${BADGED.includes(id) ? badgeHtml(id) : ''}</button>`;
 //  The rail always shows the six buttons; Equipe holds the leader card that opens the leader list (spec ui-polish UIP-13)
 const RAIL = SCREENS;
 const HUD_HTML = `<div class="hero-hud">${RAIL.map(buttonHtml).join('')}</div>`;
@@ -179,6 +182,19 @@ export class HeroUi
     get isOpen ()
     {
         return this.open;
+    }
+
+    //  Closes `screen` when it is the one open, else opens it over whatever is open (a hero detail or the fusion ladder of Mochila is the screen bag)
+    toggle (screen)
+    {
+        if (this.open && this.screen === screen)
+        {
+            this.close();
+
+            return undefined;
+        }
+
+        return this.show(screen);
     }
 
     //  Opens a screen by id; the fight keeps running behind it (spec background-fight)
