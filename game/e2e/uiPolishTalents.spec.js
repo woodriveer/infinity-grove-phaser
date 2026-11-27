@@ -293,16 +293,15 @@ test.describe('Talentos in place (UIP-06)', () => {
 
         await expect.poll(available).toBe(1);
 
-        //  The screen that was open when the answer landed is the one built before it: the answer changed no element of it
+        //  The screen open when the answer landed is repainted in place (UIP-07 AC 3): it shows the level the collection now holds, in the same elements
         await expect(page.getByTestId('talent-detail-empty')).toBeVisible();
-        await expect(page.getByTestId('talent-node-level-COMBO')).toHaveText('1/10');
+        await expect(page.getByTestId('talent-node-level-COMBO')).toHaveText('2/10');
         expect((await same(page)).board).toBe(true);
         expect(await removedImages(page)).toBe(0);
     });
 
-    //  FIX TASK F1 (tasks.md § Author check): HeroUi.upgradeTalent repaints only when its `view` is still the current one, so a screen opened while the request ran keeps
-    //  both buttons aria-disabled "true" after the answer. UIP-07 AC 3 says both give aria-disabled "false" when the request ends. Remove `test.fail` once F1 is done.
-    test.fail('a screen opened while a request ran gives both buttons aria-disabled false when the request ends (UIP-07 AC 3)', async ({ page }) => {
+    //  UIP-07 AC 3 on the reopen path (fix task F1): the screen opened while the request ran gives both buttons aria-disabled "false" when the request ends
+    test('a screen opened while a request ran gives both buttons aria-disabled false when the request ends (UIP-07 AC 3)', async ({ page }) => {
         const { fake } = await startGame(page, { talents: { COMBO: 1 }, points: 2 });
         await openTalents(page);
         await pick(page, 'COMBO');

@@ -1063,7 +1063,7 @@ Run on 2026-11-27 by `test-engineer`, tree at `08f8fe1a` plus the T16 commit. Un
 | UIP-06 Edge 4 | close during a request, open: empty card, late answer changes only the collection (`available` 1, board `===`, 0 removed) | `HeroUi.test.js:1451` (the screen keeps its elements) | Talents:274 |
 | UIP-07 AC 1 | `aria-disabled` `true`, `opacity` `1`, `cursor` `progress` on card button and reset, for an upgrade and for a reset | `talentsView.test.js:189, 339` | Talents:353, 404 |
 | UIP-07 AC 2 (Edge 2) | `talentUpgrades()` length 1, `talentResets()` 0 after clicks while it runs | `talentsView.test.js:727` | Talents:366; Shift:228 |
-| UIP-07 AC 3 | `aria-disabled` `false` on both, card `cursor` `pointer` after the answer | `talentsView.test.js:727` | Talents:387; **gap F1**: Talents:305 (`test.fail`) |
+| UIP-07 AC 3 | `aria-disabled` `false` on both, card `cursor` `pointer` after the answer | `talentsView.test.js:727` | Talents:387; F1 done: Talents:305; `HeroUi.test.js` (two reopen tests) |
 | UIP-07 AC 4 | disabled `opacity` `0.45` only with 0 points; running request sets no `disabled` | `talentsView.test.js:196, 339` | Talents:417 |
 | UIP-08 AC 1 | COMBO 0, 5 points, `levels` 5: level 5, value 25, `nextCost` 1, points `{ 5, 5, 0 }` | `T:domain/TalentsTest.kt:223, 232, 243, 252` | `T:adapter/web/TalentControllerIT.kt:263, 278` |
 | UIP-08 AC 2 | no `levels` or null: one level | `T:service/TalentServiceTest.kt:129` | `T:adapter/web/TalentControllerIT.kt:289` |
@@ -1165,7 +1165,7 @@ Run on 2026-11-27 by `test-engineer`, tree at `08f8fe1a` plus the T16 commit. Un
 
 | Id | Owner | Task | Evidence |
 | --- | --- | --- | --- |
-| F1 | game-dev | A screen opened while a talent request runs keeps `aria-disabled="true"` on Reiniciar pontos and the card button after the answer, until the next patch. `HeroUi.upgradeTalent` and `HeroUi.resetTalents` repaint in `finally` only when `view === this.view`; a screen opened meanwhile has another `view`, and `render_talents` is the patch that clears the busy flag. UIP-07 AC 3 says both buttons give `aria-disabled` `false` when the request ends. Fix: repaint (in place) whenever `this.open && this.screen === 'talents'`, keeping the error line and the collection-only rule for the rest. Then remove `test.fail` from `game/e2e/uiPolishTalents.spec.js:305`. | `HeroUi.js:1091` (`finally` of `upgradeTalent`) and the same `finally` of `resetTalents`; `uiPolishTalents.spec.js:305` fails on `aria-disabled` `true` (expected `false`) with `test.fail` removed |
+| F1 [x] done | game-dev | A screen opened while a talent request runs keeps `aria-disabled="true"` on Reiniciar pontos and the card button after the answer, until the next patch. `HeroUi.upgradeTalent` and `HeroUi.resetTalents` repaint in `finally` only when `view === this.view`; a screen opened meanwhile has another `view`, and `render_talents` is the patch that clears the busy flag. UIP-07 AC 3 says both buttons give `aria-disabled` `false` when the request ends. Fix: repaint (in place) whenever `this.open && this.screen === 'talents'`, keeping the error line and the collection-only rule for the rest. Then remove `test.fail` from `game/e2e/uiPolishTalents.spec.js:305`. | `HeroUi.js:1091` (`finally` of `upgradeTalent`) and the same `finally` of `resetTalents`; `uiPolishTalents.spec.js:305` fails on `aria-disabled` `true` (expected `false`) with `test.fail` removed |
 
 ### Failures not caused by the feature
 

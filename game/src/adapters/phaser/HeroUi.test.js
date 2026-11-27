@@ -1820,6 +1820,53 @@ describe('HeroUi Talentos', () => {
         expect(ctx.testid('talent-CLICK_DAMAGE').getAttribute('aria-pressed')).toBe('false');
     });
 
+    //  UIP-07 AC 3: a screen opened while a request ran gives both buttons aria-disabled "false" when the request ends
+    it('gives both buttons aria-disabled false when an upgrade ends after Talentos was closed and opened again', async () => {
+        const ctx = createUi({ talentList: talentsAnswer({ CLICK_DAMAGE: 1 }, 2) });
+        let finish;
+
+        ctx.talentGateway.upgrade.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+        await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
+        ctx.testid('talent-upgrade-CLICK_DAMAGE').click();
+        ctx.ui.close();
+        await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
+
+        expect(ctx.testid('talent-reset').getAttribute('aria-disabled')).toBe('true');
+        expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').getAttribute('aria-disabled')).toBe('true');
+
+        finish({ talents: talentTree({ CLICK_DAMAGE: 2 }), points: pointsOf(1, 1) });
+        await flush();
+
+        expect(ctx.testid('talent-reset').getAttribute('aria-disabled')).toBe('false');
+        expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').getAttribute('aria-disabled')).toBe('false');
+        ctx.ui.destroy();
+    });
+
+    it('gives both buttons aria-disabled false when a reset ends after Talentos was closed and opened again', async () => {
+        const ctx = createUi({ talentList: { talents: talentTree({ CLICK_DAMAGE: 1 }), points: pointsOf(0, 1) } });
+        let finish;
+
+        ctx.talentGateway.reset.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+        await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
+        ctx.testid('talent-reset').click();
+        ctx.ui.close();
+        await open(ctx, 'talents');
+        pick(ctx, 'CLICK_DAMAGE');
+
+        expect(ctx.testid('talent-reset').getAttribute('aria-disabled')).toBe('true');
+        expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').getAttribute('aria-disabled')).toBe('true');
+
+        finish(talentsAnswer({}, 1));
+        await flush();
+
+        expect(ctx.testid('talent-reset').getAttribute('aria-disabled')).toBe('false');
+        expect(ctx.testid('talent-upgrade-CLICK_DAMAGE').getAttribute('aria-disabled')).toBe('false');
+        ctx.ui.destroy();
+    });
+
     it('clears the selection when another screen is shown in between', async () => {
         const ctx = createUi({ talentList: talentsAnswer({}, 1) });
 

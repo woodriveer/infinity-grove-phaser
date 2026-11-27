@@ -1088,7 +1088,8 @@ export class HeroUi
         {
             this.talentBusy = false;
 
-            if (view === this.view && this.screen === 'talents')
+            //  Whatever view started the request, the Talentos screen open now was built with the buttons waiting (UIP-07 AC 3)
+            if (this.open && this.screen === 'talents')
             {
                 this.render_talents();
             }
@@ -1128,7 +1129,8 @@ export class HeroUi
         {
             this.talentBusy = false;
 
-            if (view === this.view && this.screen === 'talents')
+            //  Whatever view started the request, the Talentos screen open now was built with the buttons waiting (UIP-07 AC 3)
+            if (this.open && this.screen === 'talents')
             {
                 this.render_talents();
             }
