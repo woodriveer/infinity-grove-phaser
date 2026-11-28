@@ -464,7 +464,7 @@ The tests `a click number keeps the gold fill and the 8 px outline` and `a criti
 
 ---
 
-#### T7: The click pair in the browser [ ]
+#### T7: The click pair in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: Every AC of TCD-01 to TCD-04 and every spec Edge Case holds in Chrome through the player's click (L-062, L-098, L-099).
@@ -512,7 +512,13 @@ The tests `a click number keeps the gold fill and the 8 px outline` and `a criti
 **Gate**: `cd game && npm test && npx playwright test e2e/teamClickDamage.spec.js`
 **Done when**:
 
-- [ ] The 22 scenarios pass with the exact values above.
+- [x] The 22 scenarios pass with the exact values above.
+
+**Execution notes (T7)**:
+
+- `autoClick: true` switches the auto click on through `scene.switchAutoClick(true)` after the loop sleeps (the pattern of `minibossAddsTarget.spec.js`), not through the init script: with `'on'` at load a real frame could fire an auto click before the sleep and break the full-health check.
+- Scenario 1 (real mouse click) keeps the loop awake (Phaser reads the pointer on a frame) and records each number as it is shown (`recordNumbers` wraps `showDamage`), so the 800 ms fade cannot hide it from a slow read.
+- Scenario 8 also asserts the skill landed (one gold number, health below 1000) so "no team number" is not a vacuous check; scenario 14 runs with the auto click on, so the pause is shown to stop it too.
 
 **Commit**: `test(game): pin the click pair of the team in the browser`
 
