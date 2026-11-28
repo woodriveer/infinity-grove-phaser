@@ -139,7 +139,7 @@ test.describe('Unified damage', () => {
 
         await expect(chips).toHaveCount(3);
         await expect(chips.nth(0)).toHaveAttribute('data-element', 'WATER');
-        await expect(chips.nth(0)).toHaveText('Water');
+        await expect(chips.nth(0)).toHaveText('Água');
         await expect(chips.nth(1)).toHaveAttribute('data-stat', 'defense');
         await expect(chips.nth(1)).toHaveText('Defesa 11%');
         await expect(chips.nth(2)).toHaveAttribute('data-stat', 'crit');

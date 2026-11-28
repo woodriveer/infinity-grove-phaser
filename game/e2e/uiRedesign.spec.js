@@ -1840,7 +1840,10 @@ test.describe('Grove theme', () => {
         expect(near(chapter.centreY, 96)).toBe(true);
         expect(near(combo.centreX, 670)).toBe(true);
         expect(near(combo.centreY, 150)).toBe(true);
-        expect(near(timer.centreX, 512)).toBe(true);
+        //  The timer sits on x 512 while the plate ends 12 px before it; the plate `Estágio 1/1  Miniboss` is wider than the English one was, so it
+        //  pushes the timer right and the timer starts 12 px after the plate (boss-replay-chapters, portuguese-text PT-04 AC 4)
+        expect(near(timer.centreX, 512) || near(timer.left - stage.right, 12)).toBe(true);
+        expect(timer.centreX).toBeGreaterThanOrEqual(512 - 1);
         expect(near(timer.centreY, 44)).toBe(true);
         expect(near(enemy.centreX, 670)).toBe(true);
         expect(near(enemy.centreY, 609)).toBe(true);
