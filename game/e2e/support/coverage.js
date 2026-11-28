@@ -13,6 +13,12 @@ export const test = base.extend({
     //  Every spec starts with every catalog scene seen (spec story-scenes D23), so a chapter 1 battle opens on the fight;
     //  the story specs turn it off with test.use({ storySeen: false }). A value the test wrote itself is kept.
     storySeen: [ true, { option: true } ],
+    //  A context a test opens itself (browser.newContext) never gets the init script of `page`; the seeded storage reaches it through here
+    storageState: async ({ storageState, storySeen, baseURL }, use) => {
+        const seeded = { cookies: [], origins: [ { origin: new URL(baseURL).origin, localStorage: [ { name: 'infinity-grove.story-seen', value: SEEN } ] } ] };
+
+        await use(storySeen && baseURL && typeof storageState !== 'string' ? seeded : storageState);
+    },
     page: async ({ page, storySeen }, use, testInfo) => {
         if (storySeen) {
             await page.addInitScript((seen) => {
