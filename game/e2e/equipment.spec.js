@@ -42,7 +42,7 @@ test.describe('Equipment', () => {
         const canvas = await page.locator('#game-container canvas').boundingBox();
         const hud = await page.locator('.hero-hud').boundingBox();
 
-        await expect(page.locator('.hero-hud button')).toHaveCount(6);
+        await expect(page.locator('.hero-hud button')).toHaveCount(7);
         await expect(page.getByTestId('hud-equipment')).toHaveText('Equipamento');
         expect(hud.y).toBeGreaterThanOrEqual(canvas.y);
         expect(hud.y + hud.height).toBeLessThanOrEqual(canvas.y + canvas.height);

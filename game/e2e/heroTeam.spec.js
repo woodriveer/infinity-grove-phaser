@@ -79,18 +79,18 @@ const tick = (page, ms) => page.evaluate((delta) => {
 const slot = (page, index) => page.getByTestId(`team-slot-${index}`);
 
 test.describe('Hero team: Equipe screen', () => {
-    test('the Equipe button is in the rail before the chapter 5 boss is won and the rail keeps six buttons', async ({ page }) => {
+    test('the Equipe button is in the rail before the chapter 5 boss is won and the rail keeps seven buttons', async ({ page }) => {
         await startTeam(page, { cleared: [ 1, 2, 3, 4 ] });
 
         await expect(page.getByTestId('hud-team')).toHaveCount(1);
-        await expect(page.locator('.hero-hud button')).toHaveCount(6);
+        await expect(page.locator('.hero-hud button')).toHaveCount(7);
     });
 
     test('the Equipe button sits right after Mochila once the chapter 5 boss is won and the rail stays above the battle bar', async ({ page }) => {
         await startTeam(page, { cleared: [ 5 ] });
 
         expect(await page.locator('.hero-hud button[data-testid^="hud-"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.testid)))
-            .toEqual([ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm' ]);
+            .toEqual([ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm', 'hud-rankings' ]);
         await expect(page.getByTestId('hud-team')).toHaveText('Equipe');
 
         const icon = page.getByTestId('hud-team').locator('svg');

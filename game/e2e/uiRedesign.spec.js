@@ -959,7 +959,7 @@ test.describe('Grove theme', () => {
         await startAs(page, {});
         const rail = [
             [ 'hud-heroes', 'Heróis' ], [ 'hud-bag', 'Mochila' ], [ 'hud-team', 'Equipe' ],
-            [ 'hud-equipment', 'Equipamento' ], [ 'hud-talents', 'Talentos' ], [ 'hud-farm', 'Mapa' ]
+            [ 'hud-equipment', 'Equipamento' ], [ 'hud-talents', 'Talentos' ], [ 'hud-farm', 'Mapa' ], [ 'hud-rankings', 'Ranking' ]
         ];
 
         await expectStyle(page.locator('.hero-hud'), {
@@ -1459,13 +1459,13 @@ test.describe('Grove theme', () => {
         expect(Math.abs(bar.from - 624)).toBeLessThanOrEqual(1);
         expect(Math.abs(bar.to - 748)).toBeLessThanOrEqual(1);
 
-        //  The rail starts at x 907 and stays centred on y 370: six buttons (hero-bag-cards BAG-38) are 412 px tall, y 164..576,
-        //  where the seven of the Fusão days ended at y 609; UIR-19 AC21 keeps it above the bar (y 624)
+        //  The rail starts at x 907 and stays centred on y 370: the seven buttons since rankings (RNK-07, six plus Ranking) are 478 px tall,
+        //  y 131..609, as the seven of the Fusão days were; the six before were 412 px, y 164..576. UIR-19 AC21 keeps it above the bar (y 624)
         const rail = await page.locator('.hero-hud').boundingBox();
 
         expect(Math.abs(sceneSpan(canvas, rail).from - 907)).toBeLessThanOrEqual(1);
-        expect(Math.abs(sceneY(rail).from - 164)).toBeLessThanOrEqual(1);
-        expect(Math.abs(sceneY(rail).to - 576)).toBeLessThanOrEqual(1);
+        expect(Math.abs(sceneY(rail).from - 131)).toBeLessThanOrEqual(1);
+        expect(Math.abs(sceneY(rail).to - 609)).toBeLessThanOrEqual(1);
         expect(sceneY(rail).to).toBeLessThanOrEqual(609);
     });
 

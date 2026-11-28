@@ -1523,7 +1523,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 
 ---
 
-#### T19: Re-pin the e2e rail to seven buttons [ ]
+#### T19: Re-pin the e2e rail to seven buttons [x]
 
 **Owner**: test-engineer
 **Goal**: The three e2e files that pin six rail buttons pin seven, with Ranking last (RNK-07; spec Screen AC 1).
@@ -1542,6 +1542,9 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 | `heroBagCards.spec.js` | `the rail has six buttons and no Fusão` | `the rail has seven buttons and no Fusão` | ids + `'hud-rankings'` last |
 | `heroTeam.spec.js` | `the Equipe button is in the rail before the chapter 5 boss is won and the rail keeps six buttons` | `the Equipe button is in the rail before the chapter 5 boss is won and the rail keeps seven buttons` | `toHaveCount(6)` -> `toHaveCount(7)` |
 | `heroTeam.spec.js` | `the Equipe button sits right after Mochila once the chapter 5 boss is won and the rail stays above the battle bar` | unchanged | ids + `'hud-rankings'` last; its "rail above the battle bar" assertion stays as written |
+| `uiPolishHud.spec.js` | `the rail reads Heróis, Mochila, Equipe, Equipamento, Talentos, Mapa in chapter 1` | `the rail reads Heróis, Mochila, Equipe, Equipamento, Talentos, Mapa, Ranking in chapter 1` | `[ 'hud-rankings', 'Ranking' ]` last (added by the orchestrator, consequence of AD-037) |
+| `uiRedesign.spec.js` | `draws the rail as framed wood squares on parchment` | unchanged | `[ 'hud-rankings', 'Ranking' ]` last; the seventh button passes the same 76 x 60 and style checks (added by the orchestrator, consequence of AD-037) |
+| `uiRedesign.spec.js` | `keeps the leader card, the bar and the rail at their scene boxes` | unchanged | rail y range `164..576` -> `131..609` (seven buttons, 478 px, still centred on y 370 and above the bar at 624); `to <= 609` stays (added by the orchestrator, consequence of AD-037) |
 
 **Steps**: apply the table; run the gate for each file in turn.
 
@@ -1549,7 +1552,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 **Gate**: `cd game && npx playwright test e2e/equipment.spec.js`, then `e2e/heroBagCards.spec.js`, then `e2e/heroTeam.spec.js` (one file per run)
 **Done when**:
 
-- [ ] The three files pass; the commit body lists the four re-pinned tests.
+- [x] The three files pass (and the two added by the orchestrator); the commit body lists the seven re-pinned tests.
 
 **Commit**: `test(game): the rail has seven buttons`
 

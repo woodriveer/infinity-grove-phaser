@@ -405,12 +405,12 @@ test.describe('Mochila hero cards', () => {
         await expect(page.getByTestId('fusion-all-confirm')).toHaveCount(0);
     });
 
-    test('the rail has six buttons and no Fusão', async ({ page }) => {
+    test('the rail has seven buttons and no Fusão', async ({ page }) => {
         await startWith(page, { 'kael:0': 1 });
 
         const ids = await page.locator('.hero-hud button[data-testid^="hud-"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.testid));
 
-        expect(ids).toEqual([ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm' ]);
+        expect(ids).toEqual([ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm', 'hud-rankings' ]);
         await expect(page.getByTestId('hud-fusion')).toHaveCount(0);
     });
 
