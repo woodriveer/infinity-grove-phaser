@@ -215,7 +215,7 @@ Numbers on the canvas use `formatDamage` (one decimal, K/M/B/T from 1 000).
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| TCD-01 | P1: The team strikes with every click | Tasks | In Tasks |
+| TCD-01 | P1: The team strikes with every click | Tasks | Implementing |
 | TCD-02 | P1: The team never hits on its own | Tasks | In Tasks |
 | TCD-03 | P1: The team number stands beside the click number | Tasks | In Tasks |
 | TCD-04 | P1: Equipe speaks of damage per click | Tasks | In Tasks |

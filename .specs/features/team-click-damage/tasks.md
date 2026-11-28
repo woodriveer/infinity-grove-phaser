@@ -82,7 +82,7 @@ T9
 
 ### Phase 1: Game
 
-#### T1: `landTeam` lands one round of ally hits [ ]
+#### T1: `landTeam` lands one round of ally hits [x]
 
 **Owner**: game-dev
 **Goal**: A pure function lands every fighting ally once on the target read before each hit and reports each hit's target (TCD-01 AC 1, 7, 8).
@@ -127,8 +127,8 @@ Body: `const slots = []; const hits = []; let damage = 0;` then `for (const { sl
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 7 cases pass; every existing case of `allyCombat.test.js` still passes.
-- [ ] Gate passes.
+- [x] The 7 cases pass; every existing case of `allyCombat.test.js` still passes.
+- [x] Gate passes.
 
 **Commit**: `feat(game): land one round of ally hits with landTeam`
 
