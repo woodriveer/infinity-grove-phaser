@@ -4,10 +4,10 @@ const MIN_PASSWORD_LENGTH = 8;
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
 
-const problem = (status, detail, code) => ({
+const problem = (status, detail, code, extra = {}) => ({
     status,
     contentType: 'application/problem+json',
-    json: { status, detail, ...(code && { code }) }
+    json: { status, detail, ...(code && { code }), ...extra }
 });
 
 const unauthenticated = () => problem(401, 'Authentication is required', 'AUTH_UNAUTHENTICATED');
@@ -1074,7 +1074,7 @@ export async function mockBackend (page, {
 
             if (!username) { return route.fulfill(problem(400, 'Username must not be blank')); }
             if (String(body.password ?? '').length < MIN_PASSWORD_LENGTH) {
-                return route.fulfill(problem(400, `Password must have at least ${MIN_PASSWORD_LENGTH} characters`));
+                return route.fulfill(problem(400, `Password must have at least ${MIN_PASSWORD_LENGTH} characters`, 'USER_PASSWORD_TOO_SHORT', { minLength: MIN_PASSWORD_LENGTH }));
             }
             if (store.has(username)) {
                 return route.fulfill(problem(409, `User '${username}' already exists`, 'USER_ALREADY_EXISTS'));

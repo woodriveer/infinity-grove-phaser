@@ -313,7 +313,7 @@ T11
 
 ### Phase 3: Tests in the browser and author check
 
-#### T8: Move every English e2e and review assertion to Portuguese [ ]
+#### T8: Move every English e2e and review assertion to Portuguese [x]
 
 **Owner**: test-engineer
 **Goal**: Every e2e test, e2e helper and review shot reads the Portuguese texts, with every other value unchanged (PT-01, PT-02, PT-04, PT-05; design § Test Text Mapping).
@@ -336,9 +336,9 @@ T11
 **Gate**: `cd game && npm test && npm run build && npx playwright test <every e2e file changed by this task>`
 **Done when**:
 
-- [ ] The changed e2e files pass.
-- [ ] `git grep -n -E "Welcome back|Account created|Hello, |Click to Start|Enter username|name: 'Login'|name: 'Sign up'|name: 'Logout'|Stage [0-9]|Chapter Boss|Time: [0-9]|Gold: |Could not load|Chapter complete|Farm boss|Paused|1\. Continue|2\. Leave fight|Yes, leave|No, stay" -- game/e2e game/ui-review` prints nothing.
-- [ ] `git grep -n -E "'(Password is invalid|Cannot reach the server\. Try again later\.)'|already exists\"|does not exist\"" -- game/e2e ':!game/e2e/support/fakeBackend.js'` prints nothing.
+- [x] The changed e2e files pass.
+- [x] `git grep -n -E "Welcome back|Account created|Hello, |Click to Start|Enter username|name: 'Login'|name: 'Sign up'|name: 'Logout'|Stage [0-9]|Chapter Boss|Time: [0-9]|Gold: |Could not load|Chapter complete|Farm boss|Paused|1\. Continue|2\. Leave fight|Yes, leave|No, stay" -- game/e2e game/ui-review` prints nothing.
+- [x] `git grep -n -E "'(Password is invalid|Cannot reach the server\. Try again later\.)'|already exists\"|does not exist\"" -- game/e2e ':!game/e2e/support/fakeBackend.js'` prints nothing.
 
 **Commit**: `test(game): read the Portuguese texts in the e2e and review suites`
 

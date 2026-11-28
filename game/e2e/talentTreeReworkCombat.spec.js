@@ -42,7 +42,7 @@ const startGame = async (page, {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     await expect(page.getByTestId('skill-slot-1')).toBeVisible();
@@ -107,7 +107,7 @@ test.describe('Boss damage', () => {
         await expect.poll(() => dealt(page)).toBeCloseTo(19.8, 5);
     });
 
-    test('the chapter boss timer ignores a BOSS_TIME of an older backend: Time: 60', async ({ page }) => {
+    test('the chapter boss timer ignores a BOSS_TIME of an older backend: Tempo: 60s', async ({ page }) => {
         await startGame(page, {
             encounter: 'CHAPTER_BOSS',
             routes: answerTalents([ olderTalent('BOSS_TIME', 'TIME', 'Tempo do chefe do capítulo', 's', 30) ])
@@ -126,7 +126,7 @@ test.describe('Boss damage', () => {
         });
 
         expect(limit).toBe(60_000);
-        await expect(page.locator('.boss-timer')).toHaveText('Time: 60');
+        await expect(page.locator('.boss-timer')).toHaveText('Tempo: 60s');
     });
 });
 

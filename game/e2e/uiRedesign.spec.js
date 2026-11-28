@@ -85,7 +85,7 @@ const hitMonsterAt = async (page) => {
 const enterGame = async (page, menu) => {
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
 };
@@ -292,7 +292,7 @@ test.describe('Grove theme', () => {
         await expectStyle(page.getByTestId('fusion-button-kael-1'), QUIET);
     });
 
-    test('draws Login as an ember pill', async ({ page }) => {
+    test('draws Entrar as an ember pill', async ({ page }) => {
         const menu = await openMenu(page);
 
         await expectStyle(menu.loginButton, QUIET);
@@ -305,7 +305,7 @@ test.describe('Grove theme', () => {
         });
     });
 
-    test('draws the secondary and primary buttons of the Sign up and login screen', async ({ page }) => {
+    test('draws the secondary and primary buttons of the Criar conta and Entrar screen', async ({ page }) => {
         const menu = await openMenu(page);
 
         await expectStyle(menu.signupButton, WOOD_PILL);
@@ -315,12 +315,12 @@ test.describe('Grove theme', () => {
         await expectShades(page, menu.loginButton);
     });
 
-    test('draws Logout as a wood pill on the welcome', async ({ page }) => {
+    test('draws Sair as a wood pill on the welcome', async ({ page }) => {
         await mockBackend(page, { users: { yan: 'secret123' } });
         const menu = await openMainMenu(page);
         await fillCredentials(menu, 'yan', 'secret123');
         await menu.loginButton.click();
-        await expect(menu.message).toHaveText('Welcome back, yan!');
+        await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
 
         await page.reload();
         const welcome = await openMainMenu(page, { state: 'welcome' });
@@ -332,12 +332,12 @@ test.describe('Grove theme', () => {
 
     //  UIR-15 AC6: the start line is a prompt, not a button. The welcome block takes no pointer (the canvas takes the click),
     //  so the hover and the press are forced on the node: no rule may shade it
-    test('draws Click to Start as an ember prompt with no hover or press shade', async ({ page }) => {
+    test('draws Clique para jogar! as an ember prompt with no hover or press shade', async ({ page }) => {
         await mockBackend(page, { users: { yan: 'secret123' } });
         const menu = await openMainMenu(page);
         await fillCredentials(menu, 'yan', 'secret123');
         await menu.loginButton.click();
-        await expect(menu.message).toHaveText('Welcome back, yan!');
+        await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
 
         await page.reload();
         await openMainMenu(page, { state: 'welcome' });
@@ -689,7 +689,7 @@ test.describe('Grove theme', () => {
 
         await enterGame(page, menu);
 
-        await expect(page.locator('.stage-message')).toHaveText('Could not load progress');
+        await expect(page.locator('.stage-message')).toHaveText('Não foi possível carregar o progresso');
         await expectStyle(page.locator('.stage-message'), {
             color: 'rgb(255, 211, 92)',
             '-webkit-text-stroke-color': 'rgb(42, 20, 8)',
@@ -764,7 +764,7 @@ test.describe('Grove theme', () => {
         await startAs(page, { progress: MINIBOSS });
         const timer = page.locator('.boss-timer');
 
-        await expect(timer).toHaveText(/^Time: \d+$/);
+        await expect(timer).toHaveText(/^Tempo: \d+s$/);
         await expectStyle(timer, {
             'background-color': 'rgb(43, 29, 20)',
             'border-top-width': '2px',
@@ -845,7 +845,7 @@ test.describe('Grove theme', () => {
     test('draws the enemy chips with a dot and two icons: the defense shield and the crit target', async ({ page }) => {
         await startAs(page, { monster: bare('NATURE', 10, 30) });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Nature  Defesa 10%  Seu crítico: 10%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Natureza  Defesa 10%  Seu crítico: 10%');
         await expectStyle(page.locator('.enemy-stats'), { 'background-color': 'rgba(0, 0, 0, 0)' });
         //  UIR-07 AC18: a dark chip with a 1 px solid bronze border
         await expectStyle(page.locator('.tag-element'), { 'background-color': 'rgba(28, 18, 12, 0.85)', 'border-top-width': '1px', 'border-top-style': 'solid', 'border-top-color': 'rgb(176, 122, 58)' });
@@ -1479,7 +1479,7 @@ test.describe('Grove theme', () => {
         //  UIR-11 AC30: the skull is drawn in rgb(224, 180, 90), #e0b45a
         expect(await farm.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain('%23e0b45a');
         await expectStyle(page.locator('.farm-toggle'), { 'font-size': '12px', 'font-family': expect.stringMatching(/Figtree/), 'font-weight': '700', color: 'rgb(42, 26, 16)' });
-        await expect(page.locator('.farm-toggle')).toContainText('Farm boss');
+        await expect(page.locator('.farm-toggle')).toContainText('Farmar chefe');
 
         await farm.evaluate((node) => { node.checked = true; });
         await expectStyle(farm, { 'border-top-color': 'rgb(232, 116, 42)' });
@@ -1516,7 +1516,7 @@ test.describe('Grove theme', () => {
         await expectStyle(page.locator('.pause-title'), { 'font-size': '40px', 'font-weight': '700', color: 'rgb(42, 26, 16)' });
         expect((await css(page.locator('.pause-title'), [ 'font-family' ]))['font-family']).toMatch(/^"?Cinzel/);
 
-        await page.getByRole('button', { name: '1. Continue' }).click();
+        await page.getByRole('button', { name: '1. Continuar' }).click();
         await openScreen(page, 'heroes');
         await expectStyle(page.locator('.hero-panel'), { 'background-color': 'rgba(28, 18, 12, 0.62)' });
     });
@@ -2000,7 +2000,7 @@ test.describe('Grove theme', () => {
         await menu.signupButton.click();
 
         await expect(page.locator('.path-choice')).toBeVisible();
-        //  The pointer rests where Sign up was clicked, and the option under it shows its hover colour
+        //  The pointer rests where Criar conta was clicked, and the option under it shows its hover colour
         await page.mouse.move(0, 0);
         await expectStyle(page.locator('.path-choice'), { 'background-color': 'rgb(234, 214, 173)' });
         await expectStyle(page.locator('.path-option').first(), { 'background-color': 'rgb(230, 208, 162)' });

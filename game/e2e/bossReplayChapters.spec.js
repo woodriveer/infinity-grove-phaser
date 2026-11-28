@@ -22,7 +22,7 @@ const startGame = async (page, options = {}) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     await expect(page.getByTestId('hud-farm')).toBeVisible();
@@ -140,7 +140,7 @@ test.describe('Rever chefes: escolher capítulo', () => {
         await expect(page.getByTestId('monster-hp')).toHaveText('HP 2/2');
         //  The limit is the chapter 2 miniboss time limit, exact; the display ticks down from it, so it is read as a number from 40 to 45
         await expect.poll(() => countdownLimit(page)).toBe(45_000);
-        await expect(page.locator('.boss-timer')).toHaveText(/^Time: (4[0-5])$/);
+        await expect(page.locator('.boss-timer')).toHaveText(/^Tempo: (4[0-5])s$/);
 
         await menu.canvas.click();
 
@@ -160,7 +160,7 @@ test.describe('Rever chefes: escolher capítulo', () => {
         await expect(farmLabel(page)).toHaveText('Rever chefe: Chefe do capítulo (Capítulo 2)');
         //  The limit is the chapter 2 boss time limit, exact; the display ticks down from it, so it is read as a number from 45 to 50
         await expect.poll(() => countdownLimit(page)).toBe(50_000);
-        await expect(page.locator('.boss-timer')).toHaveText(/^Time: (4[5-9]|50)$/);
+        await expect(page.locator('.boss-timer')).toHaveText(/^Tempo: (4[5-9]|50)s$/);
     });
 
     test('a fight of the current chapter is reported without a chapter', async ({ page }) => {

@@ -30,7 +30,7 @@ const startGame = async (page, { progress, definition = chapter(1), equipment, l
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     await expect(page.getByTestId('leader-card')).toContainText('Kael');
@@ -57,7 +57,7 @@ test.describe('Campaign chapters', () => {
         await menu.canvas.click();
 
         await expect(page.getByTestId('chapter-hud')).toHaveText('Capítulo 6', { timeout: 15_000 });
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 1/10  Phase 1/5', { timeout: 15_000 });
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 1/10  Fase 1/5', { timeout: 15_000 });
         await expect.poll(() => backend.progresses.get('yan'), { timeout: 15_000 }).toMatchObject({ chapter: 6, stage: 1, encounter: 'PHASE', phase: 1, completed: false });
     });
 
@@ -69,7 +69,7 @@ test.describe('Campaign chapters', () => {
         await expect(page.getByTestId('chapter-hud')).toHaveText('Capítulo 15');
         await menu.canvas.click();
 
-        await expect(page.locator('.stage-message')).toHaveText('Chapter complete!', { timeout: 15_000 });
+        await expect(page.locator('.stage-message')).toHaveText('Capítulo concluído!', { timeout: 15_000 });
         await expect.poll(() => backend.progresses.get('yan').completed, { timeout: 25_000 }).toBe(true);
         await expect.poll(() => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').monster ?? null)).toBeNull();
     });
@@ -80,7 +80,7 @@ test.describe('Campaign chapters', () => {
         });
 
         await expect(page.getByTestId('chapter-hud')).toHaveText('Capítulo 6');
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 1/10  Phase 1/5');
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 1/10  Fase 1/5');
         expect(backend.progresses.get('yan')).toMatchObject({ chapter: 6, stage: 1, encounter: 'PHASE', phase: 1, completed: false });
     });
 

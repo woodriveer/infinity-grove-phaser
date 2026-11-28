@@ -32,16 +32,16 @@ export async function openMainMenu (page, { state = 'form', random = 0.99 } = {}
         canvas,
         username: page.locator('.auth-form input[name="username"]'),
         password: page.locator('.auth-form input[name="password"]'),
-        loginButton: page.getByRole('button', { name: 'Login' }),
-        signupButton: page.getByRole('button', { name: 'Sign up' }),
+        loginButton: page.getByRole('button', { name: 'Entrar', exact: true }),
+        signupButton: page.getByRole('button', { name: 'Criar conta', exact: true }),
         pathTitle: page.locator('.path-title'),
         pathHint: page.locator('.path-hint'),
         heroChoices: page.locator('.path-option'),
-        //  Picks the first hero on the screen after Sign up: FIRE, WATER or NATURE; the pick creates the account
+        //  Picks the first hero on the screen after Criar conta: FIRE, WATER or NATURE; the pick creates the account
         chooseHero: (element) => page.locator(`.path-option[data-element="${element}"]`).click(),
         message: page.getByRole('alert'),
         welcomeTitle: page.locator('.welcome-title'),
-        logoutButton: page.getByRole('button', { name: 'Logout' })
+        logoutButton: page.getByRole('button', { name: 'Sair', exact: true })
     };
 }
 

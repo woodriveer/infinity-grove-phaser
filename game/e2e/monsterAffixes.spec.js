@@ -238,7 +238,7 @@ test.describe('Farm and payload', () => {
         await page.locator('.pause-leave').click();
         await page.locator('.pause-confirm-yes').click();
 
-        await expect(page.locator('.stage-message')).toHaveText('Chapter complete!');
+        await expect(page.locator('.stage-message')).toHaveText('Capítulo concluído!');
         await expect(chip(page)).toHaveText('');
         await expect(chip(page)).toBeHidden();
 

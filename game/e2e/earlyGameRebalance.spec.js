@@ -40,7 +40,7 @@ const startGame = async (page, progress) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     await expect(page.getByTestId('skill-slot-1')).toBeVisible();
@@ -62,23 +62,23 @@ const restartCountdown = (page) => page.evaluate(() => {
 });
 
 test.describe('Chapter 1 of the fitted curve', () => {
-    test('miniboss 1-1 starts at HP 207/207 with Time: 45', async ({ page }) => {
+    test('miniboss 1-1 starts at HP 207/207 with Tempo: 45s', async ({ page }) => {
         await startGame(page, { stage: 1, encounter: 'MINIBOSS' });
 
         await expect(page.getByTestId('monster-hp')).toHaveText('HP 207/207');
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 1/10  Miniboss');
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 1/10  Miniboss');
 
         expect(await restartCountdown(page)).toBe(45_000);
-        await expect(page.locator('.boss-timer')).toHaveText('Time: 45');
+        await expect(page.locator('.boss-timer')).toHaveText('Tempo: 45s');
     });
 
-    test('the chapter boss starts at HP 6K/6K with Time: 90', async ({ page }) => {
+    test('the chapter boss starts at HP 6K/6K with Tempo: 90s', async ({ page }) => {
         await startGame(page, { stage: 10, encounter: 'CHAPTER_BOSS' });
 
         await expect(page.getByTestId('monster-hp')).toHaveText('HP 6K/6K');
 
         expect(await restartCountdown(page)).toBe(90_000);
-        await expect(page.locator('.boss-timer')).toHaveText('Time: 90');
+        await expect(page.locator('.boss-timer')).toHaveText('Tempo: 90s');
     });
 
     test('a leader with no critical bonus reads Seu crítico: 10% against miniboss 1-1', async ({ page }) => {
@@ -95,17 +95,17 @@ test.describe('Chapter 1 of the fitted curve', () => {
         await expect(page.locator('.enemy-stats [data-stat="crit"]')).toHaveText('Seu crítico: 1%');
     });
 
-    test('a phase monster of stage 1 starts at HP 69/69 and the label reads Stage 1/10  Phase 1/8', async ({ page }) => {
+    test('a phase monster of stage 1 starts at HP 69/69 and the label reads Estágio 1/10  Fase 1/8', async ({ page }) => {
         await startGame(page, { stage: 1, encounter: 'PHASE' });
 
         await expect(page.getByTestId('monster-hp')).toHaveText('HP 69/69');
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 1/10  Phase 1/8');
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 1/10  Fase 1/8');
     });
 
     test('phase 8 of stage 1 is the last phase before the miniboss', async ({ page }) => {
         await startGame(page, { stage: 1, encounter: 'PHASE', phase: 8 });
 
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 1/10  Phase 8/8');
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 1/10  Fase 8/8');
         await expect(page.getByTestId('monster-hp')).toHaveText('HP 69/69');
 
         //  The clicks are calls of the scene with the loop asleep, so no frame adds a tick; the monster fades out on the loop, which wakes once it is dead
@@ -123,7 +123,7 @@ test.describe('Chapter 1 of the fitted curve', () => {
             game.loop.wake();
         });
 
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 1/10  Miniboss');
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 1/10  Miniboss');
         await expect(page.getByTestId('monster-hp')).toHaveText('HP 207/207');
     });
 });

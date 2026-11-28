@@ -11,10 +11,10 @@ test.describe('Sign up', () => {
         await menu.signupButton.click();
         await menu.chooseHero('WATER');
 
-        await expect(menu.message).toHaveText('Account created, newbie!');
+        await expect(menu.message).toHaveText('Conta criada, newbie!');
         await expect(menu.message).not.toHaveClass(/error/);
         await expect(page.locator('.auth-form')).toHaveCount(0);
-        await expect(menu.welcomeTitle).toHaveText('Hello, newbie!');
+        await expect(menu.welcomeTitle).toHaveText('Olá, newbie!');
         expect(await registryValue(page, 'user')).toMatchObject({ username: 'newbie' });
         expect(backend.calls).toEqual([{ method: 'POST', path: '/users', body: { username: 'newbie', password: 'secret123', startingElement: 'WATER' } }]);
         expect(backend.cardsOf('newbie')).toMatchObject({ start: 'WATER', leader: 'orina', copies: { 'orina:0': 1 } });
@@ -29,7 +29,7 @@ test.describe('Sign up', () => {
         await menu.signupButton.click();
         await menu.chooseHero('FIRE');
 
-        await expect(menu.message).toHaveText("User 'yan' already exists");
+        await expect(menu.message).toHaveText('Esse nome de usuário já existe.');
         await expect(menu.signupButton).toBeEnabled();
         expect(await registryValue(page, 'user')).toBeUndefined();
     });
@@ -56,7 +56,7 @@ test.describe('Sign up', () => {
         await menu.signupButton.click();
         await menu.chooseHero('NATURE');
 
-        await expect(menu.message).toHaveText('Password must have at least 8 characters');
+        await expect(menu.message).toHaveText('A senha precisa ter pelo menos 8 caracteres.');
         expect(await registryValue(page, 'user')).toBeUndefined();
     });
 });
@@ -69,9 +69,9 @@ test.describe('Login', () => {
         await fillCredentials(menu, 'yan', 'secret123');
         await menu.loginButton.click();
 
-        await expect(menu.message).toHaveText('Welcome back, yan!');
+        await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
         await expect(page.locator('.auth-form')).toHaveCount(0);
-        await expect(menu.welcomeTitle).toHaveText('Hello, yan!');
+        await expect(menu.welcomeTitle).toHaveText('Olá, yan!');
         expect(await registryValue(page, 'user')).toMatchObject({ username: 'yan' });
         expect(backend.calls).toEqual([{ method: 'POST', path: '/users/login', body: { username: 'yan', password: 'secret123' } }]);
     });
@@ -83,7 +83,7 @@ test.describe('Login', () => {
         await fillCredentials(menu, 'yan', 'wrong-pass');
         await menu.loginButton.click();
 
-        await expect(menu.message).toHaveText('Password is invalid');
+        await expect(menu.message).toHaveText('Senha incorreta.');
         await expect(menu.message).toBeVisible();
         await expect(menu.message).toHaveClass(/error/);
         await expect(page.locator('.auth-form')).toBeVisible();
@@ -97,7 +97,7 @@ test.describe('Login', () => {
         await fillCredentials(menu, 'ghost', 'secret123');
         await menu.loginButton.click();
 
-        await expect(menu.message).toHaveText("User 'ghost' does not exist");
+        await expect(menu.message).toHaveText('Usuário não encontrado.');
     });
 
     test('does not call the backend when fields are empty', async ({ page }) => {
@@ -106,7 +106,7 @@ test.describe('Login', () => {
 
         await menu.loginButton.click();
 
-        await expect(menu.message).toHaveText('Enter username and password');
+        await expect(menu.message).toHaveText('Informe usuário e senha');
         expect(backend.calls).toHaveLength(0);
     });
 
@@ -119,7 +119,7 @@ test.describe('Login', () => {
 
         await expect(menu.loginButton).toBeDisabled();
         await expect(menu.signupButton).toBeDisabled();
-        await expect(menu.message).toHaveText('Welcome back, yan!');
+        await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     });
 
     test('tells the player when the server is unreachable', async ({ page }) => {
@@ -129,7 +129,7 @@ test.describe('Login', () => {
         await fillCredentials(menu, 'yan', 'secret123');
         await menu.loginButton.click();
 
-        await expect(menu.message).toHaveText('Cannot reach the server. Try again later.');
+        await expect(menu.message).toHaveText('Não foi possível falar com o servidor. Tente de novo mais tarde.');
         await expect(menu.loginButton).toBeEnabled();
     });
 });
@@ -142,7 +142,7 @@ test.describe('Sign up then login', () => {
         await fillCredentials(menu, 'newbie', 'secret123');
         await menu.signupButton.click();
         await menu.chooseHero('FIRE');
-        await expect(menu.message).toHaveText('Account created, newbie!');
+        await expect(menu.message).toHaveText('Conta criada, newbie!');
 
         //  The session now persists across reloads (persistent-session); drop it to get the form back
         await page.evaluate(() => localStorage.clear());
@@ -152,7 +152,7 @@ test.describe('Sign up then login', () => {
         await fillCredentials(menu, 'newbie', 'secret123');
         await menu.loginButton.click();
 
-        await expect(menu.message).toHaveText('Welcome back, newbie!');
+        await expect(menu.message).toHaveText('Bem-vindo de volta, newbie!');
         expect(backend.calls.map((c) => c.path)).toEqual(['/users', '/users/login']);
     });
 
@@ -162,7 +162,7 @@ test.describe('Sign up then login', () => {
 
         await fillCredentials(menu, 'yan', 'secret123');
         await menu.loginButton.click();
-        await expect(menu.message).toHaveText('Welcome back, yan!');
+        await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
 
         await menu.canvas.click();
 

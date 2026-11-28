@@ -67,7 +67,7 @@ const startTeam = async (page, {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     //  The heroes load in the background; the skill bar of the leader is the sign that they did
@@ -112,26 +112,26 @@ const QUICK_PHASES = { health: 1, minibossHealth: 1000, bossHealth: 1000 };
 const TWO_STAGES = { health: 1, minibossHealth: 3, bossHealth: 1000, stageCount: 2 };
 
 test.describe('Hero team: passives', () => {
-    test('Kael as an ally starts a 30 s miniboss at Time: 35', async ({ page }) => {
+    test('Kael as an ally starts a 30 s miniboss at Tempo: 35s', async ({ page }) => {
         await startTeam(page, { leader: 'lyra', team: KAEL_IN_SLOT_1, phase: 5, sizes: QUICK_PHASES, stop: false });
         await reachBoss(page);
 
-        await expect(timer(page)).toHaveText('Time: 35');
+        await expect(timer(page)).toHaveText('Tempo: 35s');
     });
 
-    test('Kael as an ally with MINIBOSS_TIME 4 starts it at Time: 39', async ({ page }) => {
+    test('Kael as an ally with MINIBOSS_TIME 4 starts it at Tempo: 39s', async ({ page }) => {
         await startTeam(page, { leader: 'lyra', team: KAEL_IN_SLOT_1, phase: 5, sizes: QUICK_PHASES, talents: { MINIBOSS_TIME: 2 }, stop: false });
         await reachBoss(page);
 
-        await expect(timer(page)).toHaveText('Time: 39');
+        await expect(timer(page)).toHaveText('Tempo: 39s');
     });
 
-    test('Kael as an ally starts the chapter boss at Time: 65', async ({ page }) => {
+    test('Kael as an ally starts the chapter boss at Tempo: 65s', async ({ page }) => {
         await startTeam(page, { leader: 'lyra', team: KAEL_IN_SLOT_1, phase: 5, sizes: { ...QUICK_PHASES, minibossHealth: 1 }, stop: false });
         //  The miniboss (limit 35 s) dies first; the chapter boss is the countdown above 40 s
         await reachBoss(page, { above: 40_000 });
 
-        await expect(timer(page)).toHaveText('Time: 65');
+        await expect(timer(page)).toHaveText('Tempo: 65s');
     });
 
     test('Lyra as an ally makes a roll of 15 a critical click, and her team hit adds 2', async ({ page, browser }) => {
@@ -213,20 +213,20 @@ test.describe('Hero team: passives', () => {
         await startTeam(page, { leader: 'kael', team: LYRA_IN_SLOT_1, phase: 5, sizes: QUICK_PHASES, stop: false });
         await reachBoss(page);
 
-        await expect(timer(page)).toHaveText('Time: 30');
+        await expect(timer(page)).toHaveText('Tempo: 30s');
     });
 
     test('below chapter 5 no passive applies', async ({ page }) => {
         await startTeam(page, { chapter: 4, cleared: [ 5 ], leader: 'lyra', team: KAEL_IN_SLOT_1, phase: 5, sizes: QUICK_PHASES, stop: false });
         await reachBoss(page);
 
-        await expect(timer(page)).toHaveText('Time: 30');
+        await expect(timer(page)).toHaveText('Tempo: 30s');
     });
 
     test('a team change keeps the running countdown and applies to the next boss', async ({ page }) => {
         await startTeam(page, { leader: 'lyra', team: KAEL_IN_SLOT_1, phase: 5, sizes: TWO_STAGES, stop: false });
         await reachBoss(page);
-        await expect(timer(page)).toHaveText('Time: 35');
+        await expect(timer(page)).toHaveText('Tempo: 35s');
 
         //  The loop is stopped on the countdown: Kael leaves the team while it runs
         await page.getByTestId('hud-team').click();
@@ -236,7 +236,7 @@ test.describe('Hero team: passives', () => {
         await page.getByTestId('hero-close').click();
 
         //  Not 30: the countdown that runs keeps its 35 s
-        await expect(timer(page)).toHaveText('Time: 35');
+        await expect(timer(page)).toHaveText('Tempo: 35s');
         expect(await scene(page, '(s) => s.countdown.limitMs')).toBe(35_000);
 
         //  The first miniboss dies to clicks, and the miniboss of stage 2 comes without Kael
@@ -244,7 +244,7 @@ test.describe('Hero team: passives', () => {
         await reachBoss(page, { other: true });
 
         expect(await scene(page, '(s) => s.countdown.limitMs')).toBe(30_000);
-        await expect(timer(page)).toHaveText('Time: 30');
+        await expect(timer(page)).toHaveText('Tempo: 30s');
     });
 
     test('the attribute panel counts the passives', async ({ page }) => {
@@ -269,6 +269,6 @@ test.describe('Hero team: passives', () => {
         await page.getByTestId('farm-entry-miniboss-1').click();
         await freeze(page);
 
-        await expect(timer(page)).toHaveText('Time: 35');
+        await expect(timer(page)).toHaveText('Tempo: 35s');
     });
 });

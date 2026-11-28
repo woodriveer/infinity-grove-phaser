@@ -35,7 +35,7 @@ const startAs = async (page, heroId, { monster, encounter = 'PHASE', roll, talen
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     await expect(page.getByTestId('skill-slot-3')).toHaveAttribute('data-unlocked', 'true');
@@ -92,7 +92,7 @@ test.describe('Unified damage', () => {
     test('Chuva de Meteoros ignores physicalDefense of an old payload: physicalDefense 50 and magicalDefense 10 make 25 x 1.4 = 35', async ({ page }) => {
         await startAs(page, 'orina', { monster: { element: 'WATER', physicalDefense: 50, magicalDefense: 10, critResistance: 0 } });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 0%  Seu crítico: 40%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Água  Defesa 0%  Seu crítico: 40%');
 
         await use(page, 3);
 
@@ -102,7 +102,7 @@ test.describe('Unified damage', () => {
     test('a monster of the new payload shows Defesa 40% and a click meets it: 1.4 x 0.6 = 0.84', async ({ page }) => {
         await startAs(page, 'orina', { monster: enemy('WATER', 40, 12) });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 40%  Seu crítico: 28%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Água  Defesa 40%  Seu crítico: 28%');
         await expect(page.locator('.enemy-stats')).not.toContainText('Physical def');
         await expect(page.locator('.enemy-stats')).not.toContainText('Magical def');
         await expect(page.locator('.enemy-stats [data-stat="defense"]')).toHaveCount(1);
@@ -115,7 +115,7 @@ test.describe('Unified damage', () => {
     test('defense wins over physicalDefense when a payload has both: Defesa 40%', async ({ page }) => {
         await startAs(page, 'orina', { monster: { element: 'WATER', defense: 40, physicalDefense: 70, magicalDefense: 70, critResistance: 0 } });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 40%  Seu crítico: 40%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Água  Defesa 40%  Seu crítico: 40%');
 
         await click(page);
 
@@ -125,7 +125,7 @@ test.describe('Unified damage', () => {
     test('PHYSICAL_BREAK 5 lowers the defense for an Orina skill too: Chuva de Meteoros on defense 20 deals 25 x 1.4 x 0.85 = 29.75', async ({ page }) => {
         await startAs(page, 'orina', { monster: enemy('WATER', 20), talents: { PHYSICAL_BREAK: 5 } });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 15%  Seu crítico: 40%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Água  Defesa 15%  Seu crítico: 40%');
 
         await use(page, 3);
 
@@ -178,7 +178,7 @@ test.describe('Unified damage', () => {
     test('upgrading PHYSICAL_BREAK from 5 to 6 turns Defesa 15% into 14% on the same monster, and the next click meets it: 1.4 x 0.86', async ({ page }) => {
         await startAs(page, 'orina', { monster: enemy('WATER', 20), talents: { PHYSICAL_BREAK: 5 }, talentPoints: 1 });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 15%  Seu crítico: 40%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Água  Defesa 15%  Seu crítico: 40%');
 
         await page.getByTestId('hud-talents').click();
         await page.getByTestId('talent-PHYSICAL_BREAK').click();
@@ -186,7 +186,7 @@ test.describe('Unified damage', () => {
         await expect(page.getByTestId('talent-level-PHYSICAL_BREAK')).toHaveText('Nível 6/10');
         await page.getByTestId('hero-close').click();
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 14%  Seu crítico: 40%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Água  Defesa 14%  Seu crítico: 40%');
 
         await click(page);
 

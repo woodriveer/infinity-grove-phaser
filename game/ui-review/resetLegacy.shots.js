@@ -30,7 +30,7 @@ const start = async (page, chapter, legacy, { legacyStatus = 200 } = {}) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect(page.getByTestId('chapter-hud')).toHaveText(`Capítulo ${chapter}`);
     await page.getByTestId('auto-click-button').click();

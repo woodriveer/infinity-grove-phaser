@@ -22,7 +22,7 @@ const startGame = async (page, options) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     //  The heroes load in the background; the skill bar of the leader is the sign that they did
@@ -82,7 +82,7 @@ test.describe('Equipment', () => {
     test('refining spends copper, raises the level and updates the wallet and the next cost', async ({ page }) => {
         await mockBackend(page, { users: { yan: 'secret123' }, wallets: { yan: 600 }, equipment: { yan: [ RING ] } });
         await startGame(page);
-        await expect(walletText(page)).toHaveText('Gold: 0 Silver: 6 Copper: 0');
+        await expect(walletText(page)).toHaveText('Ouro: 0 Prata: 6 Cobre: 0');
 
         await page.getByTestId('hud-equipment').click();
         await page.getByTestId('equip-piece-r1').click();
@@ -93,7 +93,7 @@ test.describe('Equipment', () => {
         await expect(page.getByTestId('piece-line-0')).toHaveText('Dano de clique +7%');
         await expect(page.getByTestId('piece-refine')).toHaveText('Refinar (8 prata 50 cobre)');
         await expect(page.getByTestId('piece-refine')).toBeDisabled();
-        await expect(walletText(page)).toHaveText('Gold: 0 Silver: 1 Copper: 0');
+        await expect(walletText(page)).toHaveText('Ouro: 0 Prata: 1 Cobre: 0');
     });
 
     test('selling a piece adds its price to the wallet and takes it out of the bag', async ({ page }) => {
@@ -106,7 +106,7 @@ test.describe('Equipment', () => {
         await page.getByTestId('piece-sell').click();
 
         await expect(page.getByTestId('equipment-empty')).toBeVisible();
-        await expect(walletText(page)).toHaveText('Gold: 0 Silver: 1 Copper: 50');
+        await expect(walletText(page)).toHaveText('Ouro: 0 Prata: 1 Cobre: 50');
     });
 
     test('a piece dropped by a won miniboss shows the notice and joins the bag', async ({ page }) => {

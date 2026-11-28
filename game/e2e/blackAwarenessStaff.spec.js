@@ -18,7 +18,7 @@ const startGame = async (page, options = {}) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     //  The heroes load in the background; the skill bar of the leader is the sign that they did
@@ -168,7 +168,7 @@ test.describe('Black awareness staff', () => {
         await page.getByTestId('piece-reroll-0').click();
 
         //  The 5000 copper of the reroll leave the wallet; the detail is drawn again with the special still last
-        await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 50 Copper: 0');
+        await expect(page.locator('.wallet')).toHaveText('Ouro: 0 Prata: 50 Cobre: 0');
         await expect(page.locator('[data-testid^="piece-reroll-"]')).toHaveCount(4);
         await expect(page.getByTestId('piece-line-5')).toHaveText(SPECIAL_LINE);
     });
@@ -177,7 +177,7 @@ test.describe('Black awareness staff', () => {
         await startGame(page, { equipment: { yan: [ GIFT_STAFF ] }, wallets: { yan: 50 } });
         await openEquipment(page);
 
-        await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 0 Copper: 50');
+        await expect(page.locator('.wallet')).toHaveText('Ouro: 0 Prata: 0 Cobre: 50');
 
         await tile(page).click();
         await expect(page.getByTestId('piece-sell')).toHaveText('Vender (5 prata)');
@@ -185,7 +185,7 @@ test.describe('Black awareness staff', () => {
 
         await expect(page.getByTestId('equipment-empty')).toBeVisible();
         await expect(tile(page)).toHaveCount(0);
-        await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 5 Copper: 50');
+        await expect(page.locator('.wallet')).toHaveText('Ouro: 0 Prata: 5 Cobre: 50');
     });
 
     test('the bulk sale sells the staff for 500 copper and sends its id', async ({ page }) => {
@@ -202,7 +202,7 @@ test.describe('Black awareness staff', () => {
         await page.getByTestId('bulk-sell-confirm-yes').click();
 
         await expect(tile(page)).toHaveCount(0);
-        await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 5 Copper: 50');
+        await expect(page.locator('.wallet')).toHaveText('Ouro: 0 Prata: 5 Cobre: 50');
         expect(backend.calls.filter(({ method, path }) => method === 'POST' && path === '/equipment/sell').map(({ body }) => body)).toEqual([ { pieceIds: [ 'gift-staff' ] } ]);
     });
 

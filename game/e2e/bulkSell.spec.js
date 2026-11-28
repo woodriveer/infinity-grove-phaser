@@ -21,7 +21,7 @@ const startGame = async (page, equipment = PIECES) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     await expect(page.getByTestId('hud-equipment')).toBeVisible();
@@ -44,7 +44,7 @@ test.describe('Bulk sell', () => {
         const backend = await startGame(page);
         await openEquipment(page);
 
-        await expect(walletText(page)).toHaveText('Gold: 0 Silver: 0 Copper: 50');
+        await expect(walletText(page)).toHaveText('Ouro: 0 Prata: 0 Cobre: 50');
         await expect(page.getByTestId('bulk-sell-start')).toBeVisible();
 
         await startSelling(page);
@@ -69,7 +69,7 @@ test.describe('Bulk sell', () => {
         await expect(page.getByTestId('equip-piece-u1')).toHaveCount(0);
         await expect(page.getByTestId('bulk-sell-start')).toBeVisible();
         await expect(page.getByTestId('bulk-sell-bar')).toHaveCount(0);
-        await expect(walletText(page)).toHaveText('Gold: 0 Silver: 3 Copper: 50');
+        await expect(walletText(page)).toHaveText('Ouro: 0 Prata: 3 Cobre: 50');
 
         expect(sellCalls(backend.calls)).toHaveLength(1);
         expect(sellCalls(backend.calls)[0].body).toEqual({ pieceIds: [ 'c1', 'u1' ] });
@@ -182,7 +182,7 @@ test.describe('Bulk sell', () => {
         await expect(page.getByTestId('equip-piece-c1')).toBeVisible();
         await expect(page.getByTestId('equip-piece-c1')).toHaveAttribute('aria-pressed', 'true');
         await expect(page.getByTestId('bulk-sell-bar')).toBeVisible();
-        await expect(walletText(page)).toHaveText('Gold: 0 Silver: 0 Copper: 50');
+        await expect(walletText(page)).toHaveText('Ouro: 0 Prata: 0 Cobre: 50');
     });
 
     test('a piece sold in another tab fails the sale, leaves the bag and keeps the others selected', async ({ page }) => {
@@ -208,7 +208,7 @@ test.describe('Bulk sell', () => {
         await expect(page.getByTestId('bulk-sell-summary')).toHaveText('Selecionadas: 1 · Total: 2 prata');
         await expect(page.getByTestId('bulk-sell-question')).toHaveCount(0);
         await expect(page.getByTestId('bulk-sell-bar')).toBeVisible();
-        await expect(walletText(page)).toHaveText('Gold: 0 Silver: 0 Copper: 50');
+        await expect(walletText(page)).toHaveText('Ouro: 0 Prata: 0 Cobre: 50');
     });
 
     test('rarity buttons select and unselect every bag piece of a rarity', async ({ page }) => {
@@ -253,7 +253,7 @@ test.describe('Bulk sell', () => {
 
         await expect(page.getByTestId('equip-sell-notice')).toHaveText('2 peças vendidas por 2 prata');
         await expect(page.locator('.equip-bag-title')).toHaveText('Mochila (2)');
-        await expect(walletText(page)).toHaveText('Gold: 0 Silver: 2 Copper: 50');
+        await expect(walletText(page)).toHaveText('Ouro: 0 Prata: 2 Cobre: 50');
         expect(sellCalls(backend.calls).map(({ body }) => body)).toEqual([ { pieceIds: [ 'c1', 'c2' ] } ]);
     });
 
@@ -363,7 +363,7 @@ test.describe('Bulk sell', () => {
         release();
 
         //  The sale is paid on the server and the HUD wallet follows it; the closed window stays closed and draws nothing
-        await expect(walletText(page)).toHaveText('Gold: 0 Silver: 1 Copper: 50');
+        await expect(walletText(page)).toHaveText('Ouro: 0 Prata: 1 Cobre: 50');
         await expect(page.locator('.hero-panel')).toBeHidden();
         await expect(page.locator('.hero-body > *')).toHaveCount(0);
 

@@ -54,7 +54,7 @@ const startAdds = async (page, {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     //  The heroes load in the background; the skill bar of the leader is the sign that they did
@@ -98,7 +98,7 @@ test.describe('Miniboss adds', () => {
         await startAdds(page);
 
         expect(await state(page)).toMatchObject({ main: 100, adds: [ 30, 30 ], target: 'Miniboss', drawn: 2 });
-        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 109%  Seu crítico: 10%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Fogo  Defesa 109%  Seu crítico: 10%');
         await expect(page.getByTestId('target-chip')).toHaveText('Alvo: Miniboss · HP 100/100');
         expect(await scene(page, '(s) => s.children.list.filter((o) => o.type === "Text" && o.text === "+30 de defesa").length')).toBe(2);
     });
@@ -224,7 +224,7 @@ test.describe('Miniboss adds', () => {
         await hitAt(page, ...MINIBOSS, 10);
         await wake(page);
 
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 2/2 Phase 1/5');
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 2/2 Fase 1/5');
         await expect.poll(() => outcomeCalls(backend).length).toBe(1);
         expect(outcomeCalls(backend)[0].body).toMatchObject({ outcome: 'CLEARED', encounter: 'MINIBOSS', chapter: 11 });
 
@@ -249,7 +249,7 @@ test.describe('Miniboss adds', () => {
         await advance(page, 30_000);
         await wake(page);
 
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 1/2 Phase 5/5');
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 1/2 Fase 5/5');
         //  A FAILED report waits for the next report tick (a few seconds of real time); a CLEARED one goes at once
         await expect.poll(() => outcomeCalls(backend).length, { timeout: 25_000 }).toBe(1);
         expect(outcomeCalls(backend)[0].body).toMatchObject({ outcome: 'FAILED', encounter: 'MINIBOSS', chapter: 11 });
@@ -332,7 +332,7 @@ test.describe('Miniboss adds', () => {
         await freeze(page);
 
         expect(await state(page)).toMatchObject({ main: 100, adds: [ 30, 30 ], drawn: 2 });
-        await expect(page.locator('.boss-timer')).toHaveText('Time: 30');
+        await expect(page.locator('.boss-timer')).toHaveText('Tempo: 30s');
     });
 
     test('a chapter 1 miniboss has no adds, no marker and no target chip', async ({ page }) => {
@@ -344,7 +344,7 @@ test.describe('Miniboss adds', () => {
         expect(after.drawn).toBe(0);
         expect(after.marker).toBeNull();
         await expect(page.getByTestId('target-chip')).toBeHidden();
-        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 11%  Seu crítico: 0%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Fogo  Defesa 11%  Seu crítico: 0%');
     });
 
     test('a stage with an invalid add spawns only the valid one', async ({ page }) => {

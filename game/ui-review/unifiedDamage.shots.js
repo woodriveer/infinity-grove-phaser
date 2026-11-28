@@ -22,7 +22,7 @@ const start = async (page, heroId, talents) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     await expect(page.getByTestId('skill-slot-3')).toHaveAttribute('data-unlocked', 'true');
@@ -31,13 +31,13 @@ const start = async (page, heroId, talents) => {
 
 test('S1 enemy line', async ({ page }, testInfo) => {
     await start(page, 'kael');
-    await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 11%  Crit res 33%');
+    await expect(page.locator('.enemy-stats')).toHaveText('Água  Defesa 11%  Crit res 33%');
     await shot(page, testInfo, '01-enemy-line');
 });
 
 test('S2 enemy line with broken defense', async ({ page }, testInfo) => {
     await start(page, 'kael', { PHYSICAL_BREAK: 5 });
-    await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 6%  Crit res 33%');
+    await expect(page.locator('.enemy-stats')).toHaveText('Água  Defesa 6%  Crit res 33%');
     await shot(page, testInfo, '02-enemy-line-broken');
 });
 

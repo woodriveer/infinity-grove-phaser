@@ -63,7 +63,7 @@ const startAdds = async (page, {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     //  The heroes load in the background; the skill bar of the leader is the sign that they did
@@ -120,7 +120,7 @@ test.describe('Miniboss target', () => {
 
         await expect.poll(() => state(page)).toMatchObject({ target: 'Lacaio 1', adds: [ 29, 30 ], marker: [ 480, 253.5 ] });
         await expect(page.getByTestId('target-chip')).toHaveText('Alvo: Lacaio 1 · HP 29/30');
-        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 0%  Seu crítico: 10%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Fogo  Defesa 0%  Seu crítico: 10%');
     });
 
     test('a click on the miniboss makes it the target again', async ({ page }) => {
@@ -250,7 +250,7 @@ test.describe('Miniboss target', () => {
         await hitAt(page, ...LACAIO_1);
 
         expect((await state(page)).adds[0]).toBeCloseTo(29.15, 5);
-        await expect(page.locator('.enemy-stats')).toHaveText('Fire  Defesa 15%  Seu crítico: 10%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Fogo  Defesa 15%  Seu crítico: 10%');
     });
 
     test('the Erosão Arcana of an Orina ally lowers the defense an ally hit meets on an add: two hits of 1.9 show 3.8', async ({ page }) => {
@@ -420,7 +420,7 @@ test.describe('Miniboss target', () => {
             };
         });
 
-        for (const [ target, text, minWidth ] of [ [ MINIBOSS, 'Darkness  Defesa 161%  Seu crítico: 99.5%', 300 ], [ LACAIO_2, 'Darkness  Defesa 0%  Seu crítico: 99.5%', 250 ] ])
+        for (const [ target, text, minWidth ] of [ [ MINIBOSS, 'Escuridão  Defesa 161%  Seu crítico: 99.5%', 300 ], [ LACAIO_2, 'Escuridão  Defesa 0%  Seu crítico: 99.5%', 250 ] ])
         {
             await hitAt(page, ...target);
 

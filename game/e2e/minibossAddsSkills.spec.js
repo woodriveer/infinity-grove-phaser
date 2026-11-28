@@ -59,7 +59,7 @@ const startAdds = async (page, {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     //  The heroes load in the background; the skill bar of the leader is the sign that they did
@@ -122,7 +122,7 @@ test.describe('Miniboss skills', () => {
         expect(await lastNumbers(page, 3)).toMatchObject(shown([ '35', '35', '17.5' ]));
         expect((await state(page)).adds).toEqual([ 0, 0 ]);
         expect((await state(page)).main).toBeCloseTo(182.5, 5);
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 50%  Seu crítico: 40%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Água  Defesa 50%  Seu crítico: 40%');
     });
 
     test('a skill that kills both adds and the miniboss wins once', async ({ page }) => {
@@ -131,7 +131,7 @@ test.describe('Miniboss skills', () => {
         await useSkill(page, 3);
         await wake(page);
 
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 2/2 Phase 1/5');
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 2/2 Fase 1/5');
         await expect.poll(() => outcomeCalls(backend).length).toBe(1);
         expect(outcomeCalls(backend)[0].body).toMatchObject({ outcome: 'CLEARED', encounter: 'MINIBOSS', chapter: 11 });
         expect(outcomeCalls(backend)).toHaveLength(1);

@@ -18,7 +18,7 @@ const startGame = async (page, options = {}) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     await expect(page.getByTestId('skill-slot-1')).toBeVisible();
@@ -59,7 +59,7 @@ test.describe('Talents in combat', () => {
     test('MINIBOSS_TIME 5 gives a miniboss 40 s instead of 30', async ({ page }) => {
         await startGame(page, { talents: { yan: { MINIBOSS_TIME: 5 } }, progress: { yan: { stage: 1, encounter: 'MINIBOSS', phase: 1 } } });
 
-        await expect(page.locator('.boss-timer')).toHaveText(/Time: (40|39)/);
+        await expect(page.locator('.boss-timer')).toHaveText(/Tempo: (40|39)s/);
     });
 });
 

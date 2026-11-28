@@ -25,7 +25,7 @@ const startGame = async (page, backendOptions) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     await expect(page.getByTestId('skill-slot-1')).toBeVisible();
@@ -68,14 +68,14 @@ test.describe('Rever chefes', () => {
 
         await expect(page.locator('.hero-panel')).toBeHidden();
         await expect(farmLabel(page)).toHaveText('Rever chefe: Miniboss 1');
-        await expect(page.locator('.boss-timer')).toHaveText('Time: 60');
+        await expect(page.locator('.boss-timer')).toHaveText('Tempo: 60s');
 
         await menu.canvas.click();
 
         await expect(page.getByTestId('card-notice')).toHaveText('Carta: Kael Raizférrea');
         expect(farmCalls(backend).map((call) => call.body)).toEqual([ { boss: { kind: 'MINIBOSS', stage: 1 }, outcome: 'CLEARED' } ]);
         await expect(farmLabel(page)).toHaveText('Rever chefe: Miniboss 1');
-        await expect(page.locator('.boss-timer')).toHaveText('Time: 60');
+        await expect(page.locator('.boss-timer')).toHaveText('Tempo: 60s');
         expect(backend.progresses.get('yan')).toMatchObject(COMPLETED);
         expect(backend.calls.filter((call) => call.path === '/progress/outcome')).toEqual([]);
         expect(backend.cardsOf('yan').copies['kael:0']).toBe(2);
@@ -95,7 +95,7 @@ test.describe('Rever chefes', () => {
         await expect(page.getByTestId('farm-entry-chapter-boss')).toContainText('0 vitórias restantes hoje');
         await expect(page.getByTestId('farm-entry-chapter-boss')).toBeDisabled();
         await expect(page.getByTestId('farm-entry-miniboss-1')).toBeEnabled();
-        await expect(page.locator('.stage-message')).toHaveText('Chapter complete!');
+        await expect(page.locator('.stage-message')).toHaveText('Capítulo concluído!');
         expect(farmCalls(backend)).toHaveLength(1);
     });
 
@@ -128,7 +128,7 @@ test.describe('Rever chefes', () => {
         expect(backend.calls.filter((call) => call.path === '/progress/outcome')).toEqual([]);
     });
 
-    test('Leave fight in a farm fight returns to the campaign without reporting anything', async ({ page }) => {
+    test('Sair da luta in a farm fight returns to the campaign without reporting anything', async ({ page }) => {
         const { backend } = await startGame(page);
         await openFarm(page);
         await page.getByTestId('farm-entry-miniboss-1').click();
@@ -138,14 +138,14 @@ test.describe('Rever chefes', () => {
         await page.locator('.pause-leave').click();
         await page.locator('.pause-confirm-yes').click();
 
-        await expect(page.locator('.stage-message')).toHaveText('Chapter complete!');
+        await expect(page.locator('.stage-message')).toHaveText('Capítulo concluído!');
         await expect(page.locator('.pause-menu')).toBeHidden();
         expect(farmCalls(backend)).toEqual([]);
         expect(backend.calls.filter((call) => call.path === '/progress/outcome')).toEqual([]);
     });
 });
 
-test.describe('Farm boss switch', () => {
+test.describe('Farmar chefe switch', () => {
     const AT_MINIBOSS = { stage: 1, encounter: 'MINIBOSS', phase: 1, completed: false };
     const RARE_WEAPON = (id) => ({ id, slot: 'WEAPON', rarity: 'RARE', baseClick: 4, refine: 0, affixes: [] });
     const progressCalls = (backend) => backend.calls.filter((call) => call.path === '/progress/outcome');
@@ -157,7 +157,7 @@ test.describe('Farm boss switch', () => {
             chances: [ 0 ],
             equipmentDrops: [ RARE_WEAPON('drop1'), RARE_WEAPON('drop2') ]
         });
-        await expect(farmLabel(page)).toHaveText('Stage 1/1  Miniboss');
+        await expect(farmLabel(page)).toHaveText('Estágio 1/1  Miniboss');
         await farmSwitch(page).check();
 
         //  The first win is the campaign clear: it pays the card and the piece and the miniboss comes back as a farm fight

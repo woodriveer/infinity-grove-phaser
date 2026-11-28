@@ -38,7 +38,7 @@ const startTeam = async (page, {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     //  The heroes load in the background; the skill bar of the leader is the sign that they did
@@ -249,7 +249,7 @@ test.describe('Hero team: Equipe screen', () => {
         await tick(page, 1);
         await expect(page.getByTestId('team-notice')).toBeHidden();
 
-        await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 0 Copper: 0');
+        await expect(page.locator('.wallet')).toHaveText('Ouro: 0 Prata: 0 Cobre: 0');
         await expect(slot(page, 1)).toHaveAttribute('data-state', 'empty');
         await expect(slot(page, 1)).toHaveAttribute('data-selected', 'true');
         await expect(slot(page, 1).locator('.team-empty')).toHaveText('vazio');

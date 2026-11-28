@@ -2,7 +2,7 @@ import { expect, test } from './support/coverage';
 import { mockBackend } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
-//  Stage 4 of the chapter with the minibosses 1 to 3 beaten
+//  The 4th stage of the chapter with the minibosses 1 to 3 beaten
 const AT_STAGE_4 = { yan: { stage: 4, encounter: 'PHASE', phase: 2 } };
 
 const startGame = async (page, options = {}) => {
@@ -11,7 +11,7 @@ const startGame = async (page, options = {}) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     await expect(page.getByTestId('hud-farm')).toBeVisible();

@@ -14,7 +14,7 @@ const startGame = async (page, { state = 'form' } = {}) => {
     {
         await fillCredentials(menu, 'yan', 'secret123');
         await menu.loginButton.click();
-        await expect(menu.message).toHaveText('Welcome back, yan!');
+        await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     }
 
     await menu.canvas.click();
@@ -45,11 +45,11 @@ test.describe('Monster drops', () => {
         const menu = await startGame(page);
         const wallet = page.locator('.wallet');
 
-        await expect(wallet).toHaveText('Gold: 0 Silver: 0 Copper: 0');
+        await expect(wallet).toHaveText('Ouro: 0 Prata: 0 Cobre: 0');
 
         await killMonster(menu.canvas);
 
-        await expect(wallet).toHaveText('Gold: 0 Silver: 0 Copper: 3');
+        await expect(wallet).toHaveText('Ouro: 0 Prata: 0 Cobre: 3');
         await expect.poll(() => syncCalls(backend).length, { timeout: 20_000 }).toBe(1);
         expect(syncCalls(backend)[0].body).toEqual({ kills: { 1: 1 } });
         expect(backend.wallets.get('yan').copper).toBe(3);
@@ -57,18 +57,18 @@ test.describe('Monster drops', () => {
         await page.reload();
         await startGame(page, { state: 'welcome' });
 
-        await expect(wallet).toHaveText('Gold: 0 Silver: 0 Copper: 3');
+        await expect(wallet).toHaveText('Ouro: 0 Prata: 0 Cobre: 3');
     });
 
     test('99 copper plus a drop of 2 shows 1 silver and 1 copper', async ({ page }) => {
         await mockBackend(page, { users: { yan: 'secret123' }, wallets: { yan: 99 }, drops: [ 2 ] });
         const menu = await startGame(page);
         const wallet = page.locator('.wallet');
-        await expect(wallet).toHaveText('Gold: 0 Silver: 0 Copper: 99');
+        await expect(wallet).toHaveText('Ouro: 0 Prata: 0 Cobre: 99');
 
         await killMonster(menu.canvas);
 
-        await expect(wallet).toHaveText('Gold: 0 Silver: 1 Copper: 1');
+        await expect(wallet).toHaveText('Ouro: 0 Prata: 1 Cobre: 1');
     });
 
     test('a monster and its miniboss drop from the queues of their own drop rules', async ({ page }) => {
@@ -90,15 +90,15 @@ test.describe('Monster drops', () => {
         const wallet = page.locator('.wallet');
         const hud = page.locator('.stage-hud');
 
-        await expect(hud).toHaveText('Stage 1/1 Phase 5/5', { timeout: 15_000 });
-        await expect(wallet).toHaveText('Gold: 0 Silver: 0 Copper: 0');
+        await expect(hud).toHaveText('Estágio 1/1 Fase 5/5', { timeout: 15_000 });
+        await expect(wallet).toHaveText('Ouro: 0 Prata: 0 Cobre: 0');
 
         await canvasHits(menu.canvas, 2);
-        await expect(wallet).toHaveText('Gold: 0 Silver: 0 Copper: 3');
+        await expect(wallet).toHaveText('Ouro: 0 Prata: 0 Cobre: 3');
 
-        await expect(hud).toHaveText('Stage 1/1 Miniboss', { timeout: 15_000 });
+        await expect(hud).toHaveText('Estágio 1/1 Miniboss', { timeout: 15_000 });
         await canvasHits(menu.canvas, 2);
-        await expect(wallet).toHaveText('Gold: 0 Silver: 0 Copper: 15');
+        await expect(wallet).toHaveText('Ouro: 0 Prata: 0 Cobre: 15');
 
         await expect.poll(() => backend.wallets.get('yan').copper, { timeout: 25_000 }).toBe(15);
         const reported = syncCalls(backend).map((call) => call.body.kills);

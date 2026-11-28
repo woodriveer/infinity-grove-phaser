@@ -82,7 +82,7 @@ const startTeam = async (page, {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     //  The loop sleeps first so no real frame runs an auto click or a respawn while the test reads the scene
@@ -342,7 +342,7 @@ test.describe('Hero team: ally hits', () => {
         await startTeam(page, {
             health: 10, cleared: [ 5, 6 ], stars: { lyra: 9 }, team: { boughtSlots: 2, allies: [ 'lyra', 'orina', null, null ] }
         });
-        await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 0 Copper: 0');
+        await expect(page.locator('.wallet')).toHaveText('Ouro: 0 Prata: 0 Cobre: 0');
 
         await team(page);
 
@@ -354,7 +354,7 @@ test.describe('Hero team: ally hits', () => {
         await recordShownMonsters(page);
         await wake(page);
 
-        await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 0 Copper: 3');
+        await expect(page.locator('.wallet')).toHaveText('Ouro: 0 Prata: 0 Cobre: 3');
         await expect.poll(() => shownMonsters(page)).toEqual([ { health: 10, dead: false } ]);
     });
 

@@ -10,7 +10,7 @@ const logIn = async (page, username = 'yan') => {
 
     await fillCredentials(menu, username, 'secret123');
     await menu.loginButton.click();
-    await expect(menu.welcomeTitle).toHaveText(`Hello, ${username}!`);
+    await expect(menu.welcomeTitle).toHaveText(`Olá, ${username}!`);
 
     return menu;
 };
@@ -32,7 +32,7 @@ test.describe('Persistent session', () => {
         await page.reload();
         const menu = await openMainMenu(page, { state: 'welcome' });
 
-        await expect(menu.welcomeTitle).toHaveText('Hello, yan!');
+        await expect(menu.welcomeTitle).toHaveText('Olá, yan!');
         await expect(page.locator('.auth-form')).toHaveCount(0);
         expect(backend.calls.slice(callsBeforeReload)).toEqual([]);
         expect(paths(backend)).toEqual(['/users/login']);
@@ -49,7 +49,7 @@ test.describe('Persistent session', () => {
         await page.reload();
         const menu = await openMainMenu(page, { state: 'welcome' });
 
-        await expect(menu.welcomeTitle).toHaveText('Hello, yan!');
+        await expect(menu.welcomeTitle).toHaveText('Olá, yan!');
         await expect(page.locator('.auth-form')).toHaveCount(0);
         expect(paths(backend).filter((path) => path === '/auth/refresh')).toHaveLength(1);
         const after = JSON.parse(await storedSession(page));
@@ -83,7 +83,7 @@ test.describe('Persistent session', () => {
         await page.reload();
         const menu = await openMainMenu(page);
 
-        await expect(menu.message).toHaveText('Cannot reach the server. Try again later.');
+        await expect(menu.message).toHaveText('Não foi possível falar com o servidor. Tente de novo mais tarde.');
         await expect(menu.message).toHaveClass(/error/);
         expect(await storedSession(page)).toBe(kept);
     });

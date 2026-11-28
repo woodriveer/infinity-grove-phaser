@@ -63,7 +63,7 @@ const startAs = async (page, { monster = bare('FIRE'), copies, progress, talents
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     await expect(page.getByTestId('leader-card')).toContainText('Kael');
@@ -105,7 +105,7 @@ test('menu and preloader', async ({ page }, testInfo) => {
     const menu = {
         username: page.locator('.auth-form input[name="username"]'),
         password: page.locator('.auth-form input[name="password"]'),
-        loginButton: page.getByRole('button', { name: 'Login' }),
+        loginButton: page.getByRole('button', { name: 'Entrar', exact: true }),
         message: page.getByRole('alert')
     };
 
@@ -117,7 +117,7 @@ test('menu and preloader', async ({ page }, testInfo) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await page.mouse.move(0, 0);
     await settleImages(page);
     await shot(page, testInfo, '03-menu-welcome');
@@ -172,7 +172,7 @@ test('battle', async ({ page }, testInfo) => {
     await settleImages(page);
     await shot(page, testInfo, '11-pause');
 
-    await page.getByRole('button', { name: '1. Continue' }).click();
+    await page.getByRole('button', { name: '1. Continuar' }).click();
     await page.keyboard.press('a');
     await expect(page.getByTestId('auto-click-popover')).toBeVisible();
     await expect(page.getByTestId('auto-click-toggle')).toBeFocused();

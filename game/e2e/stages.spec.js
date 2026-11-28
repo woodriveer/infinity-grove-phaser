@@ -20,7 +20,7 @@ const startGame = async (page, { state = 'form' } = {}) => {
     {
         await fillCredentials(menu, 'yan', 'secret123');
         await menu.loginButton.click();
-        await expect(menu.message).toHaveText('Welcome back, yan!');
+        await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     }
 
     await menu.canvas.click();
@@ -46,12 +46,12 @@ test.describe('Stages', () => {
 
         for (let phase = 1; phase <= 5; phase++)
         {
-            await expect(hud).toHaveText(`Stage 1/2 Phase ${phase}/5`, { timeout: 15_000 });
+            await expect(hud).toHaveText(`Estágio 1/2 Fase ${phase}/5`, { timeout: 15_000 });
             await hit(menu.canvas, 2);
         }
 
-        await expect(hud).toHaveText('Stage 1/2 Miniboss', { timeout: 15_000 });
-        await expect(page.locator('.boss-timer')).toHaveText(/^Time: [23]$/);
+        await expect(hud).toHaveText('Estágio 1/2 Miniboss', { timeout: 15_000 });
+        await expect(page.locator('.boss-timer')).toHaveText(/^Tempo: [23]s$/);
     });
 
     test('a miniboss that survives its time sends the player back to phase 5, and killing it in time reaches stage 2', async ({ page }) => {
@@ -64,13 +64,13 @@ test.describe('Stages', () => {
         const menu = await startGame(page);
         const hud = page.locator('.stage-hud');
 
-        await expect(hud).toHaveText('Stage 1/2 Miniboss', { timeout: 15_000 });
-        await expect(hud).toHaveText('Stage 1/2 Phase 5/5', { timeout: 15_000 });
+        await expect(hud).toHaveText('Estágio 1/2 Miniboss', { timeout: 15_000 });
+        await expect(hud).toHaveText('Estágio 1/2 Fase 5/5', { timeout: 15_000 });
 
         await hit(menu.canvas, 2);
-        await expect(hud).toHaveText('Stage 1/2 Miniboss', { timeout: 15_000 });
+        await expect(hud).toHaveText('Estágio 1/2 Miniboss', { timeout: 15_000 });
         await hit(menu.canvas, 2);
-        await expect(hud).toHaveText('Stage 2/2 Phase 1/5', { timeout: 15_000 });
+        await expect(hud).toHaveText('Estágio 2/2 Fase 1/5', { timeout: 15_000 });
 
         await expect.poll(() => outcomeCalls(backend).length, { timeout: 25_000 }).toBe(3);
         expect(outcomeCalls(backend).map((call) => [ call.body.encounter, call.body.phase, call.body.outcome ])).toEqual([
@@ -87,17 +87,17 @@ test.describe('Stages', () => {
         const menu = await startGame(page);
         const hud = page.locator('.stage-hud');
 
-        await expect(hud).toHaveText('Stage 1/2 Phase 1/5', { timeout: 15_000 });
+        await expect(hud).toHaveText('Estágio 1/2 Fase 1/5', { timeout: 15_000 });
         await hit(menu.canvas, 2);
-        await expect(hud).toHaveText('Stage 1/2 Phase 2/5', { timeout: 15_000 });
+        await expect(hud).toHaveText('Estágio 1/2 Fase 2/5', { timeout: 15_000 });
         await hit(menu.canvas, 2);
-        await expect(hud).toHaveText('Stage 1/2 Phase 3/5', { timeout: 15_000 });
+        await expect(hud).toHaveText('Estágio 1/2 Fase 3/5', { timeout: 15_000 });
         await expect.poll(() => outcomeCalls(backend).length, { timeout: 25_000 }).toBe(2);
 
         await page.reload();
         await startGame(page, { state: 'welcome' });
 
-        await expect(hud).toHaveText('Stage 1/2 Phase 3/5', { timeout: 15_000 });
+        await expect(hud).toHaveText('Estágio 1/2 Fase 3/5', { timeout: 15_000 });
     });
 
     test('beating the chapter boss shows the completion message, saves it, and a reload shows it again', async ({ page }) => {
@@ -109,15 +109,15 @@ test.describe('Stages', () => {
         });
         const menu = await startGame(page);
 
-        await expect(page.locator('.stage-hud')).toHaveText('Chapter Boss', { timeout: 15_000 });
+        await expect(page.locator('.stage-hud')).toHaveText('Chefe do capítulo', { timeout: 15_000 });
         await hit(menu.canvas, 3);
 
-        await expect(page.locator('.stage-message')).toHaveText('Chapter complete!', { timeout: 15_000 });
+        await expect(page.locator('.stage-message')).toHaveText('Capítulo concluído!', { timeout: 15_000 });
         await expect.poll(() => backend.progresses.get('yan').completed, { timeout: 25_000 }).toBe(true);
 
         await page.reload();
         await startGame(page, { state: 'welcome' });
 
-        await expect(page.locator('.stage-message')).toHaveText('Chapter complete!', { timeout: 15_000 });
+        await expect(page.locator('.stage-message')).toHaveText('Capítulo concluído!', { timeout: 15_000 });
     });
 });

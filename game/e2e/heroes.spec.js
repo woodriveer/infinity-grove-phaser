@@ -20,7 +20,7 @@ const startGame = async (page, options) => {
 
     await fillCredentials(menu, 'yan', 'secret123');
     await menu.loginButton.click();
-    await expect(menu.message).toHaveText('Welcome back, yan!');
+    await expect(menu.message).toHaveText('Bem-vindo de volta, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
     //  The heroes load in the background; the skill bar of the leader is the sign that they did
@@ -29,7 +29,7 @@ const startGame = async (page, options) => {
     return menu;
 };
 
-const fightPaused = (page) => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').paused);
+const pauseFlag = (page) => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').paused);
 
 test.describe('Hero screens', () => {
     test('the catalog shows the owned hero in colour and the other four in grey, with every skill of a grey hero locked', async ({ page }) => {
@@ -43,7 +43,7 @@ test.describe('Hero screens', () => {
         await expect(page.getByTestId('hero-card-kael')).not.toHaveClass(/is-grey/);
         await expect(page.getByTestId('hero-card-vex')).toHaveClass(/is-grey/);
         //  Spec background-fight: a hero screen does not pause the fight
-        expect(await fightPaused(page)).toBe(false);
+        expect(await pauseFlag(page)).toBe(false);
 
         await page.getByTestId('hero-card-vex').click();
 
@@ -54,7 +54,7 @@ test.describe('Hero screens', () => {
 
         await page.getByTestId('hero-close').click();
 
-        expect(await fightPaused(page)).toBe(false);
+        expect(await pauseFlag(page)).toBe(false);
         await expect(page.locator('.hero-panel')).toBeHidden();
     });
 
@@ -183,7 +183,7 @@ test.describe('Hero screens', () => {
 
         await expect(page.locator('.hero-panel')).toBeHidden();
         await expect(page.locator('.pause-menu')).toBeHidden();
-        expect(await fightPaused(page)).toBe(false);
+        expect(await pauseFlag(page)).toBe(false);
     });
 
     test('a card dropped by a won miniboss shows the notice and joins the bag', async ({ page }) => {

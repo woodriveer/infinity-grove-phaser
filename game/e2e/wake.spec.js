@@ -11,7 +11,7 @@ const logIn = async (page, username = 'yan') => {
 
     await fillCredentials(menu, username, 'secret123');
     await menu.loginButton.click();
-    await expect(menu.welcomeTitle).toHaveText(`Hello, ${username}!`);
+    await expect(menu.welcomeTitle).toHaveText(`Olá, ${username}!`);
 
     return menu;
 };
@@ -64,7 +64,7 @@ test.describe('Backend wake-up on the start screen', () => {
         await page.reload();
         const menu = await openMainMenu(page);
 
-        await expect(menu.message).toHaveText('Cannot reach the server. Try again later.');
+        await expect(menu.message).toHaveText('Não foi possível falar com o servidor. Tente de novo mais tarde.');
         expect(Date.now() - started).toBeLessThan(15000);
     });
 
