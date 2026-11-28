@@ -723,7 +723,7 @@ const shown = () => document.querySelector('.story-shown').textContent;
 
 ---
 
-#### T11: The História group of the Mapa screen (farmView.js) [ ]
+#### T11: The História group of the Mapa screen (farmView.js) [x]
 
 **Owner**: game-dev
 **Goal**: One chip per replayable scene at the top right of the Mapa (STORY-26).
@@ -754,7 +754,7 @@ const shown = () => document.querySelector('.story-shown').textContent;
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 6 new cases pass; every existing `farmView.test.js` case passes unchanged.
+- [x] The 6 new cases pass; every existing `farmView.test.js` case passes unchanged.
 
 **Commit**: `feat(game): list the story scenes on the Mapa screen`
 

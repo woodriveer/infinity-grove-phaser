@@ -244,3 +244,56 @@ describe('renderFarm', () => {
         });
     });
 });
+
+describe('renderFarm: the História group', () => {
+    const STORIES = [ { id: 'prologue', label: 'Prólogo' } ];
+
+    it('shows a História group with one chip per story', () => {
+        const screen = show(undefined, undefined, { stories: STORIES });
+        const group = find(screen, 'farm-story');
+        const chip = find(screen, 'story-replay-prologue');
+
+        expect(group.getAttribute('role')).toBe('group');
+        expect(group.getAttribute('aria-label')).toBe('História');
+        expect(group.querySelector('.farm-story-label').textContent).toBe('História');
+        expect(chip.tagName).toBe('BUTTON');
+        expect(chip.type).toBe('button');
+        expect(chip.textContent).toBe('Prólogo');
+        expect(chip.getAttribute('aria-label')).toBe('Assistir Prólogo');
+    });
+
+    it('sits right after the map title', () => {
+        const screen = show(undefined, undefined, { stories: STORIES });
+
+        expect([ ...screen.children ].map((child) => child.className).slice(0, 2)).toEqual([ 'farm-map-title', 'farm-story' ]);
+    });
+
+    it('a chip click calls onStory with the scene id and picks no boss', () => {
+        const onStory = vi.fn();
+        const onPick = vi.fn();
+        const screen = renderFarm(minibosses(1, 2, 3), 10, { onPick, map: AT_STAGE_4, stories: STORIES, onStory });
+
+        find(screen, 'story-replay-prologue').click();
+
+        expect(onStory).toHaveBeenCalledTimes(1);
+        expect(onStory).toHaveBeenCalledWith('prologue');
+        expect(onPick).not.toHaveBeenCalled();
+    });
+
+    it('lists two stories in the given order', () => {
+        const screen = show(undefined, undefined, { stories: [ { id: 'prologue', label: 'Prólogo' }, { id: 'chapter-1', label: 'Capítulo 1' } ] });
+
+        expect([ ...screen.querySelectorAll('.farm-story-chip') ].map((chip) => chip.textContent)).toEqual([ 'Prólogo', 'Capítulo 1' ]);
+    });
+
+    it('shows the group when no boss was beaten', () => {
+        const screen = renderFarm([], 10, { onPick: vi.fn(), map: AT_BOSS, stories: STORIES });
+
+        expect(find(screen, 'farm-story')).not.toBeNull();
+        expect(find(screen, 'farm-empty')).not.toBeNull();
+    });
+
+    it('shows no group without stories', () => {
+        expect(find(show(), 'farm-story')).toBeNull();
+    });
+});

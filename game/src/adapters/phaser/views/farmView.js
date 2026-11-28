@@ -79,12 +79,31 @@ const renderChapters = ({ chapters, chapter, currentChapter, busy, onChapter }) 
     return row;
 };
 
+//  The story scenes the player may watch again (spec story-scenes), one chip each, at the top right of the screen: a click calls
+//  onStory(id) and picks no boss.
+const renderStories = (stories, onStory) =>
+{
+    const group = el('div', 'farm-story', '', { testid: 'farm-story', role: 'group', 'aria-label': 'História' });
+
+    group.append(el('span', 'farm-story-label', 'História'));
+    stories.forEach(({ id, label }) =>
+    {
+        const chip = el('button', 'farm-story-chip', label, { type: 'button', testid: `story-replay-${id}`, 'aria-label': `Assistir ${label}` });
+
+        chip.addEventListener('click', () => onStory(id));
+        group.append(chip);
+    });
+
+    return group;
+};
+
 //  The chapter as a map: the stops of its 10 minibosses and its chapter boss along one path (`map` = { chapter, stage, kind, stageCount,
 //  completed } is where the player stands), each defeated one a button that fights it again through `onPick({ kind, stage })`. The chapter boss
 //  shows its wins left today and cannot be picked at 0. A stage without a position in the layout is a plain button below the map.
 //  `chapters` (the chapters the player may pick) and `chapter` (the shown one) draw the chapter row when there are two or more, with
 //  `currentChapter` (the campaign's own) marked, `busy` disabling it and `onChapter(n)` choosing another chapter.
-export const renderFarm = (bosses, winsLeft, { onPick, map, chapters = [], chapter = null, currentChapter = null, busy = false, onChapter = () => {} }) =>
+//  `stories` ([{ id, label }]) draws the História group right after the title when it has one or more, `onStory(id)` playing one.
+export const renderFarm = (bosses, winsLeft, { onPick, map, chapters = [], chapter = null, currentChapter = null, busy = false, onChapter = () => {}, stories = [], onStory = () => {} }) =>
 {
     const screen = el('div', 'farm-screen', '', { testid: 'farm-screen' });
     const board = el('div', 'farm-map', '', { testid: 'farm-map' });
@@ -117,6 +136,11 @@ export const renderFarm = (bosses, winsLeft, { onPick, map, chapters = [], chapt
     });
 
     screen.append(el('h3', 'farm-map-title', `Caminho do Capítulo ${map.chapter}`, { testid: 'farm-map-title' }));
+
+    if (stories.length >= 1)
+    {
+        screen.append(renderStories(stories, onStory));
+    }
 
     if (chapters.length >= 2)
     {
