@@ -927,7 +927,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 
 ---
 
-#### T15: e2e: the Mapa tab and the replay [ ]
+#### T15: e2e: the Mapa tab and the replay [x]
 
 **Owner**: test-engineer
 **Goal**: The renamed tab, the História group and the replay over the open Mapa (STORY-19, STORY-25 to STORY-28).
@@ -958,7 +958,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 **Gate**: `cd game && npx playwright test e2e/storyReplay.spec.js`
 **Done when**:
 
-- [ ] The 13 scenarios pass twice in a row with `--workers=1`.
+- [x] The 13 scenarios pass twice in a row with `--workers=1`.
 
 **Commit**: `test(game): cover the Mapa tab and the story replay in the browser`
 
