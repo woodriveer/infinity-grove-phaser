@@ -344,7 +344,7 @@ T11
 
 ---
 
-#### T9: The Portuguese texts in the browser [ ]
+#### T9: The Portuguese texts in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: A new e2e file pins every row of spec § Player-Facing Texts on the real screens and scans the main screens for the inventoried English words (PT-01, PT-02, PT-04, PT-05, PT-06).
@@ -395,7 +395,7 @@ For the codes the fake backend never answers on sign-in (`AUTH_UNAUTHENTICATED`,
 **Gate**: `cd game && npm test && npx playwright test e2e/portugueseText.spec.js e2e/auth.spec.js`
 **Done when**:
 
-- [ ] Every case passes; `auth.spec.js` passes with the new fake backend answer.
+- [x] Every case passes; `auth.spec.js` passes with the new fake backend answer.
 
 **Commit**: `test(game): pin the Portuguese texts in the browser`
 

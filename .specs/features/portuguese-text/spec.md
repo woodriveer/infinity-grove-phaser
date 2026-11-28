@@ -251,7 +251,7 @@ Every text exactly (AD-007, L-010). `<user>` is the username as typed (trimmed),
 | PT-03 | P1: Backend code - AC 1 to 3 | Tasks T1 | Implementing |
 | PT-04 | P1: Combat HUD - AC 1 to 9, Edge 2, 3 | Tasks T4, T5, T6, T9, T10 | Implementing |
 | PT-05 | P1: Pause menu - AC 1 to 3 | Tasks T7, T9, T10 | Implementing |
-| PT-06 | P1: No English left - AC 1, 2 | Tasks T10 | Pending |
+| PT-06 | P1: No English left - AC 1, 2 | Tasks T9, T10 | Implementing |
 
 **Coverage:** 6 total, 6 mapped to tasks, 0 unmapped
 
