@@ -1002,7 +1002,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 
 ---
 
-#### T20: e2e: the chapter 1 boss scene [ ]
+#### T20: e2e: the chapter 1 boss scene [x]
 
 **Owner**: test-engineer
 **Goal**: The chapter 1 scene opens once after the chapter 1 boss win and shows its cards, faces, camera, letterbox, veins and dawn in the browser (STORY-44, STORY-46, STORY-47, STORY-49 to STORY-55).
@@ -1029,7 +1029,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 **Gate**: `cd game && npx playwright test e2e/storyChapterOne.spec.js`
 **Done when**:
 
-- [ ] The 9 scenarios pass twice in a row with `--workers=1`.
+- [x] The 9 scenarios pass twice in a row with `--workers=1`.
 
 **Commit**: `test(game): cover the chapter 1 boss scene in the browser`
 
