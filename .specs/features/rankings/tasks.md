@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/rankings/spec.md`
 **Design**: `.specs/features/rankings/design.md`
-**Status**: Draft. Waits for the owner's answers to spec Q1 to Q14. If the owner changes an answer, the product owner revises the affected tasks before any task starts: Q1 (a separate nick) adds a backend and a game task and changes `username` in T4, T9, T10, T11, T14, T18; Q2 (play time) changes T2, T5; Q7 (current power) changes T4, T5; Q9 (current money) removes the trigger of T1 and changes T4; Q10 (another top N) changes `RecordRules.TOP` and every row count.
+**Status**: Approved by the owner on 2026-11-28 with the recommended answers to Q1 to Q14 (nick = username, story time on the real clock, every default as written). Execution started.
 
 Rules for every task:
 
