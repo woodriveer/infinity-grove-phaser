@@ -6030,6 +6030,21 @@ describe('ClickerGame hero team', () => {
             expect(ctx.scene.monster.health).toBeCloseTo(7.5, 9);
         });
 
+        it('a team hit against a boss gets the boss damage of the ally: +20 % makes 2.4 on a miniboss and 2 on a phase monster', async () => {
+            const amulet = { id: 'a', slot: 'AMULET', rarity: 'COMMON', refine: 0, affixes: [ { type: 'BOSS_DAMAGE_PCT', value: 20 } ], heroId: 'lyra', sellPrice: 1 };
+            const phase = await open([ 'lyra', null, null, null ], { start: big() });
+            const boss = await open([ 'lyra', null, null, null ], { start: { ...big(), ...atChapter(5, 1, 'MINIBOSS') } });
+
+            equipmentGateway.list.mockResolvedValue({ capacity: 100, pieces: [ amulet ] });
+            await phase.scene.equipment.load();
+            await boss.scene.equipment.load();
+            team(phase);
+            team(boss);
+
+            expect(phase.scene.monster.health).toBe(998);
+            expect(boss.scene.monster.maxHealth - boss.scene.monster.health).toBeCloseTo(2.4, 9);
+        });
+
         it('a damage-over-time tick brings no team strike: Tempestade Arcana ticks 2.4 and Lyra does not hit', async () => {
             const ctx = await open([ 'lyra', null, null, null ], { heroOptions: { leaderId: 'orina', stars: { orina: 2 } }, start: big() });
 
@@ -6759,6 +6774,20 @@ describe('ClickerGame miniboss target', () => {
         expect(ctx.texts.slice(before).map(({ text, x, y, style }) => [ text, x, y, style.color ])).toEqual([
             [ '1', 480, 360, '#ffd35c' ],
             [ '2', 498, 360, '#7fd4ff' ],
+            [ '0.4', 740, 273, '#7fd4ff' ]
+        ]);
+    });
+
+    it('a click that kills the add it hit brings the team to the miniboss: Lyra deals 0.4 with the number at (740, 273)', async () => {
+        const ctx = await allyScene([ 'lyra', null, null, null ], { adds: [ { health: 1, defenseBuff: 30 }, ADD ] });
+        const before = ctx.texts.length;
+
+        ctx.click(lacaio1);
+
+        expect(ctx.scene.fight.adds[0].monster.dead).toBe(true);
+        expect(ctx.scene.monster.health).toBeCloseTo(99.58, 9);
+        expect(ctx.texts.slice(before).map(({ text, x, y, style }) => [ text, x, y, style.color ])).toEqual([
+            [ '1', 480, 360, '#ffd35c' ],
             [ '0.4', 740, 273, '#7fd4ff' ]
         ]);
     });

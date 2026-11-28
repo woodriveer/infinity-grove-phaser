@@ -229,6 +229,20 @@ test.describe('Miniboss target', () => {
         expect(Math.abs(allyNumbers[0].x - (gold.x + gold.width / 2 + 8))).toBeLessThanOrEqual(0.5);
     });
 
+    //  Spec team-click-damage AC 7 and Q9: the click itself kills the add, so the team strikes the miniboss; its number stands at the miniboss's ally place
+    test('a click that kills the add it hit brings the team to the miniboss: Lyra deals 0.4 at (740, 273)', async ({ page }) => {
+        await startAdds(page, {
+            definition: addsChapter({ adds: [ { health: 1, defenseBuff: 30 }, ADD ] }),
+            team: LYRA_ALLY
+        });
+
+        await hitAt(page, ...LACAIO_1);
+
+        expect(await state(page)).toMatchObject({ adds: [ 0, 30 ], target: 'Miniboss' });
+        expect((await state(page)).main).toBeCloseTo(99.58, 5);
+        expect(await numbers(page)).toMatchObject([ { text: '1', x: 480, y: 360, color: '#ffd35c' }, { text: '0.4', x: 740, y: 273, color: ALLY } ]);
+    });
+
     //  The adds carry the stats of the stage's phase monster (seeded with defense 0, so a fixture gives them defense 20 to make a break visible)
     test('Quebra de defesa 5 lowers the defense of an add: a click deals 0.85 on defense 20', async ({ page }) => {
         await startAdds(page, { definition: addsChapter({ monsterDefense: 20 }), talents: { PHYSICAL_BREAK: 5 } });
