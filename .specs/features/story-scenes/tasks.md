@@ -654,7 +654,7 @@ const shown = () => document.querySelector('.story-shown').textContent;
 
 ---
 
-#### T9: Story stylesheet and fonts [ ]
+#### T9: Story stylesheet and fonts [x]
 
 **Owner**: game-dev
 **Goal**: The look of the design and the Mapa group in the stylesheet, and the story fonts (STORY-22, STORY-26, STORY-37, STORY-39, STORY-40, STORY-41).
@@ -675,8 +675,8 @@ const shown = () => document.querySelector('.story-shown').textContent;
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `npm test` passes unchanged and `npm run build` exits 0.
-- [ ] `game/public/style.css` contains `.story-camera`, `.story-tint.is-veins`, `.story-tint.is-dawn`, `.story-bar.is-on { height: 46px; }`, `.story-box.is-face`, `.story-face`, `.story-cardtitle`, `.story-overlay.is-chapter-boss .story-logo { width: 520px; }` and `@keyframes storyVeins`, and no `.story-mote.is-m` rule (motes are inline); and `game/index.html` contains `Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600` and `Cinzel:wght@500;700`.
+- [x] `npm test` passes unchanged and `npm run build` exits 0.
+- [x] `game/public/style.css` contains `.story-camera`, `.story-tint.is-veins`, `.story-tint.is-dawn`, `.story-bar.is-on { height: 46px; }`, `.story-box.is-face`, `.story-face`, `.story-cardtitle`, `.story-overlay.is-chapter-boss .story-logo { width: 520px; }` and `@keyframes storyVeins`, and no `.story-mote.is-m` rule (motes are inline); and `game/index.html` contains `Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600` and `Cinzel:wght@500;700`.
 
 **Commit**: `feat(game): style the story overlay and load its fonts`
 

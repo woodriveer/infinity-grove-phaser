@@ -3192,7 +3192,8 @@ body.piece-dragging .piece-tooltip {
     gap: 6px;
 }
 
-.farm-chapters-label {
+.farm-chapters-label,
+.farm-story-label {
     margin-right: 4px;
     font-family: var(--font-body);
     font-size: 14px;
@@ -3200,7 +3201,8 @@ body.piece-dragging .piece-tooltip {
     color: var(--ink-600);
 }
 
-.farm-chapter {
+.farm-chapter,
+.farm-story-chip {
     position: relative;
     min-width: 40px;
     height: 32px;
@@ -3237,18 +3239,26 @@ body.piece-dragging .piece-tooltip {
     background: var(--gold-400);
 }
 
-.farm-chapter:hover:not(:disabled) {
+.farm-chapter:hover:not(:disabled),
+.farm-story-chip:hover:not(:disabled) {
     filter: brightness(1.15);
 }
 
-.farm-chapter:active:not(:disabled) {
+.farm-chapter:active:not(:disabled),
+.farm-story-chip:active:not(:disabled) {
     filter: brightness(0.9);
 }
 
-.farm-chapter:focus-visible {
+.farm-chapter:focus-visible,
+.farm-story-chip:focus-visible {
     outline: 2px solid var(--color-focus);
     outline-offset: 2px;
 }
+
+/* Mapa: the scenes the player may watch again, at the top right, level with the map title (spec story-scenes) */
+.farm-screen { position: relative; }
+.farm-story { position: absolute; top: 0; right: 0; display: flex; align-items: center; gap: 6px; }
+.farm-story-chip { padding: 0 14px 3px; }
 
 .farm-map {
     position: relative;
@@ -3533,3 +3543,84 @@ body.piece-dragging .piece-tooltip {
 .team-hero-stars { font-family: var(--font-body); font-weight: 600; font-size: 12px; }
 .team-hero-passive { font-family: var(--font-body); font-weight: 500; font-size: 11px; color: var(--ink-600); }
 .team-available-empty { margin: 0; font-family: var(--font-body); font-size: 13px; color: var(--ink-600); }
+
+/* Story scenes (spec story-scenes): a 1280x720 stage scaled to the viewport, over the whole page */
+.story-overlay { position: fixed; inset: 0; z-index: 9; overflow: hidden; background: #05090a; }
+.story-hit { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.story-hit:focus-visible { outline: 3px solid #f3dc95; outline-offset: -6px; }
+.story-stage { position: absolute; left: 50%; top: 50%; z-index: 2; width: 1280px; height: 720px; overflow: hidden; transform: translate(-50%, -50%) scale(var(--story-scale, 1)); transform-origin: center; pointer-events: none; font-family: "Cormorant Garamond", Georgia, serif; color: #f4ecd4; }
+.story-backdrop { position: absolute; inset: -4%; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.4s ease; }
+.story-backdrop.is-on { opacity: 1; }
+.story-backdrop.is-drift { animation: storyDrift 40s ease-in-out infinite alternate; }
+.story-backdrop.is-pan { animation: storyPan 14s ease-in-out infinite alternate; }
+.story-tint { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s ease; }
+.story-tint.is-on { opacity: 1; }
+.story-tint.is-dark { background: rgba(2, 6, 6, 0.55); }
+.story-tint.is-red { background: radial-gradient(ellipse at 50% 55%, rgba(120, 0, 0, 0) 20%, rgba(140, 10, 10, 0.55) 75%, rgba(60, 0, 0, 0.85) 100%); animation: storyPulse 1.6s ease-in-out infinite; }
+.story-tint.is-gold { background: radial-gradient(ellipse at 50% 40%, rgba(255, 214, 120, 0.28), rgba(0, 0, 0, 0) 60%); }
+.story-tint.is-voice { background: radial-gradient(ellipse at 50% 30%, rgba(150, 255, 190, 0.22), rgba(0, 0, 0, 0) 55%); }
+.story-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.7) 100%); }
+.story-mote { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #fff2a8; box-shadow: 0 0 10px 3px rgba(255, 236, 140, 0.7); animation: storyFloat 9s ease-in-out infinite; }
+.story-camera { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; transition: transform 1.8s cubic-bezier(0.45, 0.05, 0.25, 1); }
+.story-tint.is-veins { background: radial-gradient(ellipse at 30% 62%, rgba(170, 60, 255, 0.35), rgba(0, 0, 0, 0) 45%); mix-blend-mode: screen; transition: opacity 1s ease; }
+.story-tint.is-veins.is-on { animation: storyVeins 1.4s ease-in-out infinite; }
+.story-tint.is-dawn { background: radial-gradient(ellipse at 50% 0%, rgba(255, 200, 120, 0.35), rgba(0, 0, 0, 0) 60%); transition: opacity 2.5s ease; }
+.story-bar { position: absolute; left: 0; right: 0; height: 0; background: #000; transition: height 0.8s ease; }
+.story-bar.is-top { top: 0; }
+.story-bar.is-bottom { bottom: 0; }
+.story-bar.is-on { height: 46px; }
+.story-ghost { color: transparent; text-shadow: none; }
+.story-narr-scrim { position: absolute; left: 50%; top: 50%; width: 1200px; height: 420px; transform: translate(-50%, -50%); background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0) 70%); }
+.story-narr { position: absolute; left: 50%; top: 50%; width: 940px; margin: 0; transform: translate(-50%, -50%); text-align: center; font-size: 38px; line-height: 1.45; font-style: italic; font-weight: 500; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.95), 0 0 4px rgba(0, 0, 0, 0.9); }
+.story-box { position: absolute; bottom: 40px; box-sizing: border-box; padding: 34px 40px 30px; font-size: 32px; line-height: 1.4; font-weight: 500; background: linear-gradient(180deg, rgba(14, 26, 20, 0.92), rgba(8, 16, 12, 0.95)); border: 2px solid #c9a95a; border-radius: 14px; box-shadow: 0 0 0 4px rgba(10, 18, 14, 0.8), 0 0 0 5px rgba(201, 169, 90, 0.45), 0 18px 40px rgba(0, 0, 0, 0.6); animation: storyRise 0.5s ease both; }
+.story-box.is-voice { left: 210px; width: 860px; min-height: 160px; }
+.story-box.is-character { left: 330px; width: 900px; min-height: 170px; }
+.story-box.is-face { left: 110px; width: 1060px; min-height: 176px; padding: 36px 48px 30px 210px; }
+.story-box.is-face .story-name { top: -22px; left: 206px; }
+.story-face { position: absolute; left: 28px; top: -52px; width: 156px; height: 156px; border-radius: 50%; object-fit: cover; border: 3px solid #e8cf86; box-shadow: 0 0 0 5px rgba(10, 18, 14, 0.9), 0 0 22px rgba(255, 220, 140, 0.45), 0 10px 24px rgba(0, 0, 0, 0.6); background: #0b140f; }
+.story-line { margin: 0; }
+.story-line.is-italic { font-style: italic; }
+.story-name { position: absolute; top: -24px; left: 32px; padding: 8px 22px; font-family: "Cinzel", Georgia, serif; font-weight: 700; font-size: 20px; letter-spacing: 0.12em; color: #1b1406; background: linear-gradient(180deg, #f3dc95, #c9a24c); border: 1px solid #fff0bf; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
+.story-next { position: absolute; right: 22px; bottom: 14px; animation: storyBob 1s ease-in-out infinite; }
+.story-next.is-narr { left: 50%; right: auto; bottom: 120px; margin-left: -14px; }
+.story-portrait { position: absolute; left: 70px; bottom: 0; height: 560px; filter: drop-shadow(0 0 22px rgba(255, 226, 150, 0.45)); animation: storyEnter 0.8s ease both; }
+.story-orb { position: absolute; left: 50%; top: 150px; width: 150px; height: 150px; margin-left: -75px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #ffffff 0%, #c9ffd9 18%, rgba(110, 230, 160, 0.55) 45%, rgba(60, 180, 120, 0) 72%); animation: storyBreath 2.6s ease-in-out infinite; }
+.story-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; }
+.story-logo { width: 620px; filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.6)); animation: storyRise 1.2s ease both; }
+.story-kicker { margin: 0; font-family: "Cinzel", Georgia, serif; font-weight: 500; letter-spacing: 0.3em; font-size: 16px; color: #e9d9a6; text-transform: uppercase; text-shadow: 0 2px 8px #000; }
+.story-cta { margin: 18px 0 0; font-family: "Cinzel", Georgia, serif; font-weight: 500; letter-spacing: 0.18em; font-size: 18px; color: #fff3cc; text-shadow: 0 0 12px rgba(255, 220, 140, 0.8), 0 2px 6px #000; animation: storyBlink 1.8s ease-in-out infinite; }
+.story-center.is-end .story-cta { margin-top: 26px; }
+.story-endtitle { margin: 0; font-family: "Cinzel", Georgia, serif; font-weight: 700; font-size: 56px; letter-spacing: 0.06em; color: #f3dc95; text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9); }
+.story-endsub { margin: 0; font-size: 30px; font-style: italic; text-shadow: 0 2px 12px #000; }
+.story-cardtitle { margin: 0; font-family: "Cinzel", Georgia, serif; font-weight: 700; font-size: 44px; letter-spacing: 0.05em; color: #f3dc95; text-shadow: 0 4px 24px rgba(0, 0, 0, 0.95); }
+/* Cards of a chapter-boss scene (chapter design, spec D31) */
+.story-overlay.is-chapter-boss .story-center { gap: 16px; }
+.story-overlay.is-chapter-boss .story-logo { width: 520px; }
+.story-overlay.is-chapter-boss .story-endtitle { font-size: 44px; letter-spacing: 0.05em; }
+.story-overlay.is-chapter-boss .story-endsub { font-size: 28px; }
+.story-overlay.is-chapter-boss .story-cta { margin-top: 22px; }
+.story-ui { position: absolute; top: 22px; right: 24px; display: flex; align-items: center; gap: 16px; pointer-events: auto; }
+.story-dots { display: flex; align-items: center; gap: 8px; }
+.story-dots[hidden] { display: none; }
+.story-dot { width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; background: rgba(244, 236, 212, 0.25); border: 1px solid rgba(244, 236, 212, 0.5); }
+.story-dot.is-on { background: #f3dc95; border-color: #f3dc95; box-shadow: 0 0 8px rgba(243, 220, 149, 0.8); }
+.story-skip, .story-mute { height: 44px; color: #f3dc95; background: rgba(8, 16, 12, 0.6); border: 1px solid rgba(243, 220, 149, 0.6); cursor: pointer; }
+.story-skip { padding: 0 18px; border-radius: 22px; font-family: "Cinzel", Georgia, serif; font-weight: 700; font-size: 16px; letter-spacing: 0.12em; }
+.story-mute { width: 44px; padding: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.story-skip:hover, .story-mute:hover { background: rgba(30, 50, 38, 0.8); }
+.story-skip:focus-visible, .story-mute:focus-visible { outline: 3px solid #f3dc95; outline-offset: 2px; }
+@keyframes storyDrift { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.08) translate(-1.5%, -1%); } }
+@keyframes storyPan { from { transform: scale(1.05) translate(1.5%, 0); } to { transform: scale(1.1) translate(-2%, -1%); } }
+@keyframes storyPulse { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+@keyframes storyFloat { 0% { transform: translate(0, 0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 0.8; } 100% { transform: translate(30px, -90px); opacity: 0; } }
+@keyframes storyRise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes storyEnter { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes storyBreath { 0%, 100% { transform: scale(0.92); opacity: 0.85; } 50% { transform: scale(1.08); opacity: 1; } }
+@keyframes storyBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+@keyframes storyBlink { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+@keyframes storyVeins { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+/* Reduced motion (spec D16): no animation or transition in the scene, no motes; the typing follows the voice and stays */
+@media (prefers-reduced-motion: reduce) {
+    .story-overlay, .story-overlay * { animation: none !important; transition: none !important; }
+    .story-mote { display: none; }
+}

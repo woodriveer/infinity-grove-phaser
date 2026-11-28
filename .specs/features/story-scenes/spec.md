@@ -329,7 +329,7 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | STORY-23 | P1: Watching a scene (AC 15) | T3, T7, T16 | Implementing |
 | STORY-24 | P1: Watching a scene (AC 16) | T8, T16 | Implementing |
 | STORY-25 | P1: The Mapa tab (AC 1) | T12, T15 | In Tasks |
-| STORY-26 | P1: The Mapa tab (AC 2) | T9, T11, T12, T15 | In Tasks |
+| STORY-26 | P1: The Mapa tab (AC 2) | T9, T11, T12, T15 | Implementing |
 | STORY-27 | P1: The Mapa tab (AC 3) | T12, T13, T15 | In Tasks |
 | STORY-28 | P1: The Mapa tab (AC 4) | T13, T15 | In Tasks |
 | STORY-29 | P1: The Mapa tab (AC 5) | T4, T13 | Implementing |
@@ -342,9 +342,9 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | STORY-36 | P2: Scenes are data (AC 5) | T13 | In Tasks |
 | STORY-37 | P2: Fits every screen (AC 1) | T3, T8, T9, T16 | Implementing |
 | STORY-38 | P2: Fits every screen (AC 2) | T8, T16 | Implementing |
-| STORY-39 | P2: Fits every screen (AC 3) | T9, T16 | In Tasks |
-| STORY-40 | P2: Fits every screen (AC 4) | T9, T16 | In Tasks |
-| STORY-41 | P2: Fits every screen (AC 5) | T9, T16 | In Tasks |
+| STORY-39 | P2: Fits every screen (AC 3) | T9, T16 | Implementing |
+| STORY-40 | P2: Fits every screen (AC 4) | T9, T16 | Implementing |
+| STORY-41 | P2: Fits every screen (AC 5) | T9, T16 | Implementing |
 | STORY-42 | P2: Keys while a scene plays (AC 1) | T8, T13, T14 | Implementing |
 | STORY-43 | P2: Keys while a scene plays (AC 2) | T13, T14 | In Tasks |
 | STORY-44 | P1: The chapter 1 boss scene (AC 1) | T5, T20 | Implementing |
