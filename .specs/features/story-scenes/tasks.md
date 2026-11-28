@@ -497,7 +497,7 @@ Read rules: `getItem` throws → `memory`; `getItem` returns `null` → `memory`
 
 ### Phase 3: Player views
 
-#### T7: The overlay DOM and its repaint (storyStage.js) [ ]
+#### T7: The overlay DOM and its repaint (storyStage.js) [x]
 
 **Owner**: game-dev
 **Goal**: Build the overlay of the two designs once and repaint it from a snapshot, keeping the content node while the line does not change, with the camera, face, letterbox, motes and card looks of revision 3 (STORY-09, STORY-11, STORY-16, STORY-20, STORY-21, STORY-22, STORY-23, STORY-32, STORY-46, STORY-47, STORY-49 to STORY-55).
@@ -563,7 +563,7 @@ export const createStoryStage = ({ scene, backdrops, onHit, onSkip, onMute }) =>
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 31 cases pass and every earlier unit test passes.
+- [x] The 31 cases pass and every earlier unit test passes.
 
 **Commit**: `feat(game): build the story overlay of the prologue design`
 
