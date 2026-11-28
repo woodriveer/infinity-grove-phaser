@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ícones dos talentos</title>
+<style>
+:root { --bg:#faf7f2; --surface:#fff; --text:#2b2622; --muted:#6f655c; --line:#e4dcd1; --ok:#2f7a4a; }
+@media (prefers-color-scheme: dark) { :root { --bg:#1d1a17; --surface:#27231f; --text:#efe8df; --muted:#a99d90; --line:#3a342e; --ok:#6cc28c; } }
+* { box-sizing: border-box; }
+body { margin:0; padding:32px 16px 64px; background:var(--bg); color:var(--text); font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+main { max-width:920px; margin:0 auto; }
+h1 { font-size:28px; margin:0 0 4px; } h2 { font-size:18px; margin:36px 0 12px; }
+.sub { color:var(--muted); margin:8px 0 0; }
+.verdict { display:inline-block; padding:4px 12px; border-radius:999px; background:var(--ok); color:var(--bg); font-weight:700; }
+table { width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--line); }
+th,td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { font-size:13px; color:var(--muted); font-weight:600; }
+td.n { font-variant-numeric:tabular-nums; }
+code { font-size:13px; }
+img { max-width:100%; border:1px solid var(--line); border-radius:6px; }
+.shots { display:flex; flex-wrap:wrap; gap:8px; }
+.shots img { width:96px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Ícones dos talentos</h1>
+<p class="sub">Versão v0.17.1 (patch) · 28/11/2026 · <span class="verdict">CONCLUÍDO</span></p>
+
+<h2>Veredito</h2>
+<p>No cartão de detalhes da árvore de talentos, os ícones de Fúria crescente, Tempo do miniboss e Dano contra chefe passavam do anel. A causa: a imagem de um <code>.icon</code> tinha <code>height: 100%</code> dentro de um grid sem trilhas, a porcentagem não se resolvia e uma arte alta mantinha a proporção e crescia (60 × 93 e 60 × 119 px em vez de 60 × 60). Agora o grid do <code>.icon</code> tem uma célula do tamanho da caixa, e toda arte cabe nela.</p>
+<table>
+<tr><th>Item</th><th>Valor</th></tr>
+<tr><td>Faixa de commits</td><td><code>a1477641..581cfbaa</code>: 1 fix (<code>d316eb54</code>), 1 docs (<code>581cfbaa</code>)</td></tr>
+<tr><td>Verificação de autoria do <code>test-engineer</code></td><td>Não rodada (patch de 2 linhas de CSS, sem spec). No lugar dela, o novo teste e2e foi rodado contra o código sem a correção e falhou (a caixa da imagem ficou diferente da caixa do ícone); com a correção, passa. Sensor de mutantes: não rodado (não há código JavaScript mutável na mudança).</td></tr>
+<tr><td>Revisão de UI</td><td>APROVADA (<code>ui-review.html</code>): árvore, seis anéis de detalhe, HUD e mochila conferidos, sem regressão em outros <code>.icon</code></td></tr>
+<tr><td>Execução do CI</td><td class="n">46142714897, Tests workflow em <code>ci/talent-icon-fit</code>, commit <code>d316eb54</code>: success (fonte de todos os números abaixo)</td></tr>
+</table>
+
+<h2>Antes e depois</h2>
+<div class="shots">
+<img src="ui-review/01-combo-fury-desktop.png" alt="Fúria crescente">
+<img src="ui-review/02-miniboss-time-desktop.png" alt="Tempo do miniboss">
+<img src="ui-review/03-boss-damage-desktop.png" alt="Dano contra chefe">
+<img src="ui-review/04-click-damage-desktop.png" alt="Dano de clique">
+<img src="ui-review/05-combo-desktop.png" alt="Combo">
+<img src="ui-review/06-crit-chance-desktop.png" alt="Chance de crítico">
+</div>
+<p class="sub">Depois da correção. Antes, as três primeiras artes ocupavam o anel de cima a baixo.</p>
+
+<h2>Código de produção</h2>
+<table>
+<tr><th>Parte</th><th>Linhas adicionadas</th><th>Linhas removidas</th><th>Arquivos</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes, <code>game/public/*.css</code>)</td><td class="n">2</td><td class="n">0</td><td class="n">1 (<code>game/public/style.css</code>)</td></tr>
+</table>
+
+<h2>Código de teste</h2>
+<table>
+<tr><th>Suíte</th><th>Linhas adicionadas</th><th>Testes adicionados</th><th>Total da suíte no CI</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td class="n">0</td><td class="n">0</td><td class="n">1398 (1398 passaram)</td></tr>
+<tr><td>Jogo unitário (<code>game/src/**/*.test.js</code>)</td><td class="n">0</td><td class="n">0</td><td class="n">2729 (2729 passaram)</td></tr>
+<tr><td>e2e (<code>game/e2e</code>)</td><td class="n">30</td><td class="n">1</td><td class="n">888 (888 passaram)</td></tr>
+<tr><td>Scripts de deploy</td><td class="n">0</td><td class="n">0</td><td class="n">306 (306 passaram)</td></tr>
+</table>
+<p class="sub">Também foram adicionados dois roteiros de screenshots em <code>game/ui-review/</code> (<code>talentIconFit.shots.js</code>, <code>talentIconFitBag.shots.js</code>), que não são suíte de teste.</p>
+
+<h2>Cobertura de testes unitários</h2>
+<table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Backend, projeto todo (JaCoCo)</td><td class="n">98,49%</td><td class="n">93,72%</td></tr>
+<tr><td>Jogo, projeto todo (Vitest v8)</td><td class="n">98,69%</td><td class="n">95,20%</td></tr>
+<tr><td>Arquivos alterados</td><td colspan="2">não medido: o único arquivo de produção é CSS, que nem v8 nem JaCoCo medem</td></tr>
+</table>
+
+<h2>Cobertura e2e</h2>
+<table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Código do jogo exercido pelo Playwright (istanbul, limite inferior)</td><td class="n">93,41%</td><td class="n">77,07%</td></tr>
+</table>
+<table>
+<tr><th>Cenário e2e</th><th>Resultado</th></tr>
+<tr><td>Talentos card: a tall icon › a tall picture fits the ring of the card and the node (Fúria crescente, Tempo do miniboss, Dano contra chefe, no cartão e no nó)</td><td>passou</td></tr>
+</table>
+
+<h2>Testes falhando fora da mudança</h2>
+<p>Nenhum: as quatro suítes do CI terminaram sem falhas.</p>
+
+<h2>Também nesta versão</h2>
+<p>A v0.17.1 leva os commits da revisão 4 de <code>story-scenes</code> que vieram depois da v0.17.0 (<code>d4012436..a1477641</code>): novos rostos dos heróis, rosto redondo de Seraphine no prólogo e nova última fala de Kael. Eles têm relatório e revisão próprios na pasta de <code>story-scenes</code>.</p>
+</main>
+</body>
+</html>

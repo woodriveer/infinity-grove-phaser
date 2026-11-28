@@ -3,6 +3,18 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.17.1] - 2026-11-28
+
+Patch: ícones dos talentos (`talent-icon-fit`) e revisão 4 das cenas da história.
+
+### Corrigido
+
+- Os ícones de Fúria crescente, Tempo do miniboss e Dano contra chefe passavam do anel no cartão de detalhes da árvore de talentos; agora toda arte cabe no anel, inclusive no nó da árvore.
+
+### Alterado
+
+- Cenas da história: novos rostos dos heróis, rosto redondo de Seraphine no prólogo e nova última fala de Kael no capítulo 1.
+
 ## [0.17.0] - 2026-11-28
 
 Cenas da história (`story-scenes`): o jogo passa a contar a história em cenas dentro da tela, com o prólogo e a cena do chefe do capítulo 1.
