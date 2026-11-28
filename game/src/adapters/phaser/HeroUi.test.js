@@ -4,6 +4,7 @@ import { ApiError } from '../../application/ApiError';
 import { createEquipmentCollection } from '../../application/equipment/equipmentCollection';
 import { createFarmSession } from '../../application/farm/farmSession';
 import { createHeroCollection } from '../../application/heroes/heroCollection';
+import { createRankingBoard } from '../../application/rankings/rankingBoard';
 import { createTalentCollection } from '../../application/talents/talentCollection';
 
 const flush = () => new Promise((resolve) => setTimeout(resolve));
@@ -53,6 +54,10 @@ const createUi = ({ list = catalog(), farmGet = farmState(), equipmentList = { c
         sellMany: vi.fn()
     };
     const farmGateway = { get: vi.fn(() => (farmGet instanceof Error ? Promise.reject(farmGet) : Promise.resolve(farmGet))), win: vi.fn() };
+    const rankingGateway = {
+        get: vi.fn(async (board, chapter) => ({ board, chapter: board === 'boss-time' ? chapter : null, entries: [], me: null })),
+        recordClickPower: vi.fn(async () => ({ value: 1, best: 1 }))
+    };
     const timers = [];
     const scene = {
         add: {
@@ -78,12 +83,13 @@ const createUi = ({ list = catalog(), farmGet = farmState(), equipmentList = { c
     const farm = createFarmSession({ gateway: farmGateway });
     const equipment = createEquipmentCollection({ gateway: equipmentGateway });
     const talents = createTalentCollection({ gateway: talentGateway });
-    const ui = new HeroUi(scene, { heroes, equipment, talents, farm, ...hooks });
+    const rankings = createRankingBoard({ gateway: rankingGateway });
+    const ui = new HeroUi(scene, { heroes, equipment, talents, farm, rankings, ...hooks });
     const root = scene.add.dom.mock.results.map((result) => result.value.node);
     const query = (selector) => root.map((node) => node.querySelector(selector)).find(Boolean) ?? null;
     const testid = (id) => query(`[data-testid="${id}"]`);
 
-    return { ui, scene, heroes, equipment, talents, farm, heroesGateway, equipmentGateway, talentGateway, farmGateway, hooks, timers, query, testid, root };
+    return { ui, scene, heroes, equipment, talents, farm, rankings, heroesGateway, equipmentGateway, talentGateway, farmGateway, rankingGateway, hooks, timers, query, testid, root };
 };
 
 const open = async (ctx, screen) => {
@@ -92,14 +98,14 @@ const open = async (ctx, screen) => {
 };
 
 describe('HeroUi HUD', () => {
-    it('shows the six buttons Heróis, Mochila, Equipe, Equipamento, Talentos and Mapa', () => {
+    it('shows the seven buttons Heróis, Mochila, Equipe, Equipamento, Talentos, Mapa and Ranking', () => {
         const { testid } = createUi();
 
         //  The label of a button: its text without the chip of its key
         const label = (id) => testid(`hud-${id}`).textContent.slice(0, -(testid(`hud-key-${id}`)?.textContent.length ?? 0) || undefined);
 
-        expect([ 'heroes', 'bag', 'team', 'equipment', 'talents', 'farm' ].map(label)).toEqual([
-            'Heróis', 'Mochila', 'Equipe', 'Equipamento', 'Talentos', 'Mapa'
+        expect([ 'heroes', 'bag', 'team', 'equipment', 'talents', 'farm', 'rankings' ].map(label)).toEqual([
+            'Heróis', 'Mochila', 'Equipe', 'Equipamento', 'Talentos', 'Mapa', 'Ranking'
         ]);
         expect(testid('hud-fusion')).toBeNull();
     });
@@ -3115,20 +3121,20 @@ const CHAPTER_5 = { chapter: 5, stage: 1, kind: 'PHASE', stageCount: 10, complet
 const railIds = (ctx) => [ ...ctx.query('.hero-hud').querySelectorAll('button') ].map((button) => button.getAttribute('data-testid'));
 
 describe('HeroUi Equipe', () => {
-    it('the rail has the six buttons with Equipe in third place while the team is locked', async () => {
+    it('the rail has the seven buttons with Equipe in third place while the team is locked', async () => {
         const ctx = createUi();
 
         await ctx.heroes.load();
 
-        expect(railIds(ctx)).toEqual([ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm' ]);
+        expect(railIds(ctx)).toEqual([ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm', 'hud-rankings' ]);
     });
 
-    it('the rail keeps the same six buttons once the team is unlocked', async () => {
+    it('the rail keeps the same seven buttons once the team is unlocked', async () => {
         const ctx = createUi({ list: ownedCatalog(teamOf()) });
 
         await ctx.heroes.load();
 
-        expect(railIds(ctx)).toEqual([ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm' ]);
+        expect(railIds(ctx)).toEqual([ 'hud-heroes', 'hud-bag', 'hud-team', 'hud-equipment', 'hud-talents', 'hud-farm', 'hud-rankings' ]);
         expect(ctx.testid('hud-team').textContent).toBe('Equipe');
         expect(ctx.testid('hud-team').querySelectorAll('svg path')).toHaveLength(8);
     });
@@ -3143,7 +3149,7 @@ describe('HeroUi Equipe', () => {
         await ctx.heroes.load();
 
         expect(ctx.testid('hud-team')).not.toBeNull();
-        expect(railIds(ctx)).toHaveLength(6);
+        expect(railIds(ctx)).toHaveLength(7);
     });
 
     it('the Equipe button opens the Equipe panel', async () => {
@@ -3522,5 +3528,145 @@ describe('HeroUi Equipe purchase', () => {
         expect(ctx.testid('team-slot-1').getAttribute('data-state')).toBe('empty');
         expect(ctx.testid('team-notice').hidden).toBe(true);
         expect(ctx.testid('team-buy-dialog')).toBeNull();
+    });
+});
+
+describe('HeroUi Ranking', () => {
+    const CHAPTER_4 = { chapter: 4, stage: 3, kind: 'PHASE', stageCount: 10, completed: false };
+    const deferred = () => {
+        const slot = {};
+
+        slot.promise = new Promise((resolve, reject) => { slot.resolve = resolve; slot.reject = reject; });
+
+        return slot;
+    };
+    const pageOf = (board) => ({ board, chapter: board === 'boss-time' ? 4 : null, entries: [], me: null });
+
+    it('the Ranking button carries the trophy icon and its label', () => {
+        const ctx = createUi();
+
+        expect(ctx.testid('hud-rankings').textContent).toBe('Ranking');
+        expect(ctx.testid('hud-rankings').querySelectorAll('svg')).toHaveLength(1);
+    });
+
+    it('the Ranking button records the click power and opens the boss board of the campaign chapter', async () => {
+        const ctx = createUi({ position: CHAPTER_4 });
+
+        await open(ctx, 'rankings');
+
+        expect(ctx.rankingGateway.recordClickPower).toHaveBeenCalledTimes(1);
+        expect(ctx.rankingGateway.get).toHaveBeenCalledWith('boss-time', 4);
+        expect(ctx.query('.hero-title').textContent).toBe('Ranking');
+        expect(ctx.testid('ranking-tab-boss-time').getAttribute('aria-pressed')).toBe('true');
+        expect(ctx.testid('ranking-chapter-4').getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('a completed campaign opens chapter 15', async () => {
+        const ctx = createUi({ position: { chapter: 15, stage: 10, kind: 'CHAPTER_BOSS', stageCount: 10, completed: true } });
+
+        await open(ctx, 'rankings');
+
+        expect(ctx.rankingGateway.get).toHaveBeenCalledWith('boss-time', 15);
+    });
+
+    it('a tab click shows Carregando... and then the board', async () => {
+        const ctx = createUi({ position: CHAPTER_4 });
+        const pending = deferred();
+
+        await open(ctx, 'rankings');
+        ctx.rankingGateway.get.mockImplementationOnce(() => pending.promise);
+        ctx.testid('ranking-tab-fortune').click();
+
+        expect(ctx.testid('ranking-loading').textContent).toBe('Carregando...');
+        expect(ctx.testid('ranking-tabs')).not.toBeNull();
+
+        pending.resolve(pageOf('fortune'));
+        await flush();
+
+        expect(ctx.testid('ranking-name').textContent).toBe('Tesouro do Bosque');
+        expect(ctx.testid('ranking-loading')).toBeNull();
+    });
+
+    it('a chapter chip click loads that chapter', async () => {
+        const ctx = createUi({ position: CHAPTER_4 });
+
+        await open(ctx, 'rankings');
+        ctx.testid('ranking-chapter-9').click();
+        await flush();
+
+        expect(ctx.rankingGateway.get).toHaveBeenLastCalledWith('boss-time', 9);
+        expect(ctx.testid('ranking-chapter-9').getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('a failed open shows Não foi possível carregar.', async () => {
+        const ctx = createUi({ position: CHAPTER_4 });
+
+        ctx.rankingGateway.get.mockRejectedValue(new Error('down'));
+        await open(ctx, 'rankings');
+
+        expect(ctx.query('.hero-error').hidden).toBe(false);
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível carregar.');
+    });
+
+    it('a failed tab load shows the error line and no rows, and a later success hides it', async () => {
+        const ctx = createUi({ position: CHAPTER_4 });
+
+        await open(ctx, 'rankings');
+        ctx.rankingGateway.get.mockRejectedValueOnce(new Error('down'));
+        ctx.testid('ranking-tab-fortune').click();
+        await flush();
+
+        expect(ctx.query('.hero-error').hidden).toBe(false);
+        expect(ctx.query('.hero-error').textContent).toBe('Não foi possível carregar.');
+        expect(ctx.testid('ranking-table')).toBeNull();
+
+        ctx.testid('ranking-tab-story-time').click();
+        await flush();
+
+        expect(ctx.query('.hero-error').hidden).toBe(true);
+        expect(ctx.testid('ranking-name').textContent).toBe('Travessia do Bosque');
+    });
+
+    it('closing during a tab load drops its answer', async () => {
+        const ctx = createUi({ position: CHAPTER_4 });
+        const pending = deferred();
+
+        await open(ctx, 'rankings');
+        ctx.rankingGateway.get.mockImplementationOnce(() => pending.promise);
+        ctx.testid('ranking-tab-fortune').click();
+        ctx.ui.close();
+        pending.resolve(pageOf('fortune'));
+        await flush();
+
+        expect(ctx.ui.isOpen).toBe(false);
+        expect(ctx.query('.hero-body').children).toHaveLength(0);
+    });
+
+    it('opening another screen during a tab load drops its answer', async () => {
+        const ctx = createUi({ position: CHAPTER_4 });
+        const pending = deferred();
+
+        await open(ctx, 'rankings');
+        ctx.rankingGateway.get.mockImplementationOnce(() => pending.promise);
+        ctx.testid('ranking-tab-fortune').click();
+        await open(ctx, 'talents');
+        pending.resolve(pageOf('fortune'));
+        await flush();
+
+        expect(ctx.query('.hero-title').textContent).toBe('Talentos');
+        expect(ctx.testid('ranking-screen')).toBeNull();
+    });
+
+    it('reopening shows the board and chapter shown last', async () => {
+        const ctx = createUi({ position: CHAPTER_4 });
+
+        await open(ctx, 'rankings');
+        ctx.testid('ranking-tab-fortune').click();
+        await flush();
+        ctx.ui.close();
+        await open(ctx, 'rankings');
+
+        expect(ctx.rankingGateway.get).toHaveBeenLastCalledWith('fortune', undefined);
+        expect(ctx.testid('ranking-tab-fortune').getAttribute('aria-pressed')).toBe('true');
     });
 });

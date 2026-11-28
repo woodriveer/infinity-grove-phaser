@@ -16,6 +16,7 @@ import { renderFarm } from './views/farmView';
 import { renderBagHero, renderFuseAllResult } from './views/fusionLadderView';
 import { renderFusionResult } from './views/fusionView';
 import { renderLeaderPicker } from './views/leaderView';
+import { renderRanking } from './views/rankingView';
 import { refreshSkillBar, renderLeaderCard, renderSkillBar } from './views/skillBar';
 import { renderTeam, teamModel } from './views/teamView';
 import { placeTalentScroll, renderTalents, renderTalentsUnavailable, revealTalent, updateTalents } from './views/talentsView';
@@ -38,7 +39,8 @@ const ICONS = {
     equipment: icon('<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>'),
     talents: icon('<path d="M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3"></path><path d="M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4"></path><path d="M5 21h14"></path>'),
     team: icon('<path d="M14.5 17.5 3 6V3h3l11.5 11.5"></path><path d="m13 19 6-6"></path><path d="m16 16 4 4"></path><path d="m19 21 2-2"></path><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"></path><path d="m5 14 4 4"></path><path d="m7 17-3 3"></path><path d="m3 19 2 2"></path>'),
-    farm: icon('<path d="M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z"></path><circle cx="15" cy="12" r="1"></circle><circle cx="9" cy="12" r="1"></circle>')
+    farm: icon('<path d="M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z"></path><circle cx="15" cy="12" r="1"></circle><circle cx="9" cy="12" r="1"></circle>'),
+    rankings: icon('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>')
 };
 
 const SCREENS = [
@@ -47,7 +49,8 @@ const SCREENS = [
     { id: 'team', label: 'Equipe', title: 'Equipe' },
     { id: 'equipment', label: 'Equipamento', title: 'Equipamento' },
     { id: 'talents', label: 'Talentos', title: 'Talentos' },
-    { id: 'farm', label: 'Mapa', title: 'Mapa' }
+    { id: 'farm', label: 'Mapa', title: 'Mapa' },
+    { id: 'rankings', label: 'Ranking', title: 'Ranking' }
 ];
 
 //  Where the map assumes the player stands while the campaign has not loaded
@@ -74,7 +77,7 @@ const badgeHtml = (id) => `<span class="hud-badge" data-testid="${id}-badge" hid
 const SHORTCUTS = { bag: 'B', talents: 'T' };
 const keyHtml = (id) => (SHORTCUTS[id] ? `<span class="hud-key" data-testid="hud-key-${id}" aria-hidden="true">${SHORTCUTS[id]}</span>` : '');
 const buttonHtml = ({ id, label }) => `<button type="button" data-testid="hud-${id}"${SHORTCUTS[id] ? ` aria-keyshortcuts="${SHORTCUTS[id]}"` : ''}>${ICONS[id]}${label}${keyHtml(id)}${BADGED.includes(id) ? badgeHtml(id) : ''}</button>`;
-//  The rail always shows the six buttons; Equipe holds the leader card that opens the leader list (spec ui-polish UIP-13)
+//  The rail always shows the seven buttons; Equipe holds the leader card that opens the leader list (spec ui-polish UIP-13)
 const RAIL = SCREENS;
 const HUD_HTML = `<div class="hero-hud">${RAIL.map(buttonHtml).join('')}</div>`;
 
@@ -88,10 +91,10 @@ const BAR_HTML = '<div class="skill-bar-host"></div>';
 const LEADER_HTML = '<div class="leader-host"></div>';
 const NOTICE_HTML = '<div class="hud-box hud-notice"><div class="card-notice" data-testid="card-notice" hidden></div></div>';
 
-//  The hero screens on top of the combat scene: six HUD buttons, one panel
-//  that shows the screen that was opened (Heróis, Mochila, Equipe, Equipamento, Talentos, Mapa), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
+//  The hero screens on top of the combat scene: seven HUD buttons, one panel
+//  that shows the screen that was opened (Heróis, Mochila, Equipe, Equipamento, Talentos, Mapa, Ranking), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
 //  It is plain DOM placed with scene.add.dom.
-//  Collaborators: heroes (heroCollection), equipment (equipmentCollection), talents (talentCollection), farm (farmSession) and the scene hooks
+//  Collaborators: heroes (heroCollection), equipment (equipmentCollection), talents (talentCollection), farm (farmSession), rankings (rankingBoard, optional) and the scene hooks
 //    walletCopper() -> the copper the player holds, to disable what costs more;
 //    startFarm(boss) starts the farm fight of the chosen boss;
 //    useSkill(slot) uses a skill of the leader (optional); skillState(slot) -> { state, seconds } of a slot of the leader (optional);
@@ -99,7 +102,7 @@ const NOTICE_HTML = '<div class="hud-box hud-notice"><div class="card-notice" da
 //    stories() -> [{ id, label }] the scenes the Mapa lists (optional); playStory(id) plays one over the open Mapa (optional).
 export class HeroUi
 {
-    constructor (scene, { heroes, equipment, talents, farm, startFarm, walletCopper, useSkill, skillState, mapPosition, stories, playStory })
+    constructor (scene, { heroes, equipment, talents, farm, rankings = null, startFarm, walletCopper, useSkill, skillState, mapPosition, stories, playStory })
     {
         this.scene = scene;
         this.heroes = heroes;
@@ -117,6 +120,8 @@ export class HeroUi
         this.bagHeroId = null;
         this.fuseAllAsking = false;
         this.farm = farm;
+        this.rankings = rankings;
+        this.rankingLoading = false;
         this.hooks = { startFarm, walletCopper, useSkill, skillState, mapPosition, stories, playStory };
         this.open = false;
         this.view = 0;
@@ -205,6 +210,7 @@ export class HeroUi
         const view = ++this.view;
 
         this.dropFarmLoad();
+        this.dropRankingLoad();
 
         if (!this.open)
         {
@@ -253,6 +259,10 @@ export class HeroUi
             {
                 await this.talents.load();
             }
+            else if (screen === 'rankings')
+            {
+                await this.rankings.open(this.campaignChapter());
+            }
             else
             {
                 await this.heroes.load();
@@ -297,6 +307,7 @@ export class HeroUi
 
         this.view += 1;
         this.dropFarmLoad();
+        this.dropRankingLoad();
         this.open = false;
         this.screen = null;
         this.sellMode = null;
@@ -323,6 +334,25 @@ export class HeroUi
         {
             this.farm.cancel();
         }
+    }
+
+    //  Leaving Ranking or opening a screen over it drops a pending board load: the loading line goes away and the
+    //  ranking board ignores its late answer. Runs before `this.screen` changes, so it reads the screen being left.
+    dropRankingLoad ()
+    {
+        if (this.screen === 'rankings')
+        {
+            this.rankings?.cancel();
+            this.rankingLoading = false;
+        }
+    }
+
+    //  The chapter the campaign stands in (15 once completed), the boss board chapter shown on the first open
+    campaignChapter ()
+    {
+        const map = this.hooks.mapPosition?.() ?? DEFAULT_POSITION;
+
+        return map.completed ? 15 : map.chapter;
     }
 
     setError (text)
@@ -1205,6 +1235,54 @@ export class HeroUi
                         this.setError(LOAD_FAILED);
                     }
                 }
+            }
+        }
+    }
+
+    //  The Ranking screen: the board and chapter shown, the last page, and the loading line while a tab or chip loads
+    render_rankings ()
+    {
+        this.body.replaceChildren(renderRanking({
+            boardId: this.rankings.board(),
+            chapter: this.rankings.chapter(),
+            campaignChapter: this.campaignChapter(),
+            page: this.rankings.page(),
+            loading: this.rankingLoading
+        }, {
+            onBoard: (id) => this.selectRanking(id),
+            onChapter: (number) => this.selectRanking(this.rankings.board(), number)
+        }));
+    }
+
+    //  Loads another board or boss chapter of Ranking under the loading line; a failure shows the error line and no rows.
+    //  A load dropped by a newer one, by show() or by close() changes nothing when it ends.
+    async selectRanking (board, chapter)
+    {
+        const view = this.view;
+
+        this.rankingLoading = true;
+        this.setError('');
+        this.render_rankings();
+
+        try
+        {
+            const fresh = await this.rankings.select(board, chapter);
+
+            if (!fresh || view !== this.view)
+            {
+                return;
+            }
+
+            this.rankingLoading = false;
+            this.render_rankings();
+        }
+        catch
+        {
+            if (view === this.view)
+            {
+                this.rankingLoading = false;
+                this.setError(LOAD_FAILED);
+                this.render_rankings();
             }
         }
     }

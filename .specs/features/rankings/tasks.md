@@ -1326,7 +1326,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 
 ---
 
-#### T15: The Ranking rail button and screen [ ]
+#### T15: The Ranking rail button and screen [x]
 
 **Owner**: game-dev
 **Goal**: A seventh rail button opens the Ranking screen; tabs and chips load through the ranking board with `Carregando...`, a failure shows the error line, and closing drops pending loads (RNK-07, RNK-09; spec Screen AC 1 to 8, Loading AC 1, 2, 4).
@@ -1362,6 +1362,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 | `shows the six buttons Heróis, Mochila, Equipe, Equipamento, Talentos and Mapa` | `shows the seven buttons Heróis, Mochila, Equipe, Equipamento, Talentos, Mapa and Ranking` | ids list + `'rankings'`, labels + `'Ranking'` |
 | `the rail has the six buttons with Equipe in third place while the team is locked` | `the rail has the seven buttons with Equipe in third place while the team is locked` | expected ids + `'hud-rankings'` last |
 | `the rail keeps the same six buttons once the team is unlocked` | `the rail keeps the same seven buttons once the team is unlocked` | expected ids + `'hud-rankings'` last |
+| `the Equipe button stays when a load answers a locked team` | unchanged | `toHaveLength(6)` becomes `toHaveLength(7)` (added by the orchestrator, consequence of AD-037) |
 
 **Tests**: unit
 **Test cases** (`HeroUi.test.js`, new `describe('HeroUi Ranking')`; `position` of `createUi` sets `mapPosition`):
@@ -1380,7 +1381,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 10 new cases and the 3 re-pinned cases pass; every other `HeroUi.test.js` case passes unchanged.
+- [x] The 10 new cases and the 3 re-pinned cases pass; every other `HeroUi.test.js` case passes unchanged.
 
 **Commit**: `feat(game): open the rankings from the rail`
 
