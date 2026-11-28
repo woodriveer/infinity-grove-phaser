@@ -304,3 +304,33 @@ test.describe('Talentos card: the kept texts', () => {
         await expect(page.getByTestId('talent-upgrade-CLICK_DAMAGE')).toBeDisabled();
     });
 });
+
+//  A tall picture (1 x 2, like the art of Fúria crescente, Tempo do miniboss and Dano contra chefe) stays inside its box on the card and on the node: before the
+//  patch the picture kept its aspect ratio and grew past the ring (60 x 93 on the card)
+const TALL = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEElEQVR4nGM4YWT0nwFEAAAVEwRXj8naZgAAAABJRU5ErkJggg==', 'base64');
+const artTall = (page) => page.route('**/assets/talent-*', (route) => route.fulfill({ status: 200, contentType: 'image/png', body: TALL }));
+const box = (locator) => locator.evaluate((node) => { const b = node.getBoundingClientRect(); return [ Math.round(b.width), Math.round(b.height) ]; });
+
+test.describe('Talentos card: a tall icon', () => {
+    test('a tall picture fits the ring of the card and the node', async ({ page }) => {
+        await startGame(page, { art: 'present', routes: artTall });
+        await openTalents(page);
+
+        for (const id of [ 'COMBO_FURY', 'MINIBOSS_TIME', 'BOSS_DAMAGE' ])
+        {
+            await select(page, id);
+            await expect(page.getByTestId('talent-detail-name')).toBeVisible();
+
+            const art = page.getByTestId('talent-detail-icon').locator('.talent-detail-art');
+            const picture = art.locator('img');
+
+            await expect(picture).toHaveJSProperty('complete', true);
+            expect(await picture.evaluate((img) => img.naturalHeight), id).toBe(2);
+            expect(await box(picture), id).toEqual(await box(art));
+
+            const node = page.getByTestId(`talent-${id}`).locator('.talent-node-icon');
+
+            expect(await box(node.locator('img')), id).toEqual(await box(node));
+        }
+    });
+});

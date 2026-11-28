@@ -2613,6 +2613,8 @@ button.bag-card:hover:not(:disabled) {
 .icon {
     display: grid;
     flex: none;
+    /* One cell the size of the box, so the picture's 100% height resolves: without it a tall picture keeps its aspect ratio and grows past the box */
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
     place-items: center;
     width: 48px;
     height: 48px;
