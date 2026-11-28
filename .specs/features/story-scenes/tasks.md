@@ -466,7 +466,7 @@ Read rules: `getItem` throws → `memory`; `getItem` returns `null` → `memory`
 
 ---
 
-#### T19: The shared e2e fixture seeds every catalog scene as seen [ ]
+#### T19: The shared e2e fixture seeds every catalog scene as seen [x]
 
 **Owner**: test-engineer
 **Goal**: The existing e2e specs that win the chapter 1 boss keep playing on once the chapter 1 scene ships, and a future scene needs no fixture change (spec D23).
@@ -489,7 +489,7 @@ Read rules: `getItem` throws → `memory`; `getItem` returns `null` → `memory`
 **Gate**: `cd game && npx playwright test e2e/storyFixture.spec.js`, then `npx playwright test e2e/campaignChapters.spec.js` (one file per run)
 **Done when**:
 
-- [ ] The 3 cases pass and `campaignChapters.spec.js` passes unchanged.
+- [x] The 3 cases pass and `campaignChapters.spec.js` passes unchanged.
 
 **Commit**: `test(game): seed every story scene as seen in the shared e2e fixture`
 

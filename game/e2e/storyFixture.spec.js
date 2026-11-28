@@ -3,10 +3,10 @@ import { expect, test } from './support/coverage';
 const KEY = 'infinity-grove.story-seen';
 const readSeen = (page) => page.evaluate((key) => localStorage.getItem(key), KEY);
 
-test('the shared fixture marks the prologue as seen before the page loads', async ({ page }) => {
+test('the shared fixture marks every catalog scene as seen before the page loads', async ({ page }) => {
     await page.goto('/');
 
-    expect(await readSeen(page)).toBe('["prologue"]');
+    expect(await readSeen(page)).toBe('["prologue","chapter-1"]');
 });
 
 test('the shared fixture keeps a seen list already stored', async ({ page }) => {

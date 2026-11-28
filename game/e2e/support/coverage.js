@@ -4,20 +4,22 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test as base } from '@playwright/test';
+import { STORY_SCENES } from '../../src/domain/story/storyCatalog.js';
 
 const collecting = process.env.VITE_COVERAGE === 'true';
+const SEEN = JSON.stringify(STORY_SCENES.map((scene) => scene.id));
 
 export const test = base.extend({
-    //  Every spec starts with the prologue seen (spec story-scenes D23), so a chapter 1 battle opens on the fight;
+    //  Every spec starts with every catalog scene seen (spec story-scenes D23), so a chapter 1 battle opens on the fight;
     //  the story specs turn it off with test.use({ storySeen: false }). A value the test wrote itself is kept.
     storySeen: [ true, { option: true } ],
     page: async ({ page, storySeen }, use, testInfo) => {
         if (storySeen) {
-            await page.addInitScript(() => {
+            await page.addInitScript((seen) => {
                 if (localStorage.getItem('infinity-grove.story-seen') === null) {
-                    localStorage.setItem('infinity-grove.story-seen', '["prologue"]');
+                    localStorage.setItem('infinity-grove.story-seen', seen);
                 }
-            });
+            }, SEEN);
         }
 
         await use(page);
