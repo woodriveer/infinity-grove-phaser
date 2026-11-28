@@ -6016,6 +6016,45 @@ describe('ClickerGame hero team', () => {
 
             expect(allyTexts(ctx)).toHaveLength(0);
         });
+
+        it('an ally hit meets the one defense: Lyra deals 1 to a FIRE monster of defense 50 and the click 0.5', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { start: { ...atChapter(5), definition: withDefense({ element: 'FIRE', defense: 50, critResistance: 0 }) } });
+
+            team(ctx);
+
+            expect(ctx.scene.monster.health).toBe(9);
+            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '1' ]);
+
+            ctx.click();
+
+            expect(ctx.scene.monster.health).toBeCloseTo(7.5, 9);
+        });
+
+        it('a damage-over-time tick brings no team strike: Tempestade Arcana ticks 2.4 and Lyra does not hit', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { heroOptions: { leaderId: 'orina', stars: { orina: 2 } }, start: big() });
+
+            key(ctx, 'TWO');
+            ctx.scene.update(0, 1000);
+
+            expect(ctx.scene.monster.health).toBeCloseTo(997.6, 9);
+            expect(ctx.texts.map((text) => text.text)).toEqual([ '2.4' ]);
+            expect(allyTexts(ctx)).toHaveLength(0);
+        });
+
+        it('a click on a shielded miniboss takes one charge for the click and one for Lyra: Escudo de golpes 3/3 to 1/3', async () => {
+            const shielded = {
+                ...atChapter(5, 1, 'MINIBOSS'),
+                definition: { ...definition, stages: definition.stages.map((stage, index) => (index === 0 ? { ...stage, minibossAffix: { type: 'HIT_SHIELD', amount: 3, periodMs: 6000 } } : stage)) }
+            };
+            const ctx = await open([ 'lyra', null, null, null ], { start: shielded });
+
+            expect(ctx.hud('.affix-chip').textContent).toBe('Escudo de golpes: 3/3');
+
+            ctx.click();
+
+            expect(ctx.hud('.affix-chip').textContent).toBe('Escudo de golpes: 1/3');
+            expect(ctx.scene.monster.health).toBe(50);
+        });
     });
 });
 

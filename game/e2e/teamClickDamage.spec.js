@@ -257,6 +257,17 @@ test.describe('A click brings the team (TCD-01)', () => {
         expect(await texts(page, ALLY)).toEqual([]);
     });
 
+    test('a damage-over-time tick brings no team strike: Tempestade Arcana ticks and Lyra does not hit', async ({ page }) => {
+        await startTeam(page, { leader: 'orina', stars: { orina: 3 }, monster: monsterOf('WATER'), team: LYRA_IN_SLOT_1 });
+
+        await useSkill(page, 2);
+        await advance(page, 3_000);
+
+        //  The three ticks landed (the monster lost health) and no light-blue number came with any of them
+        expect(await health(page)).toBeLessThan(1000);
+        expect(await texts(page, ALLY)).toEqual([]);
+    });
+
     test('below chapter 5 a click shows no team number', async ({ page }) => {
         await startTeam(page, { chapter: 4, cleared: [ 5 ], team: LYRA_IN_SLOT_1, health: 10 });
 
