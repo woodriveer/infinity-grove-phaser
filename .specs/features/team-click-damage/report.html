@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dano da equipe por clique</title>
+<style>
+:root { --bg:#faf7f2; --surface:#fff; --text:#2b2622; --muted:#6f655c; --line:#e4dcd1; --ok:#2f7a4a; }
+@media (prefers-color-scheme: dark) { :root { --bg:#1d1a17; --surface:#27231f; --text:#efe8df; --muted:#a99d90; --line:#3a342e; --ok:#6cc28c; } }
+* { box-sizing: border-box; }
+body { margin:0; padding:32px 16px 64px; background:var(--bg); color:var(--text); font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+main { max-width:920px; margin:0 auto; }
+h1 { font-size:28px; margin:0 0 4px; } h2 { font-size:18px; margin:36px 0 12px; }
+.sub { color:var(--muted); margin:8px 0 0; }
+.verdict { display:inline-block; padding:4px 12px; border-radius:999px; background:var(--ok); color:var(--bg); font-weight:700; }
+table { width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--line); }
+th,td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { font-size:13px; color:var(--muted); font-weight:600; }
+td.n { font-variant-numeric:tabular-nums; }
+code { font-size:13px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Dano da equipe por clique</h1>
+<p class="sub">Versão v0.14.0 · 28/11/2026 · <span class="verdict">CONCLUÍDO</span></p>
+
+<h2>Veredito</h2>
+<p>Todas as tarefas de <code>tasks.md</code> (T1 a T9) estão marcadas; a verificação de autoria do <code>test-engineer</code> não tem lacunas nem mutantes sobreviventes; a revisão do <code>ui-artist</code> está APROVADO; tudo está em <code>origin/main</code>. O dano da equipe deixou de ser por segundo: cada clique (manual ou do clique automático) é seguido por um golpe de cada aliado, mostrado como um número azul-claro 8 px à direita do número do clique.</p>
+<table>
+<tr><th>Item</th><th>Valor</th></tr>
+<tr><td>Faixa de commits</td><td><code>cf7fddaa..3d993532</code> (14 commits; código: f25d6a45, f9d745da, 48f66c13; testes: 04925258 a 4eb23b07; autoria: 5536381e; UI: 8ff775f2; README: 3d993532)</td></tr>
+<tr><td>Execução do CI citada</td><td>Tests workflow, run <b>46098027062</b>, commit <code>3d993532</code> em <code>main</code>: success (todos os jobs; <code>mutants</code> ignorado, como esperado)</td></tr>
+<tr><td>Revisão de UI</td><td>APROVADO (<code>ui-review.html</code>)</td></tr>
+</table>
+
+<h2>Verificação de autoria dos testes (test-engineer)</h2>
+<p>25 mutantes do sensor: 25 mortos, 0 sobreviventes (execuções de mutantes no CI: 46095020582 e 46096723585). Execução verde do CI do ramo em <code>4eb23b07</code>: 46095691635. Nenhuma lacuna de critério de aceitação apontada.</p>
+
+<h2>Código de produção (<code>git diff --numstat cf7fddaa 3d993532</code>)</h2>
+<table>
+<tr><th>Área</th><th>Arquivos</th><th>Adicionadas</th><th>Removidas</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes + <code>game/public/*.css</code>)</td><td class="n">5</td><td class="n">78</td><td class="n">112</td></tr>
+</table>
+<p class="sub">Arquivos: <code>ClickerGame.js</code> (+49/-36), <code>allyCombat.js</code> (+22/-69), <code>allyAttacker.js</code> (+2/-2), <code>teamView.js</code> (+4/-4), <code>style.css</code> (+1/-1). Specs, README, testes, scripts de captura de UI e imagens não contam como produção.</p>
+
+<h2>Código de teste</h2>
+<table>
+<tr><th>Suíte</th><th>Arquivos</th><th>Adicionadas</th><th>Removidas</th><th>Testes no intervalo</th><th>Total após a execução</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1389 (todos passaram)</td></tr>
+<tr><td>Unitário do jogo</td><td class="n">4</td><td class="n">395</td><td class="n">222</td><td class="n">+16 (+21 em ClickerGame.test.js, -5 em allyCombat.test.js)</td><td class="n">2488 (todos passaram)</td></tr>
+<tr><td>E2E (<code>game/e2e</code>)</td><td class="n">12</td><td class="n">636</td><td class="n">171</td><td class="n">+22 (+23 em teamClickDamage.spec.js, -2 em heroTeamCombat.spec.js, +1 em minibossAddsTarget.spec.js)</td><td class="n">798 (todos passaram)</td></tr>
+<tr><td>Scripts de deploy</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">306 (todos passaram)</td></tr>
+</table>
+<p class="sub">Variação de testes contada por blocos <code>it(</code>/<code>test(</code> dos arquivos alterados, antes e depois do intervalo. Os totais vêm do run 46098027062.</p>
+
+<h2>Cobertura de testes unitários (run 46098027062)</h2>
+<table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Backend (JaCoCo), projeto inteiro</td><td class="n">98,49%</td><td class="n">93,72%</td></tr>
+<tr><td>Jogo (Vitest v8), projeto inteiro</td><td class="n">98,73%</td><td class="n">95,10%</td></tr>
+<tr><td><code>ClickerGame.js</code></td><td class="n">97,91%</td><td class="n">91,53%</td></tr>
+<tr><td><code>allyCombat.js</code></td><td class="n">100%</td><td class="n">100%</td></tr>
+<tr><td><code>allyAttacker.js</code></td><td class="n">100%</td><td class="n">100%</td></tr>
+<tr><td><code>teamView.js</code></td><td class="n">98,91%</td><td class="n">96,42%</td></tr>
+<tr><td>Backend, arquivos alterados</td><td colspan="2">não se aplica: nenhum arquivo do backend mudou</td></tr>
+<tr><td>Scripts de deploy (lcov)</td><td class="n">98,47%</td><td class="n">96,79%</td></tr>
+</table>
+
+<h2>Cobertura E2E (Playwright, istanbul; limite inferior)</h2>
+<table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Jogo, projeto inteiro</td><td class="n">94,41%</td><td class="n">80,64%</td></tr>
+<tr><td><code>ClickerGame.js</code></td><td class="n">94,01%</td><td class="n">83,16%</td></tr>
+<tr><td><code>allyCombat.js</code></td><td class="n">100%</td><td class="n">100%</td></tr>
+<tr><td><code>allyAttacker.js</code></td><td class="n">100%</td><td class="n">50%</td></tr>
+<tr><td><code>teamView.js</code></td><td class="n">98,91%</td><td class="n">75,51%</td></tr>
+</table>
+
+<h2>Cenários E2E da feature (<code>teamClickDamage.spec.js</code>: 23 cenários, 23 passaram)</h2>
+<table>
+<tr><th>Cenário</th><th>Resultado</th></tr>
+<tr><td>Clique real com Lyra no slot 1: 1 e 2, vida 7/10</td><td>passou</td></tr>
+<tr><td>Dois aliados: um 1 dourado e um 4 azul-claro</td><td>passou</td></tr>
+<tr><td>Clique que mata não mostra número da equipe</td><td>passou</td></tr>
+<tr><td>Golpe da equipe que mata é tratado uma vez (moedas uma vez, Orina não bate)</td><td>passou</td></tr>
+<tr><td>Clique automático de 500 ms traz a equipe</td><td>passou</td></tr>
+<tr><td>Clique duplo da Lyra: dois 2 laranja e o da equipe ao lado do segundo</td><td>passou</td></tr>
+<tr><td>O combo não chega à equipe (três cliques: 990,97)</td><td>passou</td></tr>
+<tr><td>Habilidade não traz golpe da equipe</td><td>passou</td></tr>
+<tr><td>Tick de dano ao longo do tempo (Tempestade Arcana) não traz golpe</td><td>passou</td></tr>
+<tr><td>Abaixo do capítulo 5 não há número da equipe</td><td>passou</td></tr>
+<tr><td>Miniboss com escudo: uma carga pelo clique e outra pela Lyra</td><td>passou</td></tr>
+<tr><td>Luta de farm no capítulo 5: 1 e 2</td><td>passou</td></tr>
+<tr><td>10 s sem clique não causam dano da equipe</td><td>passou</td></tr>
+<tr><td>Com Heróis aberto o clique não faz nada e o clique automático ainda traz a equipe</td><td>passou</td></tr>
+<tr><td>O menu de pausa para o clique e a equipe</td><td>passou</td></tr>
+<tr><td>Número azul-claro a 8 px à direita do dourado, na mesma linha de base</td><td>passou</td></tr>
+<tr><td>Número longo (12,5K) mantém o espaço</td><td>passou</td></tr>
+<tr><td>Ambos sobem e somem em 800 ms</td><td>passou</td></tr>
+<tr><td>Cinco cliques seguidos: cinco 1 dourados e cinco 2 azuis</td><td>passou</td></tr>
+<tr><td>Cada golpe move o sprite da Lyra; clique que mata não move nenhum</td><td>passou</td></tr>
+<tr><td>Linha do aliado: <code>Dano: 12.5K/clique</code> em uma linha dentro do cartão</td><td>passou</td></tr>
+<tr><td>Linha da equipe: <code>Dano da equipe por clique: 12.5K</code></td><td>passou</td></tr>
+<tr><td>Nenhum texto de Equipe diz <code>/s</code></td><td>passou</td></tr>
+</table>
+<p class="sub">Os 798 cenários E2E do projeto passaram no run 46098027062, incluindo os arquivos de equipe, minibosses e afixos reescritos para o clique.</p>
+
+<h2>Falhas não causadas pela feature</h2>
+<p>Nenhuma. Todos os jobs do run 46098027062 passaram na primeira execução; nada foi reexecutado.</p>
+
+<h2>Implantação e produção</h2>
+<p>O <code>publish.sh</code> roda no computador de publicação (DESKTOP-RCMC353) e o vigia marcou <code>3d993532</code> como tratado (slot ativo: green). O Worker serve o bundle novo (<code>/assets/index-B1zlYtsy.js</code> contém "Dano da equipe por clique") e o backend responde pelo túnel (HTTP 401 sem login, como esperado). A extensão Claude in Chrome não estava conectada, então o caminho jogável não foi percorrido no navegador de produção; a verificação foi feita pelo conteúdo servido. A feature não altera o backend.</p>
+<p class="sub">O site está no ar apenas enquanto o <code>publish.sh</code> estiver rodando.</p>
+</main>
+</body>
+</html>

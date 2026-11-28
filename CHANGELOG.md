@@ -3,6 +3,19 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.14.0] - 2026-11-28
+
+Dano da equipe por clique (`team-click-damage`): a equipe deixa de bater uma vez por segundo e passa a complementar o seu clique.
+
+### Adicionado
+
+- Cada clique, manual ou do clique automático, é seguido por um golpe de cada aliado da equipe. O dano do aliado aparece como um número azul-claro logo à direita do número do clique, como um segundo clique.
+
+### Alterado
+
+- Em Equipe, o cartão de cada aliado mostra `Dano: <n>/clique` e o total mostra `Dano da equipe por clique: <n>`. O dano de cada golpe é o mesmo de antes, então a equipe causa mais dano quanto mais você clica.
+- Habilidades e o dano ao longo do tempo não trazem golpe da equipe, e sem cliques a equipe não bate.
+
 ## [0.13.0] - 2026-11-27
 
 Acabamento da interface (`ui-polish`): o jogo deixa de se comportar como uma página da web, a tela de Talentos para de piscar e comprar vários níveis ficou rápido.
