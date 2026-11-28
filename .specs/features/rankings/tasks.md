@@ -1083,7 +1083,7 @@ Rules: `formatDuration`: `total = floor(ms / 1000)`, `hours = floor(total / 3600
 
 ---
 
-#### T12: Ranking http adapter [ ]
+#### T12: Ranking http adapter [x]
 
 **Owner**: game-dev
 **Goal**: The game calls `GET /rankings/<board>` (with `chapter` for boss-time) and `POST /rankings/click-power` through the authenticated client (RNK-07).
@@ -1119,7 +1119,7 @@ export const createRankingApi = (httpClient) => ({
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 4 cases pass.
+- [x] The 4 cases pass.
 
 **Commit**: `feat(game): call the ranking endpoints`
 
