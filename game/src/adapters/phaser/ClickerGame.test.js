@@ -6045,6 +6045,42 @@ describe('ClickerGame hero team', () => {
             expect(boss.scene.monster.maxHealth - boss.scene.monster.health).toBeCloseTo(2.4, 9);
         });
 
+        it("Lyra's first hit kills: the second hit does not land and the team finds nothing to hit", async () => {
+            const ctx = await open([ 'kael', null, null, null ], { heroOptions: { leaderId: 'lyra' }, start: big(undefined, 1) });
+
+            ctx.dice.value = 0;
+            ctx.click();
+
+            expect(ctx.scene.monster.dead).toBe(true);
+            expect(ctx.texts.map((text) => [ text.text, text.style.color ])).toEqual([ [ '2', '#ff8a1f' ] ]);
+            expect(ctx.tweens.filter((tween) => tween.targets?.key === 'hero_kael')).toHaveLength(0);
+        });
+
+        it('a team change reaches the next click: Orina joins Lyra and a click deals 1 plus 4', async () => {
+            const ctx = await open([ 'lyra', null, null, null ]);
+
+            heroesGateway.setTeam.mockResolvedValue({ leaderId: 'kael', team: teamPayload([ 'lyra', 'orina', null, null ]) });
+            await ctx.scene.heroes.setTeam([ 'lyra', 'orina', null, null ]);
+            ctx.click();
+
+            expect(ctx.scene.monster.health).toBe(5);
+            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '4' ]);
+        });
+
+        it('a click with the team leaves the countdown of a miniboss as it was', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { start: atChapter(5, 1, 'MINIBOSS', 1) });
+
+            expect(timer(ctx)).toBe('Time: 30');
+
+            ctx.click();
+            expect(timer(ctx)).toBe('Time: 30');
+
+            ctx.scene.update(0, 1000);
+            ctx.click();
+
+            expect(timer(ctx)).toBe('Time: 29');
+        });
+
         it('a damage-over-time tick brings no team strike: Tempestade Arcana ticks 2.4 and Lyra does not hit', async () => {
             const ctx = await open([ 'lyra', null, null, null ], { heroOptions: { leaderId: 'orina', stars: { orina: 2 } }, start: big() });
 
@@ -6790,6 +6826,18 @@ describe('ClickerGame miniboss target', () => {
             [ '1', 480, 360, '#ffd35c' ],
             [ '0.4', 740, 273, '#7fd4ff' ]
         ]);
+    });
+
+    it('a click that kills its add and a team hit that kills the miniboss: the kill is handled once and the later slot does not land', async () => {
+        const ctx = await allyScene([ 'lyra', 'vex', null, null ], { adds: [ { health: 1, defenseBuff: 30 }, ADD ], minibossHealth: 0.4 });
+
+        ctx.click(lacaio1);
+
+        expect(ctx.scene.fight.adds[0].monster.dead).toBe(true);
+        expect(ctx.scene.monster.dead).toBe(true);
+        expect(ctx.texts.filter((text) => text.style.color === '#7fd4ff')).toHaveLength(1);
+        expect(ctx.tweens.filter((tween) => tween.targets?.key === 'hero_lyra')).toHaveLength(1);
+        expect(ctx.tweens.filter((tween) => tween.targets?.key === 'hero_vex')).toHaveLength(0);
     });
 
     it('no target change and no hit while the pause menu is open', async () => {
