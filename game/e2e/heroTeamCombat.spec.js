@@ -3,10 +3,10 @@ import { mockBackend } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 import { openLeaderList } from './support/leader';
 
-//  Hero team (spec hero-team): the ally hits on the real scene. The allies hit once every 1000 ms of fight time, never critical, with the one
-//  damage of every strike. The player owns one blank card of each of the five heroes; `stars` adds a card of that many stars.
+//  Hero team (spec hero-team): the ally hits on the real scene. The allies hit once with every click (spec team-click-damage), never critical,
+//  with the one damage of every strike. The player owns one blank card of each of the five heroes; `stars` adds a card of that many stars.
 //  The auto click is switched off (chapter 5 opens it), and the Phaser loop is stopped once the game has loaded: time moves only with
-//  advance(page, ms), which steps the scene by that many fight milliseconds, so no real frame adds a tick.
+//  advance(page, ms), which steps the scene by that many fight milliseconds; team(page) lands the team's part of a click without the click.
 const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 const ALLY_COLOR = '#7fd4ff';
 
@@ -27,19 +27,21 @@ const chapter = (monster, health = 1000, miniboss = monster) => ({
 const scene = (page, read) => page.evaluate(`(${read})(window.__PHASER_GAME__.scene.getScene('ClickerGame'))`);
 const health = (page) => scene(page, '(s) => s.monster?.health');
 const advance = (page, ms) => page.evaluate((delta) => window.__PHASER_GAME__.scene.getScene('ClickerGame').update(0, delta), ms);
-//  The light-blue numbers of the ally ticks that are on screen, oldest first
+//  The light-blue numbers of the team strikes that are on screen, oldest first
 const allyTexts = (page) => scene(page, `(s) => s.children.list.filter((o) => o.type === "Text" && o.style.color === "${ALLY_COLOR}").map((o) => ({ text: o.text, x: o.x, size: o.style.fontSize }))`);
 const lastAllyText = async (page) => (await allyTexts(page)).at(-1)?.text;
 const dealt = async (page, from = 1000) => from - await health(page);
 
-//  Stops the loop and puts the ally clock back at 1000 ms, as it stands when a monster appears
-const freeze = (page) => page.evaluate(() => {
-    const game = window.__PHASER_GAME__;
-
-    game.loop.sleep();
-    game.scene.getScene('ClickerGame').allies.untilTickMs = 1000;
-});
+//  Stops the loop
+const freeze = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
 const wake = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.wake());
+//  The team's part of a click without the click: lands it on the target, then the kill path, as strike does
+const team = (page) => page.evaluate(() => {
+    const game = window.__PHASER_GAME__.scene.getScene('ClickerGame');
+
+    game.teamStrike(game.currentTarget());
+    game.afterDamage();
+});
 //  Records the main monster at the moment each encounter is shown, inside showEncounter: a respawned monster that the allies kill again a
 //  second later is read from this record, never from the live scene (L-112, TD-012)
 const recordShownMonsters = (page) => page.evaluate(() => {
@@ -83,7 +85,7 @@ const startTeam = async (page, {
     await expect(menu.message).toHaveText('Welcome back, yan!');
     await menu.canvas.click();
     await expect.poll(() => activeSceneKeys(page)).toContain('ClickerGame');
-    //  The first ally tick lands 1000 ms after the team loads: under load that is shorter than the wait below, so the loop sleeps first
+    //  The loop sleeps first so no real frame runs an auto click or a respawn while the test reads the scene
     if (stop)
     {
         await page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
@@ -95,7 +97,7 @@ const startTeam = async (page, {
     if (stop)
     {
         await freeze(page);
-        //  No ally hit may land before the test moves the time
+        //  No ally hit may land before the test acts
         await expect.poll(() => health(page)).toBe(monsterHealth);
     }
 
@@ -105,37 +107,32 @@ const startTeam = async (page, {
 const useSkill = (page, slot) => page.evaluate((number) => window.__PHASER_GAME__.scene.getScene('ClickerGame').useSkill(number), slot);
 const strike = (page) => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').strike(670));
 
-//  Uses a skill and moves the time in the same call, for an effect that is short (Prisão de Espinhos lasts 2 s)
-const useThenAdvance = (page, slot, ms) => page.evaluate(([ number, delta ]) => {
-    const game = window.__PHASER_GAME__.scene.getScene('ClickerGame');
-
-    game.useSkill(number);
-    game.update(0, delta);
-}, [ slot, ms ]);
-
 const LYRA_IN_SLOT_1 = { boughtSlots: 1, allies: [ 'lyra', null, null, null ] };
 const piece = (overrides) => ({ id: 'p1', slot: 'WEAPON', rarity: 'COMMON', refine: 0, affixes: [], heroId: null, ...overrides });
 
 test.describe('Hero team: ally hits', () => {
-    test('Lyra in slot 1 hits a FIRE monster of 10 health for 2 after 1 s with no click, in light blue at x 740', async ({ page }) => {
+    test('Lyra in slot 1 lands nothing in 10 s with no click, and a team strike hits a FIRE monster of 10 health for 2 in light blue at x 740', async ({ page }) => {
         await startTeam(page, { health: 10, team: LYRA_IN_SLOT_1 });
 
-        await advance(page, 999);
+        await advance(page, 10_000);
         expect(await health(page)).toBe(10);
         expect(await allyTexts(page)).toEqual([]);
 
-        await advance(page, 1);
+        await team(page);
 
         expect(await health(page)).toBe(8);
         await expect(page.getByTestId('monster-hp')).toHaveText('HP 8/10');
         expect(await allyTexts(page)).toEqual([ { text: '2', x: 740, size: '28px' } ]);
     });
 
-    test('after a reset to chapter 1 a monster takes no damage from allies for 3 s', async ({ page }) => {
+    test('after a reset to chapter 1 a click deals no team damage', async ({ page }) => {
         await startTeam(page, { chapter: 6, cleared: [ 5 ], team: LYRA_IN_SLOT_1, stop: false });
 
-        //  The team is active at chapter 6: a tick lands in real time and takes health from the monster
-        await expect.poll(() => health(page), { timeout: 20_000 }).toBeLessThan(1000);
+        //  The team is active at chapter 6: a click deals 1 and Lyra's 2
+        await freeze(page);
+        await strike(page);
+        expect(await health(page)).toBe(997);
+        await wake(page);
 
         await page.getByTestId('auto-click-button').click();
         await expect(page.getByTestId('auto-click-popover')).toBeVisible();
@@ -144,21 +141,21 @@ test.describe('Hero team: ally hits', () => {
         await expect(page.getByTestId('chapter-hud')).toHaveText('Capítulo 1');
         await expect(page.getByTestId('reset-dialog')).toBeHidden();
 
-        //  The numbers of the old ticks fade away; the new monster is full and stays so
+        //  The numbers of the old click fade away; the new monster is full
         await expect.poll(() => allyTexts(page), { timeout: 5_000 }).toEqual([]);
         await freeze(page);
         expect(await health(page)).toBe(1000);
 
-        await advance(page, 3_000);
+        await strike(page);
 
-        expect(await health(page)).toBe(1000);
+        expect(await health(page)).toBe(999);
         expect(await allyTexts(page)).toEqual([]);
     });
 
     test('an ally meets the one defense: Lyra deals 1 to a FIRE monster with defense 50', async ({ page }) => {
         await startTeam(page, { monster: monsterOf('FIRE', 50), team: LYRA_IN_SLOT_1 });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(1, 5);
         expect(await lastAllyText(page)).toBe('1');
@@ -167,7 +164,7 @@ test.describe('Hero team: ally hits', () => {
     test('an old payload with physicalDefense 50 halves the ally hit too', async ({ page }) => {
         await startTeam(page, { monster: { element: 'FIRE', physicalDefense: 50, magicalDefense: 50, critResistance: 0 }, team: LYRA_IN_SLOT_1 });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(1, 5);
     });
@@ -177,7 +174,7 @@ test.describe('Hero team: ally hits', () => {
 
         await startTeam(page, { monster: monsterOf('FIRE', 40), team: { boughtSlots: 1, allies: [ 'vex', null, null, null ] }, equipment: [ ring ] });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(1.6, 5);
         expect(await lastAllyText(page)).toBe('1.6');
@@ -186,8 +183,8 @@ test.describe('Hero team: ally hits', () => {
     test('Prisão de Espinhos raises an ally hit to 2.5', async ({ page }) => {
         await startTeam(page, { leader: 'orina', stars: { orina: 3 }, monster: monsterOf('WATER'), team: LYRA_IN_SLOT_1 });
 
-        await advance(page, 999);
-        await useThenAdvance(page, 1, 1);
+        await useSkill(page, 1);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(2.5, 5);
         expect(await lastAllyText(page)).toBe('2.5');
@@ -197,7 +194,7 @@ test.describe('Hero team: ally hits', () => {
         await startTeam(page, { leader: 'seraphine', stars: { seraphine: 3 }, monster: monsterOf('LIGHT'), team: LYRA_IN_SLOT_1 });
 
         await useSkill(page, 1);
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(2.6, 5);
         expect(await lastAllyText(page)).toBe('2.6');
@@ -207,7 +204,7 @@ test.describe('Hero team: ally hits', () => {
         await startTeam(page, { leader: 'kael', stars: { kael: 3 }, monster: monsterOf('FIRE', 40), team: LYRA_IN_SLOT_1 });
 
         await useSkill(page, 3);
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(1.8, 5);
         expect(await lastAllyText(page)).toBe('1.8');
@@ -216,13 +213,13 @@ test.describe('Hero team: ally hits', () => {
     test('PHYSICAL_BREAK 5 lowers the defense an ally meets: 1.3 against defense 40', async ({ page }) => {
         await startTeam(page, { monster: monsterOf('FIRE', 40), team: LYRA_IN_SLOT_1, talents: { PHYSICAL_BREAK: 5 } });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(1.3, 5);
         expect(await lastAllyText(page)).toBe('1.3');
     });
 
-    test('Ventos Ligeiros, a running combo and critical pieces leave an ally hit at 2', async ({ page }) => {
+    test('Ventos Ligeiros, a running combo and critical pieces leave a team hit at 2', async ({ page }) => {
         const ring = piece({
             id: 'r1', slot: 'RING', affixes: [ { type: 'CRIT_CHANCE', base: 50 }, { type: 'CRIT_DAMAGE_PCT', base: 100 } ], heroId: 'orina'
         });
@@ -236,19 +233,19 @@ test.describe('Hero team: ally hits', () => {
             await strike(page);
         }
 
-        //  The clicks are on the monster; only the tick that follows is measured
+        //  The clicks are on the monster; only the team strike that follows is measured
         const before = await health(page);
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(before - await health(page)).toBeCloseTo(2, 5);
         expect(await lastAllyText(page)).toBe('2');
     });
 
-    test('a 3 star leader leaves the ally hit at 2', async ({ page }) => {
+    test('a 3 star leader leaves the team hit at 2', async ({ page }) => {
         await startTeam(page, { leader: 'kael', stars: { kael: 3 }, team: LYRA_IN_SLOT_1 });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(2, 5);
         expect(await lastAllyText(page)).toBe('2');
@@ -262,7 +259,7 @@ test.describe('Hero team: ally hits', () => {
 
         await startTeam(page, { stars: { lyra: 3 }, monster: monsterOf('NATURE', 50), team: LYRA_IN_SLOT_1, equipment: [ weapon, ring ] });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(105.6, 5);
         expect(await lastAllyText(page)).toBe('105.6');
@@ -276,7 +273,7 @@ test.describe('Hero team: ally hits', () => {
             stars: { orina: 3 }, monster: monsterOf('NATURE', 50), team: { boughtSlots: 1, allies: [ 'orina', null, null, null ] }, equipment: [ weapon, ring ]
         });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(137.28, 5);
     });
@@ -284,7 +281,7 @@ test.describe('Hero team: ally hits', () => {
     test('a 9 star Lyra deals 20', async ({ page }) => {
         await startTeam(page, { stars: { lyra: 9 }, team: LYRA_IN_SLOT_1 });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(20, 5);
         expect(await lastAllyText(page)).toBe('20');
@@ -296,7 +293,7 @@ test.describe('Hero team: ally hits', () => {
         await startTeam(page, { encounter: 'MINIBOSS', miniboss: monsterOf('FIRE', 10), team: LYRA_IN_SLOT_1, equipment: [ amulet ] });
         await expect(page.locator('.boss-timer')).toBeVisible();
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(2.16, 5);
     });
@@ -304,7 +301,7 @@ test.describe('Hero team: ally hits', () => {
     test('an ally hit uses the new leader\'s element after a leader change', async ({ page }) => {
         await startTeam(page, { monster: monsterOf('NATURE'), team: LYRA_IN_SLOT_1 });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(4, 5);
         expect(await lastAllyText(page)).toBe('4');
@@ -314,16 +311,16 @@ test.describe('Hero team: ally hits', () => {
         await expect(page.getByTestId('leader-card')).toContainText('Orina');
         await page.getByTestId('hero-close').click();
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(5, 5);
         expect(await lastAllyText(page)).toBe('1');
     });
 
-    test('an ally that equips a piece hits with it on the next tick', async ({ page }) => {
+    test('an ally that equips a piece hits with it on the next team strike', async ({ page }) => {
         await startTeam(page, { team: LYRA_IN_SLOT_1, equipment: [ piece({ id: 'w1', slot: 'WEAPON', baseClick: 1 }) ] });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await lastAllyText(page)).toBe('2');
 
@@ -335,7 +332,7 @@ test.describe('Hero team: ally hits', () => {
 
         const before = await health(page);
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(before - await health(page)).toBeCloseTo(4, 5);
         expect(await lastAllyText(page)).toBe('4');
@@ -347,9 +344,9 @@ test.describe('Hero team: ally hits', () => {
         });
         await expect(page.locator('.wallet')).toHaveText('Gold: 0 Silver: 0 Copper: 0');
 
-        await advance(page, 1_000);
+        await team(page);
 
-        //  Lyra's 20 kills the monster of 10: Orina's hit of the same tick does not land
+        //  Lyra's 20 kills the monster of 10: Orina's hit of the same team strike does not land
         expect(await allyTexts(page)).toEqual([ { text: '20', x: 740, size: '28px' } ]);
         expect(await scene(page, '(s) => s.monster.dead')).toBe(true);
 
@@ -361,7 +358,7 @@ test.describe('Hero team: ally hits', () => {
         await expect.poll(() => shownMonsters(page)).toEqual([ { health: 10, dead: false } ]);
     });
 
-    test('an ally hit keeps the combo streak', async ({ page }) => {
+    test('a team strike keeps the combo streak', async ({ page }) => {
         //  The combo shows only with a combo limit from the COMBO talent
         await startTeam(page, { team: LYRA_IN_SLOT_1, talents: { COMBO: 1 } });
 
@@ -376,7 +373,7 @@ test.describe('Hero team: ally hits', () => {
 
         const before = await health(page);
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(before - await health(page)).toBeCloseTo(2, 5);
         await expect(page.getByTestId('combo-hud')).toHaveText(streak);
@@ -392,7 +389,7 @@ test.describe('Hero team: ally hits', () => {
     test('an ally number has the light-blue fill and the dark 10 px outline', async ({ page }) => {
         await startTeam(page, { team: LYRA_IN_SLOT_1 });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await lastTextStyle(page, ALLY_COLOR)).toEqual({
             color: '#7fd4ff', fontSize: '28px', fontFamily: 'Cinzel', fontStyle: '700', stroke: '#1c120c', strokeThickness: 10
@@ -415,58 +412,31 @@ test.describe('Hero team: ally hits', () => {
         expect(await lastTextStyle(page, '#ff8a1f')).toMatchObject({ color: '#ff8a1f', stroke: '#2a1408', strokeThickness: 8, fontSize: '48px' });
     });
 
-    test('two allies in one tick draw one number with the dark 10 px outline', async ({ page }) => {
+    test('two allies in one team strike draw one number with the dark 10 px outline', async ({ page }) => {
         await startTeam(page, { team: { boughtSlots: 2, allies: [ 'lyra', 'orina', null, null ] } });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await allyTexts(page)).toHaveLength(1);
         expect(await lastTextStyle(page, ALLY_COLOR)).toMatchObject({ fontSize: '28px', stroke: '#1c120c', strokeThickness: 10 });
     });
 
-    test('ally hits keep landing while Heróis is open', async ({ page }) => {
+    test('a click while paused lands neither the click nor the team', async ({ page }) => {
         await startTeam(page, { health: 10, team: LYRA_IN_SLOT_1 });
 
-        await page.getByTestId('hud-heroes').click();
-        await expect(page.locator('.hero-panel')).toBeVisible();
-        await advance(page, 1_000);
-
-        expect(await health(page)).toBe(8);
-    });
-
-    test('the pause menu freezes the ally clock', async ({ page }) => {
-        await startTeam(page, { health: 10, team: LYRA_IN_SLOT_1 });
-
-        await advance(page, 600);
         await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').escape());
         await expect(page.locator('.pause-menu')).toBeVisible();
+        await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').hitMonster({ x: 670, y: 440 }));
         await advance(page, 10_000);
-        await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').escape());
-        await expect(page.locator('.pause-menu')).toBeHidden();
-        await advance(page, 399);
 
         expect(await health(page)).toBe(10);
+        expect(await allyTexts(page)).toEqual([]);
 
-        await advance(page, 1);
+        await page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').escape());
+        await expect(page.locator('.pause-menu')).toBeHidden();
+        await strike(page);
 
-        expect(await health(page)).toBe(8);
-    });
-
-    test('one advance of 2500 ms lands two ticks', async ({ page }) => {
-        await startTeam(page, { health: 100, team: LYRA_IN_SLOT_1 });
-
-        await advance(page, 2_500);
-
-        expect(await health(page)).toBe(96);
-        expect((await allyTexts(page)).map(({ text }) => text)).toEqual([ '2', '2' ]);
-
-        await advance(page, 499);
-
-        expect(await health(page)).toBe(96);
-
-        await advance(page, 1);
-
-        expect(await health(page)).toBe(94);
+        expect(await health(page)).toBe(7);
     });
 
     test('a farm fight at chapter 5 has the allies hit too', async ({ page }) => {
@@ -479,7 +449,7 @@ test.describe('Hero team: ally hits', () => {
 
         const before = await health(page);
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(before - await health(page)).toBeCloseTo(2, 5);
         expect(await lastAllyText(page)).toBe('2');
@@ -497,7 +467,7 @@ test.describe('Hero team: ally hits', () => {
 
         const before = await health(page);
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(before - await health(page)).toBeCloseTo(2, 5);
         expect(await lastAllyText(page)).toBe('2');

@@ -312,7 +312,7 @@ Body: `const slots = []; const hits = []; let damage = 0;` then `for (const { sl
 
 ### Phase 2: Tests in the browser and author check
 
-#### T4: The hero team combat e2e follows the click [ ]
+#### T4: The hero team combat e2e follows the click [x]
 
 **Owner**: test-engineer
 **Goal**: `heroTeamCombat.spec.js` stops stepping the ally clock and keeps every Ally Damage value through the team strike (TCD-01, TCD-02).
@@ -367,8 +367,8 @@ The tests `a click number keeps the gold fill and the 8 px outline` and `a criti
 **Gate**: `cd game && npm test && npx playwright test e2e/heroTeamCombat.spec.js`
 **Done when**:
 
-- [ ] `git grep -n "untilTickMs" game/e2e/heroTeamCombat.spec.js` prints nothing.
-- [ ] Every row is applied with the name and value of the table; the file passes.
+- [x] `git grep -n "untilTickMs" game/e2e/heroTeamCombat.spec.js` prints nothing.
+- [x] Every row is applied with the name and value of the table; the file passes.
 
 **Commit**: `test(game): the hero team combat e2e lands the team with the click`
 
