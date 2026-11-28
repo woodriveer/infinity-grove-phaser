@@ -569,7 +569,7 @@ export const createStoryStage = ({ scene, backdrops, onHit, onSkip, onMute }) =>
 
 ---
 
-#### T8: The scene player: audio, typing clock, keys and scale (storyPlayer.js) [ ]
+#### T8: The scene player: audio, typing clock, keys and scale (storyPlayer.js) [x]
 
 **Owner**: game-dev
 **Goal**: Play one scene in the overlay and resolve when it closes; Escape follows the key rule of AD-034 (STORY-10 to STORY-20, STORY-24, STORY-37, STORY-38, STORY-42).
@@ -648,7 +648,7 @@ const shown = () => document.querySelector('.story-shown').textContent;
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 28 cases (31 tests with the 4 rows of the modifier table) pass and every earlier unit test passes.
+- [x] The 28 cases (31 tests with the 4 rows of the modifier table) pass and every earlier unit test passes.
 
 **Commit**: `feat(game): play story scenes with voice, synced text, skip and mute`
 
