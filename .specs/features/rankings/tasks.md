@@ -627,7 +627,7 @@ Board sources (a private `data class Source(val table: String, val column: Strin
 
 ### Phase 2: Backend records and API
 
-#### T5: RecordKeeper turns game events into clocks and records [ ]
+#### T5: RecordKeeper turns game events into clocks and records [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: One component applies spec § Record Rules for every event: loads, outcomes, farm wins, resets and the click power (RNK-01, RNK-02, RNK-03).
@@ -727,7 +727,7 @@ Fakes (`test/Fakes.kt`): `object NoRecordKeeping : RecordKeeping` (every method 
 **Gate**: `cd backend && ./gradlew ktlintCheck test --tests '*RecordKeeperTest'`
 **Done when**:
 
-- [ ] The 19 cases pass; ktlint passes.
+- [x] The 19 cases pass; ktlint passes.
 
 **Commit**: `feat(backend): keep the ranking clocks and records`
 

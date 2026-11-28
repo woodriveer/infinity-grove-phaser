@@ -5,9 +5,11 @@ import br.com.woodriver.infinity_grove_ws.domain.DropRule
 import br.com.woodriver.infinity_grove_ws.domain.DropTable
 import br.com.woodriver.infinity_grove_ws.domain.GiftGrant
 import br.com.woodriver.infinity_grove_ws.domain.Hero
+import br.com.woodriver.infinity_grove_ws.domain.Outcome
 import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.Progress
+import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
 import br.com.woodriver.infinity_grove_ws.domain.RankingBoard
 import br.com.woodriver.infinity_grove_ws.domain.RankingEntry
 import br.com.woodriver.infinity_grove_ws.domain.RankingMe
@@ -42,6 +44,7 @@ import br.com.woodriver.infinity_grove_ws.port.TalentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.TeamRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.WalletRepositoryPort
+import br.com.woodriver.infinity_grove_ws.usecase.RecordKeeping
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
@@ -472,5 +475,59 @@ class InMemoryRankingRepository : RankingRepositoryPort {
             }
         val byValue = compareBy<Pair<String, Pair<Double, Long>>> { it.second.first }
         return rows.sortedWith((if (board.lowerIsBetter) byValue else byValue.reversed()).thenBy { it.second.second }.thenBy { it.first })
+    }
+}
+
+/** The record keeping of the tests that are not about the rankings: every event is ignored. */
+object NoRecordKeeping : RecordKeeping {
+    override fun onProgressLoaded(
+        username: String,
+        progress: Progress,
+    ) = Unit
+
+    override fun onOutcome(
+        username: String,
+        reported: ProgressPosition,
+        outcome: Outcome,
+        next: Progress,
+    ) = Unit
+
+    override fun onFarmWin(
+        username: String,
+        campaign: Progress,
+    ) = Unit
+
+    override fun onReset(username: String) = Unit
+}
+
+/** Notes every event it receives as text, so a test can assert what a service reported and in which order. */
+class RecordingRecordKeeping : RecordKeeping {
+    val events = mutableListOf<String>()
+
+    override fun onProgressLoaded(
+        username: String,
+        progress: Progress,
+    ) {
+        events += "loaded:${progress.position.chapter}:${progress.position.encounter}"
+    }
+
+    override fun onOutcome(
+        username: String,
+        reported: ProgressPosition,
+        outcome: Outcome,
+        next: Progress,
+    ) {
+        events += "outcome:${reported.encounter}:$outcome:${next.position.encounter}:${next.completed}"
+    }
+
+    override fun onFarmWin(
+        username: String,
+        campaign: Progress,
+    ) {
+        events += "farm:${campaign.position.encounter}"
+    }
+
+    override fun onReset(username: String) {
+        events += "reset"
     }
 }
