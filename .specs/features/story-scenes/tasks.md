@@ -1137,7 +1137,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 
 ### Phase 6: UI review
 
-#### T18: UI review of the story overlay and the Mapa [ ]
+#### T18: UI review of the story overlay and the Mapa [x]
 
 **Owner**: ui-artist
 **Goal**: The player-visible changes match the design reference and read well on the desktop (STORY-09, STORY-16, STORY-21, STORY-22, STORY-25, STORY-26, STORY-37, STORY-39).
@@ -1165,9 +1165,16 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 **Gate**: `cd game && npm run ui:shots -- storyScenes`
 **Done when**:
 
-- [ ] `ui-review.html` has a verdict (APROVADO or REPROVADO) and every finding is listed for the product owner to turn into tasks.
+- [x] `ui-review.html` has a verdict (APROVADO or REPROVADO) and every finding is listed for the product owner to turn into tasks.
 
 **Commit**: `docs(ui): review the story overlay and the Mapa`
+
+**Result**: APROVADO (82ad70d5). Findings, none blocking, left as follow-ups for a later polish pass:
+
+- [ ] F1 (medium): the Mapa tab still shows the skull icon of "Rever chefes"; draw a map or scroll icon in the style of the other five (`game/public/style.css`, `game/public/assets/ui/`). Shot `10b-rail-with-mapa-tab`.
+- [ ] F2 (low): on the chapter 1 title and end cards the logo covers Kael's head and the text crosses three heroes; darken the scrim behind the text or move the logo up (`.story-tint.is-dark`, `.story-logo`). Shot `15-ch1-title`.
+- [ ] F3 (low): Kael's round face is off-centre; reframe `game/public/assets/story/face-kael.jpg` with the head centred (owner art). Shot `17-ch1-kael`.
+- [ ] F4 (low): the line 7 dawn is barely visible; raise `.story-tint.is-dawn` to about 0.5 or move the gradient to `ellipse at 50% 15%`. Shot `20-ch1-dawn`.
 
 ---
 
