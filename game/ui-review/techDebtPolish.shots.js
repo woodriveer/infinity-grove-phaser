@@ -5,7 +5,7 @@ import { shot } from './support/shots';
 
 //  Screenshots of the tech-debt-polish review (.specs/features/tech-debt-polish/ui-review/): the attribute panel and the ally number. Fake backend, nothing stubbed.
 const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
-const monsterOf = (element, defense = 0) => ({ element, defense, physicalDefense: defense, magicalDefense: defense, critResistance: 0 });
+const monsterOf = (element, defense = 0) => ({ element, defense, critResistance: 0 });
 const ADD = { health: 30, defenseBuff: 30 };
 const chapter = (monster, adds) => ({
     bossHealth: 1000,

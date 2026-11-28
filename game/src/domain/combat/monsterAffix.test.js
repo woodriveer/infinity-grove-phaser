@@ -35,10 +35,10 @@ describe('affixDefense', () => {
         expect(affixDefense(stats, { type: 'ARMORED', amount: 20 })).toEqual({ element: 'FIRE', defense: 53, critResistance: 0 });
     });
 
-    it('reads physicalDefense of an old payload', () => {
+    it('ignores physicalDefense of an old payload: Blindado 20 reads 20', () => {
         const old = { element: 'FIRE', physicalDefense: 33, critResistance: 0 };
 
-        expect(affixDefense(old, { type: 'ARMORED', amount: 20 }).defense).toBe(53);
+        expect(affixDefense(old, { type: 'ARMORED', amount: 20 }).defense).toBe(20);
     });
 
     it('keeps the stats of a shell', () => {

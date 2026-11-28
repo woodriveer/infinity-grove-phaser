@@ -161,12 +161,12 @@ test.describe('Hero team: ally hits', () => {
         expect(await lastAllyText(page)).toBe('1');
     });
 
-    test('an old payload with physicalDefense 50 halves the ally hit too', async ({ page }) => {
+    test('an old payload with only physicalDefense 50 no longer halves the ally hit: 2', async ({ page }) => {
         await startTeam(page, { monster: { element: 'FIRE', physicalDefense: 50, magicalDefense: 50, critResistance: 0 }, team: LYRA_IN_SLOT_1 });
 
         await team(page);
 
-        expect(await dealt(page)).toBeCloseTo(1, 5);
+        expect(await dealt(page)).toBeCloseTo(2, 5);
     });
 
     test('Vex with 50 % armor pierce deals 1.6 to defense 40', async ({ page }) => {

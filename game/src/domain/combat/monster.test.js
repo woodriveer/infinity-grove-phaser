@@ -225,8 +225,8 @@ describe('defenseOf', () => {
         expect(defenseOf({ defense: 0, physicalDefense: 50 })).toBe(0);
     });
 
-    it('falls back to physicalDefense of an old payload', () => {
-        expect(defenseOf({ physicalDefense: 50, magicalDefense: 10 })).toBe(50);
+    it('ignores physicalDefense of an old payload', () => {
+        expect(defenseOf({ physicalDefense: 50, magicalDefense: 10 })).toBe(0);
     });
 
     it('never reads magicalDefense', () => {

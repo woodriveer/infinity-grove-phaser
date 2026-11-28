@@ -148,9 +148,9 @@ describe('monsterAfterBreak', () => {
         expect(stats).toEqual(monster(10, 10));
     });
 
-    it('reads physicalDefense of an old payload and writes defense', () => {
+    it('ignores physicalDefense of an old payload and writes defense 0', () => {
         expect(monsterAfterBreak({ element: 'FIRE', physicalDefense: 20, magicalDefense: 20, critResistance: 0 }, tree({ PHYSICAL_BREAK: 5 })))
-            .toEqual({ element: 'FIRE', physicalDefense: 20, magicalDefense: 20, critResistance: 0, defense: 15 });
+            .toEqual({ element: 'FIRE', physicalDefense: 20, magicalDefense: 20, critResistance: 0, defense: 0 });
     });
 
     it('takes the defense to 0, not below, when the break is larger: defense 10 and PHYSICAL_BREAK 15', () => {
@@ -335,9 +335,9 @@ describe('monsterAfterBreak with the team passives', () => {
         expect(monsterAfterBreak(monster(10, 10), null, { critResistBreak: 15 })).toEqual(monster(10, 0));
     });
 
-    it('an old payload with physicalDefense 50 and Orina\'s passive reads defense 35', () => {
+    it('an old payload with only physicalDefense 50 and Orina\'s passive reads defense 0', () => {
         expect(monsterAfterBreak({ element: 'FIRE', physicalDefense: 50, magicalDefense: 50, critResistance: 0 }, null, { defenseBreak: 15 }).defense)
-            .toBe(35);
+            .toBe(0);
     });
 
     it('no passives argument keeps the result of before', () => {

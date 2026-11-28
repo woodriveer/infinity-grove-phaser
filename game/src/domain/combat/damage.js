@@ -12,7 +12,7 @@ export const effectiveCritChance = (critChance, critResistance) => Math.min(100,
 //  The points of critical chance past 100 after the resistance; each one adds 1 % of critical damage to a critical strike
 export const critOverflow = (critChance, critResistance) => Math.max(0, critChance - critResistance - 100);
 
-//  What a click deals to `defender` ({ element, defense, critResistance }; `defenseOf` also reads an older payload). Every hit meets the
+//  What a click deals to `defender` ({ element, defense, critResistance }). Every hit meets the
 //  same defense: an attacker's `damageType` is ignored (spec unified-damage).
 //  `random` returns a number in [0, 1); it decides the critical hit, whose chance is the attacker's minus the defender's critical resistance
 //  (`effectiveCritChance`); a critical strike adds the chance past 100 as critical damage (`critOverflow`). `boss` is true against a miniboss or a chapter boss.

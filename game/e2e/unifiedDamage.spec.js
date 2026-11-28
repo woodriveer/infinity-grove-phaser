@@ -89,14 +89,14 @@ test.describe('Unified damage', () => {
         await expect.poll(() => dealt(page)).toBeCloseTo(8 * STAR * 1.3, 5);
     });
 
-    test('Chuva de Meteoros meets the one defense of an old payload: physicalDefense 50 and magicalDefense 10 make 25 x 1.4 x 0.5 = 17.5', async ({ page }) => {
+    test('Chuva de Meteoros ignores physicalDefense of an old payload: physicalDefense 50 and magicalDefense 10 make 25 x 1.4 = 35', async ({ page }) => {
         await startAs(page, 'orina', { monster: { element: 'WATER', physicalDefense: 50, magicalDefense: 10, critResistance: 0 } });
 
-        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 50%  Seu crítico: 40%');
+        await expect(page.locator('.enemy-stats')).toHaveText('Water  Defesa 0%  Seu crítico: 40%');
 
         await use(page, 3);
 
-        await expect.poll(() => dealt(page)).toBeCloseTo(25 * STAR * 0.5, 5);
+        await expect.poll(() => dealt(page)).toBeCloseTo(25 * STAR, 5);
     });
 
     test('a monster of the new payload shows Defesa 40% and a click meets it: 1.4 x 0.6 = 0.84', async ({ page }) => {

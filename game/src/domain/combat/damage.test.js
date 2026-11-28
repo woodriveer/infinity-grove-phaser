@@ -46,6 +46,12 @@ describe('calculateDamage', () => {
         expect(calculateDamage({ defender, random: never }).damage).toBeCloseTo(0.6, 10);
     });
 
+    it('ignores physicalDefense of an old payload: physicalDefense 80 alone deals 1', () => {
+        const defender = { element: 'FIRE', physicalDefense: 80, magicalDefense: 80, critResistance: 0 };
+
+        expect(calculateDamage({ defender, random: never }).damage).toBe(1);
+    });
+
     it('meets defense 0 when the stats carry no defense field', () => {
         expect(calculateDamage({ defender: { element: 'FIRE', critResistance: 0 }, random: never }).damage).toBe(1);
     });

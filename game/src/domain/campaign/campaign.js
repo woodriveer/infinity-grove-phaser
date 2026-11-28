@@ -7,8 +7,7 @@
 //    definition: { bossHealth, bossTimeLimitMs, boss, bossDropRuleId, bossAffix,
 //                  stages: [{ number, phasesPerStage, monsterHealth, minibossHealth, minibossTimeLimitMs, monster, miniboss, monsterDropRuleId, minibossDropRuleId,
 //                            minibossAffix }] } }
-//  where boss, monster and miniboss are { element, defense, critResistance } (an older backend sends physicalDefense and magicalDefense
-//  instead of defense, read by defenseOf); a payload without them means DEFAULT_STATS. The drop rule ids name the wallet queue a kill takes its copper from,
+//  where boss, monster and miniboss are { element, defense, critResistance }; a payload without them means DEFAULT_STATS. The drop rule ids name the wallet queue a kill takes its copper from,
 //  and each stage may carry adds: [{ health, defenseBuff }] (spec miniboss-adds); a miniboss (stage.minibossAffix) and a chapter boss (bossAffix) may
 //  carry an affix { type, amount, periodMs } (spec early-game-rebalance), read by affixOf: a missing or malformed one means none
 import { addsOf } from '../combat/adds';

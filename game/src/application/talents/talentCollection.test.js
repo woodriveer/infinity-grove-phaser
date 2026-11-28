@@ -160,20 +160,20 @@ describe('talentCollection', () => {
     });
 
     describe('retired talents', () => {
-        it('drops the magical break of every grade from a loaded list', async () => {
+        it('drops the retired talents of every grade from a loaded list', async () => {
             gateway.list.mockResolvedValue({
-                talents: [ talent('PHYSICAL_BREAK', 2), talent('MAGICAL_BREAK', 5), talent('MAGICAL_BREAK_G2', 1), talent('MAGICAL_BREAK_G3'), talent('CLICK_DAMAGE') ],
+                talents: [ talent('PHYSICAL_BREAK', 2), talent('BOSS_TIME', 5), talent('BOSS_TIME_G2', 1), talent('CRIT_RESIST_BREAK_G3'), talent('CLICK_DAMAGE') ],
                 points: points(9, 9)
             });
 
             await collection.load();
 
             expect(collection.talents().map((t) => t.id)).toEqual([ 'PHYSICAL_BREAK', 'CLICK_DAMAGE' ]);
-            expect(collection.levelOf('MAGICAL_BREAK')).toBe(0);
+            expect(collection.levelOf('BOSS_TIME')).toBe(0);
         });
 
         it('drops it from the list an upgrade answers', async () => {
-            gateway.upgrade.mockResolvedValue({ talents: [ talent('CLICK_DAMAGE', 1), talent('MAGICAL_BREAK', 5) ], points: points(9, 6) });
+            gateway.upgrade.mockResolvedValue({ talents: [ talent('CLICK_DAMAGE', 1), talent('BOSS_TIME', 5) ], points: points(9, 6) });
 
             await collection.upgrade('CLICK_DAMAGE', 0);
 
@@ -181,7 +181,7 @@ describe('talentCollection', () => {
         });
 
         it('drops it from the list a reset answers', async () => {
-            gateway.reset.mockResolvedValue({ talents: [ talent('MAGICAL_BREAK'), talent('COMBO') ], points: points(9, 0) });
+            gateway.reset.mockResolvedValue({ talents: [ talent('CRIT_RESIST_BREAK'), talent('COMBO') ], points: points(9, 0) });
 
             await collection.reset();
 
@@ -194,9 +194,8 @@ describe('talentCollection', () => {
             expect(collection.talents()).toEqual([ talent('CLICK_DAMAGE'), talent('CRIT_CHANCE', 4) ]);
         });
 
-        it('lists the nine retired ids', () => {
+        it('lists the six retired ids', () => {
             expect(RETIRED_TALENT_IDS).toEqual([
-                'MAGICAL_BREAK', 'MAGICAL_BREAK_G2', 'MAGICAL_BREAK_G3',
                 'BOSS_TIME', 'BOSS_TIME_G2', 'BOSS_TIME_G3',
                 'CRIT_RESIST_BREAK', 'CRIT_RESIST_BREAK_G2', 'CRIT_RESIST_BREAK_G3'
             ]);

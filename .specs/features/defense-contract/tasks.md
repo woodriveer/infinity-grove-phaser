@@ -361,7 +361,7 @@ Rows inserted in the scratch schema name it (`insert into defense_expand_check.e
 
 ---
 
-#### T7: The game reads `defense` only [ ]
+#### T7: The game reads `defense` only [x]
 
 **Owner**: game-dev
 **Goal**: Drop the `physicalDefense` fallback, the three retired `MAGICAL_BREAK*` ids and the unused magical break icon, and pin that the old fields are ignored (DEF-04; spec Game AC 1 to 5, Q5, Q6).
@@ -405,10 +405,10 @@ export const RETIRED_TALENT_IDS = [
 **Gate**: `cd game && npm test && npm run build && npx playwright test e2e/heroTeamCombat.spec.js e2e/unifiedDamage.spec.js e2e/talents.spec.js e2e/talentTreeRework.spec.js`
 **Done when**:
 
-- [ ] The unit suite passes with one more test than before the task (the new `damage.test.js` case); the four e2e files pass.
-- [ ] `git grep -n "physicalDefense" -- game/src ':!*.test.js'` prints only the `defenseOf` comment line of `monster.js`.
-- [ ] `git grep -n -E "physicalDefense|magicalDefense" -- game` prints only lines of the tests of design § Legacy Payload Tests and the `monster.js` comment.
-- [ ] `game/public/assets/talent-break-magical.png` no longer exists.
+- [x] The unit suite passes with one more test than before the task (the new `damage.test.js` case); the four e2e files pass.
+- [x] `git grep -n "physicalDefense" -- game/src ':!*.test.js'` prints only the `defenseOf` comment line of `monster.js`.
+- [x] `git grep -n -E "physicalDefense|magicalDefense" -- game` prints only lines of the tests of design § Legacy Payload Tests and the `monster.js` comment.
+- [x] `game/public/assets/talent-break-magical.png` no longer exists.
 
 **Commit**: `refactor(game): read the enemy defense from defense only`
 

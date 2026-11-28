@@ -157,11 +157,11 @@ describe('Fight', () => {
         expect(fight.statsOf(fight.main)).toBe(fight.main.stats);
     });
 
-    it('statsOf reads a legacy physicalDefense payload', () => {
+    it('statsOf ignores physicalDefense of an old payload: physicalDefense 49 and an add of 30 read 30', () => {
         const main = mainMonster({ element: 'FIRE', physicalDefense: 49, magicalDefense: 49, critResistance: 0 });
         const fight = new Fight(main, [ add(30, 30) ]);
 
-        expect(fight.statsOf(main).defense).toBe(79);
+        expect(fight.statsOf(main).defense).toBe(30);
     });
 
     it("statsOf of an add is the add's own stats", () => {

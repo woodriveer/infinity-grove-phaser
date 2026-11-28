@@ -2048,12 +2048,12 @@ describe('ClickerGame elements', () => {
         expect(water.scene.monster.health).toBe(water.scene.monster.maxHealth - 2);
     });
 
-    it('applies the defense of the monster: physicalDefense 50 of an old payload', async () => {
-        const ctx = await createScene({ start: withStats(stats('FIRE', 50)) });
+    it('ignores physicalDefense of an old payload: physicalDefense 50 takes a full click', async () => {
+        const ctx = await createScene({ start: withStats({ element: 'FIRE', physicalDefense: 50, magicalDefense: 10, critResistance: 0 }) });
 
         ctx.click();
 
-        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 0.5);
+        expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth - 1);
     });
 
     it('applies the defense of a new payload: defense 50 takes half of a click', async () => {
@@ -2070,10 +2070,10 @@ describe('ClickerGame elements', () => {
         expect(enemyText(ctx)).toBe('Water  Defesa 40%  Seu crítico: 0%');
     });
 
-    it('shows Defesa 50% for an old payload with physicalDefense 50 and magicalDefense 10', async () => {
+    it('shows Defesa 0% for an old payload with only physicalDefense 50 and magicalDefense 10', async () => {
         const ctx = await createScene({ start: withStats({ element: 'DARKNESS', physicalDefense: 50, magicalDefense: 10, critResistance: 100 }) });
 
-        expect(enemyText(ctx)).toBe('Darkness  Defesa 50%  Seu crítico: 0%');
+        expect(enemyText(ctx)).toBe('Darkness  Defesa 0%  Seu crítico: 0%');
         expect(enemyText(ctx)).not.toContain('Physical def');
         expect(enemyText(ctx)).not.toContain('Magical def');
     });
