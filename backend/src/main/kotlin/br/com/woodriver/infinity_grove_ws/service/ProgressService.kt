@@ -18,6 +18,7 @@ import br.com.woodriver.infinity_grove_ws.port.TalentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.usecase.GetProgressUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.OutcomeResult
+import br.com.woodriver.infinity_grove_ws.usecase.RecordKeeping
 import br.com.woodriver.infinity_grove_ws.usecase.ReportOutcomeUseCase
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -34,11 +35,13 @@ class ProgressService(
     private val equipmentRewards: EquipmentRewards,
     private val talentRepository: TalentRepositoryPort,
     private val talentRules: TalentRules,
+    private val records: RecordKeeping,
 ) : GetProgressUseCase,
     ReportOutcomeUseCase {
     override fun get(username: String): ProgressView {
         logger.info("Getting progress username={}", username)
         val progress = load(username)
+        records.onProgressLoaded(username, progress)
         return progress.view(chapterOf(progress))
     }
 
@@ -54,6 +57,7 @@ class ProgressService(
         progressRepository.save(next)
         val (drop, equipmentDrop) = if (outcome == Outcome.CLEARED) awardBoss(username, position) else NO_REWARDS
         val talentPoints = if (outcome == Outcome.CLEARED) awardTalentPoints(username, position) else 0
+        records.onOutcome(username, position, outcome, next)
         return OutcomeResult(next.view(chapterOf(next)), drop, equipmentDrop, talentPoints)
     }
 

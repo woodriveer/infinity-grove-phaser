@@ -733,7 +733,7 @@ Fakes (`test/Fakes.kt`): `object NoRecordKeeping : RecordKeeping` (every method 
 
 ---
 
-#### T6: ProgressService reports loads and outcomes to the records [ ]
+#### T6: ProgressService reports loads and outcomes to the records [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: Every `GET /progress` and every accepted outcome reaches `RecordKeeping`, after the progress is saved, and a refused report reaches nothing (RNK-01, RNK-02, RNK-03; spec Boss AC 5, 10).
@@ -768,7 +768,7 @@ Fakes (`test/Fakes.kt`): `object NoRecordKeeping : RecordKeeping` (every method 
 **Gate**: `cd backend && ./gradlew ktlintCheck test --tests '*ProgressServiceTest'`
 **Done when**:
 
-- [ ] The 4 new cases and every existing case of `ProgressServiceTest` pass.
+- [x] The 4 new cases and every existing case of `ProgressServiceTest` pass.
 
 **Commit**: `feat(backend): report progress loads and outcomes to the rankings`
 

@@ -12,6 +12,8 @@ import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
 import br.com.woodriver.infinity_grove_ws.LogCapture
 import br.com.woodriver.infinity_grove_ws.MutableClock
+import br.com.woodriver.infinity_grove_ws.NoRecordKeeping
+import br.com.woodriver.infinity_grove_ws.RecordingRecordKeeping
 import br.com.woodriver.infinity_grove_ws.SequenceChanceRoller
 import br.com.woodriver.infinity_grove_ws.SequenceDropRoller
 import br.com.woodriver.infinity_grove_ws.SequenceIds
@@ -35,6 +37,7 @@ import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
 import br.com.woodriver.infinity_grove_ws.port.EquipmentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
+import br.com.woodriver.infinity_grove_ws.usecase.RecordKeeping
 import java.time.LocalDate
 import java.time.ZoneOffset
 import kotlin.test.Test
@@ -69,7 +72,7 @@ class ProgressServiceTest {
             InMemoryLegacyRepository(),
         )
 
-    private val service get() =
+    private fun serviceWith(records: RecordKeeping) =
         ProgressService(
             progresses,
             chapters,
@@ -79,7 +82,10 @@ class ProgressServiceTest {
             equipmentRewards(),
             talents,
             TalentRules(),
+            records,
         )
+
+    private val service get() = serviceWith(NoRecordKeeping)
 
     private val start = ProgressPosition(1, 1, Encounter.PHASE, 1)
 
@@ -298,6 +304,7 @@ class ProgressServiceTest {
                 equipmentRewards(),
                 talents,
                 TalentRules(pointsPerPhase = 3),
+                NoRecordKeeping,
             )
 
         assertEquals(3, tuned.report("yan", start, Outcome.CLEARED).talentPoints)
@@ -496,6 +503,7 @@ class ProgressServiceTest {
                 equipmentRewards(),
                 talents,
                 TalentRules(),
+                NoRecordKeeping,
             )
 
         assertFailsWith<IllegalStateException> { broken.report("yan", miniboss, Outcome.CLEARED) }
@@ -586,8 +594,56 @@ class ProgressServiceTest {
                 equipmentRewards(failing),
                 talents,
                 TalentRules(),
+                NoRecordKeeping,
             )
 
         assertFailsWith<IllegalStateException> { broken.report("yan", chapterBoss, Outcome.CLEARED) }
+    }
+
+    @Test
+    fun `a progress load is reported to the records with the loaded position`() {
+        existingUser()
+        progresses.save(Progress("yan", ProgressPosition(3, 10, Encounter.CHAPTER_BOSS, 1)))
+        val records = RecordingRecordKeeping()
+
+        serviceWith(records).get("yan")
+
+        assertEquals(listOf("loaded:3:CHAPTER_BOSS"), records.events)
+    }
+
+    @Test
+    fun `an accepted outcome is reported with the reported position and the next progress`() {
+        existingUser()
+        progresses.save(Progress("yan", start))
+        val records = RecordingRecordKeeping()
+
+        serviceWith(records).report("yan", start, Outcome.CLEARED)
+
+        assertEquals(listOf("outcome:PHASE:CLEARED:PHASE:false"), records.events)
+    }
+
+    @Test
+    fun `a last miniboss win is reported as reaching the chapter boss`() {
+        existingUser()
+        val lastMiniboss = ProgressPosition(1, 10, Encounter.MINIBOSS, 1)
+        progresses.save(Progress("yan", lastMiniboss))
+        val records = RecordingRecordKeeping()
+
+        serviceWith(records).report("yan", lastMiniboss, Outcome.CLEARED)
+
+        assertEquals("outcome:MINIBOSS:CLEARED:CHAPTER_BOSS:false", records.events.last())
+    }
+
+    @Test
+    fun `a refused report reaches no record`() {
+        existingUser()
+        progresses.save(Progress("yan", start))
+        val records = RecordingRecordKeeping()
+
+        assertFailsWith<ProgressConflictException> {
+            serviceWith(records).report("yan", ProgressPosition(1, 2, Encounter.PHASE, 1), Outcome.CLEARED)
+        }
+
+        assertTrue(records.events.isEmpty())
     }
 }
