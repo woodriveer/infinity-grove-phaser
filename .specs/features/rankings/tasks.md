@@ -911,7 +911,7 @@ class RankingService(
 
 ---
 
-#### T10: RankingController and its errors [ ]
+#### T10: RankingController and its errors [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: `GET /rankings/{board}` and `POST /rankings/click-power` answer the spec shapes, errors and integer values, and a real boss flow lands on the board (RNK-03, RNK-05; spec Boards API AC 1 to 10, Power AC 6).
@@ -978,7 +978,7 @@ class RankingController(private val getRanking: GetRankingUseCase, private val r
 **Gate**: `git push origin HEAD:ci/rankings` then `node scripts/ci-wait.mjs ci/rankings`: the `backend` job is green with `RankingControllerIT`.
 **Done when**:
 
-- [ ] The 12 cases pass in CI; the whole backend job is green (every other suite unchanged).
+- [x] The 12 cases pass in CI; the whole backend job is green (every other suite unchanged).
 
 **Commit**: `feat(backend): serve the ranking boards`
 

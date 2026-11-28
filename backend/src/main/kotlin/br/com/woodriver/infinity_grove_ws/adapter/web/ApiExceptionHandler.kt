@@ -10,12 +10,14 @@ import br.com.woodriver.infinity_grove_ws.domain.EquipmentRequestException
 import br.com.woodriver.infinity_grove_ws.domain.HeroConflictException
 import br.com.woodriver.infinity_grove_ws.domain.HeroNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.HeroRequestException
+import br.com.woodriver.infinity_grove_ws.domain.InvalidRankingRequestException
 import br.com.woodriver.infinity_grove_ws.domain.InvalidRefreshTokenException
 import br.com.woodriver.infinity_grove_ws.domain.LoginException
 import br.com.woodriver.infinity_grove_ws.domain.LoginUserNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.PasswordTooShortException
 import br.com.woodriver.infinity_grove_ws.domain.ProgressConflictException
 import br.com.woodriver.infinity_grove_ws.domain.ProgressRequestException
+import br.com.woodriver.infinity_grove_ws.domain.RankingNotFoundException
 import br.com.woodriver.infinity_grove_ws.domain.ResetChapterMismatchException
 import br.com.woodriver.infinity_grove_ws.domain.ResetConflictException
 import br.com.woodriver.infinity_grove_ws.domain.ResetRequestException
@@ -120,6 +122,12 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(ResetConflictException::class)
     fun resetConflict(e: ResetConflictException) = problem(HttpStatus.CONFLICT, e)
+
+    @ExceptionHandler(RankingNotFoundException::class)
+    fun rankingNotFound(e: RankingNotFoundException) = problem(HttpStatus.NOT_FOUND, e)
+
+    @ExceptionHandler(InvalidRankingRequestException::class)
+    fun rankingRequest(e: InvalidRankingRequestException) = problem(HttpStatus.BAD_REQUEST, e)
 
     @ExceptionHandler(BusinessException::class)
     fun business(e: BusinessException) = problem(HttpStatus.UNPROCESSABLE_CONTENT, e)
