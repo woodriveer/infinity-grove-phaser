@@ -10,14 +10,14 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/story-scenes/spec.md`
 **Design**: `.specs/features/story-scenes/design.md`
-**Status**: Approved by the owner on 2026-11-28 with every recommended answer to Q1 to Q14. Revision 2 (2026-11-28): every line number, contract and existing test re-checked against `origin/main` (`6ad59d17`) after AD-030 to AD-035; T1, T8, T10, T12, T13, T14, T16, T17 and T18 changed.
+**Status**: Approved by the owner on 2026-11-28 with every recommended answer to Q1 to Q14. Revision 2 (2026-11-28): every line number, contract and existing test re-checked against `origin/main` (`6ad59d17`) after AD-030 to AD-035; T1, T8, T10, T12, T13, T14, T16, T17 and T18 changed. Revision 3 (2026-11-28, scope addition under the owner's standing approval): the chapter 1 boss scene ships with real content (spec STORY-44 to STORY-55, D25 to D33): T3, T4, T5, T7, T8, T9, T13, T15, T17 and T18 amended, T19 (fixture seeds every catalog id) and T20 (e2e of the chapter 1 scene) added. T1 stays done.
 
 Rules for every task:
 
 - Paths are from the repository root `D:/Developer/infinity-grove`. `GS/` = `game/src/`, `VW/` = `game/src/adapters/phaser/views/`.
 - Before reading code, run `graphify query "<question>"` (CLAUDE.md § graphify); read raw files only for the lines the graph or this file located. After changing code, run `graphify update .`.
 - Read the files under **Read first** before editing. Line numbers drift: locate an edit by the quoted text when the line moved.
-- **Branch.** Every task works on the branch `ci/story-scenes`. The first task (T1) creates it: `git fetch origin && git switch -c ci/story-scenes origin/main`. Every later task starts with `git switch ci/story-scenes && git pull --rebase origin ci/story-scenes`. Push right after each commit: `git push origin HEAD:ci/story-scenes`. No task pushes to `main`; `gitops` merges once T17's CI run is green and T18 is APROVADO (design § Tech Decisions: a half-built story must not reach the deployed `main`).
+- **Branch.** Every task works on the branch `ci/story-scenes` (T1 created it). Every task starts with `git switch ci/story-scenes && git pull --rebase origin ci/story-scenes`. When `origin/main` moved, rebase with `git fetch origin && git rebase origin/main` and push with `git push --force-with-lease origin ci/story-scenes`. Push right after each commit: `git push origin HEAD:ci/story-scenes`. No task pushes to `main`; `gitops` merges once T17's CI run is green and T18 is APROVADO (design § Tech Decisions: a half-built story must not reach the deployed `main`).
 - One task = one commit with the message under **Commit**, checked with `py -3 .claude/skills/tlc-spec-driven/scripts/check_commit.py --message "<msg>"`, ending with the line `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Add files by path only, never `git add -A` or `git add .`: the working tree holds the owner's uncommitted files (`CLAUDE.md`, `GEMINI.md`, `graphify-out/`, `.agents/`, `.claude/skills/impeccable/`, `.claude/skills/reversa-*/`, `.claude/agents/*.png`, `BRIEFING_HISTORIA.md`, `ROTEIRO_DIALOGOS.md`, `presentation/`). No task edits any of them.
 - Mark the task `[x]` in this file in the same commit and set its requirement rows in `spec.md` § Requirement Traceability to `Implementing`.
 - **Re-pinning existing tests.** Only T10 (the composition key list) and T12 (the tab label `Rever chefes` becomes `Mapa`) change existing assertions, and only the ones their tables list. Name every re-pinned test in the commit body. If a test the task does not list fails, stop and report it to the orchestrator; do not change it. Never delete a test.
@@ -72,9 +72,12 @@ T1
 ```
 T2 → T5
 T4 → T5
+T5 → T19
 T3
 T6
 ```
+
+T19 (test-engineer) widens the T1 seed to every catalog id right after the catalog exists, before T13 makes the chapter 1 boss win open a scene.
 
 ### Phase 3: Player views (game-dev)
 
@@ -96,6 +99,7 @@ T10 → T13
 T14 → T17
 T15 → T17
 T16 → T17
+T20 → T17
 ```
 
 ### Phase 6: UI review (ui-artist)
@@ -208,9 +212,9 @@ export const test = base.extend({
 **Also changes**: `game/src/domain/story/storyPlayback.test.js` (new)
 **Read first**: `design.md` § Components `storyPlayback.js` (every function and value)
 **Depends on**: None
-**Requirement**: STORY-09, STORY-12, STORY-13, STORY-14, STORY-16, STORY-17, STORY-18, STORY-21, STORY-23, STORY-37
+**Requirement**: STORY-09, STORY-12, STORY-13, STORY-14, STORY-16, STORY-17, STORY-18, STORY-21, STORY-23, STORY-37, STORY-46, STORY-49, STORY-53
 
-**Contract** (exports): `STORY_STAGE` (`{ width: 1280, height: 720 }`), `AUTO_ADVANCE_MS` (`1200`), `startStory(scene)`, `advanceStory(scene, state)`, `endLine(state)`, `skipStory(state)`, `hitLabel(state)`, `progressDots(scene, state)`, `sceneLook(scene, state, t)`, `storyScale(width, height)`, each as the design defines. Every function returns a new object or array; none mutates its input.
+**Contract** (exports): `STORY_STAGE` (`{ width: 1280, height: 720 }`), `AUTO_ADVANCE_MS` (`1200`), `startStory(scene)`, `advanceStory(scene, state)`, `endLine(state)`, `skipStory(state)`, `hitLabel(state, scene)`, `progressDots(scene, state)`, `sceneLook(scene, state, t)`, `cameraOf(backdrops, look)`, `cameraTransform(camera)`, `storyScale(width, height)`, each as the design defines (revision 3: `hitLabel` reads `scene.title.action`; `sceneLook` returns `camera` and reads the card `backdrop` and `tints`). Every function returns a new object or array; none mutates its input.
 
 **Steps**:
 
@@ -235,18 +239,25 @@ export const test = base.extend({
 - `the hit label of each state`: title `Começar a história`, typing line `Mostrar fala completa`, complete line `Próxima fala`, end `Continuar`, done `''`.
 - `dots light up to the current line`: `progressDots(SIX, { line, 2, false })` equals `[ true, true, true, false, false, false ]`.
 - `no dot is lit on the title and end cards`: both give six `false`.
-- `the title and end cards look like the dark forest`: `sceneLook(FULL, title, 0)` and `sceneLook(FULL, end, 0)` equal `{ backdrop: 'forest', tints: [ 'dark' ] }`.
-- `a line with no tint shows its backdrop only`: `sceneLook(BARE, { line, 0, false }, 0)` equals `{ backdrop: 'forest', tints: [] }`.
+- `the title and end cards look like the dark forest`: `sceneLook(FULL, title, 0)` and `sceneLook(FULL, end, 0)` equal `{ backdrop: 'forest', tints: [ 'dark' ], camera: 'wide' }`.
+- `a line with no tint shows its backdrop only`: `sceneLook(BARE, { line, 0, false }, 0)` equals `{ backdrop: 'forest', tints: [], camera: 'wide' }`. (Every line look below also carries `camera: 'wide'` unless stated.)
 - `the red tint waits for its second`: `{ lines: [ RED ] }`, typing at `t` 6.0 gives tints `[ 'dark' ]`, at 6.1 gives `[ 'dark', 'red' ]`.
 - `the red tint shows on a complete line whatever the second`: complete at `t` 0 gives `[ 'dark', 'red' ]`.
 - `a map line shows the map and the gold tint`: `{ backdrop: 'map', tints: [ 'gold' ] }`.
 - `the stage scale of <w>x<h> is <s>` (`it.each`): `[1280, 720, 1]`, `[1920, 1080, 1.5]`, `[1024, 768, 0.8]`, `[390, 844, 0.3046875]`.
 - `auto-advance waits 1200 ms`: `AUTO_ADVANCE_MS` is 1200.
+- Revision 3 fixtures: `CAMS = { clearing: { image: 'c.jpg', motion: 'still', cameras: { kael: { x: -551, y: -350, scale: 1.75 }, narr: { x: 0, y: -129, scale: 1.18, ms: 6000 } } } }`; `CARDS = { title: { kicker: 'k', cta: 'c', action: 'Começar a cena', backdrop: 'clearing', tints: [ 'dark' ] }, end: { kicker: 'a', title: 'b', subtitle: 'c', cta: 'd', backdrop: 'clearing', tints: [ 'dark', 'dawn' ] }, lines: [ L({ backdrop: 'clearing', camera: 'kael' }) ] }`.
+- `the title card label comes from its action`: `hitLabel({ phase: 'title', index: 0, complete: false }, CARDS)` is `Começar a cena`; with `FULL` it is `Começar a história`.
+- `a card takes its backdrop and tints from the data`: `sceneLook(CARDS, title, 0)` equals `{ backdrop: 'clearing', tints: [ 'dark' ], camera: 'wide' }`; the end state gives `{ backdrop: 'clearing', tints: [ 'dark', 'dawn' ], camera: 'wide' }`.
+- `a line names its camera`: `sceneLook(CARDS, { line, 0, false }, 0).camera` is `'kael'`.
+- `cameraOf finds the preset with the default 1800 ms`: `cameraOf(CAMS, { backdrop: 'clearing', camera: 'kael' })` equals `{ x: -551, y: -350, scale: 1.75, ms: 1800 }`; `narr` keeps `ms` 6000.
+- `cameraOf of wide or an unknown camera is the identity`: `{ backdrop: 'clearing', camera: 'wide' }` and `{ backdrop: 'forest', camera: 'kael' }` (forest has no cameras) each give `{ x: 0, y: 0, scale: 1, ms: 1800 }`.
+- `cameraTransform writes the CSS transform`: `{ x: -551, y: -350, scale: 1.75 }` gives `translate(-551px, -350px) scale(1.75)`; the identity gives `translate(0px, 0px) scale(1)`.
 
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 22 cases pass and every earlier unit test passes.
+- [ ] The 28 cases pass and every earlier unit test passes.
 
 **Commit**: `feat(game): add the story scene state machine`
 
@@ -260,9 +271,9 @@ export const test = base.extend({
 **Also changes**: `game/src/domain/story/storyScenes.test.js` (new)
 **Read first**: `design.md` § Components `storyScenes.js`, § Validation rules (the 16 rules, the catalog rules and every message)
 **Depends on**: None
-**Requirement**: STORY-01, STORY-03, STORY-04, STORY-29, STORY-33, STORY-34, STORY-35
+**Requirement**: STORY-01, STORY-03, STORY-04, STORY-29, STORY-33, STORY-34, STORY-35, STORY-48, STORY-49, STORY-50, STORY-52, STORY-53, STORY-54
 
-**Contract** (exports): `LINE_KINDS`, `TINTS`, `TRIGGERS`, `MOTIONS` (the arrays of the design), `validateScene(scene, backdrops): string[]`, `validateCatalog(scenes, backdrops): string[]`, `sceneToPlay(scenes, { from, to, seen }): object | null`, `replayableScenes(scenes, seen): object[]`. Messages are the design's, character for character. `validateScene` checks rules 1 to 16 in order and collects every message (it does not stop at the first), except rule 6 which skips the line rules.
+**Contract** (exports): `LINE_KINDS`, `TINTS`, `TRIGGERS`, `MOTIONS` (the arrays of the design), `validateScene(scene, backdrops): string[]`, `validateCatalog(scenes, backdrops): string[]`, `sceneToPlay(scenes, { from, to, seen }): object | null`, `replayableScenes(scenes, seen, position): object[]`. Messages are the design's, character for character. `validateScene` checks rules 1 to 16 (with 5b, 5c and 11b of revision 3, and the two messages of rule 9) in order and collects every message (it does not stop at the first), except rule 6 which skips the line rules.
 
 **Steps**:
 
@@ -285,9 +296,12 @@ export const test = base.extend({
   - rule 6 `lines: []` gives `chapter-1: a scene needs at least one line`.
   - rule 7 `kind: 'sera'` on line 2 (`lines: [ line(), line({ kind: 'sera' }) ]`) gives `chapter-1 line 2: kind must be narrator, voice or character`.
   - rule 8 `line({ kind: 'voice', speaker: '' })` gives `chapter-1 line 1: speaker is missing`; a narrator line with no speaker gives `[]`.
-  - rule 9 `line({ kind: 'character', speaker: 'Kael' })` with no portrait gives `chapter-1 line 1: a character line needs a portrait`.
+  - rule 9 `line({ kind: 'character', speaker: 'Kael' })` with no portrait and no face gives `chapter-1 line 1: a character line needs a portrait or a face`; with `portrait: 'p.png', face: 'f.jpg'` it gives `chapter-1 line 1: a character line takes a portrait or a face, not both`; with only `face: 'f.jpg'` it gives `[]`.
+  - rule 5b `title: { kicker: 'k', cta: 'c', backdrop: 'cave' }` gives `chapter-1: title backdrop or tints are unknown`; `end: { kicker: 'a', title: 'b', subtitle: 'c', cta: 'd', tints: [ 'blue' ] }` gives `chapter-1: end backdrop or tints are unknown`.
+  - rule 5c `letterbox: 'yes'` gives `chapter-1: letterbox must be true or false`; `motes: [ [ 1, 2, 3 ] ]` and `motes: [ [ 1, 2, 3, 0 ] ]` each give `chapter-1: motes must be [left, top, delay, duration] numbers`.
+  - rule 11b with `BACKDROPS_CAM = { ...BACKDROPS, clearing: { image: 'c.jpg', motion: 'still', cameras: { kael: { x: -551, y: -350, scale: 1.75 } } } }`: `line({ backdrop: 'clearing', camera: 'lyra' })` gives `chapter-1 line 1: unknown camera lyra for backdrop clearing`; `camera: 'kael'` and `camera: 'wide'` give `[]`; `line({ camera: 'kael' })` on `forest` gives `chapter-1 line 1: unknown camera kael for backdrop forest`.
   - rule 10 `backdrop: 'cave'` gives `chapter-1 line 1: unknown backdrop cave`.
-  - rule 11 `tints: [ 'dark', 'blue', 'pink' ]` gives `[ 'chapter-1 line 1: unknown tint blue', 'chapter-1 line 1: unknown tint pink' ]`.
+  - rule 11 (TINTS now `dawn, dark, red, gold, voice, veins`: `tints: [ 'dawn', 'veins' ]` gives `[]`) `tints: [ 'dark', 'blue', 'pink' ]` gives `[ 'chapter-1 line 1: unknown tint blue', 'chapter-1 line 1: unknown tint pink' ]`.
   - rule 12 `tints: [ 'dark' ], tintAt: { red: 1 }` gives `chapter-1 line 1: tintAt names a tint the line does not use: red`.
   - rule 13 `audio: ''` gives `chapter-1 line 1: audio is missing`.
   - rule 14 `duration: 0` gives `chapter-1 line 1: duration must be above 0`.
@@ -298,6 +312,8 @@ export const test = base.extend({
 - `validateCatalog lists a backdrop of an unknown motion`: `{ cave: { image: 'c.png', motion: 'spin' } }` gives `backdrop cave: motion must be drift, pan or still`.
 - `validateCatalog lists a repeated id once`: `[ CH1, CH1, CH1 ]` (and `BACKDROPS`) ends with `duplicate scene id chapter-1` exactly once and `two scenes share the trigger chapter-boss 1` exactly once.
 - `validateCatalog of a valid catalog is empty`: `validateCatalog(CATALOG, BACKDROPS)` is `[]`.
+- `validateCatalog lists a broken camera`: `{ clearing: { image: 'c.jpg', motion: 'still', cameras: { kael: { x: 0, y: 0, scale: 0 } } } }` gives `backdrop clearing camera kael: needs x, y and a scale above 0`; `cameras: { lyra: { x: 0, scale: 1 } }` gives `backdrop clearing camera lyra: needs x, y and a scale above 0`; `cameras: { kael: { x: 0, y: 0, scale: 1, ms: 0 } }` gives the same message for `kael`.
+- `validateCatalog refuses a camera named wide`: `cameras: { wide: { x: 0, y: 0, scale: 1 } }` gives `backdrop clearing camera wide: wide is reserved`.
 - `sceneToPlay` (one test each, `seen` `[]` unless stated):
   - `the first encounter at chapter 1 opens the prologue`: `{ from: null, to: 1 }` gives `PROLOGUE`.
   - `a seen prologue opens nothing`: `{ from: null, to: 1, seen: [ 'prologue' ] }` gives `null`.
@@ -314,6 +330,11 @@ export const test = base.extend({
   - `lists the prologue when nothing was seen`: `replayableScenes(CATALOG, [])` gives `[ PROLOGUE ]`.
   - `lists a seen boss scene after the prologue`: `[ 'chapter-2' ]` gives `[ PROLOGUE, CH2 ]`.
   - `keeps the catalog order, not the seen order`: `[ 'chapter-2', 'chapter-1' ]` gives `[ PROLOGUE, CH1, CH2 ]`.
+  (The cases above pass `position` `null`.)
+  - `lists the boss scenes of the chapters the campaign passed`: `replayableScenes(CATALOG, [], { chapter: 2, completed: false })` gives `[ PROLOGUE, CH1 ]`; `{ chapter: 3, completed: false }` gives `[ PROLOGUE, CH1, CH2 ]`.
+  - `does not list the boss scene of the current chapter`: `{ chapter: 1, completed: false }` gives `[ PROLOGUE ]`.
+  - `a completed campaign lists the boss scene of its last chapter`: `{ chapter: 2, completed: true }` gives `[ PROLOGUE, CH1, CH2 ]`.
+  - `a reset back to chapter 1 lists only what was seen`: `[ 'chapter-2' ]` with `{ chapter: 1, completed: false }` gives `[ PROLOGUE, CH2 ]`.
 
 **Gate**: `cd game && npm test`
 **Done when**:
@@ -324,27 +345,26 @@ export const test = base.extend({
 
 ---
 
-#### T5: The prologue catalog, its assets and the file check (storyCatalog.js) [ ]
+#### T5: The prologue and chapter 1 catalog, its assets and the file check (storyCatalog.js) [ ]
 
 **Owner**: game-dev
-**Goal**: The prologue data of the design, the backdrops, the committed asset files and a unit test that fails on a malformed entry or a missing file (STORY-30, STORY-31, STORY-32, STORY-33).
+**Goal**: The prologue and chapter 1 data of the two designs, the backdrops with the clearing cameras, the default motes, the committed asset files and a unit test that fails on a malformed entry or a missing file (STORY-30, STORY-31, STORY-32, STORY-33, STORY-44, STORY-45).
 **Where**: `game/src/domain/story/storyCatalog.js` (new)
-**Also changes**: `game/src/domain/story/storyCatalog.test.js` (new), `game/src/storyAssets.test.js` (new), and commits the 10 files of `game/public/assets/story/` (already in the working tree, untracked): `bg-forest.png`, `bg-map.jpg`, `logo.png`, `portrait-seraphine.png`, `prologue-01.mp4` to `prologue-06.mp4`
-**Read first**: `design.md` § Data model (the scene format and § Prologue data, to copy verbatim), `GS/rarityFrames.test.js` (a root test that reads files with `node:fs`)
+**Also changes**: `game/src/domain/story/storyCatalog.test.js` (new), `game/src/storyAssets.test.js` (new), and commits the 23 files of `game/public/assets/story/` (already in the working tree, untracked): `bg-forest.png`, `bg-map.jpg`, `bg-clearing.jpg`, `logo.png`, `portrait-seraphine.png`, `face-kael.jpg`, `face-lyra.jpg`, `face-orina.jpg`, `face-seraphine.jpg`, `face-vex.jpg`, `prologue-01.mp4` to `prologue-06.mp4`, `chapter-01-01.mp4` to `chapter-01-07.mp4`
+**Read first**: `design.md` § Data model (the scene format, `STORY_BACKDROPS` with the clearing cameras, `STORY_DEFAULT_MOTES`, § Prologue data and § Chapter 1 data, to copy verbatim), `GS/rarityFrames.test.js` (a root test that reads files with `node:fs`)
 **Depends on**: T2, T4
-**Requirement**: STORY-30, STORY-31, STORY-32, STORY-33
+**Requirement**: STORY-30, STORY-31, STORY-32, STORY-33, STORY-44, STORY-45
 
 **Contract**:
 
 ```js
 //  The story of the game (spec story-scenes): the backdrops and the scenes. A content feature adds a scene here and its files
 //  under game/public/assets/story/; storyCatalog.test.js validates it and storyAssets.test.js checks every file.
-export const STORY_BACKDROPS = {
-    forest: { image: 'assets/story/bg-forest.png', motion: 'drift' },
-    map: { image: 'assets/story/bg-map.jpg', motion: 'pan' }
-};
+export const STORY_BACKDROPS = { /* forest, map and clearing with its six cameras: design.md § Data model, verbatim */ };
 
-export const STORY_SCENES = [ /* the prologue of design.md § Prologue data, verbatim */ ];
+export const STORY_DEFAULT_MOTES = [ /* the 14 prologue motes: design.md § Data model, verbatim */ ];
+
+export const STORY_SCENES = [ /* the prologue of design.md § Prologue data, then chapter 1 of § Chapter 1 data, verbatim */ ];
 
 export const storyScene = (id) => STORY_SCENES.find((scene) => scene.id === id) ?? null;
 ```
@@ -353,10 +373,10 @@ export const storyScene = (id) => STORY_SCENES.find((scene) => scene.id === id) 
 
 **Steps**:
 
-1. Create `storyCatalog.js`; copy the prologue from `design.md` § Prologue data without changing a number or a character.
+1. Create `storyCatalog.js`; copy the backdrops, the default motes, the prologue and chapter 1 from `design.md` without changing a number or a character.
 2. Create `storyCatalog.test.js` (imports `lineText` from `./storyText` and `validateCatalog` from `./storyScenes`).
-3. Create `GS/storyAssets.test.js`: collect every path (`STORY_BACKDROPS[*].image`, every `scene.title?.logo`, every `line.portrait`, every `line.audio`), and `expect(paths.filter((path) => !existsSync(new URL(`../public/${path}`, import.meta.url)))).toEqual([])`.
-4. `git add` the 10 asset files by path in this task's commit.
+3. Create `GS/storyAssets.test.js`: collect every path (`STORY_BACKDROPS[*].image`, every `scene.title?.logo`, every `line.portrait`, every `line.face`, every `line.audio`), and `expect(paths.filter((path) => !existsSync(new URL(`../public/${path}`, import.meta.url)))).toEqual([])`.
+4. `git add` the 23 asset files by path in this task's commit.
 
 **Tests**: unit
 **Test cases**:
@@ -367,15 +387,20 @@ export const storyScene = (id) => STORY_SCENES.find((scene) => scene.id === id) 
   - `the prologue has the six lines of the design`: `lines.map(({ kind, speaker, portrait, backdrop, tints, tintAt, audio, duration }) => ...)` equals the table of spec P1 Prologue content AC 1 (character line portrait `assets/story/portrait-seraphine.png`; `tintAt` `{ red: 6.1 }` on line 3 and `undefined` on the others).
   - `the prologue lines read the texts of the design`: `lines.map(lineText)` equals the six texts of spec P1 Prologue content AC 1, character for character.
   - `the prologue cue timings are the design's`: `lines[0].cues[0]` is `[ 0.05, 3.51, 'Eldora sempre respirou pela Grande Árvore.' ]`, `lines[2].cues[2]` is `[ 6.23, 7.3, 'Vermelhos.' ]`, `lines[5].cues[3]` is `[ 5.19, 6.2, 'está com medo.' ]`, and the cue counts are `[ 5, 2, 3, 3, 3, 4 ]`.
-  - `the backdrops are the forest that drifts and the map that pans`: `STORY_BACKDROPS` equals the contract.
-  - `storyScene finds a scene by id`: `storyScene('prologue')` is `STORY_SCENES[0]`; `storyScene('chapter-99')` is `null`.
-- `storyAssets.test.js`: `every file the story catalog names exists under game/public`: the missing list is `[]` (10 distinct paths).
+  - `the backdrops are the forest that drifts, the map that pans and the clearing with six cameras`: `STORY_BACKDROPS` equals the object of `design.md` § Data model (clearing `motion` `still`, `cameras.kael` `{ x: -551, y: -350, scale: 1.75 }`, `cameras.narr` `{ x: 0, y: -129, scale: 1.18, ms: 6000 }`).
+  - `the default motes are the 14 of the prologue design`: length 14, first `[ 608, 480, 1.04, 8.46 ]`, last `[ 169, 312, 4.05, 7.54 ]`.
+  - `chapter 1 opens after the chapter 1 boss with its cards`: `STORY_SCENES[1]` has `id` `chapter-1`, `label` `Capítulo 1`, `trigger` `{ kind: 'chapter-boss', chapter: 1 }`, `letterbox` `true`, 10 motes (first `[ 120, 520, 0.4, 9.2 ]`), and the `title` and `end` objects of `design.md` § Chapter 1 data.
+  - `chapter 1 has the seven lines of its design`: `lines.map(({ kind, speaker, face, backdrop, camera, tints, audio, duration }) => ...)` equals the table of spec P1 chapter 1 AC 1 (every backdrop `clearing`).
+  - `chapter 1 lines read the texts of the script`: `lines.map(lineText)` equals the seven texts of spec P1 chapter 1 AC 1, character for character (lengths 83, 61, 72, 98, 61, 49, 58).
+  - `chapter 1 cue timings are the design's`: `lines[2].cues[1]` is `[ 1.7, 2.7, 'Ainda brilham.' ]`, `lines[6].cues[1]` is `[ 2.14, 3.77, 'Avançamos ao amanhecer.' ]`, cue counts `[ 2, 3, 3, 3, 2, 3, 2 ]`.
+  - `storyScene finds a scene by id`: `storyScene('prologue')` is `STORY_SCENES[0]`, `storyScene('chapter-1')` is `STORY_SCENES[1]`; `storyScene('chapter-99')` is `null`.
+- `storyAssets.test.js`: `every file the story catalog names exists under game/public`: the missing list is `[]` (23 distinct paths).
 
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 8 cases pass and every earlier unit test passes.
-- [ ] `git ls-files game/public/assets/story` lists the 10 files.
+- [ ] The 13 cases pass and every earlier unit test passes.
+- [ ] `git ls-files game/public/assets/story` lists the 23 files.
 
 **Commit**: `feat(game): add the prologue to the story catalog with its art and voice`
 
@@ -441,17 +466,46 @@ Read rules: `getItem` throws → `memory`; `getItem` returns `null` → `memory`
 
 ---
 
+#### T19: The shared e2e fixture seeds every catalog scene as seen [ ]
+
+**Owner**: test-engineer
+**Goal**: The existing e2e specs that win the chapter 1 boss keep playing on once the chapter 1 scene ships, and a future scene needs no fixture change (spec D23).
+**Where**: `game/e2e/support/coverage.js`
+**Also changes**: `game/e2e/storyFixture.spec.js`
+**Read first**: `game/e2e/support/coverage.js` (the `storySeen` option of T1), `game/e2e/storyFixture.spec.js` (T1's three cases), `game/src/domain/story/storyCatalog.js` (T5)
+**Depends on**: T5
+**Requirement**: STORY-34 (test isolation, D23)
+
+**Contract**: `import { STORY_SCENES } from '../../src/domain/story/storyCatalog.js';` (Node loads it: `game/package.json` has `"type": "module"` and the catalog imports nothing); `const SEEN = JSON.stringify(STORY_SCENES.map((scene) => scene.id));` and the init script writes `SEEN` (passed as the `addInitScript` argument) instead of the literal `'["prologue"]'` when the key is absent. Update the comment of the option.
+
+**Steps**:
+
+1. Add the import and `SEEN`; pass it to `page.addInitScript((seen) => { ... }, SEEN)`.
+2. Re-pin `the shared fixture marks the prologue as seen before the page loads` (`storyFixture.spec.js`): rename it `the shared fixture marks every catalog scene as seen before the page loads` and expect `'["prologue","chapter-1"]'`. The other two cases stay as they are.
+
+**Tests**: e2e
+**Test cases** (`game/e2e/storyFixture.spec.js`): the re-pinned case above; `the shared fixture keeps a seen list already stored` and `the key stays absent` unchanged.
+
+**Gate**: `cd game && npx playwright test e2e/storyFixture.spec.js`, then `npx playwright test e2e/campaignChapters.spec.js` (one file per run)
+**Done when**:
+
+- [ ] The 3 cases pass and `campaignChapters.spec.js` passes unchanged.
+
+**Commit**: `test(game): seed every story scene as seen in the shared e2e fixture`
+
+---
+
 ### Phase 3: Player views
 
 #### T7: The overlay DOM and its repaint (storyStage.js) [ ]
 
 **Owner**: game-dev
-**Goal**: Build the overlay of the design once and repaint it from a snapshot, keeping the content node while the line does not change (STORY-09, STORY-11, STORY-16, STORY-20, STORY-21, STORY-22, STORY-23, STORY-32).
+**Goal**: Build the overlay of the two designs once and repaint it from a snapshot, keeping the content node while the line does not change, with the camera, face, letterbox, motes and card looks of revision 3 (STORY-09, STORY-11, STORY-16, STORY-20, STORY-21, STORY-22, STORY-23, STORY-32, STORY-46, STORY-47, STORY-49 to STORY-55).
 **Where**: `game/src/adapters/phaser/views/storyStage.js` (new)
 **Also changes**: `game/src/adapters/phaser/views/storyStage.test.js` (new)
 **Read first**: `design.md` § DOM structure (every class, test id and attribute), `VW/dom.js` (`el`), `design-reference.dc.html:88-155` (markup and SVG paths: chevron `:101` 28x18 and `:112` 22x14, speaker icons `:149` muted and `:152` unmuted)
 **Depends on**: T2, T3
-**Requirement**: STORY-09, STORY-11, STORY-16, STORY-20, STORY-21, STORY-22, STORY-23, STORY-32
+**Requirement**: STORY-09, STORY-11, STORY-16, STORY-20, STORY-21, STORY-22, STORY-23, STORY-32, STORY-46, STORY-47, STORY-49, STORY-50, STORY-51, STORY-52, STORY-53, STORY-54, STORY-55
 
 **Contract**:
 
@@ -463,22 +517,33 @@ export const createStoryStage = ({ scene, backdrops, onHit, onSkip, onMute }) =>
 
 - `root` is `div.story-overlay` with `data-testid="story-overlay"`, `role="dialog"`, `aria-modal="true"`, `aria-label` `História: ${scene.label}`.
 - `hit` (click → `onHit()`), `.story-skip` (click → `onSkip()`), `.story-mute` (click → `onMute()`).
-- Backdrops: one `div.story-backdrop.is-<motion>` per entry of `backdrops`, `data-backdrop=<key>`, `style.backgroundImage = url("<image>")`.
+- Backdrops: one `div.story-backdrop.is-<motion>` per entry of `backdrops`, `data-backdrop=<key>`, `style.backgroundImage = url("<image>")`, inside `div.story-camera` (with `.story-tint.is-veins`).
+- `root` carries the class `is-<scene.trigger.kind>`; motes come from `scene.motes ?? STORY_DEFAULT_MOTES` as inline `left`, `top` (px), `animation-delay`, `animation-duration` (s); the bars exist only when `scene.letterbox`; the camera is written only when its name or backdrop changes (`cameraOf`, `cameraTransform`).
 - `update(snapshot)` as `design.md` § DOM structure states; the `.story-shown` / `.story-ghost` split uses `lineText` and `snapshot.shown`.
 
 **Steps**:
 
-1. Write the static part (overlay, hit, stage, backdrops, tints, 14 motes `is-m0` to `is-m13`, vignette, empty `.story-content`, bar with dots, `Pular`, mute).
-2. Write one builder per content kind (title, narrator, voice, character, end) returning the nodes of § DOM structure.
+1. Write the static part (overlay with its trigger class, hit, stage, camera with backdrops and veins, the other tints in the order `dawn, dark, red, gold, voice`, motes from the data, vignette, the two letterbox bars when the scene asks, empty `.story-content`, bar with dots, `Pular`, mute).
+2. Write one builder per content kind (title with its optional `h1.story-cardtitle`, narrator, voice, character with a portrait, character with a face, end) returning the nodes of § DOM structure.
 3. Write `update`: look classes, content rebuild on `${phase}:${index}` change, text split, next arrow, hit label, dots, mute label, `aria-pressed` and icon.
-4. Write the tests with the real `STORY_SCENES[0]` and `STORY_BACKDROPS` (domain imports are allowed) and `vi.fn()` callbacks. `line = (index, complete = false) => ({ phase: 'line', index, complete })`.
+4. Write the tests with the real `STORY_SCENES[0]`, `STORY_SCENES[1]` (`CH1`) and `STORY_BACKDROPS` (domain imports are allowed) and `vi.fn()` callbacks. `line = (index, complete = false) => ({ phase: 'line', index, complete })`.
 
 **Tests**: unit
 **Test cases** (`storyStage.test.js`):
 
 - `the overlay is a modal dialog named after the scene`: test id, `role` `dialog`, `aria-modal` `true`, `aria-label` `História: Prólogo`.
 - `draws one backdrop per entry with its image and motion`: two backdrops; `forest` has `is-drift` and a `background-image` containing `assets/story/bg-forest.png`; `map` has `is-pan` and `assets/story/bg-map.jpg`.
-- `draws the four tints and fourteen motes`: `.story-tint.is-dark`, `.is-red`, `.is-gold`, `.is-voice` one each; 14 `.story-mote`.
+- `draws the six tints and fourteen motes`: `.story-tint.is-dawn`, `.is-dark`, `.is-red`, `.is-gold`, `.is-voice` one each in this order after the camera, `.is-veins` inside `[data-testid="story-camera"]`; 14 `.story-mote`, the first with `style.left` `608px`, `top` `480px`, `animation-delay` `1.04s`, `animation-duration` `8.46s`.
+- `the prologue has no letterbox bars and the chapter-start class`: no `.story-bar`; the overlay has `is-chapter-start`.
+- `the chapter 1 overlay has bars, ten motes and the chapter-boss class`: `CH1`: two `.story-bar` (`is-top`, `is-bottom`), 10 `.story-mote` (first left `120px`), the overlay has `is-chapter-boss`.
+- `the bars are on while a line plays and off on the cards`: `CH1` title: no `.story-bar.is-on`; line 1: both `is-on`; end: none `is-on`.
+- `the chapter 1 title card shows its kicker, title, call and action`: `.story-kicker` `Capítulo 1 — Final`, `.story-cardtitle` `A Devoradora da Clareira`, `.story-cta` `Clique para começar`, hit `Começar a cena`; the clearing backdrop and `.is-dark` `is-on`; the prologue title card has no `.story-cardtitle`.
+- `the chapter 1 end card shows its texts and the dawn`: `.story-kicker` `Fim do Capítulo 1`, `.story-endtitle` `A Devoradora da Clareira`, `.story-endsub` `Ao amanhecer, os cinco guardiões avançam.`, `.story-cta` `Clique para continuar`, hit `Continuar`; `.is-dark` and `.is-dawn` `is-on`.
+- `the camera moves to the line's preset`: `CH1` line 2: `[data-testid="story-camera"]` `style.transform` `translate(-551px, -350px) scale(1.75)`, `style.transitionDuration` `1800ms`; line 1: `translate(0px, -129px) scale(1.18)`, `6000ms`; the title card: `translate(0px, 0px) scale(1)`.
+- `a repaint of the same line does not rewrite the camera`: two updates of `CH1` line 2 (`t` 0.5 then 1.0): after the first, set `camera.style.transitionDuration = 'x'`; after the second it is still `'x'`.
+- `the prologue camera stays wide`: every prologue state gives `translate(0px, 0px) scale(1)`.
+- `a face line shows the round face inside the wide box`: `CH1` line 2: `[data-testid="story-face"]` `src` `assets/story/face-kael.jpg`, `alt` `Kael`; `.story-box.is-face`; speaker `Kael`; no `[data-testid="story-portrait"]`.
+- `the veins show on lines 1 and 4 and the dawn on line 7`: `CH1` line 1 and line 4: `.is-veins` `is-on`; line 2: not; line 7: `.is-dawn` `is-on`, `.is-veins` not.
 - `the title card shows the logo, the kicker and the call`: `update({ state: { phase: 'title', index: 0, complete: false }, shown: 0, t: 0, muted: false })`: `.story-logo` `src` `assets/story/logo.png`, `alt` `Infinity Grove`; `.story-kicker` `Ato 1 — Bosque Desperto · Prólogo`; `.story-cta` `Clique para começar`; hit `aria-label` `Começar a história`.
 - `the title card shows the dark forest and no dots`: forest backdrop `is-on`, map not; only `.is-dark` tint `is-on`; `.story-dots` `hidden`.
 - `a typing narrator line splits its text at the shown count`: line 2 typing, `shown` 14: `[data-testid="story-text"]` is `.story-narr`; `.story-shown` `Até a noite em`; `.story-ghost` ` que as raízes tremeram.`; `.story-next` hidden; no `[data-testid="story-speaker"]`; hit `Mostrar fala completa`.
@@ -498,7 +563,7 @@ export const createStoryStage = ({ scene, backdrops, onHit, onSkip, onMute }) =>
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 20 cases pass and every earlier unit test passes.
+- [ ] The 31 cases pass and every earlier unit test passes.
 
 **Commit**: `feat(game): build the story overlay of the prologue design`
 
@@ -577,12 +642,13 @@ const shown = () => document.querySelector('.story-shown').textContent;
 - `a resize sets the new scale`: `viewport` returns 1920x1080, `options.window.dispatchEvent(new Event('resize'))`: `--story-scale` `1.5`.
 - `close gives the focus back`: a `button` in `document.body` focused before `playStory`; after `Pular`, `document.activeElement` is that button.
 - `closing twice resolves once and later audio events do nothing`: `Pular` twice does not throw; a later `audios[0].onended?.()` changes nothing (no overlay in the page).
+- `the chapter 1 scene creates one audio per line with its file`: `playStory(STORY_SCENES[1], options())`: 7 audios, `src` `assets/story/chapter-01-01.mp4` to `-07.mp4`; the title hit label `Começar a cena`.
 - `a scene with no title card starts on line 1`: `{ ...STORY_SCENES[0], title: undefined }`: `audios[0].play` called at open with no click.
 
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 27 cases (30 tests with the 4 rows of the modifier table) pass and every earlier unit test passes.
+- [ ] The 28 cases (31 tests with the 4 rows of the modifier table) pass and every earlier unit test passes.
 
 **Commit**: `feat(game): play story scenes with voice, synced text, skip and mute`
 
@@ -596,7 +662,7 @@ const shown = () => document.querySelector('.story-shown').textContent;
 **Also changes**: `game/index.html` (line 9, the Google Fonts link)
 **Read first**: `design.md` § Stylesheet (the whole CSS block, the Mapa rules and the font list), `game/public/style.css:3188-3251` (`.farm-chapters` to `.farm-chapter:focus-visible`), `game/index.html:7-10`
 **Depends on**: T7
-**Requirement**: STORY-22, STORY-26, STORY-37, STORY-39, STORY-40, STORY-41
+**Requirement**: STORY-22, STORY-26, STORY-37, STORY-39, STORY-40, STORY-41, STORY-49, STORY-50, STORY-51, STORY-52, STORY-55
 
 **Steps**:
 
@@ -610,7 +676,7 @@ const shown = () => document.querySelector('.story-shown').textContent;
 **Done when**:
 
 - [ ] `npm test` passes unchanged and `npm run build` exits 0.
-- [ ] `grep -c "story-" game/public/style.css` is at least 60, and `game/index.html` contains `Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600` and `Cinzel:wght@500;700`.
+- [ ] `game/public/style.css` contains `.story-camera`, `.story-tint.is-veins`, `.story-tint.is-dawn`, `.story-bar.is-on { height: 46px; }`, `.story-box.is-face`, `.story-face`, `.story-cardtitle`, `.story-overlay.is-chapter-boss .story-logo { width: 520px; }` and `@keyframes storyVeins`, and no `.story-mote.is-m` rule (motes are inline); and `game/index.html` contains `Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600` and `Cinzel:wght@500;700`.
 
 **Commit**: `feat(game): style the story overlay and load its fonts`
 
@@ -750,12 +816,12 @@ Rename `describe('HeroUi Rever chefes', ...)` (`HeroUi.test.js:645`) and `descri
 #### T13: Play the story from the battle and hold the fight (ClickerGame.js) [ ]
 
 **Owner**: game-dev
-**Goal**: The battle opens the unseen prologue on its first chapter 1 encounter and the unseen chapter boss scene after the boss win, holds the fight while a scene plays (which also silences T, B, A and the skill keys, AD-034), ignores Escape meanwhile and gives the Mapa its hooks (STORY-01 to STORY-06, STORY-08, STORY-19, STORY-27, STORY-28, STORY-29, STORY-32, STORY-34, STORY-35, STORY-36, STORY-42, STORY-43).
+**Goal**: The battle opens the unseen prologue on its first chapter 1 encounter and the unseen chapter boss scene after the boss win, holds the fight while a scene plays (which also silences T, B, A and the skill keys, AD-034), ignores Escape meanwhile and gives the Mapa its hooks (STORY-01 to STORY-06, STORY-08, STORY-19, STORY-27, STORY-28, STORY-29, STORY-32, STORY-34, STORY-35, STORY-36, STORY-42, STORY-43, STORY-46, STORY-48).
 **Where**: `game/src/adapters/phaser/ClickerGame.js`
 **Also changes**: `game/src/adapters/phaser/ClickerGame.test.js`
 **Read first**: `design.md` § `ClickerGame` (changes) and § Integration Points (keys), `ClickerGame.js:34` (`hasModifier`), `:160-205` (`create`; `this.createHeroUi()` at `:258`), `:404-432` (`autoClickKey`, `screenKey`: both return while `paused`), `:604-619` (`escape`), `:622-640` (`createHeroUi`), `:780-795` (`pauseFight`), `:883-900` (`showEncounter`), `:1152-1166` (`completeChapter`), `:1378-1385` (`useSkill`), `:1543-1548` (`hitMonster`); `ClickerGame.test.js:39-52` (`services`), `:105` (`createScene`), `:1480-1496` (a chapter boss win test: `killAll`, `advance`, `flush`), `:4001` (`press`), `:4431` (the A key test, at chapter 2), `:4721-4740` (`Screen keys T and B`), `:3071` (the key 1 skill test), the account reset tests near `confirm = (ctx) => ctx.hud('[data-testid="reset-confirm"]')` (`:5158`), the farm test `picking a boss in Rever chefes closes the panel, resumes and starts the farm fight` (`:2630`)
-**Depends on**: T4, T10, T12
-**Requirement**: STORY-01, STORY-02, STORY-03, STORY-04, STORY-05, STORY-06, STORY-08, STORY-19, STORY-27, STORY-28, STORY-29, STORY-32, STORY-34, STORY-35, STORY-36, STORY-42, STORY-43
+**Depends on**: T4, T10, T12, T19
+**Requirement**: STORY-01, STORY-02, STORY-03, STORY-04, STORY-05, STORY-06, STORY-08, STORY-19, STORY-27, STORY-28, STORY-29, STORY-32, STORY-34, STORY-35, STORY-36, STORY-42, STORY-43, STORY-46, STORY-48
 
 **Contract**: exactly `design.md` § `ClickerGame` (changes): imports `sceneToPlay` and `replayableScenes` from `../../domain/story/storyScenes`; fields `storySeen`, `storyScenes`, `playStoryView`, `storyOpen`; `showEncounter` reads `from` first and calls `playUnseenStory(from, null)` after `completeChapter()` and `playUnseenStory(from, this.session.chapter)` at its end; `playUnseenStory(from, to)`; `async playStory(scene)`; the `escape()` guard; the two hooks in `createHeroUi`. No new Phaser key handler: the list of registered keys pinned at `ClickerGame.test.js:4854` stays as it is.
 
@@ -765,11 +831,11 @@ Rename `describe('HeroUi Rever chefes', ...)` (`HeroUi.test.js:645`) and `descri
 2. Change `showEncounter`; add `playUnseenStory` and `playStory` after it.
 3. Add the guard as the first statement of `escape()`.
 4. Add `stories` and `playStory` to the `new HeroUi(this, { ... })` options.
-5. Extend the test harness: import `STORY_SCENES`; add the stubs below to `services`; give `createScene` two options `seen = [ 'prologue' ]` and `storyScenes = STORY_SCENES` that set `storySeen.list = [ ...seen ]`, `services.storyScenes = storyScenes`, and reset `story.play` (`mockClear`) and `story.close = null`.
+5. Extend the test harness: import `STORY_SCENES`; add the stubs below to `services`; give `createScene` two options `seen = STORY_SCENES.map((scene) => scene.id)` (every catalog id, so the existing chapter 1 boss win tests open no scene) and `storyScenes = STORY_SCENES` that set `storySeen.list = [ ...seen ]`, `services.storyScenes = storyScenes`, and reset `story.play` (`mockClear`) and `story.close = null`.
 
 ```js
 //  The story: the seen list holds the prologue by default (so no other test opens a scene) and the player stays open until a test calls story.close()
-const storySeen = { list: [ 'prologue' ], seen () { return [ ...this.list ]; }, markSeen (id) { this.list.push(id); } };
+const storySeen = { list: [ 'prologue', 'chapter-1' ], seen () { return [ ...this.list ]; }, markSeen (id) { this.list.push(id); } };
 const story = { close: null, play: vi.fn(() => new Promise((resolve) => { story.close = resolve; })) };
 //  in services: storySeen, storyScenes: STORY_SCENES, playStory: (scene) => story.play(scene)
 //  Fixture scene for the chapter boss cases
@@ -799,6 +865,9 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 - `a seen chapter scene does not play again`: as the chapter 1 case with `seen: [ 'prologue', 'chapter-1' ]`: not called.
 - `an account reset back to chapter 1 plays no scene and keeps the seen list`: start at chapter 3 with `seen: []`, run the reset the way the tests near `:5158` do: not called; `storySeen.list` `[]`.
 - `a farm win of a chapter boss plays no scene`: a completed campaign at chapter 1 with `storyScenes: [ bossScene(1) ]` and `seen: [ 'prologue' ]`, pick the chapter boss in the farm the way the test at `:2630` picks a miniboss, `killAll`, `advance`, `await flush()`: not called.
+- `the first win of the chapter 1 boss plays the real chapter 1 scene`: default catalog, `seen: [ 'prologue' ]`, the chapter 1 boss win of the case above: `story.play` called once with `STORY_SCENES[1]` (`id` `chapter-1`).
+- `the Mapa lists the chapter 1 scene for a player already past chapter 1`: default catalog, `seen: [ 'prologue' ]`, `start: atChapter(3)`: `heroUi.hooks.stories().map((s) => s.id)` is `[ 'prologue', 'chapter-1' ]`, and `story.play` was not called.
+- `the Mapa does not list the chapter 1 scene at chapter 1 when it was not seen`: default catalog, `seen: [ 'prologue' ]`: `[ 'prologue' ]`.
 - `the Mapa lists the prologue and the chapter scenes already seen`: `storyScenes: [ STORY_SCENES[0], bossScene(1), bossScene(2) ]`, `seen: [ 'prologue', 'chapter-2' ]`: `scene.heroUi.hooks.stories().map((s) => s.id)` is `[ 'prologue', 'chapter-2' ]`.
 - `the Mapa replays a scene with the fight held and the seen list unchanged`: `heroUi.hooks.playStory('prologue')`: `story.play` called with `STORY_SCENES[0]`; `scene.paused` `true`; `storySeen.list` `[ 'prologue' ]`.
 - `a second scene request while one plays is ignored`: during the prologue, `heroUi.hooks.playStory('prologue')`: `story.play` called once in total.
@@ -807,7 +876,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 24 cases pass; every existing `ClickerGame.test.js` case passes unchanged (the harness seeds `['prologue']`).
+- [ ] The 27 cases pass; every existing `ClickerGame.test.js` case passes unchanged (the harness seeds every catalog id).
 
 **Commit**: `feat(game): open the story scenes from the battle and hold the fight meanwhile`
 
@@ -865,9 +934,9 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 **Where**: `game/e2e/storyReplay.spec.js` (new)
 **Read first**: `game/e2e/farm.spec.js` (start helper, `COMPLETED`, `farmLabel`), `game/e2e/bossMap.spec.js:1-40`, spec P1 The Mapa tab
 **Depends on**: T13
-**Requirement**: STORY-19, STORY-25, STORY-26, STORY-27, STORY-28
+**Requirement**: STORY-19, STORY-25, STORY-26, STORY-27, STORY-28, STORY-29, STORY-48
 
-**Setup**: the default fixture (`["prologue"]` seeded). Start as in `farm.spec.js` (`addInitScript` auto click `off`). `openMapa = (page) => page.getByTestId('hud-farm').click()`. `chip = page.getByTestId('story-replay-prologue')`.
+**Setup**: the default fixture (every catalog id seeded: `["prologue","chapter-1"]`). Start as in `farm.spec.js` (`addInitScript` auto click `off`). `openMapa = (page) => page.getByTestId('hud-farm').click()`. `chip = page.getByTestId('story-replay-prologue')`.
 
 **Tests**: e2e
 **Test cases**:
@@ -876,6 +945,10 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 - `the farm fight label still reads Rever chefe`: completed campaign, pick `farm-entry-miniboss-1`: `.stage-hud` `Rever chefe: Miniboss 1`.
 - `the Mapa shows the História group beside the map title`: `farm-story` visible; `.farm-story-label` `História`; `chip` text `Prólogo`, `aria-label` `Assistir Prólogo`; the vertical centres of `farm-story` and `farm-map-title` differ by at most 4 px; the right edge of `farm-story` is at or left of the right edge of `farm-screen`; the two boxes do not overlap; the chip computes `font-family` starting with `Cinzel`, `font-size` `15px`, `height` `32px`, `color` `rgb(244, 230, 200)`, `border-top-color` `rgb(176, 122, 58)`.
 - `the Prólogo chip shows before any boss is beaten`: campaign at its start: `farm-empty` and `chip` visible.
+- `the Mapa lists Capítulo 1 after Prólogo once it was seen`: the chips of `farm-story` read `[ 'Prólogo', 'Capítulo 1' ]`; `story-replay-chapter-1` has the aria-label `Assistir Capítulo 1`.
+- `a player past chapter 1 who never saw the chapter 1 scene finds it on the Mapa`: `addInitScript` writes `'["prologue"]'` before the start, `progress: { yan: { chapter: 3 } }`: `story-replay-chapter-1` visible and no overlay opened on its own.
+- `at chapter 1 an unseen chapter 1 scene is not listed`: `addInitScript` writes `'["prologue"]'`, campaign at its start: `story-replay-chapter-1` count 0.
+- `the Capítulo 1 chip replays the chapter 1 scene`: click `story-replay-chapter-1`: `.story-kicker` `Capítulo 1 — Final`, `.story-cardtitle` `A Devoradora da Clareira`; `Pular` shows the Mapa again.
 - `the Prólogo chip replays the prologue with the fight held and the seen list unchanged`: click `chip`: `story-overlay` visible on the title card (`.story-kicker`); `ClickerGame.paused` `true`; `infinity-grove.story-seen` still `'["prologue"]'`.
 - `Pular on a replay shows the Mapa again on the same chapter`: overlay count 0; `.hero-panel` visible; `farm-map-title` `Caminho do Capítulo 1`.
 - `Escape on a replay closes only the story`: overlay count 0; `.hero-panel` visible (checked again after 500 ms).
@@ -885,7 +958,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 **Gate**: `cd game && npx playwright test e2e/storyReplay.spec.js`
 **Done when**:
 
-- [ ] The 9 scenarios pass twice in a row with `--workers=1`.
+- [ ] The 13 scenarios pass twice in a row with `--workers=1`.
 
 **Commit**: `test(game): cover the Mapa tab and the story replay in the browser`
 
@@ -929,15 +1002,48 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 
 ---
 
+#### T20: e2e: the chapter 1 boss scene [ ]
+
+**Owner**: test-engineer
+**Goal**: The chapter 1 scene opens once after the chapter 1 boss win and shows its cards, faces, camera, letterbox, veins and dawn in the browser (STORY-44, STORY-46, STORY-47, STORY-49 to STORY-55).
+**Where**: `game/e2e/storyChapterOne.spec.js` (new)
+**Read first**: `game/e2e/campaignChapters.spec.js:1-40` (a chapter boss of health 1 won by one click: `chapter(1)`, `lastChapter`), the `startBattle` of T14, spec P1 The chapter 1 boss scene and P2 Scene looks as data, design § Chapter 1 data and § Stylesheet
+**Depends on**: T13
+**Requirement**: STORY-44, STORY-46, STORY-47, STORY-49, STORY-50, STORY-51, STORY-52, STORY-53, STORY-54, STORY-55
+
+**Setup**: `test.use({ storySeen: false })` and an `addInitScript` that writes `'["prologue"]'` (the prologue is not under test). Start at `progress: { yan: { chapter: 1, stage: 10, encounter: 'CHAPTER_BOSS', phase: 1 } }` with `definition: chapter(1)` and `lastChapter: 2` (the pattern of `campaignChapters.spec.js`), then one canvas click wins the boss. `noPlay` of T16 (play rejects) in every scenario, so lines type by the clock. `camera = page.getByTestId('story-camera')`.
+
+**Tests**: e2e
+**Test cases**:
+
+- `the chapter 1 boss win opens the chapter 1 scene on its title card`: `story-overlay` visible with the class `is-chapter-boss`; `.story-kicker` `Capítulo 1 — Final`; `.story-cardtitle` `A Devoradora da Clareira` with `font-size` `44px`; `.story-logo` `width` `520px`; `.story-cta` `Clique para começar`; `story-hit` aria-label `Começar a cena`; `infinity-grove.story-seen` `'["prologue","chapter-1"]'`; `chapter-hud` `Capítulo 2` under the overlay.
+- `the camera pushes in on the narrator and moves to Kael`: start: `camera` `transform` computes the matrix of `translate(0px, -129px) scale(1.18)` (`matrix(1.18, 0, 0, 1.18, 0, -129)`) after its 6 s (`expect.poll`, timeout 8 s), `transition-duration` `6s`; complete line 1, next: `matrix(1.75, 0, 0, 1.75, -551, -350)` within 3 s, `transition-duration` `1.8s`, `transition-timing-function` `cubic-bezier(0.45, 0.05, 0.25, 1)`.
+- `the letterbox frames the lines and leaves the cards`: title card: both `.story-bar` `height` `0px`; line 1: `46px` within 2 s; end card: `0px` within 2 s.
+- `each line shows its speaker and round face`: click through lines 2 to 7: `story-speaker` reads `Kael`, `Lyra`, `Orina`, `Seraphine`, `Vex`, `Kael`; `story-face` `src` ends with `face-kael.jpg`, `face-lyra.jpg`, `face-orina.jpg`, `face-seraphine.jpg`, `face-vex.jpg`, `face-kael.jpg`, computes `width` `156px` and `border-radius` `50%`; `.story-box.is-face` computes `left` `110px`, `width` `1060px`, `padding-left` `210px`; each full text equals spec P1 chapter 1 AC 1.
+- `the veins pulse on the narrator and Orina, the dawn warms Kael's last line`: `.story-tint.is-veins` has `is-on` and `animation-name` `storyVeins` on lines 1 and 4, not on line 2; `.story-tint.is-dawn` has `is-on` on line 7 and on the end card.
+- `the end card closes into the chapter 2 fight`: `.story-kicker` `Fim do Capítulo 1`, `.story-endtitle` `A Devoradora da Clareira` (`font-size` `44px`), `.story-endsub` `Ao amanhecer, os cinco guardiões avançam.` (`font-size` `28px`), `.story-cta` `Clique para continuar`, hit `Continuar`; a click: overlay count 0, `.stage-hud` `Stage 1/10  Phase 1/5`, the fight not paused.
+- `the chapter 1 scene does not open again`: close with `Pular`, reload, back in the battle at chapter 2: overlay count 0.
+- `the scene draws ten motes`: `.story-mote` count 10, the first `left` `120px`, `top` `520px`.
+- `with reduced motion the camera jumps`: `page.emulateMedia({ reducedMotion: 'reduce' })`: on line 2 `camera` computes `transition-duration` `0s` and the Kael matrix at once.
+
+**Gate**: `cd game && npx playwright test e2e/storyChapterOne.spec.js`
+**Done when**:
+
+- [ ] The 9 scenarios pass twice in a row with `--workers=1`.
+
+**Commit**: `test(game): cover the chapter 1 boss scene in the browser`
+
+---
+
 #### T17: Author check of the feature [ ]
 
 **Owner**: test-engineer
-**Goal**: The feature's test gate (`.claude/agents/test-engineer.md` § Author check): every AC value pinned, the suites green in CI, mutants killed (STORY-01 to STORY-43).
+**Goal**: The feature's test gate (`.claude/agents/test-engineer.md` § Author check): every AC value pinned, the suites green in CI, mutants killed (STORY-01 to STORY-55).
 **Where**: `.specs/features/story-scenes/tasks.md` (this file: the AC table below T17 and the ticks)
 **Also changes**: test files only, when a gap or a survivor needs a test
 **Read first**: `.claude/agents/test-engineer.md` § Suites and § Author check, `scripts/sensor.mjs:1-25` (mutants format), `CLAUDE.md` § Agent team 4 (CI commands)
-**Depends on**: T14, T15, T16
-**Requirement**: STORY-01 to STORY-43
+**Depends on**: T14, T15, T16, T20
+**Requirement**: STORY-01 to STORY-55
 
 **Steps**:
 
@@ -945,8 +1051,8 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 2. Run `cd game && npm test` once locally.
 3. Push the branch and get the full suites from CI: `git push origin HEAD:ci/story-scenes`, then `node scripts/ci-wait.mjs ci/story-scenes` (foreground, `timeout: 600000`).
 4. Write these 7 mutants (5 on the riskiest new code, 2 on spec-named CSS values) in `<scratchpad>/mutants.json`, each with its narrowest command (cwd `game`):
-   - M1 `GS/domain/story/storyText.js`: `(i < line.cues.length - 1 ? 1 : 0)` → `1` (`npx vitest run src/domain/story/storyText.test.js`).
-   - M2 `GS/domain/story/storyScenes.js`: `to === from + 1 || to === null` → `to === from + 1` (`npx vitest run src/domain/story/storyScenes.test.js`).
+   - M1 `GS/domain/story/storyPlayback.js`: `cameraOf` always returns the identity `{ x: 0, y: 0, scale: 1, ms: 1800 }` (`npx vitest run src/domain/story/storyPlayback.test.js`).
+   - M2 `GS/domain/story/storyScenes.js`: in `replayableScenes`, drop the `position.chapter > N` condition (`npx vitest run src/domain/story/storyScenes.test.js`).
    - M3 `GS/adapters/phaser/ClickerGame.js`: `const held = !this.paused` → `const held = true` (`npx vitest run src/adapters/phaser/ClickerGame.test.js`).
    - M4 `ClickerGame.js`: delete `this.storySeen.markSeen(scene.id);` (`npx vitest run src/adapters/phaser/ClickerGame.test.js`).
    - M5 `VW/storyPlayer.js`: delete `event.stopPropagation();` of the Escape handler (`npx playwright test e2e/storyScenes.spec.js -g "Escape"`).
@@ -975,18 +1081,19 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 **Goal**: The player-visible changes match the design reference and read well on the desktop (STORY-09, STORY-16, STORY-21, STORY-22, STORY-25, STORY-26, STORY-37, STORY-39).
 **Where**: `.specs/features/story-scenes/ui-review.html` (new, from the ui-review template named under Read first)
 **Also changes**: `game/ui-review/storyScenes.shots.js` (new), `.specs/features/story-scenes/ui-review/*.png`
-**Read first**: `game/ui-review/blackAwarenessStaff.shots.js` (shots pattern), `game/ui-review/support/shots.js`, `.claude/templates/ui-review.html`, `design-reference.dc.html` (open it in a browser for the target look), spec D15, D16, D19
+**Read first**: `game/ui-review/blackAwarenessStaff.shots.js` (shots pattern), `game/ui-review/support/shots.js`, `.claude/templates/ui-review.html`, `design-reference.dc.html` and `design-reference-chapter-01.dc.html` (open them in a browser for the target look), spec D15, D16, D19
 **Depends on**: T17
-**Requirement**: STORY-09, STORY-16, STORY-21, STORY-22, STORY-25, STORY-26, STORY-37, STORY-39
+**Requirement**: STORY-09, STORY-16, STORY-21, STORY-22, STORY-25, STORY-26, STORY-37, STORY-39, STORY-46, STORY-47, STORY-49, STORY-50, STORY-51, STORY-52, STORY-55
 
 **Shots** (the `desktop` project of `ui-review.config.js`, 1280x720, is the review target; the config also writes `-phone` files, which are not reviewed because TD-010 was dropped and the game targets PC; the shots file uses `@playwright/test` directly, so it writes `infinity-grove.story-seen` itself: absent for the overlay shots, `'["prologue"]'` for the Mapa shots; `HTMLMediaElement.prototype.play` rejects so every line types by the clock, and each line is completed by a click before its shot):
 
-1. `01-title` the title card; 2. `02-narrator-typing` line 1 halfway (after 6 s on the clock); 3. `03-narrator-complete` line 1 complete with the arrow; 4. `04-dark` line 2 complete; 5. `05-red` line 3 complete (red tint on); 6. `06-map` line 4 complete (map and gold); 7. `07-voice` line 5 complete (orb, plate); 8. `08-character` line 6 complete (Seraphine portrait, plate); 9. `09-end` the end card; 10. `10-muted` the bar with the mute on; 11. `11-mapa` the Mapa screen with the História group (chapter 1, no boss beaten); 12. `12-mapa-chapters` the Mapa at chapter 3 with the chapter chips and the História group; 13. `13-reduced-motion` the title card with reduced motion emulated; 14. `14-bands-1024` the title card at 1024x768 (`page.setViewportSize`), bands above and below.
+1. `01-title` the title card; 2. `02-narrator-typing` line 1 halfway (after 6 s on the clock); 3. `03-narrator-complete` line 1 complete with the arrow; 4. `04-dark` line 2 complete; 5. `05-red` line 3 complete (red tint on); 6. `06-map` line 4 complete (map and gold); 7. `07-voice` line 5 complete (orb, plate); 8. `08-character` line 6 complete (Seraphine portrait, plate); 9. `09-end` the end card; 10. `10-muted` the bar with the mute on; 11. `11-mapa` the Mapa screen with the História group (chapter 1, no boss beaten); 12. `12-mapa-chapters` the Mapa at chapter 3 with the chapter chips and the História group; 13. `13-reduced-motion` the title card with reduced motion emulated; 14. `14-bands-1024` the title card at 1024x768 (`page.setViewportSize`), bands above and below; 15. `15-ch1-title` the chapter 1 title card; 16. `16-ch1-narrator` chapter 1 line 1 complete after its 6 s push-in (veins on, bars); 17. `17-ch1-kael` line 2 complete after the 1.8 s move (face, wide box); 18. `18-ch1-orina` line 4 complete (veins); 19. `19-ch1-vex` line 6 complete; 20. `20-ch1-dawn` line 7 complete (dawn); 21. `21-ch1-end` the chapter 1 end card; 22. `22-mapa-two-chips` the Mapa with `Prólogo` and `Capítulo 1`. The chapter 1 shots start at the chapter 1 boss (campaign `chapter: 1, stage: 10, encounter: 'CHAPTER_BOSS'`, a boss of health 1) with `'["prologue"]'` stored.
 
 **What to check**:
 
 1. Each shot against the design reference: colours (`#f3dc95`, `#c9a95a`, `#05090a`), plate, box, scrim, vignette, orb, portrait glow, tints; text not clipped, the ghost text never visible.
-2. The Seraphine portrait at 560 px (D19): blur or pixelation, and whether a larger file is needed (owner art).
+2. The Seraphine portrait at 560 px (D19): blur or pixelation, and whether a larger file is needed (owner art). The chapter 1 faces (256x256 files drawn at 156 px) and the clearing at camera scale 1.8: each face centred in its frame, the camera framing each speaker as in `design-reference-chapter-01.dc.html`.
+7. Chapter 1 cards against the chapter design (44 px title, 520 px logo), the end card scrim drawn as the `dark` tint (D30: 0.55 instead of 0.6), the letterbox bars, the veins and the dawn.
 3. The bar (dots, `Pular`, mute): aligned, 44 px targets, readable over every backdrop.
 4. `14-bands-1024`: the stage centred with even dark bands of 96 px, nothing of the game showing through.
 5. The Mapa: the História group level with the title, not touching the chapter chips or the map, the tab reads `Mapa` with its current icon and the rail keeps its six buttons with the T and B chips (AD-034; spec Q6: say if the icon should change).
@@ -1012,6 +1119,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 | T4 | 1 module (catalog rules) | ✅ Granular |
 | T5 | 1 data module + file check + assets | ⚠️ OK (cohesive: data and its files) |
 | T6 | 1 storage adapter | ✅ Granular |
+| T19 | 1 fixture change + 1 re-pinned case | ✅ Granular |
 | T7 | 1 view | ✅ Granular |
 | T8 | 1 controller | ✅ Granular |
 | T9 | 1 stylesheet block + font link | ⚠️ OK (cohesive) |
@@ -1022,6 +1130,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 | T14 | 1 e2e file | ✅ Granular |
 | T15 | 1 e2e file | ✅ Granular |
 | T16 | 1 e2e file | ✅ Granular |
+| T20 | 1 e2e file | ✅ Granular |
 | T17 | author check | ✅ Granular |
 | T18 | review | ✅ Granular |
 
@@ -1035,17 +1144,19 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 | T4 | None | none | ✅ Match |
 | T5 | T2, T4 | T2 → T5, T4 → T5 | ✅ Match |
 | T6 | None | none | ✅ Match |
+| T19 | T5 | T5 → T19 | ✅ Match |
 | T7 | T2, T3 (Phase 2) | none inside Phase 3 | ✅ Match |
 | T8 | T7 | T7 → T8 | ✅ Match |
 | T9 | T7 | T7 → T9 | ✅ Match |
 | T10 | T5, T6, T8 (earlier phases) | none inside Phase 4 | ✅ Match |
 | T11 | None | none | ✅ Match |
 | T12 | T11 | T11 → T12 | ✅ Match |
-| T13 | T4 (Phase 2), T10, T12 | T10 → T13, T12 → T13 | ✅ Match |
+| T13 | T4, T19 (Phase 2), T10, T12 | T10 → T13, T12 → T13 | ✅ Match |
 | T14 | T1, T9, T13 (earlier phases) | none inside Phase 5 | ✅ Match |
 | T15 | T13 (Phase 4) | none inside Phase 5 | ✅ Match |
 | T16 | T13 (Phase 4) | none inside Phase 5 | ✅ Match |
-| T17 | T14, T15, T16 | T14 → T17, T15 → T17, T16 → T17 | ✅ Match |
+| T20 | T13 (Phase 4) | none inside Phase 5 | ✅ Match |
+| T17 | T14, T15, T16, T20 | T14 → T17, T15 → T17, T16 → T17, T20 → T17 | ✅ Match |
 | T18 | T17 (Phase 5) | none inside Phase 6 | ✅ Match |
 
 ## Test Co-location Validation
@@ -1058,6 +1169,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 | T4 | Domain | unit | unit | ✅ OK |
 | T5 | Domain data + files on disk | unit | unit | ✅ OK |
 | T6 | Storage adapter | unit | unit | ✅ OK |
+| T19 | e2e fixture | e2e | e2e | ✅ OK |
 | T7 | View | unit | unit | ✅ OK |
 | T8 | View | unit | unit | ✅ OK |
 | T9 | Stylesheet and fonts | e2e | none (pinned by T15, T16) | ⚠️ Project convention: `test-engineer` owns e2e (CLAUDE.md § Agent team); CSS cannot be unit-tested in jsdom. Mutants M16 to M18 of T17 prove the e2e pins it |
@@ -1068,5 +1180,6 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 | T14 | e2e | e2e | e2e | ✅ OK |
 | T15 | e2e | e2e | e2e | ✅ OK |
 | T16 | e2e | e2e | e2e | ✅ OK |
+| T20 | e2e | e2e | e2e | ✅ OK |
 | T17 | author check (CI suites, 7 mutants) | unit, e2e | unit and e2e | ✅ OK |
 | T18 | review artifact | none | none | ✅ OK |

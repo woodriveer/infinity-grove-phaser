@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Infinity Grove — Capítulo 1, Final</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#05090a}
+a{color:#e9d9a6}a:hover{color:#fff3cc}
+.cf-stage{position:relative;width:1280px;height:720px;overflow:hidden;background:#05090a;font-family:'Cormorant Garamond',Georgia,serif;color:#f4ecd4}
+.cf-cam{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;transition:transform 1.8s cubic-bezier(.45,.05,.25,1)}
+.cf-bg{position:absolute;inset:0;background-image:url(/_blob/0a02d7894d2cbcc631c79640361e6ccf);background-size:cover;background-position:center}
+.cf-veins{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 62%,rgba(170,60,255,.35),rgba(0,0,0,0) 45%);mix-blend-mode:screen;opacity:0;transition:opacity 1s ease;pointer-events:none}
+.cf-veins.on{opacity:1;animation:cfPulse 1.4s ease-in-out infinite}
+.cam-wide{transform:translate(0px,0px) scale(1)}
+.cam-narr{transform:translate(0px,-129px) scale(1.18);transition-duration:6s}
+.cam-kael{transform:translate(-551px,-350px) scale(1.75)}
+.cam-lyra{transform:translate(-934px,-300px) scale(1.8)}
+.cam-orina{transform:translate(-896px,-432px) scale(1.7)}
+.cam-sera{transform:translate(-1024px,-277px) scale(1.8)}
+.cam-vex{transform:translate(-1024px,-268px) scale(1.8)}
+.cf-dark{position:absolute;inset:0;background:rgba(2,6,6,.55);opacity:0;transition:opacity 1.2s ease;pointer-events:none}
+.cf-dark.on{opacity:1}
+.cf-dawn{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,200,120,.35),rgba(0,0,0,0) 60%);opacity:0;transition:opacity 2.5s ease;pointer-events:none}
+.cf-dawn.on{opacity:1}
+.cf-vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 45%,rgba(0,0,0,.72) 100%)}
+.cf-bars{position:absolute;left:0;right:0;height:0;background:#000;transition:height .8s ease;pointer-events:none}
+.cf-bars.on{height:46px}
+.cf-mote{position:absolute;width:5px;height:5px;border-radius:50%;background:#fff2a8;box-shadow:0 0 10px 3px rgba(255,236,140,.7);animation:cfFloat 9s ease-in-out infinite;pointer-events:none}
+.cf-m0{left:120px;top:520px;animation-delay:.4s;animation-duration:9.2s}
+.cf-m1{left:260px;top:380px;animation-delay:2.1s;animation-duration:11s}
+.cf-m2{left:430px;top:600px;animation-delay:4.3s;animation-duration:8.4s}
+.cf-m3{left:590px;top:300px;animation-delay:1.2s;animation-duration:10.6s}
+.cf-m4{left:720px;top:560px;animation-delay:5.6s;animation-duration:9.8s}
+.cf-m5{left:860px;top:420px;animation-delay:3.2s;animation-duration:12.1s}
+.cf-m6{left:990px;top:640px;animation-delay:6.4s;animation-duration:8.8s}
+.cf-m7{left:1110px;top:350px;animation-delay:.9s;animation-duration:10.2s}
+.cf-m8{left:1210px;top:520px;animation-delay:7.3s;animation-duration:9.4s}
+.cf-m9{left:340px;top:250px;animation-delay:8.1s;animation-duration:11.6s}
+.cf-ghost{color:transparent;text-shadow:none}
+.cf-narr{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:960px;text-align:center;font-size:38px;line-height:1.45;font-style:italic;font-weight:500;text-shadow:0 2px 18px rgba(0,0,0,.95),0 0 4px rgba(0,0,0,.9);margin:0;animation:cfFade .6s ease both}
+.cf-scrim{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:1200px;height:400px;background:radial-gradient(ellipse at center,rgba(0,0,0,.62),rgba(0,0,0,0) 70%);pointer-events:none}
+.cf-box{position:absolute;left:110px;bottom:40px;width:1060px;min-height:176px;background:linear-gradient(180deg,rgba(14,26,20,.93),rgba(8,16,12,.96));border:2px solid #c9a95a;border-radius:14px;box-shadow:0 0 0 4px rgba(10,18,14,.8),0 0 0 5px rgba(201,169,90,.45),0 18px 40px rgba(0,0,0,.6);padding:36px 48px 30px 210px;box-sizing:border-box;font-size:32px;line-height:1.4;font-weight:500;animation:cfRise .45s ease both}
+.cf-portrait{position:absolute;left:28px;top:-52px;width:156px;height:156px;border-radius:50%;object-fit:cover;border:3px solid #e8cf86;box-shadow:0 0 0 5px rgba(10,18,14,.9),0 0 22px rgba(255,220,140,.45),0 10px 24px rgba(0,0,0,.6);background:#0b140f}
+.cf-name{position:absolute;top:-22px;left:206px;font-family:'Cinzel',serif;font-weight:700;font-size:20px;letter-spacing:.12em;color:#1b1406;background:linear-gradient(180deg,#f3dc95,#c9a24c);padding:8px 22px;border-radius:8px;border:1px solid #fff0bf;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+.cf-next{position:absolute;right:22px;bottom:14px;animation:cfBob 1s ease-in-out infinite}
+.cf-hit{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;background:transparent;cursor:pointer;z-index:5}
+.cf-hit:focus-visible{outline:3px solid #f3dc95;outline-offset:-6px}
+.cf-ui{position:absolute;top:22px;right:24px;z-index:6;display:flex;align-items:center;gap:16px}
+.cf-dot{width:10px;height:10px;border-radius:50%;background:rgba(244,236,212,.25);border:1px solid rgba(244,236,212,.5)}
+.cf-dot.on{background:#f3dc95;border-color:#f3dc95;box-shadow:0 0 8px rgba(243,220,149,.8)}
+.cf-icon{width:44px;height:44px;border-radius:50%;border:1px solid rgba(243,220,149,.6);background:rgba(8,16,12,.6);color:#f3dc95;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.cf-icon:hover{background:rgba(30,50,38,.8)}
+.cf-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center}
+.cf-logo{width:520px;filter:drop-shadow(0 10px 30px rgba(0,0,0,.6));animation:cfRise 1.2s ease both}
+.cf-kicker{font-family:'Cinzel',serif;letter-spacing:.3em;font-size:16px;color:#e9d9a6;text-transform:uppercase;text-shadow:0 2px 8px #000;margin:0}
+.cf-title{font-family:'Cinzel',serif;font-weight:700;font-size:44px;letter-spacing:.05em;color:#f3dc95;text-shadow:0 4px 24px rgba(0,0,0,.95);margin:0}
+.cf-sub{font-size:28px;font-style:italic;text-shadow:0 2px 12px #000;margin:0}
+.cf-cta{font-family:'Cinzel',serif;letter-spacing:.18em;font-size:18px;color:#fff3cc;text-shadow:0 0 12px rgba(255,220,140,.8),0 2px 6px #000;animation:cfBlink 1.8s ease-in-out infinite;margin:22px 0 0}
+@keyframes cfPulse{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes cfFloat{0%{transform:translate(0,0);opacity:0}20%{opacity:1}80%{opacity:.8}100%{transform:translate(30px,-90px);opacity:0}}
+@keyframes cfRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cfFade{from{opacity:0}to{opacity:1}}
+@keyframes cfBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+@keyframes cfBlink{0%,100%{opacity:.45}50%{opacity:1}}
+</style>
+</helmet>
+<div class="cf-stage">
+  <div class="cf-cam {{camClass}}">
+    <div class="cf-bg"></div>
+    <div class="cf-veins {{veinsOn}}"></div>
+  </div>
+  <div class="cf-dawn {{dawnOn}}"></div>
+  <div class="cf-dark {{darkOn}}"></div>
+  <sc-for list="{{motes}}" as="m" hint-placeholder-count="10">
+    <span class="cf-mote {{m.cls}}"></span>
+  </sc-for>
+  <div class="cf-vignette"></div>
+  <div class="cf-bars {{barsOn}}" style="top: 0"></div>
+  <div class="cf-bars {{barsOn}}" style="bottom: 0"></div>
+
+  <sc-if value="{{isTitle}}" hint-placeholder-val="{{ true }}">
+    <div class="cf-center">
+      <img class="cf-logo" src="/_blob/14499b2c564d15956d96940d8a659840" alt="Infinity Grove">
+      <p class="cf-kicker">Capítulo 1 — Final</p>
+      <h1 class="cf-title">A Devoradora da Clareira</h1>
+      <p class="cf-cta">Clique para começar</p>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{showNarr}}" hint-placeholder-val="{{ false }}">
+    <div class="cf-scrim"></div>
+    <p class="cf-narr">{{shown}}<span class="cf-ghost">{{rest}}</span></p>
+    <sc-if value="{{showNext}}" hint-placeholder-val="{{ false }}">
+      <div class="cf-next" style="left: 50%; right: auto; bottom: 120px; margin-left: -14px">
+        <svg width="28" height="18" viewBox="0 0 28 18" aria-hidden="true"><path d="M3 3 L14 14 L25 3" fill="none" stroke="#f3dc95" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <sc-if value="{{showChar}}" hint-placeholder-val="{{ false }}">
+    <div class="cf-box">
+      <img class="cf-portrait" src="{{portrait}}" alt="{{speaker}}">
+      <span class="cf-name">{{speaker}}</span>
+      <p style="margin: 0">{{shown}}<span class="cf-ghost">{{rest}}</span></p>
+      <sc-if value="{{showNext}}" hint-placeholder-val="{{ false }}">
+        <div class="cf-next"><svg width="22" height="14" viewBox="0 0 28 18" aria-hidden="true"><path d="M3 3 L14 14 L25 3" fill="none" stroke="#f3dc95" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isEnd}}" hint-placeholder-val="{{ false }}">
+    <div class="cf-center" style="background: rgba(2,6,6,.6)">
+      <p class="cf-kicker">Fim do Capítulo 1</p>
+      <h1 class="cf-title">A Devoradora da Clareira</h1>
+      <p class="cf-sub">Ao amanhecer, os cinco guardiões avançam.</p>
+      <p class="cf-cta">Clique para assistir de novo</p>
+    </div>
+  </sc-if>
+
+  <button class="cf-hit" type="button" aria-label="{{hitLabel}}" onClick="{{advance}}"></button>
+
+  <div class="cf-ui">
+    <sc-if value="{{isPlaying}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; gap: 8px; align-items: center" aria-hidden="true">
+        <sc-for list="{{dots}}" as="d" hint-placeholder-count="7">
+          <span class="cf-dot {{d.on}}"></span>
+        </sc-for>
+      </div>
+    </sc-if>
+    <button class="cf-icon" type="button" aria-label="{{muteLabel}}" onClick="{{toggleMute}}">
+      <sc-if value="{{muted}}" hint-placeholder-val="{{ false }}">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 L6 9 H3 v6 h3 l5 4 z"></path><path d="M17 9 l5 6"></path><path d="M22 9 l-5 6"></path></svg>
+      </sc-if>
+      <sc-if value="{{unmuted}}" hint-placeholder-val="{{ true }}">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 L6 9 H3 v6 h3 l5 4 z"></path><path d="M15.5 8.5 a5 5 0 0 1 0 7"></path><path d="M18.5 5.5 a9 9 0 0 1 0 13"></path></svg>
+      </sc-if>
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"autoDelay":{"editor":"range","min":0,"max":4,"step":0.1,"unit":"s","default":1.2},"$preview":{"width":1280,"height":720}}'>
+var CF_PORTRAITS = {
+  kael: '/_blob/e2c0495809883692bdd31031e40a024c',
+  lyra: '/_blob/52e9449f4c4b6c250cf964be4bbe220a',
+  orina: '/_blob/0e6b16f92a703758f9985872a13a2099',
+  sera: '/_blob/3ed74dbea6c19ebbd5814e2e9c51d5ec',
+  vex: '/_blob/575c15203c34b7d52f0070537dc7f454'
+};
+var CF_LINES = [
+  { speaker: 'Narrador', who: 'narr', dur: 6.03, audio: '/_blob/b2f9f806437cda7faf2148b9321a3174',
+    cues: [[0.05, 2.51, 'A Serpente Umbral tomba na clareira,'], [2.93, 5.78, 'e o veneno roxo escorre de volta para a terra.']] },
+  { speaker: 'Kael', who: 'kael', dur: 5.64, audio: '/_blob/bc916228475acafd8f1a3f6ed60a8574',
+    cues: [[0.05, 2.23, 'Uma serpente desse tamanho,'], [2.5, 3.13, 'aqui?'], [3.64, 5.34, 'Isto não é do nosso bosque.']] },
+  { speaker: 'Lyra', who: 'lyra', dur: 5.49, audio: '/_blob/e37087503c7a946372202d6eec16b025',
+    cues: [[0.05, 1.7, 'Olha os olhos dela, Kael!'], [1.7, 2.7, 'Ainda brilham.'], [2.7, 5.2, 'Vermelho, vermelho, como brasa!']] },
+  { speaker: 'Orina', who: 'orina', dur: 8.91, audio: '/_blob/f70ef52d4d596cbeb8783459282e60ce', veins: true,
+    cues: [[0.05, 1.29, 'Interessante...'], [2.38, 4.99, 'As veias roxas pulsam no mesmo ritmo.'], [5.71, 8.8, 'Como se algo lá embaixo respirasse por elas.']] },
+  { speaker: 'Seraphine', who: 'sera', dur: 5.25, audio: '/_blob/309c8a6461b1a4175ac810560a1a6fba',
+    cues: [[0.05, 2.83, 'A Árvore diz que isto é só o começo.'], [3.24, 5.2, 'Precisamos ficar juntos.']] },
+  { speaker: 'Vex', who: 'vex', dur: 4.83, audio: '/_blob/09f20a422ac0853eb36bdb50381b5193',
+    cues: [[0.05, 1.06, 'Ela diz, é?'], [1.8, 2.66, 'Sorte a sua.'], [3.06, 4.49, 'Comigo ninguém conversa.']] },
+  { speaker: 'Kael', who: 'kael', dur: 4.05, audio: '/_blob/64b4462bcda3e48d7570f607a8a11844', dawn: true,
+    cues: [[0.05, 1.78, 'Então fique calado e lute, espião.'], [2.14, 3.77, 'Avançamos ao amanhecer.']] }
+];
+CF_LINES.forEach(function (l) { l.text = l.cues.map(function (c) { return c[2]; }).join(' '); });
+var CF_MOTES = [];
+for (var mi = 0; mi < 10; mi++) CF_MOTES.push({ cls: 'cf-m' + mi });
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { phase: 'title', idx: 0, n: 0, mode: 'playing', t: 0, muted: false };
+    this.raf = null;
+    this.timer = null;
+    this.audios = [];
+    this.clockStart = 0;
+    this.useClock = false;
+  }
+
+  componentDidMount() {
+    try {
+      this.audios = CF_LINES.map(function (l) { var a = new Audio(l.audio); a.preload = 'auto'; return a; });
+    } catch (e) { this.audios = []; }
+  }
+
+  componentWillUnmount() { this.stopAll(); }
+
+  stopAll() {
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = null;
+    if (this.timer) clearTimeout(this.timer);
+    this.timer = null;
+    this.audios.forEach(function (a) { try { a.pause(); a.onended = null; } catch (e) {} });
+  }
+
+  charsAt(line, t) {
+    var n = 0;
+    for (var i = 0; i < line.cues.length; i++) {
+      var c = line.cues[i], len = c[2].length + (i < line.cues.length - 1 ? 1 : 0);
+      if (t >= c[1]) n += len;
+      else if (t > c[0]) { n += Math.floor(len * (t - c[0]) / (c[1] - c[0])); break; }
+      else break;
+    }
+    return Math.min(n, line.text.length);
+  }
+
+  play(i) {
+    var self = this;
+    this.stopAll();
+    var line = CF_LINES[i];
+    this.setState({ phase: 'play', idx: i, n: 0, mode: 'playing', t: 0 });
+    var a = this.audios[i];
+    this.useClock = false;
+    this.clockStart = performance.now();
+    if (a) {
+      try {
+        a.currentTime = 0;
+        a.muted = this.state.muted;
+        a.onended = function () { self.finish(true); };
+        var p = a.play();
+        if (p && p.catch) p.catch(function () { self.useClock = true; self.clockStart = performance.now(); });
+      } catch (e) { this.useClock = true; }
+    } else { this.useClock = true; }
+    var tick = function () {
+      var t = self.useClock || !a ? (performance.now() - self.clockStart) / 1000 : a.currentTime;
+      if (self.useClock && t >= line.dur) { self.finish(true); return; }
+      self.setState({ n: self.charsAt(line, t), t: t });
+      self.raf = requestAnimationFrame(tick);
+    };
+    this.raf = requestAnimationFrame(tick);
+  }
+
+  finish(auto) {
+    var line = CF_LINES[this.state.idx];
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = null;
+    var a = this.audios[this.state.idx];
+    if (a) { try { a.pause(); a.onended = null; } catch (e) {} }
+    this.setState({ n: line.text.length, mode: 'complete', t: line.dur });
+    if (auto) {
+      var self = this;
+      var d = this.props.autoDelay != null ? this.props.autoDelay : 1.2;
+      if (this.timer) clearTimeout(this.timer);
+      this.timer = setTimeout(function () { self.timer = null; self.next(); }, d * 1000);
+    }
+  }
+
+  next() {
+    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+    var i = this.state.idx + 1;
+    if (i < CF_LINES.length) this.play(i);
+    else { this.stopAll(); this.setState({ phase: 'end' }); }
+  }
+
+  advance() {
+    var s = this.state;
+    if (s.phase === 'title' || s.phase === 'end') { this.play(0); return; }
+    if (s.mode === 'playing') this.finish(false);
+    else this.next();
+  }
+
+  toggleMute() {
+    var m = !this.state.muted;
+    this.audios.forEach(function (a) { a.muted = m; });
+    this.setState({ muted: m });
+  }
+
+  renderVals() {
+    var s = this.state;
+    var playing = s.phase === 'play';
+    var line = CF_LINES[s.idx];
+    var text = playing ? line.text : '';
+    var lastDawn = (playing && line.dawn) || s.phase === 'end';
+    return {
+      advance: () => this.advance(),
+      toggleMute: () => this.toggleMute(),
+      motes: CF_MOTES,
+      camClass: playing ? 'cam-' + line.who : 'cam-wide',
+      veinsOn: (playing && (line.veins || line.who === 'narr')) ? 'on' : '',
+      dawnOn: lastDawn ? 'on' : '',
+      darkOn: s.phase === 'title' ? 'on' : '',
+      barsOn: playing ? 'on' : '',
+      isTitle: s.phase === 'title',
+      isEnd: s.phase === 'end',
+      isPlaying: playing,
+      showNarr: playing && line.who === 'narr',
+      showChar: playing && line.who !== 'narr',
+      speaker: playing ? line.speaker : '',
+      portrait: playing && CF_PORTRAITS[line.who] ? CF_PORTRAITS[line.who] : CF_PORTRAITS.kael,
+      shown: text.slice(0, s.n),
+      rest: text.slice(s.n),
+      showNext: playing && s.mode === 'complete',
+      dots: CF_LINES.map(function (l, i) { return { on: i <= s.idx && playing ? 'on' : '' }; }),
+      hitLabel: playing ? (s.mode === 'playing' ? 'Mostrar fala completa' : 'Próxima fala') : 'Começar a cena',
+      muted: s.muted,
+      unmuted: !s.muted,
+      muteLabel: s.muted ? 'Ativar som' : 'Silenciar'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -2,19 +2,20 @@
 
 ## Problem Statement
 
-The game has a written story (`BRIEFING_HISTORIA.md`, `ROTEIRO_DIALOGOS.md`: a prologue and one dialogue scene after every chapter boss, acts 1 and 2 written) but no way to tell it. The owner designed the prologue player in Claude Design (`.specs/features/story-scenes/design-reference.dc.html`) and asked on 2026-11-28 that it play the first time a player starts chapter 1, that the screen today called "Rever chefes" become "Mapa" and offer a button to watch the story again, and that the player be a reusable template: the chapter scenes (chapters 1 to 30) must be added later as data (lines, audio, cues, backgrounds, portraits) with no new code. This feature ships the player, the template and the prologue content; the chapter scenes' content comes in later features.
+The game has a written story (`BRIEFING_HISTORIA.md`, `ROTEIRO_DIALOGOS.md`: a prologue and one dialogue scene after every chapter boss, acts 1 and 2 written) but no way to tell it. The owner designed the prologue player in Claude Design (`.specs/features/story-scenes/design-reference.dc.html`) and asked on 2026-11-28 that it play the first time a player starts chapter 1, that the screen today called "Rever chefes" become "Mapa" and offer a button to watch the story again, and that the player be a reusable template: the chapter scenes (chapters 1 to 30) must be added later as data (lines, audio, cues, backgrounds, portraits) with no new code. This feature ships the player, the template, the prologue and, by a scope addition of 2026-11-28 (revision 3), the chapter 1 boss scene "Capítulo 1 — Final: A Devoradora da Clareira" of a second owner design (`.specs/features/story-scenes/design-reference-chapter-01.dc.html`); the other chapter scenes come in later features.
 
 ## Goals
 
 - [ ] A player whose battle loads at chapter 1 for the first time on a browser watches the 6-line prologue (about 40 s) with voice, synced subtitles, backgrounds and tints as in the design, and can skip it.
 - [ ] The tab `Rever chefes` reads `Mapa`, and its screen replays the prologue (and, later, every chapter scene already seen).
+- [ ] A player who beats the chapter 1 boss watches the 7-line chapter 1 scene once (camera moves, round face portraits, letterbox, veins and dawn), and the Mapa replays it.
 - [ ] A chapter scene can be added by appending one entry to `game/src/domain/story/storyCatalog.js` and its files to `game/public/assets/story/`; `npm test` rejects a malformed entry or a missing file, and the scene plays after the first win of its chapter boss with no code change.
 
 ## Out of Scope
 
 | Feature | Reason |
 | ------- | ------ |
-| The content of the chapter scenes (chapters 1 to 30: lines, audio, portraits of Kael, Lyra, Orina, Vex, Morvath, Coruja Áurea) | Owner: this feature ships only the prologue; the audio of the chapter scenes is not recorded yet |
+| The content of the chapter scenes 2 to 30 (lines, audio, portraits of Morvath, Coruja Áurea) | Only the prologue and chapter 1 are designed and recorded |
 | Storing "seen" on the backend, per account or across devices | D1: a local flag like the auto click switch; no backend change, no Flyway migration (AD-016 not triggered) |
 | Remembering the mute choice after a reload | D13: lasts the page; not asked |
 | A portrait on the right side, two portraits at once, portrait expressions | Not in the design; a character line shows one portrait on the left |
@@ -41,7 +42,7 @@ Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrat
 | D7 HUD label `Rever chefe: <boss>` | Unchanged (`game/src/domain/campaign/campaign.js:24`), as is the `Farm boss` switch | It names the farm fight, not the tab | y (Q5) |
 | D8 Tab rename | The rail button `hud-farm` and the panel title read `Mapa`; the test id `hud-farm`, the screen id `farm` and the icon stay | Owner's request; ids are not player text. A new icon is the owner's call (Q6) | y (Q6) |
 | D9 Replay control | A group `História` with one chip per replayable scene at the top right of the Mapa screen, level with the title `Caminho do Capítulo <n>`. The prologue chip reads `Prólogo` and shows at every chapter, also before any boss is beaten | Owner: the button lives in the Mapa screen; placing it beside the title adds no height to a panel that is already 708 px high | y (Q7) |
-| D10 Replayable scenes | Every `chapter-start` scene (the prologue) plus every `chapter-boss` scene in the seen list, in catalog order | A chapter scene appears in the Mapa once the player watched it | y (Q12) |
+| D10 Replayable scenes | Every `chapter-start` scene (the prologue) plus every `chapter-boss` scene of chapter N that is in the seen list or that the campaign already passed (campaign chapter above N, or the campaign completed at N or later), in catalog order | A chapter scene appears in the Mapa once the player watched it (Q12); revision 3 adds the passed chapters (D26) | y (Q12, D26) |
 | D11 Fight while a scene plays | Held like the pause menu (`ClickerGame.paused`, `time.paused`, `tweens.paused` true) for automatic play and for replay; resumed when the overlay closes, unless the fight was already paused before | A replay opened during a boss fight must not cost the boss timer (the Mapa panel alone keeps the fight running, spec `background-fight`) | y (Q8) |
 | D12 Auto-advance | After a line's audio ends, the next line starts 1200 ms later (design `autoDelay` 1.2 s). A click while the text types shows the whole line and stops the audio; that line then waits for a click | The design's behaviour | y |
 | D13 Mute | A 44 px round button with aria-label `Silenciar` / `Ativar som` and `aria-pressed`; the choice lasts until the page reloads, across scenes, and is not stored | The design has the toggle; persisting it is not asked | y (Q9) |
@@ -55,7 +56,16 @@ Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrat
 | D21 Overlay layer | One DOM element in `document.body`, `position: fixed`, `z-index: 9`: above the canvas and the Phaser DOM panels, below the version label (`z-index: 10`, AD-026) and the drag copy of a tile (1000) | Outside the scaled canvas the stage can fit the whole viewport (D15); the version stays on every screen (AD-026) | y (Q11) |
 | D22 Storage failure | IF localStorage cannot be read or written, the seen list lives in memory for the page (the prologue opens once per page load) and nothing throws; a value that is not a JSON array of strings reads as empty and is rewritten on the next automatic scene | Same fallback as `sessionStore` (memory until unload) | y (Q1) |
 | D24 Keys while a scene plays | Escape closes the scene only with no Ctrl, Alt, Meta or Shift and not as an auto-repeat, the same rule as the T, B and A keys (AD-034); every Escape keydown is stopped at the overlay while it is open, so the battle never sees it. T, B, A and the skill keys (1, 2, 3, Q, W, E) do nothing while a scene plays, because the hold sets `paused`, which `screenKey`, `autoClickKey` and `useSkill` already check | AD-034 key rule; a key must not open a screen or a skill under the overlay | y (AD-034) |
-| D23 Existing e2e and shots | The shared e2e fixture (`game/e2e/support/coverage.js`) seeds `["prologue"]` before every page load unless a spec turns the option `storySeen` off, so the 53 existing specs keep starting chapter 1 on the fight | Otherwise every chapter 1 e2e test opens the overlay over the canvas | y |
+| D23 Existing e2e and shots | The shared e2e fixture (`game/e2e/support/coverage.js`) seeds the id of every catalog scene (`["prologue","chapter-1"]` today, read from `STORY_SCENES`) before every page load unless a spec turns the option `storySeen` off, so the 53 existing specs keep starting chapter 1 on the fight and win the chapter 1 boss with no overlay. T1 seeded `["prologue"]`; T19 widens it | Otherwise every chapter 1 e2e test, and every test that wins the chapter 1 boss, opens the overlay over the canvas | y |
+| D25 Camera | A line may name a camera: `wide` (no move, every backdrop has it) or a camera of its backdrop, `{ x, y, scale, ms }` in `STORY_BACKDROPS.<key>.cameras`. The backdrop layer moves to `translate(x px, y px) scale(scale)` with origin `0 0` over `ms` (default 1800) with `cubic-bezier(0.45, 0.05, 0.25, 1)`. Title and end cards and lines with no camera use `wide`. The clearing has `narr` (0, -129, 1.18, 6000), `kael` (-551, -350, 1.75), `lyra` (-934, -300, 1.8), `orina` (-896, -432, 1.7), `sera` (-1024, -277, 1.8), `vex` (-1024, -268, 1.8) | The values aim at the faces of one painted image, so they belong to the backdrop, not to the scene | y (orchestrator, owner's standing approval 2026-11-28) |
+| D26 Chapter 1 scene for players already past chapter 1 | Not played automatically (the trigger is the move from chapter 1 to 2, which already happened), but listed on the Mapa as replayable, because they never saw it | Orchestrator's recommended default; a player at chapter 7 would otherwise never find it | y (orchestrator, standing approval) |
+| D27 Two character styles | A `character` line carries either `portrait` (full body at the left, prologue) or `face` (a round 156 px face inside a wider box, chapter 1), never both | Both designs ship; the chapter scenes to come use faces | y (orchestrator, standing approval) |
+| D28 Letterbox | A scene with `letterbox: true` shows two black bars 46 px tall at the top and bottom while a line plays (they grow in 0.8 s); title and end cards have none. The prologue has none | Chapter design; a scene flag, not code per scene | y (orchestrator, standing approval) |
+| D29 New tints | `veins` (purple radial, screen blend, pulsing 1.4 s, drawn on the backdrop layer so it moves with the camera) and `dawn` (warm radial from the top, 2.5 s fade). The chapter design lit `veins` on Orina's line and on narrator lines; the catalog lists it explicitly on lines 1 and 4. `dawn` is on line 7 and in the end card's tints | Explicit data instead of a rule tied to the narrator | y (orchestrator, standing approval) |
+| D30 Card looks as data | `title` and `end` take optional `backdrop` (default `forest`) and `tints` (default `[ 'dark' ]`); `title` takes an optional `title` line and an optional `action` (the hit label, default `Começar a história`). Chapter 1: title on the clearing with `dark`, action `Começar a cena`; end on the clearing with `dark` and `dawn`. The chapter design's 0.6 end-card scrim is drawn as the `dark` tint (0.55) | One template for both designs; 0.05 of opacity is the ui-artist's call | y (orchestrator, standing approval) |
+| D31 Card typography by trigger | Cards of a `chapter-boss` scene use the chapter design's sizes (card title 44 px, subtitle 28 px, logo 520 px wide, gap 16 px); cards of a `chapter-start` scene keep the prologue's (end title 56 px, subtitle 30 px, logo 620 px, gap 18 px). The narrator text (940 px, scrim 420 px) and the vignette (0.7) of the prologue serve both (the chapter design: 960 px, 400 px, 0.72) | The two designs differ only by scene kind; the narrator and vignette differences are under 3 % | y (orchestrator, standing approval) |
+| D32 Motes as data | A scene may list its motes as `[left, top, delay s, duration s]`; with none it uses the prologue's 14. Chapter 1 lists the design's 10 | Each design places its own motes | y (orchestrator, standing approval) |
+| D33 Chapter 1 end call | `Clique para continuar` (design: `Clique para assistir de novo`), closing the scene into the chapter 2 fight or back to the Mapa, as the prologue (D4) | Same rule as the prologue's end card | y (orchestrator, standing approval) |
 
 **Open questions:** none. The owner approved the recommended answer of every question below on 2026-11-28 (record):
 
@@ -140,7 +150,7 @@ Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrat
 2. WHILE the Mapa screen shows, the group `data-testid="farm-story"` with the label `História` SHALL show at the top right of the screen, its vertical centre within 4 px of the vertical centre of `farm-map-title`, with one chip per replayable scene; the prologue chip `data-testid="story-replay-prologue"` SHALL read `Prólogo` with the aria-label `Assistir Prólogo` at every chapter, also when no boss was beaten.  <!-- state-driven -->
 3. WHEN the player clicks a story chip THEN the overlay SHALL open on that scene's title card with the fight held (P1 first story AC 5) and the seen list unchanged.  <!-- event-driven -->
 4. WHEN a scene opened from the Mapa closes THEN the Mapa screen SHALL still show, on the chapter it showed before.  <!-- event-driven -->
-5. The replayable scenes SHALL be every `chapter-start` scene of the catalog plus every `chapter-boss` scene whose id is in the seen list, in catalog order.  <!-- ubiquitous -->
+5. The replayable scenes SHALL be every `chapter-start` scene of the catalog plus every `chapter-boss` scene of chapter N whose id is in the seen list or whose chapter the campaign passed (campaign chapter above N, or completed at a chapter of at least N), in catalog order (D26).  <!-- ubiquitous -->
 
 **Independent Test**: Open Mapa, read `Mapa` on the tab and the title, click `Prólogo`, watch the title card, click `Pular`: the Mapa is still open.
 
@@ -223,6 +233,56 @@ Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrat
 
 ---
 
+### P1: The chapter 1 boss scene ⭐ MVP
+
+**User Story**: As a player who beats the Serpente Umbral, I want to watch the heroes talk over her body so that the story goes on after chapter 1.
+
+**Why P1**: Scope addition of 2026-11-28 (owner's second design, `design-reference-chapter-01.dc.html`).
+
+**Acceptance Criteria**:
+
+1. The catalog SHALL hold the scene `chapter-1` (label `Capítulo 1`, trigger `chapter-boss` of chapter 1, `letterbox: true`) with these 7 lines in this order and the cues of the design's `CF_LINES` (`design.md` § Chapter 1 data):
+
+   | # | kind | speaker | face | camera | tints | audio | duration (s) |
+   | - | ---- | ------- | ---- | ------ | ----- | ----- | ------------ |
+   | 1 | narrator | Narrador | none | narr | veins | `assets/story/chapter-01-01.mp4` | 6.03 |
+   | 2 | character | Kael | `assets/story/face-kael.jpg` | kael | none | `assets/story/chapter-01-02.mp4` | 5.64 |
+   | 3 | character | Lyra | `assets/story/face-lyra.jpg` | lyra | none | `assets/story/chapter-01-03.mp4` | 5.49 |
+   | 4 | character | Orina | `assets/story/face-orina.jpg` | orina | veins | `assets/story/chapter-01-04.mp4` | 8.91 |
+   | 5 | character | Seraphine | `assets/story/face-seraphine.jpg` | sera | none | `assets/story/chapter-01-05.mp4` | 5.25 |
+   | 6 | character | Vex | `assets/story/face-vex.jpg` | vex | none | `assets/story/chapter-01-06.mp4` | 4.83 |
+   | 7 | character | Kael | `assets/story/face-kael.jpg` | kael | dawn | `assets/story/chapter-01-07.mp4` | 4.05 |
+
+   every line on the backdrop `clearing`, and the line texts SHALL be: 1 `A Serpente Umbral tomba na clareira, e o veneno roxo escorre de volta para a terra.`; 2 `Uma serpente desse tamanho, aqui? Isto não é do nosso bosque.`; 3 `Olha os olhos dela, Kael! Ainda brilham. Vermelho, vermelho, como brasa!`; 4 `Interessante... As veias roxas pulsam no mesmo ritmo. Como se algo lá embaixo respirasse por elas.`; 5 `A Árvore diz que isto é só o começo. Precisamos ficar juntos.`; 6 `Ela diz, é? Sorte a sua. Comigo ninguém conversa.`; 7 `Então fique calado e lute, espião. Avançamos ao amanhecer.`  <!-- ubiquitous -->
+2. The repository SHALL hold `game/public/assets/story/bg-clearing.jpg`, the five `face-<hero>.jpg` files and `chapter-01-01.mp4` to `chapter-01-07.mp4` (AAC, 6.03, 5.64, 5.49, 8.91, 5.25, 4.83, 4.05 s by `ffprobe`).  <!-- ubiquitous -->
+3. WHEN the chapter 1 boss win moves the campaign to chapter 2 and the seen list does not hold `chapter-1` THEN the game SHALL add `chapter-1` to the seen list and open the overlay on its title card: the logo, the kicker `Capítulo 1 — Final`, the title `A Devoradora da Clareira`, the call `Clique para começar`, and `story-hit` with the aria-label `Começar a cena`.  <!-- event-driven -->
+4. WHILE the chapter 1 end card shows the overlay SHALL show the kicker `Fim do Capítulo 1`, the title `A Devoradora da Clareira`, the subtitle `Ao amanhecer, os cinco guardiões avançam.` and the call `Clique para continuar`, with `story-hit` labelled `Continuar`; a click SHALL close it with the chapter 2 fight going on.  <!-- state-driven -->
+5. WHILE the Mapa screen shows and `chapter-1` is replayable (P1 Mapa AC 5) the História group SHALL hold, after `Prólogo`, the chip `data-testid="story-replay-chapter-1"` reading `Capítulo 1` with the aria-label `Assistir Capítulo 1`; at chapter 1 with `chapter-1` unseen it SHALL not.  <!-- state-driven -->
+
+**Independent Test**: Win the chapter 1 boss on a browser that never saw the scene: the title card `A Devoradora da Clareira` opens; click through the seven lines (the camera moves to each speaker) to the end card and into chapter 2; open the Mapa and replay `Capítulo 1`.
+
+---
+
+### P2: Scene looks as data
+
+**User Story**: As the owner, I want camera moves, face portraits, letterbox, motes and card looks to be scene data so that the next chapter scenes need no code.
+
+**Why P2**: The chapter design adds them; the template must carry them.
+
+**Acceptance Criteria**:
+
+1. WHILE a line plays, the camera layer (`data-testid="story-camera"`, holding the backdrops and the `veins` tint) SHALL have the inline `transform` `translate(<x>px, <y>px) scale(<scale>)` of the line's camera and the `transition-duration` of its `ms` (default 1800 ms) with the timing function `cubic-bezier(0.45, 0.05, 0.25, 1)`; WHILE a card shows or the line names no camera it SHALL be `translate(0px, 0px) scale(1)` (camera `wide`). Chapter 1 line 2 gives `translate(-551px, -350px) scale(1.75)` and 1.8 s; line 1 gives `translate(0px, -129px) scale(1.18)` and 6 s.  <!-- state-driven -->
+2. The overlay SHALL draw a `character` line that has a `face` as the round face image (`data-testid="story-face"`, alt = the speaker, 156x156 px, `border-radius` 50 %) inside the dialogue box `.story-box.is-face` (left 110 px, width 1060 px, `padding-left` 210 px) with the speaker plate at left 206 px, and a `character` line that has a `portrait` as the full-body portrait of P1 Watching AC 14.  <!-- ubiquitous -->
+3. WHERE a scene has `letterbox: true`, WHILE a line plays two bars `.story-bar` (`#000`) SHALL be 46 px tall at the top and bottom of the stage, and WHILE a card shows they SHALL be 0 px tall; a scene without `letterbox` SHALL never show them taller than 0 px.  <!-- optional-feature -->
+4. WHILE a line or card lists the tint `veins` the overlay SHALL turn on `.story-tint.is-veins` inside the camera layer (it moves with the camera), and WHILE it lists `dawn` it SHALL turn on `.story-tint.is-dawn`: chapter 1 lines 1 and 4 show `veins`, line 7 and the end card show `dawn`.  <!-- state-driven -->
+5. WHILE a title or end card shows, the overlay SHALL show the card's `backdrop` and `tints` (default `forest` and `dark`): the chapter 1 title card the `clearing` with `dark`, its end card the `clearing` with `dark` and `dawn`; the prologue cards the `forest` with `dark`.  <!-- state-driven -->
+6. The overlay SHALL draw the scene's motes from its `motes` list (`[left px, top px, delay s, duration s]`), 14 of the prologue's when the scene lists none: chapter 1 draws 10, the first at left 120 px, top 520 px.  <!-- ubiquitous -->
+7. The cards of a `chapter-boss` scene SHALL use a 44 px card title, a 28 px subtitle and a 520 px logo, and the cards of a `chapter-start` scene a 56 px end title, a 30 px subtitle and a 620 px logo (D31).  <!-- ubiquitous -->
+
+**Independent Test**: In the chapter 1 scene, line 2 moves the clearing to Kael's face in 1.8 s, the box shows Kael's round face, the bars frame the line, Orina's line pulses purple, Kael's last line warms with the dawn that stays on the end card.
+
+---
+
 ## Edge Cases
 
 - WHEN the player clicks on the letterbox outside the scaled stage THEN the click SHALL act as a click on `story-hit` (the hit button covers the whole overlay) (STORY-11, STORY-12).
@@ -232,12 +292,15 @@ Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrat
 - IF the seen list holds `prologue` but the campaign is at chapter 1 THEN the Mapa SHALL still list `Prólogo` (STORY-26, STORY-29).
 - WHEN the prologue opens on a browser whose storage throws THEN the battle SHALL still show the encounter after the overlay closes (STORY-07).
 - WHEN a chapter boss is beaten again in the farm THEN no scene SHALL open (STORY-35).
+- WHEN a player whose campaign is at chapter 2 or later and whose seen list lacks `chapter-1` opens the Mapa THEN the `Capítulo 1` chip SHALL show (STORY-29, STORY-48), and no scene SHALL open on its own (STORY-35).
+- WHEN the camera moves while the player completes a line with a click THEN the camera SHALL keep moving to the same preset (STORY-49).
+- WHERE reduced motion is on, the camera SHALL jump to its preset with no transition (STORY-39, STORY-49).
 
 ---
 
 ## Requirement Traceability
 
-IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens", STORY-09 to STORY-24 "Watching a scene", STORY-25 to STORY-29 "The Mapa tab", STORY-30 to STORY-31 "The prologue content", STORY-32 to STORY-36 "Scenes are data", STORY-37 to STORY-41 "Fits every screen", STORY-42 to STORY-43 "Keys while a scene plays".
+IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens", STORY-09 to STORY-24 "Watching a scene", STORY-25 to STORY-29 "The Mapa tab", STORY-30 to STORY-31 "The prologue content", STORY-32 to STORY-36 "Scenes are data", STORY-37 to STORY-41 "Fits every screen", STORY-42 to STORY-43 "Keys while a scene plays", STORY-44 to STORY-48 "The chapter 1 boss scene" (revision 3), STORY-49 to STORY-55 "Scene looks as data" (revision 3).
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
@@ -284,12 +347,24 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | STORY-41 | P2: Fits every screen (AC 5) | T9, T16 | In Tasks |
 | STORY-42 | P2: Keys while a scene plays (AC 1) | T8, T13, T14 | In Tasks |
 | STORY-43 | P2: Keys while a scene plays (AC 2) | T13, T14 | In Tasks |
+| STORY-44 | P1: The chapter 1 boss scene (AC 1) | T5, T20 | In Tasks |
+| STORY-45 | P1: The chapter 1 boss scene (AC 2) | T5 | In Tasks |
+| STORY-46 | P1: The chapter 1 boss scene (AC 3) | T3, T7, T13, T20 | In Tasks |
+| STORY-47 | P1: The chapter 1 boss scene (AC 4) | T7, T20 | In Tasks |
+| STORY-48 | P1: The chapter 1 boss scene (AC 5) | T4, T13, T15 | In Tasks |
+| STORY-49 | P2: Scene looks as data (AC 1) | T3, T4, T7, T9, T20 | In Tasks |
+| STORY-50 | P2: Scene looks as data (AC 2) | T4, T7, T9, T20 | In Tasks |
+| STORY-51 | P2: Scene looks as data (AC 3) | T7, T9, T20 | In Tasks |
+| STORY-52 | P2: Scene looks as data (AC 4) | T4, T7, T9, T20 | In Tasks |
+| STORY-53 | P2: Scene looks as data (AC 5) | T3, T4, T7, T20 | In Tasks |
+| STORY-54 | P2: Scene looks as data (AC 6) | T4, T7, T20 | In Tasks |
+| STORY-55 | P2: Scene looks as data (AC 7) | T7, T9, T20 | In Tasks |
 
 **ID format:** `STORY-<NN>`
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 43 total, 43 mapped to tasks, 0 unmapped
+**Coverage:** 55 total, 55 mapped to tasks, 0 unmapped
 
 ---
 
@@ -299,4 +374,5 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 - [ ] A reload, a logout or an account reset never shows the prologue again on that browser (e2e and unit).
 - [ ] The tab reads `Mapa` and its `Prólogo` chip replays the scene with the Mapa open afterwards (e2e `storyReplay.spec.js`).
 - [ ] A fixture `chapter-boss` scene plays after the first win of its chapter boss with no code change (unit `ClickerGame.test.js`), and a malformed catalog entry fails `npm test`.
-- [ ] The `ui-artist` review of the title card, each line kind, the end card, the Mapa group, the 1024x768 fit and reduced motion is APROVADO.
+- [ ] Winning the chapter 1 boss opens the chapter 1 scene once, and the Mapa replays it (e2e `storyChapterOne.spec.js`).
+- [ ] The `ui-artist` review of the title card, each line kind (including the chapter 1 faces and camera), the end card, the Mapa group, the 1024x768 fit and reduced motion is APROVADO.

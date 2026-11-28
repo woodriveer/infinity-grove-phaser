@@ -1,9 +1,9 @@
 # Story Scenes Design
 
 **Spec**: `.specs/features/story-scenes/spec.md`
-**Status**: Approved by the owner on 2026-11-28 (every recommended answer to Q1 to Q14). Revision 2 (2026-11-28): line numbers, contracts and risks re-checked against `origin/main` after AD-030 to AD-035 (`ui-polish` rail and keys, `team-click-damage`); keys follow the rule of AD-034; desktop target (TD-010 dropped).
+**Status**: Approved by the owner on 2026-11-28 (every recommended answer to Q1 to Q14). Revision 2 (2026-11-28): line numbers, contracts and risks re-checked against `origin/main` after AD-030 to AD-035 (`ui-polish` rail and keys, `team-click-damage`); keys follow the rule of AD-034; desktop target (TD-010 dropped). Revision 3 (2026-11-28): the chapter 1 boss scene of the second owner design (`design-reference-chapter-01.dc.html`) ships with real content, and its additions are catalog data: cameras per backdrop, face portraits, letterbox, `veins` and `dawn` tints, card looks, motes (spec D25 to D33).
 
-Visual and behavioural reference: `.specs/features/story-scenes/design-reference.dc.html` (owner's Claude Design page). It is not code to paste: its `class Component extends DCLogic` is split below into a pure domain (text timing, state machine, catalog rules), a storage adapter and two DOM views, as AD-003 asks.
+Visual and behavioural references: `.specs/features/story-scenes/design-reference.dc.html` (the prologue) and `.specs/features/story-scenes/design-reference-chapter-01.dc.html` (the chapter 1 boss scene; same player logic, its `CF_*` data and `cf-*` CSS), the owner's Claude Design pages. It is not code to paste: its `class Component extends DCLogic` is split below into a pure domain (text timing, state machine, catalog rules), a storage adapter and two DOM views, as AD-003 asks.
 
 ---
 
@@ -125,9 +125,11 @@ export const charsAt = (line, t) =>
     - `end` → `{ phase: 'done', index, complete: false }`; `done` → the same state
   - `endLine(state)` (audio ended or the clock reached the duration): `line` and not complete → `{ ...state, complete: true }`; any other state unchanged.
   - `skipStory(state)`: `{ ...state, phase: 'done' }`.
-  - `hitLabel(state)`: `title` `Começar a história`; `line` typing `Mostrar fala completa`; `line` complete `Próxima fala`; `end` `Continuar`; `done` `''`.
+  - `hitLabel(state, scene)`: `title` `scene.title.action ?? 'Começar a história'` (chapter 1: `Começar a cena`); `line` typing `Mostrar fala completa`; `line` complete `Próxima fala`; `end` `Continuar`; `done` `''`.
   - `progressDots(scene, state): boolean[]`: one per line; `phase === 'line'` → `i <= state.index`; any other phase → every `false`.
-  - `sceneLook(scene, state, t): { backdrop: string, tints: string[] }`: `title`, `end` and `done` → `{ backdrop: 'forest', tints: [ 'dark' ] }`; `line` → `{ backdrop: line.backdrop, tints: line.tints.filter((tint) => line.tintAt?.[tint] === undefined || state.complete || t >= line.tintAt[tint]) }`.
+  - `sceneLook(scene, state, t): { backdrop: string, tints: string[], camera: string }`: `title` → `{ backdrop: scene.title.backdrop ?? 'forest', tints: scene.title.tints ?? [ 'dark' ], camera: 'wide' }`; `end` and `done` → the same from `scene.end` (a scene with no end card uses `forest`, `[ 'dark' ]`); `line` → `{ backdrop: line.backdrop, tints: line.tints.filter((tint) => line.tintAt?.[tint] === undefined || state.complete || t >= line.tintAt[tint]), camera: line.camera ?? 'wide' }`.
+  - `cameraOf(backdrops, look): { x, y, scale, ms }`: `look.camera === 'wide'` (or not found) → `{ x: 0, y: 0, scale: 1, ms: 1800 }`; else `backdrops[look.backdrop].cameras[look.camera]` with `ms` defaulting to 1800.
+  - `cameraTransform(camera): string`: `` `translate(${x}px, ${y}px) scale(${scale})` ``.
   - `storyScale(width, height)`: `Math.min(width / 1280, height / 720)`.
 - **Dependencies**: none.
 
@@ -136,14 +138,14 @@ export const charsAt = (line, t) =>
 - **Purpose**: The catalog rules: validation, which scene a chapter move opens, which scenes the Mapa lists.
 - **Location**: `game/src/domain/story/storyScenes.js`
 - **Interfaces**:
-  - `LINE_KINDS = [ 'narrator', 'voice', 'character' ]`, `TINTS = [ 'dark', 'red', 'gold', 'voice' ]`, `TRIGGERS = [ 'chapter-start', 'chapter-boss' ]`, `MOTIONS = [ 'drift', 'pan', 'still' ]`
+  - `LINE_KINDS = [ 'narrator', 'voice', 'character' ]`, `TINTS = [ 'dawn', 'dark', 'red', 'gold', 'voice', 'veins' ]` (drawing order; `veins` is drawn on the camera layer), `TRIGGERS = [ 'chapter-start', 'chapter-boss' ]`, `MOTIONS = [ 'drift', 'pan', 'still' ]`
   - `validateScene(scene, backdrops): string[]` - every broken rule of § Validation rules, in rule order; `[]` when valid.
   - `validateCatalog(scenes, backdrops): string[]` - the backdrop rules, then each scene's errors, then the duplicate rules.
   - `sceneToPlay(scenes, { from, to, seen }): scene | null`:
     - `from === null && to !== null` → the scene with `trigger.kind === 'chapter-start' && trigger.chapter === to`
     - `from !== null && (to === from + 1 || to === null)` → the scene with `trigger.kind === 'chapter-boss' && trigger.chapter === from`
     - anything else → `null`; a found scene whose `id` is in `seen` → `null`
-  - `replayableScenes(scenes, seen): scene[]` - `chapter-start` scenes and the `chapter-boss` scenes whose id is in `seen`, in catalog order.
+  - `replayableScenes(scenes, seen, position): scene[]` - `position` is `{ chapter, completed }` of the campaign (or `null` before it loads: then only `seen` counts). `chapter-start` scenes, and each `chapter-boss` scene of chapter N with its id in `seen`, or `position.chapter > N`, or `position.completed && position.chapter >= N`; in catalog order (spec D26).
 - **Dependencies**: none.
 
 ### `storyCatalog.js` (domain data)
@@ -197,7 +199,7 @@ export const charsAt = (line, t) =>
 - `playUnseenStory(from, to)`: `const scene = sceneToPlay(this.storyScenes, { from, to, seen: this.storySeen.seen() });` when a scene comes back, `this.storySeen.markSeen(scene.id)` then `this.playStory(scene)`.
 - `async playStory(scene)`: return when `!scene || this.storyOpen`; `this.storyOpen = true`; `const held = !this.paused`; when `held`, set `paused`, `time.paused`, `tweens.paused` to `true`; `try { await this.playStoryView(scene); } finally { this.storyOpen = false; when held, set the three to false }`.
 - `escape()`: first line `if (this.storyOpen) { return; }`.
-- `createHeroUi()`: add the hooks `stories: () => replayableScenes(this.storyScenes, this.storySeen.seen())` and `playStory: (id) => this.playStory(this.storyScenes.find((scene) => scene.id === id) ?? null)`.
+- `createHeroUi()`: add the hooks `stories: () => replayableScenes(this.storyScenes, this.storySeen.seen(), this.session.mapPosition())` and `playStory: (id) => this.playStory(this.storyScenes.find((scene) => scene.id === id) ?? null)`.
 
 ### `HeroUi` and `farmView` (changes)
 
@@ -222,20 +224,41 @@ div.farm-story [data-testid=farm-story][role=group][aria-label=História]
 //  A backdrop: the image (path under game/public) and its slow motion
 STORY_BACKDROPS = {
     forest: { image: 'assets/story/bg-forest.png', motion: 'drift' },   // drift: 40 s scale 1 -> 1.08
-    map: { image: 'assets/story/bg-map.jpg', motion: 'pan' }            // pan: 14 s scale 1.05 -> 1.1
+    map: { image: 'assets/story/bg-map.jpg', motion: 'pan' },           // pan: 14 s scale 1.05 -> 1.1
+    clearing: {
+        image: 'assets/story/bg-clearing.jpg', motion: 'still',
+        //  The camera presets aim at the faces of this painting (chapter design `.cam-*`); `wide` (0, 0, 1) exists for every backdrop
+        cameras: {
+            narr: { x: 0, y: -129, scale: 1.18, ms: 6000 },
+            kael: { x: -551, y: -350, scale: 1.75 },
+            lyra: { x: -934, y: -300, scale: 1.8 },
+            orina: { x: -896, y: -432, scale: 1.7 },
+            sera: { x: -1024, y: -277, scale: 1.8 },
+            vex: { x: -1024, y: -268, scale: 1.8 }
+        }
+    }
 };
+
+//  The motes of a scene that lists none: [left px, top px, delay s, duration s] (prologue design `.ig-m0` to `.ig-m13`)
+STORY_DEFAULT_MOTES = [ [ 608, 480, 1.04, 8.46 ], [ 550, 453, 0.71, 12.27 ], [ 731, 405, 2.56, 11.69 ], [ 815, 238, 4.49, 8.41 ], [ 833, 279, 5.04, 9.92 ],
+    [ 218, 225, 8.45, 12.82 ], [ 150, 422, 8.6, 8.13 ], [ 520, 475, 6.05, 8.68 ], [ 211, 693, 4.01, 8.4 ], [ 678, 365, 1.38, 11.64 ],
+    [ 436, 375, 0.72, 12.56 ], [ 296, 642, 4.24, 8.42 ], [ 748, 401, 6.83, 10.92 ], [ 169, 312, 4.05, 7.54 ] ];
 
 scene = {
     id: 'prologue',                    // lowercase letters, digits, dashes; the seen list stores it. Chapter scenes: 'chapter-<n>'
     label: 'Prólogo',                  // the Mapa chip text
     trigger: { kind: 'chapter-start' | 'chapter-boss', chapter: 1 },
-    title: { logo: 'assets/story/logo.png', kicker: '...', cta: '...' },   // optional; logo optional
-    end: { kicker: '...', title: '...', subtitle: '...', cta: '...' },      // optional
+    letterbox: true,                   // optional: black bars of 46 px while a line plays
+    motes: [ [ 120, 520, 0.4, 9.2 ], ... ],   // optional: [left px, top px, delay s, duration s]; none = STORY_DEFAULT_MOTES
+    title: { logo: 'assets/story/logo.png', kicker: '...', title: '...', cta: '...', action: 'Começar a cena', backdrop: 'clearing', tints: [ 'dark' ] },   // optional; logo, title, action, backdrop, tints optional
+    end: { kicker: '...', title: '...', subtitle: '...', cta: '...', backdrop: 'clearing', tints: [ 'dark', 'dawn' ] },      // optional; backdrop and tints optional (default forest, [ 'dark' ])
     lines: [
         {
             kind: 'narrator' | 'voice' | 'character',
             speaker: 'Narrador',       // the name plate (voice, character); narrator lines keep it for the record and show no plate
-            portrait: 'assets/story/portrait-<id>.png',   // character lines only
+            portrait: 'assets/story/portrait-<id>.png',   // character lines: a full-body portrait at the left (prologue) ...
+            face: 'assets/story/face-<id>.jpg',           // ... or a round face in the box (chapter scenes); exactly one of the two
+            camera: 'kael',            // optional: 'wide' or a camera of the backdrop; none = 'wide'
             backdrop: 'forest',        // a key of STORY_BACKDROPS
             tints: [ 'dark', 'red' ],  // any of dark, red, gold, voice; [] for none
             tintAt: { red: 6.1 },      // optional: a tint of `tints` that turns on at this second of the line
@@ -247,7 +270,7 @@ scene = {
 };
 ```
 
-A chapter scene added later: `{ id: 'chapter-1', label: 'Capítulo 1', trigger: { kind: 'chapter-boss', chapter: 1 }, lines: [...] }`, with its files in `game/public/assets/story/`. A new backdrop is one more `STORY_BACKDROPS` entry; tints are a fixed set of CSS classes.
+A chapter scene added later: `{ id: 'chapter-<n>', label: 'Capítulo <n>', trigger: { kind: 'chapter-boss', chapter: <n> }, letterbox: true, lines: [...] }`, with its files in `game/public/assets/story/` (chapter 1 below is the model). A new backdrop is one more `STORY_BACKDROPS` entry; tints are a fixed set of CSS classes.
 
 ### Validation rules (`validateScene`, exact messages)
 
@@ -258,19 +281,22 @@ A chapter scene added later: `{ id: 'chapter-1', label: 'Capítulo 1', trigger: 
 3. `trigger.kind` is in `TRIGGERS` and `trigger.chapter` is an integer of at least 1, else `<id>: trigger must be chapter-start or chapter-boss with a chapter of at least 1`.
 4. `title`, when present, has non-empty string `kicker` and `cta`, else `<id>: title needs kicker and cta`.
 5. `end`, when present, has non-empty string `kicker`, `title`, `subtitle` and `cta`, else `<id>: end needs kicker, title, subtitle and cta`.
+5b. `title.backdrop` and `end.backdrop`, when present, are keys of `backdrops`, and their `tints`, when present, are arrays of `TINTS`, else `<id>: <title|end> backdrop or tints are unknown`.
+5c. `letterbox`, when present, is a boolean, else `<id>: letterbox must be true or false`; `motes`, when present, is an array of `[left, top, delay, duration]` with four finite numbers, `duration > 0`, else `<id>: motes must be [left, top, delay, duration] numbers`.
 6. `lines` is an array of at least 1, else `<id>: a scene needs at least one line` (and no line rule runs).
 7. Per line: `kind` in `LINE_KINDS`, else `<id> line <n>: kind must be narrator, voice or character`.
 8. `voice` and `character` lines have a non-empty string `speaker`, else `<id> line <n>: speaker is missing`.
-9. `character` lines have a non-empty string `portrait`, else `<id> line <n>: a character line needs a portrait`.
+9. `character` lines have a non-empty string `portrait` or a non-empty string `face`, else `<id> line <n>: a character line needs a portrait or a face`; never both, else `<id> line <n>: a character line takes a portrait or a face, not both`.
 10. `backdrop` is a key of `backdrops`, else `<id> line <n>: unknown backdrop <backdrop>`.
 11. `tints` is an array; each entry in `TINTS`, else `<id> line <n>: unknown tint <tint>` (one message per unknown tint).
+11b. `camera`, when present, is `wide` or a key of `backdrops[backdrop].cameras`, else `<id> line <n>: unknown camera <camera> for backdrop <backdrop>`.
 12. Each key of `tintAt` is in the line's `tints`, else `<id> line <n>: tintAt names a tint the line does not use: <tint>`.
 13. `audio` is a non-empty string, else `<id> line <n>: audio is missing`.
 14. `duration` is a number above 0, else `<id> line <n>: duration must be above 0`.
 15. `cues` is an array of at least 1, else `<id> line <n>: a line needs at least one cue`.
 16. Each cue is `[start, end, text]` with `0 <= start < end <= duration`, `start >=` the previous cue's `end`, and a non-empty string `text`, else `<id> line <n> cue <m>: cues must be in order, inside the duration and carry text`.
 
-`validateCatalog(scenes, backdrops)` adds, before the scene errors, for each backdrop entry: `backdrop <key>: image is missing` (no non-empty string `image`) and `backdrop <key>: motion must be drift, pan or still`; and after them `duplicate scene id <id>` (once per repeated id) and `two scenes share the trigger <kind> <chapter>` (once per repeated pair).
+`validateCatalog(scenes, backdrops)` adds, before the scene errors, for each backdrop entry: `backdrop <key>: image is missing` (no non-empty string `image`) and `backdrop <key>: motion must be drift, pan or still`, and for each camera `backdrop <key> camera <name>: needs x, y and a scale above 0` (finite `x` and `y`, `scale > 0`, `ms` absent or above 0); a camera named `wide` gives `backdrop <key> camera wide: wide is reserved`; and after them `duplicate scene id <id>` (once per repeated id) and `two scenes share the trigger <kind> <chapter>` (once per repeated pair).
 
 ### Prologue data (verbatim from the design's `IG_LINES`)
 
@@ -317,23 +343,76 @@ The design's `scene` values map as: `forest` → backdrop `forest`, no tint; `da
 
 ---
 
+### Chapter 1 data (verbatim from the chapter design's `CF_LINES`)
+
+Appended to `STORY_SCENES` after the prologue:
+
+```js
+    {
+        id: 'chapter-1',
+        label: 'Capítulo 1',
+        trigger: { kind: 'chapter-boss', chapter: 1 },
+        letterbox: true,
+        motes: [ [ 120, 520, 0.4, 9.2 ], [ 260, 380, 2.1, 11 ], [ 430, 600, 4.3, 8.4 ], [ 590, 300, 1.2, 10.6 ], [ 720, 560, 5.6, 9.8 ],
+            [ 860, 420, 3.2, 12.1 ], [ 990, 640, 6.4, 8.8 ], [ 1110, 350, 0.9, 10.2 ], [ 1210, 520, 7.3, 9.4 ], [ 340, 250, 8.1, 11.6 ] ],
+        title: { logo: 'assets/story/logo.png', kicker: 'Capítulo 1 — Final', title: 'A Devoradora da Clareira', cta: 'Clique para começar', action: 'Começar a cena', backdrop: 'clearing', tints: [ 'dark' ] },
+        end: { kicker: 'Fim do Capítulo 1', title: 'A Devoradora da Clareira', subtitle: 'Ao amanhecer, os cinco guardiões avançam.', cta: 'Clique para continuar', backdrop: 'clearing', tints: [ 'dark', 'dawn' ] },
+        lines: [
+            {
+                kind: 'narrator', speaker: 'Narrador', backdrop: 'clearing', camera: 'narr', tints: [ 'veins' ], audio: 'assets/story/chapter-01-01.mp4', duration: 6.03,
+                cues: [ [ 0.05, 2.51, 'A Serpente Umbral tomba na clareira,' ], [ 2.93, 5.78, 'e o veneno roxo escorre de volta para a terra.' ] ]
+            },
+            {
+                kind: 'character', speaker: 'Kael', face: 'assets/story/face-kael.jpg', backdrop: 'clearing', camera: 'kael', tints: [], audio: 'assets/story/chapter-01-02.mp4', duration: 5.64,
+                cues: [ [ 0.05, 2.23, 'Uma serpente desse tamanho,' ], [ 2.5, 3.13, 'aqui?' ], [ 3.64, 5.34, 'Isto não é do nosso bosque.' ] ]
+            },
+            {
+                kind: 'character', speaker: 'Lyra', face: 'assets/story/face-lyra.jpg', backdrop: 'clearing', camera: 'lyra', tints: [], audio: 'assets/story/chapter-01-03.mp4', duration: 5.49,
+                cues: [ [ 0.05, 1.7, 'Olha os olhos dela, Kael!' ], [ 1.7, 2.7, 'Ainda brilham.' ], [ 2.7, 5.2, 'Vermelho, vermelho, como brasa!' ] ]
+            },
+            {
+                kind: 'character', speaker: 'Orina', face: 'assets/story/face-orina.jpg', backdrop: 'clearing', camera: 'orina', tints: [ 'veins' ], audio: 'assets/story/chapter-01-04.mp4', duration: 8.91,
+                cues: [ [ 0.05, 1.29, 'Interessante...' ], [ 2.38, 4.99, 'As veias roxas pulsam no mesmo ritmo.' ], [ 5.71, 8.8, 'Como se algo lá embaixo respirasse por elas.' ] ]
+            },
+            {
+                kind: 'character', speaker: 'Seraphine', face: 'assets/story/face-seraphine.jpg', backdrop: 'clearing', camera: 'sera', tints: [], audio: 'assets/story/chapter-01-05.mp4', duration: 5.25,
+                cues: [ [ 0.05, 2.83, 'A Árvore diz que isto é só o começo.' ], [ 3.24, 5.2, 'Precisamos ficar juntos.' ] ]
+            },
+            {
+                kind: 'character', speaker: 'Vex', face: 'assets/story/face-vex.jpg', backdrop: 'clearing', camera: 'vex', tints: [], audio: 'assets/story/chapter-01-06.mp4', duration: 4.83,
+                cues: [ [ 0.05, 1.06, 'Ela diz, é?' ], [ 1.8, 2.66, 'Sorte a sua.' ], [ 3.06, 4.49, 'Comigo ninguém conversa.' ] ]
+            },
+            {
+                kind: 'character', speaker: 'Kael', face: 'assets/story/face-kael.jpg', backdrop: 'clearing', camera: 'kael', tints: [ 'dawn' ], audio: 'assets/story/chapter-01-07.mp4', duration: 4.05,
+                cues: [ [ 0.05, 1.78, 'Então fique calado e lute, espião.' ], [ 2.14, 3.77, 'Avançamos ao amanhecer.' ] ]
+            }
+        ]
+    }
+```
+
+The chapter design's `who` maps to `camera` and `face` (`narr` → camera `narr`, no face; `sera` → `face-seraphine.jpg`); its `veins: true` and its "narrator lines light the veins" rule become `tints: [ 'veins' ]` on lines 1 and 4; `dawn: true` becomes `tints: [ 'dawn' ]` on line 7 and the end card's `dawn` (its `lastDawn` rule). Text lengths: 83, 61, 72, 98, 61, 49, 58 characters. Durations match `ffprobe` (6.034, 5.642, 5.485, 8.907, 5.25, 4.832, 4.049 s).
+
 ## DOM structure (`createStoryStage`)
 
 ```
-div.story-overlay [data-testid=story-overlay][role=dialog][aria-modal=true][aria-label="História: <scene.label>"]
-  button.story-hit [type=button][data-testid=story-hit][aria-label=<hitLabel(state)>]           (covers the overlay, letterbox included)
+div.story-overlay.is-<trigger.kind> [data-testid=story-overlay][role=dialog][aria-modal=true][aria-label="História: <scene.label>"]
+  button.story-hit [type=button][data-testid=story-hit][aria-label=<hitLabel(state, scene)>]           (covers the overlay, letterbox included)
   div.story-stage [data-testid=story-stage]  style --story-scale
-    div.story-backdrop.is-<motion> [data-backdrop=<key>] style background-image: url("<image>")   one per STORY_BACKDROPS entry; .is-on on the look's backdrop
-    div.story-tint.is-dark / .is-red / .is-gold / .is-voice                                       .is-on on the look's tints
-    span.story-mote.is-m0 ... span.story-mote.is-m13                                              14 motes
+    div.story-camera [data-testid=story-camera] style transform: <cameraTransform>; transition-duration: <ms>ms
+      div.story-backdrop.is-<motion> [data-backdrop=<key>] style background-image: url("<image>")   one per STORY_BACKDROPS entry; .is-on on the look's backdrop
+      div.story-tint.is-veins                                                                     .is-on when the look lists veins (moves with the camera)
+    div.story-tint.is-dawn / .is-dark / .is-red / .is-gold / .is-voice                            in this order; .is-on on the look's tints
+    span.story-mote x (scene.motes ?? STORY_DEFAULT_MOTES).length  style left, top, animation-delay, animation-duration from the entry
+    div.story-bar.is-top + div.story-bar.is-bottom                                                only when scene.letterbox; .is-on while phase === 'line'
     div.story-vignette
     div.story-content                                                                             rebuilt when phase or index changes
-      title:     div.story-center > img.story-logo [src=title.logo][alt=Infinity Grove] (only when title.logo) + p.story-kicker + p.story-cta
+      title:     div.story-center > img.story-logo [src=title.logo][alt=Infinity Grove] (only when title.logo) + p.story-kicker + h1.story-cardtitle (only when title.title) + p.story-cta
       narrator:  div.story-narr-scrim + p.story-narr [data-testid=story-text] > span.story-shown + span.story-ghost
                  + div.story-next.is-narr [hidden unless complete] > chevron svg (28x18)
       voice:     div.story-orb [data-testid=story-orb]
                  + div.story-box.is-voice > span.story-name [data-testid=story-speaker] + p.story-line.is-italic [data-testid=story-text] > shown + ghost
                    + div.story-next [hidden unless complete] > chevron svg (22x14)
+      character with face: div.story-box.is-face > img.story-face [data-testid=story-face][src=face][alt=speaker] + span.story-name [data-testid=story-speaker] + p.story-line [data-testid=story-text] > shown + ghost + div.story-next
       character: img.story-portrait [data-testid=story-portrait][src=portrait][alt=speaker]
                  + div.story-box.is-character > span.story-name [data-testid=story-speaker] + p.story-line [data-testid=story-text] > shown + ghost + div.story-next
       end:       div.story-center.is-end > p.story-kicker + h1.story-endtitle + p.story-endsub + p.story-cta
@@ -343,7 +422,7 @@ div.story-overlay [data-testid=story-overlay][role=dialog][aria-modal=true][aria
       button.story-mute [type=button][data-testid=story-mute][aria-label=Silenciar|Ativar som][aria-pressed=false|true] > speaker svg (20x20)
 ```
 
-`update({ state, shown, t, muted })`: toggles `.is-on` on backdrops (`sceneLook`) and tints; rebuilds `.story-content` when `${state.phase}:${state.index}` differs from the last paint; sets `.story-shown` to `lineText(line).slice(0, shown)` and `.story-ghost` to the rest; `.story-next.hidden = !state.complete`; `hit` aria-label `hitLabel(state)`; dots `.is-on` from `progressDots` and `hidden` unless `phase === 'line'`; mute aria-label `Ativar som` and `aria-pressed="true"` when muted, else `Silenciar` and `false`, with the muted or unmuted icon. The SVG paths are the design's (`design-reference.dc.html:101`, `:112`, `:149-152`).
+`update({ state, shown, t, muted })`: toggles `.is-on` on backdrops (`sceneLook`) and tints; sets the camera's `style.transform` to `cameraTransform(cameraOf(backdrops, look))` and `style.transitionDuration` to `<ms>ms` only when the camera name or backdrop changed (so a repaint never restarts a move); toggles `.is-on` on the bars; rebuilds `.story-content` when `${state.phase}:${state.index}` differs from the last paint; sets `.story-shown` to `lineText(line).slice(0, shown)` and `.story-ghost` to the rest; `.story-next.hidden = !state.complete`; `hit` aria-label `hitLabel(state)`; dots `.is-on` from `progressDots` and `hidden` unless `phase === 'line'`; mute aria-label `Ativar som` and `aria-pressed="true"` when muted, else `Silenciar` and `false`, with the muted or unmuted icon. The SVG paths are the design's (`design-reference.dc.html:101`, `:112`, `:149-152`).
 
 ---
 
@@ -369,26 +448,23 @@ Copied from the design (`design-reference.dc.html:14-73`) with the `story-` pref
 .story-tint.is-voice { background: radial-gradient(ellipse at 50% 30%, rgba(150, 255, 190, 0.22), rgba(0, 0, 0, 0) 55%); }
 .story-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.7) 100%); }
 .story-mote { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #fff2a8; box-shadow: 0 0 10px 3px rgba(255, 236, 140, 0.7); animation: storyFloat 9s ease-in-out infinite; }
-.story-mote.is-m0 { left: 608px; top: 480px; animation-delay: 1.04s; animation-duration: 8.46s; }
-.story-mote.is-m1 { left: 550px; top: 453px; animation-delay: 0.71s; animation-duration: 12.27s; }
-.story-mote.is-m2 { left: 731px; top: 405px; animation-delay: 2.56s; animation-duration: 11.69s; }
-.story-mote.is-m3 { left: 815px; top: 238px; animation-delay: 4.49s; animation-duration: 8.41s; }
-.story-mote.is-m4 { left: 833px; top: 279px; animation-delay: 5.04s; animation-duration: 9.92s; }
-.story-mote.is-m5 { left: 218px; top: 225px; animation-delay: 8.45s; animation-duration: 12.82s; }
-.story-mote.is-m6 { left: 150px; top: 422px; animation-delay: 8.6s; animation-duration: 8.13s; }
-.story-mote.is-m7 { left: 520px; top: 475px; animation-delay: 6.05s; animation-duration: 8.68s; }
-.story-mote.is-m8 { left: 211px; top: 693px; animation-delay: 4.01s; animation-duration: 8.4s; }
-.story-mote.is-m9 { left: 678px; top: 365px; animation-delay: 1.38s; animation-duration: 11.64s; }
-.story-mote.is-m10 { left: 436px; top: 375px; animation-delay: 0.72s; animation-duration: 12.56s; }
-.story-mote.is-m11 { left: 296px; top: 642px; animation-delay: 4.24s; animation-duration: 8.42s; }
-.story-mote.is-m12 { left: 748px; top: 401px; animation-delay: 6.83s; animation-duration: 10.92s; }
-.story-mote.is-m13 { left: 169px; top: 312px; animation-delay: 4.05s; animation-duration: 7.54s; }
+.story-camera { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; transition: transform 1.8s cubic-bezier(0.45, 0.05, 0.25, 1); }
+.story-tint.is-veins { background: radial-gradient(ellipse at 30% 62%, rgba(170, 60, 255, 0.35), rgba(0, 0, 0, 0) 45%); mix-blend-mode: screen; transition: opacity 1s ease; }
+.story-tint.is-veins.is-on { animation: storyVeins 1.4s ease-in-out infinite; }
+.story-tint.is-dawn { background: radial-gradient(ellipse at 50% 0%, rgba(255, 200, 120, 0.35), rgba(0, 0, 0, 0) 60%); transition: opacity 2.5s ease; }
+.story-bar { position: absolute; left: 0; right: 0; height: 0; background: #000; transition: height 0.8s ease; }
+.story-bar.is-top { top: 0; }
+.story-bar.is-bottom { bottom: 0; }
+.story-bar.is-on { height: 46px; }
 .story-ghost { color: transparent; text-shadow: none; }
 .story-narr-scrim { position: absolute; left: 50%; top: 50%; width: 1200px; height: 420px; transform: translate(-50%, -50%); background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0) 70%); }
 .story-narr { position: absolute; left: 50%; top: 50%; width: 940px; margin: 0; transform: translate(-50%, -50%); text-align: center; font-size: 38px; line-height: 1.45; font-style: italic; font-weight: 500; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.95), 0 0 4px rgba(0, 0, 0, 0.9); }
 .story-box { position: absolute; bottom: 40px; box-sizing: border-box; padding: 34px 40px 30px; font-size: 32px; line-height: 1.4; font-weight: 500; background: linear-gradient(180deg, rgba(14, 26, 20, 0.92), rgba(8, 16, 12, 0.95)); border: 2px solid #c9a95a; border-radius: 14px; box-shadow: 0 0 0 4px rgba(10, 18, 14, 0.8), 0 0 0 5px rgba(201, 169, 90, 0.45), 0 18px 40px rgba(0, 0, 0, 0.6); animation: storyRise 0.5s ease both; }
 .story-box.is-voice { left: 210px; width: 860px; min-height: 160px; }
 .story-box.is-character { left: 330px; width: 900px; min-height: 170px; }
+.story-box.is-face { left: 110px; width: 1060px; min-height: 176px; padding: 36px 48px 30px 210px; }
+.story-box.is-face .story-name { top: -22px; left: 206px; }
+.story-face { position: absolute; left: 28px; top: -52px; width: 156px; height: 156px; border-radius: 50%; object-fit: cover; border: 3px solid #e8cf86; box-shadow: 0 0 0 5px rgba(10, 18, 14, 0.9), 0 0 22px rgba(255, 220, 140, 0.45), 0 10px 24px rgba(0, 0, 0, 0.6); background: #0b140f; }
 .story-line { margin: 0; }
 .story-line.is-italic { font-style: italic; }
 .story-name { position: absolute; top: -24px; left: 32px; padding: 8px 22px; font-family: "Cinzel", Georgia, serif; font-weight: 700; font-size: 20px; letter-spacing: 0.12em; color: #1b1406; background: linear-gradient(180deg, #f3dc95, #c9a24c); border: 1px solid #fff0bf; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
@@ -403,6 +479,13 @@ Copied from the design (`design-reference.dc.html:14-73`) with the `story-` pref
 .story-center.is-end .story-cta { margin-top: 26px; }
 .story-endtitle { margin: 0; font-family: "Cinzel", Georgia, serif; font-weight: 700; font-size: 56px; letter-spacing: 0.06em; color: #f3dc95; text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9); }
 .story-endsub { margin: 0; font-size: 30px; font-style: italic; text-shadow: 0 2px 12px #000; }
+.story-cardtitle { margin: 0; font-family: "Cinzel", Georgia, serif; font-weight: 700; font-size: 44px; letter-spacing: 0.05em; color: #f3dc95; text-shadow: 0 4px 24px rgba(0, 0, 0, 0.95); }
+/* Cards of a chapter-boss scene (chapter design, spec D31) */
+.story-overlay.is-chapter-boss .story-center { gap: 16px; }
+.story-overlay.is-chapter-boss .story-logo { width: 520px; }
+.story-overlay.is-chapter-boss .story-endtitle { font-size: 44px; letter-spacing: 0.05em; }
+.story-overlay.is-chapter-boss .story-endsub { font-size: 28px; }
+.story-overlay.is-chapter-boss .story-cta { margin-top: 22px; }
 .story-ui { position: absolute; top: 22px; right: 24px; display: flex; align-items: center; gap: 16px; pointer-events: auto; }
 .story-dots { display: flex; align-items: center; gap: 8px; }
 .story-dots[hidden] { display: none; }
@@ -422,6 +505,7 @@ Copied from the design (`design-reference.dc.html:14-73`) with the `story-` pref
 @keyframes storyBreath { 0%, 100% { transform: scale(0.92); opacity: 0.85; } 50% { transform: scale(1.08); opacity: 1; } }
 @keyframes storyBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
 @keyframes storyBlink { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+@keyframes storyVeins { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 /* Reduced motion (spec D16): no animation or transition in the scene, no motes; the typing follows the voice and stays */
 @media (prefers-reduced-motion: reduce) {
     .story-overlay, .story-overlay * { animation: none !important; transition: none !important; }
@@ -462,14 +546,16 @@ Fonts (`game/index.html:9`): the `family` list becomes `family=Cinzel:wght@500;7
 
 | Concern | Location (file:line) | Impact | Mitigation |
 | ------- | -------------------- | ------ | ---------- |
-| Every chapter 1 e2e test would open the overlay over the canvas | `game/e2e/support/coverage.js:10` (all 53 specs import it) | The whole e2e suite fails | T1 (first task) seeds `["prologue"]` before every page load by default; story specs opt out with `test.use({ storySeen: false })` |
+| Every chapter 1 e2e test would open the overlay over the canvas, and every test that wins the chapter 1 boss would open the chapter 1 scene | `game/e2e/support/coverage.js:10` (all 53 specs import it); boss wins in `campaignChapters.spec.js`, `bossReplayChapters.spec.js`, `drops.spec.js` and others | The whole e2e suite fails | T1 seeds `["prologue"]`; T19 (right after T5) seeds the ids of every catalog scene, read from `STORY_SCENES` (Node imports the catalog: `game/package.json` has `"type": "module"` and the catalog imports nothing), so a future scene needs no fixture change; story specs opt out with `test.use({ storySeen: false })` |
 | `ui-review/*.shots.js` of earlier features use `@playwright/test` directly | `game/ui-review/support/shots.js` | A rerun of an old shots file at chapter 1 would capture the overlay | Each future shots file seeds the key (`page.addInitScript`); noted in T18. No old shots file is rerun by this feature |
 | Phaser reads keys from a window listener and processes them on its next step | Phaser 3.80 KeyboardManager (`game/package.json`: `phaser ^3.80.1`) | An Escape that closed the scene could still reach `ClickerGame.escape` after `storyOpen` became `false` and open the pause menu or close the Mapa | The player stops propagation of Escape at `document` (window never sees it) and `escape()` returns while `storyOpen`; e2e T14 and T15 press Escape and assert no pause menu and the Mapa still open. I have not checked the Phaser source for the queue; the e2e decides |
 | Playwright's bundled Chromium may not decode AAC | `game/public/assets/story/*.mp4` (AAC, `ffprobe`) | e2e audio may always take the clock fallback | The e2e asserts click behaviour that holds either way; the fallback scenario forces `play()` to reject; real audio is the `ui-artist`'s and the owner's manual check. Not verified which way the bundled build goes |
-| Unit tests of `ClickerGame` build the scene with a `services` object that has no story services | `game/src/adapters/phaser/ClickerGame.test.js:39-52` | about 6 900 lines of tests break | T13 adds `storySeen` (list `['prologue']`), `storyScenes` (the real catalog) and `playStory` stubs to the shared `services` object |
+| Unit tests of `ClickerGame` build the scene with a `services` object that has no story services | `game/src/adapters/phaser/ClickerGame.test.js:39-52` | about 6 900 lines of tests break | T13 adds `storySeen` (list: every catalog id, so the existing chapter 1 boss win tests such as `:1480` open no scene), `storyScenes` (the real catalog) and `playStory` stubs to the shared `services` object |
 | `farmView.test.js` pins the children order of the Mapa screen | `game/src/adapters/phaser/views/farmView.test.js:227-228` | A wrapper row would break them | The `História` group is added only when `stories.length >= 1` and is absolutely positioned; with no stories the children are unchanged |
 | The Mapa panel is already near its 708 px height | `game/public/style.css:1447-1457` | A new row would add a scrollbar | The group sits in the title line (absolute top right) |
 | The Mapa screen is rebuilt by `render_farm` on every chapter load (TD-014, AD-033 (2)) | `game/src/adapters/phaser/HeroUi.js:1140-1164` | The História group is rebuilt with it | The group adds no action that changes the screen (a chip opens the overlay and the screen stays as it is), so it adds nothing to TD-014; it is rebuilt from the same hook values |
+| A repaint during a camera move | `storyStage.update` | Writing the same `transform` again is harmless, but writing a new `transitionDuration` mid-move retimes it | `update` writes the camera only when the camera name or backdrop changed |
+| Large clearing backdrop | `game/public/assets/story/bg-clearing.jpg` (802 KB, 2730x1536) | The camera scales it 1.8x, so a smaller file would blur | Keep the file; it loads with the overlay like `bg-map.jpg` |
 | Low-resolution portrait | `game/public/assets/story/portrait-seraphine.png` (118x300) | Blurry at 560 px | D19: ships, `ui-artist` judges, owner art later |
 | Large map backdrop | `game/public/assets/story/bg-map.jpg` (945 KB, 2730x1536) | Slower first show of line 4 on a slow link | Loaded only when the overlay opens; the 1.4 s cross-fade hides the load; a smaller file is owner art |
 | Typing at 60 fps rewrites two text nodes per frame | `storyStage.update` | Negligible | `update` touches only `.story-shown` and `.story-ghost` when `shown` changed |
