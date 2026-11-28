@@ -406,7 +406,7 @@ export const storyScene = (id) => STORY_SCENES.find((scene) => scene.id === id) 
 
 ---
 
-#### T6: The seen list in localStorage (storySeen.js) [ ]
+#### T6: The seen list in localStorage (storySeen.js) [x]
 
 **Owner**: game-dev
 **Goal**: Remember which scenes opened automatically, per browser, with a memory fallback (STORY-02, STORY-07).
@@ -460,7 +460,7 @@ Read rules: `getItem` throws → `memory`; `getItem` returns `null` → `memory`
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 10 cases pass and every earlier unit test passes.
+- [x] The 10 cases pass and every earlier unit test passes.
 
 **Commit**: `feat(game): remember the story scenes already seen in this browser`
 

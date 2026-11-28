@@ -305,12 +305,12 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
 | STORY-01 | P1: The prologue opens (AC 1) | T4, T13, T14 | Implementing |
-| STORY-02 | P1: The prologue opens (AC 2) | T6, T13, T14 | In Tasks |
+| STORY-02 | P1: The prologue opens (AC 2) | T6, T13, T14 | Implementing |
 | STORY-03 | P1: The prologue opens (AC 3) | T4, T13, T14 | Implementing |
 | STORY-04 | P1: The prologue opens (AC 4) | T4, T13, T14 | Implementing |
 | STORY-05 | P1: The prologue opens (AC 5) | T13, T14 | In Tasks |
 | STORY-06 | P1: The prologue opens (AC 6) | T13, T14 | In Tasks |
-| STORY-07 | P1: The prologue opens (AC 7) | T6, T14 | In Tasks |
+| STORY-07 | P1: The prologue opens (AC 7) | T6, T14 | Implementing |
 | STORY-08 | P1: The prologue opens (AC 8) | T13, T14 | In Tasks |
 | STORY-09 | P1: Watching a scene (AC 1) | T3, T7, T14 | Implementing |
 | STORY-10 | P1: Watching a scene (AC 2) | T8, T14 | In Tasks |
