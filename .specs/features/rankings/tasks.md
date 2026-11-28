@@ -391,7 +391,7 @@ object RecordRules {
 
 ---
 
-#### T3: ClickPower domain and the shared fixture [ ]
+#### T3: ClickPower domain and the shared fixture [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The backend computes `Dano de clique` + `Dano da equipe por clique` exactly as the game, proven by one fixture file both suites read (RNK-03; spec Power AC 1, § Power Examples).
@@ -518,7 +518,7 @@ object ClickPower {
 **Gate**: `cd backend && ./gradlew ktlintCheck test --tests '*ClickPowerTest'`
 **Done when**:
 
-- [ ] The 7 cases pass; the fixture file is exactly the JSON above.
+- [x] The 7 cases pass; the fixture file is exactly the JSON above.
 
 **Commit**: `feat(backend): compute the click power of the rankings`
 
