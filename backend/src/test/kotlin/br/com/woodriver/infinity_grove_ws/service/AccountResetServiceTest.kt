@@ -9,6 +9,7 @@ import br.com.woodriver.infinity_grove_ws.InMemoryResetRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryTalentRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
 import br.com.woodriver.infinity_grove_ws.LogCapture
+import br.com.woodriver.infinity_grove_ws.RecordingRecordKeeping
 import br.com.woodriver.infinity_grove_ws.domain.ChapterDefinition
 import br.com.woodriver.infinity_grove_ws.domain.Encounter
 import br.com.woodriver.infinity_grove_ws.domain.Progress
@@ -32,7 +33,8 @@ class AccountResetServiceTest {
     private val resets = InMemoryResetRepository()
     private val autoClick = InMemoryAutoClickRepository()
     private val legacies = InMemoryLegacyRepository()
-    private val service = AccountResetService(progress, chapters, users, talents, crystals, resets, legacies)
+    private val records = RecordingRecordKeeping()
+    private val service = AccountResetService(progress, chapters, users, talents, crystals, resets, legacies, records)
 
     private val start = Progress("yan", ProgressPosition(1, 1, Encounter.PHASE, 1))
 
@@ -265,5 +267,25 @@ class AccountResetServiceTest {
         val result = service.reset("yan", 10)
 
         assertEquals(legacyOf(5 to 100, 10 to 50), result.legacy)
+    }
+
+    @Test
+    fun `a reset is reported to the records`() {
+        player(chapter = 3)
+
+        service.reset("yan", 3)
+
+        assertEquals(listOf("reset"), records.events)
+    }
+
+    @Test
+    fun `a refused reset reaches no record`() {
+        player(chapter = 1)
+        assertFailsWith<ResetLockedException> { service.reset("yan", 1) }
+
+        player(chapter = 3)
+        assertFailsWith<ResetChapterMismatchException> { service.reset("yan", 4) }
+
+        assertTrue(records.events.isEmpty())
     }
 }

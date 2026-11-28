@@ -809,7 +809,7 @@ Fakes (`test/Fakes.kt`): `object NoRecordKeeping : RecordKeeping` (every method 
 
 ---
 
-#### T8: AccountResetService reports resets to the records [ ]
+#### T8: AccountResetService reports resets to the records [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: A successful reset reaches `RecordKeeping.onReset`; a refused one does not (RNK-01, RNK-02; spec Boss AC 9, Story AC 2).
@@ -837,7 +837,7 @@ Fakes (`test/Fakes.kt`): `object NoRecordKeeping : RecordKeeping` (every method 
 **Gate**: `cd backend && ./gradlew ktlintCheck test --tests '*AccountResetServiceTest'`
 **Done when**:
 
-- [ ] The 2 new cases and every existing case pass.
+- [x] The 2 new cases and every existing case pass.
 
 **Commit**: `feat(backend): report account resets to the rankings`
 

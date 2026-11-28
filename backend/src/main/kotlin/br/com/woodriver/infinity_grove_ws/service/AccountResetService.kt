@@ -12,6 +12,7 @@ import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ResetRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.TalentRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
+import br.com.woodriver.infinity_grove_ws.usecase.RecordKeeping
 import br.com.woodriver.infinity_grove_ws.usecase.ResetAccountUseCase
 import br.com.woodriver.infinity_grove_ws.usecase.ResetResult
 import org.slf4j.LoggerFactory
@@ -33,6 +34,7 @@ class AccountResetService(
     private val crystalRepository: CrystalRepositoryPort,
     private val resetRepository: ResetRepositoryPort,
     private val legacyRepository: LegacyRepositoryPort,
+    private val records: RecordKeeping,
 ) : ResetAccountUseCase {
     override fun reset(
         username: String,
@@ -55,6 +57,7 @@ class AccountResetService(
         resetRepository.save(username, resets)
         val legacy = legacyRepository.find(username).afterReset(reward)
         legacyRepository.save(legacy)
+        records.onReset(username)
 
         logger.info(
             "Account reset username={} chapter={} reward={} crystals={} resets={} legacyChapter={} legacyPercent={}",
