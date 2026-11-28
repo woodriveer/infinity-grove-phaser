@@ -26,12 +26,15 @@ const addsChapter = ({ adds = [ ADD, ADD ], defense = 49, minibossHealth = 100, 
 const scene = (page, read) => page.evaluate(`(${read})(window.__PHASER_GAME__.scene.getScene('ClickerGame'))`);
 const advance = (page, ms) => page.evaluate((delta) => window.__PHASER_GAME__.scene.getScene('ClickerGame').update(0, delta), ms);
 
-//  Stops the loop and puts the ally clock back at 1000 ms, as it stands when a monster appears
-const freeze = (page) => page.evaluate(() => {
-    const game = window.__PHASER_GAME__;
+//  Stops the loop
+const freeze = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
 
-    game.loop.sleep();
-    game.scene.getScene('ClickerGame').allies.untilTickMs = 1000;
+//  The team's part of a click without the click: lands it on the target, then the kill path, as strike does
+const team = (page) => page.evaluate(() => {
+    const game = window.__PHASER_GAME__.scene.getScene('ClickerGame');
+
+    game.teamStrike(game.currentTarget());
+    game.afterDamage();
 });
 
 //  Logs in at chapter 11 stage 1 MINIBOSS (or `progress`), every hero owned with one blank card (`stars` adds a card of that many stars), Kael as
@@ -190,15 +193,15 @@ test.describe('Miniboss target', () => {
     test('an ally hits the guarded miniboss for 0.2 and the target add for 2', async ({ page }) => {
         await startAdds(page, { team: LYRA_ALLY, definition: addsChapter({ adds: GUARD_90 }) });
 
-        await advance(page, 1000);
+        await team(page);
 
         expect((await state(page)).main).toBeCloseTo(99.8, 5);
         expect(await lastNumber(page)).toMatchObject({ text: '0.2', x: 740, color: ALLY });
 
         await hitAt(page, ...LACAIO_1);
-        await advance(page, 1000);
+        await team(page);
 
-        expect((await state(page)).adds).toEqual([ 27, 30 ]);
+        expect((await state(page)).adds).toEqual([ 25, 30 ]);
         expect(await lastNumber(page)).toMatchObject({ text: '2', x: 520, y: 360, color: ALLY });
         //  Spec tech-debt-polish Edge 2: the number on an add has the same dark 10 px outline
         expect(await scene(page, `(s) => s.children.list.filter((o) => o.type === "Text" && o.style.color === "${ALLY}").map((o) => [ o.style.stroke, o.style.strokeThickness ]).at(-1)`)).toEqual([ '#1c120c', 10 ]);
@@ -207,21 +210,23 @@ test.describe('Miniboss target', () => {
     //  The task wrote allies Lyra and Orina with 99.58 and 0.4, but Orina's Erosão Arcana takes 15 points off the defense of every hit (spec
     //  Facts, `monsterAfterBreak`): her hit would meet 79 - 15 = 64 and deal 0.72. Vex only lowers the critical resistance, so Lyra and Vex give
     //  the numbers of the spec rules: Lyra kills the add (2), then Vex hits the miniboss at 79 for 0.42.
-    test('an ally tick that kills the target add lands its later hit on the miniboss', async ({ page }) => {
+    test('a click whose team strike kills the target add lands the later hit on the miniboss', async ({ page }) => {
         await startAdds(page, {
             definition: addsChapter({ adds: [ { health: 2, defenseBuff: 30 }, ADD ] }),
             team: { boughtSlots: 2, allies: [ 'lyra', 'vex', null, null ] }
         });
 
         await hitAt(page, ...LACAIO_1);
-        await advance(page, 1000);
 
         expect(await state(page)).toMatchObject({ adds: [ 0, 30 ], target: 'Miniboss' });
         expect((await state(page)).main).toBeCloseTo(99.58, 5);
 
+        //  Lyra's 2 stands 8 px right of the gold 1 of the click (spec team-click-damage E7); Vex's 0.4 stands at the miniboss's ally number place
+        const gold = await scene(page, '(s) => s.children.list.filter((o) => o.type === "Text" && o.style.color === "#ffd35c").map((o) => ({ x: o.x, width: o.width })).at(-1)');
         const allyNumbers = (await numbers(page)).filter(({ color }) => color === ALLY);
 
-        expect(allyNumbers).toMatchObject([ { text: '2', x: 520, y: 360 }, { text: '0.4', x: 740, y: 273 } ]);
+        expect(allyNumbers).toMatchObject([ { text: '2', y: 360 }, { text: '0.4', x: 740, y: 273 } ]);
+        expect(Math.abs(allyNumbers[0].x - (gold.x + gold.width / 2 + 8))).toBeLessThanOrEqual(0.5);
     });
 
     //  The adds carry the stats of the stage's phase monster (seeded with defense 0, so a fixture gives them defense 20 to make a break visible)
@@ -238,9 +243,9 @@ test.describe('Miniboss target', () => {
         await startAdds(page, { definition: addsChapter({ monsterDefense: 20 }), team: { boughtSlots: 2, allies: [ 'lyra', 'orina', null, null ] } });
 
         await hitAt(page, ...LACAIO_1);
-        await advance(page, 1000);
+        await team(page);
 
-        //  Lyra and Orina hit for 2 each on defense 20 - 15 = 5; the tick shows their sum at the add's ally number place
+        //  Lyra and Orina hit for 2 each on defense 20 - 15 = 5; the team strike shows their sum at the add's ally number place
         expect(await lastNumber(page)).toMatchObject({ text: '3.8', x: 520, y: 360, color: ALLY });
     });
 

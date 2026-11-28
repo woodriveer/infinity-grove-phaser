@@ -38,10 +38,7 @@ const start = async (page, { chapter = 5, cleared = [ 5 ], copper = 0, team, lea
 
     if (freeze)
     {
-        await page.evaluate(() => {
-            window.__PHASER_GAME__.loop.sleep();
-            window.__PHASER_GAME__.scene.getScene('ClickerGame').allies.untilTickMs = 1000;
-        });
+        await page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
     }
 };
 
@@ -136,7 +133,7 @@ test('field formation', async ({ page }, testInfo) => {
     await start(page, { cleared: [ 5, 6, 7, 8 ], team: FOUR, leader: 'lyra', freeze: true });
     await shot(page, testInfo, '09-field-formation');
     await page.evaluate(() => {
-        window.__PHASER_GAME__.scene.getScene('ClickerGame').update(0, 1000);
+        window.__PHASER_GAME__.scene.getScene('ClickerGame').strike(670);
         window.__PHASER_GAME__.loop.wake();
     });
     await page.waitForTimeout(250);

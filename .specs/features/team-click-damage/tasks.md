@@ -422,7 +422,7 @@ The tests `a click number keeps the gold fill and the 8 px outline` and `a criti
 
 ---
 
-#### T6: The adds, affix and review files stop writing the ally clock [ ]
+#### T6: The adds, affix and review files stop writing the ally clock [x]
 
 **Owner**: test-engineer
 **Goal**: The miniboss adds and affix e2e files keep their values with the team on the click, and no support or review file writes `allies.untilTickMs` (TCD-01 AC 7, 11; TCD-03 AC 2, 4).
@@ -457,8 +457,8 @@ The tests `a click number keeps the gold fill and the 8 px outline` and `a criti
 **Gate**: `cd game && npm test`, then one at a time: `npx playwright test e2e/minibossAddsTarget.spec.js`, `e2e/minibossAdds.spec.js`, `e2e/minibossAddsSkills.spec.js`, `e2e/monsterAffixes.spec.js`, `e2e/monsterAffixesHud.spec.js`
 **Done when**:
 
-- [ ] `git grep -n "untilTickMs" game/e2e game/ui-review` prints nothing.
-- [ ] Every row is applied; the five files pass.
+- [x] `git grep -n "untilTickMs" game/e2e game/ui-review` prints nothing.
+- [x] Every row is applied; the five files pass.
 
 **Commit**: `test(game): the adds, affix and review files land the team with the click`
 

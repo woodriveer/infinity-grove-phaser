@@ -25,13 +25,8 @@ const addsChapter = ({ adds = [ ADD, ADD ], defense = 49, minibossHealth = 100, 
 const scene = (page, read) => page.evaluate(`(${read})(window.__PHASER_GAME__.scene.getScene('ClickerGame'))`);
 const advance = (page, ms) => page.evaluate((delta) => window.__PHASER_GAME__.scene.getScene('ClickerGame').update(0, delta), ms);
 
-//  Stops the loop and puts the ally clock back at 1000 ms, as it stands when a monster appears
-const freeze = (page) => page.evaluate(() => {
-    const game = window.__PHASER_GAME__;
-
-    game.loop.sleep();
-    game.scene.getScene('ClickerGame').allies.untilTickMs = 1000;
-});
+//  Stops the loop
+const freeze = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
 const wake = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.wake());
 
 //  Logs in at chapter 11 stage 1 MINIBOSS (or `progress`), every hero owned with one blank card (`stars` adds a card of that many stars), Kael as

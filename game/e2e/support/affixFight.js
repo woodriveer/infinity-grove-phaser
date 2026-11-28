@@ -35,12 +35,15 @@ export const scene = (page, read) => page.evaluate(`(${read})(window.__PHASER_GA
 export const health = (page) => scene(page, '(s) => s.monster?.health');
 export const advance = (page, ms) => page.evaluate((delta) => window.__PHASER_GAME__.scene.getScene('ClickerGame').update(0, delta), ms);
 
-//  Stops the loop and puts the ally clock back at 1000 ms, as it stands when a monster appears
-export const freeze = (page) => page.evaluate(() => {
-    const game = window.__PHASER_GAME__;
+//  Stops the loop
+export const freeze = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
 
-    game.loop.sleep();
-    game.scene.getScene('ClickerGame').allies.untilTickMs = 1000;
+//  The team's part of a click without the click: lands it on the target, then the kill path, as strike does
+export const team = (page) => page.evaluate(() => {
+    const game = window.__PHASER_GAME__.scene.getScene('ClickerGame');
+
+    game.teamStrike(game.currentTarget());
+    game.afterDamage();
 });
 
 //  The body of the miniboss and of the chapter boss: a click in its middle hits it (MONSTER of ClickerGame.js)

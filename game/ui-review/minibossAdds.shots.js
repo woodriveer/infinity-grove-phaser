@@ -17,10 +17,7 @@ const addsChapter = ({ adds = [ ADD, ADD ], defense = 49, minibossHealth = 100, 
 });
 
 const scene = (page, read) => page.evaluate(`(${read})(window.__PHASER_GAME__.scene.getScene('ClickerGame'))`);
-const freeze = (page) => page.evaluate(() => {
-    window.__PHASER_GAME__.loop.sleep();
-    window.__PHASER_GAME__.scene.getScene('ClickerGame').allies.untilTickMs = 100000;
-});
+const freeze = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
 const hitAt = (page, x, y, times = 1) => page.evaluate(([ px, py, n ]) => {
     const s = window.__PHASER_GAME__.scene.getScene('ClickerGame');
 
@@ -106,7 +103,6 @@ test('05 skill numbers', async ({ page }, testInfo) => {
 test('06 with team', async ({ page }, testInfo) => {
     await start(page, { team: { boughtSlots: 4, allies: [ 'lyra', 'orina', 'seraphine', 'vex' ] } });
     await hitAt(page, 480, 360);
-    await page.evaluate(() => { window.__PHASER_GAME__.scene.getScene('ClickerGame').allies.untilTickMs = 30; });
     await page.evaluate(() => window.__PHASER_GAME__.loop.wake());
     await page.waitForTimeout(150);
     await shot(page, testInfo, '06-adds-with-team');

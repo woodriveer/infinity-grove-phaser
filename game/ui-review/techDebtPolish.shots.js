@@ -47,14 +47,13 @@ const openPanel = async (page) => {
     await page.waitForTimeout(500);
 };
 
-//  Loop asleep, ally clock at 1000 ms, one tick stepped by hand: the number is at alpha 1
+//  Loop asleep, one click stepped by hand: the click number and the team number are at alpha 1
 const tick = (page) => page.evaluate(() => {
     const game = window.__PHASER_GAME__;
     const scene = game.scene.getScene('ClickerGame');
 
     game.loop.sleep();
-    scene.allies.untilTickMs = 1000;
-    scene.update(0, 1000);
+    scene.strike(scene.centreXOf(scene.currentTarget()), scene.currentTarget());
     //  The loop is asleep, so draw one frame by hand with a delta of 0: the tweens do not move and the number stays at alpha 1
     game.step(performance.now(), 0);
 });

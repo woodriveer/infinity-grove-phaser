@@ -1,6 +1,6 @@
 import { expect, test } from './support/coverage';
 import {
-    ARMORED, REGENERATION, SHELL, SHIELD, advance, affixChapter, chip, clickMonster, damageTexts, freeze, health, hp, scene, startFight
+    ARMORED, REGENERATION, SHELL, SHIELD, advance, affixChapter, chip, clickMonster, damageTexts, freeze, health, hp, scene, startFight, team
 } from './support/affixFight';
 
 //  The affix rules of minibosses and chapter bosses on the real scene (spec early-game-rebalance, Affix Rules and Affixes AC 4 to 12). The miniboss has 100 health, defense 0
@@ -168,7 +168,7 @@ test.describe('Every strike goes through the affix', () => {
 
         await expect(chip(page)).toHaveText('Escudo de golpes: 3/3');
 
-        await advance(page, 1_000);
+        await team(page);
 
         await expect(chip(page)).toHaveText('Escudo de golpes: 2/3');
         expect(await health(page)).toBe(100);
