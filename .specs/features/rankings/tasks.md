@@ -1429,7 +1429,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 
 ### Phase 4: Tests in the browser and author check
 
-#### T17: The game formulas give the fixture values [ ]
+#### T17: The game formulas give the fixture values [x]
 
 **Owner**: test-engineer
 **Goal**: The game's `leaderAttacker` and `allyDamagePerClick` give the six values of the shared fixture, so a damage change in the game that the backend does not follow fails `npm test` (RNK-03; spec Power AC 2).
@@ -1441,7 +1441,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 
 **Contract** (test only, no production change):
 
-- Read the fixture with `readFileSync(fileURLToPath(new URL('../../../../backend/src/test/resources/ranking/click-power-cases.json', import.meta.url)), 'utf8')` (`node:fs`, `node:url`) and `JSON.parse`.
+- Read the fixture with `import CASES from '../../../../backend/src/test/resources/ranking/click-power-cases.json'` (SPEC_DEVIATION by the test-engineer: the task named `readFileSync` with `node:fs` and `node:url`, but `architecture.test.js` lets a domain test import only `vitest`, so the first run of that form failed it; a JSON import reads the same file).
 - Per case: `piece(p)` = `p.slot === 'WEAPON' ? { slot: 'WEAPON', clickDamage: p.click, affixes: [] } : { slot: p.slot, affixes: [ { type: 'CLICK_DAMAGE_PCT', value: p.clickDamagePct } ] }`; `talents` = `Object.entries(c.talentValues).map(([ id, value ]) => ({ id, value }))`; `allies` = `c.allies.slice(0, c.boughtSlots)`; `active` = `teamActive({ chapter: c.chapter, completed: c.completed })`; `allyFactor` = `teamPassives(active ? allies.map((a) => a.heroId) : []).allyFactor`; `power` = `leaderAttacker({ leader: { element: 'FIRE', stars: c.leader.stars }, pieces: c.leader.pieces.map(piece), talents }).baseDamage + sum of allyDamagePerClick({ ally: { stars: a.stars }, pieces: a.pieces.map(piece), allyFactor })`.
 
 **Steps**: create the test; run the gate.
@@ -1455,7 +1455,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 2 tests (7 assertions of value) pass.
+- [x] The 2 tests (7 assertions of value) pass.
 
 **Commit**: `test(game): pin the click power formula to the backend fixture`
 
