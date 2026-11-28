@@ -9,6 +9,7 @@ import { createHealthApi } from './adapters/http/healthApi';
 import { createHeroesApi } from './adapters/http/heroesApi';
 import { createHttpClient } from './adapters/http/httpClient';
 import { createProgressApi } from './adapters/http/progressApi';
+import { createRankingApi } from './adapters/http/rankingApi';
 import { createTalentApi } from './adapters/http/talentApi';
 import { createUserApi } from './adapters/http/userApi';
 import { createWalletApi } from './adapters/http/walletApi';
@@ -23,6 +24,7 @@ import { createCampaignSession as createCampaignSessionService } from './applica
 import { createEquipmentCollection as createEquipmentCollectionService } from './application/equipment/equipmentCollection';
 import { createFarmSession as createFarmSessionService } from './application/farm/farmSession';
 import { createHeroCollection as createHeroCollectionService } from './application/heroes/heroCollection';
+import { createRankingBoard as createRankingBoardService } from './application/rankings/rankingBoard';
 import { createSessionManager } from './application/session/sessionManager';
 import { createTalentCollection as createTalentCollectionService } from './application/talents/talentCollection';
 import { createWalletSync as createWalletSyncService } from './application/wallet/walletSync';
@@ -43,6 +45,7 @@ export const autoClickApi = createAutoClickApi(httpClient);
 export const accountResetApi = createAccountResetApi(httpClient);
 export const healthApi = createHealthApi(httpClient);
 export const giftApi = createGiftApi(httpClient);
+export const rankingApi = createRankingApi(httpClient);
 
 //  A fresh wallet service, campaign session, hero collection, equipment collection, talent collection, farm session and auto click state
 //  per game scene
@@ -50,6 +53,7 @@ export const createWalletSync = () => createWalletSyncService({ gateway: walletA
 export const createCampaignSession = () => createCampaignSessionService({ gateway: progressApi });
 export const createHeroCollection = () => createHeroCollectionService({ gateway: heroesApi });
 export const createFarmSession = () => createFarmSessionService({ gateway: farmApi });
+export const createRankingBoard = () => createRankingBoardService({ gateway: rankingApi });
 export const createEquipmentCollection = () => createEquipmentCollectionService({ gateway: equipmentApi });
 export const createTalentCollection = () => createTalentCollectionService({ gateway: talentApi });
 export const createAutoClickState = () => createAutoClickStateService({ gateway: autoClickApi });
@@ -72,6 +76,7 @@ export const services = {
     createEquipmentCollection,
     createTalentCollection,
     createFarmSession,
+    createRankingBoard,
     createAutoClickState,
     createAccountReset,
     resetLegacy,

@@ -189,6 +189,7 @@ export class ClickerGame extends Scene
         this.gifts = services.gifts;
         this.talents = services.createTalentCollection();
         this.farm = services.createFarmSession();
+        this.rankings = services.createRankingBoard();
         this.autoClick = services.createAutoClickState();
         this.autoClickPreference = services.autoClickPreference;
         this.autoClickEnabled = this.autoClickPreference.enabled();
@@ -639,6 +640,7 @@ export class ClickerGame extends Scene
             equipment: this.equipment,
             talents: this.talents,
             farm: this.farm,
+            rankings: this.rankings,
             walletCopper: () => walletCopper(this.wallet.display()),
             startFarm: (boss) => this.startFarm(boss),
             useSkill: (slot) => this.useSkill(slot),

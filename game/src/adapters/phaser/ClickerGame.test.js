@@ -8,6 +8,7 @@ import { createCampaignSession } from '../../application/campaign/campaignSessio
 import { createEquipmentCollection } from '../../application/equipment/equipmentCollection';
 import { createFarmSession } from '../../application/farm/farmSession';
 import { createHeroCollection } from '../../application/heroes/heroCollection';
+import { createRankingBoard } from '../../application/rankings/rankingBoard';
 import { createTalentCollection } from '../../application/talents/talentCollection';
 import { createWalletSync } from '../../application/wallet/walletSync';
 import { STORY_SCENES } from '../../domain/story/storyCatalog';
@@ -24,6 +25,11 @@ const campaignGateway = { get: vi.fn(), report: vi.fn() };
 //  The real hero collection and farm session over mocked gateways; by default the player owns Kael with one blank card
 const heroesGateway = { list: vi.fn(), fuse: vi.fn(), setLeader: vi.fn(), setTeam: vi.fn(), buySlot: vi.fn() };
 const farmGateway = { get: vi.fn(), win: vi.fn() };
+//  The ranking board over a gateway that answers an empty boss board
+const rankingGateway = {
+    get: vi.fn(async () => ({ board: 'boss-time', chapter: 1, entries: [], me: null })),
+    recordClickPower: vi.fn(async () => ({ value: 1, best: 1 }))
+};
 const talentGateway = { list: vi.fn(), upgrade: vi.fn(), reset: vi.fn() };
 //  The real auto click state over a mocked gateway, and the switch preference as a plain object (on unless a test turns it off)
 const autoClickGateway = { get: vi.fn(), upgrade: vi.fn() };
@@ -54,6 +60,7 @@ const services = {
     createEquipmentCollection: () => createEquipmentCollection({ gateway: equipmentGateway }),
     createTalentCollection: () => createTalentCollection({ gateway: talentGateway }),
     createFarmSession: () => createFarmSession({ gateway: farmGateway }),
+    createRankingBoard: () => createRankingBoard({ gateway: rankingGateway }),
     createAutoClickState: () => createAutoClickState({ gateway: autoClickGateway }),
     createAccountReset: (ports) => createAccountReset({ gateway: resetGateway, ...ports }),
     resetLegacy: createResetLegacy({ gateway: legacyGateway }),
@@ -525,6 +532,15 @@ describe('ClickerGame element wheel', () => {
 
         expect(ctx.hud('[data-testid="element-wheel"]')).not.toBeNull();
         expect(ctx.hud('[data-testid="element-wheel"]').closest('[hidden]')).toBeNull();
+    });
+});
+
+describe('ClickerGame ranking board', () => {
+    it('the scene hands its ranking board to the hero screens', async () => {
+        const ctx = await createScene();
+
+        expect(ctx.scene.rankings).not.toBeNull();
+        expect(ctx.scene.heroUi.rankings).toBe(ctx.scene.rankings);
     });
 });
 

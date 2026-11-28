@@ -5,7 +5,7 @@ import { STORY_SCENES } from './domain/story/storyCatalog';
 describe('composition root', () => {
     it('hands the scenes the session, the user api and one factory per game service', () => {
         expect(Object.keys(services).sort()).toEqual([
-            'autoClickPreference', 'backend', 'createAccountReset', 'createAutoClickState', 'createCampaignSession', 'createEquipmentCollection', 'createFarmSession', 'createHeroCollection', 'createTalentCollection', 'createWalletSync', 'gifts', 'playStory', 'resetLegacy', 'session', 'storyScenes', 'storySeen', 'users'
+            'autoClickPreference', 'backend', 'createAccountReset', 'createAutoClickState', 'createCampaignSession', 'createEquipmentCollection', 'createFarmSession', 'createHeroCollection', 'createRankingBoard', 'createTalentCollection', 'createWalletSync', 'gifts', 'playStory', 'resetLegacy', 'session', 'storyScenes', 'storySeen', 'users'
         ]);
         expect(typeof services.gifts.claim).toBe('function');
         expect(typeof services.users.signUp).toBe('function');
@@ -37,6 +37,17 @@ describe('composition root', () => {
         expect(first.heroes()).toEqual([]);
         expect(typeof first.fuse).toBe('function');
         expect(typeof first.setLeader).toBe('function');
+    });
+
+    it('builds a fresh ranking board with its own state on every call', () => {
+        const first = services.createRankingBoard();
+        const second = services.createRankingBoard();
+
+        expect(first).not.toBe(second);
+        expect(first.board()).toBe('boss-time');
+        expect(first.chapter()).toBeNull();
+        expect(first.page()).toBeNull();
+        expect(typeof first.open).toBe('function');
     });
 
     it('builds a fresh equipment collection with its own state on every call', () => {

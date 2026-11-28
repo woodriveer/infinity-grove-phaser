@@ -1387,7 +1387,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 
 ---
 
-#### T16: Wire the ranking board into the game [ ]
+#### T16: Wire the ranking board into the game [x]
 
 **Owner**: game-dev
 **Goal**: The composition builds the ranking api and one board per scene, and the scene hands it to the hero screens (RNK-07).
@@ -1419,7 +1419,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 2 cases and the re-pinned case pass; every other case of the two test files passes.
+- [x] The 2 cases and the re-pinned case pass; every other case of the two test files passes.
 
 **Commit**: `feat(game): wire the ranking board into the scene`
 
