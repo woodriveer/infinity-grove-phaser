@@ -1094,12 +1094,12 @@ export class ClickerGame extends Scene
         this.targetChip.textContent = this.fight?.hasAdds && target ? `Alvo: ${this.fight.nameOf(target)} · ${healthText(target)}` : '';
     }
 
-    //  "Water  Defesa 10%  Seu crítico: 28%", one chip each; the double spaces are hidden between the chips. data-element and data-stat give each
+    //  "Água  Defesa 10%  Seu crítico: 28%", one chip each; the double spaces are hidden between the chips. data-element and data-stat give each
     //  chip its dot or icon (spec ui-redesign UIR-07); the one defense is read by defenseOf (spec unified-damage)
     showEnemyStats (stats)
     {
         const { element } = stats;
-        const name = element.charAt(0) + element.slice(1).toLowerCase();
+        const name = ELEMENT_LABELS[element];
         //  The click's critical chance against this monster (spec talent-tree-rework): no skill buff, no overflow, one decimal at most
         const chance = Math.round(effectiveCritChance(this.leaderAttacker().critChance, stats.critResistance ?? 0) * 10) / 10;
         const chips = [ [ 'defense', `Defesa ${defenseOf(stats)}%` ], [ 'crit', `Seu crítico: ${chance}%` ] ];

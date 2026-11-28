@@ -2067,13 +2067,13 @@ describe('ClickerGame elements', () => {
     it('shows defense over physicalDefense when a payload has both: Defesa 40%', async () => {
         const ctx = await createScene({ start: withStats({ element: 'WATER', defense: 40, physicalDefense: 70, magicalDefense: 70, critResistance: 12 }) });
 
-        expect(enemyText(ctx)).toBe('Water  Defesa 40%  Seu crítico: 0%');
+        expect(enemyText(ctx)).toBe('Água  Defesa 40%  Seu crítico: 0%');
     });
 
     it('shows Defesa 0% for an old payload with only physicalDefense 50 and magicalDefense 10', async () => {
         const ctx = await createScene({ start: withStats({ element: 'DARKNESS', physicalDefense: 50, magicalDefense: 10, critResistance: 100 }) });
 
-        expect(enemyText(ctx)).toBe('Darkness  Defesa 0%  Seu crítico: 0%');
+        expect(enemyText(ctx)).toBe('Escuridão  Defesa 0%  Seu crítico: 0%');
         expect(enemyText(ctx)).not.toContain('Physical def');
         expect(enemyText(ctx)).not.toContain('Magical def');
     });
@@ -2135,32 +2135,32 @@ describe('ClickerGame elements', () => {
     it('shows the element, the defense of the monster and Seu crítico on screen', async () => {
         const ctx = await createScene({ start: withStats(stats('WATER', 11, 33)) });
 
-        expect(enemyText(ctx)).toBe('Water  Defesa 11%  Seu crítico: 0%');
+        expect(enemyText(ctx)).toBe('Água  Defesa 11%  Seu crítico: 0%');
     });
 
     it('shows the miniboss attributes when the miniboss spawns', async () => {
         const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT', 1, 3)), encounter: 'MINIBOSS' } });
 
-        expect(enemyText(ctx)).toBe('Light  Defesa 1%  Seu crítico: 7%');
+        expect(enemyText(ctx)).toBe('Luz  Defesa 1%  Seu crítico: 7%');
     });
 
     it('shows the chapter boss attributes', async () => {
         const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
 
-        expect(enemyText(ctx)).toBe('Darkness  Defesa 30%  Seu crítico: 0%');
+        expect(enemyText(ctx)).toBe('Escuridão  Defesa 30%  Seu crítico: 0%');
     });
 
     it('shows fire with no defense for a payload without stats', async () => {
         const ctx = await createScene();
 
-        expect(enemyText(ctx)).toBe('Fire  Defesa 0%  Seu crítico: 10%');
+        expect(enemyText(ctx)).toBe('Fogo  Defesa 0%  Seu crítico: 10%');
     });
 
     it('shows Seu crítico: 10% for a 3-star Kael against critical resistance 30', async () => {
         const heroes = { leaderId: 'kael', heroes: [ heroEntry('kael', { 3: 1 }, 3) ] };
         const ctx = await createScene({ start: withStats(stats('FIRE', 0, 30)), heroes });
 
-        expect(enemyText(ctx)).toBe('Fire  Defesa 0%  Seu crítico: 10%');
+        expect(enemyText(ctx)).toBe('Fogo  Defesa 0%  Seu crítico: 10%');
     });
 
     it('shows Seu crítico: 100% for a leader of critical chance 130 against resistance 10', async () => {
@@ -2168,7 +2168,7 @@ describe('ClickerGame elements', () => {
         const talents = [ COMBO_MAXED, { id: 'CRIT_CHANCE', baseId: 'CRIT_CHANCE', value: 60 } ];
         const ctx = await createScene({ start: withStats(stats('FIRE', 0, 10)), heroes, talents });
 
-        expect(enemyText(ctx)).toBe('Fire  Defesa 0%  Seu crítico: 100%');
+        expect(enemyText(ctx)).toBe('Fogo  Defesa 0%  Seu crítico: 100%');
     });
 
     it('marks the element chip with data-element and the defense and crit chips with data-stat', async () => {
@@ -2179,10 +2179,23 @@ describe('ClickerGame elements', () => {
             .toEqual([ [ 'defense', 'Defesa 11%' ], [ 'crit', 'Seu crítico: 0%' ] ]);
     });
 
+    it('names the element chip in Portuguese for the five elements', async () => {
+        const names = { FIRE: 'Fogo', WATER: 'Água', NATURE: 'Natureza', LIGHT: 'Luz', DARKNESS: 'Escuridão' };
+
+        for (const [ element, name ] of Object.entries(names))
+        {
+            const ctx = await createScene({ start: withStats(stats(element, 0, 0)) });
+            const chip = ctx.hud('.enemy-stats .tag-element');
+
+            expect(chip.textContent).toBe(name);
+            expect(chip.getAttribute('data-element')).toBe(element);
+        }
+    });
+
     it('keeps the element chip and the one-defense line on a chapter boss', async () => {
         const ctx = await createScene({ start: { ...withStats(stats('WATER'), stats('LIGHT'), stats('DARKNESS', 30, 30)), stage: 10, encounter: 'CHAPTER_BOSS' } });
 
-        expect(enemyText(ctx)).toBe('Darkness  Defesa 30%  Seu crítico: 0%');
+        expect(enemyText(ctx)).toBe('Escuridão  Defesa 30%  Seu crítico: 0%');
         expect(ctx.hud('.enemy-stats .tag-element').getAttribute('data-element')).toBe('DARKNESS');
     });
 
@@ -2194,7 +2207,7 @@ describe('ClickerGame elements', () => {
 
         fade(ctx).onComplete();
         ctx.timers.at(-1).callback();
-        expect(enemyText(ctx)).toBe('Nature  Defesa 0%  Seu crítico: 10%');
+        expect(enemyText(ctx)).toBe('Natureza  Defesa 0%  Seu crítico: 10%');
     });
 
     it('clears the attributes when the boss runs out of time', async () => {
@@ -2292,7 +2305,7 @@ describe('ClickerGame elements', () => {
         fade(ctx).onComplete();
         ctx.timers.at(-1).callback();
 
-        expect(enemyText(ctx)).toBe('Light  Defesa 4%  Seu crítico: 4%');
+        expect(enemyText(ctx)).toBe('Luz  Defesa 4%  Seu crítico: 4%');
     });
 });
 
@@ -5721,7 +5734,7 @@ describe('ClickerGame hero team', () => {
     it('Orina as an ally shows Defesa 25% on a monster of defense 40 and a click deals 0.75 plus her 1.5', async () => {
         const ctx = await open([ 'orina', null, null, null ], { start: ironMonster() });
 
-        expect(ctx.hud('.enemy-stats').textContent).toBe('Fire  Defesa 25%  Seu crítico: 0%');
+        expect(ctx.hud('.enemy-stats').textContent).toBe('Fogo  Defesa 25%  Seu crítico: 0%');
 
         ctx.click();
 
@@ -5733,19 +5746,19 @@ describe('ClickerGame hero team', () => {
         const withVex = await open([ 'vex', null, null, null ], { start: start() });
         const without = await open([ null, null, null, null ], { start: start() });
 
-        expect(withVex.hud('.enemy-stats').textContent).toBe('Fire  Defesa 40%  Seu crítico: 10%');
-        expect(without.hud('.enemy-stats').textContent).toBe('Fire  Defesa 40%  Seu crítico: 5%');
+        expect(withVex.hud('.enemy-stats').textContent).toBe('Fogo  Defesa 40%  Seu crítico: 10%');
+        expect(without.hud('.enemy-stats').textContent).toBe('Fogo  Defesa 40%  Seu crítico: 5%');
     });
 
     it('the chip follows a change of the fighting allies: Lyra in slot 1 turns Seu crítico: 10% into 20%', async () => {
         const ctx = await open([ null, null, null, null ]);
 
-        expect(ctx.hud('.enemy-stats').textContent).toBe('Fire  Defesa 0%  Seu crítico: 10%');
+        expect(ctx.hud('.enemy-stats').textContent).toBe('Fogo  Defesa 0%  Seu crítico: 10%');
 
         heroesGateway.setTeam.mockResolvedValue({ leaderId: 'kael', team: teamPayload([ 'lyra', null, null, null ]) });
         await ctx.scene.heroes.setTeam([ 'lyra', null, null, null ]);
 
-        expect(ctx.hud('.enemy-stats').textContent).toBe('Fire  Defesa 0%  Seu crítico: 20%');
+        expect(ctx.hud('.enemy-stats').textContent).toBe('Fogo  Defesa 0%  Seu crítico: 20%');
     });
 
     it('Lyra as an ally makes a roll of 15 a critical click', async () => {
@@ -6359,7 +6372,7 @@ describe('ClickerGame miniboss adds', () => {
     it('the enemy line of the guarded miniboss reads Defesa 109%', async () => {
         const ctx = await addsScene();
 
-        expect(enemyLine(ctx)).toBe('Fire  Defesa 109%  Seu crítico: 10%');
+        expect(enemyLine(ctx)).toBe('Fogo  Defesa 109%  Seu crítico: 10%');
     });
 
     it('a click on the guarded miniboss deals 0 at defense 109, then 0.21 after one add died and 0.51 after both', async () => {
@@ -6382,7 +6395,7 @@ describe('ClickerGame miniboss adds', () => {
 
         killAdd(ctx, 1);
 
-        expect(enemyLine(ctx)).toBe('Fire  Defesa 79%  Seu crítico: 10%');
+        expect(enemyLine(ctx)).toBe('Fogo  Defesa 79%  Seu crítico: 10%');
     });
 
     it('an add death fades its body, bar, fill and text over 500 ms and destroys them', async () => {
@@ -6583,7 +6596,7 @@ describe('ClickerGame miniboss target', () => {
         expect(healthOf(ctx, 1)).toBeCloseTo(29, 9);
         expect(ctx.scene.fight.target).toBe(ctx.scene.fight.adds[0].monster);
         expect(chip(ctx)).toBe('Alvo: Lacaio 1 · HP 29/30');
-        expect(enemyLine(ctx)).toBe('Fire  Defesa 0%  Seu crítico: 10%');
+        expect(enemyLine(ctx)).toBe('Fogo  Defesa 0%  Seu crítico: 10%');
     });
 
     it('the chip follows the target of a fight with adds: the main reads Seu crítico: 10%, an add of resistance 4 reads 6%', async () => {
@@ -6591,11 +6604,11 @@ describe('ClickerGame miniboss target', () => {
             miniboss: { element: 'FIRE', defense: 49, critResistance: 0 }, monster: { element: 'FIRE', defense: 0, critResistance: 4 }
         });
 
-        expect(enemyLine(ctx)).toBe('Fire  Defesa 109%  Seu crítico: 10%');
+        expect(enemyLine(ctx)).toBe('Fogo  Defesa 109%  Seu crítico: 10%');
 
         ctx.click(lacaio1);
 
-        expect(enemyLine(ctx)).toBe('Fire  Defesa 0%  Seu crítico: 6%');
+        expect(enemyLine(ctx)).toBe('Fogo  Defesa 0%  Seu crítico: 6%');
     });
 
     it('a click on an add shows its number where it landed, at y 360', async () => {
@@ -6939,7 +6952,7 @@ describe('ClickerGame miniboss skills', () => {
 
         expect(numbers(ctx, before)).toEqual([ [ '2.8', 480, 360 ], [ '2.8', 480, 540 ], [ '1.4', 670, 273 ] ]);
         expect(ctx.scene.fight.adds.map((add) => add.monster.dead)).toEqual([ true, true ]);
-        expect(enemyLine(ctx)).toBe('Fire  Defesa 50%  Seu crítico: 40%');
+        expect(enemyLine(ctx)).toBe('Fogo  Defesa 50%  Seu crítico: 40%');
     });
 
     it('Bomba de Veneno ticks on every monster', async () => {

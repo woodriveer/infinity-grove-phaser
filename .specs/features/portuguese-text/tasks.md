@@ -218,7 +218,7 @@ T11
 
 ---
 
-#### T5: The enemy element chip names the element in Portuguese [ ]
+#### T5: The enemy element chip names the element in Portuguese [x]
 
 **Owner**: game-dev
 **Goal**: The first chip of the enemy line reads `Fogo`, `Água`, `Natureza`, `Luz` or `Escuridão`, keeping its `data-element` and dot (PT-04; spec Combat HUD AC 6, I26).
@@ -242,8 +242,8 @@ T11
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The unit suite passes.
-- [ ] `git grep -n "charAt(0) + element.slice(1)" -- game/src` prints nothing.
+- [x] The unit suite passes.
+- [x] `git grep -n "charAt(0) + element.slice(1)" -- game/src` prints nothing.
 
 **Commit**: `feat(game): name the enemy element in Portuguese`
 
