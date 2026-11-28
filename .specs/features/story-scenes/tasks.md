@@ -1173,7 +1173,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 
 - [ ] F1 (medium): the Mapa tab still shows the skull icon of "Rever chefes"; draw a map or scroll icon in the style of the other five (`game/public/style.css`, `game/public/assets/ui/`). Shot `10b-rail-with-mapa-tab`.
 - [ ] F2 (low): on the chapter 1 title and end cards the logo covers Kael's head and the text crosses three heroes; darken the scrim behind the text or move the logo up (`.story-tint.is-dark`, `.story-logo`). Shot `15-ch1-title`.
-- [ ] F3 (low): Kael's round face is off-centre; reframe `game/public/assets/story/face-kael.jpg` with the head centred (owner art). Shot `17-ch1-kael`.
+- [x] F3 (low, closed by revision 4): Kael's round face is off-centre; reframe `game/public/assets/story/face-kael.jpg` with the head centred (owner art). Shot `17-ch1-kael`.
 - [ ] F4 (low): the line 7 dawn is barely visible; raise `.story-tint.is-dawn` to about 0.5 or move the gradient to `ellipse at 50% 15%`. Shot `20-ch1-dawn`.
 
 ---
