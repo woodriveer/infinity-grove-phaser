@@ -18,29 +18,29 @@ describe('teamModel', () => {
     it('the model of a team with Lyra in slot 1 and slot 2 buyable', () => {
         const model = modelOf();
 
-        expect(model.slots[0]).toMatchObject({ slot: 1, state: 'filled', dpsText: 'Dano: 2/s', passiveLine: 'Olho do Falcão: +10 de chance de crítico' });
+        expect(model.slots[0]).toMatchObject({ slot: 1, state: 'filled', dpsText: 'Dano: 2/clique', passiveLine: 'Olho do Falcão: +10 de chance de crítico' });
         expect(model.slots[1]).toMatchObject({ slot: 2, state: 'buyable', priceGold: 2 });
         expect(model.slots[2]).toMatchObject({ slot: 3, state: 'locked', chapter: 7 });
-        expect(model.teamDpsText).toBe('Dano da equipe: 2/s');
+        expect(model.teamDpsText).toBe('Dano da equipe por clique: 2');
         expect(model.leader).toMatchObject({ id: 'kael', name: 'Kael', bonusText: 'Bonus (em breve)' });
     });
 
     it('Seraphine raises every shown damage by 1.25', () => {
         const model = modelOf({ team: teamOf({ openSlots: 2, boughtSlots: 2, allies: [ 'lyra', 'seraphine', null, null ] }) });
 
-        expect([ model.slots[0].dpsText, model.slots[1].dpsText ]).toEqual([ 'Dano: 2.5/s', 'Dano: 2.5/s' ]);
-        expect(model.teamDpsText).toBe('Dano da equipe: 5/s');
+        expect([ model.slots[0].dpsText, model.slots[1].dpsText ]).toEqual([ 'Dano: 2.5/clique', 'Dano: 2.5/clique' ]);
+        expect(model.teamDpsText).toBe('Dano da equipe por clique: 5');
     });
 
     it('the shown damage of a 9 star Lyra with a 624 click weapon reads 12.5K', () => {
         const pieces = [ { id: 'w', slot: 'WEAPON', clickDamage: 624, affixes: [], heroId: 'lyra' } ];
         const model = modelOf({ heroes: heroes({ lyra: { stars: 9 } }), pieces });
 
-        expect(model.slots[0].dpsText).toBe('Dano: 12.5K/s');
+        expect(model.slots[0].dpsText).toBe('Dano: 12.5K/clique');
     });
 
-    it('no ally reads Dano da equipe: 0/s', () => {
-        expect(modelOf({ team: teamOf({ boughtSlots: 0, allies: [ null, null, null, null ] }) }).teamDpsText).toBe('Dano da equipe: 0/s');
+    it('no ally reads Dano da equipe por clique: 0', () => {
+        expect(modelOf({ team: teamOf({ boughtSlots: 0, allies: [ null, null, null, null ] }) }).teamDpsText).toBe('Dano da equipe por clique: 0');
     });
 
     it('canPick is true with an empty bought slot and false when every bought slot is full and none is selected', () => {
@@ -113,7 +113,7 @@ describe('renderTeam', () => {
 
         expect(byId(screen, 'team-slot-1').getAttribute('data-state')).toBe('filled');
         expect(cardText(screen, 'team-slot-1', '.team-slot-label')).toBe('Aliado 1');
-        expect(cardText(screen, 'team-slot-1', '.team-dps-line')).toBe('Dano: 2/s');
+        expect(cardText(screen, 'team-slot-1', '.team-dps-line')).toBe('Dano: 2/clique');
         expect(cardText(screen, 'team-slot-1', '.team-passive')).toBe('Olho do Falcão: +10 de chance de crítico');
     });
 

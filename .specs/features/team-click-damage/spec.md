@@ -218,8 +218,8 @@ Numbers on the canvas use `formatDamage` (one decimal, K/M/B/T from 1 000).
 | TCD-01 | P1: The team strikes with every click | Tasks | Implementing |
 | TCD-02 | P1: The team never hits on its own | Tasks | Implementing |
 | TCD-03 | P1: The team number stands beside the click number | Tasks | Implementing |
-| TCD-04 | P1: Equipe speaks of damage per click | Tasks | In Tasks |
-| TCD-05 | P2: The README tells how the team fights | Tasks | In Tasks |
+| TCD-04 | P1: Equipe speaks of damage per click | Tasks | Implementing |
+| TCD-05 | P2: The README tells how the team fights | Tasks | Implementing |
 
 **Coverage:** 5 total, 5 mapped to tasks, 0 unmapped.
 

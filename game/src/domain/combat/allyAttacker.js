@@ -24,5 +24,5 @@ export const allyAttacker = ({ ally, pieces = [], leaderElement, allyFactor = 1 
     };
 };
 
-//  What the Equipe screen shows as `Dano: <n>/s`: the base of the attacker, before element, defense and boss factor
-export const allyDamagePerSecond = ({ ally, pieces = [], allyFactor = 1 }) => allyAttacker({ ally, pieces, leaderElement: PLAYER.element, allyFactor }).baseDamage;
+//  What the Equipe screen shows as `Dano: <n>/clique`: the base of the attacker, before element, defense and boss factor
+export const allyDamagePerClick = ({ ally, pieces = [], allyFactor = 1 }) => allyAttacker({ ally, pieces, leaderElement: PLAYER.element, allyFactor }).baseDamage;

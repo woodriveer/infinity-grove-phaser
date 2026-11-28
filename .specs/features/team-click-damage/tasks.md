@@ -264,7 +264,7 @@ Body: `const slots = []; const hits = []; let damage = 0;` then `for (const { sl
 
 ---
 
-#### T3: Equipe reads damage per click [ ]
+#### T3: Equipe reads damage per click [x]
 
 **Owner**: game-dev
 **Goal**: The Equipe lines read `Dano: <n>/clique` and `Dano da equipe por clique: <n>`, the ally line stays on one line, and the README says how the team fights (TCD-04, TCD-05).
@@ -303,8 +303,8 @@ Body: `const slots = []; const hits = []; let damage = 0;` then `for (const { sl
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `git grep -n "allyDamagePerSecond\|/s\`\|/s'" game/src/adapters/phaser/views/teamView.js game/src/domain/combat/allyAttacker.js` prints nothing.
-- [ ] The re-pins carry the values of the table; gate passes.
+- [x] `git grep -n "allyDamagePerSecond\|/s\`\|/s'" game/src/adapters/phaser/views/teamView.js game/src/domain/combat/allyAttacker.js` prints nothing.
+- [x] The re-pins carry the values of the table; gate passes.
 
 **Commit**: `feat(game): Equipe shows the team damage per click`
 

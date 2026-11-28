@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { tickDamage } from '../skills/skillDamage';
-import { allyAttacker, allyDamagePerSecond, allyStarMultiplier } from './allyAttacker';
+import { allyAttacker, allyDamagePerClick, allyStarMultiplier } from './allyAttacker';
 
 const weapon = (clickDamage) => ({ id: 'w', slot: 'WEAPON', clickDamage, affixes: [] });
 const ring = (...affixes) => ({ id: 'r', slot: 'RING', affixes });
@@ -66,11 +66,11 @@ describe('allyAttacker', () => {
         expect(attacker.baseDamage).toBeCloseTo(2, 9);
     });
 
-    it('allyDamagePerSecond reads 2, 105.6, 2.5 and 12500', () => {
-        expect(allyDamagePerSecond({ ally: { stars: 0 } })).toBeCloseTo(2, 9);
-        expect(allyDamagePerSecond({ ally: { stars: 3 }, pieces: [ weapon(10), ring(affix('CLICK_DAMAGE_PCT', 20)) ] })).toBeCloseTo(105.6, 9);
-        expect(allyDamagePerSecond({ ally: { stars: 0 }, allyFactor: 1.25 })).toBeCloseTo(2.5, 9);
-        expect(allyDamagePerSecond({ ally: { stars: 9 }, pieces: [ weapon(624) ] })).toBeCloseTo(12500, 9);
+    it('allyDamagePerClick reads 2, 105.6, 2.5 and 12500', () => {
+        expect(allyDamagePerClick({ ally: { stars: 0 } })).toBeCloseTo(2, 9);
+        expect(allyDamagePerClick({ ally: { stars: 3 }, pieces: [ weapon(10), ring(affix('CLICK_DAMAGE_PCT', 20)) ] })).toBeCloseTo(105.6, 9);
+        expect(allyDamagePerClick({ ally: { stars: 0 }, allyFactor: 1.25 })).toBeCloseTo(2.5, 9);
+        expect(allyDamagePerClick({ ally: { stars: 9 }, pieces: [ weapon(624) ] })).toBeCloseTo(12500, 9);
     });
 });
 

@@ -1,4 +1,4 @@
-import { allyDamagePerSecond } from '../../../domain/combat/allyAttacker';
+import { allyDamagePerClick } from '../../../domain/combat/allyAttacker';
 import { formatDamage } from '../../../domain/combat/damage';
 import { wornBy } from '../../../domain/equipment/equipment';
 import { leaderBonusText } from '../../../domain/heroes/leaderBonus';
@@ -33,11 +33,11 @@ export const teamModel = ({ team, heroes, leaderId, pieces = [], position, selec
             return { ...state, hero: null, dpsText: '', passiveLine: '' };
         }
 
-        const damage = allyDamagePerSecond({ ally: hero, pieces: wornBy(pieces, hero.id), allyFactor });
+        const damage = allyDamagePerClick({ ally: hero, pieces: wornBy(pieces, hero.id), allyFactor });
 
         teamDps += damage;
 
-        return { ...state, hero, dpsText: `Dano: ${formatDamage(damage)}/s`, passiveLine: passiveLine(hero.id) };
+        return { ...state, hero, dpsText: `Dano: ${formatDamage(damage)}/clique`, passiveLine: passiveLine(hero.id) };
     });
     const selectedState = selected ? slots[selected - 1]?.state : null;
     const slotAsked = asking ? slots[asking - 1] : null;
@@ -49,7 +49,7 @@ export const teamModel = ({ team, heroes, leaderId, pieces = [], position, selec
         available: availableHeroes({ team, heroes, leaderId }).map((hero) => ({
             id: hero.id, name: hero.name, stars: hero.stars, passiveName: passiveOf(hero.id)?.name ?? ''
         })),
-        teamDpsText: `Dano da equipe: ${formatDamage(teamDps)}/s`,
+        teamDpsText: `Dano da equipe por clique: ${formatDamage(teamDps)}`,
         active: teamActive(position),
         busy,
         canPick: !busy && (selectedState === 'filled' || selectedState === 'empty' || slots.some(({ state }) => state === 'empty')),
