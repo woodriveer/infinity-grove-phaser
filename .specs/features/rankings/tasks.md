@@ -986,7 +986,7 @@ class RankingController(private val getRanking: GetRankingUseCase, private val r
 
 ### Phase 3: Game
 
-#### T11: Ranking domain: boards, formats and rows [ ]
+#### T11: Ranking domain: boards, formats and rows [x]
 
 **Owner**: game-dev
 **Goal**: One pure module holds the four boards (names, subtitles, value labels), every value format and the rows a page shows (RNK-08; spec § The Four Rankings, § Value Formats, Rows AC 1 to 6).
@@ -1077,7 +1077,7 @@ Rules: `formatDuration`: `total = floor(ms / 1000)`, `hours = floor(total / 3600
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 15 cases pass; `architecture.test.js` passes (no import outward).
+- [x] The 15 cases pass; `architecture.test.js` passes (no import outward).
 
 **Commit**: `feat(game): add the ranking boards and value formats`
 

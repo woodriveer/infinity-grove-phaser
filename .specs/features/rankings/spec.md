@@ -380,7 +380,7 @@ Every new text, exactly (AD-007, L-010).
 | RNK-05 | P1: Boards API - AC 1 to 10 | Tasks T4, T9, T10 | Pending |
 | RNK-06 | P1: Storage - AC 1 to 4 | Tasks T1, T4 | Implementing |
 | RNK-07 | P1: Ranking screen - AC 1 to 8 | Tasks T12, T13, T15, T16, T18, T19 | Pending |
-| RNK-08 | P1: Rows and formats - AC 1 to 7 | Tasks T11, T14, T18, T21 | Pending |
+| RNK-08 | P1: Rows and formats - AC 1 to 7 | Tasks T11, T14, T18, T21 | Implementing |
 | RNK-09 | P1: Loading and failure - AC 1 to 4 | Tasks T13, T14, T15, T18 | Pending |
 
 **Coverage:** 9 total, 9 mapped to tasks, 0 unmapped
