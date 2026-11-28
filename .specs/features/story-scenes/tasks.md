@@ -884,7 +884,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 
 ### Phase 5: e2e and author check
 
-#### T14: e2e: the prologue on the first chapter 1 battle [ ]
+#### T14: e2e: the prologue on the first chapter 1 battle [x]
 
 **Owner**: test-engineer
 **Goal**: The player-visible behaviour of automatic play, clicking through, closing, the keys under a scene and the seen list (STORY-01 to STORY-09, STORY-12, STORY-13, STORY-16 to STORY-19, STORY-22, STORY-30, STORY-42, STORY-43).
@@ -921,7 +921,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 **Gate**: `cd game && npx playwright test e2e/storyScenes.spec.js`
 **Done when**:
 
-- [ ] The 19 scenarios pass twice in a row with `--workers=1`.
+- [x] The 19 scenarios pass twice in a row with `--workers=1`.
 
 **Commit**: `test(game): cover the prologue of the first chapter 1 battle in the browser`
 
