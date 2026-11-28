@@ -401,7 +401,7 @@ For the codes the fake backend never answers on sign-in (`AUTH_UNAUTHENTICATED`,
 
 ---
 
-#### T10: Author check [ ]
+#### T10: Author check [x]
 
 **Owner**: test-engineer
 **Goal**: Every AC and edge case of PT-01 to PT-06 has a test that asserts its spec text, and the tests kill the injected faults.
@@ -421,7 +421,7 @@ For the codes the fake backend never answers on sign-in (`AUTH_UNAUTHENTICATED`,
 **Gate**: `cd backend && ./gradlew test && cd ../game && npm test && npx playwright test e2e/portugueseText.spec.js`
 **Done when**:
 
-- [ ] Every AC and edge case maps to a test; every mutant is killed or a fix task is listed.
+- [x] Every AC and edge case maps to a test; every mutant is killed or a fix task is listed.
 
 **Commit**: `test: author check of the Portuguese texts`
 
@@ -451,6 +451,84 @@ For the codes the fake backend never answers on sign-in (`AUTH_UNAUTHENTICATED`,
 - [ ] `ui-review.html` lists the 12 shots with `APROVADO`, or each finding as a new task in this file with its owner.
 
 **Commit**: `docs(ui): review the Portuguese screens`
+
+---
+
+## Author Check (T10)
+
+CI runs: suites `46113702848` of `5c438b68` (green: backend 1398/1398, game unit 2511/2511, e2e 825/825, deploy-scripts 306/306); mutants `46115111396` of `5c438b68` (12 of 12 killed). Unit lines are in `game/src/**`, e2e lines in `game/e2e/**`. "Exact" means the test asserts the spec's own text or number, not a rounded or "was called" value.
+
+### AC to assertion table
+
+| AC | Spec value | Unit (`file:line`) | e2e (`file:line`) | Exact |
+| --- | --- | --- | --- | --- |
+| PT-01 AC 1 | placeholders `Usuário`, `Senha`; buttons `Entrar`, `Criar conta` | `adapters/phaser/MainMenu.test.js:114` (119-122) | `portugueseText.spec.js:50` | yes |
+| PT-01 AC 2 / Edge 1 | `Informe usuário e senha`, no request, also for `   ` | `MainMenu.test.js:125` (135), `:169`, `:243` | `portugueseText.spec.js:60` (empty, spaces, empty password on `Criar conta`; `backend.calls` is `[]`) | yes |
+| PT-01 AC 3 | `Bem-vindo de volta, yan!`, `Olá, yan!` | `MainMenu.test.js:186-187` | `portugueseText.spec.js:83`; `auth.spec.js:74`; the start helper of 43 files | yes |
+| PT-01 AC 4 | `Conta criada, newbie!`, `Olá, newbie!` | `MainMenu.test.js:239` (`ana`) | `portugueseText.spec.js:109`; `auth.spec.js:14-17` | yes |
+| PT-01 AC 5 | `Clique para jogar!` on one line in the 320 px pill, button `Sair` | `MainMenu.test.js:138` (144), `:505` | `portugueseText.spec.js:83` (height <= 1.5 line-height + frame, `scrollWidth <= clientWidth`); `uiRedesign.spec.js:352` (`width: '320px'`) | yes |
+| PT-01 AC 6 | `<html lang="pt-BR">` | none (`index.html` is not under Vitest) | `portugueseText.spec.js:121`; mutant M8 | yes |
+| PT-02 AC 1 | `Não foi possível falar com o servidor. Tente de novo mais tarde.` | `application/errorText.test.js:41`, `ApiError.test.js:38` | `portugueseText.spec.js:209`; `auth.spec.js:132` | yes |
+| PT-02 AC 2 / Edge 4 | `Esse nome de usuário já existe.`, no `already exists` on the page | `errorText.test.js:5`, `ApiError.test.js:11`, `MainMenu.test.js:283` | `portugueseText.spec.js:130` (also `not.toContain('already exists')`) | yes |
+| PT-02 AC 3 | `Usuário não encontrado.` | `errorText.test.js:9` | `portugueseText.spec.js:142` | yes |
+| PT-02 AC 4 | `Senha incorreta.` | `errorText.test.js:13`, `MainMenu.test.js:303` | `portugueseText.spec.js:153` | yes |
+| PT-02 AC 5 | `A senha precisa ter pelo menos 8 caracteres.`; without `minLength` `A senha é muito curta.` | `errorText.test.js:17`, `:22` (body `{}` and `'8'`) | `portugueseText.spec.js:164`; `auth.spec.js:59` | yes |
+| PT-02 AC 6 | `Sua sessão expirou. Entre de novo.` for both codes | `errorText.test.js:28` | `portugueseText.spec.js:176` (`AUTH_UNAUTHENTICATED`; the refresh code is unit only: the sign-in form cannot reach it) | yes |
+| PT-02 AC 7 | `O pedido falhou (erro 500).` whatever `detail` and `title` | `errorText.test.js:33`, `:37`, `ApiError.test.js:16` | `portugueseText.spec.js:192` (`Boom` and `Internal Server Error` absent from the page) | yes |
+| PT-02 AC 8 | `O pedido falhou.` | `ApiError.test.js:41`, `sessionManager.test.js:145` | none: no player action builds a request that cannot be built | yes (unit only, not player-visible) |
+| PT-02 AC 9 | the AC 1 text at the start | `sessionManager.test.js:145-151` | `portugueseText.spec.js:220`; `session.spec.js:86`; `wake.spec.js:67` | yes |
+| PT-03 AC 1 | 400, `code` `USER_PASSWORD_TOO_SHORT`, `minLength` 8, `detail` `Password must have at least 8 characters` | `domain/UserTest.kt:35-38` | backend IT `UserControllerIT.kt:93-99`; mutant M3 | yes |
+| PT-03 AC 2 | same body on `PUT /users/{username}/password` | `UserTest.kt:57-60` | `UserControllerIT.kt:189-197` | yes |
+| PT-03 AC 3 | every other status, code and detail unchanged | `UserControllerIT`, `AuthControllerIT`, `SecurityIT` unchanged and green (backend 1398/1398) | n/a | yes |
+| PT-04 AC 1 | `Estágio 1/10  Fase 2/8` (two spaces) | `campaign.test.js:168-173` | `portugueseText.spec.js:251` (`textContent` `Estágio 1/10  Fase 1/5`); `earlyGameRebalance.spec.js:102`, `:108` (`Fase 1/8`, `8/8`); mutant M10 | yes |
+| PT-04 AC 2 | `Estágio 3/10  Miniboss` | `campaign.test.js:174` | `portugueseText.spec.js:251` | yes |
+| PT-04 AC 3 | `Chefe do capítulo` | `campaign.test.js:162`, `:175` | `portugueseText.spec.js:251`; `stages.spec.js:112`; mutant M9 | yes |
+| PT-04 AC 4 | `Tempo: 37s`, `Tempo: 9s` (Edge 3); timer at least 12 px right of the plate | `ClickerGame.test.js:1459` (1463, 1466); mutant M5 | `portugueseText.spec.js:259` (`/^Tempo: ([1-5]?[0-9]\|60)s$/`, `timer.x - plate.right >= 12`); `earlyGameRebalance.spec.js:72`, `:81` (`Tempo: 45s`, `Tempo: 90s`) | yes (37 and 9 only in unit: a real countdown cannot be frozen on them) |
+| PT-04 AC 5 | `Ouro: 0 Prata: 0 Cobre: 3`, names in `.sr-only` | `ClickerGame.test.js:673-693` | `portugueseText.spec.js:272` (`.sr-only` texts `Ouro:`, `Prata:`, `Cobre:`); `drops.spec.js:52` (`Cobre: 3`); mutant M6 | yes |
+| PT-04 AC 6 | `Fogo`, `Água`, `Natureza`, `Luz`, `Escuridão` with `data-element` | `ClickerGame.test.js:2219` (2214, 2236) | `portugueseText.spec.js:292` (5 cases, one per element); the dot colour in `uiRedesign.spec.js` (`::before` `rgb(79, 154, 60)`); mutant M4 | yes |
+| PT-04 AC 7 | `Não foi possível carregar o progresso` | `ClickerGame.test.js:1528` (1533) | `uiRedesign.spec.js:692` | yes |
+| PT-04 AC 8 | `Capítulo concluído!` | `ClickerGame.test.js:1484`, `:1523` | `stages.spec.js:115`, `:121`; `campaignChapters.spec.js:72`; `farm.spec.js:98` | yes |
+| PT-04 AC 9 | `Farmar chefe` on one line | `ClickerGame.test.js:1890` | `portugueseText.spec.js:300` (text and one distinct line top); `uiRedesign.spec.js` (`toContainText('Farmar chefe')`, 12 px 700 Figtree) | yes |
+| PT-04 Edge 2 | farm plate `Rever chefe: <boss> (Capítulo <n>)` unchanged | `stageLabel.test.js:27-32` | `bossReplayChapters.spec.js:139`, `:160` | yes |
+| PT-05 AC 1 | `Pausado`, `1. Continuar`, `2. Sair da luta` | `ClickerGame.test.js:1869` (1874-1876) | `portugueseText.spec.js:320` | yes |
+| PT-05 AC 2 | `Sair da luta? Isso conta como derrota.`, `Sim, sair`, `Não, ficar` | `ClickerGame.test.js:1879` (1885-1887); mutant M7 | `portugueseText.spec.js:320` | yes |
+| PT-05 AC 3 | buttons keep continue, leave, confirm, stay | `ClickerGame.test.js:1854`, `:1904`, `:1920` | `portugueseText.spec.js:320` (`Não, ficar` returns to the menu); `farm.spec.js:131` (leave then confirm) | yes (see Findings 3) |
+| PT-06 AC 1 | no inventoried English word on the six screens | none | `portugueseText.spec.js:346` (form, welcome, boss fight, pause, confirmation), `:377` (phase fight) | yes (see Findings 1) |
+| PT-06 AC 2 | no English string of I3 to I33 in a literal of `game/src`, `game/e2e`, `game/ui-review` | n/a | `git grep` of the done-when lines of T8, run again by T10: prints nothing, except the `ApiError` fixtures of I11 that T8's design keeps | yes |
+
+CSS the spec names, asserted with computed style in e2e: the start pill `width: 320px` (`uiRedesign.spec.js:352`), the farm label 12 px 700 Figtree (`uiRedesign.spec.js`, farm switch case), the 12 px gap of the timer (`portugueseText.spec.js:259`, bounding boxes). The spec names no colour or hover shade for this feature, so the sensor has no CSS mutant.
+
+### Mutants
+
+| Id | Fault | Command | Outcome |
+| --- | --- | --- | --- |
+| M1 | `ApiError.from` returns the backend `detail` when present | `vitest run src/application/ApiError.test.js` | killed |
+| M2 | `USER_PASSWORD_TOO_SHORT` ignores `minLength` | `vitest run src/application/errorText.test.js` | killed |
+| M3 | handler of `PasswordTooShortException` removed (422) | `sh gradlew test --tests ...UserControllerIT` | killed |
+| M4 | enemy chip back to the English name | `vitest run src/adapters/phaser/ClickerGame.test.js` | killed |
+| M5 | countdown text without the `s` | `ClickerGame.test.js` | killed |
+| M6 | `COINS` gold named `Gold` | `ClickerGame.test.js` | killed |
+| M7 | `Não, ficar` back to `No, stay` | `ClickerGame.test.js` | killed |
+| M8 | `index.html` with `lang="en"` | `playwright test e2e/portugueseText.spec.js -g "declares lang"` | killed |
+| M9 | chapter boss label `Chapter Boss` | `vitest run src/domain/campaign/campaign.test.js` | killed |
+| M10 | one space before `Fase` | `campaign.test.js` | killed |
+| M11 | empty-fields text `Informe o usuário e a senha` | `vitest run src/adapters/phaser/MainMenu.test.js` | killed |
+| M12 | unknown-code line without the status | `errorText.test.js` | killed |
+
+12 of 12 killed (run `46115111396`, isolation ok).
+
+### Suites (CI run `46113702848` of `5c438b68`)
+
+Backend 1398 passed, 0 failed (JaCoCo lines 98.49%, branches 93.72%); game unit 2511 passed, 0 failed (lines 98.73%, branches 95.15%); e2e 825 passed, 0 failed (lines 94.60%); deploy-scripts 306 passed.
+
+### Findings
+
+1. The spec's PT-06 list holds `Nature`, which is also the first letters of the Portuguese `Natureza` (`Fogo vence Natureza ...` is on screen), so a plain `includes` fails on correct Portuguese. `portugueseText.spec.js` matches whole words (no letter touches the word on a side where the word has a letter). Spec wording to correct: "contain none of ... as a whole word". Owner: product-owner (docs only).
+2. Design § Layout says the stage plate grows by 1 character; it grows by 2 (`Estágio` against `Stage`). The plate `Estágio 1/1  Miniboss` is now wide enough to push the boss timer off x 512 in `uiRedesign.spec.js` "keeps the battle HUD on the scene anchors", which now accepts the anchor or the 12 px gap (PT-04 AC 4). T11 must look at the timer next to the plate. Owner: ui-artist (T11).
+3. Spec PT-05 AC 3 names "the keys `1` and `2`" for the pause menu; the menu answers only Esc and its buttons (`1` and `2` fire skills). Behaviour unchanged and tested; wording only.
+4. Test titles `Sign up`, `Login` of `auth.spec.js` became `Criar conta` and `Entrar` so PT-06 AC 2 holds for the literals of the e2e files.
+
+No fix task: every AC maps to a test, every mutant is killed.
 
 ---
 

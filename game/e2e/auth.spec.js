@@ -2,7 +2,7 @@ import { expect, test } from './support/coverage';
 import { mockBackend, serverDown } from './support/fakeBackend';
 import { activeSceneKeys, fillCredentials, openMainMenu, registryValue } from './support/game';
 
-test.describe('Sign up', () => {
+test.describe('Criar conta', () => {
     test('creates an account and greets the new player', async ({ page }) => {
         const backend = await mockBackend(page);
         const menu = await openMainMenu(page);
@@ -34,7 +34,7 @@ test.describe('Sign up', () => {
         expect(await registryValue(page, 'user')).toBeUndefined();
     });
 
-    test('Sign up opens the path screen with fire, water and nature and sends no request', async ({ page }) => {
+    test('Criar conta opens the path screen with fire, water and nature and sends no request', async ({ page }) => {
         const backend = await mockBackend(page);
         const menu = await openMainMenu(page);
 
@@ -61,7 +61,7 @@ test.describe('Sign up', () => {
     });
 });
 
-test.describe('Login', () => {
+test.describe('Entrar', () => {
     test('logs in an existing player and shows the greeting', async ({ page }) => {
         const backend = await mockBackend(page, { users: { yan: 'secret123' } });
         const menu = await openMainMenu(page);
@@ -134,7 +134,7 @@ test.describe('Login', () => {
     });
 });
 
-test.describe('Sign up then login', () => {
+test.describe('Criar conta then Entrar', () => {
     test('a new player can sign up, then log in with the same credentials after a reload', async ({ page }) => {
         const backend = await mockBackend(page);
         let menu = await openMainMenu(page);
