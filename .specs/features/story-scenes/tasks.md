@@ -964,7 +964,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 
 ---
 
-#### T16: e2e: stage fit, motion, fonts, audio fallback and focus [ ]
+#### T16: e2e: stage fit, motion, fonts, audio fallback and focus [x]
 
 **Owner**: test-engineer
 **Goal**: The computed look and the behaviours that need a real browser (STORY-14, STORY-15, STORY-20, STORY-21, STORY-23, STORY-24, STORY-37 to STORY-41).
@@ -996,7 +996,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 **Gate**: `cd game && npx playwright test e2e/storyStage.spec.js`
 **Done when**:
 
-- [ ] The 14 scenarios pass twice in a row with `--workers=1`. No phone viewport (TD-010 dropped; the 390x844 scale is pinned by the T3 unit test).
+- [x] The 14 scenarios pass twice in a row with `--workers=1`. No phone viewport (TD-010 dropped; the 390x844 scale is pinned by the T3 unit test).
 
 **Commit**: `test(game): cover the story stage fit, motion, fonts and fallbacks in the browser`
 
