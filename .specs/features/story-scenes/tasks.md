@@ -110,7 +110,7 @@ T18
 
 ### Phase 1: e2e fixture
 
-#### T1: The shared e2e fixture seeds the prologue as seen [ ]
+#### T1: The shared e2e fixture seeds the prologue as seen [x]
 
 **Owner**: test-engineer
 **Goal**: Every existing e2e spec (53 files, all importing `./support/coverage`) keeps starting chapter 1 on the fight once the prologue ships, and story specs can turn the seed off (spec D23; protects STORY-01 to STORY-08 tests from the rest of the suite).
@@ -157,8 +157,8 @@ export const test = base.extend({
 **Gate**: `cd game && npx playwright test e2e/storyFixture.spec.js`, then `npx playwright test e2e/farm.spec.js` (one file per run); then CI: `git push origin HEAD:ci/story-scenes` and `node scripts/ci-wait.mjs ci/story-scenes`
 **Done when**:
 
-- [ ] The 3 new cases pass and `farm.spec.js` passes unchanged locally.
-- [ ] The CI run of the branch is green (every existing e2e spec passes with the seed).
+- [x] The 3 new cases pass and `farm.spec.js` passes unchanged locally.
+- [x] The CI run of the branch is green (every existing e2e spec passes with the seed).
 
 **Commit**: `test(game): seed the prologue as seen in the shared e2e fixture`
 
