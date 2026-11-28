@@ -61,13 +61,9 @@ class EnemyRepositoryIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `the defense is stored in the defense column and copied to the old columns until the contract`() {
+    fun `the defense is stored in the defense column`() {
         val id = repository.idOf(stats)
 
-        val row = jdbc.queryForMap("select defense, physical_defense, magical_defense from enemies where id = ?", id)
-
-        assertEquals(81, row["defense"])
-        assertEquals(81, row["physical_defense"])
-        assertEquals(81, row["magical_defense"])
+        assertEquals(81, jdbc.queryForObject("select defense from enemies where id = ?", Int::class.java, id))
     }
 }

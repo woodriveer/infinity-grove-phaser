@@ -18,7 +18,16 @@ class EarlyGameRebalanceMigrationIT : IntegrationTestBase() {
     @Autowired
     private lateinit var jdbc: JdbcTemplate
 
-    private fun migrate() = jdbc.execute(ClassPathResource("db/migration/V16__early_game_rebalance.sql").getContentAsString(Charsets.UTF_8))
+    /** V16 as it reads on a database after V20 (spec defense-contract, design § V16 Replay): the dropped defense columns map to `defense`. */
+    private fun migrate() =
+        jdbc.execute(
+            ClassPathResource("db/migration/V16__early_game_rebalance.sql")
+                .getContentAsString(Charsets.UTF_8)
+                .replace("n.physical_defense = e.physical_defense and n.magical_defense = e.magical_defense", "n.defense = e.defense")
+                .replace("e.physical_defense, e.magical_defense", "e.defense")
+                .replace("(element, physical_defense, magical_defense, crit_resistance)", "(element, defense, crit_resistance)")
+                .replace("uk_enemies_attributes", "uk_enemies_defense"),
+        )
 
     private fun count(sql: String) = jdbc.queryForObject(sql, Int::class.java)
 

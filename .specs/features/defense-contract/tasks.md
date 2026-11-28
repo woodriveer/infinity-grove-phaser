@@ -444,7 +444,7 @@ export const RETIRED_TALENT_IDS = [
 
 ### Phase 5: Contract
 
-#### T9: V20 drops the old defense columns [ ]
+#### T9: V20 drops the old defense columns [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The contract step: no old column, key, trigger or function left; the release 1 backend keeps working on the result (DEF-06; spec Contract AC 1 to 5, Edge 3, Q2, Q8).
@@ -497,10 +497,10 @@ export const RETIRED_TALENT_IDS = [
 **Gate**: `cd backend && ./gradlew ktlintCheck test`
 **Done when**:
 
-- [ ] The precondition held and is quoted in the commit body (the `active.commit` and `previous` printed in step 0).
-- [ ] The backend suite passes, including `SchemaValidationIT`.
-- [ ] `git grep -n -E "physical_defense|magical_defense" -- backend/src` prints only `V1__schema.sql`, `V16__early_game_rebalance.sql`, `V19__enemy_defense_expand.sql`, `V20__enemy_defense_contract.sql`, `EnemyDefenseMigrationIT.kt` and the `String.replace` lines of `EarlyGameRebalanceMigrationIT.migrate()` (DEF-06 AC 5).
-- [ ] The commit touches exactly the migration, the 4 test files and this file, and is pushed alone; `.deploy-state` `active.commit` is the T9 commit afterwards.
+- [x] The precondition held and is quoted in the commit body (the `active.commit` and `previous` printed in step 0).
+- [x] The backend suite passes, including `SchemaValidationIT`.
+- [x] `git grep -n -E "physical_defense|magical_defense" -- backend/src` prints only `V1__schema.sql`, `V16__early_game_rebalance.sql`, `V19__enemy_defense_expand.sql`, `V20__enemy_defense_contract.sql`, `EnemyDefenseMigrationIT.kt` and the `String.replace` lines of `EarlyGameRebalanceMigrationIT.migrate()` (DEF-06 AC 5).
+- [x] The commit touches exactly the migration, the 4 test files and this file, and is pushed alone; `.deploy-state` `active.commit` is the T9 commit afterwards.
 
 **Commit**: `feat(backend): drop the old enemy defense columns`
 

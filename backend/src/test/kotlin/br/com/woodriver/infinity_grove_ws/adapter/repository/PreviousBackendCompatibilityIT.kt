@@ -16,10 +16,10 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * AD-016: the release before V19 (the backend before defense-contract, commit 171f518, last migration V18) must keep starting and serving
- * on the database after V19. Its entities are the current ones except EnemyEntity, which maps physical_defense and magical_defense; these
- * checks replay its column types, its enemy read and write paths and Flyway's validation of its own migrations V1 to V18. The older
- * releases' validation cases stay. Booting a previous image itself is not executed here.
+ * AD-016: the release before V20 (the defense-contract release 1, last migration V19) must keep starting and serving on the database after
+ * V20. Its entities are the current ones (SchemaValidationIT); these checks replay its column types, its enemy read and write paths and
+ * Flyway's validation of its own migrations V1 to V19. Compatibility with the backend before defense-contract (commit 171f518) ended by
+ * design at V20, which drops the old defense columns it maps. Booting a previous image itself is not executed here.
  */
 class PreviousBackendCompatibilityIT : IntegrationTestBase() {
     @Autowired
@@ -93,8 +93,7 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
                     mapOf(
                         "id" to "bigint",
                         "element" to "character varying",
-                        "physical_defense" to "integer",
-                        "magical_defense" to "integer",
+                        "defense" to "integer",
                         "crit_resistance" to "integer",
                     ),
             )
@@ -176,18 +175,17 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
     }
 
     @Test
-    fun `the previous backend writes and reads enemies through physical_defense and magical_defense`() {
+    fun `the previous backend writes and reads enemies through defense`() {
         rolledBack {
             val sql =
-                "insert into enemies (element, physical_defense, magical_defense, crit_resistance) values (?, ?, ?, ?) " +
-                    "on conflict (element, physical_defense, magical_defense, crit_resistance) do nothing"
-            assertEquals(1, jdbc.update(sql, "NATURE", 88, 88, 98))
+                "insert into enemies (element, defense, crit_resistance) values (?, ?, ?) " +
+                    "on conflict (element, defense, crit_resistance) do nothing"
+            assertEquals(1, jdbc.update(sql, "NATURE", 88, 98))
             val ids =
                 jdbc.queryForList(
-                    "select id from enemies where element = ? and physical_defense = ? and magical_defense = ? and crit_resistance = ?",
+                    "select id from enemies where element = ? and defense = ? and crit_resistance = ?",
                     Long::class.java,
                     "NATURE",
-                    88,
                     88,
                     98,
                 )
@@ -195,7 +193,7 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
             assertEquals(
                 30,
                 jdbc.queryForObject(
-                    "select e.physical_defense from enemies e join chapters c on c.boss_enemy_id = e.id where c.number = 1",
+                    "select e.defense from enemies e join chapters c on c.boss_enemy_id = e.id where c.number = 1",
                     Int::class.java,
                 ),
             )
@@ -204,32 +202,37 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
 
     @Test
     fun `the previous release starts on the migrated schema and its validation ignores V13`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 12, futureMigrations = 7)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 12, futureMigrations = 8)
     }
 
     @Test
     fun `the release before the black awareness staff starts on the migrated schema and its validation ignores V14`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 13, futureMigrations = 6)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 13, futureMigrations = 7)
     }
 
     @Test
     fun `the release before the talent tree rework starts on the migrated schema and its validation ignores V15`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 14, futureMigrations = 5)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 14, futureMigrations = 6)
     }
 
     @Test
     fun `the release before the early game rebalance starts on the migrated schema and its validation ignores V16 and V17`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 15, futureMigrations = 4)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 15, futureMigrations = 5)
     }
 
     @Test
     fun `the release before the reset legacy starts on the migrated schema and its validation ignores V18`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 17, futureMigrations = 2)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 17, futureMigrations = 3)
     }
 
     @Test
     fun `the release before the defense contract starts on the migrated schema and its validation ignores V19`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 18, futureMigrations = 1)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 18, futureMigrations = 2)
+    }
+
+    @Test
+    fun `the release 1 of the defense contract starts on the migrated schema and its validation ignores V20`() {
+        previousReleaseStartsOnMigratedSchema(lastVersion = 19, futureMigrations = 1)
     }
 
     /** The release whose last migration is `V[lastVersion]` validates its own files and sees [futureMigrations] newer ones as future. */

@@ -17,7 +17,8 @@ import kotlin.test.assertTrue
 /**
  * `V19__enemy_defense_expand.sql` (spec defense-contract, TD-002): the one defense gets its own column; a trigger keeps it and the two
  * old columns equal while the backend before this feature can still run (AD-016). The scratch schema cases migrate to V19 only, so they
- * keep holding after V20.
+ * keep holding after V20. `V20__enemy_defense_contract.sql` drops the old columns, their key and the trigger once no running backend reads
+ * them.
  */
 class EnemyDefenseMigrationIT : IntegrationTestBase() {
     @Autowired
@@ -112,19 +113,6 @@ class EnemyDefenseMigrationIT : IntegrationTestBase() {
         assertEquals(85, row["defense"])
         assertEquals(85, row["physical_defense"])
         assertEquals(86, row["magical_defense"])
-    }
-
-    @Test
-    fun `every enemy seeded by the new backend holds the same value in defense, physical_defense and magical_defense`() {
-        val total = jdbc.queryForObject("select count(*) from enemies", Int::class.java)
-        val different =
-            jdbc.queryForObject(
-                "select count(*) from enemies where defense <> physical_defense or defense <> magical_defense",
-                Int::class.java,
-            )
-
-        assertTrue(total!! > 0, "the seeder stored no enemy")
-        assertEquals(0, different)
     }
 
     @Test
@@ -223,6 +211,32 @@ class EnemyDefenseMigrationIT : IntegrationTestBase() {
             0,
             jdbc.queryForObject("select count(*) from $SCRATCH.flyway_schema_history where version = '19' and success", Int::class.java),
         )
+    }
+
+    @Test
+    fun `V20 drops the old columns, their key and the trigger`() {
+        assertEquals(
+            0,
+            jdbc.queryForObject(
+                "select count(*) from information_schema.columns where table_schema = 'public' and table_name = 'enemies' " +
+                    "and column_name in ('physical_defense', 'magical_defense')",
+                Int::class.java,
+            ),
+        )
+        assertEquals(0, jdbc.queryForObject("select count(*) from pg_constraint where conname = 'uk_enemies_attributes'", Int::class.java))
+        assertEquals(0, jdbc.queryForObject("select count(*) from pg_trigger where tgname = 'enemies_defense_sync'", Int::class.java))
+        assertEquals(0, jdbc.queryForObject("select count(*) from pg_proc where proname = 'enemies_defense_sync'", Int::class.java))
+    }
+
+    @Test
+    fun `a database at V19 keeps every defense after V20`() {
+        scratchAt("19")
+        jdbc.update("insert into $SCRATCH.enemies (element, defense, crit_resistance) values ('WATER', 12, 3)")
+        jdbc.update("insert into $SCRATCH.enemies (element, defense, crit_resistance) values ('FIRE', 40, 9)")
+
+        scratchAt("20")
+
+        assertEquals(listOf(12, 40), jdbc.queryForList("select defense from $SCRATCH.enemies order by id", Int::class.java))
     }
 
     private companion object {
