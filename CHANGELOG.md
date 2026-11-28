@@ -3,6 +3,21 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.16.0] - 2026-11-28
+
+Textos em português (`portuguese-text`): tudo o que o jogador lê agora está em português, com acentos.
+
+### Adicionado
+
+- O menu principal, a entrada e o cadastro falam português: "Usuário", "Senha", "Entrar", "Criar conta", "Bem-vindo de volta" e "Clique para jogar!".
+- As mensagens de erro (nome já usado, usuário não encontrado, senha incorreta, senha curta, sessão expirada, servidor fora do ar) aparecem em português.
+
+### Alterado
+
+- A placa de estágio ("Estágio", "Fase", "Miniboss", "Chefe do capítulo"), a carteira (Ouro, Prata, Cobre), o cronômetro do chefe ("Tempo"), o elemento do inimigo (Fogo, Água, Natureza, Luz, Escuridão), o menu de pausa e a troca "Farmar chefe" foram traduzidos.
+- A página do jogo agora se declara em português do Brasil.
+- Quando a senha é curta, o servidor responde com um código próprio, e o jogo mostra "A senha precisa ter pelo menos 8 caracteres.".
+
 ## [0.15.0] - 2026-11-28
 
 Contrato da defesa do inimigo (`defense-contract`): a defesa dos inimigos passa a ter um único registro no jogo e no servidor. Nada muda na tela: os números e a linha do inimigo continuam como eram.

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Textos em português</title>
+<style>
+:root { --bg:#faf7f2; --surface:#fff; --text:#2b2622; --muted:#6f655c; --line:#e4dcd1; --ok:#2f7a4a; }
+@media (prefers-color-scheme: dark) { :root { --bg:#1d1a17; --surface:#27231f; --text:#efe8df; --muted:#a99d90; --line:#3a342e; --ok:#6cc28c; } }
+* { box-sizing: border-box; }
+body { margin:0; padding:32px 16px 64px; background:var(--bg); color:var(--text); font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+main { max-width:920px; margin:0 auto; }
+h1 { font-size:28px; margin:0 0 4px; } h2 { font-size:18px; margin:36px 0 12px; }
+.sub { color:var(--muted); margin:8px 0 0; }
+.verdict { display:inline-block; padding:4px 12px; border-radius:999px; background:var(--ok); color:var(--bg); font-weight:700; }
+table { width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--line); }
+th,td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { font-size:13px; color:var(--muted); font-weight:600; }
+td.n { font-variant-numeric:tabular-nums; }
+code { font-size:13px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Textos em português</h1>
+<p class="sub">Versão v0.16.0 · 28/11/2026 · <span class="verdict">CONCLUÍDO</span></p>
+
+<h2>Veredito</h2>
+<p>Todas as tarefas de <code>tasks.md</code> (T1 a T11) estão marcadas; a verificação de autoria do <code>test-engineer</code> (T10) matou 12 de 12 mutantes, sem lacunas; a revisão de UI do <code>ui-artist</code> (T11) está APROVADA; tudo está em <code>origin/main</code>. Todo texto que o jogador lê (menu principal, entrada e cadastro, linhas de erro, placa de estágio, carteira, cronômetro do chefe, elemento do inimigo, menu de pausa, troca de fazenda) passou a ser português, com acentos, e a página declara <code>lang="pt-BR"</code>. As linhas de erro são escolhidas pelo <code>code</code> da resposta do backend, nunca pelo <code>detail</code> em inglês. O backend passou a responder a senha curta com o código <code>USER_PASSWORD_TOO_SHORT</code> e <code>minLength</code> 8.</p>
+<table>
+<tr><th>Item</th><th>Valor</th></tr>
+<tr><td>Commits da funcionalidade</td><td>12 commits, de <code>472808ae</code> a <code>7597db4a</code>: T1 <code>472808ae</code> (backend), T2 <code>f70e19fe</code>, T3 <code>cf45d26b</code>, T4 <code>c5795c20</code>, T5 <code>929b8fd5</code>, T6 <code>bd6d9e35</code>, T7 <code>3f4cb18b</code>, T8 <code>892d6e6c</code>, T9 <code>b506186d</code>, correção <code>5c438b68</code>, T10 <code>6442c4e3</code>, T11 <code>7597db4a</code>. Spec: <code>a84df48e</code> (compartilhado com <code>defense-contract</code>). Commit da versão: o commit <code>docs(release): v0.16.0 portuguese-text</code> logo depois de <code>7597db4a</code>.</td></tr>
+<tr><td>Como os números foram separados</td><td>Os commits T1 a T6 ficam antes do release v0.15.0 (<code>78cb2e02</code>) e há commits de outras funcionalidades intercalados na faixa <code>v0.15.0..7597db4a</code> e antes dela. Todos os números abaixo vêm de <code>git show --numstat</code> somente dos 12 commits acima, não de <code>git diff</code> de uma faixa.</td></tr>
+<tr><td>Revisão de UI</td><td>APROVADO (<code>ui-review.html</code>, commit <code>7597db4a</code>). Sugestão não bloqueante: o botão <code>Criar conta</code> quebra em duas linhas dentro do botão.</td></tr>
+</table>
+
+<h2>Execuções do CI citadas</h2>
+<p>O commit de release só acrescenta documentos (<code>7597db4a</code> é revisão de UI e <code>tasks.md</code>), então o Tests workflow não roda nele (<code>ci-wait</code> terminou com código 3, sem execução). A árvore de código de <code>7597db4a</code> é a mesma de <code>6442c4e3</code>; os números vêm da execução verde desse commit.</p>
+<table>
+<tr><th>Execução</th><th>O que é</th><th>Resultado</th></tr>
+<tr><td class="n">46118182005</td><td><code>6442c4e3</code> (T10): todas as suítes, fonte dos números deste relatório (backend, game-unit, deploy-scripts, 12 shards e2e, e2e mesclado)</td><td>success, sem repetição</td></tr>
+<tr><td class="n">46115690625</td><td><code>6442c4e3</code>: execução anterior do mesmo commit</td><td>success na tentativa 2; a tentativa 1 falhou em um caso instável de <code>dragEquip.spec.js</code></td></tr>
+<tr><td class="n">46113702848</td><td><code>5c438b68</code> (correção dos dois casos e2e)</td><td>success, e2e 825/825, linhas 94,60%</td></tr>
+<tr><td class="n">46115111396</td><td>mutantes da T10 (workflow_dispatch)</td><td>12 de 12 mortos</td></tr>
+</table>
+
+<h2>Verificação de autoria dos testes (test-engineer)</h2>
+<p>T10 (<code>6442c4e3</code>): 12 mutantes, 12 mortos, 0 sobreviventes, nenhuma lacuna de critério de aceitação apontada. Execução 46115111396.</p>
+
+<h2>Código de produção (somente os 12 commits da funcionalidade)</h2>
+<table>
+<tr><th>Área</th><th>Arquivos</th><th>Adicionadas</th><th>Removidas</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td class="n">3</td><td class="n">12</td><td class="n">2</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes, mais <code>game/index.html</code>)</td><td class="n">7</td><td class="n">73</td><td class="n">37</td></tr>
+</table>
+<p class="sub">Backend: <code>BusinessException.kt</code> (+5), <code>ApiExceptionHandler.kt</code> (+4), <code>User.kt</code> (+3/-2). Jogo: <code>errorText.js</code> (novo), <code>ApiError.js</code>, <code>sessionManager.js</code>, <code>MainMenu.js</code>, <code>campaign.js</code>, <code>ClickerGame.js</code> (+72/-36 no conjunto sem <code>index.html</code>) e <code>index.html</code> (+1/-1, <code>lang="pt-BR"</code>). Não há CSS alterado. Specs, scripts de captura, testes e assets não são código de produção.</p>
+
+<h2>Código de teste (somente os 12 commits)</h2>
+<table>
+<tr><th>Suíte</th><th>Arquivos</th><th>Adicionadas</th><th>Removidas</th><th>Testes adicionados / removidos</th><th>Total após a execução</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td class="n">3</td><td class="n">31</td><td class="n">6</td><td class="n">+1 / 0</td><td class="n">1398 testes, 0 falhas</td></tr>
+<tr><td>Unitário do jogo (<code>game/src/**/*.test.js</code>)</td><td class="n">10</td><td class="n">308</td><td class="n">155</td><td class="n">+33 / -14</td><td class="n">2511 testes, 0 falhas</td></tr>
+<tr><td>e2e (<code>game/e2e</code>)</td><td class="n">51</td><td class="n">578</td><td class="n">191</td><td class="n">+34 / -13</td><td class="n">825 cenários, 0 falhas</td></tr>
+<tr><td>Capturas de revisão de UI (<code>game/ui-review/*.shots.js</code>)</td><td class="n">18</td><td class="n">178</td><td class="n">22</td><td class="n">não é suíte de testes</td><td class="n">-</td></tr>
+</table>
+<p class="sub">Testes adicionados e removidos contam as linhas <code>@Test</code>/<code>@ParameterizedTest</code> e <code>it(</code>/<code>test(</code> no diff dos 12 commits, incluindo títulos renomeados; o saldo real vem dos totais da execução. Também rodou o teste de <code>deploy-scripts</code>: 306 testes, 0 falhas.</p>
+
+<h2>Cobertura de testes unitários (execução 46118182005)</h2>
+<table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Backend inteiro (JaCoCo)</td><td class="n">98,49%</td><td class="n">93,72%</td></tr>
+<tr><td>Jogo inteiro (Vitest, v8)</td><td class="n">98,73%</td><td class="n">95,15%</td></tr>
+<tr><td>Scripts de deploy (lcov)</td><td class="n">98,47%</td><td class="n">96,79%</td></tr>
+</table>
+<p>Arquivos do jogo que a funcionalidade alterou:</p>
+<table>
+<tr><th>Arquivo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td><code>errorText.js</code></td><td class="n">100%</td><td class="n">100%</td></tr>
+<tr><td><code>ApiError.js</code></td><td class="n">100%</td><td class="n">100%</td></tr>
+<tr><td><code>sessionManager.js</code></td><td class="n">100%</td><td class="n">100%</td></tr>
+<tr><td><code>campaign.js</code></td><td class="n">100%</td><td class="n">100%</td></tr>
+<tr><td><code>MainMenu.js</code></td><td class="n">98,42%</td><td class="n">81,81%</td></tr>
+<tr><td><code>ClickerGame.js</code></td><td class="n">97,91%</td><td class="n">91,53%</td></tr>
+</table>
+<p class="sub">Backend por arquivo: não medido por arquivo neste relatório (o JaCoCo do projeto inteiro é o número acima); as três mudanças de produção do backend (uma exceção, um handler e uma validação) são cobertas por <code>UserTest</code> e <code>UserControllerIT</code>.</p>
+
+<h2>Cobertura e2e (execução 46118182005)</h2>
+<p>Linhas do código do jogo exercitadas pelo Playwright (instrumentação istanbul, limite inferior): <b>94,58%</b> das linhas, 80,79% dos ramos, em 825 cenários. Arquivos alterados (linhas / ramos): <code>errorText.js</code> 100% / 57,14%, <code>ApiError.js</code> 92,3% / 90%, <code>sessionManager.js</code> 82% / 58,33%, <code>campaign.js</code> 92,45% / 83,78%, <code>MainMenu.js</code> 89,76% / 66,66%, <code>ClickerGame.js</code> 94,01% / 83,16%.</p>
+
+<h2>Cenários e2e da funcionalidade</h2>
+<p><code>portugueseText.spec.js</code>, 27 cenários, todos passaram (execução 46118182005):</p>
+<table>
+<tr><th>Grupo</th><th>Cenários</th></tr>
+<tr><td>O menu principal em português (5)</td><td>formulário Usuário, Senha, Entrar e Criar conta; campo vazio e nome de espaços leem "Informe usuário e senha" e não enviam pedido; entrada lê "Bem-vindo de volta, yan!", "Olá, yan!", "Clique para jogar!" e "Sair"; cadastro lê "Conta criada, newbie!"; a página declara <code>lang pt-BR</code></td></tr>
+<tr><td>Linhas de erro pelo código do backend (8)</td><td>nome já usado; usuário não encontrado; senha incorreta; senha curta ("A senha precisa ter pelo menos 8 caracteres."); <code>AUTH_UNAUTHENTICATED</code> ("Sua sessão expirou. Entre de novo."); erro 500; servidor inalcançável na entrada e no início</td></tr>
+<tr><td>O HUD de combate em português (12)</td><td>placa de fase, de miniboss e do chefe do capítulo; cronômetro do chefe 12 px ou mais à direita da placa; carteira Ouro, Prata e Cobre; chip do elemento em Fogo, Água, Natureza, Luz e Escuridão com o <code>data-element</code> intacto; rótulo "Farmar chefe" em uma linha</td></tr>
+<tr><td>O menu de pausa em português (1)</td><td>"Pausado", "Continuar", "Sair da luta", a confirmação e "Não, ficar" volta ao menu</td></tr>
+<tr><td>Sem inglês sobrando (2)</td><td>nenhuma palavra inglesa do inventário aparece nas telas principais nem em uma luta de fase</td></tr>
+</table>
+
+<h2>Falhas não causadas pela funcionalidade</h2>
+<p>Um caso instável de <code>dragEquip.spec.js</code> falhou na tentativa 1 da execução 46115690625 (commit <code>6442c4e3</code>) e passou na tentativa 2 (<code>gh run rerun --failed</code>). A mudança do commit não toca esse arquivo de produção; é instabilidade conhecida da arrastada. A execução 46118182005, do mesmo commit, passou inteira sem repetição. Observação: o artefato de resumo da execução 46115690625 ainda mostra os números da tentativa 1, por isso os números deste relatório vêm da execução 46118182005.</p>
+
+<h2>Implantação e produção</h2>
+<table>
+<tr><th>Item</th><th>Resultado</th></tr>
+<tr><td>Backend</td><td>Slot ativo: <code>blue</code>, commit <code>cde19d26</code>, que já contém a T1 (<code>472808ae</code>). Pedido de cadastro descartável com senha curta (<code>abc</code>) pelo túnel respondeu 400 com <code>code</code> <code>USER_PASSWORD_TOO_SHORT</code> e <code>minLength</code> 8, sem criar conta. O contêiner <code>infinity-grove-backend-blue</code> está no ar.</td></tr>
+<tr><td>Jogo (Worker)</td><td>O observador marcou <code>7597db4a</code> como tratado. O site <code>https://infinity-grove.yan-tapajos.workers.dev/</code> serve <code>lang="pt-BR"</code> e o pacote <code>index-f5pgmto0.js</code> contém "Clique para jogar!", "Chefe do capítulo", "Farmar chefe", "Sua sessão expirou", "Não foi possível falar com o servidor" e <code>USER_PASSWORD_TOO_SHORT</code>.</td></tr>
+<tr><td>Navegador</td><td>A extensão Claude in Chrome não estava conectada, então a jogada do caminho principal no navegador não foi feita; a verificação foi por HTTP (site, pacote do Worker, túnel, contêineres). As capturas do <code>ui-review.html</code> cobrem as telas.</td></tr>
+</table>
+<p class="sub">O site só fica no ar enquanto o <code>publish.sh</code> roda na máquina de publicação.</p>
+</main>
+</body>
+</html>
