@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Cenas de história (prólogo, capítulo 1 e Mapa)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Cenas de história (prólogo, capítulo 1 e Mapa)</h1>
+                <div class="meta">
+                    <code>.specs/features/story-scenes</code> · commit <code>cd13fb68</code> · 2026-11-28 · desktop local (dev), áudio recusado
+                </div>
+            </div>
+            <span class="chip verdict ok">APROVADO</span>
+        </div>
+        <p style="margin-top:16px">O overlay do prólogo e da cena do capítulo 1 segue a referência de design: paleta, placa, caixa, orbe, retrato e letterbox corretos, texto sem corte e o rótulo da versão sempre visível. O Mapa mostra o grupo História alinhado ao título. Há um achado médio (ícone da aba Mapa) e três baixos; nenhum bloqueia a aprovação.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">25</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">25</div><div class="l">capturas (desktop)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">4</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>Prólogo: cartão, narrador, voz e personagem com retrato, na ordem do design <code>STORY-09, STORY-16</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Cores #f3dc95, #c9a95a e #05090a, placa dourada, caixa com borda dupla, orbe e vinheta como na referência <code>design-reference.dc.html</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Retrato da Seraphine a 560 px nítido, sem borrão nem pixelização; arquivo maior não necessário <code>D19</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Barra (pontos, Pular, mudo) alinhada, alvos de 44 px, legível em todos os fundos <code>STORY-21</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Faixas de 96 px em 1024×768, nada do jogo aparecendo <code>STORY-22</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Capítulo 1: rostos redondos, câmera com push-in, letterbox de 46 px, veias, cartão final com tinta escura <code>STORY-46 a STORY-52</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Mapa: aba se chama Mapa, grupo História alinhado ao título sem tocar chips nem mapa, seis botões com chips T e B <code>STORY-37, STORY-39</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Versão visível sobre o overlay em todas as capturas <code>tasks.md T18 item 6</code></span></li>
+            <li class="no"><span class="mark">✗</span><span>Ícone da aba Mapa ainda é de caveira <code>spec Q6, achado #1</code></span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+        <div class="screen">
+            <h3>Prólogo</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/01-title-desktop.png" target="_blank"><img src="ui-review/01-title-desktop.png" alt="Cartão de título" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão de título</span>
+                        <span class="d">Logo, kicker, chamada, Pular e mudo; versão visível.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/02-narrator-typing-desktop.png" target="_blank"><img src="ui-review/02-narrator-typing-desktop.png" alt="Narrador digitando" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Narrador digitando</span>
+                        <span class="d">Fala 1 pela metade, texto sem corte, sem texto fantasma.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/03-narrator-complete-desktop.png" target="_blank"><img src="ui-review/03-narrator-complete-desktop.png" alt="Narrador completo" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Narrador completo</span>
+                        <span class="d">Fala 1 completa com a seta; pontos de progresso.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/04-dark-desktop.png" target="_blank"><img src="ui-review/04-dark-desktop.png" alt="Fala 2 (escuro)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fala 2 (escuro)</span>
+                        <span class="d">Tinta escura.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/05-red-desktop.png" target="_blank"><img src="ui-review/05-red-desktop.png" alt="Fala 3 (vermelho)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fala 3 (vermelho)</span>
+                        <span class="d">Tinta vermelha, três pontos acesos.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/06-map-desktop.png" target="_blank"><img src="ui-review/06-map-desktop.png" alt="Fala 4 (mapa e ouro)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fala 4 (mapa e ouro)</span>
+                        <span class="d">Fala sobre os cinco guardiões.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/07-voice-desktop.png" target="_blank"><img src="ui-review/07-voice-desktop.png" alt="Fala 5 (A Voz)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fala 5 (A Voz)</span>
+                        <span class="d">Orbe verde, placa dourada, caixa com borda dupla.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/08-character-desktop.png" target="_blank"><img src="ui-review/08-character-desktop.png" alt="Fala 6 (Seraphine)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fala 6 (Seraphine)</span>
+                        <span class="d">Retrato de 560 px com brilho, placa, caixa deslocada à direita.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/09-end-desktop.png" target="_blank"><img src="ui-review/09-end-desktop.png" alt="Cartão final" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão final</span>
+                        <span class="d">Fim do Prólogo, título 44 px, Capítulo 1.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/10-muted-desktop.png" target="_blank"><img src="ui-review/10-muted-desktop.png" alt="Barra com som desligado" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Barra com som desligado</span>
+                        <span class="d">Ícone de mudo trocado, alvos de 44 px.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/13-reduced-motion-desktop.png" target="_blank"><img src="ui-review/13-reduced-motion-desktop.png" alt="Movimento reduzido" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Movimento reduzido</span>
+                        <span class="d">Cartão de título com prefers-reduced-motion.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/14-bands-1024-desktop.png" target="_blank"><img src="ui-review/14-bands-1024-desktop.png" alt="Faixas em 1024×768" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Faixas em 1024×768</span>
+                        <span class="d">Palco centralizado com faixas escuras de 96 px, nada do jogo aparece.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Cena do capítulo 1</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/15-ch1-title-desktop.png" target="_blank"><img src="ui-review/15-ch1-title-desktop.png" alt="Cartão de título do capítulo 1" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão de título do capítulo 1</span>
+                        <span class="d">Clareira com tinta escura, logo de 520 px, título de 44 px.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #2</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/16-ch1-narrator-desktop.png" target="_blank"><img src="ui-review/16-ch1-narrator-desktop.png" alt="Narrador do capítulo 1" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Narrador do capítulo 1</span>
+                        <span class="d">Após o avanço de 6 s, letterbox de 46 px.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/17-ch1-kael-desktop.png" target="_blank"><img src="ui-review/17-ch1-kael-desktop.png" alt="Fala de Kael" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fala de Kael</span>
+                        <span class="d">Câmera em Kael, rosto redondo, caixa larga.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #3</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/17b-ch1-lyra-desktop.png" target="_blank"><img src="ui-review/17b-ch1-lyra-desktop.png" alt="Fala de Lyra" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fala de Lyra</span>
+                        <span class="d">Câmera abre no grupo; rosto centrado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/18-ch1-orina-desktop.png" target="_blank"><img src="ui-review/18-ch1-orina-desktop.png" alt="Fala de Orina" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fala de Orina</span>
+                        <span class="d">Veias pulsando na serpente; rosto da Orina bem enquadrado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/18b-ch1-seraphine-desktop.png" target="_blank"><img src="ui-review/18b-ch1-seraphine-desktop.png" alt="Fala de Seraphine" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fala de Seraphine</span>
+                        <span class="d">Rosto centrado, halo visível.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/19-ch1-vex-desktop.png" target="_blank"><img src="ui-review/19-ch1-vex-desktop.png" alt="Fala de Vex" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fala de Vex</span>
+                        <span class="d">Rosto de perfil, bem enquadrado.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/20-ch1-dawn-desktop.png" target="_blank"><img src="ui-review/20-ch1-dawn-desktop.png" alt="Fala 7 (amanhecer)" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Fala 7 (amanhecer)</span>
+                        <span class="d">Brilho do amanhecer quase imperceptível.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #4</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/21-ch1-end-desktop.png" target="_blank"><img src="ui-review/21-ch1-end-desktop.png" alt="Cartão final do capítulo 1" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Cartão final do capítulo 1</span>
+                        <span class="d">Tinta escura (0,55), título e subtítulo legíveis.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-baixa">achado #2</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Mapa e trilho</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/10b-rail-with-mapa-tab-desktop.png" target="_blank"><img src="ui-review/10b-rail-with-mapa-tab-desktop.png" alt="Trilho com a aba Mapa" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Trilho com a aba Mapa</span>
+                        <span class="d">Seis botões, chips T e B, aba Mapa com ícone de caveira.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip sev-media">achado #1</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/11-mapa-desktop.png" target="_blank"><img src="ui-review/11-mapa-desktop.png" alt="Mapa com grupo História" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Mapa com grupo História</span>
+                        <span class="d">Título do caminho e grupo História na mesma linha, só Prólogo.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/12-mapa-chapters-desktop.png" target="_blank"><img src="ui-review/12-mapa-chapters-desktop.png" alt="Mapa no capítulo 3" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Mapa no capítulo 3</span>
+                        <span class="d">Chips de capítulo, História com Prólogo e Capítulo 1.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/22-mapa-two-chips-desktop.png" target="_blank"><img src="ui-review/22-mapa-two-chips-desktop.png" alt="Mapa com dois botões de história" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">Mapa com dois botões de história</span>
+                        <span class="d">Prólogo e Capítulo 1 alinhados à direita.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-media">#1 · Média</span><strong>A aba Mapa mantém o ícone de caveira de "Rever chefes"</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Trilho lateral (desktop 1280×720)</dd>
+                    <dt>O que está errado</dt><dd>A aba agora se chama Mapa, mas o ícone ainda é uma caveira (chefe). Nome e ícone dizem coisas diferentes (spec Q6).</dd>
+                    <dt>Como deveria ficar</dt><dd>Trocar por um ícone de mapa ou pergaminho no mesmo estilo dos outros cinco.</dd>
+                    <dt>Arquivo</dt><dd><code>ícone da aba farm em game/public/style.css e o asset em game/public/assets/ui/</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/10b-rail-with-mapa-tab-desktop.png" target="_blank"><img src="ui-review/10b-rail-with-mapa-tab-desktop.png" alt="Captura do achado #1"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#2 · Baixa</span><strong>Logo e título do capítulo 1 competem com os heróis e a serpente</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Cartões de título e final do capítulo 1 (desktop 1280×720)</dd>
+                    <dt>O que está errado</dt><dd>O logo de 520 px cobre a cabeça do Kael e o título e a chamada cruzam Kael, Orina e Seraphine. Legível pelo brilho do texto, mas poluído.</dd>
+                    <dt>Como deveria ficar</dt><dd>Escurecer mais o cartão atrás do texto ou subir o logo, sem passar de 520 px.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (.story-tint.is-dark, .story-logo)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/15-ch1-title-desktop.png" target="_blank"><img src="ui-review/15-ch1-title-desktop.png" alt="Captura do achado #2"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#3 · Baixa</span><strong>Rosto do Kael descentralizado no círculo</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Fala de Kael (e a última fala) (desktop 1280×720)</dd>
+                    <dt>O que está errado</dt><dd>A cabeça fica no lado esquerdo do círculo, com a capa ocupando a metade direita; os outros quatro rostos estão centrados.</dd>
+                    <dt>Como deveria ficar</dt><dd>Reenquadrar face-kael.jpg com a cabeça ao centro.</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/assets/story/face-kael.jpg</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/17-ch1-kael-desktop.png" target="_blank"><img src="ui-review/17-ch1-kael-desktop.png" alt="Captura do achado #3"></a>
+        </article>
+        <article class="finding">
+            <div>
+                <div class="top"><span class="chip sev-baixa">#4 · Baixa</span><strong>O amanhecer da fala 7 mal se vê</strong></div>
+                <dl>
+                    <dt>Tela</dt><dd>Fala 7 do capítulo 1 (desktop 1280×720)</dd>
+                    <dt>O que está errado</dt><dd>O brilho (rgba(255,200,120,0.35), só no topo) fica sob a faixa preta e quase não muda a cena em relação à fala 2.</dd>
+                    <dt>Como deveria ficar</dt><dd>Subir a opacidade ou levar o gradiente mais para o centro (ex.: elipse a 50% 15%, 0.5).</dd>
+                    <dt>Arquivo</dt><dd><code>game/public/style.css (.story-tint.is-dawn)</code></dd>
+                </dl>
+            </div>
+            <a href="ui-review/20-ch1-dawn-desktop.png" target="_blank"><img src="ui-review/20-ch1-dawn-desktop.png" alt="Captura do achado #4"></a>
+        </article>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>O botão inferior do HUD ainda diz "Farm boss" e o cabeçalho "Stage 1/10 Phase 1/5" está em inglês (anteriores a esta feature, AD-007).</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <p class="empty">Nenhum recurso faltando: todas as imagens carregaram nas capturas (o script não coleta o console).</p>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-28</footer>
+</main>
+</body>
+</html>
