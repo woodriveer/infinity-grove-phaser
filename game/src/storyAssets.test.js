@@ -19,6 +19,6 @@ describe('the story assets', () => {
         const missing = [ ...paths ].filter((path) => !existsSync(join(PUBLIC, path)));
 
         expect(missing).toEqual([]);
-        expect(paths.size).toBe(23);
+        expect(paths.size).toBe(22);
     });
 });

@@ -100,8 +100,10 @@ test.describe('The prologue', () => {
 
             if (n === 6) {
                 await expect(page.getByTestId('story-speaker')).toHaveText('Seraphine');
-                await expect(page.getByTestId('story-portrait')).toHaveAttribute('alt', 'Seraphine');
-                await expect(page.getByTestId('story-portrait')).toHaveAttribute('src', 'assets/story/portrait-seraphine.png');
+                await expect(page.getByTestId('story-face')).toHaveAttribute('alt', 'Seraphine');
+                await expect(page.getByTestId('story-face')).toHaveAttribute('src', 'assets/story/face-seraphine.jpg');
+                await expect(page.locator('.story-box.is-face')).toBeVisible();
+                await expect(page.getByTestId('story-speaker')).toHaveCSS('left', '206px');
             }
         }
 

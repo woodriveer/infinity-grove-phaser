@@ -19,15 +19,15 @@ describe('storyCatalog', () => {
     });
 
     it('the prologue has the six lines of the design', () => {
-        expect(PROLOGUE.lines.map(({ kind, speaker, portrait, backdrop, tints, tintAt, audio, duration }) => (
-            { kind, speaker, portrait, backdrop, tints, tintAt, audio, duration }
+        expect(PROLOGUE.lines.map(({ kind, speaker, face, backdrop, tints, tintAt, audio, duration }) => (
+            { kind, speaker, face, backdrop, tints, tintAt, audio, duration }
         ))).toEqual([
-            { kind: 'narrator', speaker: 'Narrador', portrait: undefined, backdrop: 'forest', tints: [], tintAt: undefined, audio: 'assets/story/prologue-01.mp4', duration: 12.36 },
-            { kind: 'narrator', speaker: 'Narrador', portrait: undefined, backdrop: 'forest', tints: [ 'dark' ], tintAt: undefined, audio: 'assets/story/prologue-02.mp4', duration: 3.47 },
-            { kind: 'narrator', speaker: 'Narrador', portrait: undefined, backdrop: 'forest', tints: [ 'dark', 'red' ], tintAt: { red: 6.1 }, audio: 'assets/story/prologue-03.mp4', duration: 7.47 },
-            { kind: 'narrator', speaker: 'Narrador', portrait: undefined, backdrop: 'map', tints: [ 'gold' ], tintAt: undefined, audio: 'assets/story/prologue-04.mp4', duration: 6.11 },
-            { kind: 'voice', speaker: 'A Voz', portrait: undefined, backdrop: 'forest', tints: [ 'dark', 'voice' ], tintAt: undefined, audio: 'assets/story/prologue-05.mp4', duration: 4.05 },
-            { kind: 'character', speaker: 'Seraphine', portrait: 'assets/story/portrait-seraphine.png', backdrop: 'forest', tints: [], tintAt: undefined, audio: 'assets/story/prologue-06.mp4', duration: 6.35 }
+            { kind: 'narrator', speaker: 'Narrador', face: undefined, backdrop: 'forest', tints: [], tintAt: undefined, audio: 'assets/story/prologue-01.mp4', duration: 12.36 },
+            { kind: 'narrator', speaker: 'Narrador', face: undefined, backdrop: 'forest', tints: [ 'dark' ], tintAt: undefined, audio: 'assets/story/prologue-02.mp4', duration: 3.47 },
+            { kind: 'narrator', speaker: 'Narrador', face: undefined, backdrop: 'forest', tints: [ 'dark', 'red' ], tintAt: { red: 6.1 }, audio: 'assets/story/prologue-03.mp4', duration: 7.47 },
+            { kind: 'narrator', speaker: 'Narrador', face: undefined, backdrop: 'map', tints: [ 'gold' ], tintAt: undefined, audio: 'assets/story/prologue-04.mp4', duration: 6.11 },
+            { kind: 'voice', speaker: 'A Voz', face: undefined, backdrop: 'forest', tints: [ 'dark', 'voice' ], tintAt: undefined, audio: 'assets/story/prologue-05.mp4', duration: 4.05 },
+            { kind: 'character', speaker: 'Seraphine', face: 'assets/story/face-seraphine.jpg', backdrop: 'forest', tints: [], tintAt: undefined, audio: 'assets/story/prologue-06.mp4', duration: 6.35 }
         ]);
     });
 
@@ -120,14 +120,14 @@ describe('storyCatalog', () => {
             'Interessante... As veias roxas pulsam no mesmo ritmo. Como se algo lá embaixo respirasse por elas.',
             'A Árvore diz que isto é só o começo. Precisamos ficar juntos.',
             'Ela diz, é? Sorte a sua. Comigo ninguém conversa.',
-            'Então fique calado e lute, espião. Avançamos ao amanhecer.'
+            'Deixe de reclamar, espião. Avançamos ao amanhecer!'
         ]);
-        expect(CHAPTER_1.lines.map((line) => lineText(line).length)).toEqual([ 83, 61, 72, 98, 61, 49, 58 ]);
+        expect(CHAPTER_1.lines.map((line) => lineText(line).length)).toEqual([ 83, 61, 72, 98, 61, 49, 50 ]);
     });
 
     it('chapter 1 cue timings are the design\'s', () => {
         expect(CHAPTER_1.lines[2].cues[1]).toEqual([ 1.7, 2.7, 'Ainda brilham.' ]);
-        expect(CHAPTER_1.lines[6].cues[1]).toEqual([ 2.14, 3.77, 'Avançamos ao amanhecer.' ]);
+        expect(CHAPTER_1.lines[6].cues).toEqual([ [ 0.05, 1.78, 'Deixe de reclamar, espião.' ], [ 2.14, 3.77, 'Avançamos ao amanhecer!' ] ]);
         expect(CHAPTER_1.lines.map((line) => line.cues.length)).toEqual([ 2, 3, 3, 3, 2, 3, 2 ]);
     });
 

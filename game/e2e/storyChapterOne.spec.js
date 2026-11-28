@@ -13,7 +13,7 @@ const LINES = [
     'Interessante... As veias roxas pulsam no mesmo ritmo. Como se algo lá embaixo respirasse por elas.',
     'A Árvore diz que isto é só o começo. Precisamos ficar juntos.',
     'Ela diz, é? Sorte a sua. Comigo ninguém conversa.',
-    'Então fique calado e lute, espião. Avançamos ao amanhecer.'
+    'Deixe de reclamar, espião. Avançamos ao amanhecer!'
 ];
 const SPEAKERS = [ 'Kael', 'Lyra', 'Orina', 'Seraphine', 'Vex', 'Kael' ];
 const FACES = [ 'face-kael.jpg', 'face-lyra.jpg', 'face-orina.jpg', 'face-seraphine.jpg', 'face-vex.jpg', 'face-kael.jpg' ];

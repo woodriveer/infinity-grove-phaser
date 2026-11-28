@@ -56,7 +56,7 @@ export const STORY_SCENES = [
                 cues: [ [ 0.05, 1.03, 'Criança...' ], [ 1.39, 2.04, 'venha.' ], [ 2.57, 3.9, 'Eu preciso de você.' ] ]
             },
             {
-                kind: 'character', speaker: 'Seraphine', portrait: 'assets/story/portrait-seraphine.png', backdrop: 'forest', tints: [], audio: 'assets/story/prologue-06.mp4', duration: 6.35,
+                kind: 'character', speaker: 'Seraphine', face: 'assets/story/face-seraphine.jpg', backdrop: 'forest', tints: [], audio: 'assets/story/prologue-06.mp4', duration: 6.35,
                 cues: [ [ 0.05, 1.46, 'Vocês também ouviram?' ], [ 2.1, 3.4, 'Ela está nos chamando.' ], [ 4.02, 4.82, 'A Árvore...' ], [ 5.19, 6.2, 'está com medo.' ] ]
             }
         ]
@@ -105,7 +105,7 @@ export const STORY_SCENES = [
             },
             {
                 kind: 'character', speaker: 'Kael', face: 'assets/story/face-kael.jpg', backdrop: 'clearing', camera: 'kael', tints: [ 'dawn' ], audio: 'assets/story/chapter-01-07.mp4', duration: 4.05,
-                cues: [ [ 0.05, 1.78, 'Então fique calado e lute, espião.' ], [ 2.14, 3.77, 'Avançamos ao amanhecer.' ] ]
+                cues: [ [ 0.05, 1.78, 'Deixe de reclamar, espião.' ], [ 2.14, 3.77, 'Avançamos ao amanhecer!' ] ]
             }
         ]
     }

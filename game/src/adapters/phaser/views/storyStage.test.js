@@ -245,16 +245,30 @@ describe('storyStage', () => {
         expect(id('story-text').className).toBe('story-line is-italic');
     });
 
-    it('the character line shows the portrait, the plate and upright text', () => {
+    it('the prologue character line shows the round face, the plate and upright text', () => {
         const { id, paint, q } = build();
 
         paint(line(5));
 
-        expect(id('story-portrait').getAttribute('src')).toBe('assets/story/portrait-seraphine.png');
+        expect(id('story-face').getAttribute('src')).toBe('assets/story/face-seraphine.jpg');
+        expect(id('story-face').getAttribute('alt')).toBe('Seraphine');
+        expect(id('story-portrait')).toBeNull();
+        expect(id('story-speaker').textContent).toBe('Seraphine');
+        expect(q('.story-box').classList.contains('is-face')).toBe(true);
+        expect(id('story-text').classList.contains('is-italic')).toBe(false);
+    });
+
+    it('a character line with a portrait shows the full-body portrait and the character box', () => {
+        const portraitLine = { ...PROLOGUE.lines[5], face: undefined, portrait: 'assets/story/portrait-x.png' };
+        const { id, paint, q } = build({ ...PROLOGUE, lines: [ portraitLine ] });
+
+        paint(line(0));
+
+        expect(id('story-portrait').getAttribute('src')).toBe('assets/story/portrait-x.png');
         expect(id('story-portrait').getAttribute('alt')).toBe('Seraphine');
+        expect(id('story-face')).toBeNull();
         expect(id('story-speaker').textContent).toBe('Seraphine');
         expect(q('.story-box').classList.contains('is-character')).toBe(true);
-        expect(id('story-text').classList.contains('is-italic')).toBe(false);
     });
 
     it('the end card shows its texts and the Continuar label', () => {
