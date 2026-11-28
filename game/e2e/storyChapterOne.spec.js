@@ -174,7 +174,7 @@ test.describe('The chapter 1 boss scene', () => {
         await hitButton(page).click();
 
         await expect(overlay(page)).toHaveCount(0);
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 1/10  Phase 1/5');
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 1/10  Fase 1/5');
         expect(await held(page)).toEqual([ false, false, false ]);
     });
 

@@ -156,7 +156,7 @@ test.describe('The prologue', () => {
 
         await expect(overlay(page)).toHaveCount(0);
         expect(await held(page)).toEqual(ALL_FALSE);
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 1/10  Phase 1/5');
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 1/10  Fase 1/5');
 
         const before = await monsterHealth(page);
 
@@ -296,7 +296,7 @@ test.describe('The prologue', () => {
         await page.getByTestId('reset-confirm').click();
 
         await expect(page.getByTestId('chapter-hud')).toHaveText('Capítulo 1');
-        await expect(page.locator('.stage-hud')).toHaveText('Stage 1/10  Phase 1/5');
+        await expect(page.locator('.stage-hud')).toHaveText('Estágio 1/10  Fase 1/5');
         await page.waitForTimeout(500);
         await expect(overlay(page)).toHaveCount(0);
         expect(await seenKey(page)).toBe('["prologue"]');
