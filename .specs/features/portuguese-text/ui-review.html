@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de UI · Texto em português</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* The Organic look of game/public/style.css: cream rounded panels over the forest, Caprasimo for titles,
+   terracotta for actions and alerts, sage for what passes. */
+:root {
+    --forest: #272e1b;
+    --forest-2: #3d472b;
+    --bg: #f5ead8;
+    --surface: #ebddc5;
+    --panel: #f9f4ed;
+    --text: #201e1d;
+    --muted: #645c50;
+    --line: color-mix(in srgb, #201e1d 16%, transparent);
+    --accent: #c67139;
+    --accent-dark: #8c491a;
+    --accent-soft: #ffe1d0;
+    --sage: #728157;
+    --sage-dark: #3d472b;
+    --sage-soft: #e1eecc;
+    --amber: #a3621b;
+    --amber-soft: #fff2eb;
+    --font-heading: "Caprasimo", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+    --shadow-md: 0 3px 10px color-mix(in srgb, #2e2b25 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2e2b25 30%, transparent);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 50% -10%, var(--forest-2), var(--forest)) fixed;
+    font: 15px/1.55 var(--font-body);
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.panel { background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 24px 28px; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; margin: 0; line-height: 1.2; }
+h1 { font-size: 34px; }
+h2 { font-size: 22px; margin-bottom: 14px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--surface); padding: 1px 6px; border-radius: 6px; }
+.brand { color: var(--sage-soft); font-family: var(--font-heading); font-size: 15px; letter-spacing: .04em; text-align: center; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.meta { color: var(--muted); margin-top: 6px; }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.verdict { font-family: var(--font-heading); font-weight: 400; font-size: 18px; padding: 8px 20px; }
+.ok { background: var(--sage); color: var(--panel); }
+.changes { background: var(--accent); color: var(--panel); }
+.sev-alta { background: var(--accent-dark); color: var(--panel); }
+.sev-media { background: var(--accent-soft); color: var(--accent-dark); }
+.sev-baixa { background: var(--sage-soft); color: var(--sage-dark); }
+.vp { background: var(--surface); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 14px 16px; }
+.stat .n { font-family: var(--font-heading); font-size: 30px; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+ul.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.checks li { background: var(--panel); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+ul.checks li .mark { font-weight: 700; }
+ul.checks li.yes .mark { color: var(--sage); }
+ul.checks li.no .mark { color: var(--accent-dark); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.shots.phone { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+figure { margin: 0; background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+figure a { display: block; background: var(--forest); }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; display: grid; gap: 6px; }
+figcaption .t { font-weight: 700; }
+figcaption .d { color: var(--muted); font-size: 13px; }
+figcaption .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.screen + .screen { margin-top: 22px; }
+.screen h3 { margin-bottom: 10px; }
+.finding { background: var(--panel); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 16px 18px; display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.finding + .finding { margin-top: 14px; }
+.finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.finding dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; }
+.finding dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.finding dd { margin: 0; }
+.finding img { width: 100%; border-radius: 10px; display: block; }
+.empty { color: var(--muted); font-style: italic; }
+footer { color: var(--sage-soft); text-align: center; font-size: 13px; opacity: .8; }
+@media (max-width: 640px) {
+    .panel { padding: 20px 18px; border-radius: 22px; }
+    h1 { font-size: 27px; }
+    .finding { grid-template-columns: 1fr; }
+    .finding dl { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+    <div class="brand">Infinity Grove · Revisão de UI</div>
+
+    <section class="panel">
+        <div class="head">
+            <div>
+                <h1>Texto em português</h1>
+                <div class="meta">
+                    <code>.specs/features/portuguese-text</code> · commits <code>até 6442c4e3</code> · 2026-11-28 · local, Playwright (fake backend)
+                </div>
+            </div>
+            <span class="chip verdict ok">APROVADO</span>
+        </div>
+        <p style="margin-top:16px">Os textos em português cabem onde os ingleses cabiam: nada cortado nem sobreposto nos 12 estados revisados. O timer do boss mantém 12 px de folga da placa (justo no miniboss, 19 px no chefe do capítulo), a pílula de início, o rótulo Farmar chefe e os botões da pausa ficam em uma linha, e os acentos renderizam em Cinzel e Figtree. Sem achados; duas sugestões de gosto.</p>
+        <div class="stats">
+            <div class="stat"><div class="n">12</div><div class="l">telas e estados verificados</div></div>
+            <div class="stat"><div class="n">12</div><div class="l">capturas (desktop)</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados de severidade alta</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">achados médios e baixos</div></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Fidelidade à spec</h2>
+        <ul class="checks">
+            <li class="yes"><span class="mark">✓</span><span>A placa do estágio cresceu (Estágio/Fase) e o timer continua 12 px ou mais à direita dela: 12 px no miniboss, 19 px no chefe do capítulo. <code>design § Layout, Stage plate</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Clique para jogar! em uma linha na pílula de 320 px, com o ícone dentro. <code>design § Layout, Start prompt</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Tempo: 45s e Tempo: 90s em uma linha dentro do anel. <code>design § Layout, Boss timer</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>A linha do inimigo (Escuridão, Defesa, Seu crítico) não quebra. <code>design § Layout, Element chip</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Farmar chefe em uma linha sob o botão de 56 px, dentro da barra de batalha. <code>design § Layout, Farm switch label</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Sim, sair, Não, ficar, 1. Continuar e 2. Sair da luta em uma linha dentro do cartão. <code>design § Layout, Pause menu</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>O erro offline (o mais longo) quebra dentro da coluna oval, sem corte. <code>design § Layout, Message line</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Acentos (á, ã, é, í, ç) renderizam em Cinzel e Figtree, sem caixas vazias. Cores, fontes e bordas do Grove não mudaram (AD-022). <code>tasks T11, Check against</code></span></li>
+            <li class="yes"><span class="mark">✓</span><span>Todo o texto novo visível está em português; nenhuma palavra em inglês nas telas capturadas. <code>AD-007</code></span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Capturas</h2>
+                <div class="screen">
+            <h3>Formulário de entrada</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/01-signin-form-desktop.png" target="_blank"><img src="ui-review/01-signin-form-desktop.png" alt="01 · Formulário" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">01 · Formulário</span>
+                        <span class="d">Usuário, Senha, Entrar e Criar conta. Criar conta quebra em duas linhas dentro do botão (sugestão 1).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/02-signin-error-offline-desktop.png" target="_blank"><img src="ui-review/02-signin-error-offline-desktop.png" alt="02 · Erro offline" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">02 · Erro offline</span>
+                        <span class="d">A frase mais longa (64 caracteres) quebra em duas linhas dentro da coluna oval, sem corte.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/03-signin-error-short-password-desktop.png" target="_blank"><img src="ui-review/03-signin-error-short-password-desktop.png" alt="03 · Senha curta" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">03 · Senha curta</span>
+                        <span class="d">A senha precisa ter pelo menos 8 caracteres, em uma linha.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Boas-vindas</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/04-welcome-desktop.png" target="_blank"><img src="ui-review/04-welcome-desktop.png" alt="04 · Boas-vindas" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">04 · Boas-vindas</span>
+                        <span class="d">Olá, yan!, Clique para jogar! em uma linha na pílula de 320 px com o ícone, e Sair. Acentos em Cinzel sem caixas vazias.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>HUD de combate</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/05-hud-phase-desktop.png" target="_blank"><img src="ui-review/05-hud-phase-desktop.png" alt="05 · Placa de fase" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">05 · Placa de fase</span>
+                        <span class="d">Estágio 10/10  Fase 8/8 (maior placa de fase): cabe na placa, sem timer.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/06-hud-miniboss-timer-desktop.png" target="_blank"><img src="ui-review/06-hud-miniboss-timer-desktop.png" alt="06 · Miniboss com timer" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">06 · Miniboss com timer</span>
+                        <span class="d">Estágio 3/10  Miniboss e Tempo: 45s. Medido: placa termina em x 563, timer começa em x 575, folga de 12 px (limite do design).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/07-hud-chapter-boss-desktop.png" target="_blank"><img src="ui-review/07-hud-chapter-boss-desktop.png" alt="07 · Chefe do capítulo" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">07 · Chefe do capítulo</span>
+                        <span class="d">Chefe do capítulo e Tempo: 90s. Folga de 19 px entre placa (x 534) e timer (x 553).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/08-enemy-line-darkness-desktop.png" target="_blank"><img src="ui-review/08-enemy-line-darkness-desktop.png" alt="08 · Linha do inimigo" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">08 · Linha do inimigo</span>
+                        <span class="d">Escuridão, Defesa 20%, Seu crítico: 0% em três chips de uma linha só.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/11-farm-switch-desktop.png" target="_blank"><img src="ui-review/11-farm-switch-desktop.png" alt="11 · Farmar chefe" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">11 · Farmar chefe</span>
+                        <span class="d">Rótulo em uma linha sob o botão de 56 px, dentro da barra de batalha.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Menu de pausa</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/09-pause-menu-desktop.png" target="_blank"><img src="ui-review/09-pause-menu-desktop.png" alt="09 · Pausa" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">09 · Pausa</span>
+                        <span class="d">Pausado, 1. Continuar e 2. Sair da luta, cada botão em uma linha dentro do cartão.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+                <figure>
+                    <a href="ui-review/10-pause-confirm-desktop.png" target="_blank"><img src="ui-review/10-pause-confirm-desktop.png" alt="10 · Confirmação" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">10 · Confirmação</span>
+                        <span class="d">Sair da luta? Isso conta como derrota., Sim, sair e Não, ficar em uma linha (328 px de largura cada).</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="screen">
+            <h3>Fim do capítulo</h3>
+            <div class="shots">
+                <figure>
+                    <a href="ui-review/12-chapter-complete-desktop.png" target="_blank"><img src="ui-review/12-chapter-complete-desktop.png" alt="12 · Capítulo concluído" loading="lazy"></a>
+                    <figcaption>
+                        <span class="t">12 · Capítulo concluído</span>
+                        <span class="d">Capítulo concluído! em Cinzel dourado, centrado, sem corte, com Carta: Seraphine Aurora acima.</span>
+                        <span class="tags"><span class="chip vp">Desktop 1280×720</span><span class="chip ok">ok</span></span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Achados</h2>
+        <p class="empty">Nenhum achado.</p>
+    </section>
+
+    <section class="panel">
+        <h2>Sugestões</h2>
+        <ul class="checks">
+            <li><span class="mark">✦</span><span>Criar conta quebra em duas linhas no botão de 143 px (Entrar fica em uma). Cabe e não corta, mas um tamanho de fonte um ponto menor, ou botões com larguras diferentes, manteria os dois rótulos em uma linha (<code>game/public/style.css</code>, botão do formulário).</span></li>
+            <li><span class="mark">✦</span><span>Fora do escopo desta feature: o painel de elementos mostra "x1,8 vs trio" e a caixa cinza translúcida no lugar do monstro vem do backend falso das capturas (sem sprite), não do jogo.</span></li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Console e recursos</h2>
+        <p class="empty">Nenhum erro nem recurso faltando visto nas capturas. O Claude in Chrome não foi usado: as capturas são do Playwright (<code>npm run ui:shots -- portugueseText</code>), e o console não foi lido.</p>
+    </section>
+
+    <footer>Revisão do ui-artist · 2026-11-28</footer>
+</main>
+</body>
+</html>

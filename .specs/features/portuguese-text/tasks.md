@@ -429,7 +429,7 @@ For the codes the fake backend never answers on sign-in (`AUTH_UNAUTHENTICATED`,
 
 ### Phase 4: UI review
 
-#### T11: UI review of the Portuguese screens [ ]
+#### T11: UI review of the Portuguese screens [x]
 
 **Owner**: ui-artist
 **Goal**: The Portuguese texts fit where the English ones did: no clipped, wrapped or overlapping text (PT-01, PT-04, PT-05; design § Layout).
@@ -448,7 +448,7 @@ For the codes the fake backend never answers on sign-in (`AUTH_UNAUTHENTICATED`,
 **Gate**: `cd game && npm run ui:shots -- portugueseText`
 **Done when**:
 
-- [ ] `ui-review.html` lists the 12 shots with `APROVADO`, or each finding as a new task in this file with its owner.
+- [x] `ui-review.html` lists the 12 shots with `APROVADO`, or each finding as a new task in this file with its owner.
 
 **Commit**: `docs(ui): review the Portuguese screens`
 
