@@ -1125,7 +1125,7 @@ export const createRankingApi = (httpClient) => ({
 
 ---
 
-#### T13: Ranking board application service [ ]
+#### T13: Ranking board application service [x]
 
 **Owner**: game-dev
 **Goal**: The screen's state: the board and chapter shown, the last page, the click power poke before each open and late answers dropped (RNK-07, RNK-09; spec Ranking screen AC 2, 3, 7, 8, Loading AC 3).
@@ -1181,7 +1181,7 @@ Rules:
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 11 cases pass.
+- [x] The 11 cases pass.
 
 **Commit**: `feat(game): keep the ranking board state`
 
