@@ -133,7 +133,7 @@ Os chefes seguem `PROMPTS_ASSETS_MONSTROS.md`.
 | 4 | Orina | Interessante... As veias roxas pulsam no mesmo ritmo. Como se algo lá embaixo respirasse por elas. | [curious, thoughtful] Interessante... [pause] As veias roxas pulsam no mesmo ritmo. Como se algo lá embaixo respirasse por elas. | 7 s |
 | 5 | Seraphine | A Árvore diz que isto é só o começo. Precisamos ficar juntos. | [serene, confident] A Árvore diz que isto é só o começo. Precisamos ficar juntos. | 6 s |
 | 6 | Vex | Ela diz, é? Sorte a sua. Comigo ninguém conversa. | [sarcastic] Ela diz, é? [snorts] Sorte a sua. Comigo ninguém conversa. | 4 s |
-| 7 | Kael | Então fique calado e lute, espião. Avançamos ao amanhecer. | [firm, commanding] Então fique calado e lute, espião. Avançamos ao amanhecer. | 4,5 s |
+| 7 | Kael | Deixe de reclamar, espião. Avançamos ao amanhecer! | [annoyed, then firm and commanding] Deixe de reclamar, espião. [rallying] Avançamos ao amanhecer! | 4,5 s |
 
 **Duração total:** ~38 s
 

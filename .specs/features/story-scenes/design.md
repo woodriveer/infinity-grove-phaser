@@ -384,7 +384,7 @@ Appended to `STORY_SCENES` after the prologue:
             },
             {
                 kind: 'character', speaker: 'Kael', face: 'assets/story/face-kael.jpg', backdrop: 'clearing', camera: 'kael', tints: [ 'dawn' ], audio: 'assets/story/chapter-01-07.mp4', duration: 4.05,
-                cues: [ [ 0.05, 1.78, 'Então fique calado e lute, espião.' ], [ 2.14, 3.77, 'Avançamos ao amanhecer.' ] ]
+                cues: [ [ 0.05, 1.78, 'Deixe de reclamar, espião.' ], [ 2.14, 3.77, 'Avançamos ao amanhecer!' ] ]
             }
         ]
     }

@@ -34,6 +34,7 @@ a{color:#e9d9a6}a:hover{color:#fff3cc}
 .ig-name{position:absolute;top:-24px;left:32px;font-family:'Cinzel',serif;font-weight:700;font-size:20px;letter-spacing:.12em;color:#1b1406;background:linear-gradient(180deg,#f3dc95,#c9a24c);padding:8px 22px;border-radius:8px;border:1px solid #fff0bf;box-shadow:0 4px 12px rgba(0,0,0,.5)}
 .ig-next{position:absolute;right:22px;bottom:14px;animation:igBob 1s ease-in-out infinite}
 .ig-sera{position:absolute;left:70px;bottom:0;height:560px;filter:drop-shadow(0 0 22px rgba(255,226,150,.45));animation:igEnter .8s ease both}
+.ig-portrait{position:absolute;left:28px;top:-52px;width:156px;height:156px;border-radius:50%;object-fit:cover;border:3px solid #e8cf86;box-shadow:0 0 0 5px rgba(10,18,14,.9),0 0 22px rgba(255,220,140,.45),0 10px 24px rgba(0,0,0,.6);background:#0b140f}
 .ig-orb{position:absolute;left:50%;top:150px;width:150px;height:150px;margin-left:-75px;border-radius:50%;background:radial-gradient(circle at 50% 50%,#ffffff 0%,#c9ffd9 18%,rgba(110,230,160,.55) 45%,rgba(60,180,120,0) 72%);animation:igBreath 2.6s ease-in-out infinite}
 .ig-hit{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;background:transparent;cursor:pointer;z-index:5}
 .ig-hit:focus-visible{outline:3px solid #f3dc95;outline-offset:-6px}
@@ -115,9 +116,9 @@ a{color:#e9d9a6}a:hover{color:#fff3cc}
   </sc-if>
 
   <sc-if value="{{showSera}}" hint-placeholder-val="{{ false }}">
-    <img class="ig-sera" src="/_blob/3404e4184f3224a6e08a782b64f2b2a6" alt="Seraphine">
-    <div class="ig-box" style="left: 330px; width: 900px; min-height: 170px">
-      <span class="ig-name">{{speaker}}</span>
+    <div class="ig-box" style="left: 110px; width: 1060px; min-height: 176px; padding: 36px 48px 30px 210px">
+      <img class="ig-portrait" src="/_blob/58ff428d0eacd3e6e936828588282c04" alt="Seraphine">
+      <span class="ig-name" style="left: 206px; top: -22px">{{speaker}}</span>
       <p style="margin: 0">{{shown}}<span class="ig-ghost">{{rest}}</span></p>
       <sc-if value="{{showNext}}" hint-placeholder-val="{{ false }}">
         <div class="ig-next"><svg width="22" height="14" viewBox="0 0 28 18" aria-hidden="true"><path d="M3 3 L14 14 L25 3" fill="none" stroke="#f3dc95" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
