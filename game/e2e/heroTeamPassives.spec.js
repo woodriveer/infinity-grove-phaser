@@ -4,7 +4,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
 //  Hero team (spec hero-team): the passives of the allies on the real scene and screens. The player owns one blank card of each of the five
 //  heroes; `stars` adds a card of that many stars. The auto click is switched off (chapter 5 opens it). Where a number is read, the Phaser
-//  loop is stopped once the game has loaded and time moves only with advance(page, ms); a click scenario starts with `talents: {}`-like
+//  loop is stopped once the game has loaded; team(page) lands the team's part of a click without the click; a click scenario starts with `talents: {}`-like
 //  defaults so the combo adds nothing, and the roll of the click is set with `roll`.
 const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 const ELEMENT_OF = { kael: 'FIRE', lyra: 'NATURE', orina: 'WATER', seraphine: 'LIGHT', vex: 'DARKNESS' };
@@ -27,20 +27,21 @@ const chapter = (monster, { health = 1000, minibossHealth = health, bossHealth =
 
 const scene = (page, read) => page.evaluate(`(${read})(window.__PHASER_GAME__.scene.getScene('ClickerGame'))`);
 const health = (page) => scene(page, '(s) => s.monster?.health');
-const advance = (page, ms) => page.evaluate((delta) => window.__PHASER_GAME__.scene.getScene('ClickerGame').update(0, delta), ms);
 const allyTexts = (page) => scene(page, '(s) => s.children.list.filter((o) => o.type === "Text" && o.style.color === "#7fd4ff").map((o) => o.text)');
 const criticalTexts = (page) => scene(page, `(s) => s.children.list.filter((o) => o.type === "Text" && o.style.color === "${CRITICAL_COLOR}").map((o) => o.text)`);
 const dealt = async (page, from = 1000) => from - await health(page);
 const strike = (page) => page.evaluate(() => window.__PHASER_GAME__.scene.getScene('ClickerGame').strike(670));
 
-//  Stops the loop and puts the ally clock back at 1000 ms, as it stands when a monster appears
-const freeze = (page) => page.evaluate(() => {
-    const game = window.__PHASER_GAME__;
-
-    game.loop.sleep();
-    game.scene.getScene('ClickerGame').allies.untilTickMs = 1000;
-});
+//  Stops the loop
+const freeze = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
 const wake = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.wake());
+//  The team's part of a click without the click: lands it on the target, then the kill path, as strike does
+const team = (page) => page.evaluate(() => {
+    const game = window.__PHASER_GAME__.scene.getScene('ClickerGame');
+
+    game.teamStrike(game.currentTarget());
+    game.afterDamage();
+});
 
 const startTeam = async (page, {
     chapter: campaignChapter = 5, stage = 1, encounter = 'PHASE', phase = 1, completed, cleared = [ 5 ], team, leader = 'kael', stars = {}, equipment, talents,
@@ -133,14 +134,14 @@ test.describe('Hero team: passives', () => {
         await expect(timer(page)).toHaveText('Time: 65');
     });
 
-    test('Lyra as an ally makes a roll of 15 a critical click', async ({ page, browser }) => {
+    test('Lyra as an ally makes a roll of 15 a critical click, and her team hit adds 2', async ({ page, browser }) => {
         //  Two games boot in this scenario
         test.setTimeout(120_000);
 
         await startTeam(page, { team: LYRA_IN_SLOT_1, roll: 0.15 });
         await strike(page);
 
-        expect(await dealt(page)).toBeCloseTo(2, 5);
+        expect(await dealt(page)).toBeCloseTo(4, 5);
         expect(await criticalTexts(page)).toEqual([ '2' ]);
 
         //  Without Lyra in the team the same click is a plain 1
@@ -155,14 +156,14 @@ test.describe('Hero team: passives', () => {
         await context.close();
     });
 
-    test('Orina as an ally shows Defesa 25% on a monster of defense 40 and a click deals 0.75', async ({ page }) => {
+    test('Orina as an ally shows Defesa 25% on a monster of defense 40 and a click deals 0.75 plus her team hit 1.5', async ({ page }) => {
         await startTeam(page, { team: { boughtSlots: 1, allies: [ 'orina', null, null, null ] }, monster: monsterOf('FIRE', 40) });
 
         await expect(page.locator('.enemy-stats [data-stat="defense"]')).toHaveText('Defesa 25%');
 
         await strike(page);
 
-        expect(await dealt(page)).toBeCloseTo(0.75, 5);
+        expect(await dealt(page)).toBeCloseTo(2.25, 5);
     });
 
     test('Orina as an ally on a monster of defense 10 shows Defesa 0%', async ({ page }) => {
@@ -172,7 +173,7 @@ test.describe('Hero team: passives', () => {
 
         await strike(page);
 
-        expect(await dealt(page)).toBeCloseTo(1, 5);
+        expect(await dealt(page)).toBeCloseTo(3, 5);
     });
 
     test('Vex as an ally shows Seu crítico: 10% on a monster of critical resistance 5 and a roll of 8 is critical', async ({ page, browser }) => {
@@ -185,7 +186,7 @@ test.describe('Hero team: passives', () => {
 
         await strike(page);
 
-        expect(await dealt(page)).toBeCloseTo(2, 5);
+        expect(await dealt(page)).toBeCloseTo(4, 5);
 
         //  Without Vex the chance is 10 - 5 = 5: the same roll of 8 is a plain click
         const context = await browser.newContext();
@@ -199,10 +200,10 @@ test.describe('Hero team: passives', () => {
         await context.close();
     });
 
-    test('Seraphine and Lyra as allies deal 5 per tick', async ({ page }) => {
+    test('Seraphine and Lyra as allies deal 5 per team strike', async ({ page }) => {
         await startTeam(page, { cleared: [ 5, 6 ], team: { boughtSlots: 2, allies: [ 'lyra', 'seraphine', null, null ] } });
 
-        await advance(page, 1_000);
+        await team(page);
 
         expect(await dealt(page)).toBeCloseTo(5, 5);
         expect(await allyTexts(page)).toEqual([ '5' ]);

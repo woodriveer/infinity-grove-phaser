@@ -374,7 +374,7 @@ The tests `a click number keeps the gold fill and the 8 px outline` and `a criti
 
 ---
 
-#### T5: The other hero team e2e files follow the click [ ]
+#### T5: The other hero team e2e files follow the click [x]
 
 **Owner**: test-engineer
 **Goal**: `heroTeamField`, `heroTeamPassives`, `heroTeam`, `heroTeamEditing` and `heroTeamStyle` pass with the team on the click and the per click texts (TCD-01, TCD-03 AC 6, TCD-04).
@@ -410,8 +410,13 @@ The tests `a click number keeps the gold fill and the 8 px outline` and `a criti
 **Gate**: `cd game && npm test`, then one at a time: `npx playwright test e2e/heroTeamField.spec.js`, `e2e/heroTeamPassives.spec.js`, `e2e/heroTeam.spec.js`, `e2e/heroTeamEditing.spec.js`, `e2e/heroTeamStyle.spec.js`
 **Done when**:
 
-- [ ] `git grep -n "untilTickMs\|/s')" game/e2e/heroTeam*.spec.js` prints nothing.
-- [ ] Every row is applied; the five files pass.
+- [x] `git grep -n "untilTickMs\|/s')" game/e2e/heroTeam*.spec.js` prints nothing.
+- [x] Every row is applied; the five files pass.
+
+**Execution notes (T5)**:
+
+- Text re-pins the table did not list, same pattern and same values as its `heroTeamEditing` and `heroTeam` rows: `heroTeamEditing.spec.js` `Dano: 2/s` (line 64) -> `Dano: 2/clique`; the test holding `Dano: 2.5/s` x2 and `Dano da equipe: 10/s` (line 245-247) -> `Dano: 2.5/clique` x2 and `Dano da equipe por clique: 10`. Without them the file fails and the Success Criterion grep for `/s'` would not be empty.
+- `advance` helper removed from `heroTeamField.spec.js` and `heroTeamPassives.spec.js` (no caller left).
 
 **Commit**: `test(game): the hero team e2e files read the team per click`
 

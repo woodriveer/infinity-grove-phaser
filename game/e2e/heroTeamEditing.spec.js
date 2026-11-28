@@ -61,7 +61,7 @@ test.describe('Hero team: editing', () => {
         await expect(slot(page, 1)).toHaveAttribute('data-state', 'filled');
         await expect(slot(page, 1).locator('.team-name')).toHaveText('Lyra Folhaveloz');
         await expect(slot(page, 1).locator('.team-stars')).toHaveText('0★');
-        await expect(slot(page, 1).locator('.team-dps-line')).toHaveText('Dano: 2/s');
+        await expect(slot(page, 1).locator('.team-dps-line')).toHaveText('Dano: 2/clique');
         await expect(slot(page, 1).locator('.team-passive')).toHaveText('Olho do Falcão: +10 de chance de crítico');
     });
 
@@ -169,13 +169,13 @@ test.describe('Hero team: editing', () => {
         await expect(page.getByTestId('hero-close')).toBeEnabled();
     });
 
-    test('Dano da equipe sums the allies: Lyra and Seraphine read 2.5/s each and 5/s together', async ({ page }) => {
+    test('Dano da equipe por clique sums the allies: Lyra and Seraphine read 2.5/clique each and 5 together', async ({ page }) => {
         await startTeam(page, { cleared: [ 5, 6 ], team: { boughtSlots: 2, allies: [ 'lyra', 'seraphine', null, null ] } });
         await openTeam(page);
 
-        await expect(slot(page, 1).locator('.team-dps-line')).toHaveText('Dano: 2.5/s');
-        await expect(slot(page, 2).locator('.team-dps-line')).toHaveText('Dano: 2.5/s');
-        await expect(page.getByTestId('team-dps')).toHaveText('Dano da equipe: 5/s');
+        await expect(slot(page, 1).locator('.team-dps-line')).toHaveText('Dano: 2.5/clique');
+        await expect(slot(page, 2).locator('.team-dps-line')).toHaveText('Dano: 2.5/clique');
+        await expect(page.getByTestId('team-dps')).toHaveText('Dano da equipe por clique: 5');
     });
 
     test('a failed team save shows Não foi possível salvar a equipe. and the stored team', async ({ page }) => {
@@ -242,8 +242,8 @@ test.describe('Hero team: editing', () => {
         await pick(page, 'seraphine').click();
 
         await expect(slot(page, 4).locator('.team-passive')).toHaveText('Graça da Aurora: +25% de dano da equipe');
-        await expect(slot(page, 4).locator('.team-dps-line')).toHaveText('Dano: 2.5/s');
-        await expect(slot(page, 1).locator('.team-dps-line')).toHaveText('Dano: 2.5/s');
-        await expect(page.getByTestId('team-dps')).toHaveText('Dano da equipe: 10/s');
+        await expect(slot(page, 4).locator('.team-dps-line')).toHaveText('Dano: 2.5/clique');
+        await expect(slot(page, 1).locator('.team-dps-line')).toHaveText('Dano: 2.5/clique');
+        await expect(page.getByTestId('team-dps')).toHaveText('Dano da equipe por clique: 10');
     });
 });

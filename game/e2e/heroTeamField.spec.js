@@ -4,7 +4,7 @@ import { activeSceneKeys, fillCredentials, openMainMenu } from './support/game';
 
 //  Hero team (spec hero-team): the allies on the field of the real scene. The player owns one blank card of each of the five heroes.
 //  The auto click is switched off (chapter 5 opens it). Where a position is read the Phaser loop is stopped once the game has loaded, so
-//  no real tick moves a sprite; the attack motion runs in real time on a woken loop.
+//  no real frame moves a sprite; the attack motion runs in real time on a woken loop. team(page) lands the team's part of a click.
 const HERO_IDS = [ 'kael', 'lyra', 'orina', 'seraphine', 'vex' ];
 
 const monsterOf = (element) => ({ element, defense: 0, critResistance: 0 });
@@ -22,18 +22,19 @@ const chapter = (monster) => ({
 
 const scene = (page, read) => page.evaluate(`(${read})(window.__PHASER_GAME__.scene.getScene('ClickerGame'))`);
 const health = (page) => scene(page, '(s) => s.monster?.health');
-const advance = (page, ms) => page.evaluate((delta) => window.__PHASER_GAME__.scene.getScene('ClickerGame').update(0, delta), ms);
 const sprites = (page) => scene(page, '(s) => [ ...s.allySprites ].map(([ slot, o ]) => ({ slot, key: o.texture.key, x: o.x, y: o.y, width: o.displayWidth, height: o.displayHeight, depth: o.depth, originX: o.originX, originY: o.originY }))');
 const leaderSprite = (page) => scene(page, '(s) => ({ key: s.character.texture.key, x: s.character.x, y: s.character.y, width: s.character.displayWidth, height: s.character.displayHeight, depth: s.character.depth, originX: s.character.originX, originY: s.character.originY })');
 
-//  Stops the loop and puts the ally clock back at 1000 ms, as it stands when a monster appears
-const freeze = (page) => page.evaluate(() => {
-    const game = window.__PHASER_GAME__;
-
-    game.loop.sleep();
-    game.scene.getScene('ClickerGame').allies.untilTickMs = 1000;
-});
+//  Stops the loop
+const freeze = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.sleep());
 const wake = (page) => page.evaluate(() => window.__PHASER_GAME__.loop.wake());
+//  The team's part of a click without the click: lands it on the target, then the kill path, as strike does
+const team = (page) => page.evaluate(() => {
+    const game = window.__PHASER_GAME__.scene.getScene('ClickerGame');
+
+    game.teamStrike(game.currentTarget());
+    game.afterDamage();
+});
 
 const startTeam = async (page, { chapter: campaignChapter = 5, cleared = [ 5 ], team, leader = 'kael', stop = true, encounter = 'PHASE', definition, lastChapter } = {}) => {
     const copies = Object.fromEntries(HERO_IDS.map((id) => [ `${id}:0`, 1 ]));
@@ -156,12 +157,12 @@ test.describe('Hero team: allies on the field', () => {
         await context.close();
     });
 
-    test('each ally tick moves the sprite 24 px right and back', async ({ page }) => {
+    test('each team strike moves the sprite 24 px right and back', async ({ page }) => {
         await startTeam(page, { team: LYRA_IN_SLOT_1 });
         expect((await sprites(page))[0].x).toBe(180);
 
-        //  The tick lands now; the motion is a Phaser tween, so it runs on the woken loop in real time
-        await advance(page, 1_000);
+        //  The team strike lands now; the motion is a Phaser tween, so it runs on the woken loop in real time
+        await team(page);
         await page.evaluate(() => {
             const sprite = window.__PHASER_GAME__.scene.getScene('ClickerGame').allySprites.get(1);
             const trace = [];
@@ -181,9 +182,9 @@ test.describe('Hero team: allies on the field', () => {
 
     test('the attack motion is one yoyo tween of 100 ms each way', async ({ page }) => {
         await startTeam(page, { team: LYRA_IN_SLOT_1 });
-        await advance(page, 1_000);
+        await team(page);
 
-        //  The loop is stopped, so the tween the tick made is still at its start
+        //  The loop is stopped, so the tween the team strike made is still at its start
         const tweens = await scene(page, '(s) => s.tweens.getTweens().filter((t) => t.targets[0].texture?.key === "hero_lyra").map((t) => ({ duration: t.data[0].duration, yoyo: t.data[0].yoyo }))');
 
         expect(tweens).toEqual([ { duration: 100, yoyo: true } ]);

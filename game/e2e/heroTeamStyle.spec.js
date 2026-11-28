@@ -160,7 +160,8 @@ test.describe('Hero team: computed style of the Equipe screen', () => {
             'font-family': FONT_BODY, 'font-weight': '500', 'font-size': '11px', color: INK_600, '-webkit-line-clamp': '2'
         });
         await hasStyle(ally.locator('.team-dps-line'), { 'font-family': FONT_BODY, 'font-weight': '600', 'font-size': '12px', color: EMBER_700 });
-        await expect(ally.locator('.team-dps-line')).toHaveText('Dano: 2/s');
+        await expect(ally.locator('.team-dps-line')).toHaveText('Dano: 2/clique');
+        await expect(ally.locator('.team-dps-line')).toHaveCSS('white-space', 'nowrap');
         await hasStyle(ally.locator('.team-passive'), {
             'font-family': FONT_BODY, 'font-weight': '500', 'font-size': '11px', color: INK_600, '-webkit-line-clamp': '2'
         });

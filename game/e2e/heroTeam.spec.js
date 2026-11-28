@@ -387,11 +387,11 @@ test.describe('Hero team: Equipe screen', () => {
         await context.close();
     });
 
-    test('Dano da equipe reads 0/s with no ally', async ({ page }) => {
+    test('Dano da equipe por clique reads 0 with no ally', async ({ page }) => {
         await startTeam(page, { cleared: [ 5 ] });
         await openTeam(page);
 
-        await expect(page.getByTestId('team-dps')).toHaveText('Dano da equipe: 0/s');
+        await expect(page.getByTestId('team-dps')).toHaveText('Dano da equipe por clique: 0');
     });
 
     test('below chapter 5 the panel says A equipe luta a partir do capítulo 5.', async ({ page, browser }) => {
@@ -432,7 +432,7 @@ test.describe('Hero team: Equipe screen', () => {
         expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
     });
 
-    test('a 12.5K shown damage reads Dano: 12.5K/s', async ({ page }) => {
+    test('a 12.5K shown damage reads Dano: 12.5K/clique', async ({ page }) => {
         const weapon = { id: 'w1', slot: 'WEAPON', rarity: 'COMMON', baseClick: 624, refine: 0, affixes: [], heroId: 'lyra' };
 
         await startTeam(page, {
@@ -440,8 +440,8 @@ test.describe('Hero team: Equipe screen', () => {
         });
         await openTeam(page);
 
-        await expect(slot(page, 1).locator('.team-dps-line')).toHaveText('Dano: 12.5K/s');
-        await expect(page.getByTestId('team-dps')).toHaveText('Dano da equipe: 12.5K/s');
+        await expect(slot(page, 1).locator('.team-dps-line')).toHaveText('Dano: 12.5K/clique');
+        await expect(page.getByTestId('team-dps')).toHaveText('Dano da equipe por clique: 12.5K');
     });
 
     test('winning the chapter 6 boss opens slot 2 for purchase without a reload', async ({ page }) => {
