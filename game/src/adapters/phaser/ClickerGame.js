@@ -136,17 +136,17 @@ const AUTO_CLICK_HUD_HTML = '<div class="hud-box hud-auto-click"><div class="aut
     + '</div></div>';
 //  The confirmation of the account reset (spec account-reset) covers the screen like the pause menu
 const RESET_DIALOG_HTML = '<div class="reset-dialog" data-testid="reset-dialog" hidden><div class="reset-card"></div></div>';
-const FARM_TOGGLE_HTML = '<div class="hud-box hud-farm"><label class="farm-toggle"><input type="checkbox"> Farm boss</label></div>';
+const FARM_TOGGLE_HTML = '<div class="hud-box hud-farm"><label class="farm-toggle"><input type="checkbox"> Farmar chefe</label></div>';
 const PAUSE_MENU_HTML = '<div class="pause-menu" hidden><div class="pause-card">'
-    + '<div class="pause-title">Paused</div>'
+    + '<div class="pause-title">Pausado</div>'
     + '<div class="pause-options">'
-    + '<button class="pause-continue">1. Continue</button>'
-    + '<button class="pause-leave">2. Leave fight</button>'
+    + '<button class="pause-continue">1. Continuar</button>'
+    + '<button class="pause-leave">2. Sair da luta</button>'
     + '</div>'
     + '<div class="pause-confirm" hidden>'
-    + '<div class="pause-question">Leave the fight? It counts as failed.</div>'
-    + '<button class="pause-confirm-yes">Yes, leave</button>'
-    + '<button class="pause-confirm-no">No, stay</button>'
+    + '<div class="pause-question">Sair da luta? Isso conta como derrota.</div>'
+    + '<button class="pause-confirm-yes">Sim, sair</button>'
+    + '<button class="pause-confirm-no">Não, ficar</button>'
     + '</div>'
     + '</div></div>';
 const LOAD_FAILED_TEXT = 'Não foi possível carregar o progresso';
@@ -181,7 +181,7 @@ export class ClickerGame extends Scene
         this.loadingCampaign = false;
         this.paused = false;
         this.farmBoss = null;
-        //  True while the farm fight comes from the Farm boss switch, not from Rever chefes: turning the switch off ends it
+        //  True while the farm fight comes from the Farmar chefe switch, not from Rever chefes: turning the switch off ends it
         this.farmBySwitch = false;
         this.heroes = services.createHeroCollection();
         this.equipment = services.createEquipmentCollection();
@@ -1706,7 +1706,7 @@ export class ClickerGame extends Scene
         //  The report goes at once, not on the next tick: the talent points, the card and the piece it pays show up as the encounter is won
         this.session.flush();
 
-        //  With the Farm boss switch on, a won miniboss is now beaten and comes back as a farm fight, so every later win pays its drops
+        //  With the Farmar chefe switch on, a won miniboss is now beaten and comes back as a farm fight, so every later win pays its drops
         //  too. The chapter boss moves on: its farm opens from Rever chefes once the chapter is completed.
         if (this.farmToggle.checked && won?.kind === MINIBOSS)
         {
@@ -1767,7 +1767,7 @@ export class ClickerGame extends Scene
         return this.nextFarmEncounter();
     }
 
-    //  The same boss again, or the campaign position once the Farm boss switch that started this farm was turned off
+    //  The same boss again, or the campaign position once the Farmar chefe switch that started this farm was turned off
     nextFarmEncounter ()
     {
         if (this.farmBySwitch && !this.farmToggle.checked)

@@ -280,7 +280,7 @@ T11
 
 ---
 
-#### T7: Pause menu and farm switch in Portuguese [ ]
+#### T7: Pause menu and farm switch in Portuguese [x]
 
 **Owner**: game-dev
 **Goal**: The pause menu, its confirmation and the farm switch label read their spec texts with unchanged behaviour (PT-04, PT-05; spec Combat HUD AC 9, Pause menu AC 1 to 3, I27 to I33, Q6).
@@ -304,8 +304,8 @@ T11
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The unit suite passes.
-- [ ] `git grep -n -E "Paused|1\. Continue|2\. Leave fight|Leave the fight|Yes, leave|No, stay|Farm boss" -- game/src ':!*.test.js'` prints nothing.
+- [x] The unit suite passes.
+- [x] `git grep -n -E "Paused|1\. Continue|2\. Leave fight|Leave the fight|Yes, leave|No, stay|Farm boss" -- game/src ':!*.test.js'` prints nothing.
 
 **Commit**: `feat(game): translate the pause menu and the farm switch`
 

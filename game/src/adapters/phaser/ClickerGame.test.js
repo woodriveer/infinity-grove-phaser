@@ -1851,7 +1851,7 @@ describe('ClickerGame pause and leave fight', () => {
         expect(ctx.scene.pauseElement.y).toBe(384);
     });
 
-    it('continues on the Continue button and on a second Esc', async () => {
+    it('continues on the Continuar button and on a second Esc', async () => {
         const ctx = await createScene({ start: bossStart() });
 
         ctx.handlers['keydown-ESC']();
@@ -1866,6 +1866,33 @@ describe('ClickerGame pause and leave fight', () => {
         expect(ctx.control('.pause-menu').hidden).toBe(true);
     });
 
+    it('the pause menu reads Pausado, 1. Continuar and 2. Sair da luta', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.handlers['keydown-ESC']();
+
+        expect(ctx.control('.pause-title').textContent).toBe('Pausado');
+        expect(ctx.control('.pause-continue').textContent).toBe('1. Continuar');
+        expect(ctx.control('.pause-leave').textContent).toBe('2. Sair da luta');
+    });
+
+    it('the leave confirmation reads Sair da luta? Isso conta como derrota. with Sim, sair and Não, ficar', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        ctx.handlers['keydown-ESC']();
+        press(ctx, '.pause-leave');
+
+        expect(ctx.control('.pause-question').textContent).toBe('Sair da luta? Isso conta como derrota.');
+        expect(ctx.control('.pause-confirm-yes').textContent).toBe('Sim, sair');
+        expect(ctx.control('.pause-confirm-no').textContent).toBe('Não, ficar');
+    });
+
+    it('the farm switch label reads Farmar chefe', async () => {
+        const ctx = await createScene({ start: bossStart() });
+
+        expect(ctx.control('.farm-toggle').textContent.trim()).toBe('Farmar chefe');
+    });
+
     it('does not pause when there is no monster to fight', async () => {
         const ctx = await createScene({ start: new Error('down') });
 
@@ -1874,7 +1901,7 @@ describe('ClickerGame pause and leave fight', () => {
         expect(ctx.control('.pause-menu').hidden).toBe(true);
     });
 
-    it('asks for confirmation before leaving, and No goes back to the menu', async () => {
+    it('asks for confirmation before leaving, and Não, ficar goes back to the menu', async () => {
         const ctx = await createScene({ start: bossStart() });
 
         ctx.handlers['keydown-ESC']();
@@ -2553,7 +2580,7 @@ describe('ClickerGame farm mode', () => {
         expect(campaignGateway.report).not.toHaveBeenCalled();
     });
 
-    it('Leave fight in a farm fight returns to the campaign encounter without a failed report', async () => {
+    it('Sair da luta in a farm fight returns to the campaign encounter without a failed report', async () => {
         const ctx = await createScene({ start: midCampaign() });
         ctx.scene.startFarm(miniboss);
 
