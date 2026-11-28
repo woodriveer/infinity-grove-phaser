@@ -760,7 +760,7 @@ const shown = () => document.querySelector('.story-shown').textContent;
 
 ---
 
-#### T12: Rename the tab to Mapa and pass the story hooks (HeroUi.js) [ ]
+#### T12: Rename the tab to Mapa and pass the story hooks (HeroUi.js) [x]
 
 **Owner**: game-dev
 **Goal**: The tab and its title read `Mapa`; the Mapa screen lists the stories of the `stories` hook and plays one through `playStory` (STORY-25, STORY-26, STORY-27).
@@ -805,9 +805,9 @@ Rename `describe('HeroUi Rever chefes', ...)` (`HeroUi.test.js:645`) and `descri
 **Gate**: `cd game && npm test`, then `npx playwright test e2e/uiRedesign.spec.js -g "draws the rail as framed wood squares on parchment"`, then `npx playwright test e2e/uiPolishHud.spec.js -g "the rail reads"` (one file per run); then CI: `git push origin HEAD:ci/story-scenes` and `node scripts/ci-wait.mjs ci/story-scenes`
 **Done when**:
 
-- [ ] The 4 new cases and the 5 re-pinned assertions pass; every other unit test passes unchanged.
-- [ ] `grep -rn "'Rever chefes'" game/src game/e2e` prints nothing.
-- [ ] The CI run of the branch is green.
+- [x] The 4 new cases and the 5 re-pinned assertions pass; every other unit test passes unchanged.
+- [x] `grep -rn "'Rever chefes'" game/src game/e2e` prints nothing.
+- [x] The CI run of the branch is green.
 
 **Commit**: `feat(game): rename the boss map tab to Mapa and list the story scenes on it`
 

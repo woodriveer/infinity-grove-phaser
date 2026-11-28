@@ -267,7 +267,7 @@ test.describe('Ctrl+A and the auto click (UIP-14)', () => {
 test.describe('Equipe replaces Líder (UIP-13)', () => {
     const LOCKED_SLOT_TEXTS = [ 'Chefe do capítulo 5', 'Chefe do capítulo 6', 'Chefe do capítulo 7', 'Chefe do capítulo 8' ];
 
-    test('the rail reads Heróis, Mochila, Equipe, Equipamento, Talentos, Rever chefes in chapter 1', async ({ page }) => {
+    test('the rail reads Heróis, Mochila, Equipe, Equipamento, Talentos, Mapa in chapter 1', async ({ page }) => {
         await startGame(page);
 
         const rail = await page.locator('.hero-hud button[data-testid^="hud-"]').evaluateAll((nodes) => nodes.map((node) => {
@@ -281,7 +281,7 @@ test.describe('Equipe replaces Líder (UIP-13)', () => {
 
         expect(rail).toEqual([
             [ 'hud-heroes', 'Heróis' ], [ 'hud-bag', 'Mochila' ], [ 'hud-team', 'Equipe' ],
-            [ 'hud-equipment', 'Equipamento' ], [ 'hud-talents', 'Talentos' ], [ 'hud-farm', 'Rever chefes' ]
+            [ 'hud-equipment', 'Equipamento' ], [ 'hud-talents', 'Talentos' ], [ 'hud-farm', 'Mapa' ]
         ]);
         await expect(page.getByTestId('hud-leader')).toHaveCount(0);
     });

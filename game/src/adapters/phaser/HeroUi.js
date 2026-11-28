@@ -47,7 +47,7 @@ const SCREENS = [
     { id: 'team', label: 'Equipe', title: 'Equipe' },
     { id: 'equipment', label: 'Equipamento', title: 'Equipamento' },
     { id: 'talents', label: 'Talentos', title: 'Talentos' },
-    { id: 'farm', label: 'Rever chefes', title: 'Rever chefes' }
+    { id: 'farm', label: 'Mapa', title: 'Mapa' }
 ];
 
 //  Where the map assumes the player stands while the campaign has not loaded
@@ -89,16 +89,17 @@ const LEADER_HTML = '<div class="leader-host"></div>';
 const NOTICE_HTML = '<div class="hud-box hud-notice"><div class="card-notice" data-testid="card-notice" hidden></div></div>';
 
 //  The hero screens on top of the combat scene: six HUD buttons, one panel
-//  that shows the screen that was opened (Heróis, Mochila, Equipe, Equipamento, Talentos, Rever chefes), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
+//  that shows the screen that was opened (Heróis, Mochila, Equipe, Equipamento, Talentos, Mapa), the skill bar of the leader and the "Carta: <nome>" and "Equipamento encontrado: <peça>" notices.
 //  It is plain DOM placed with scene.add.dom.
 //  Collaborators: heroes (heroCollection), equipment (equipmentCollection), talents (talentCollection), farm (farmSession) and the scene hooks
 //    walletCopper() -> the copper the player holds, to disable what costs more;
 //    startFarm(boss) starts the farm fight of the chosen boss;
 //    useSkill(slot) uses a skill of the leader (optional); skillState(slot) -> { state, seconds } of a slot of the leader (optional);
-//    mapPosition() -> { chapter, stage, kind, stageCount, completed } where the player stands, for the chapter map (optional).
+//    mapPosition() -> { chapter, stage, kind, stageCount, completed } where the player stands, for the chapter map (optional);
+//    stories() -> [{ id, label }] the scenes the Mapa lists (optional); playStory(id) plays one over the open Mapa (optional).
 export class HeroUi
 {
-    constructor (scene, { heroes, equipment, talents, farm, startFarm, walletCopper, useSkill, skillState, mapPosition })
+    constructor (scene, { heroes, equipment, talents, farm, startFarm, walletCopper, useSkill, skillState, mapPosition, stories, playStory })
     {
         this.scene = scene;
         this.heroes = heroes;
@@ -116,7 +117,7 @@ export class HeroUi
         this.bagHeroId = null;
         this.fuseAllAsking = false;
         this.farm = farm;
-        this.hooks = { startFarm, walletCopper, useSkill, skillState, mapPosition };
+        this.hooks = { startFarm, walletCopper, useSkill, skillState, mapPosition, stories, playStory };
         this.open = false;
         this.view = 0;
         this.noticeId = 0;
@@ -312,7 +313,7 @@ export class HeroUi
         this.shiftKey.dispose();
     }
 
-    //  Leaving Rever chefes or opening a screen over it drops a pending chapter load (TD-009): the chips are enabled again and the
+    //  Leaving Mapa or opening a screen over it drops a pending chapter load (TD-009): the chips are enabled again and the
     //  farm session ignores its late answer. Runs before `this.screen` changes, so it reads the screen being left.
     dropFarmLoad ()
     {
@@ -1155,6 +1156,8 @@ export class HeroUi
             currentChapter: current.chapter,
             busy: this.farmBusy,
             onChapter: (chapter) => this.selectFarmChapter(chapter),
+            stories: this.hooks.stories?.() ?? [],
+            onStory: (id) => this.hooks.playStory?.(id),
             onPick: (boss) =>
             {
                 this.close();
@@ -1163,7 +1166,7 @@ export class HeroUi
         }));
     }
 
-    //  Loads another chapter of Rever chefes; the chips are disabled meanwhile and a failure keeps the map shown before.
+    //  Loads another chapter of Mapa; the chips are disabled meanwhile and a failure keeps the map shown before.
     //  A load dropped by show() or close() changes nothing when it ends: its view is old and farmBusy may belong to a newer load.
     async selectFarmChapter (chapter)
     {

@@ -2368,7 +2368,7 @@ describe('ClickerGame hero screens', () => {
         const label = (id) => testid(ctx, `hud-${id}`)?.textContent.slice(0, -(testid(ctx, `hud-key-${id}`)?.textContent.length ?? 0) || undefined);
 
         expect([ 'heroes', 'bag', 'team', 'farm' ].map(label)).toEqual([
-            'Heróis', 'Mochila', 'Equipe', 'Rever chefes'
+            'Heróis', 'Mochila', 'Equipe', 'Mapa'
         ]);
         expect(testid(ctx, 'hud-fusion') ?? null).toBeNull();
         expect(ctx.control('.pause-menu').querySelector('[data-testid^="hud-"]')).toBeNull();

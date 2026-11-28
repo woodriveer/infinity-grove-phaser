@@ -92,14 +92,14 @@ const open = async (ctx, screen) => {
 };
 
 describe('HeroUi HUD', () => {
-    it('shows the six buttons Heróis, Mochila, Equipe, Equipamento, Talentos and Rever chefes', () => {
+    it('shows the six buttons Heróis, Mochila, Equipe, Equipamento, Talentos and Mapa', () => {
         const { testid } = createUi();
 
         //  The label of a button: its text without the chip of its key
         const label = (id) => testid(`hud-${id}`).textContent.slice(0, -(testid(`hud-key-${id}`)?.textContent.length ?? 0) || undefined);
 
         expect([ 'heroes', 'bag', 'team', 'equipment', 'talents', 'farm' ].map(label)).toEqual([
-            'Heróis', 'Mochila', 'Equipe', 'Equipamento', 'Talentos', 'Rever chefes'
+            'Heróis', 'Mochila', 'Equipe', 'Equipamento', 'Talentos', 'Mapa'
         ]);
         expect(testid('hud-fusion')).toBeNull();
     });
@@ -642,7 +642,46 @@ describe('HeroUi Equipe leader card', () => {
     });
 });
 
-describe('HeroUi Rever chefes', () => {
+describe('HeroUi Mapa', () => {
+    it('opening Mapa titles the panel Mapa', async () => {
+        const ctx = createUi();
+
+        await open(ctx, 'farm');
+
+        expect(ctx.query('.hero-title').textContent).toBe('Mapa');
+    });
+
+    it('the Mapa screen shows a chip per story of the stories hook', async () => {
+        const ctx = createUi();
+
+        ctx.ui.hooks.stories = () => [ { id: 'prologue', label: 'Prólogo' } ];
+        await open(ctx, 'farm');
+
+        expect(ctx.testid('story-replay-prologue').textContent).toBe('Prólogo');
+    });
+
+    it('a story chip plays that story and keeps the panel open', async () => {
+        const ctx = createUi();
+
+        ctx.ui.hooks.stories = () => [ { id: 'prologue', label: 'Prólogo' } ];
+        ctx.ui.hooks.playStory = vi.fn();
+        await open(ctx, 'farm');
+
+        ctx.testid('story-replay-prologue').click();
+
+        expect(ctx.ui.hooks.playStory).toHaveBeenCalledTimes(1);
+        expect(ctx.ui.hooks.playStory).toHaveBeenCalledWith('prologue');
+        expect(ctx.ui.isOpen).toBe(true);
+        expect(ctx.hooks.startFarm).not.toHaveBeenCalled();
+    });
+
+    it('without a stories hook the Mapa shows no story group', async () => {
+        const ctx = createUi();
+
+        await open(ctx, 'farm');
+
+        expect(ctx.testid('farm-story')).toBeNull();
+    });
     it('loads the farm state and lists the bosses with the wins left', async () => {
         const ctx = createUi();
 
@@ -2136,7 +2175,7 @@ describe('HeroUi transfer of a set', () => {
     });
 });
 
-describe('HeroUi Rever chefes map', () => {
+describe('HeroUi Mapa map', () => {
     const beaten = (...stages) => ({ bosses: stages.map((stage) => ({ kind: 'MINIBOSS', stage })), chapterBossWinsLeft: 10 });
     const states = (ctx) => ctx.root.flatMap((node) => [ ...node.querySelectorAll('.farm-map .map-node') ]).map((node) => node.getAttribute('data-state'));
 

@@ -959,7 +959,7 @@ test.describe('Grove theme', () => {
         await startAs(page, {});
         const rail = [
             [ 'hud-heroes', 'Heróis' ], [ 'hud-bag', 'Mochila' ], [ 'hud-team', 'Equipe' ],
-            [ 'hud-equipment', 'Equipamento' ], [ 'hud-talents', 'Talentos' ], [ 'hud-farm', 'Rever chefes' ]
+            [ 'hud-equipment', 'Equipamento' ], [ 'hud-talents', 'Talentos' ], [ 'hud-farm', 'Mapa' ]
         ];
 
         await expectStyle(page.locator('.hero-hud'), {

@@ -328,9 +328,9 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | STORY-22 | P1: Watching a scene (AC 14) | T7, T9, T14 | Implementing |
 | STORY-23 | P1: Watching a scene (AC 15) | T3, T7, T16 | Implementing |
 | STORY-24 | P1: Watching a scene (AC 16) | T8, T16 | Implementing |
-| STORY-25 | P1: The Mapa tab (AC 1) | T12, T15 | In Tasks |
+| STORY-25 | P1: The Mapa tab (AC 1) | T12, T15 | Implementing |
 | STORY-26 | P1: The Mapa tab (AC 2) | T9, T11, T12, T15 | Implementing |
-| STORY-27 | P1: The Mapa tab (AC 3) | T12, T13, T15 | In Tasks |
+| STORY-27 | P1: The Mapa tab (AC 3) | T12, T13, T15 | Implementing |
 | STORY-28 | P1: The Mapa tab (AC 4) | T13, T15 | In Tasks |
 | STORY-29 | P1: The Mapa tab (AC 5) | T4, T13 | Implementing |
 | STORY-30 | P1: The prologue content (AC 1) | T5, T14 | Implementing |
