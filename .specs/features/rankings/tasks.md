@@ -843,7 +843,7 @@ Fakes (`test/Fakes.kt`): `object NoRecordKeeping : RecordKeeping` (every method 
 
 ---
 
-#### T9: RankingService answers boards and refreshes the click power [ ]
+#### T9: RankingService answers boards and refreshes the click power [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The two use cases behind the endpoints: one board page with the top 10 and the caller, and the click power refresh (RNK-03, RNK-05; spec Power AC 6 to 8, Boards API AC 1 to 5, 8, 9).
@@ -905,7 +905,7 @@ class RankingService(
 **Gate**: `cd backend && ./gradlew ktlintCheck test --tests '*RankingServiceTest'`
 **Done when**:
 
-- [ ] The 8 cases pass.
+- [x] The 8 cases pass.
 
 **Commit**: `feat(backend): answer ranking boards and refresh the click power`
 
