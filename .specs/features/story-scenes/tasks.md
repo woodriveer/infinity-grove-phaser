@@ -170,7 +170,7 @@ export const test = base.extend({
 
 ### Phase 2: Domain and storage
 
-#### T2: Line text and typing count (storyText.js) [ ]
+#### T2: Line text and typing count (storyText.js) [x]
 
 **Owner**: game-dev
 **Goal**: The text of a line and how many characters show at `t` seconds (STORY-11).
@@ -198,7 +198,7 @@ export const test = base.extend({
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 4 cases (9 rows in the table one) pass and every earlier unit test passes.
+- [x] The 4 cases (9 rows in the table one) pass and every earlier unit test passes.
 
 **Commit**: `feat(game): add the story line text and typing count`
 

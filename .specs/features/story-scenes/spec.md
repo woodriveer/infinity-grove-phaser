@@ -314,7 +314,7 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | STORY-08 | P1: The prologue opens (AC 8) | T13, T14 | In Tasks |
 | STORY-09 | P1: Watching a scene (AC 1) | T3, T7, T14 | In Tasks |
 | STORY-10 | P1: Watching a scene (AC 2) | T8, T14 | In Tasks |
-| STORY-11 | P1: Watching a scene (AC 3) | T2, T7, T8 | In Tasks |
+| STORY-11 | P1: Watching a scene (AC 3) | T2, T7, T8 | Implementing |
 | STORY-12 | P1: Watching a scene (AC 4) | T3, T8, T14 | In Tasks |
 | STORY-13 | P1: Watching a scene (AC 5) | T3, T8, T14 | In Tasks |
 | STORY-14 | P1: Watching a scene (AC 6) | T3, T8, T16 | In Tasks |
