@@ -21,6 +21,13 @@ const monsterHealth = (page) => page.evaluate(() => window.__PHASER_GAME__.scene
 const ALL_FALSE = [ false, false, false ];
 const ALL_TRUE = [ true, true, true ];
 
+//  Counts the Escape keydowns that reach the window, where the battle listens (spec story-scenes STORY-42)
+const countEscapes = (page) => page.evaluate(() => {
+    window.__escapes = 0;
+    window.addEventListener('keydown', (event) => { if (event.key === 'Escape') { window.__escapes += 1; } });
+});
+const escapes = (page) => page.evaluate(() => window.__escapes);
+
 const openPrologue = async (page, backend) => {
     const started = await startBattle(page, backend);
 
@@ -180,6 +187,7 @@ test.describe('The prologue', () => {
 
     test('Escape closes the prologue and opens no pause menu', async ({ page }) => {
         await openPrologue(page);
+        await countEscapes(page);
 
         await page.keyboard.press('Escape');
 
@@ -189,16 +197,20 @@ test.describe('The prologue', () => {
         await page.waitForTimeout(500);
         await expect(pauseMenu(page)).toBeHidden();
         expect(await held(page)).toEqual(ALL_FALSE);
+        //  The key never reached the window, where the battle listens
+        expect(await escapes(page)).toBe(0);
     });
 
     test('Shift+Escape keeps the prologue open and opens no pause menu', async ({ page }) => {
         await openPrologue(page);
+        await countEscapes(page);
 
         await page.keyboard.press('Shift+Escape');
 
         await expect(overlay(page)).toBeVisible();
         await expect(pauseMenu(page)).toBeHidden();
         expect(await held(page)).toEqual(ALL_TRUE);
+        expect(await escapes(page)).toBe(0);
     });
 
     test('T and B open nothing while a replay plays', async ({ page }) => {
