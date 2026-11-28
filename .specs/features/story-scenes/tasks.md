@@ -684,7 +684,7 @@ const shown = () => document.querySelector('.story-shown').textContent;
 
 ### Phase 4: Wiring
 
-#### T10: Hand the story services to the scenes (composition.js) [ ]
+#### T10: Hand the story services to the scenes (composition.js) [x]
 
 **Owner**: game-dev
 **Goal**: The battle gets the seen list, the catalog and the player through the registry (STORY-02, STORY-32).
@@ -717,7 +717,7 @@ const shown = () => document.querySelector('.story-shown').textContent;
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The new case and the extended key list pass; every other unit test passes unchanged.
+- [x] The new case and the extended key list pass; every other unit test passes unchanged.
 
 **Commit**: `feat(game): hand the story services to the scenes`
 

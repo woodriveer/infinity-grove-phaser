@@ -12,8 +12,10 @@ import { createProgressApi } from './adapters/http/progressApi';
 import { createTalentApi } from './adapters/http/talentApi';
 import { createUserApi } from './adapters/http/userApi';
 import { createWalletApi } from './adapters/http/walletApi';
+import { playStory } from './adapters/phaser/views/storyPlayer';
 import { autoClickPreference } from './adapters/storage/autoClickPreference';
 import { sessionStore } from './adapters/storage/sessionStore';
+import { storySeen } from './adapters/storage/storySeen';
 import { createAccountReset as createAccountResetService } from './application/accountReset/accountReset';
 import { createResetLegacy as createResetLegacyService } from './application/accountReset/resetLegacy';
 import { createAutoClickState as createAutoClickStateService } from './application/autoClick/autoClickState';
@@ -24,6 +26,7 @@ import { createHeroCollection as createHeroCollectionService } from './applicati
 import { createSessionManager } from './application/session/sessionManager';
 import { createTalentCollection as createTalentCollectionService } from './application/talents/talentCollection';
 import { createWalletSync as createWalletSyncService } from './application/wallet/walletSync';
+import { STORY_SCENES } from './domain/story/storyCatalog';
 
 export const sessionManager = createSessionManager({ store: sessionStore, authGateway: authApi });
 
@@ -72,5 +75,9 @@ export const services = {
     createAutoClickState,
     createAccountReset,
     resetLegacy,
-    autoClickPreference
+    autoClickPreference,
+    //  The story scenes (spec story-scenes): the seen list of this browser, the catalog and the overlay player
+    storySeen,
+    storyScenes: STORY_SCENES,
+    playStory
 };
