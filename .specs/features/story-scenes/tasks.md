@@ -263,7 +263,7 @@ export const test = base.extend({
 
 ---
 
-#### T4: Catalog rules: validation, trigger and replay list (storyScenes.js) [ ]
+#### T4: Catalog rules: validation, trigger and replay list (storyScenes.js) [x]
 
 **Owner**: game-dev
 **Goal**: Reject malformed scenes, pick the scene a chapter move opens and list the replayable scenes (STORY-01, STORY-03, STORY-04, STORY-29, STORY-33, STORY-34, STORY-35).
@@ -339,7 +339,7 @@ export const test = base.extend({
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] Every case above passes (one test per rule, per broken cue and per `sceneToPlay` row) and every earlier unit test passes.
+- [x] Every case above passes (one test per rule, per broken cue and per `sceneToPlay` row) and every earlier unit test passes.
 
 **Commit**: `feat(game): add the story catalog rules`
 
