@@ -6,7 +6,7 @@ import { AutoClicker, autoClickUnlocked } from '../../domain/combat/autoClick';
 import { resetReward } from '../../domain/campaign/accountReset';
 import { resetLegacyText } from '../../domain/campaign/resetLegacy';
 import { allyAttacker } from '../../domain/combat/allyAttacker';
-import { AllyCombat } from '../../domain/combat/allyCombat';
+import { landTeam } from '../../domain/combat/allyCombat';
 import { Combo, comboText } from '../../domain/combat/combo';
 import { effectiveCritChance, formatDamage } from '../../domain/combat/damage';
 import { weaknessOf } from '../../domain/combat/elements';
@@ -108,6 +108,8 @@ const NORMAL_TEXT = { color: '#ffd35c', fontSize: 32 };
 const ALLY_TEXT = { color: '#7fd4ff', fontSize: 28, stroke: '#1c120c', strokeThickness: 10 };
 //  The ally number stands right of the monster centre so it does not cover the click numbers (spec hero-team)
 const ALLY_TEXT_OFFSET = 70;
+//  The team number of a click stands 8 px right of the click number it follows (spec team-click-damage TCD-03)
+const TEAM_TEXT_GAP = 8;
 const STAGE_MESSAGE = { x: 512, y: 384 };
 const BATTLE_BAR = { x: 512, y: 686 };
 const BATTLE_BAR_HTML = '<div class="battle-bar"></div>';
@@ -173,7 +175,6 @@ export class ClickerGame extends Scene
         this.random = services.random ?? Math.random;
         //  The break talents lower the stats of the monster at the moment of every hit, so an upgrade counts from the next click
         this.skills = new SkillCombat({ random: this.random, statsOf: (monster) => monsterAfterBreak(this.statsFor(monster), this.talents.talents(), this.passives()) });
-        this.allies = new AllyCombat();
         this.encounterChapter = null;
         this.combo = new Combo();
         this.effectsKey = '';
@@ -1209,8 +1210,6 @@ export class ClickerGame extends Scene
         this.showCombo();
 
         const alive = this.monster && !this.monster.dead;
-        //  The allies strike first, so an effect that ends in this frame still counts for them (spec hero-team)
-        const allyTicks = this.allyFrame(delta);
         //  The stop of Stun and Root is read before the skills use it up with this frame
         const countdownMs = this.skills.countdownMs(delta);
 
@@ -1226,7 +1225,7 @@ export class ClickerGame extends Scene
             this.showDamage(formatDamage(damage), this.centreXOf(targets[index]), critical, null, this.numberYOf(targets[index])));
 
         //  Any damage settles the dead adds and the health bars; a dead main runs the kill path once
-        if (alive && (this.monster.dead || hits.length > 0 || allyTicks > 0))
+        if (alive && (this.monster.dead || hits.length > 0))
         {
             this.afterDamage();
         }
@@ -1318,44 +1317,47 @@ export class ClickerGame extends Scene
         }));
     }
 
-    //  The ally ticks of this frame on the monster on screen (a countdown means a boss); shows one number per tick. Returns how many landed.
-    allyFrame (delta)
+    //  The team's part of a click (spec team-click-damage): every fighting ally, in slot order, hits the target read right before its hit with the
+    //  one damage of a tick (never critical, no combo). One light-blue number per monster hit, with the sum of its hits: on `clicked` it stands
+    //  8 px right of `anchor` (the last click number) on the same baseline; on any other monster, or with no anchor, at that monster's ally
+    //  place. The sprites that hit step. The caller runs afterDamage. Returns how many allies hit.
+    teamStrike (clicked, anchor = null)
     {
-        const monster = this.monster && !this.monster.dead ? this.monster : null;
+        const allies = this.allyAttackers();
+
+        if (allies.length === 0 || !this.monster || this.monster.dead)
+        {
+            return 0;
+        }
+
         const boss = this.countdown !== null;
-        const landed = [];
-        const { ticks } = this.allies.advance(delta, {
-            monster,
-            allies: this.allyAttackers(),
+        const { slots, hits } = landTeam({
+            allies,
             //  Each ally hit asks for the target right before it lands (hero-team seam, spec miniboss-adds)
             target: () => this.currentTarget(),
-            hit: (attacker, target) =>
-            {
-                const { damage } = this.skills.allyHit({ attacker, monster: target, main: this.monster, boss });
-
-                landed.push({ target, damage });
-
-                return damage;
-            }
+            hit: (attacker, target) => this.skills.allyHit({ attacker, monster: target, main: this.monster, boss }).damage
         });
-        let next = 0;
+        //  One number per monster the strike hit, with the sum of its hits there, in the order the monsters were first hit
+        const sums = new Map();
 
-        ticks.forEach(({ slots }) =>
+        hits.forEach(({ target, damage }) => sums.set(target, (sums.get(target) ?? 0) + damage));
+        sums.forEach((damage, target) =>
         {
-            //  One number per monster the tick hit, with the sum of its hits there, in the order the monsters were first hit
-            const sums = new Map();
+            if (target === clicked && anchor)
+            {
+                this.showDamage(formatDamage(damage), anchor.x + anchor.width * (1 - anchor.originX) + TEAM_TEXT_GAP, false, ALLY_TEXT, anchor.y, 0);
+                return;
+            }
 
-            landed.slice(next, next + slots.length).forEach(({ target, damage }) => sums.set(target, (sums.get(target) ?? 0) + damage));
-            next += slots.length;
-            sums.forEach((damage, target) => this.showDamage(formatDamage(damage), this.allyNumberXOf(target), false, ALLY_TEXT, this.numberYOf(target)));
-            this.onAllyTick(slots);
+            this.showDamage(formatDamage(damage), this.allyNumberXOf(target), false, ALLY_TEXT, this.numberYOf(target));
         });
+        this.stepAllies(slots);
 
-        return ticks.length;
+        return slots.length;
     }
 
-    //  The sprites of the slots that landed step 24 px toward the monster and back, 100 ms each way
-    onAllyTick (slots)
+    //  The sprites of the slots that hit with this click step 24 px toward the monster and back, 100 ms each way
+    stepAllies (slots)
     {
         slots.forEach((slot) =>
         {
@@ -1613,7 +1615,8 @@ export class ClickerGame extends Scene
         return add ? ADD_BOXES[add.slot].x + ADD_ALLY_TEXT_OFFSET : MONSTER.x + ALLY_TEXT_OFFSET;
     }
 
-    //  One click on a living monster of the fight (the target unless told otherwise), by hand or by the auto click, with its number at `x`
+    //  One click on a living monster of the fight (the target unless told otherwise), by hand or by the auto click, with its number at `x`: the
+    //  click hit(s), then the team strike, then the kill path once
     strike (x, monster = this.currentTarget())
     {
         //  A countdown means the monster is a boss. One click is one step of the combo; the double click of Lyra lands two critical hits that
@@ -1623,6 +1626,7 @@ export class ClickerGame extends Scene
 
         const multiplier = 1 + this.combo.click() / 100;
         const hits = clickHits(this.heroes.leader()?.id, this.random);
+        let last = null;
 
         for (let hit = 0; hit < hits && !monster.dead; hit++)
         {
@@ -1630,7 +1634,13 @@ export class ClickerGame extends Scene
                 attacker: this.leaderAttacker(), monster, main: this.monster, boss: this.countdown !== null, multiplier, forceCritical: hits === 2
             });
 
-            this.showDamage(formatDamage(damage), x + hit * DOUBLE_HIT_OFFSET, critical, null, this.numberYOf(monster));
+            last = this.showDamage(formatDamage(damage), x + hit * DOUBLE_HIT_OFFSET, critical, null, this.numberYOf(monster));
+        }
+
+        //  The team strikes with the click (spec team-click-damage), unless the click killed the main monster
+        if (this.monster && !this.monster.dead)
+        {
+            this.teamStrike(monster, last);
         }
 
         this.showCombo();
@@ -1909,12 +1919,13 @@ export class ClickerGame extends Scene
         return onMonster ? pointer.x : MONSTER.x;
     }
 
-    //  A critical hit is bigger and orange, a normal one gold; `style` gives another look (the light-blue number of an ally tick)
-    showDamage (damage, x, critical = false, style = null, y = this.damageTextY)
+    //  A critical hit is bigger and orange, a normal one gold; `style` gives another look (the light-blue number of an ally tick); returns the
+    //  Text (strike anchors the team number on it)
+    showDamage (damage, x, critical = false, style = null, y = this.damageTextY, originX = 0.5)
     {
         const textStyle = { ...DAMAGE_FONT, ...(style ?? (critical ? CRITICAL_TEXT : NORMAL_TEXT)) };
 
-        const text = this.add.text(x, y, damage, textStyle).setOrigin(0.5, 1).setDepth(1);
+        const text = this.add.text(x, y, damage, textStyle).setOrigin(originX, 1).setDepth(1);
 
         this.tweens.add({
             targets: text,
@@ -1923,5 +1934,7 @@ export class ClickerGame extends Scene
             duration: DAMAGE_TEXT.duration,
             onComplete: () => text.destroy()
         });
+
+        return text;
     }
 }

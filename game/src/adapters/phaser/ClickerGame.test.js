@@ -84,6 +84,12 @@ const teamPayload = (allies, { openSlots = 4, boughtSlots = 4, unlocked = true }
 const teamHeroes = (allies, { leaderId = 'kael', stars = {} } = {}) => ({
     leaderId, heroes: TEAM_IDS.map((id) => heroEntry(id, { 0: 1 }, stars[id] ?? 0)), team: teamPayload(allies)
 });
+//  The team's part of a click without the click (spec team-click-damage): lands it on the target, then the kill path, as strike does
+const team = (ctx) =>
+{
+    ctx.scene.teamStrike(ctx.scene.currentTarget());
+    ctx.scene.afterDamage();
+};
 const atChapter = (chapter, ...args) => ({ ...progress(...args), chapter });
 
 const walletResponse = (coins = { gold: 2, silver: 14, copper: 37 }, drops = { 1: [3, 1, 5, 2, 4] }) => ({ wallet: coins, drops });
@@ -169,7 +175,7 @@ const createScene = async ({ wallet, start = progress(), heroes = heroesResponse
             return rect;
         }),
         text: vi.fn((x, y, text, style) => {
-            const obj = { x, y, text, style, alpha: 1, destroy: vi.fn() };
+            const obj = { x, y, text, style, alpha: 1, width: String(text).length * 20, destroy: vi.fn() };
 
             obj.setOrigin = (ox, oy) => { obj.originX = ox; obj.originY = oy; return obj; };
             obj.setDepth = () => obj;
@@ -5514,20 +5520,19 @@ describe('ClickerGame hero team', () => {
     const withDefense = (monster) => ({ ...definition, stages: definition.stages.map((stage, index) => (index === 0 ? { ...stage, monster } : stage)) });
     const ironMonster = () => ({ ...atChapter(5), definition: withDefense({ element: 'FIRE', defense: 40, critResistance: 30 }) });
 
-    it('a fighting ally hits the monster for 2 at 1000 ms with no click', async () => {
+    it('a click with Lyra in slot 1 deals 1 and her 2: health 10 to 7', async () => {
         const ctx = await open([ 'lyra', null, null, null ]);
 
-        ctx.scene.update(0, 999);
-        expect(ctx.scene.monster.health).toBe(10);
+        ctx.click();
 
-        ctx.scene.update(0, 1);
-        expect(ctx.scene.monster.health).toBe(8);
+        expect(ctx.scene.monster.health).toBe(7);
+        expect(ctx.texts.map((t) => [ t.text, t.style.color ])).toEqual([ [ '1', '#ffd35c' ], [ '2', '#7fd4ff' ] ]);
     });
 
-    it('the ally tick shows one light-blue 2 at x 740 in the damage font with the dark 10 px outline', async () => {
+    it('the team strike shows one light-blue 2 at x 740 in the damage font with the dark 10 px outline', async () => {
         const ctx = await open([ 'lyra', null, null, null ]);
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         const text = ctx.texts.at(-1);
 
@@ -5537,19 +5542,19 @@ describe('ClickerGame hero team', () => {
         expect(text.style).toMatchObject({ color: ALLY_BLUE, fontSize: 28, fontFamily: 'Cinzel', fontStyle: '700', stroke: '#1c120c', strokeThickness: 10 });
     });
 
-    it('two allies show one number with the sum of the tick', async () => {
+    it('two allies show one number with the sum of the team strike', async () => {
         const ctx = await open([ 'lyra', 'orina', null, null ]);
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '4' ]);
         expect(ctx.scene.monster.health).toBe(6);
     });
 
-    it('the one summed number of two allies in the same tick uses the dark 10 px outline', async () => {
+    it('the one summed number of two allies uses the dark 10 px outline', async () => {
         const ctx = await open([ 'lyra', 'orina', null, null ]);
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(allyTexts(ctx)).toHaveLength(1);
         expect(allyTexts(ctx)[0].style).toMatchObject({ color: ALLY_BLUE, fontSize: 28, stroke: '#1c120c', strokeThickness: 10 });
@@ -5558,7 +5563,7 @@ describe('ClickerGame hero team', () => {
     it('Seraphine as an ally multiplies every ally hit by 1.25', async () => {
         const ctx = await open([ 'lyra', 'seraphine', null, null ]);
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '5' ]);
         expect(ctx.scene.monster.health).toBe(5);
@@ -5567,7 +5572,7 @@ describe('ClickerGame hero team', () => {
     it('an ally hit that does not kill moves the health bar and the HP text', async () => {
         const ctx = await open([ 'lyra', null, null, null ]);
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(hp(ctx)).toBe('HP 8/10');
         expect(ctx.fill.width).toBeCloseTo(240 * 0.8, 9);
@@ -5576,7 +5581,7 @@ describe('ClickerGame hero team', () => {
     it('an ally kill is handled once and the later slots do not land', async () => {
         const ctx = await open([ 'lyra', 'orina', null, null ], { heroOptions: { stars: { lyra: 9 } }, wallet: walletResponse(undefined, { 1: [ 3 ] }) });
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(ctx.scene.monster.dead).toBe(true);
         expect(ctx.texts.map((text) => text.text)).toEqual([ '20' ]);
@@ -5588,96 +5593,95 @@ describe('ClickerGame hero team', () => {
         expect(ctx.sprites).toHaveLength(3);
     });
 
-    it('no ally hits while the campaign stands at chapter 4', async () => {
+    it('a click lands no team hit while the campaign stands at chapter 4', async () => {
         const ctx = await open([ 'lyra', null, null, null ], { start: atChapter(4) });
 
-        ctx.scene.update(0, 3000);
+        ctx.click();
 
-        expect(ctx.scene.monster.health).toBe(10);
+        expect(ctx.scene.monster.health).toBe(9);
         expect(allyTexts(ctx)).toHaveLength(0);
     });
 
-    it('no ally hits before the heroes load', async () => {
+    it('a click lands no team hit before the heroes load', async () => {
         const ctx = await open([ 'lyra', null, null, null ], { heroes: new Error('offline') });
 
-        ctx.scene.update(0, 3000);
+        ctx.click();
 
-        expect(ctx.scene.monster.health).toBe(10);
+        expect(ctx.scene.monster.health).toBe(9);
     });
 
-    it('a heroes payload without team lands no ally hit', async () => {
+    it('a heroes payload without team lands no team hit with a click', async () => {
         const ctx = await createScene({ start: atChapter(5), heroes: heroesResponse(), talents: [], autoClickOn: false });
 
         await flush();
-        ctx.scene.update(0, 3000);
+        ctx.click();
 
-        expect(ctx.scene.monster.health).toBe(10);
+        expect(ctx.scene.monster.health).toBe(9);
     });
 
-    it('an ally hit leaves the combo streak unchanged', async () => {
+    it('a team strike leaves the combo streak unchanged', async () => {
         const ctx = await open([ 'lyra', null, null, null ]);
 
         ctx.click();
 
         const streak = ctx.hud('.combo-hud').textContent;
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(ctx.hud('.combo-hud').textContent).toBe(streak);
     });
 
-    it('the pause menu freezes the ally clock', async () => {
+    it('a click while paused lands neither the click nor the team', async () => {
         const ctx = await open([ 'lyra', null, null, null ]);
 
-        ctx.scene.update(0, 600);
         ctx.scene.pauseFight();
+        ctx.click();
         ctx.scene.update(0, 10000);
-        ctx.scene.resumeFight();
-        ctx.scene.update(0, 399);
+
+        expect(ctx.scene.monster.health).toBe(10);
+        expect(allyTexts(ctx)).toHaveLength(0);
+    });
+
+    it('with a hero screen open a click does nothing and the auto click brings the team', async () => {
+        const ctx = await open([ 'lyra', null, null, null ], { autoClickOn: true });
+
+        await ctx.scene.heroUi.show('heroes');
+        ctx.click();
 
         expect(ctx.scene.monster.health).toBe(10);
 
-        ctx.scene.update(0, 1);
+        ctx.scene.update(0, 500);
 
-        expect(ctx.scene.monster.health).toBe(8);
+        expect(ctx.scene.monster.health).toBe(7);
     });
 
-    it('ally hits keep landing while a hero screen is open', async () => {
-        const ctx = await open([ 'lyra', null, null, null ]);
-
-        await ctx.scene.heroUi.show('heroes');
-        ctx.scene.update(0, 1000);
-
-        expect(ctx.scene.monster.health).toBe(8);
-    });
-
-    it('a leader change switches the element of the next ally hit', async () => {
+    it('a leader change switches the element of the next team strike', async () => {
         //  The task text says WATER, but WATER beats FIRE (x2); NATURE against FIRE is the half hit the spec reads as 1
         const payload = teamHeroes([ 'lyra', null, null, null ]);
         const heroes = { ...payload, heroes: payload.heroes.map((hero) => (hero.id === 'orina' ? { ...hero, element: 'NATURE' } : hero)) };
         const ctx = await open([ 'lyra', null, null, null ], { heroes });
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(ctx.scene.monster.health).toBe(8);
 
         heroesGateway.setLeader.mockResolvedValue({ leaderId: 'orina', team: teamPayload([ 'lyra', null, null, null ]) });
         await ctx.scene.heroes.setLeader('orina');
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(ctx.scene.monster.health).toBe(7);
     });
 
-    it('an ally that equips a piece hits with it on the next tick', async () => {
+    it('an ally that equips a piece hits with it on the next team strike', async () => {
         const ctx = await open([ 'lyra', null, null, null ]);
         const weapon = { id: 'w', slot: 'WEAPON', rarity: 'COMMON', refine: 0, clickDamage: 1, affixes: [], heroId: 'lyra', sellPrice: 1 };
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
         expect(ctx.scene.monster.health).toBe(8);
 
         equipmentGateway.list.mockResolvedValue({ capacity: 100, pieces: [ weapon ] });
         await ctx.scene.equipment.load();
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(ctx.scene.monster.health).toBe(4);
     });
@@ -5714,14 +5718,14 @@ describe('ClickerGame hero team', () => {
         expect(timer(ctx)).toBe('Time: 35');
     });
 
-    it('Orina as an ally shows Defesa 25% on a monster of defense 40', async () => {
+    it('Orina as an ally shows Defesa 25% on a monster of defense 40 and a click deals 0.75 plus her 1.5', async () => {
         const ctx = await open([ 'orina', null, null, null ], { start: ironMonster() });
 
         expect(ctx.hud('.enemy-stats').textContent).toBe('Fire  Defesa 25%  Seu crítico: 0%');
 
         ctx.click();
 
-        expect(ctx.scene.monster.health).toBeCloseTo(9.25, 9);
+        expect(ctx.scene.monster.health).toBeCloseTo(7.75, 9);
     });
 
     it('Vex as an ally shows Seu crítico: 10% on a monster of critical resistance 5, 5% without him', async () => {
@@ -5750,7 +5754,7 @@ describe('ClickerGame hero team', () => {
         withLyra.dice.value = 0.15;
         withLyra.click();
 
-        expect(withLyra.scene.monster.health).toBe(8);
+        expect(withLyra.scene.monster.health).toBe(6);
 
         const without = await open([ null, null, null, null ]);
 
@@ -5791,66 +5795,61 @@ describe('ClickerGame hero team', () => {
         });
         const tree = (values) => Object.entries(values).map(([ id, value ]) => ({ id, perLevel: 1, maxLevel: 50, level: value, value, nextCost: 300 }));
 
-        it('an ally tick in the frame where Prisão de Espinhos ends still gets +25 %: 2.5 at 2000 ms, 2 after it', async () => {
+        it('a team strike under Prisão de Espinhos gets +25 %: 2.5, and 2 once it ended', async () => {
             const ctx = await open([ 'lyra', null, null, null ], { heroOptions: { leaderId: 'orina', stars: { orina: 1 } }, start: bigMonster() });
 
             key(ctx, 'ONE');
-            ctx.scene.update(0, 1000);
+            team(ctx);
+            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '2.5' ]);
             expect(ctx.scene.monster.health).toBeCloseTo(1000 - 2.5, 9);
 
-            //  The second tick lands in the very frame that uses up the 2000 ms of Prisão
-            ctx.scene.update(0, 1000);
-            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '2.5', '2.5' ]);
-            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 5, 9);
-
-            ctx.scene.update(0, 1000);
-            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '2.5', '2.5', '2' ]);
-            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 7, 9);
+            ctx.scene.update(0, 2000);
+            team(ctx);
+            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '2.5', '2' ]);
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 4.5, 9);
         });
 
-        it('an ally tick in the frame where Bênção da Grande Árvore ends still gets +30 %: 2.6 at 15000 ms, 2 after it', async () => {
+        it('a team strike under Bênção da Grande Árvore gets +30 %: 2.6, and 2 once it ended', async () => {
             const ctx = await open([ 'lyra', null, null, null ], { heroOptions: { leaderId: 'seraphine', stars: { seraphine: 1 } }, start: bigMonster() });
 
             key(ctx, 'ONE');
-            ctx.scene.update(0, 14000);
-            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 14 * 2.6, 9);
-
-            //  The 15th tick lands in the very frame that uses up the 15000 ms of Bênção
-            ctx.scene.update(0, 1000);
+            team(ctx);
             expect(allyTexts(ctx).at(-1).text).toBe('2.6');
-            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 15 * 2.6, 9);
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 2.6, 9);
 
-            ctx.scene.update(0, 1000);
+            ctx.scene.update(0, 15000);
+            team(ctx);
             expect(allyTexts(ctx).at(-1).text).toBe('2');
-            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 15 * 2.6 - 2, 9);
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 2.6 - 2, 9);
         });
 
-        it('an ally that fuses to more stars hits with the new multiplier on the next tick: 4, then 6', async () => {
+        it('an ally that fuses to more stars hits with the new multiplier on the next team strike: 4, then 6', async () => {
             const ctx = await open([ 'lyra', null, null, null ], { heroOptions: { stars: { lyra: 1 } }, start: bigMonster() });
 
-            ctx.scene.update(0, 1000);
+            team(ctx);
             expect(allyTexts(ctx).at(-1).text).toBe('4');
             expect(ctx.scene.monster.health).toBe(996);
 
             heroesGateway.fuse.mockResolvedValue(heroEntry('lyra', { 0: 1 }, 2));
             await ctx.scene.heroes.fuse('lyra', 1);
-            ctx.scene.update(0, 1000);
+            team(ctx);
 
             expect(allyTexts(ctx).at(-1).text).toBe('6');
             expect(ctx.scene.monster.health).toBe(990);
         });
 
-        it('power talents of the leader (CLICK_DAMAGE 20, CRIT_CHANCE 20) reach the click but leave the ally tick at 2', async () => {
+        it('power talents of the leader (CLICK_DAMAGE 20, CRIT_CHANCE 20) reach the click but leave the team hit at 2', async () => {
             const ctx = await open([ 'lyra', null, null, null ], { start: bigMonster(), talents: tree({ CLICK_DAMAGE: 20, CRIT_CHANCE: 20 }) });
 
             ctx.click();
-            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 1.2, 9);
-
-            ctx.dice.value = 0;
-            ctx.scene.update(0, 1000);
-
             expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '2' ]);
             expect(ctx.scene.monster.health).toBeCloseTo(1000 - 1.2 - 2, 9);
+
+            ctx.dice.value = 0;
+            team(ctx);
+
+            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '2', '2' ]);
+            expect(ctx.scene.monster.health).toBeCloseTo(1000 - 1.2 - 4, 9);
         });
 
         //  Kael at 1 star: Corte Dimensional is 1500 % of a click of 1.1, 16.5, and 33 when critical (10 % base, 20 % with Lyra)
@@ -5881,6 +5880,141 @@ describe('ClickerGame hero team', () => {
             without.dice.value = 0.08;
             key(without, 'ONE');
             expect(without.scene.monster.health).toBeCloseTo(1000 - 16.5, 9);
+        });
+    });
+
+    describe('team click damage (spec team-click-damage)', () => {
+        const big = (monster = { element: 'FIRE', defense: 0, critResistance: 0 }, health = 1000) => ({
+            ...atChapter(5),
+            definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: health, monster })) }
+        });
+        const key = (ctx, name) => ctx.handlers[`keydown-${name}`]();
+
+        it('the team number stands 8 px right of the click number on its baseline, left-anchored', async () => {
+            const ctx = await open([ 'lyra', null, null, null ]);
+
+            ctx.click();
+
+            expect(ctx.texts[0]).toMatchObject({ text: '1', x: 670, originX: 0.5, originY: 1 });
+            expect(ctx.texts[1]).toMatchObject({ text: '2', x: 688, y: ctx.texts[0].y, originX: 0, originY: 1 });
+            expect(ctx.texts[1].style).toMatchObject({ color: '#7fd4ff', fontSize: 28, fontFamily: 'Cinzel', fontStyle: '700', stroke: '#1c120c', strokeThickness: 10 });
+        });
+
+        it('the click number and the team number rise 40 px and fade over 800 ms', async () => {
+            const ctx = await open([ 'lyra', null, null, null ]);
+
+            ctx.click();
+
+            [ ctx.texts[0], ctx.texts[1] ].forEach((text) =>
+                expect(ctx.tweens.find((tween) => tween.targets === text)).toMatchObject({ y: text.y - 40, alpha: 0, duration: 800 }));
+        });
+
+        it('two allies: a click shows 1 and one 4, health 5', async () => {
+            const ctx = await open([ 'lyra', 'orina', null, null ]);
+
+            ctx.click();
+
+            expect(ctx.texts.map((text) => text.text)).toEqual([ '1', '4' ]);
+            expect(ctx.scene.monster.health).toBe(5);
+        });
+
+        it('a click that kills shows no team number', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { start: big(undefined, 1) });
+
+            ctx.click();
+
+            expect(ctx.scene.monster.dead).toBe(true);
+            expect(ctx.texts.map((text) => text.text)).toEqual([ '1' ]);
+        });
+
+        it('a team hit that kills with the click is handled once and Orina does not hit', async () => {
+            const ctx = await open([ 'lyra', 'orina', null, null ], { heroOptions: { stars: { lyra: 9 } }, wallet: walletResponse(undefined, { 1: [ 3 ] }) });
+
+            ctx.click();
+
+            expect(ctx.scene.monster.dead).toBe(true);
+            expect(ctx.texts.map((text) => text.text)).toEqual([ '1', '20' ]);
+            expect(ctx.sprites).toHaveLength(3);
+
+            ctx.scene.update(0, 1000);
+
+            expect(ctx.texts).toHaveLength(2);
+            expect(ctx.sprites).toHaveLength(3);
+        });
+
+        it('10 s with no click land no team hit', async () => {
+            const ctx = await open([ 'lyra', null, null, null ]);
+
+            ctx.scene.update(0, 10000);
+
+            expect(ctx.scene.monster.health).toBe(10);
+            expect(allyTexts(ctx)).toHaveLength(0);
+        });
+
+        it('the scene has no ally clock', async () => {
+            const ctx = await open([ 'lyra', null, null, null ]);
+
+            expect(ctx.scene.allies).toBeUndefined();
+            expect(ctx.scene.allyFrame).toBeUndefined();
+        });
+
+        it('the auto click brings the team: 500 ms deal 1 and 2', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { autoClickOn: true, start: big() });
+
+            ctx.scene.update(0, 500);
+
+            expect(ctx.scene.monster.health).toBe(997);
+            expect(ctx.texts.map((text) => [ text.text, text.x ])).toEqual([ [ '1', 670 ], [ '2', 688 ] ]);
+
+            ctx.scene.update(0, 499);
+
+            expect(ctx.scene.monster.health).toBe(997);
+        });
+
+        it("Lyra's double click: orange 2 at 670 and 706, then the team's 2 at 724", async () => {
+            const ctx = await open([ 'kael', null, null, null ], { heroOptions: { leaderId: 'lyra' }, start: big() });
+
+            ctx.dice.value = 0;
+            ctx.click();
+
+            expect(ctx.texts.map((text) => [ text.text, text.x, text.style.color ])).toEqual([
+                [ '2', 670, '#ff8a1f' ],
+                [ '2', 706, '#ff8a1f' ],
+                [ '2', 724, '#7fd4ff' ]
+            ]);
+            expect(ctx.scene.monster.health).toBe(994);
+        });
+
+        it('the combo does not reach the team: three clicks leave 990.97 with three team 2', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { start: big(), talents: [ COMBO_MAXED ] });
+
+            ctx.click();
+            ctx.click();
+            ctx.click();
+
+            expect(ctx.scene.monster.health).toBeCloseTo(990.97, 9);
+            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '2', '2', '2' ]);
+        });
+
+        it('five clicks in a row show five click numbers and five team numbers', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { start: big() });
+
+            for (let click = 0; click < 5; click++)
+            {
+                ctx.click();
+            }
+
+            expect(ctx.texts.filter((text) => text.style.color === '#ffd35c').map((text) => text.text)).toEqual([ '1', '1', '1', '1', '1' ]);
+            expect(allyTexts(ctx).map((text) => text.text)).toEqual([ '2', '2', '2', '2', '2' ]);
+            expect(ctx.scene.monster.health).toBe(985);
+        });
+
+        it('a skill brings no team strike', async () => {
+            const ctx = await open([ 'lyra', null, null, null ], { heroOptions: { stars: { kael: 1 } }, start: big() });
+
+            key(ctx, 'ONE');
+
+            expect(allyTexts(ctx)).toHaveLength(0);
         });
     });
 });
@@ -6015,10 +6149,10 @@ describe('ClickerGame hero team formation', () => {
         expect(alliesOf(ctx).map(({ key, x, y }) => ({ key, x, y }))).toEqual([ { key: 'hero_lyra', x: 180, y: 460 } ]);
     });
 
-    it('each ally hit moves its sprite 24 px right and back in 100 ms each way', async () => {
+    it('each team strike moves its sprite 24 px right and back in 100 ms each way', async () => {
         const ctx = await open([ 'lyra', null, null, null ]);
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(ctx.tweens.find((tween) => tween.targets === sprite(ctx, 'hero_lyra'))).toMatchObject({ x: 204, duration: 100, yoyo: true });
     });
@@ -6026,11 +6160,21 @@ describe('ClickerGame hero team formation', () => {
     it('a kill moves only the slots that landed', async () => {
         const ctx = await open([ 'lyra', 'orina', null, null ], { heroOptions: { stars: { lyra: 9 } } });
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(ctx.scene.monster.dead).toBe(true);
         expect(ctx.tweens.filter((tween) => tween.targets === sprite(ctx, 'hero_lyra'))).toHaveLength(1);
         expect(ctx.tweens.filter((tween) => tween.targets === sprite(ctx, 'hero_orina'))).toHaveLength(0);
+    });
+
+    it('a click that kills steps no ally sprite', async () => {
+        const start = { ...atChapter(5), definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1 })) } };
+        const ctx = await open([ 'lyra', null, null, null ], { start });
+
+        ctx.click();
+
+        expect(ctx.scene.monster.dead).toBe(true);
+        expect(ctx.tweens.filter((tween) => tween.targets === sprite(ctx, 'hero_lyra'))).toHaveLength(0);
     });
 
     it('no ally sprite takes input', async () => {
@@ -6040,7 +6184,7 @@ describe('ClickerGame hero team formation', () => {
 
         ctx.handlers.pointerdown({ x: 180, y: 400 });
 
-        expect(ctx.scene.monster.health).toBe(9);
+        expect(ctx.scene.monster.health).toBe(5);
     });
 });
 
@@ -6327,7 +6471,7 @@ describe('ClickerGame miniboss adds', () => {
 
         const before = ctx.texts.length;
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         //  Lyra and Orina hit for 2 each; the add's 20 defense drops to 5, so each deals 1.9 and the tick shows their sum at the add's ally number place
         expect(ctx.texts.slice(before).map(({ text, x, y, style }) => [ text, x, y, style.color ])).toEqual([ [ '3.8', 520, 360, '#7fd4ff' ] ]);
@@ -6536,7 +6680,7 @@ describe('ClickerGame miniboss target', () => {
     it('an ally meets the guarded miniboss: Lyra deals 0.2 at x 740', async () => {
         const ctx = await allyScene([ 'lyra', null, null, null ], { adds: GUARD_90 });
 
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect(ctx.scene.monster.health).toBeCloseTo(99.8, 9);
         expect([ lastText(ctx).text, lastText(ctx).x, lastText(ctx).y, lastText(ctx).style.color ]).toEqual([ '0.2', 740, 273, '#7fd4ff' ]);
@@ -6546,11 +6690,11 @@ describe('ClickerGame miniboss target', () => {
         const ctx = await allyScene([ 'lyra', null, null, null ]);
 
         ctx.click(lacaio1);
-        expect(healthOf(ctx, 1)).toBeCloseTo(29, 9);
-
-        ctx.scene.update(0, 1000);
-
         expect(healthOf(ctx, 1)).toBeCloseTo(27, 9);
+
+        team(ctx);
+
+        expect(healthOf(ctx, 1)).toBeCloseTo(25, 9);
         expect([ lastText(ctx).text, lastText(ctx).x, lastText(ctx).y, lastText(ctx).style.color ]).toEqual([ '2', 520, 360, '#7fd4ff' ]);
     });
 
@@ -6558,41 +6702,26 @@ describe('ClickerGame miniboss target', () => {
         const ctx = await allyScene([ 'lyra', null, null, null ]);
 
         ctx.click(lacaio1);
-        ctx.scene.update(0, 1000);
+        team(ctx);
 
         expect([ lastText(ctx).text, lastText(ctx).x, lastText(ctx).style.color ]).toEqual([ '2', 520, '#7fd4ff' ]);
         expect(lastText(ctx).style).toMatchObject({ stroke: '#1c120c', strokeThickness: 10 });
     });
 
-    it('an ally tick that kills the target add lands its later hits on the miniboss with one number each', async () => {
-        //  Vex, not Orina: Orina's passive takes 15 points off the defense, which would change the 0.4 of the miniboss tick
+    it('a click whose team strike kills the target add lands the later hit on the miniboss with one number each', async () => {
+        //  Vex, not Orina: Orina's passive takes 15 points off the defense, which would change the 0.4 of the miniboss hit
         const ctx = await allyScene([ 'lyra', 'vex', null, null ], { adds: [ { health: 2, defenseBuff: 30 }, ADD ] });
-
-        ctx.click(lacaio1);
-        expect(healthOf(ctx, 1)).toBeCloseTo(1, 9);
-
         const before = ctx.texts.length;
 
-        ctx.scene.update(0, 1000);
+        ctx.click(lacaio1);
 
         expect(ctx.scene.fight.adds[0].monster.dead).toBe(true);
         expect(ctx.scene.monster.health).toBeCloseTo(99.58, 9);
         expect(ctx.texts.slice(before).map(({ text, x, y, style }) => [ text, x, y, style.color ])).toEqual([
-            [ '2', 520, 360, '#7fd4ff' ],
+            [ '1', 480, 360, '#ffd35c' ],
+            [ '2', 498, 360, '#7fd4ff' ],
             [ '0.4', 740, 273, '#7fd4ff' ]
         ]);
-    });
-
-    it('the ally clock does not restart when the target changes', async () => {
-        const ctx = await allyScene([ 'lyra', null, null, null ]);
-
-        ctx.scene.update(0, 600);
-        ctx.click(lacaio1);
-        expect(healthOf(ctx, 1)).toBeCloseTo(29, 9);
-
-        ctx.scene.update(0, 400);
-
-        expect(healthOf(ctx, 1)).toBeCloseTo(27, 9);
     });
 
     it('no target change and no hit while the pause menu is open', async () => {

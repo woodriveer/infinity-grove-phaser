@@ -134,7 +134,7 @@ Body: `const slots = []; const hits = []; let damage = 0;` then `for (const { sl
 
 ---
 
-#### T2: Every click brings the team strike; the ally clock goes [ ]
+#### T2: Every click brings the team strike; the ally clock goes [x]
 
 **Owner**: game-dev
 **Goal**: `strike` lands the team right after the click hit(s), shows the light-blue sum 8 px right of the last click number, and nothing else lands ally hits (TCD-01, TCD-02, TCD-03).
@@ -249,9 +249,16 @@ Body: `const slots = []; const hits = []; let damage = 0;` then `for (const { sl
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] `git grep -n "AllyCombat\|ALLY_TICK_MS\|allyFrame\|onAllyTick" game/src` prints nothing.
-- [ ] The 13 new cases pass; the 28 re-pins carry the names and values of the table; the deleted cases are the 13 of `describe('AllyCombat')` and row 29.
-- [ ] Gate passes (the e2e suite is expected red until T6; do not run it).
+- [x] `git grep -n "AllyCombat\|ALLY_TICK_MS\|allyFrame\|onAllyTick" game/src` prints nothing.
+- [x] The 13 new cases pass; the 28 re-pins carry the names and values of the table; the deleted cases are the 13 of `describe('AllyCombat')` and row 29.
+- [x] Gate passes (the e2e suite is expected red until T6; do not run it).
+
+**Execution notes (T2)**:
+
+- Extra re-pin, approved by the orchestrator: `ClickerGame hero team formation` > `no ally sprite takes input` expects `monster.health` `toBe(5)` (was 9): the click on the ally sprite area now brings Lyra's 2 and Orina's 2 (1 + 2 + 2); its intent is unchanged.
+- The first Done-when grep still matches one line by design: new case 7 asserts `expect(ctx.scene.allyFrame).toBeUndefined()`. Production code has no match.
+- `describe('AllyCombat')` held 12 cases, not 13; all 12 are deleted.
+- New case 9 (Lyra's double click) uses the default FIRE monster of `big()`, not NATURE: the unit `heroEntry` makes every hero FIRE, so a NATURE monster doubles the damage (4, not 2). Expected values unchanged (2, 2, 2; health 994).
 
 **Commit**: `feat(game): the team strikes with every click instead of every second`
 
