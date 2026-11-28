@@ -232,7 +232,7 @@ on conflict (username) do nothing;
 
 ---
 
-#### T2: Ranking domain: boards, clocks and floors [ ]
+#### T2: Ranking domain: boards, clocks and floors [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The pure rules of the boss clock, the run start, the floors and the board ids (RNK-01, RNK-02, RNK-05; spec Boss AC 4 to 9, Story AC 3, 4, 6, Boards API AC 8, 9).
@@ -385,7 +385,7 @@ object RecordRules {
 **Gate**: `cd backend && ./gradlew ktlintCheck test --tests '*RankingsTest'`
 **Done when**:
 
-- [ ] The 14 cases pass; ktlint passes.
+- [x] The 14 cases pass; ktlint passes.
 
 **Commit**: `feat(backend): add the ranking boards, clocks and floors`
 

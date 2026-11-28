@@ -373,11 +373,11 @@ Every new text, exactly (AD-007, L-010).
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| RNK-01 | P1: Boss time - AC 1 to 10 | Tasks T2, T5, T6, T7, T8 | Pending |
-| RNK-02 | P1: Story time - AC 1 to 6 | Tasks T2, T5, T6, T8 | Pending |
+| RNK-01 | P1: Boss time - AC 1 to 10 | Tasks T2, T5, T6, T7, T8 | Implementing |
+| RNK-02 | P1: Story time - AC 1 to 6 | Tasks T2, T5, T6, T8 | Implementing |
 | RNK-03 | P1: Click power - AC 1 to 8 | Tasks T3, T5, T6, T7, T9, T10, T17 | Pending |
 | RNK-04 | P1: Fortune - AC 1 to 5 | Tasks T1 | Implementing |
-| RNK-05 | P1: Boards API - AC 1 to 10 | Tasks T4, T9, T10 | Pending |
+| RNK-05 | P1: Boards API - AC 1 to 10 | Tasks T4, T9, T10 | Implementing |
 | RNK-06 | P1: Storage - AC 1 to 4 | Tasks T1, T4 | Implementing |
 | RNK-07 | P1: Ranking screen - AC 1 to 8 | Tasks T12, T13, T15, T16, T18, T19 | Pending |
 | RNK-08 | P1: Rows and formats - AC 1 to 7 | Tasks T11, T14, T18, T21 | Implementing |
