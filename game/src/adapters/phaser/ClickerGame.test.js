@@ -670,11 +670,11 @@ describe('ClickerGame wallet text', () => {
         expect(walletElement().visible).toBe(false);
     });
 
-    it('shows "Gold: G  Silver: S  Copper: C" in the top-right corner once the wallet has loaded', async () => {
+    it('shows "Ouro: G  Prata: S  Cobre: C" in the top-right corner once the wallet has loaded', async () => {
         const { walletText, walletElement } = await createScene({ wallet: walletResponse() });
         await flush();
 
-        expect(walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
+        expect(walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 37');
         expect(walletElement().visible).toBe(true);
         expect(walletElement().x).toBeGreaterThan(512);
         expect(walletElement().y).toBeLessThan(100);
@@ -690,7 +690,7 @@ describe('ClickerGame wallet text', () => {
         const { walletText } = await createScene({ wallet: walletResponse({ gold: 0, silver: 0, copper: 0 }) });
         await flush();
 
-        expect(walletText().textContent).toBe('Gold: 0  Silver: 0  Copper: 0');
+        expect(walletText().textContent).toBe('Ouro: 0  Prata: 0  Cobre: 0');
     });
 
     it('shows no wallet text when the wallet cannot be loaded', async () => {
@@ -782,13 +782,13 @@ describe('ClickerGame coin drops', () => {
         const [ first, second, third ] = coinTweens(ctx);
 
         first.onComplete();
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 38');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 38');
         expect(ctx.sprites[0].destroy).toHaveBeenCalledTimes(1);
         expect(ctx.sprites[1].destroy).not.toHaveBeenCalled();
 
         second.onComplete();
         third.onComplete();
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 40');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 40');
     });
 
     it('does not change the wallet text before any coin lands', async () => {
@@ -796,7 +796,7 @@ describe('ClickerGame coin drops', () => {
 
         kill(ctx);
 
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 37');
     });
 
     it('shows 1 silver and 1 copper for 99 copper plus a drop of 2', async () => {
@@ -805,7 +805,7 @@ describe('ClickerGame coin drops', () => {
 
         landAll(ctx);
 
-        expect(ctx.walletText().textContent).toBe('Gold: 0  Silver: 1  Copper: 1');
+        expect(ctx.walletText().textContent).toBe('Ouro: 0  Prata: 1  Cobre: 1');
     });
 
     it('carries 100 silver into gold', async () => {
@@ -814,7 +814,7 @@ describe('ClickerGame coin drops', () => {
 
         landAll(ctx);
 
-        expect(ctx.walletText().textContent).toBe('Gold: 8  Silver: 0  Copper: 0');
+        expect(ctx.walletText().textContent).toBe('Ouro: 8  Prata: 0  Cobre: 0');
     });
 
     it('flies at most 5 coins for a drop above 5 copper and still credits the whole drop', async () => {
@@ -824,7 +824,7 @@ describe('ClickerGame coin drops', () => {
         landAll(ctx);
 
         expect(ctx.sprites).toHaveLength(5);
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 49');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 49');
     });
 
     it('flies 5 coins for a drop of 2 silver and credits 200 copper', async () => {
@@ -834,7 +834,7 @@ describe('ClickerGame coin drops', () => {
         landAll(ctx);
 
         expect(ctx.sprites).toHaveLength(5);
-        expect(ctx.walletText().textContent).toBe('Gold: 0  Silver: 2  Copper: 0');
+        expect(ctx.walletText().textContent).toBe('Ouro: 0  Prata: 2  Cobre: 0');
     });
 
     it('drops nothing when the wallet has not loaded', async () => {
@@ -851,7 +851,7 @@ describe('ClickerGame coin drops', () => {
         kill(ctx);
 
         expect(ctx.sprites).toHaveLength(0);
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 37');
     });
 
     it('drops nothing when the backend sent no queue for the drop rule of the encounter', async () => {
@@ -890,7 +890,7 @@ describe('ClickerGame coin drops', () => {
         kill(ctx);
 
         expect(ctx.sprites).toHaveLength(0);
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 37');
     });
 
     it('takes the next queued value on the next kill after the respawn', async () => {
@@ -1021,7 +1021,7 @@ describe('ClickerGame wallet sync', () => {
         tick(ctx);
         await flush();
 
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 15  Copper: 5');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 15  Cobre: 5');
     });
 
     it('adds the landed coins the response does not cover on top of the response wallet', async () => {
@@ -1038,7 +1038,7 @@ describe('ClickerGame wallet sync', () => {
         pending.resolve(synced({ gold: 2, silver: 14, copper: 40 }, { 1: [5, 2, 4, 9] }));
         await flush();
 
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 41');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 41');
     });
 
     it('takes the next drops from the server queue after a successful sync', async () => {
@@ -1053,7 +1053,7 @@ describe('ClickerGame wallet sync', () => {
         kill(ctx);
         ctx.tweens.filter((t) => ctx.sprites.includes(t.targets)).forEach((t) => t.onComplete());
 
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 47');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 47');
     });
 
     it('keeps playing and sends the same kills again on the next tick after a failed sync', async () => {
@@ -1083,7 +1083,7 @@ describe('ClickerGame wallet sync', () => {
 
         expect(walletApi.get).toHaveBeenCalledTimes(2);
         expect(ctx.walletElement().visible).toBe(true);
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 37');
     });
 
     it('stops asking for the wallet once it has loaded', async () => {
@@ -1144,7 +1144,7 @@ describe('ClickerGame wallet sync', () => {
         pending.resolve(synced({ gold: 9, silver: 9, copper: 9 }, { 1: [] }));
         await flush();
 
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 37');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 37');
     });
 });
 
@@ -1219,7 +1219,7 @@ describe('ClickerGame stages', () => {
 
         expect(label(ctx)).toBe('Estágio 1/10  Miniboss');
         expect(ctx.scene.monster.maxHealth).toBe(50);
-        expect(timer(ctx)).toBe('Time: 30');
+        expect(timer(ctx)).toBe('Tempo: 30s');
     });
 
     it('shows no countdown on a phase monster', async () => {
@@ -1232,10 +1232,10 @@ describe('ClickerGame stages', () => {
         const ctx = await createScene({ start: bossStart() });
 
         ctx.scene.update(0, 1001);
-        expect(timer(ctx)).toBe('Time: 29');
+        expect(timer(ctx)).toBe('Tempo: 29s');
 
         ctx.scene.update(0, 28000);
-        expect(timer(ctx)).toBe('Time: 1');
+        expect(timer(ctx)).toBe('Tempo: 1s');
         expect(ctx.scene.monster).not.toBeNull();
     });
 
@@ -1251,7 +1251,7 @@ describe('ClickerGame stages', () => {
         ctx.scene.update(0, 7500);
 
         expect(left(ctx)).toBe('0.750');
-        expect(timer(ctx)).toBe('Time: 23');
+        expect(timer(ctx)).toBe('Tempo: 23s');
     });
 
     it('writes --timer-left as 0.000 in the last millisecond, never negative', async () => {
@@ -1346,7 +1346,7 @@ describe('ClickerGame stages', () => {
             widths['stage-hud'] = 300;
             ctx.scene.update(0, 1001);
 
-            expect(timer(ctx)).toBe('Time: 29');
+            expect(timer(ctx)).toBe('Tempo: 29s');
             expect(shift(ctx)).toBe('32px');
         });
 
@@ -1358,7 +1358,7 @@ describe('ClickerGame stages', () => {
             widths['stage-hud'] = 300;
             ctx.scene.update(0, 100);
 
-            expect(timer(ctx)).toBe('Time: 30');
+            expect(timer(ctx)).toBe('Tempo: 30s');
             expect(shift(ctx)).toBe('0px');
         });
 
@@ -1431,7 +1431,7 @@ describe('ClickerGame stages', () => {
         advance(ctx);
 
         expect(label(ctx)).toBe('Estágio 1/10  Miniboss');
-        expect(timer(ctx)).toBe('Time: 30');
+        expect(timer(ctx)).toBe('Tempo: 30s');
     });
 
     it('counts a kill made before the countdown is checked as a win', async () => {
@@ -1453,7 +1453,17 @@ describe('ClickerGame stages', () => {
 
         expect(label(ctx)).toBe('Chefe do capítulo');
         expect(ctx.scene.monster.maxHealth).toBe(300);
-        expect(timer(ctx)).toBe('Time: 60');
+        expect(timer(ctx)).toBe('Tempo: 60s');
+    });
+
+    it('the boss timer reads Tempo: 37s with 37 seconds left and Tempo: 9s with 9', async () => {
+        const ctx = await createScene({ start: progress(10, 'CHAPTER_BOSS', 1) });
+
+        ctx.scene.update(0, 23000);
+        expect(timer(ctx)).toBe('Tempo: 37s');
+
+        ctx.scene.update(0, 28000);
+        expect(timer(ctx)).toBe('Tempo: 9s');
     });
 
     it('returns to phase 5 of stage 10 when the chapter boss runs out of time', async () => {
@@ -1471,7 +1481,7 @@ describe('ClickerGame stages', () => {
         killAll(ctx);
         advance(ctx);
 
-        expect(message(ctx)).toBe('Chapter complete!');
+        expect(message(ctx)).toBe('Capítulo concluído!');
         expect(ctx.scene.monster).toBeNull();
         expect(ctx.monster.alpha).toBe(0);
         expect(timer(ctx)).toBe('');
@@ -1510,17 +1520,17 @@ describe('ClickerGame stages', () => {
 
         ctx.click();
 
-        expect(message(ctx)).toBe('Chapter complete!');
+        expect(message(ctx)).toBe('Capítulo concluído!');
         expect(ctx.scene.monster).toBeNull();
         expect(ctx.texts).toHaveLength(0);
     });
 
-    it('shows "Could not load progress" and spawns no monster when the progress cannot be loaded', async () => {
+    it('shows "Não foi possível carregar o progresso" and spawns no monster when the progress cannot be loaded', async () => {
         const ctx = await createScene({ start: new Error('down') });
 
         ctx.click();
 
-        expect(message(ctx)).toBe('Could not load progress');
+        expect(message(ctx)).toBe('Não foi possível carregar o progresso');
         expect(ctx.scene.monster).toBeNull();
         expect(ctx.texts).toHaveLength(0);
     });
@@ -1544,7 +1554,7 @@ describe('ClickerGame stages', () => {
         killAll(ctx);
         ctx.tweens.filter((t) => ctx.sprites.includes(t.targets)).forEach((t) => t.onComplete());
 
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 44');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 44');
     });
 
     it('a chapter boss kill takes from the queue of the boss drop rule', async () => {
@@ -1554,7 +1564,7 @@ describe('ClickerGame stages', () => {
         killAll(ctx);
         ctx.tweens.filter((t) => ctx.sprites.includes(t.targets)).forEach((t) => t.onComplete());
 
-        expect(ctx.walletText().textContent).toBe('Gold: 2  Silver: 14  Copper: 46');
+        expect(ctx.walletText().textContent).toBe('Ouro: 2  Prata: 14  Cobre: 46');
     });
 
     it('a miniboss kill drops nothing when its drop rule has no queue', async () => {
@@ -1687,7 +1697,7 @@ describe('ClickerGame progress saving', () => {
         await flush();
 
         expect(label(ctx)).toBe('Estágio 3/10  Miniboss');
-        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
+        expect(ctx.hud('.boss-timer').textContent).toBe('Tempo: 30s');
     });
 
     it('does not spawn a stale encounter when a realignment happens while the monster fades', async () => {
@@ -1717,7 +1727,7 @@ describe('ClickerGame progress saving', () => {
 
     it('asks for the progress again on a tick while it has not loaded, and spawns the monster once it arrives', async () => {
         const ctx = await createScene({ start: new Error('down') });
-        expect(message(ctx)).toBe('Could not load progress');
+        expect(message(ctx)).toBe('Não foi possível carregar o progresso');
         campaignGateway.get.mockResolvedValue(progress(1, 'PHASE', 1));
 
         tick(ctx);
@@ -1735,7 +1745,7 @@ describe('ClickerGame progress saving', () => {
         tick(ctx);
         await flush();
 
-        expect(message(ctx)).toBe('Could not load progress');
+        expect(message(ctx)).toBe('Não foi possível carregar o progresso');
         expect(ctx.scene.monster).toBeNull();
     });
 
@@ -1929,7 +1939,7 @@ describe('ClickerGame pause and leave fight', () => {
         expect(campaignGateway.report).toHaveBeenCalledWith({ chapter: 1, stage: 1, encounter: 'MINIBOSS', phase: 1 }, 'CLEARED');
         expect(ctx.scene.farmBoss).toEqual({ kind: 'MINIBOSS', stage: 1 });
         expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
-        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
+        expect(ctx.hud('.boss-timer').textContent).toBe('Tempo: 30s');
         expect(ctx.scene.monster.health).toBe(ctx.scene.monster.maxHealth);
     });
 
@@ -2363,7 +2373,7 @@ describe('ClickerGame hero screens', () => {
         await openPanel(ctx, 'talents');
         ctx.scene.update(0, 1001);
 
-        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 29');
+        expect(ctx.hud('.boss-timer').textContent).toBe('Tempo: 29s');
     });
 
     it('a click on the canvas does not hit while a hero screen is open, and hits again once it closes', async () => {
@@ -2491,7 +2501,7 @@ describe('ClickerGame farm mode', () => {
 
         expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
         expect(ctx.scene.monster.maxHealth).toBe(50);
-        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
+        expect(ctx.hud('.boss-timer').textContent).toBe('Tempo: 30s');
         expect(ctx.scene.session.encounter()).toMatchObject({ kind: 'PHASE', stage: 3, phase: 1 });
         expect(campaignGateway.report).not.toHaveBeenCalled();
     });
@@ -2513,7 +2523,7 @@ describe('ClickerGame farm mode', () => {
 
         expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
         expect(ctx.scene.monster.health).toBe(50);
-        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
+        expect(ctx.hud('.boss-timer').textContent).toBe('Tempo: 30s');
     });
 
     it('a win reports nothing to the campaign and drops no coins', async () => {
@@ -2567,7 +2577,7 @@ describe('ClickerGame farm mode', () => {
         await flush();
 
         expect(ctx.scene.farmBoss).toBeNull();
-        expect(ctx.hud('.stage-message').textContent).toBe('Chapter complete!');
+        expect(ctx.hud('.stage-message').textContent).toBe('Capítulo concluído!');
         expect(ctx.scene.heroUi.isOpen).toBe(true);
         expect(testid(ctx, 'farm-entry-chapter-boss').disabled).toBe(true);
         expect(testid(ctx, 'farm-entry-chapter-boss').textContent).toContain('0 vitórias restantes hoje');
@@ -2689,7 +2699,7 @@ describe('ClickerGame farm mode', () => {
 
             expect(label(ctx)).toBe('Rever chefe: Miniboss 3 (Capítulo 1)');
             expect(ctx.scene.monster.maxHealth).toBe(77);
-            expect(ctx.hud('.boss-timer').textContent).toBe('Time: 45');
+            expect(ctx.hud('.boss-timer').textContent).toBe('Tempo: 45s');
             expect(campaignGateway.report).not.toHaveBeenCalled();
         });
 
@@ -2759,7 +2769,7 @@ describe('ClickerGame farm mode', () => {
 
             expect(label(ctx)).toBe('Rever chefe: Chefe do capítulo (Capítulo 1)');
             expect(ctx.scene.monster.maxHealth).toBe(60);
-            expect(ctx.hud('.boss-timer').textContent).toBe('Time: 50');
+            expect(ctx.hud('.boss-timer').textContent).toBe('Tempo: 50s');
         });
     });
 });
@@ -2878,7 +2888,7 @@ describe('ClickerGame equipment', () => {
         killAll(ctx);
         advance(ctx);
 
-        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 35');
+        expect(ctx.hud('.boss-timer').textContent).toBe('Tempo: 35s');
     });
 
     it('keeps the plain countdown without the extra seconds', async () => {
@@ -2887,7 +2897,7 @@ describe('ClickerGame equipment', () => {
         killAll(ctx);
         advance(ctx);
 
-        expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
+        expect(ctx.hud('.boss-timer').textContent).toBe('Tempo: 30s');
     });
 
     it('fights with the base attacker when the equipment cannot be loaded, and tries again on the next tick', async () => {
@@ -3248,10 +3258,10 @@ describe('ClickerGame skills', () => {
 
         key(ctx, 'TWO');
         ctx.scene.update(0, 3000);
-        expect(timer(ctx)).toBe('Time: 30');
+        expect(timer(ctx)).toBe('Tempo: 30s');
 
         ctx.scene.update(0, 1001);
-        expect(timer(ctx)).toBe('Time: 29');
+        expect(timer(ctx)).toBe('Tempo: 29s');
     });
 
     it('adds 4 s to the boss countdown with Carrilhão da Aurora', async () => {
@@ -3259,7 +3269,7 @@ describe('ClickerGame skills', () => {
 
         key(ctx, 'THREE');
 
-        expect(timer(ctx)).toBe('Time: 34');
+        expect(timer(ctx)).toBe('Tempo: 34s');
     });
 
     it('leaves a phase monster without countdown when Carrilhão is used', async () => {
@@ -4223,7 +4233,7 @@ describe('ClickerGame skills: numbers, pause, exits, farm and leader', () => {
         ctx.handlers['keydown-ESC']();
         ctx.scene.update(0, 3000);
 
-        expect(timer(ctx)).toBe('Time: 30');
+        expect(timer(ctx)).toBe('Tempo: 30s');
     });
 
     it('ends the effects on the monster when the boss runs out of time', async () => {
@@ -5699,22 +5709,22 @@ describe('ClickerGame hero team', () => {
         expect(ctx.scene.monster.health).toBe(4);
     });
 
-    it('Kael as an ally starts a 30 s miniboss at Time: 35', async () => {
+    it('Kael as an ally starts a 30 s miniboss at Tempo: 35s', async () => {
         const ctx = await open([ 'kael', null, null, null ], { heroOptions: { leaderId: 'lyra' }, start: atChapter(5, 1, 'PHASE', 5) });
 
         killAll(ctx);
         advance(ctx);
 
-        expect(timer(ctx)).toBe('Time: 35');
+        expect(timer(ctx)).toBe('Tempo: 35s');
     });
 
-    it('Kael as the leader brings no passive: Time: 30', async () => {
+    it('Kael as the leader brings no passive: Tempo: 30s', async () => {
         const ctx = await open([ 'lyra', null, null, null ], { start: atChapter(5, 1, 'PHASE', 5) });
 
         killAll(ctx);
         advance(ctx);
 
-        expect(timer(ctx)).toBe('Time: 30');
+        expect(timer(ctx)).toBe('Tempo: 30s');
     });
 
     it('a team change keeps the running countdown', async () => {
@@ -5722,13 +5732,13 @@ describe('ClickerGame hero team', () => {
 
         killAll(ctx);
         advance(ctx);
-        expect(timer(ctx)).toBe('Time: 35');
+        expect(timer(ctx)).toBe('Tempo: 35s');
 
         heroesGateway.setTeam.mockResolvedValue({ leaderId: 'lyra', team: teamPayload([ null, null, null, null ]) });
         await ctx.scene.heroes.setTeam([ null, null, null, null ]);
         ctx.scene.update(0, 0);
 
-        expect(timer(ctx)).toBe('Time: 35');
+        expect(timer(ctx)).toBe('Tempo: 35s');
     });
 
     it('Orina as an ally shows Defesa 25% on a monster of defense 40 and a click deals 0.75 plus her 1.5', async () => {
@@ -5784,7 +5794,7 @@ describe('ClickerGame hero team', () => {
         heroesGateway.buySlot.mockResolvedValue({ team: teamPayload([ null, null, null, null ], { boughtSlots: 1 }), wallet: { gold: 0, silver: 50, copper: 0 } });
         await ctx.scene.heroes.buySlot(0);
 
-        expect(ctx.walletText().textContent).toBe('Gold: 0  Silver: 50  Copper: 0');
+        expect(ctx.walletText().textContent).toBe('Ouro: 0  Prata: 50  Cobre: 0');
     });
 
     it('the next chapter reloads the heroes', async () => {
@@ -6083,15 +6093,15 @@ describe('ClickerGame hero team', () => {
         it('a click with the team leaves the countdown of a miniboss as it was', async () => {
             const ctx = await open([ 'lyra', null, null, null ], { start: atChapter(5, 1, 'MINIBOSS', 1) });
 
-            expect(timer(ctx)).toBe('Time: 30');
+            expect(timer(ctx)).toBe('Tempo: 30s');
 
             ctx.click();
-            expect(timer(ctx)).toBe('Time: 30');
+            expect(timer(ctx)).toBe('Tempo: 30s');
 
             ctx.scene.update(0, 1000);
             ctx.click();
 
-            expect(timer(ctx)).toBe('Time: 29');
+            expect(timer(ctx)).toBe('Tempo: 29s');
         });
 
         it('a damage-over-time tick brings no team strike: Tempestade Arcana ticks 2.4 and Lyra does not hit', async () => {

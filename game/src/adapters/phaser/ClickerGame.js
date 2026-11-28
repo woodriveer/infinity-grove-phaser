@@ -66,7 +66,7 @@ const ADD_ALLY_TEXT_OFFSET = 40;
 const LOGO = { x: 82, y: 44, width: 136 };
 //  The wallet pill sits in the top-right corner; coins fly to its centre
 const WALLET = { x: 890, y: 44 };
-const COINS = [ [ 'gold', 'Gold' ], [ 'silver', 'Silver' ], [ 'copper', 'Copper' ] ];
+const COINS = [ [ 'gold', 'Ouro' ], [ 'silver', 'Prata' ], [ 'copper', 'Cobre' ] ];
 //  The sheet of a flying coin by the copper it carries: silver from 100 copper, gold from 100 silver
 const coinMetal = (copper) => (copper >= 10000 ? 'gold' : copper >= 100 ? 'silver' : 'copper');
 const COIN = { duration: 600, stagger: 100, maxFlying: 5 };
@@ -149,8 +149,8 @@ const PAUSE_MENU_HTML = '<div class="pause-menu" hidden><div class="pause-card">
     + '<button class="pause-confirm-no">No, stay</button>'
     + '</div>'
     + '</div></div>';
-const LOAD_FAILED_TEXT = 'Could not load progress';
-const COMPLETED_TEXT = 'Chapter complete!';
+const LOAD_FAILED_TEXT = 'Não foi possível carregar o progresso';
+const COMPLETED_TEXT = 'Capítulo concluído!';
 
 export class ClickerGame extends Scene
 {
@@ -1167,7 +1167,7 @@ export class ClickerGame extends Scene
 
     showCountdown ()
     {
-        const text = `Time: ${this.countdown.seconds}`;
+        const text = `Tempo: ${this.countdown.seconds}s`;
 
         //  The pill's width follows its text, so the timer is placed again only when the text changes, not on every frame
         if (this.bossTimer.textContent !== text)
@@ -1527,7 +1527,7 @@ export class ClickerGame extends Scene
         this.walletText.setVisible(true);
     }
 
-    //  "Gold: 2  Silver: 14  Copper: 37": a coin disc and the amount each, the names kept for assistive tech
+    //  "Ouro: 2  Prata: 14  Cobre: 37": a coin disc and the amount each, the names kept for assistive tech
     refreshWalletText ()
     {
         const amounts = this.wallet.display();

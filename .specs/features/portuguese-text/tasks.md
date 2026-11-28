@@ -249,7 +249,7 @@ T11
 
 ---
 
-#### T6: Wallet, boss timer and scene messages in Portuguese [ ]
+#### T6: Wallet, boss timer and scene messages in Portuguese [x]
 
 **Owner**: game-dev
 **Goal**: The wallet labels, the timer and the two scene messages read their spec texts (PT-04; spec Combat HUD AC 4, 5, 7, 8, Edge 3, I22 to I25, Q7).
@@ -273,8 +273,8 @@ T11
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The unit suite passes.
-- [ ] `git grep -n -E "'Gold'|'Silver'|'Copper'|Time: |Could not load|Chapter complete" -- game/src` prints only `//` comment lines.
+- [x] The unit suite passes.
+- [x] `git grep -n -E "'Gold'|'Silver'|'Copper'|Time: |Could not load|Chapter complete" -- game/src` prints only `//` comment lines.
 
 **Commit**: `feat(game): translate the wallet, the boss timer and the scene messages`
 
