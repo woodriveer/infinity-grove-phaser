@@ -1178,7 +1178,7 @@ describe('ClickerGame stages', () => {
         expect(ctx.scene.monster.health).toBe(12);
         expect(ctx.scene.monster.maxHealth).toBe(12);
         expect(ctx.monster.alpha).toBe(1);
-        expect(label(ctx)).toBe('Stage 3/10  Phase 2/5');
+        expect(label(ctx)).toBe('Estágio 3/10  Fase 2/5');
     });
 
     it('spawns no monster and ignores clicks until the progress has loaded', async () => {
@@ -1203,10 +1203,10 @@ describe('ClickerGame stages', () => {
         const ctx = await createScene();
 
         killAll(ctx);
-        expect(label(ctx)).toBe('Stage 1/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 1/10  Fase 1/5');
         advance(ctx);
 
-        expect(label(ctx)).toBe('Stage 1/10  Phase 2/5');
+        expect(label(ctx)).toBe('Estágio 1/10  Fase 2/5');
         expect(ctx.scene.monster.health).toBe(10);
         expect(ctx.monster.alpha).toBe(1);
     });
@@ -1217,7 +1217,7 @@ describe('ClickerGame stages', () => {
         killAll(ctx);
         advance(ctx);
 
-        expect(label(ctx)).toBe('Stage 1/10  Miniboss');
+        expect(label(ctx)).toBe('Estágio 1/10  Miniboss');
         expect(ctx.scene.monster.maxHealth).toBe(50);
         expect(timer(ctx)).toBe('Time: 30');
     });
@@ -1285,7 +1285,7 @@ describe('ClickerGame stages', () => {
     it('a campaign boss label has no chapter line', async () => {
         const ctx = await createScene({ start: bossStart() });
 
-        expect(label(ctx)).toBe('Stage 1/10  Miniboss');
+        expect(label(ctx)).toBe('Estágio 1/10  Miniboss');
         expect(ctx.hud('.stage-hud .stage-hud-chapter')).toBeUndefined();
     });
 
@@ -1393,7 +1393,7 @@ describe('ClickerGame stages', () => {
         ctx.scene.update(0, 30000);
         advance(ctx);
 
-        expect(label(ctx)).toBe('Stage 2/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 2/10  Fase 1/5');
         expect(ctx.scene.monster.maxHealth).toBe(11);
         expect(timer(ctx)).toBe('');
     });
@@ -1417,7 +1417,7 @@ describe('ClickerGame stages', () => {
         expect(ctx.timers.at(-1).delay).toBe(1000);
         ctx.timers.at(-1).callback();
 
-        expect(label(ctx)).toBe('Stage 1/10  Phase 5/5');
+        expect(label(ctx)).toBe('Estágio 1/10  Fase 5/5');
         expect(ctx.scene.monster.maxHealth).toBe(10);
         expect(ctx.monster.alpha).toBe(1);
     });
@@ -1430,7 +1430,7 @@ describe('ClickerGame stages', () => {
         killAll(ctx);
         advance(ctx);
 
-        expect(label(ctx)).toBe('Stage 1/10  Miniboss');
+        expect(label(ctx)).toBe('Estágio 1/10  Miniboss');
         expect(timer(ctx)).toBe('Time: 30');
     });
 
@@ -1442,7 +1442,7 @@ describe('ClickerGame stages', () => {
         ctx.scene.update(0, 5000);
         advance(ctx);
 
-        expect(label(ctx)).toBe('Stage 2/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 2/10  Fase 1/5');
     });
 
     it('spawns the chapter boss after the miniboss of the last stage with the 60 s countdown', async () => {
@@ -1451,7 +1451,7 @@ describe('ClickerGame stages', () => {
         killAll(ctx);
         advance(ctx);
 
-        expect(label(ctx)).toBe('Chapter Boss');
+        expect(label(ctx)).toBe('Chefe do capítulo');
         expect(ctx.scene.monster.maxHealth).toBe(300);
         expect(timer(ctx)).toBe('Time: 60');
     });
@@ -1462,7 +1462,7 @@ describe('ClickerGame stages', () => {
         ctx.scene.update(0, 60000);
         ctx.timers.at(-1).callback();
 
-        expect(label(ctx)).toBe('Stage 10/10  Phase 5/5');
+        expect(label(ctx)).toBe('Estágio 10/10  Fase 5/5');
     });
 
     it('shows the completion message and spawns no monster when the chapter boss dies', async () => {
@@ -1489,7 +1489,7 @@ describe('ClickerGame stages', () => {
         await flush();
 
         expect(message(ctx)).toBe('');
-        expect(label(ctx)).toBe('Stage 1/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 1/10  Fase 1/5');
         expect(ctx.scene.monster.dead).toBe(false);
         expect(ctx.monster.alpha).toBe(1);
     });
@@ -1635,7 +1635,7 @@ describe('ClickerGame progress saving', () => {
         killAll(ctx);
         advance(ctx);
         await flush();
-        expect(label(ctx)).toBe('Stage 1/10  Phase 2/5');
+        expect(label(ctx)).toBe('Estágio 1/10  Fase 2/5');
         tick(ctx);
         await flush();
 
@@ -1658,7 +1658,7 @@ describe('ClickerGame progress saving', () => {
         killAll(ctx);
         await flush();
 
-        expect(label(ctx)).toBe('Stage 1/10  Phase 4/5');
+        expect(label(ctx)).toBe('Estágio 1/10  Fase 4/5');
         expect(ctx.scene.monster.health).toBe(10);
         expect(ctx.monster.alpha).toBe(1);
     });
@@ -1686,7 +1686,7 @@ describe('ClickerGame progress saving', () => {
         advance(ctx);
         await flush();
 
-        expect(label(ctx)).toBe('Stage 3/10  Miniboss');
+        expect(label(ctx)).toBe('Estágio 3/10  Miniboss');
         expect(ctx.hud('.boss-timer').textContent).toBe('Time: 30');
     });
 
@@ -1699,7 +1699,7 @@ describe('ClickerGame progress saving', () => {
         ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
 
         expect(ctx.timers).toHaveLength(0);
-        expect(label(ctx)).toBe('Stage 2/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 2/10  Fase 1/5');
     });
 
     it('does not spawn a stale encounter when a realignment happens during the respawn wait', async () => {
@@ -1711,7 +1711,7 @@ describe('ClickerGame progress saving', () => {
 
         ctx.timers.at(-1).callback();
 
-        expect(label(ctx)).toBe('Stage 2/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 2/10  Fase 1/5');
         expect(ctx.scene.monster.maxHealth).toBe(11);
     });
 
@@ -1726,7 +1726,7 @@ describe('ClickerGame progress saving', () => {
         expect(campaignGateway.get).toHaveBeenCalledTimes(2);
         expect(message(ctx)).toBe('');
         expect(ctx.scene.monster.maxHealth).toBe(10);
-        expect(label(ctx)).toBe('Stage 1/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 1/10  Fase 1/5');
     });
 
     it('keeps the message while the progress still cannot be loaded', async () => {
@@ -1894,7 +1894,7 @@ describe('ClickerGame pause and leave fight', () => {
         expect(ctx.hud('.boss-timer').textContent).toBe('');
 
         ctx.timers.at(-1).callback();
-        expect(label(ctx)).toBe('Stage 1/10  Phase 5/5');
+        expect(label(ctx)).toBe('Estágio 1/10  Fase 5/5');
 
         await ctx.scene.session.flush();
         expect(campaignGateway.report).toHaveBeenCalledWith({ chapter: 1, stage: 1, encounter: 'MINIBOSS', phase: 1 }, 'FAILED');
@@ -1915,7 +1915,7 @@ describe('ClickerGame pause and leave fight', () => {
         killAll(ctx);
         advance(ctx);
 
-        expect(label(ctx)).toBe('Stage 2/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 2/10  Fase 1/5');
     });
 
     it('reports the miniboss win when farming is on and brings it back as a farm fight', async () => {
@@ -1963,7 +1963,7 @@ describe('ClickerGame pause and leave fight', () => {
 
         expect(farmGateway.win).toHaveBeenCalledTimes(1);
         expect(ctx.scene.farmBoss).toBeNull();
-        expect(label(ctx)).toBe('Stage 2/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 2/10  Fase 1/5');
     });
 
     it('still moves on after a phase monster when farming is on', async () => {
@@ -1973,7 +1973,7 @@ describe('ClickerGame pause and leave fight', () => {
         killAll(ctx);
         advance(ctx);
 
-        expect(label(ctx)).toBe('Stage 1/10  Phase 2/5');
+        expect(label(ctx)).toBe('Estágio 1/10  Fase 2/5');
     });
 
     it('goes back to phase 5 and then to the boss again when the farmed boss times out', async () => {
@@ -1982,11 +1982,11 @@ describe('ClickerGame pause and leave fight', () => {
         ctx.control('.farm-toggle input').checked = true;
         ctx.scene.update(0, 30000);
         ctx.timers.at(-1).callback();
-        expect(label(ctx)).toBe('Stage 1/10  Phase 5/5');
+        expect(label(ctx)).toBe('Estágio 1/10  Fase 5/5');
 
         killAll(ctx);
         advance(ctx);
-        expect(label(ctx)).toBe('Stage 1/10  Miniboss');
+        expect(label(ctx)).toBe('Estágio 1/10  Miniboss');
     });
 });
 
@@ -2538,7 +2538,7 @@ describe('ClickerGame farm mode', () => {
         ctx.control('.pause-leave').click();
         ctx.control('.pause-confirm-yes').click();
 
-        expect(label(ctx)).toBe('Stage 3/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 3/10  Fase 1/5');
         expect(ctx.scene.farmBoss).toBeNull();
         expect(ctx.scene.paused).toBe(false);
         expect(campaignGateway.report).not.toHaveBeenCalled();
@@ -2600,7 +2600,7 @@ describe('ClickerGame farm mode', () => {
         await flush();
 
         expect(ctx.scene.farmBoss).toBeNull();
-        expect(label(ctx)).toBe('Stage 3/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 3/10  Fase 1/5');
         expect(testid(ctx, 'card-notice').hidden).toBe(true);
         expect(farmGateway.get.mock.calls.length).toBe(loads + 1);
     });
@@ -2622,7 +2622,7 @@ describe('ClickerGame farm mode', () => {
         const ctx = await createScene({ start: midCampaign() });
         ctx.scene.startFarm(miniboss);
 
-        ctx.scene.realign({ kind: 'PHASE', stage: 5, phase: 1, health: 14, stats: undefined, timeLimitMs: null, label: 'Stage 5/10  Phase 1/5' });
+        ctx.scene.realign({ kind: 'PHASE', stage: 5, phase: 1, health: 14, stats: undefined, timeLimitMs: null, label: 'Estágio 5/10  Fase 1/5' });
 
         expect(label(ctx)).toBe('Rever chefe: Miniboss 1');
     });
@@ -2716,7 +2716,7 @@ describe('ClickerGame farm mode', () => {
             ctx.scene.startFarm({ kind: 'MINIBOSS', stage: 3, chapter: 1 });
 
             expect(ctx.scene.farmBoss).toBeNull();
-            expect(label(ctx)).toBe('Stage 3/10  Phase 1/5');
+            expect(label(ctx)).toBe('Estágio 3/10  Fase 1/5');
         });
 
         it('the earlier chapter boss that spends the last daily win reopens Rever chefes on that chapter', async () => {
@@ -5782,7 +5782,7 @@ describe('ClickerGame hero team', () => {
         advance(ctx);
         await flush();
 
-        expect(label(ctx)).toBe('Stage 1/10  Phase 1/5');
+        expect(label(ctx)).toBe('Estágio 1/10  Fase 1/5');
         expect(heroesGateway.list).toHaveBeenCalledTimes(2);
     });
 

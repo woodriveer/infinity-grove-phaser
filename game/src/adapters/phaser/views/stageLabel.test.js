@@ -5,9 +5,9 @@ describe('renderStageLabel', () => {
     it('writes a campaign label as one text', () => {
         const node = document.createElement('div');
 
-        renderStageLabel(node, 'Stage 3/10  Miniboss');
+        renderStageLabel(node, 'Estágio 3/10  Miniboss');
 
-        expect(node.textContent).toBe('Stage 3/10  Miniboss');
+        expect(node.textContent).toBe('Estágio 3/10  Miniboss');
         expect(node.childNodes.length).toBe(1);
         expect(node.querySelector('.stage-hud-chapter')).toBeNull();
     });
@@ -45,9 +45,9 @@ describe('renderStageLabel', () => {
         const node = document.createElement('div');
 
         renderStageLabel(node, 'Rever chefe: Miniboss 3 (Capítulo 2)');
-        renderStageLabel(node, 'Stage 1/10  Phase 1/5');
+        renderStageLabel(node, 'Estágio 1/10  Fase 1/5');
 
-        expect(node.textContent).toBe('Stage 1/10  Phase 1/5');
+        expect(node.textContent).toBe('Estágio 1/10  Fase 1/5');
         expect(node.childNodes.length).toBe(1);
         expect(node.querySelector('.stage-hud-chapter')).toBeNull();
     });

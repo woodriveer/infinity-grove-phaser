@@ -117,7 +117,7 @@ export class Campaign
                 stats: stage.monster ?? DEFAULT_STATS,
                 dropRuleId: stage.monsterDropRuleId ?? null,
                 timeLimitMs: null,
-                label: `Stage ${this.stage}/${this.stageCount}  Phase ${this.phase}/${stage.phasesPerStage}`,
+                label: `Estágio ${this.stage}/${this.stageCount}  Fase ${this.phase}/${stage.phasesPerStage}`,
                 adds: [],
                 affix: null
             };
@@ -133,7 +133,7 @@ export class Campaign
                 stats: stage.miniboss ?? DEFAULT_STATS,
                 dropRuleId: stage.minibossDropRuleId ?? null,
                 timeLimitMs: stage.minibossTimeLimitMs,
-                label: `Stage ${this.stage}/${this.stageCount}  Miniboss`,
+                label: `Estágio ${this.stage}/${this.stageCount}  Miniboss`,
                 adds: addsOf(stage),
                 affix: affixOf(stage.minibossAffix)
             };
@@ -147,7 +147,7 @@ export class Campaign
             stats: this.definition.boss ?? DEFAULT_STATS,
             dropRuleId: this.definition.bossDropRuleId ?? null,
             timeLimitMs: this.definition.bossTimeLimitMs,
-            label: 'Chapter Boss',
+            label: 'Chefe do capítulo',
             adds: [],
             affix: affixOf(this.definition.bossAffix)
         };

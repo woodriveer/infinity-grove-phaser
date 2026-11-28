@@ -188,7 +188,7 @@ T11
 
 ---
 
-#### T4: The stage plate in Portuguese [ ]
+#### T4: The stage plate in Portuguese [x]
 
 **Owner**: game-dev
 **Goal**: The encounter labels read `Estágio <s>/<n>  Fase <p>/<m>`, `Estágio <s>/<n>  Miniboss` and `Chefe do capítulo` (PT-04; spec Combat HUD AC 1 to 3, Q4, I19 to I21).
@@ -211,8 +211,8 @@ T11
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The unit suite passes with the same number of tests.
-- [ ] `git grep -n -E "Stage [0-9<$]|Chapter Boss|  Phase " -- game/src` prints only `//` comment lines (comments stay English; string literals must be clean).
+- [x] The unit suite passes with the same number of tests.
+- [x] `git grep -n -E "Stage [0-9<$]|Chapter Boss|  Phase " -- game/src` prints only `//` comment lines (comments stay English; string literals must be clean).
 
 **Commit**: `feat(game): translate the stage plate to Portuguese`
 

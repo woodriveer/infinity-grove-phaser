@@ -35,7 +35,7 @@ describe('progressApi', () => {
         it('report sends only the position fields, not extra ones', async () => {
             httpClient.post.mockResolvedValue({ data: progress });
 
-            await progressApi.report({ ...position, label: 'Stage 2/10  Phase 3/5' }, 'FAILED');
+            await progressApi.report({ ...position, label: 'Estágio 2/10  Fase 3/5' }, 'FAILED');
 
             expect(httpClient.post.mock.calls[0][1]).toEqual({ ...position, outcome: 'FAILED' });
         });

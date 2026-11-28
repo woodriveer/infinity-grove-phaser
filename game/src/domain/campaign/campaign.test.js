@@ -92,7 +92,7 @@ describe('Campaign transitions (same table as the backend)', () => {
 describe('Campaign encounter', () => {
     it('a phase monster has the health of its stage, no time limit and the Stage/Phase label', () => {
         expect(at(2, PHASE, 3).encounter()).toEqual({
-            kind: PHASE, stage: 2, phase: 3, health: 11, stats: DEFAULT_STATS, dropRuleId: 12, timeLimitMs: null, label: 'Stage 2/3  Phase 3/3', adds: [], affix: null
+            kind: PHASE, stage: 2, phase: 3, health: 11, stats: DEFAULT_STATS, dropRuleId: 12, timeLimitMs: null, label: 'Estágio 2/3  Fase 3/3', adds: [], affix: null
         });
     });
 
@@ -150,19 +150,29 @@ describe('Campaign encounter', () => {
     });
 
     it('the label counts the stages and the phases of the chapter definition', () => {
-        expect(at(1, PHASE, 1).encounter().label).toBe('Stage 1/3  Phase 1/2');
+        expect(at(1, PHASE, 1).encounter().label).toBe('Estágio 1/3  Fase 1/2');
     });
 
     it('a miniboss has the miniboss health and time limit of its stage and the Miniboss label', () => {
         expect(at(2, MINIBOSS).encounter()).toMatchObject({
-            kind: MINIBOSS, stage: 2, health: 55, timeLimitMs: 31000, label: 'Stage 2/3  Miniboss'
+            kind: MINIBOSS, stage: 2, health: 55, timeLimitMs: 31000, label: 'Estágio 2/3  Miniboss'
         });
     });
 
-    it('the chapter boss has the boss health and time limit and the Chapter Boss label', () => {
+    it('the chapter boss has the boss health and time limit and the Chefe do capítulo label', () => {
         expect(at(3, CHAPTER_BOSS).encounter()).toMatchObject({
-            kind: CHAPTER_BOSS, health: 300, timeLimitMs: 60000, label: 'Chapter Boss'
+            kind: CHAPTER_BOSS, health: 300, timeLimitMs: 60000, label: 'Chefe do capítulo'
         });
+    });
+
+    it('labels the spec examples: Estágio 1/10  Fase 2/8, Estágio 3/10  Miniboss and Chefe do capítulo', () => {
+        const stages = Array.from({ length: 10 }, (_, i) => ({ ...definition.stages[0], number: i + 1, phasesPerStage: 8 }));
+        const ten = { ...definition, stages };
+        const at10 = (stage, encounter, phase = 1) => Campaign.fromProgress({ chapter: 1, stage, encounter, phase, completed: false, definition: ten });
+
+        expect(at10(1, PHASE, 2).encounter().label).toBe('Estágio 1/10  Fase 2/8');
+        expect(at10(3, MINIBOSS).encounter().label).toBe('Estágio 3/10  Miniboss');
+        expect(at10(10, CHAPTER_BOSS).encounter().label).toBe('Chefe do capítulo');
     });
 
     it('a chapter boss of 3000000000 health spawns with that health', () => {
