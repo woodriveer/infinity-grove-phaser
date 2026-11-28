@@ -57,6 +57,11 @@ test.describe('The chapter 1 boss scene', () => {
         await expect(hitButton(page)).toHaveAttribute('aria-label', 'Começar a cena');
         expect(await seenKey(page)).toBe('["prologue","chapter-1"]');
         await expect(page.getByTestId('chapter-hud')).toHaveText('Capítulo 2');
+        //  The title card shows the clearing with the dark tint (spec P2 Scene looks as data AC 5)
+        await expect(page.locator('[data-backdrop="clearing"]')).toHaveClass(/is-on/);
+        await expect(page.locator('[data-backdrop="forest"]')).not.toHaveClass(/is-on/);
+        await expect(page.locator('.story-tint.is-dark')).toHaveClass(/is-on/);
+        await expect(page.locator('.story-tint.is-dawn')).not.toHaveClass(/is-on/);
     });
 
     test('the camera pushes in on the narrator and moves to Kael', async ({ page }) => {
@@ -84,6 +89,8 @@ test.describe('The chapter 1 boss scene', () => {
         await hitButton(page).click();
 
         await expect(bar(page, 'top')).toHaveCSS('height', '46px', { timeout: 2000 });
+        await expect(bar(page, 'top')).toHaveCSS('background-color', 'rgb(0, 0, 0)');
+        await expect(bar(page, 'top')).toHaveCSS('transition-duration', '0.8s');
         await expect(bar(page, 'bottom')).toHaveCSS('height', '46px', { timeout: 2000 });
 
         await hitButton(page).click();
@@ -116,6 +123,7 @@ test.describe('The chapter 1 boss scene', () => {
             await expect(page.locator('.story-box.is-face')).toHaveCSS('left', '110px');
             await expect(page.locator('.story-box.is-face')).toHaveCSS('width', '1060px');
             await expect(page.locator('.story-box.is-face')).toHaveCSS('padding-left', '210px');
+            await expect(page.getByTestId('story-speaker')).toHaveCSS('left', '206px');
         }
     });
 
@@ -158,6 +166,10 @@ test.describe('The chapter 1 boss scene', () => {
         await expect(page.locator('.story-endsub')).toHaveCSS('font-size', '28px');
         await expect(page.locator('.story-cta')).toHaveText('Clique para continuar');
         await expect(hitButton(page)).toHaveAttribute('aria-label', 'Continuar');
+        //  The end card shows the clearing with the dark and dawn tints
+        await expect(page.locator('[data-backdrop="clearing"]')).toHaveClass(/is-on/);
+        await expect(page.locator('.story-tint.is-dark')).toHaveClass(/is-on/);
+        await expect(page.locator('.story-tint.is-dawn')).toHaveClass(/is-on/);
 
         await hitButton(page).click();
 

@@ -108,6 +108,29 @@ test.describe('The story stage', () => {
         await expect(text).toHaveCSS('font-style', 'normal');
     });
 
+    test('the narrator line is centred italic text over a scrim with no name plate', async ({ page }) => {
+        await openPrologue(page);
+
+        await watchLine(page);
+
+        await expect(page.locator('.story-narr')).toHaveCSS('text-align', 'center');
+        await expect(page.locator('.story-narr')).toHaveCSS('font-style', 'italic');
+        await expect(page.locator('.story-narr-scrim')).toBeVisible();
+        await expect(page.getByTestId('story-speaker')).toHaveCount(0);
+    });
+
+    test('the prologue cards use the sizes of a chapter-start scene', async ({ page }) => {
+        await openPrologue(page);
+
+        await expect(page.locator('.story-logo')).toHaveCSS('width', '620px');
+
+        await watchLine(page, 6);
+        await hitButton(page).click();
+
+        await expect(page.locator('.story-endtitle')).toHaveCSS('font-size', '56px');
+        await expect(page.locator('.story-endsub')).toHaveCSS('font-size', '30px');
+    });
+
     test('a line whose audio cannot play types by the clock and moves on by itself', async ({ page }) => {
         await noPlay(page);
         await openPrologue(page);
@@ -157,6 +180,10 @@ test.describe('The story stage', () => {
 
     test('the mute button switches its label and pressed state', async ({ page }) => {
         await openPrologue(page);
+
+        await expect(mute(page)).toHaveCSS('width', '44px');
+        await expect(mute(page)).toHaveCSS('height', '44px');
+        await expect(mute(page)).toHaveCSS('border-radius', '50%');
 
         await expect(mute(page)).toHaveAttribute('aria-label', 'Silenciar');
         await expect(mute(page)).toHaveAttribute('aria-pressed', 'false');
