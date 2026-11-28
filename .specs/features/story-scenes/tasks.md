@@ -345,7 +345,7 @@ export const test = base.extend({
 
 ---
 
-#### T5: The prologue and chapter 1 catalog, its assets and the file check (storyCatalog.js) [ ]
+#### T5: The prologue and chapter 1 catalog, its assets and the file check (storyCatalog.js) [x]
 
 **Owner**: game-dev
 **Goal**: The prologue and chapter 1 data of the two designs, the backdrops with the clearing cameras, the default motes, the committed asset files and a unit test that fails on a malformed entry or a missing file (STORY-30, STORY-31, STORY-32, STORY-33, STORY-44, STORY-45).
@@ -399,8 +399,8 @@ export const storyScene = (id) => STORY_SCENES.find((scene) => scene.id === id) 
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 13 cases pass and every earlier unit test passes.
-- [ ] `git ls-files game/public/assets/story` lists the 23 files.
+- [x] The 13 cases pass and every earlier unit test passes.
+- [x] `git ls-files game/public/assets/story` lists the 23 files.
 
 **Commit**: `feat(game): add the prologue to the story catalog with its art and voice`
 

@@ -333,9 +333,9 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | STORY-27 | P1: The Mapa tab (AC 3) | T12, T13, T15 | In Tasks |
 | STORY-28 | P1: The Mapa tab (AC 4) | T13, T15 | In Tasks |
 | STORY-29 | P1: The Mapa tab (AC 5) | T4, T13 | Implementing |
-| STORY-30 | P1: The prologue content (AC 1) | T5, T14 | In Tasks |
-| STORY-31 | P1: The prologue content (AC 2) | T5 | In Tasks |
-| STORY-32 | P2: Scenes are data (AC 1) | T5, T7, T13 | In Tasks |
+| STORY-30 | P1: The prologue content (AC 1) | T5, T14 | Implementing |
+| STORY-31 | P1: The prologue content (AC 2) | T5 | Implementing |
+| STORY-32 | P2: Scenes are data (AC 1) | T5, T7, T13 | Implementing |
 | STORY-33 | P2: Scenes are data (AC 2) | T4, T5 | Implementing |
 | STORY-34 | P2: Scenes are data (AC 3) | T4, T13 | Implementing |
 | STORY-35 | P2: Scenes are data (AC 4) | T4, T13 | Implementing |
@@ -347,8 +347,8 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | STORY-41 | P2: Fits every screen (AC 5) | T9, T16 | In Tasks |
 | STORY-42 | P2: Keys while a scene plays (AC 1) | T8, T13, T14 | In Tasks |
 | STORY-43 | P2: Keys while a scene plays (AC 2) | T13, T14 | In Tasks |
-| STORY-44 | P1: The chapter 1 boss scene (AC 1) | T5, T20 | In Tasks |
-| STORY-45 | P1: The chapter 1 boss scene (AC 2) | T5 | In Tasks |
+| STORY-44 | P1: The chapter 1 boss scene (AC 1) | T5, T20 | Implementing |
+| STORY-45 | P1: The chapter 1 boss scene (AC 2) | T5 | Implementing |
 | STORY-46 | P1: The chapter 1 boss scene (AC 3) | T3, T7, T13, T20 | Implementing |
 | STORY-47 | P1: The chapter 1 boss scene (AC 4) | T7, T20 | In Tasks |
 | STORY-48 | P1: The chapter 1 boss scene (AC 5) | T4, T13, T15 | Implementing |
