@@ -204,7 +204,7 @@ export const test = base.extend({
 
 ---
 
-#### T3: Scene state machine, labels, dots, look and scale (storyPlayback.js) [ ]
+#### T3: Scene state machine, labels, dots, look and scale (storyPlayback.js) [x]
 
 **Owner**: game-dev
 **Goal**: The pure rules of a playing scene (STORY-09, STORY-12, STORY-13, STORY-14, STORY-16, STORY-17, STORY-18, STORY-21, STORY-23, STORY-37).
@@ -257,7 +257,7 @@ export const test = base.extend({
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 28 cases pass and every earlier unit test passes.
+- [x] The 28 cases pass and every earlier unit test passes.
 
 **Commit**: `feat(game): add the story scene state machine`
 

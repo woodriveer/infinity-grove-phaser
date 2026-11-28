@@ -312,21 +312,21 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | STORY-06 | P1: The prologue opens (AC 6) | T13, T14 | In Tasks |
 | STORY-07 | P1: The prologue opens (AC 7) | T6, T14 | In Tasks |
 | STORY-08 | P1: The prologue opens (AC 8) | T13, T14 | In Tasks |
-| STORY-09 | P1: Watching a scene (AC 1) | T3, T7, T14 | In Tasks |
+| STORY-09 | P1: Watching a scene (AC 1) | T3, T7, T14 | Implementing |
 | STORY-10 | P1: Watching a scene (AC 2) | T8, T14 | In Tasks |
 | STORY-11 | P1: Watching a scene (AC 3) | T2, T7, T8 | Implementing |
-| STORY-12 | P1: Watching a scene (AC 4) | T3, T8, T14 | In Tasks |
-| STORY-13 | P1: Watching a scene (AC 5) | T3, T8, T14 | In Tasks |
-| STORY-14 | P1: Watching a scene (AC 6) | T3, T8, T16 | In Tasks |
+| STORY-12 | P1: Watching a scene (AC 4) | T3, T8, T14 | Implementing |
+| STORY-13 | P1: Watching a scene (AC 5) | T3, T8, T14 | Implementing |
+| STORY-14 | P1: Watching a scene (AC 6) | T3, T8, T16 | Implementing |
 | STORY-15 | P1: Watching a scene (AC 7) | T8, T16 | In Tasks |
-| STORY-16 | P1: Watching a scene (AC 8) | T3, T7, T14 | In Tasks |
-| STORY-17 | P1: Watching a scene (AC 9) | T3, T8, T14 | In Tasks |
-| STORY-18 | P1: Watching a scene (AC 10) | T3, T8, T14 | In Tasks |
+| STORY-16 | P1: Watching a scene (AC 8) | T3, T7, T14 | Implementing |
+| STORY-17 | P1: Watching a scene (AC 9) | T3, T8, T14 | Implementing |
+| STORY-18 | P1: Watching a scene (AC 10) | T3, T8, T14 | Implementing |
 | STORY-19 | P1: Watching a scene (AC 11) | T8, T13, T14, T15 | In Tasks |
 | STORY-20 | P1: Watching a scene (AC 12) | T7, T8, T16 | In Tasks |
-| STORY-21 | P1: Watching a scene (AC 13) | T3, T7, T16 | In Tasks |
+| STORY-21 | P1: Watching a scene (AC 13) | T3, T7, T16 | Implementing |
 | STORY-22 | P1: Watching a scene (AC 14) | T7, T9, T14 | In Tasks |
-| STORY-23 | P1: Watching a scene (AC 15) | T3, T7, T16 | In Tasks |
+| STORY-23 | P1: Watching a scene (AC 15) | T3, T7, T16 | Implementing |
 | STORY-24 | P1: Watching a scene (AC 16) | T8, T16 | In Tasks |
 | STORY-25 | P1: The Mapa tab (AC 1) | T12, T15 | In Tasks |
 | STORY-26 | P1: The Mapa tab (AC 2) | T9, T11, T12, T15 | In Tasks |
@@ -340,7 +340,7 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | STORY-34 | P2: Scenes are data (AC 3) | T4, T13 | In Tasks |
 | STORY-35 | P2: Scenes are data (AC 4) | T4, T13 | In Tasks |
 | STORY-36 | P2: Scenes are data (AC 5) | T13 | In Tasks |
-| STORY-37 | P2: Fits every screen (AC 1) | T3, T8, T9, T16 | In Tasks |
+| STORY-37 | P2: Fits every screen (AC 1) | T3, T8, T9, T16 | Implementing |
 | STORY-38 | P2: Fits every screen (AC 2) | T8, T16 | In Tasks |
 | STORY-39 | P2: Fits every screen (AC 3) | T9, T16 | In Tasks |
 | STORY-40 | P2: Fits every screen (AC 4) | T9, T16 | In Tasks |
@@ -349,14 +349,14 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | STORY-43 | P2: Keys while a scene plays (AC 2) | T13, T14 | In Tasks |
 | STORY-44 | P1: The chapter 1 boss scene (AC 1) | T5, T20 | In Tasks |
 | STORY-45 | P1: The chapter 1 boss scene (AC 2) | T5 | In Tasks |
-| STORY-46 | P1: The chapter 1 boss scene (AC 3) | T3, T7, T13, T20 | In Tasks |
+| STORY-46 | P1: The chapter 1 boss scene (AC 3) | T3, T7, T13, T20 | Implementing |
 | STORY-47 | P1: The chapter 1 boss scene (AC 4) | T7, T20 | In Tasks |
 | STORY-48 | P1: The chapter 1 boss scene (AC 5) | T4, T13, T15 | In Tasks |
-| STORY-49 | P2: Scene looks as data (AC 1) | T3, T4, T7, T9, T20 | In Tasks |
+| STORY-49 | P2: Scene looks as data (AC 1) | T3, T4, T7, T9, T20 | Implementing |
 | STORY-50 | P2: Scene looks as data (AC 2) | T4, T7, T9, T20 | In Tasks |
 | STORY-51 | P2: Scene looks as data (AC 3) | T7, T9, T20 | In Tasks |
 | STORY-52 | P2: Scene looks as data (AC 4) | T4, T7, T9, T20 | In Tasks |
-| STORY-53 | P2: Scene looks as data (AC 5) | T3, T4, T7, T20 | In Tasks |
+| STORY-53 | P2: Scene looks as data (AC 5) | T3, T4, T7, T20 | Implementing |
 | STORY-54 | P2: Scene looks as data (AC 6) | T4, T7, T20 | In Tasks |
 | STORY-55 | P2: Scene looks as data (AC 7) | T7, T9, T20 | In Tasks |
 
