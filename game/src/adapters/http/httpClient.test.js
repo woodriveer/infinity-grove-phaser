@@ -29,7 +29,7 @@ describe('httpClient', () => {
             name: 'ApiError',
             status: 401,
             code: 'LOGIN_INVALID_PASSWORD',
-            message: 'Password is invalid'
+            message: 'Senha incorreta.'
         });
         await expect(httpClient.post('/users/login', {})).rejects.toBeInstanceOf(ApiError);
     });
@@ -38,7 +38,7 @@ describe('httpClient', () => {
         httpClient.defaults.adapter = (config) =>
             Promise.reject(Object.assign(new Error('Network Error'), { config, request: {}, isAxiosError: true }));
 
-        await expect(httpClient.get('/users')).rejects.toMatchObject({ status: 0, message: 'Cannot reach the server. Try again later.' });
+        await expect(httpClient.get('/users')).rejects.toMatchObject({ status: 0, message: 'Não foi possível falar com o servidor. Tente de novo mais tarde.' });
     });
 
     it('passes successful responses through untouched', async () => {
@@ -137,11 +137,11 @@ describe('httpClient auth interceptors', () => {
 
     it('rejects with the refresh ApiError when the server is unreachable during refresh', async () => {
         token = 'old';
-        const failure = new ApiError('Cannot reach the server. Try again later.');
+        const failure = new ApiError('Não foi possível falar com o servidor. Tente de novo mais tarde.');
         refreshImpl.mockRejectedValue(failure);
         httpClient.defaults.adapter = backend('new');
 
-        await expect(httpClient.get('/users')).rejects.toMatchObject({ status: 0, message: 'Cannot reach the server. Try again later.' });
+        await expect(httpClient.get('/users')).rejects.toMatchObject({ status: 0, message: 'Não foi possível falar com o servidor. Tente de novo mais tarde.' });
     });
 
     it('does not refresh on a 401 for a skipAuth request', async () => {

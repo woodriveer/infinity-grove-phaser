@@ -62,7 +62,7 @@ describe('authApi', () => {
         const error = await authApi.refresh('bad').catch((e) => e);
 
         expect(error).toBeInstanceOf(ApiError);
-        expect(error).toMatchObject({ status: 401, code: 'AUTH_INVALID_REFRESH_TOKEN', message: 'Refresh token is invalid' });
+        expect(error).toMatchObject({ status: 401, code: 'AUTH_INVALID_REFRESH_TOKEN', message: 'Sua sessão expirou. Entre de novo.' });
         expect(authClient.defaults.adapter).toHaveBeenCalledTimes(1);
     });
 
@@ -70,7 +70,7 @@ describe('authApi', () => {
         authClient.defaults.adapter = (config) =>
             Promise.reject(Object.assign(new Error('Network Error'), { config, request: {}, isAxiosError: true }));
 
-        await expect(authApi.refresh('r')).rejects.toMatchObject({ name: 'ApiError', status: 0, message: 'Cannot reach the server. Try again later.' });
+        await expect(authApi.refresh('r')).rejects.toMatchObject({ name: 'ApiError', status: 0, message: 'Não foi possível falar com o servidor. Tente de novo mais tarde.' });
         await expect(authApi.logout('r')).rejects.toMatchObject({ name: 'ApiError', status: 0 });
     });
 });

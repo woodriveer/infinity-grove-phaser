@@ -1,4 +1,5 @@
 import { ApiError } from '../ApiError';
+import { OFFLINE_TEXT } from '../errorText';
 
 //  Orchestrates the stored session: start, restore on boot, single-flight refresh, logout.
 //  Ports (ADR 0007):
@@ -91,7 +92,7 @@ export const createSessionManager = ({ store, authGateway }) =>
                     return { status: 'none' };
                 }
 
-                return { status: 'offline', message: error?.message ?? 'Cannot reach the server. Try again later.' };
+                return { status: 'offline', message: error?.message ?? OFFLINE_TEXT };
             }
         },
 

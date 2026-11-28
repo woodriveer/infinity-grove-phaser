@@ -8,16 +8,16 @@ describe('ApiError.from', () => {
         });
 
         expect(error).toBeInstanceOf(ApiError);
-        expect(error.message).toBe("User 'yan' already exists");
+        expect(error.message).toBe('Esse nome de usuário já existe.');
         expect(error.status).toBe(409);
         expect(error.code).toBe('USER_ALREADY_EXISTS');
     });
 
-    it('falls back to the title, then to a generic message, when detail is missing', () => {
-        expect(ApiError.from({ response: { status: 500, data: { title: 'Internal Server Error' } } }).message)
-            .toBe('Internal Server Error');
+    it('answers O pedido falhou (erro <status>) for an answer without a known code, whatever its detail or title', () => {
+        expect(ApiError.from({ response: { status: 500, data: { title: 'Internal Server Error', detail: 'Boom' } } }).message)
+            .toBe('O pedido falhou (erro 500).');
         expect(ApiError.from({ response: { status: 502, data: null } }).message)
-            .toBe('Request failed (502)');
+            .toBe('O pedido falhou (erro 502).');
     });
 
     it('keeps the response body, which a 409 uses to carry the stored progress', () => {
@@ -35,10 +35,10 @@ describe('ApiError.from', () => {
         const error = ApiError.from({ request: {}, message: 'Network Error' });
 
         expect(error.status).toBe(0);
-        expect(error.message).toBe('Cannot reach the server. Try again later.');
+        expect(error.message).toBe('Não foi possível falar com o servidor. Tente de novo mais tarde.');
     });
 
-    it('keeps the original message for request setup failures', () => {
-        expect(ApiError.from(new Error('boom')).message).toBe('boom');
+    it('reports O pedido falhou. for a request that could not be built', () => {
+        expect(ApiError.from(new Error('boom')).message).toBe('O pedido falhou.');
     });
 });

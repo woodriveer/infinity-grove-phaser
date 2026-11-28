@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ApiError } from '../../application/ApiError';
 import { MainMenu } from './MainMenu';
 
 vi.mock('phaser', () => ({
@@ -234,7 +235,9 @@ describe('MainMenu authentication', () => {
     });
 
     it('a failed sign up brings the form back with the error', async () => {
-        vi.mocked(userApi.signUp).mockRejectedValue(new Error("User 'ana' already exists"));
+        vi.mocked(userApi.signUp).mockRejectedValue(ApiError.from({
+            response: { status: 409, data: { detail: "User 'ana' already exists", code: 'USER_ALREADY_EXISTS' } }
+        }));
         const { scene, form, path, pick, message } = createScene({ highscore: 0 });
         await open(scene);
         fill(form, 'ana', 'secret123');
@@ -244,7 +247,7 @@ describe('MainMenu authentication', () => {
         pick('FIRE');
         await flush();
 
-        expect(message()).toEqual({ text: "User 'ana' already exists", isError: true });
+        expect(message()).toEqual({ text: 'Esse nome de usuário já existe.', isError: true });
         expect(screen.destroy).toHaveBeenCalled();
         expect(form.setVisible).toHaveBeenLastCalledWith(true);
         expect(form.getChildByName('signup').disabled).toBe(false);

@@ -142,6 +142,16 @@ describe('sessionManager', () => {
             expect(stored()).toEqual(session);
         });
 
+        it('returns offline with the Portuguese line when the error has no message', async () => {
+            sessionStore.save(sessionStore.fromAuthResponse(authResponse({ accessTokenExpiresAt: NOW - 1 })));
+            vi.mocked(authApi.refresh).mockRejectedValue({});
+
+            await expect(sessionManager.restore(NOW)).resolves.toEqual({
+                status: 'offline',
+                message: 'Não foi possível falar com o servidor. Tente de novo mais tarde.'
+            });
+        });
+
         it('defaults to the current time', async () => {
             sessionStore.save(sessionStore.fromAuthResponse(authResponse({
                 accessTokenExpiresAt: Date.now() + 60_000,

@@ -111,7 +111,7 @@ T11
 
 ### Phase 2: Game
 
-#### T2: Portuguese error lines chosen by the backend code [ ]
+#### T2: Portuguese error lines chosen by the backend code [x]
 
 **Owner**: game-dev
 **Goal**: Every failed request carries a Portuguese `message` chosen by its `code`, never the backend `detail` (PT-02; spec Error lines AC 1 to 9, Edge 4, Q2).
@@ -145,9 +145,9 @@ T11
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The unit suite passes.
-- [ ] `git grep -n -E "Request failed|Cannot reach the server" -- game/src ':!*.test.js'` prints nothing.
-- [ ] The commit touches exactly the files above and this file.
+- [x] The unit suite passes.
+- [x] `git grep -n -E "Request failed|Cannot reach the server" -- game/src ':!*.test.js'` prints nothing.
+- [x] The commit touches exactly the files above and this file.
 
 **Commit**: `feat(game): show request errors in Portuguese by their backend code`
 
