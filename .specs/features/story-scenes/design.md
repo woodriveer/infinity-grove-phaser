@@ -1,7 +1,7 @@
 # Story Scenes Design
 
 **Spec**: `.specs/features/story-scenes/spec.md`
-**Status**: Draft (waiting for the owner's answers to Q1 to Q14 of the spec; written with the recommended defaults)
+**Status**: Approved by the owner on 2026-11-28 (every recommended answer to Q1 to Q14). Revision 2 (2026-11-28): line numbers, contracts and risks re-checked against `origin/main` after AD-030 to AD-035 (`ui-polish` rail and keys, `team-click-damage`); keys follow the rule of AD-034; desktop target (TD-010 dropped).
 
 Visual and behavioural reference: `.specs/features/story-scenes/design-reference.dc.html` (owner's Claude Design page). It is not code to paste: its `class Component extends DCLogic` is split below into a pure domain (text timing, state machine, catalog rules), a storage adapter and two DOM views, as AD-003 asks.
 
@@ -42,13 +42,13 @@ graph TD
 | Component | Location | How to Use |
 | --------- | -------- | ---------- |
 | Per-browser flag in localStorage | `game/src/adapters/storage/autoClickPreference.js` | Same shape for `storySeen.js`: a `storage` getter read on every call, every access in `try/catch` |
-| Memory fallback when storage fails | `game/src/adapters/storage/sessionStore.js:34-80` | Keep the list in memory when a write throws |
+| Memory fallback when storage fails | `game/src/adapters/storage/sessionStore.js` `save` and `load` | Keep the list in memory when a write throws |
 | Services through the registry | `game/src/composition.js` `services`, `ClickerGame.create` (`services.autoClickPreference`) | Add `storySeen`, `storyScenes`, `playStory`; tests inject stubs |
 | DOM element helper | `game/src/adapters/phaser/views/dom.js` `el(tag, className, text, attributes)` (`testid` becomes `data-testid`) | Build the stage and the Mapa chips |
 | A view mounted in `document.body`, outside the scaled canvas | `game/src/adapters/phaser/views/versionLabel.js`, AD-026 | The overlay is fixed to the viewport the same way |
-| Fight hold flags | `ClickerGame.pauseFight` (`:735-750`): `paused`, `time.paused`, `tweens.paused` | Same three flags, without the pause menu |
-| Chapter change seam | `ClickerGame.showEncounter` (`:838-855`, `encounterChapter`) | `from` = `this.encounterChapter` before it is overwritten |
-| Mapa chapter chips | `game/src/adapters/phaser/views/farmView.js` `renderChapters`, `style.css` `.farm-chapter` (`:3084-3132`) | The `História` chips reuse the chip look |
+| Fight hold flags | `ClickerGame.pauseFight` (`:780-795`): `paused`, `time.paused`, `tweens.paused` | Same three flags, without the pause menu |
+| Chapter change seam | `ClickerGame.showEncounter` (`:883-900`, `encounterChapter`) | `from` = `this.encounterChapter` before it is overwritten |
+| Mapa chapter chips | `game/src/adapters/phaser/views/farmView.js` `renderChapters`, `style.css` `.farm-chapters-label` to `.farm-chapter:focus-visible` (`:3195-3251`) | The `História` chips reuse the chip look |
 | Shared e2e fixture | `game/e2e/support/coverage.js` (`test = base.extend`) | Add the `storySeen` option that seeds `["prologue"]` |
 | Screenshot helper | `game/ui-review/support/shots.js` `shot()` | The `ui-artist` shots |
 
@@ -59,7 +59,9 @@ graph TD
 | Campaign session | Reads `session.chapter` and `session.completed` in `showEncounter`; no change to `campaignSession.js` |
 | HeroUi | Two new optional hooks `stories()` and `playStory(id)`; label and title `Mapa` |
 | Version label (AD-026) | Overlay `z-index: 9` stays under `.game-version` (`z-index: 10`) |
-| Phaser keyboard | The player stops the Escape `keydown` at `document`, so Phaser's window listener never sees it; `ClickerGame.escape` also returns while `storyOpen` |
+| Phaser keyboard and the key rule of AD-034 | The player stops every Escape `keydown` at `document` while open, so Phaser's window listener never sees it, and closes only on a plain Escape (no Ctrl, Alt, Meta or Shift, not a repeat; the `hasModifier` rule of `ClickerGame.js:34`). `ClickerGame.escape` also returns while `storyOpen`. T, B and A (`screenKey`, `autoClickKey`, `ClickerGame.js:404-432`) and the skill keys (`useSkill`, `:1378`) already return while `paused`, which the hold sets |
+| Page guards (AD-033 (3)) | The overlay lives in `document.body`, so the page block of `style.css` (`user-select: none`, no image drag) and `pageGuards.js` (no context menu) cover it with no change |
+| Team on the click (AD-035) | Allies hit only with a landing click; no click lands while the hold sets `paused` (`hitMonster`, `ClickerGame.js:1543`), so the hold also stops the team |
 | Backend | None |
 
 ---
@@ -183,7 +185,7 @@ export const charsAt = (line, t) =>
   5. `finishLine(auto)`: cancel the frame; pause the audio; `state = endLine(state)`; paint with the full length and `t = line.duration`; when `auto`, `timer = setTimer(next, AUTO_ADVANCE_MS)`.
   6. `next()`: clear the timer; `state = advanceStory(scene, state)`; `line` → `playLine()`; `end` → pause every audio and paint; `done` → `close()`.
   7. Hit (click on `story-hit`): `title` → `state = advanceStory(...)`, `playLine()`; `line` typing → `finishLine(false)`; `line` complete → `next()`; `end` → `close()`.
-  8. Skip (click on `story-skip`) and Escape (`event.key === 'Escape'`: `preventDefault()`, `stopPropagation()`) → `close()`.
+  8. Skip (click on `story-skip`) → `close()`. Escape: on every `keydown` with `event.key === 'Escape'` call `preventDefault()` and `stopPropagation()`; then `close()` only when `!event.repeat && !event.ctrlKey && !event.altKey && !event.metaKey && !event.shiftKey` (AD-034).
   9. Mute: `setStoryMuted(!storyMuted())`; every audio `muted = storyMuted()`; paint.
   10. `close()` (runs once): cancel the frame; clear the timer; pause every audio and set its `onended` and `onerror` to `null`; remove the `resize` and `keydown` listeners; remove the overlay; focus the remembered element when it is still in the document; resolve.
 - **Reuses**: `storyText`, `storyPlayback`, `storyStage`, `STORY_BACKDROPS`.
@@ -460,13 +462,14 @@ Fonts (`game/index.html:9`): the `family` list becomes `family=Cinzel:wght@500;7
 
 | Concern | Location (file:line) | Impact | Mitigation |
 | ------- | -------------------- | ------ | ---------- |
-| Every chapter 1 e2e test would open the overlay over the canvas | `game/e2e/support/coverage.js:10` (41 specs import it) | The whole e2e suite fails | T1 (first task) seeds `["prologue"]` before every page load by default; story specs opt out with `test.use({ storySeen: false })` |
+| Every chapter 1 e2e test would open the overlay over the canvas | `game/e2e/support/coverage.js:10` (all 53 specs import it) | The whole e2e suite fails | T1 (first task) seeds `["prologue"]` before every page load by default; story specs opt out with `test.use({ storySeen: false })` |
 | `ui-review/*.shots.js` of earlier features use `@playwright/test` directly | `game/ui-review/support/shots.js` | A rerun of an old shots file at chapter 1 would capture the overlay | Each future shots file seeds the key (`page.addInitScript`); noted in T18. No old shots file is rerun by this feature |
 | Phaser reads keys from a window listener and processes them on its next step | Phaser 3.80 KeyboardManager (`game/package.json`: `phaser ^3.80.1`) | An Escape that closed the scene could still reach `ClickerGame.escape` after `storyOpen` became `false` and open the pause menu or close the Mapa | The player stops propagation of Escape at `document` (window never sees it) and `escape()` returns while `storyOpen`; e2e T14 and T15 press Escape and assert no pause menu and the Mapa still open. I have not checked the Phaser source for the queue; the e2e decides |
 | Playwright's bundled Chromium may not decode AAC | `game/public/assets/story/*.mp4` (AAC, `ffprobe`) | e2e audio may always take the clock fallback | The e2e asserts click behaviour that holds either way; the fallback scenario forces `play()` to reject; real audio is the `ui-artist`'s and the owner's manual check. Not verified which way the bundled build goes |
-| Unit tests of `ClickerGame` build the scene with a `services` object that has no story services | `game/src/adapters/phaser/ClickerGame.test.js:36-48` | 6 500 lines of tests break | T13 adds `storySeen` (list `['prologue']`), `storyScenes` (the real catalog) and `playStory` stubs to the shared `services` object |
+| Unit tests of `ClickerGame` build the scene with a `services` object that has no story services | `game/src/adapters/phaser/ClickerGame.test.js:39-52` | about 6 900 lines of tests break | T13 adds `storySeen` (list `['prologue']`), `storyScenes` (the real catalog) and `playStory` stubs to the shared `services` object |
 | `farmView.test.js` pins the children order of the Mapa screen | `game/src/adapters/phaser/views/farmView.test.js:227-228` | A wrapper row would break them | The `História` group is added only when `stories.length >= 1` and is absolutely positioned; with no stories the children are unchanged |
-| The Mapa panel is already near its 708 px height | `game/public/style.css:1351-1361` | A new row would add a scrollbar | The group sits in the title line (absolute top right) |
+| The Mapa panel is already near its 708 px height | `game/public/style.css:1447-1457` | A new row would add a scrollbar | The group sits in the title line (absolute top right) |
+| The Mapa screen is rebuilt by `render_farm` on every chapter load (TD-014, AD-033 (2)) | `game/src/adapters/phaser/HeroUi.js:1140-1164` | The História group is rebuilt with it | The group adds no action that changes the screen (a chip opens the overlay and the screen stays as it is), so it adds nothing to TD-014; it is rebuilt from the same hook values |
 | Low-resolution portrait | `game/public/assets/story/portrait-seraphine.png` (118x300) | Blurry at 560 px | D19: ships, `ui-artist` judges, owner art later |
 | Large map backdrop | `game/public/assets/story/bg-map.jpg` (945 KB, 2730x1536) | Slower first show of line 4 on a slow link | Loaded only when the overlay opens; the 1.4 s cross-fade hides the load; a smaller file is owner art |
 | Typing at 60 fps rewrites two text nodes per frame | `storyStage.update` | Negligible | `update` touches only `.story-shown` and `.story-ghost` when `shown` changed |
@@ -482,4 +485,5 @@ Fonts (`game/index.html:9`): the `family` list becomes `family=Cinzel:wght@500;7
 | Seen marked at open | `markSeen` before the title card | One write; a reload mid-scene does not replay (D3) |
 | Data as a JS module | `storyCatalog.js`, not JSON fetched at runtime | No loading state; `npm test` validates it; a content feature edits one file |
 | `chapter-boss` trigger in `showEncounter` | `from` / `to` chapters | One seam for advance, completion, reset and load, testable in `ClickerGame.test.js` |
-| Fonts | Cinzel 500/700 and Cormorant Garamond only inside the overlay | Recorded as AD-036 (proposed), extending AD-022 |
+| Fonts | Cinzel 500/700 and Cormorant Garamond only inside the overlay | Recorded as AD-036 (accepted), extending AD-022 |
+| Branch | Every task on `ci/story-scenes`, merged to `main` by `gitops` once the T17 CI run is green and T18 is APROVADO | `main` is deployed by the watcher; a half-built story (the overlay without the fixture, or the tab renamed without the replay) must not reach players, and the full e2e suite runs only in CI (`CLAUDE.md` § Agent team 4) |

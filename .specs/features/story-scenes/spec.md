@@ -20,7 +20,7 @@ The game has a written story (`BRIEFING_HISTORIA.md`, `ROTEIRO_DIALOGOS.md`: a p
 | A portrait on the right side, two portraits at once, portrait expressions | Not in the design; a character line shows one portrait on the left |
 | Sound effects or music under the voice | `ROTEIRO_DIALOGOS.md`: effects go into the audio edit, not into the game |
 | A scene list for many scenes (31 chips) on the Mapa screen | Only the prologue exists; the chip row wraps. A later content feature revisits the layout when it adds scenes |
-| A phone layout with larger text | TD-010 (the whole game scales); the stage scales the same way (D15) |
+| A phone layout, phone e2e scenarios or phone review shots | TD-010 was dropped on 2026-11-26: the game targets PC only. The stage scale formula still fits any window (D15) |
 | Translating the story | AD-007: player text is Portuguese |
 | Renaming the farm fight label `Rever chefe: <boss>` and the battle bar switch `Farm boss` | D7: they label a fight, not the tab |
 
@@ -28,35 +28,36 @@ The game has a written story (`BRIEFING_HISTORIA.md`, `ROTEIRO_DIALOGOS.md`: a p
 
 ## Assumptions & Open Questions
 
-Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrator). Rows marked `n (Q<n>)` are product-owner defaults waiting for the owner's answer to the question below.
+Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrator). Rows marked `y (Q<n>)` are product-owner defaults the owner approved on 2026-11-28 with every recommended answer to Q1 to Q14. Revision 2 (2026-11-28) re-checked every row against `origin/main` after `early-game-rebalance`, `reset-legacy-drops`, `portuguese-text`, `ui-polish` and `team-click-damage` (AD-030 to AD-035).
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
-| D1 Where "seen" is stored | localStorage key `infinity-grove.story-seen`, a JSON array of scene ids (`["prologue"]`), per browser and not per account. Logout keeps it; an account reset keeps it, so a reset never replays the prologue. A second account on the same browser does not see the prologue automatically (it can watch it from the Mapa) | The game already keeps per-browser flags this way (`infinity-grove.auto-click`, `game/src/adapters/storage/autoClickPreference.js`); a server flag needs a migration and an endpoint for a cosmetic state | n (Q1) |
-| D2 Who sees it automatically | The battle's first encounter of a page load is at chapter 1 (campaign not completed) and `prologue` is not in the seen list. Players already past chapter 1 when this ships never get it automatically; players still in chapter 1 get it once | "The first time the player starts chapter 1"; an old player at chapter 7 already started chapter 1 | n (Q2) |
-| D3 When it counts as seen | When the game opens a scene automatically, before its first line, the id is written to the seen list. Closing the tab during the scene does not replay it | One write, no "half seen" state; the Mapa replays it | n (Q2) |
-| D4 End of the prologue | The design's end card stays with its texts `Fim do Prólogo`, `Ato 1 — Bosque Desperto`, `Capítulo 1`, and its call becomes `Clique para continuar` (design: `Clique para assistir de novo`). A click closes the overlay: the chapter 1 fight goes on (automatic play) or the Mapa screen shows again (replay) | Owner: continue to chapter 1, replay only from the Mapa | n (Q3) |
-| D5 Skip | A `Pular` button in the top-right bar (left of the mute button) and the Escape key close the scene at once from any card or line. Not in the design | A 40 s scene with no exit on every new account is a blocker for returning players on a new browser | n (Q4) |
-| D6 Title card | Kept from the design: logo, kicker `Ato 1 — Bosque Desperto · Prólogo`, blinking `Clique para começar`. Its click starts line 1 | The click is a user gesture that lets the audio play (autoplay policies) and gives the player a beat before the voice starts | n (Q3) |
-| D7 HUD label `Rever chefe: <boss>` | Unchanged (`game/src/domain/campaign/campaign.js:24`), as is the `Farm boss` switch | It names the farm fight, not the tab | n (Q5) |
-| D8 Tab rename | The rail button `hud-farm` and the panel title read `Mapa`; the test id `hud-farm`, the screen id `farm` and the icon stay | Owner's request; ids are not player text. A new icon is the owner's call (Q6) | n (Q6) |
-| D9 Replay control | A group `História` with one chip per replayable scene at the top right of the Mapa screen, level with the title `Caminho do Capítulo <n>`. The prologue chip reads `Prólogo` and shows at every chapter, also before any boss is beaten | Owner: the button lives in the Mapa screen; placing it beside the title adds no height to a panel that is already 708 px high | n (Q7) |
-| D10 Replayable scenes | Every `chapter-start` scene (the prologue) plus every `chapter-boss` scene in the seen list, in catalog order | A chapter scene appears in the Mapa once the player watched it | n (Q12) |
-| D11 Fight while a scene plays | Held like the pause menu (`ClickerGame.paused`, `time.paused`, `tweens.paused` true) for automatic play and for replay; resumed when the overlay closes, unless the fight was already paused before | A replay opened during a boss fight must not cost the boss timer (the Mapa panel alone keeps the fight running, spec `background-fight`) | n (Q8) |
+| D1 Where "seen" is stored | localStorage key `infinity-grove.story-seen`, a JSON array of scene ids (`["prologue"]`), per browser and not per account. Logout keeps it; an account reset keeps it, so a reset never replays the prologue. A second account on the same browser does not see the prologue automatically (it can watch it from the Mapa) | The game already keeps per-browser flags this way (`infinity-grove.auto-click`, `game/src/adapters/storage/autoClickPreference.js`); a server flag needs a migration and an endpoint for a cosmetic state | y (Q1) |
+| D2 Who sees it automatically | The battle's first encounter of a page load is at chapter 1 (campaign not completed) and `prologue` is not in the seen list. Players already past chapter 1 when this ships never get it automatically; players still in chapter 1 get it once | "The first time the player starts chapter 1"; an old player at chapter 7 already started chapter 1 | y (Q2) |
+| D3 When it counts as seen | When the game opens a scene automatically, before its first line, the id is written to the seen list. Closing the tab during the scene does not replay it | One write, no "half seen" state; the Mapa replays it | y (Q2) |
+| D4 End of the prologue | The design's end card stays with its texts `Fim do Prólogo`, `Ato 1 — Bosque Desperto`, `Capítulo 1`, and its call becomes `Clique para continuar` (design: `Clique para assistir de novo`). A click closes the overlay: the chapter 1 fight goes on (automatic play) or the Mapa screen shows again (replay) | Owner: continue to chapter 1, replay only from the Mapa | y (Q3) |
+| D5 Skip | A `Pular` button in the top-right bar (left of the mute button) and the Escape key close the scene at once from any card or line. Not in the design | A 40 s scene with no exit on every new account is a blocker for returning players on a new browser | y (Q4) |
+| D6 Title card | Kept from the design: logo, kicker `Ato 1 — Bosque Desperto · Prólogo`, blinking `Clique para começar`. Its click starts line 1 | The click is a user gesture that lets the audio play (autoplay policies) and gives the player a beat before the voice starts | y (Q3) |
+| D7 HUD label `Rever chefe: <boss>` | Unchanged (`game/src/domain/campaign/campaign.js:24`), as is the `Farm boss` switch | It names the farm fight, not the tab | y (Q5) |
+| D8 Tab rename | The rail button `hud-farm` and the panel title read `Mapa`; the test id `hud-farm`, the screen id `farm` and the icon stay | Owner's request; ids are not player text. A new icon is the owner's call (Q6) | y (Q6) |
+| D9 Replay control | A group `História` with one chip per replayable scene at the top right of the Mapa screen, level with the title `Caminho do Capítulo <n>`. The prologue chip reads `Prólogo` and shows at every chapter, also before any boss is beaten | Owner: the button lives in the Mapa screen; placing it beside the title adds no height to a panel that is already 708 px high | y (Q7) |
+| D10 Replayable scenes | Every `chapter-start` scene (the prologue) plus every `chapter-boss` scene in the seen list, in catalog order | A chapter scene appears in the Mapa once the player watched it | y (Q12) |
+| D11 Fight while a scene plays | Held like the pause menu (`ClickerGame.paused`, `time.paused`, `tweens.paused` true) for automatic play and for replay; resumed when the overlay closes, unless the fight was already paused before | A replay opened during a boss fight must not cost the boss timer (the Mapa panel alone keeps the fight running, spec `background-fight`) | y (Q8) |
 | D12 Auto-advance | After a line's audio ends, the next line starts 1200 ms later (design `autoDelay` 1.2 s). A click while the text types shows the whole line and stops the audio; that line then waits for a click | The design's behaviour | y |
-| D13 Mute | A 44 px round button with aria-label `Silenciar` / `Ativar som` and `aria-pressed`; the choice lasts until the page reloads, across scenes, and is not stored | The design has the toggle; persisting it is not asked | n (Q9) |
+| D13 Mute | A 44 px round button with aria-label `Silenciar` / `Ativar som` and `aria-pressed`; the choice lasts until the page reloads, across scenes, and is not stored | The design has the toggle; persisting it is not asked | y (Q9) |
 | D14 Audio that cannot play | If `play()` rejects (autoplay blocked, codec unsupported) or the audio fires `error`, the text types by a clock started at that moment and the line completes at its `duration` in seconds; the scene goes on silent. A stalled download with no error waits for the player's click | The design's fallback, plus the `error` event for a missing file | y |
-| D15 Small screens | The 1280x720 stage scales to `min(viewport width / 1280, viewport height / 720)`, centred, on `#05090a`. At 390x844 the scale is 0.3046875: the dialogue text (32 px) reads at about 9.75 px, the narrator text (38 px) at about 11.6 px. Same limit as TD-010 | Owner: the stage scales to fit; a phone layout is TD-010 | n (Q11) |
-| D16 Reduced motion | WHERE `prefers-reduced-motion: reduce`, no animation or transition runs inside the overlay (backdrop drift and pan, tint pulse, cross-fades, motes, orb, portrait entrance, box rise, arrow bob, call blink) and the motes are hidden. The typing stays, because it follows the voice | The motion is decoration; the typing is the subtitle | n (Q10) |
-| D17 Chapter scenes trigger | The code to play a `chapter-boss` scene ships now: when a campaign encounter moves from chapter N to N + 1, or the chapter N boss win completes the campaign, the unseen scene of chapter N opens. It is tested with fixture scenes; the catalog holds no chapter scene yet | Owner: chapter scenes must be addable as data with no new code | n (Q12) |
-| D18 Fonts | The overlay uses Cinzel 500 and 700 (names, titles, buttons) and Cormorant Garamond 500 and 600, upright and italic (text), loaded with the existing Google Fonts link of `game/index.html`. Recorded as AD-036 (it extends AD-022, whose body font is Figtree) | The design's type; the rest of the game keeps the Grove theme | n (Q13) |
-| D19 Portrait art | `portrait-seraphine.png` is 118x300 and is drawn 560 px tall (1.87x, 3.7x on a 2x screen); it ships as it is and the `ui-artist` reports how it reads | Better art is the owner's (like the other painted assets); the code does not depend on the file size | n (Q14) |
+| D15 Window fit | The 1280x720 stage scales to `min(viewport width / 1280, viewport height / 720)`, centred, on `#05090a`, for any window. The desktop is the target (TD-010 dropped on 2026-11-26): the e2e checks 1280x720, 1920x1080 and 1024x768; the 390x844 value (0.3046875) is pinned only by the unit test of the formula | Owner: the stage scales to fit (Q11); the game targets PC | y (Q11) |
+| D16 Reduced motion | WHERE `prefers-reduced-motion: reduce`, no animation or transition runs inside the overlay (backdrop drift and pan, tint pulse, cross-fades, motes, orb, portrait entrance, box rise, arrow bob, call blink) and the motes are hidden. The typing stays, because it follows the voice | The motion is decoration; the typing is the subtitle | y (Q10) |
+| D17 Chapter scenes trigger | The code to play a `chapter-boss` scene ships now: when a campaign encounter moves from chapter N to N + 1, or the chapter N boss win completes the campaign, the unseen scene of chapter N opens. It is tested with fixture scenes; the catalog holds no chapter scene yet | Owner: chapter scenes must be addable as data with no new code | y (Q12) |
+| D18 Fonts | The overlay uses Cinzel 500 and 700 (names, titles, buttons) and Cormorant Garamond 500 and 600, upright and italic (text), loaded with the existing Google Fonts link of `game/index.html`. Recorded as AD-036 (it extends AD-022, whose body font is Figtree) | The design's type; the rest of the game keeps the Grove theme | y (Q13) |
+| D19 Portrait art | `portrait-seraphine.png` is 118x300 and is drawn 560 px tall (1.87x, 3.7x on a 2x screen); it ships as it is and the `ui-artist` reports how it reads | Better art is the owner's (like the other painted assets); the code does not depend on the file size | y (Q14) |
 | D20 Assets | `bg-forest.png` (1024x768), `bg-map.jpg` (2730x1536), `logo.png` (800x436), `portrait-seraphine.png`, `prologue-01.mp4` to `prologue-06.mp4` (AAC audio, 12.36, 3.47, 7.47, 6.11, 4.05, 6.35 s, checked with `ffprobe`) are committed with the catalog task | Owner copied them; uncommitted files never reach players | y |
-| D21 Overlay layer | One DOM element in `document.body`, `position: fixed`, `z-index: 9`: above the canvas and the Phaser DOM panels, below the version label (`z-index: 10`, AD-026) and the drag copy of a tile (1000) | Outside the scaled canvas the stage can fit the whole viewport (D15); the version stays on every screen (AD-026) | n (Q11) |
-| D22 Storage failure | IF localStorage cannot be read or written, the seen list lives in memory for the page (the prologue opens once per page load) and nothing throws; a value that is not a JSON array of strings reads as empty and is rewritten on the next automatic scene | Same fallback as `sessionStore` (memory until unload) | n (Q1) |
-| D23 Existing e2e and shots | The shared e2e fixture (`game/e2e/support/coverage.js`) seeds `["prologue"]` before every page load unless a spec turns the option `storySeen` off, so the 41 existing specs keep starting chapter 1 on the fight | Otherwise every chapter 1 e2e test opens the overlay over the canvas | y |
+| D21 Overlay layer | One DOM element in `document.body`, `position: fixed`, `z-index: 9`: above the canvas and the Phaser DOM panels, below the version label (`z-index: 10`, AD-026) and the drag copy of a tile (1000) | Outside the scaled canvas the stage can fit the whole viewport (D15); the version stays on every screen (AD-026) | y (Q11) |
+| D22 Storage failure | IF localStorage cannot be read or written, the seen list lives in memory for the page (the prologue opens once per page load) and nothing throws; a value that is not a JSON array of strings reads as empty and is rewritten on the next automatic scene | Same fallback as `sessionStore` (memory until unload) | y (Q1) |
+| D24 Keys while a scene plays | Escape closes the scene only with no Ctrl, Alt, Meta or Shift and not as an auto-repeat, the same rule as the T, B and A keys (AD-034); every Escape keydown is stopped at the overlay while it is open, so the battle never sees it. T, B, A and the skill keys (1, 2, 3, Q, W, E) do nothing while a scene plays, because the hold sets `paused`, which `screenKey`, `autoClickKey` and `useSkill` already check | AD-034 key rule; a key must not open a screen or a skill under the overlay | y (AD-034) |
+| D23 Existing e2e and shots | The shared e2e fixture (`game/e2e/support/coverage.js`) seeds `["prologue"]` before every page load unless a spec turns the option `storySeen` off, so the 53 existing specs keep starting chapter 1 on the fight | Otherwise every chapter 1 e2e test opens the overlay over the canvas | y |
 
-**Open questions:** none unresolved without a default - every row above has a chosen default; rows marked `n (Q<n>)` wait for the owner's yes or change:
+**Open questions:** none. The owner approved the recommended answer of every question below on 2026-11-28 (record):
 
 - Q1 (D1, D22) Store "seen" only in this browser (localStorage), not per account and not on the server, so a logout or an account reset never replays the prologue and a second account on the same browser does not get it automatically? Recommended: yes.
 - Q2 (D2, D3) Play it automatically only when the battle loads at chapter 1 and this browser never saw it, and count it as seen as soon as it opens (closing the tab mid-scene does not replay it)? Players already past chapter 1 watch it from the Mapa. Recommended: yes.
@@ -68,7 +69,7 @@ Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrat
 - Q8 (D11) Hold the fight (no clicks, auto click, allies, ticks or boss timer) while any scene plays, also a replay opened from the Mapa during a boss fight? Recommended: yes.
 - Q9 (D13) Keep the mute choice only until the page reloads? Recommended: yes.
 - Q10 (D16) With reduced motion on, stop every animation of the scene and hide the light motes, but keep the typing synced to the voice? Recommended: yes.
-- Q11 (D15, D21) On a phone the 1280x720 stage shrinks to fit (dialogue text about 10 px at 390x844, like the rest of the game, TD-010), and the scene covers the whole window except the version label? Recommended: yes.
+- Q11 (D15, D21) The 1280x720 stage shrinks to fit the window (on a phone the dialogue text would read at about 10 px at 390x844; the game targets PC since TD-010 was dropped), and the scene covers the whole window except the version label? Recommended: yes.
 - Q12 (D10, D17) Ship now the code that plays a chapter scene after the first win of its chapter boss (tested with fixture data, no chapter content), and list a chapter scene in the Mapa once it was watched? Recommended: yes.
 - Q13 (D18) Load Cormorant Garamond and Cinzel 500 for the story only, as AD-036? Recommended: yes.
 - Q14 (D19) Ship the 118x300 Seraphine portrait drawn 560 px tall and let the `ui-artist` judge it? Recommended: yes; a larger portrait (at least 220x560) is owner art.
@@ -89,7 +90,7 @@ Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrat
 2. WHEN the game opens a scene automatically THEN it SHALL add the scene id to the seen list before the title card shows: the localStorage key `infinity-grove.story-seen` reads `["prologue"]` after the prologue opens on an empty list, and `["chapter-1","prologue"]` after it opens on `["chapter-1"]`.  <!-- event-driven -->
 3. IF the seen list holds `prologue` THEN the battle at chapter 1 SHALL open no overlay.  <!-- unwanted-behavior -->
 4. IF the first encounter of the page load is at chapter 2 or later, or the campaign is completed, THEN the battle SHALL open no overlay and SHALL leave the key `infinity-grove.story-seen` as it was (absent stays absent).  <!-- unwanted-behavior -->
-5. WHILE a story overlay is open the battle SHALL be held: `ClickerGame.paused`, `ClickerGame.time.paused` and `ClickerGame.tweens.paused` are `true`, so no click, auto click, ally hit, damage tick or boss countdown runs.  <!-- state-driven -->
+5. WHILE a story overlay is open the battle SHALL be held: `ClickerGame.paused`, `ClickerGame.time.paused` and `ClickerGame.tweens.paused` are `true`, so no click, auto click, team hit (AD-035), skill, damage tick or boss countdown runs.  <!-- state-driven -->
 6. WHEN the overlay closes THEN the game SHALL remove it from the page and set `paused`, `time.paused` and `tweens.paused` back to `false`, unless `paused` was already `true` when the overlay opened, in which case it SHALL leave the three as they are.  <!-- event-driven -->
 7. IF localStorage cannot be read or written THEN the game SHALL keep the seen list in memory for the page (the prologue opens once per page load) and SHALL not throw; IF the stored value is not a JSON array THEN it SHALL read as an empty list, and the entries that are not strings SHALL be dropped.  <!-- unwanted-behavior -->
 8. WHEN an account reset moves the campaign back to chapter 1 THEN the game SHALL open no scene, and neither a reset nor a logout SHALL change the key `infinity-grove.story-seen`.  <!-- event-driven -->
@@ -116,7 +117,7 @@ Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrat
 8. WHILE the end card shows the overlay SHALL show the kicker `Fim do Prólogo`, the title `Ato 1 — Bosque Desperto`, the subtitle `Capítulo 1` and the call `Clique para continuar`, and `story-hit` SHALL have the aria-label `Continuar`.  <!-- state-driven -->
 9. WHEN the player clicks `story-hit` on the end card THEN the overlay SHALL close.  <!-- event-driven -->
 10. WHEN the player clicks `Pular` (`data-testid="story-skip"`) on the title card, a line or the end card THEN the overlay SHALL close at once and every audio of the scene SHALL be paused.  <!-- event-driven -->
-11. WHEN the player presses Escape while the overlay is open THEN the overlay SHALL close as with `Pular`, and the battle SHALL neither open the pause menu nor close an open hero panel.  <!-- event-driven -->
+11. WHEN the player presses Escape (no Ctrl, Alt, Meta or Shift held, not an auto-repeat) while the overlay is open THEN the overlay SHALL close as with `Pular`, and the battle SHALL neither open the pause menu nor close an open hero panel.  <!-- event-driven -->
 12. WHEN the player clicks the mute button (`data-testid="story-mute"`) THEN every audio of the scene SHALL be muted and the button's aria-label SHALL change from `Silenciar` to `Ativar som` and `aria-pressed` from `false` to `true`; a second click SHALL undo both; the choice SHALL hold for the next scene opened before a reload.  <!-- event-driven -->
 13. WHILE a line plays the top-right bar SHALL show one dot `.story-dot` per line of the scene with the dots from the first up to the current line carrying `.is-on` (prologue line 3: 3 of 6); WHILE the title or the end card shows the dots SHALL be hidden.  <!-- state-driven -->
 14. The overlay SHALL draw a `narrator` line as centred italic text (`.story-narr`) over a dark scrim with no name plate, a `voice` line as the breathing green orb (`data-testid="story-orb"`) above a dialogue box with the speaker plate (`data-testid="story-speaker"`, `A Voz`) and italic text, and a `character` line as the portrait image (`data-testid="story-portrait"`, alt = the speaker) entering from the left beside a dialogue box with the speaker plate (`Seraphine`) and upright text.  <!-- ubiquitous -->
@@ -203,7 +204,22 @@ Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrat
 4. The overlay SHALL be `position: fixed` with `z-index` 9, and the version label (`data-testid="game-version"`) SHALL stay visible above it.  <!-- ubiquitous -->
 5. The overlay text SHALL use the fonts of D18: the speaker plate, kicker, end title, call and `Pular` compute a `font-family` starting with `Cinzel`, and the line texts a `font-family` starting with `"Cormorant Garamond"`.  <!-- ubiquitous -->
 
-**Independent Test**: Open the prologue at 390x844 (stage 390 wide, centred), at 1280x720 (full window), and with reduced motion emulated (no animation).
+**Independent Test**: Open the prologue at 1024x768 (bands of 96 px above and below), at 1280x720 (full window), and with reduced motion emulated (no animation).
+
+---
+
+### P2: Keys while a scene plays
+
+**User Story**: As a player, I want the keys of the battle to stay quiet under a scene so that a key I press while watching opens nothing behind it.
+
+**Why P2**: The battle's key rule of AD-034 (modifiers, repeats) applies to every key of the game.
+
+**Acceptance Criteria**:
+
+1. IF Escape is pressed with Ctrl, Alt, Meta or Shift held, or arrives as an auto-repeat, THEN the overlay SHALL stay open, and no Escape `keydown` SHALL reach the battle while the overlay is open (the pause menu stays hidden and an open hero panel stays open).  <!-- unwanted-behavior -->
+2. WHILE a scene plays, the keys T, B, A, 1, 2, 3, Q, W and E SHALL do nothing: no hero screen opens, closes or changes, the auto click window stays closed and no skill is used.  <!-- state-driven -->
+
+**Independent Test**: During the prologue press Shift+Escape (the scene stays), then T, B and 1: no screen opens and no skill fires; press Escape: the scene closes.
 
 ---
 
@@ -221,7 +237,7 @@ Rows marked `y` are the owner's request of 2026-11-28 (relayed by the orchestrat
 
 ## Requirement Traceability
 
-IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens", STORY-09 to STORY-24 "Watching a scene", STORY-25 to STORY-29 "The Mapa tab", STORY-30 to STORY-31 "The prologue content", STORY-32 to STORY-36 "Scenes are data", STORY-37 to STORY-41 "Fits every screen".
+IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens", STORY-09 to STORY-24 "Watching a scene", STORY-25 to STORY-29 "The Mapa tab", STORY-30 to STORY-31 "The prologue content", STORY-32 to STORY-36 "Scenes are data", STORY-37 to STORY-41 "Fits every screen", STORY-42 to STORY-43 "Keys while a scene plays".
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
@@ -266,12 +282,14 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 | STORY-39 | P2: Fits every screen (AC 3) | T9, T16 | In Tasks |
 | STORY-40 | P2: Fits every screen (AC 4) | T9, T16 | In Tasks |
 | STORY-41 | P2: Fits every screen (AC 5) | T9, T16 | In Tasks |
+| STORY-42 | P2: Keys while a scene plays (AC 1) | T8, T13, T14 | In Tasks |
+| STORY-43 | P2: Keys while a scene plays (AC 2) | T13, T14 | In Tasks |
 
 **ID format:** `STORY-<NN>`
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 41 total, 41 mapped to tasks, 0 unmapped
+**Coverage:** 43 total, 43 mapped to tasks, 0 unmapped
 
 ---
 
@@ -281,4 +299,4 @@ IDs follow the order of the criteria: STORY-01 to STORY-08 "The prologue opens",
 - [ ] A reload, a logout or an account reset never shows the prologue again on that browser (e2e and unit).
 - [ ] The tab reads `Mapa` and its `Prólogo` chip replays the scene with the Mapa open afterwards (e2e `storyReplay.spec.js`).
 - [ ] A fixture `chapter-boss` scene plays after the first win of its chapter boss with no code change (unit `ClickerGame.test.js`), and a malformed catalog entry fails `npm test`.
-- [ ] The `ui-artist` review of the title card, each line kind, the end card, the Mapa group, the phone fit and reduced motion is APROVADO.
+- [ ] The `ui-artist` review of the title card, each line kind, the end card, the Mapa group, the 1024x768 fit and reduced motion is APROVADO.
