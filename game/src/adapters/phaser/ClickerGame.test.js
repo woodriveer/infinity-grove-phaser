@@ -10,6 +10,7 @@ import { createFarmSession } from '../../application/farm/farmSession';
 import { createHeroCollection } from '../../application/heroes/heroCollection';
 import { createTalentCollection } from '../../application/talents/talentCollection';
 import { createWalletSync } from '../../application/wallet/walletSync';
+import { STORY_SCENES } from '../../domain/story/storyCatalog';
 
 vi.mock('phaser', () => ({
     Scene: class { constructor (key) { this.key = key; } }
@@ -36,6 +37,15 @@ const equipmentGateway = { list: vi.fn(), equip: vi.fn(), unequip: vi.fn(), refi
 const giftGateway = { claim: vi.fn() };
 //  The critical roll: 0.99 never crits a monster of the default stats (10 % chance); a test sets `dice.value` to force one
 const dice = { value: 0.99 };
+//  The story: the seen list holds every scene by default (so no other test opens one) and the player stays open until a test calls story.close()
+const storySeen = { list: [ 'prologue', 'chapter-1' ], seen () { return [ ...this.list ]; }, markSeen (id) { this.list.push(id); } };
+const story = {
+    close: null,
+    seenAtPlay: null,
+    play: vi.fn(() => new Promise((resolve) => { story.seenAtPlay = storySeen.seen(); story.close = resolve; }))
+};
+//  Fixture scene for the chapter boss cases
+const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, label: 'Capítulo ' + chapter, trigger: { kind: 'chapter-boss', chapter } });
 const services = {
     random: () => dice.value,
     createWalletSync: () => createWalletSync({ gateway: walletApi }),
@@ -48,7 +58,10 @@ const services = {
     createAccountReset: (ports) => createAccountReset({ gateway: resetGateway, ...ports }),
     resetLegacy: createResetLegacy({ gateway: legacyGateway }),
     gifts: giftGateway,
-    autoClickPreference
+    autoClickPreference,
+    storySeen,
+    storyScenes: STORY_SCENES,
+    playStory: (scene) => story.play(scene)
 };
 
 //  The drop rules of chapter 1: monster 1, miniboss 2, boss 3
@@ -102,8 +115,13 @@ const AUTO_CLICK_LEVEL_0 = { level: 0, maxLevel: 4, intervalMs: 500, crystals: 0
 
 const COMBO_MAXED = { id: 'COMBO', branch: 'COMBO', perLevel: 5, maxLevel: 10, level: 10, value: 50, nextCost: null };
 
-const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] }, talents = [ COMBO_MAXED ], autoClick = AUTO_CLICK_LEVEL_0, autoClickOn = true, textures = {}, gift = { granted: false } } = {}) => {
+const createScene = async ({ wallet, start = progress(), heroes = heroesResponse(), equipment = { capacity: 100, pieces: [] }, talents = [ COMBO_MAXED ], autoClick = AUTO_CLICK_LEVEL_0, autoClickOn = true, textures = {}, gift = { granted: false }, seen = STORY_SCENES.map((scene) => scene.id), storyScenes = STORY_SCENES } = {}) => {
     dice.value = 0.99;
+    storySeen.list = [ ...seen ];
+    services.storyScenes = storyScenes;
+    story.play.mockClear();
+    story.close = null;
+    story.seenAtPlay = null;
     giftGateway.claim.mockReset();
     giftGateway.claim.mockImplementation(() => (gift instanceof Error ? Promise.reject(gift) : Promise.resolve(gift)));
     autoClickPreference.on = autoClickOn;
@@ -7051,5 +7069,275 @@ describe('ClickerGame miniboss skills', () => {
         expect(numbers(ctx, before)).toHaveLength(1);
         expect(ctx.texts.at(-1).x).toBe(670);
         expect(ctx.texts.at(-1).y).toBe(273);
+    });
+});
+
+describe('ClickerGame story scenes', () => {
+    const key = (ctx, name) => ctx.handlers[`keydown-${name}`]({ repeat: false, target: document.body });
+    const killAll = (ctx) => {
+        while (ctx.scene.monster && !ctx.scene.monster.dead)
+        {
+            ctx.click();
+        }
+    };
+    const advance = (ctx) => {
+        ctx.tweens.filter((t) => Array.isArray(t.targets) && t.alpha === 0 && t.duration === 500).at(-1).onComplete();
+        ctx.timers.at(-1).callback();
+    };
+    const atChapter = (chapter, ...args) => ({ ...progress(...args), chapter });
+    const bigHealth = () => ({ ...progress(1, 'PHASE', 1), definition: { ...definition, stages: definition.stages.map((stage) => ({ ...stage, monsterHealth: 1000 })) } });
+    const replay = (ctx, id = 'prologue') => ctx.scene.heroUi.hooks.playStory(id);
+    const heroes = () => ({ leaderId: 'kael', heroes: [ heroEntry('kael', { 1: 1 }, 1), heroEntry('lyra'), heroEntry('orina') ] });
+    const slotState = (ctx) => ctx.control('[data-testid="skill-slot-1"]').getAttribute('data-state');
+    const held = (ctx) => [ ctx.scene.paused, ctx.scene.time.paused, ctx.scene.tweens.paused ];
+    const chapterBossWin = async (ctx) => {
+        campaignGateway.report.mockResolvedValue({ ...progress(1, 'PHASE', 1), chapter: 2 });
+        killAll(ctx);
+        advance(ctx);
+        await flush();
+    };
+
+    it('a chapter 1 battle that never saw the prologue plays it once the campaign loads', async () => {
+        await createScene({ seen: [] });
+
+        expect(story.play).toHaveBeenCalledTimes(1);
+        expect(story.play).toHaveBeenCalledWith(STORY_SCENES[0]);
+        expect(storySeen.list).toEqual([ 'prologue' ]);
+    });
+
+    it('marks the prologue seen before it plays', async () => {
+        await createScene({ seen: [] });
+
+        expect(story.seenAtPlay).toEqual([ 'prologue' ]);
+    });
+
+    it('the fight is held while the prologue plays', async () => {
+        const ctx = await createScene({ seen: [] });
+
+        expect(held(ctx)).toEqual([ true, true, true ]);
+    });
+
+    it('a click while the prologue plays deals no damage', async () => {
+        const ctx = await createScene({ seen: [], start: bigHealth() });
+        const health = ctx.scene.monster.health;
+
+        ctx.click();
+
+        expect(ctx.scene.monster.health).toBe(health);
+    });
+
+    it('the fight runs again when the prologue closes', async () => {
+        const ctx = await createScene({ seen: [], start: bigHealth() });
+        const health = ctx.scene.monster.health;
+
+        story.close();
+        await flush();
+
+        expect(held(ctx)).toEqual([ false, false, false ]);
+        ctx.click();
+        expect(ctx.scene.monster.health).toBeLessThan(health);
+    });
+
+    it('Esc while a scene plays opens no pause menu', async () => {
+        const ctx = await createScene({ seen: [] });
+
+        ctx.handlers['keydown-ESC']();
+
+        expect(ctx.control('.pause-menu').hidden).toBe(true);
+        expect(ctx.scene.paused).toBe(true);
+    });
+
+    it('Esc while a replay plays over the Mapa keeps the panel open', async () => {
+        const ctx = await createScene();
+        ctx.control('[data-testid="hud-farm"]').click();
+        await flush();
+        replay(ctx);
+
+        ctx.handlers['keydown-ESC']();
+
+        expect(ctx.scene.heroUi.isOpen).toBe(true);
+    });
+
+    it('T while a scene plays opens no screen', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        replay(ctx);
+
+        key(ctx, 'T');
+
+        expect(ctx.scene.heroUi.isOpen).toBe(false);
+    });
+
+    it('B while a scene plays opens no screen', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        replay(ctx);
+
+        key(ctx, 'B');
+
+        expect(ctx.scene.heroUi.isOpen).toBe(false);
+    });
+
+    it('T while a replay plays over the Mapa keeps the Mapa', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        ctx.control('[data-testid="hud-farm"]').click();
+        await flush();
+        replay(ctx);
+
+        key(ctx, 'T');
+
+        expect(ctx.scene.heroUi.screen).toBe('farm');
+    });
+
+    it('A while a scene plays opens no auto click window', async () => {
+        const ctx = await createScene({ start: atChapter(2) });
+        replay(ctx);
+
+        key(ctx, 'A');
+
+        expect(ctx.hud('[data-testid="auto-click-popover"]').hidden).toBe(true);
+    });
+
+    it('the key 1 while a scene plays uses no skill', async () => {
+        const ctx = await createScene({ start: bigHealth(), heroes: heroes() });
+        const health = ctx.scene.monster.health;
+        replay(ctx);
+
+        ctx.handlers['keydown-ONE']();
+
+        expect(ctx.scene.monster.health).toBe(health);
+        expect(slotState(ctx)).not.toBe('cooling');
+    });
+
+    it('a chapter 1 battle that saw the prologue plays nothing', async () => {
+        const ctx = await createScene();
+
+        expect(story.play).not.toHaveBeenCalled();
+        expect(ctx.scene.paused).toBe(false);
+    });
+
+    it('a battle that loads at chapter 2 plays nothing and marks nothing', async () => {
+        await createScene({ seen: [], start: atChapter(2) });
+
+        expect(story.play).not.toHaveBeenCalled();
+        expect(storySeen.list).toEqual([]);
+    });
+
+    it('a battle that loads a completed campaign plays nothing', async () => {
+        await createScene({ seen: [], start: progress(10, 'CHAPTER_BOSS', 1, true) });
+
+        expect(story.play).not.toHaveBeenCalled();
+    });
+
+    it('the first win of the chapter 1 boss plays its unseen chapter scene', async () => {
+        const ctx = await createScene({ seen: [ 'prologue' ], start: progress(10, 'CHAPTER_BOSS', 1), storyScenes: [ STORY_SCENES[0], bossScene(1) ] });
+
+        await chapterBossWin(ctx);
+
+        expect(story.play).toHaveBeenCalledTimes(1);
+        expect(story.play.mock.calls[0][0].id).toBe('chapter-1');
+        expect(storySeen.list.at(-1)).toBe('chapter-1');
+    });
+
+    it('the boss win that completes the campaign plays the chapter scene of that chapter', async () => {
+        const ctx = await createScene({ seen: [], start: atChapter(15, 10, 'CHAPTER_BOSS', 1), storyScenes: [ bossScene(15) ] });
+        campaignGateway.report.mockResolvedValue(atChapter(15, 10, 'CHAPTER_BOSS', 1, true));
+
+        killAll(ctx);
+        advance(ctx);
+        await flush();
+
+        expect(story.play).toHaveBeenCalledTimes(1);
+        expect(story.play.mock.calls[0][0].id).toBe('chapter-15');
+    });
+
+    it('a seen chapter scene does not play again', async () => {
+        const ctx = await createScene({ seen: [ 'prologue', 'chapter-1' ], start: progress(10, 'CHAPTER_BOSS', 1), storyScenes: [ STORY_SCENES[0], bossScene(1) ] });
+
+        await chapterBossWin(ctx);
+
+        expect(story.play).not.toHaveBeenCalled();
+    });
+
+    it('an account reset back to chapter 1 plays no scene and keeps the seen list', async () => {
+        const ctx = await createScene({ seen: [], start: atChapter(4) });
+        resetGateway.reset.mockResolvedValue({ reward: 4, crystals: 4, resets: 1, progress: progress() });
+
+        ctx.hud('[data-testid="reset-account"]').click();
+        ctx.hud('[data-testid="reset-confirm"]').click();
+        await flush();
+
+        expect(ctx.scene.session.chapter).toBe(1);
+        expect(story.play).not.toHaveBeenCalled();
+        expect(storySeen.list).toEqual([]);
+    });
+
+    it('a farm win of a chapter boss plays no scene', async () => {
+        const ctx = await createScene({ seen: [ 'prologue' ], start: progress(10, 'CHAPTER_BOSS', 1, true), storyScenes: [ bossScene(1) ] });
+        farmGateway.win.mockResolvedValue({ drop: null, chapterBossWinsLeft: 9 });
+
+        ctx.scene.startFarm({ kind: 'CHAPTER_BOSS' });
+        killAll(ctx);
+        advance(ctx);
+        await flush();
+
+        expect(story.play).not.toHaveBeenCalled();
+    });
+
+    it('the first win of the chapter 1 boss plays the real chapter 1 scene', async () => {
+        const ctx = await createScene({ seen: [ 'prologue' ], start: progress(10, 'CHAPTER_BOSS', 1) });
+
+        await chapterBossWin(ctx);
+
+        expect(story.play).toHaveBeenCalledTimes(1);
+        expect(story.play.mock.calls[0][0]).toBe(STORY_SCENES[1]);
+        expect(story.play.mock.calls[0][0].id).toBe('chapter-1');
+    });
+
+    it('the Mapa lists the chapter 1 scene for a player already past chapter 1', async () => {
+        const ctx = await createScene({ seen: [ 'prologue' ], start: atChapter(3) });
+
+        expect(ctx.scene.heroUi.hooks.stories().map((scene) => scene.id)).toEqual([ 'prologue', 'chapter-1' ]);
+        expect(story.play).not.toHaveBeenCalled();
+    });
+
+    it('the Mapa does not list the chapter 1 scene at chapter 1 when it was not seen', async () => {
+        const ctx = await createScene({ seen: [ 'prologue' ] });
+
+        expect(ctx.scene.heroUi.hooks.stories().map((scene) => scene.id)).toEqual([ 'prologue' ]);
+    });
+
+    it('the Mapa lists the prologue and the chapter scenes already seen', async () => {
+        const ctx = await createScene({ seen: [ 'prologue', 'chapter-2' ], storyScenes: [ STORY_SCENES[0], bossScene(1), bossScene(2) ] });
+
+        expect(ctx.scene.heroUi.hooks.stories().map((scene) => scene.id)).toEqual([ 'prologue', 'chapter-2' ]);
+    });
+
+    it('the Mapa replays a scene with the fight held and the seen list unchanged', async () => {
+        const ctx = await createScene();
+
+        replay(ctx);
+
+        expect(story.play).toHaveBeenCalledWith(STORY_SCENES[0]);
+        expect(ctx.scene.paused).toBe(true);
+        expect(storySeen.list).toEqual([ 'prologue', 'chapter-1' ]);
+    });
+
+    it('a second scene request while one plays is ignored', async () => {
+        const ctx = await createScene({ seen: [] });
+
+        replay(ctx);
+
+        expect(story.play).toHaveBeenCalledTimes(1);
+    });
+
+    it('a scene opened over the pause menu leaves the fight paused when it closes', async () => {
+        const ctx = await createScene();
+        ctx.scene.pauseFight();
+
+        replay(ctx);
+        story.close();
+        await flush();
+
+        expect(ctx.scene.paused).toBe(true);
+        expect(ctx.control('.pause-menu').hidden).toBe(false);
     });
 });

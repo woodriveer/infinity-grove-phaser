@@ -813,7 +813,7 @@ Rename `describe('HeroUi Rever chefes', ...)` (`HeroUi.test.js:645`) and `descri
 
 ---
 
-#### T13: Play the story from the battle and hold the fight (ClickerGame.js) [ ]
+#### T13: Play the story from the battle and hold the fight (ClickerGame.js) [x]
 
 **Owner**: game-dev
 **Goal**: The battle opens the unseen prologue on its first chapter 1 encounter and the unseen chapter boss scene after the boss win, holds the fight while a scene plays (which also silences T, B, A and the skill keys, AD-034), ignores Escape meanwhile and gives the Mapa its hooks (STORY-01 to STORY-06, STORY-08, STORY-19, STORY-27, STORY-28, STORY-29, STORY-32, STORY-34, STORY-35, STORY-36, STORY-42, STORY-43, STORY-46, STORY-48).
@@ -876,7 +876,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 **Gate**: `cd game && npm test`
 **Done when**:
 
-- [ ] The 27 cases pass; every existing `ClickerGame.test.js` case passes unchanged (the harness seeds every catalog id).
+- [x] The 27 cases pass; every existing `ClickerGame.test.js` case passes unchanged (the harness seeds every catalog id).
 
 **Commit**: `feat(game): open the story scenes from the battle and hold the fight meanwhile`
 

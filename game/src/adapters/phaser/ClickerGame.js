@@ -19,6 +19,7 @@ import { clickHits } from '../../domain/heroes/leaderBonus';
 import { ELEMENT_LABELS } from '../../domain/heroes/heroes';
 import { activePassives, fightingAllies, teamActive } from '../../domain/heroes/team';
 import { SkillCombat } from '../../domain/skills/skillCombat';
+import { replayableScenes, sceneToPlay } from '../../domain/story/storyScenes';
 import { skillLevelOf } from '../../domain/skills/skillLevel';
 import { monsterAfterBreak, talentComboCap, talentComboStep, talentTimeBonusMs } from '../../domain/talents/talents';
 import { HeroUi } from './HeroUi';
@@ -191,6 +192,11 @@ export class ClickerGame extends Scene
         this.autoClick = services.createAutoClickState();
         this.autoClickPreference = services.autoClickPreference;
         this.autoClickEnabled = this.autoClickPreference.enabled();
+        //  The story scenes (spec story-scenes): the seen list, the catalog, the overlay player and whether a scene is open
+        this.storySeen = services.storySeen;
+        this.storyScenes = services.storyScenes;
+        this.playStoryView = services.playStory;
+        this.storyOpen = false;
         this.autoClicker = new AutoClicker();
         this.upgradingAutoClick = false;
         this.accountReset = services.createAccountReset({ session: this.session, autoClick: this.autoClick, talents: this.talents });
@@ -604,6 +610,12 @@ export class ClickerGame extends Scene
     //  Esc closes the auto click window first, then an open hero screen; otherwise it opens or closes the pause menu
     escape ()
     {
+        //  The scene closes itself on Esc; the key must not also open the pause menu or close a screen under it
+        if (this.storyOpen)
+        {
+            return;
+        }
+
         if (this.autoClickWindowOpen)
         {
             this.closeAutoClickWindow();
@@ -631,7 +643,9 @@ export class ClickerGame extends Scene
             startFarm: (boss) => this.startFarm(boss),
             useSkill: (slot) => this.useSkill(slot),
             skillState: (slot) => this.skillState(slot),
-            mapPosition: () => this.session.mapPosition()
+            mapPosition: () => this.session.mapPosition(),
+            stories: () => replayableScenes(this.storyScenes, this.storySeen.seen(), this.session.mapPosition()),
+            playStory: (id) => this.playStory(this.storyScenes.find((scene) => scene.id === id) ?? null)
         });
         this.heroes.onChange(() =>
         {
@@ -882,9 +896,13 @@ export class ClickerGame extends Scene
     //  Spawns the encounter, or ends the game when there is none left
     showEncounter (encounter)
     {
+        //  The chapter of the encounter that was on screen: a move to the next one (or the end of the campaign) may open a story scene
+        const from = this.encounterChapter;
+
         if (!encounter)
         {
             this.completeChapter();
+            this.playUnseenStory(from, null);
             return;
         }
 
@@ -919,6 +937,57 @@ export class ClickerGame extends Scene
             );
             this.showCountdown();
             this.placeBossTimer();
+        }
+
+        this.playUnseenStory(from, this.session.chapter);
+    }
+
+    //  Opens the scene a chapter move triggers when this browser has not seen it; it is marked seen before it plays
+    playUnseenStory (from, to)
+    {
+        const scene = sceneToPlay(this.storyScenes, { from, to, seen: this.storySeen.seen() });
+
+        if (scene)
+        {
+            this.storySeen.markSeen(scene.id);
+            this.playStory(scene);
+        }
+    }
+
+    //  Plays a scene over the fight, which is held meanwhile (clicks, timers, tweens and so the team and the keys); one scene at a time.
+    //  A fight that was already paused (the pause menu) stays paused when the scene closes.
+    async playStory (scene)
+    {
+        if (!scene || this.storyOpen)
+        {
+            return;
+        }
+
+        this.storyOpen = true;
+
+        const held = !this.paused;
+
+        if (held)
+        {
+            this.paused = true;
+            this.time.paused = true;
+            this.tweens.paused = true;
+        }
+
+        try
+        {
+            await this.playStoryView(scene);
+        }
+        finally
+        {
+            this.storyOpen = false;
+
+            if (held)
+            {
+                this.paused = false;
+                this.time.paused = false;
+                this.tweens.paused = false;
+            }
         }
     }
 
