@@ -17,6 +17,7 @@ import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.UserRepositoryPort
 import br.com.woodriver.infinity_grove_ws.usecase.GetFarmUseCase
+import br.com.woodriver.infinity_grove_ws.usecase.RecordKeeping
 import br.com.woodriver.infinity_grove_ws.usecase.ReportFarmUseCase
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -31,6 +32,7 @@ class FarmService(
     private val playerCardsRepository: PlayerCardsRepositoryPort,
     private val rewards: CardRewards,
     private val equipmentRewards: EquipmentRewards,
+    private val records: RecordKeeping,
 ) : GetFarmUseCase,
     ReportFarmUseCase {
     override fun state(
@@ -70,6 +72,7 @@ class FarmService(
         // A farmed miniboss rolls the chance of its own stage; the chapter boss has no stage
         val (updated, drop) = rewards.award(spaced, boss.kind, fought, boss.stage ?: 0, fromFarm = true)
         playerCardsRepository.save(updated)
+        records.onFarmWin(username, progress)
         return FarmResult(drop, winsLeft(updated), equipmentRewards.award(username, boss.kind, fought))
     }
 

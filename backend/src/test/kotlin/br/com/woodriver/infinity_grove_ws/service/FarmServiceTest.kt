@@ -10,6 +10,8 @@ import br.com.woodriver.infinity_grove_ws.InMemoryProgressRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryUserRepository
 import br.com.woodriver.infinity_grove_ws.InMemoryWalletRepository
 import br.com.woodriver.infinity_grove_ws.MutableClock
+import br.com.woodriver.infinity_grove_ws.NoRecordKeeping
+import br.com.woodriver.infinity_grove_ws.RecordingRecordKeeping
 import br.com.woodriver.infinity_grove_ws.SequenceChanceRoller
 import br.com.woodriver.infinity_grove_ws.SequenceDropRoller
 import br.com.woodriver.infinity_grove_ws.SequenceIds
@@ -34,6 +36,7 @@ import br.com.woodriver.infinity_grove_ws.domain.ProgressPosition
 import br.com.woodriver.infinity_grove_ws.domain.Rarity
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.UserNotFoundException
+import br.com.woodriver.infinity_grove_ws.usecase.RecordKeeping
 import java.time.LocalDate
 import java.time.ZoneOffset
 import kotlin.test.Test
@@ -54,6 +57,7 @@ class FarmServiceTest {
     private val equipment = InMemoryEquipmentRepository()
     private var equipmentChance = SequenceChanceRoller(0.5)
     private val heroes = InMemoryHeroRepository(*HeroSeed.heroes().toTypedArray())
+    private var records: RecordKeeping = NoRecordKeeping
     private val service get() = farmWith(ChapterDefinition.first(), ChapterDefinition.of(15))
 
     private fun farmWith(vararg chapters: ChapterDefinition) =
@@ -71,6 +75,7 @@ class FarmServiceTest {
                 EquipmentRules(),
                 InMemoryLegacyRepository(),
             ),
+            records,
         )
 
     private val completed = Progress("yan", ProgressPosition(15, 10, Encounter.CHAPTER_BOSS, 1), completed = true)
@@ -626,5 +631,38 @@ class FarmServiceTest {
         chance = SequenceChanceRoller(0.0)
 
         assertEquals(CardDrop("seraphine", "Seraphine Aurora", 0), service.report("yan", chapterBoss, Outcome.CLEARED, 15).drop)
+    }
+
+    @Test
+    fun `a farm win is reported to the records with the campaign position`() {
+        player(at(2, Encounter.PHASE))
+        val recording = RecordingRecordKeeping()
+        records = recording
+
+        service.report("yan", FarmBoss(Encounter.MINIBOSS, 1), Outcome.CLEARED)
+
+        assertEquals(listOf("farm:PHASE"), recording.events)
+    }
+
+    @Test
+    fun `a failed farm fight reaches no record`() {
+        player(at(2, Encounter.PHASE))
+        val recording = RecordingRecordKeeping()
+        records = recording
+
+        service.report("yan", FarmBoss(Encounter.MINIBOSS, 1), Outcome.FAILED)
+
+        assertTrue(recording.events.isEmpty())
+    }
+
+    @Test
+    fun `a refused farm report reaches no record`() {
+        player(at(2, Encounter.PHASE))
+        val recording = RecordingRecordKeeping()
+        records = recording
+
+        assertFailsWith<BossNotAvailableException> { service.report("yan", FarmBoss(Encounter.MINIBOSS, 2), Outcome.CLEARED) }
+
+        assertTrue(recording.events.isEmpty())
     }
 }

@@ -774,7 +774,7 @@ Fakes (`test/Fakes.kt`): `object NoRecordKeeping : RecordKeeping` (every method 
 
 ---
 
-#### T7: FarmService reports farm wins to the records [ ]
+#### T7: FarmService reports farm wins to the records [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: An accepted farm `CLEARED` reaches `RecordKeeping.onFarmWin` with the campaign progress; a `FAILED` or refused farm report does not (RNK-01, RNK-03; spec Boss AC 6, Power AC 4).
@@ -803,7 +803,7 @@ Fakes (`test/Fakes.kt`): `object NoRecordKeeping : RecordKeeping` (every method 
 **Gate**: `cd backend && ./gradlew ktlintCheck test --tests '*FarmServiceTest'`
 **Done when**:
 
-- [ ] The 3 new cases and every existing case pass.
+- [x] The 3 new cases and every existing case pass.
 
 **Commit**: `feat(backend): report farm wins to the rankings`
 
