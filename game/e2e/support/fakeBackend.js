@@ -270,6 +270,10 @@ const isPublic = (method, path) => method === 'POST' && (path === '/users' || pa
 //  holdTeam() -> release() holds PUT /team, POST /team/slots and PUT /leader, failNextTeamRequest({ status = 500, code }) makes the next one of them answer that problem, teamOf(name) reads a stored team.
 //  gifts {name: true | 'fail'} (POST /gifts/claim of GiftController: true grants GIFT_STAFF on the first claim of that player and { granted: false } after, 'fail' answers 500 on every claim,
 //  a player not listed is never granted), the claims are kept out of `calls` and counted by giftCalls() (one username per request).
+//  rankings {'boss-time:<n>' | 'story-time' | 'click-power' | 'fortune': { entries, me }} (the answers of GET /rankings/<board>, a board not listed answers { entries: [], me: null }),
+//  rankingsEndpoint (false answers 404 to every /rankings path, like a backend without the feature) and failClickPower (true answers 500 to POST /rankings/click-power).
+//  The rankings requests are kept out of `calls` and listed by rankingCalls() ({ method, path, chapter }, in arrival order); holdRankings(board) -> release() holds every
+//  GET of that board and failNextRanking() makes the next GET answer 500.
 //  healthDelayMs delays the answer of GET /api/health (the backend wake-up of spec supabase-postgres), which is counted by healthCalls() and kept out of calls.
 //  Returns the recorded `calls` (users, auth and wallet routes), the `users` and `wallets` stores and test controls over issued tokens, and holdFarm(chapter, { fail }) -> release() to hold the answer of GET /farm?chapter=n, and holdOutcome() -> release() to hold the answer of POST /farm/outcome.
 export async function mockBackend (page, {
@@ -277,7 +281,7 @@ export async function mockBackend (page, {
     chapterDefinitions = {},
     cards: startingCards = {}, chances: startingChances = [ 0.99 ], farmMinIntervalMs = 0, equipment: startingEquipment = {}, equipmentDrops: startingEquipmentDrops = [],
     talents: startingTalents = {}, talentPoints: startingTalentPoints = {}, autoClick: startingAutoClick = {}, lastChapter = 1, healthDelayMs = 0, team: startingTeam = {}, gifts: startingGifts = {},
-    legacy: startingLegacy = {}, legacyEndpoint = true, talentLevels = true
+    legacy: startingLegacy = {}, legacyEndpoint = true, talentLevels = true, rankings = {}, rankingsEndpoint = true, failClickPower = false
 } = {}) {
     const store = new Map(Object.entries(users));
     const calls = [];
@@ -533,6 +537,51 @@ export async function mockBackend (page, {
         const answer = { reward, crystals: state.crystals, resets: state.resets, progress: progressBody(progressOf(username)) };
 
         return route.fulfill({ json: legacyEndpoint ? { ...answer, legacy: legacyView(percents, progressOf(username)) } : answer });
+    };
+
+    //  Rankings contract (RankingController): four boards, `chapter` 1 to 15 for boss-time only, `me` null for a player with no record
+    const rankingBoards = [ 'boss-time', 'story-time', 'click-power', 'fortune' ];
+    const rankingRequests = [];
+    const rankingHolds = new Map();
+    let rankingFailure = false;
+
+    const handleRankings = async (route, method, path, now) => {
+        const url = new URL(route.request().url());
+        const query = url.searchParams.get('chapter');
+        const board = path.slice('/rankings/'.length);
+        const chapter = Number(query);
+
+        rankingRequests.push({ method, path, chapter: query === null ? null : chapter });
+
+        if (!rankingsEndpoint) { return route.fulfill(problem(404, 'Not found')); }
+
+        const username = authenticated(route, now);
+
+        if (!username) { return null; }
+
+        if (method === 'POST' && path === '/rankings/click-power') {
+            return route.fulfill(failClickPower ? problem(500, 'Failed') : { json: { value: 1, best: 1 } });
+        }
+
+        if (method !== 'GET' || !rankingBoards.includes(board)) {
+            return route.fulfill(problem(404, `Ranking '${board}' does not exist`, 'RANKING_NOT_FOUND'));
+        }
+
+        if (board === 'boss-time' && !(Number.isInteger(chapter) && chapter >= 1 && chapter <= 15)) {
+            return route.fulfill(problem(400, 'Chapter must be an integer from 1 to 15', 'INVALID_RANKING_REQUEST'));
+        }
+
+        if (rankingFailure) {
+            rankingFailure = false;
+
+            return route.fulfill(problem(500, 'Failed'));
+        }
+
+        if (rankingHolds.has(board)) { await rankingHolds.get(board); }
+
+        const answer = rankings[board === 'boss-time' ? `boss-time:${chapter}` : board] ?? {};
+
+        return route.fulfill({ json: { board, chapter: board === 'boss-time' ? chapter : null, entries: answer.entries ?? [], me: answer.me ?? null } });
     };
 
     //  Waits for holdTalents() and answers the problem failNextTalentRequest() set, once; null when the request goes on
@@ -1051,6 +1100,9 @@ export async function mockBackend (page, {
         const body = request.postDataJSON() ?? {};
         const now = Date.now();
 
+        //  The rankings requests are kept out of `calls` so no existing call list changes
+        if (path.startsWith('/rankings/')) { return handleRankings(route, method, path, now); }
+
         calls.push({ method, path, body });
 
         if (delayMs) { await new Promise((resolve) => setTimeout(resolve, delayMs)); }
@@ -1208,6 +1260,7 @@ export async function mockBackend (page, {
     await page.route('**/api/auto-click', handler);
     await page.route('**/api/auto-click/**', handler);
     await page.route('**/api/account/**', handler);
+    await page.route('**/api/rankings/**', handler);
 
     return {
         calls,
@@ -1283,6 +1336,23 @@ export async function mockBackend (page, {
         //  Pays talent points to a player, as a first clear does
         grantTalentPoints: (username, points) => {
             earnedByUser.set(username, earnedOf(username) + points);
+        },
+        //  Every request of /rankings received, as { method, path, chapter } in order (`chapter` the query number, null without one)
+        rankingCalls: () => [ ...rankingRequests ],
+        //  Holds every GET /rankings/<board> of that board until the returned release() runs
+        holdRankings: (board) => {
+            let release = () => {};
+            const held = new Promise((resolve) => { release = resolve; });
+
+            rankingHolds.set(board, held);
+            return () => {
+                if (rankingHolds.get(board) === held) { rankingHolds.delete(board); }
+                release();
+            };
+        },
+        //  The next GET /rankings/<board> answers 500 instead of its board
+        failNextRanking: () => {
+            rankingFailure = true;
         },
         //  Holds every POST /farm/outcome until the returned release() runs: the win is applied and answered only then
         holdOutcome: () => {

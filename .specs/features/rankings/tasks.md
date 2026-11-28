@@ -1461,7 +1461,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 
 ---
 
-#### T18: Ranking scenarios in the browser [ ]
+#### T18: Ranking scenarios in the browser [x]
 
 **Owner**: test-engineer
 **Goal**: Every player-visible AC of the Ranking screen, the rows, the formats and the states runs in Chrome against the fake backend (RNK-07, RNK-08, RNK-09; spec Screen AC 1 to 8, Rows AC 1 to 7, Loading AC 1 to 4, the UI Edge Cases).
@@ -1517,7 +1517,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 **Gate**: `cd game && npm test && npx playwright test e2e/rankings.spec.js`
 **Done when**:
 
-- [ ] The 23 scenarios pass in Chrome; the other e2e files that use `mockBackend` are untouched in behaviour (the new options default to the old answers).
+- [x] The 23 scenarios pass in Chrome; the other e2e files that use `mockBackend` are untouched in behaviour (the new options default to the old answers).
 
 **Commit**: `test(game): rankings in the browser`
 
