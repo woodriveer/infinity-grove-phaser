@@ -1035,7 +1035,7 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 
 ---
 
-#### T17: Author check of the feature [ ]
+#### T17: Author check of the feature [x]
 
 **Owner**: test-engineer
 **Goal**: The feature's test gate (`.claude/agents/test-engineer.md` § Author check): every AC value pinned, the suites green in CI, mutants killed (STORY-01 to STORY-55).
@@ -1065,11 +1065,73 @@ const bossScene = (chapter) => ({ ...STORY_SCENES[0], id: 'chapter-' + chapter, 
 **Gate**: `node scripts/ci-wait.mjs ci/story-scenes` exits 0 (suites green) and the sensor runs report 7 of 7 killed
 **Done when**:
 
-- [ ] Every AC of the spec has a row with `file:line` and the spec value; 0 gaps.
-- [ ] The CI suites of the branch are green (backend untouched, game unit, the 12 e2e shards).
-- [ ] 7 of 7 mutants killed; `git status --porcelain` is as before the local sensor run.
+- [x] Every AC of the spec has a row with `file:line` and the spec value; 0 gaps.
+- [x] The CI suites of the branch are green (backend untouched, game unit, the 12 e2e shards).
+- [x] 9 of 9 mutants killed (the 7 of the task plus M8 and M9 on the card size and the face plate; M5 survived once and its Escape scenarios now count the keydowns that reach the window); `git status --porcelain` is as before the local sensor run.
 
 **Commit**: `test(game): record the story scenes author check`
+
+**AC to assertion table** (`U` = game unit, `E` = e2e; paths under `game/src/` and `game/e2e/`; every value is the spec's). 55 of 55 ACs have a row, 0 gaps.
+
+| Req | Unit (file:line) | e2e (file:line) | Exact value pinned |
+| --- | ---------------- | --------------- | ------------------ |
+| STORY-01 | `domain/story/storyScenes.test.js:186,190,194,198`; `adapters/phaser/ClickerGame.test.js:7050` | `storyScenes.spec.js:61` | the overlay opens on the prologue title card of the first chapter 1 encounter; none with the prologue seen, at chapter 2 or completed |
+| STORY-02 | `adapters/storage/storySeen.test.js:19,26`; `ClickerGame.test.js:7058` | `storyScenes.spec.js:61` | key `infinity-grove.story-seen` reads `["prologue"]` (and `["chapter-1","prologue"]` on `["chapter-1"]`, unit) |
+| STORY-03 | `storyScenes.test.js:190`; `ClickerGame.test.js:7160` | `storyScenes.spec.js:236` | overlay count 0 after a reload |
+| STORY-04 | `storyScenes.test.js:194,198`; `ClickerGame.test.js:7167,7174` | `storyScenes.spec.js:249,256` | overlay count 0, key `null` (absent stays absent) |
+| STORY-05 | `ClickerGame.test.js:7064,7070` | `storyScenes.spec.js:73` | `[paused, time.paused, tweens.paused]` = `[true,true,true]` |
+| STORY-06 | `ClickerGame.test.js:7079,7282` | `storyScenes.spec.js:150,167` | overlay removed, the three flags `false`, a canvas click lowers the monster health |
+| STORY-07 | `storySeen.test.js:43,68,76,87` | `storyScenes.spec.js:262,270` | a value `{"x":1}` rewritten to `["prologue"]`; a throwing `setItem` still opens the overlay and the fight goes on (flags `false`, key `null`) |
+| STORY-08 | `ClickerGame.test.js:7210` | `storyScenes.spec.js:290,305` | reset to chapter 1: overlay count 0, key still `["prologue"]`; after a logout the key is the same |
+| STORY-09 | `domain/story/storyPlayback.test.js:87`; `views/storyStage.test.js:182` | `storyScenes.spec.js:61` | kicker `Ato 1 — Bosque Desperto · Prólogo`, cta `Clique para começar`, logo alt `Infinity Grove` src `assets/story/logo.png`, hit aria-label `Começar a história` |
+| STORY-10 | `views/storyPlayer.test.js:105` | `storyScenes.spec.js:79`, `storyStage.spec.js:164` | a click (or Enter) on the title card starts line 1 (`.story-narr` visible) |
+| STORY-11 | `domain/story/storyText.test.js:12,17,23,29`; `storyStage.test.js:205` | `storyScenes.spec.js:79,117`, `storyStage.spec.js:134` | text of lines 1 to 6 exactly as the spec (line 2 = 38 characters) |
+| STORY-12 | `storyPlayback.test.js:36`; `storyPlayer.test.js:125` | `storyScenes.spec.js:117` | a click on a typing line shows the whole text, `.story-next` visible, still 1 dot lit after 2500 ms |
+| STORY-13 | `storyPlayback.test.js:40,44`; `storyPlayer.test.js:138,218` | `storyScenes.spec.js:79` | complete line label `Próxima fala`; the click after line 6 shows the end card |
+| STORY-14 | `storyPlayback.test.js:136`; `storyPlayer.test.js:148,162` | `storyStage.spec.js:134` | line 2 completes by the clock at 3.47 s and line 3 starts by itself (3 dots lit within 3 s) |
+| STORY-15 | `storyPlayer.test.js:173,191,203` | `storyStage.spec.js:134` | a refused `play()` types line 2 to `Até a noite em que as raízes tremeram.` |
+| STORY-16 | `storyPlayback.test.js:87`; `storyStage.test.js:260` | `storyScenes.spec.js:79` | `Fim do Prólogo`, `Ato 1 — Bosque Desperto`, `Capítulo 1`, `Clique para continuar`, hit `Continuar` |
+| STORY-17 | `storyPlayback.test.js:52`; `storyPlayer.test.js:229` | `storyScenes.spec.js:150` | a click on the end card removes the overlay |
+| STORY-18 | `storyPlayback.test.js:81`; `storyPlayer.test.js:241,250,263` | `storyScenes.spec.js:167,177` | `Pular` on the title card and in a line removes the overlay and releases the fight |
+| STORY-19 | `storyPlayer.test.js:275,289,302`; `ClickerGame.test.js:7091,7100` | `storyScenes.spec.js:188`, `storyReplay.spec.js:143` | Escape closes the overlay, `.pause-menu` hidden, flags `false`, zero Escape keydowns reach the window, the Mapa panel stays open |
+| STORY-20 | `storyPlayer.test.js:322,339`; `storyStage.test.js:317` | `storyStage.spec.js:181`, `storyReplay.spec.js:171` | `Silenciar`/`false` to `Ativar som`/`true` and back; 44 px wide and high, `border-radius` `50%`; the choice holds for the next replay |
+| STORY-21 | `storyPlayback.test.js:95,99`; `storyStage.test.js:227` | `storyScenes.spec.js:79`, `storyStage.spec.js:146` | 6 `.story-dot`, `.is-on` count 1 on line 1 and 3 on line 3; hidden on both cards |
+| STORY-22 | `storyStage.test.js:237,248` | `storyScenes.spec.js:79`, `storyStage.spec.js:111,87` | narrator: `text-align` `center`, `font-style` `italic`, no speaker plate; voice: orb + `A Voz`; character: portrait alt `Seraphine` src `assets/story/portrait-seraphine.png`, `font-style` `normal` |
+| STORY-23 | `storyPlayback.test.js:115,122,126`; `storyStage.test.js:273,285` | `storyScenes.spec.js:129,140` | red tint off on line 2 and on at line 3 complete; line 4 shows `map` and `gold` on, `forest` off |
+| STORY-24 | `storyPlayer.test.js:80,361` | `storyScenes.spec.js:61`, `storyStage.spec.js:164,172,205` | `story-hit` focused on open; Enter starts, Space completes; focus returns to `story-replay-prologue` |
+| STORY-25 | `adapters/phaser/HeroUi.test.js:95,646` | `storyReplay.spec.js:29,39` | `hud-farm` and `.hero-title` read `Mapa`; the farm label `Rever chefe: Miniboss 1` |
+| STORY-26 | `views/farmView.test.js:251`; `HeroUi.test.js:654` | `storyReplay.spec.js:48,83` | `História` group, chip `Prólogo` aria-label `Assistir Prólogo`; centres within 4 px; chip `font-family` `^Cinzel`, `font-size` `15px`, `height` `32px`, `color` `rgb(244, 230, 200)`, `border-top-color` `rgb(176, 122, 58)` |
+| STORY-27 | `farmView.test.js:271`; `HeroUi.test.js:663`; `ClickerGame.test.js:7264` | `storyReplay.spec.js:101,116` | a chip opens the title card, `paused` `true`, key unchanged `["prologue","chapter-1"]` |
+| STORY-28 | `HeroUi.test.js:663`; `ClickerGame.test.js:7100` | `storyReplay.spec.js:131,143,157` | after `Pular`, Escape and the end card the Mapa shows `Caminho do Capítulo 1` |
+| STORY-29 | `storyScenes.test.js:232,236,240,244,249,253,257`; `ClickerGame.test.js:7245,7252,7258` | `storyReplay.spec.js:92,197,207` | chips `[Prólogo, Capítulo 1]`; chapter 3 shows `story-replay-chapter-1` unseen; chapter 1 unseen lists none |
+| STORY-30 | `storyCatalog.test.js:21,34,46` | `storyScenes.spec.js:79` | the six texts, speakers, audio and durations of the table |
+| STORY-31 | `src/storyAssets.test.js:11` | none (files, not a screen) | missing paths `[]` |
+| STORY-32 | `storyCatalog.test.js:9`; `storyStage.test.js:32`; `composition.test.js:16` | `storyChapterOne.spec.js:48` | a catalog scene plays with no other change |
+| STORY-33 | `storyScenes.test.js:19-177`; `storyAssets.test.js:11` | none (unit gate) | one message per broken rule |
+| STORY-34 | `storyScenes.test.js:202,206,210`; `ClickerGame.test.js:7180,7190,7202` | `storyChapterOne.spec.js:48` | the chapter 1 boss win opens `chapter-1` and writes `["prologue","chapter-1"]` |
+| STORY-35 | `storyScenes.test.js:214,218,222,226`; `ClickerGame.test.js:7210,7223` | `storyScenes.spec.js:249,290`, `storyReplay.spec.js:197` | no scene on a reset, a farm win or a passed chapter |
+| STORY-36 | `ClickerGame.test.js:7274` | none (unit gate) | a second request while one plays is ignored |
+| STORY-37 | `storyPlayback.test.js:130` | `storyStage.spec.js:28,37,44,53` | boxes `(0,0,1280,720)`, `(0,96,1024,576)`, `(0,0,1920,1080)`; `background-color` `rgb(5, 9, 10)`; a click at (512, 40) starts the scene; 390x844 is unit only (TD-010) |
+| STORY-38 | `storyPlayer.test.js:350` | `storyStage.spec.js:44` | the box takes the 1920x1080 scale after a resize |
+| STORY-39 | none (stylesheet) | `storyStage.spec.js:69`, `storyChapterOne.spec.js:208` | `animation-name` `none`, `transition-duration` `0s`, mote `display` `none`; the camera jumps with `0s` |
+| STORY-40 | none (stylesheet) | `storyStage.spec.js:28,62` | `position` `fixed`, `z-index` `9`; `game-version` visible with `z-index` `10` |
+| STORY-41 | none (stylesheet) | `storyStage.spec.js:87` | kicker, cta, `Pular`, plate `^Cinzel`; texts `^"Cormorant Garamond"` |
+| STORY-42 | `storyPlayer.test.js:289,302`; `ClickerGame.test.js:7091` | `storyScenes.spec.js:204` | Shift+Escape leaves the overlay, `.pause-menu` hidden, flags `[true,true,true]`, zero Escape keydowns reach the window |
+| STORY-43 | `ClickerGame.test.js:7111,7120,7140,7149` | `storyScenes.spec.js:216` | T and B change nothing under a replay (`Mapa` stays), T opens `Talentos` after `Pular` |
+| STORY-44 | `storyCatalog.test.js:95,115,128` | `storyChapterOne.spec.js:105` | speakers `Kael, Lyra, Orina, Seraphine, Vex, Kael` and the seven texts |
+| STORY-45 | `storyAssets.test.js:11` | none (files, not a screen) | missing paths `[]` |
+| STORY-46 | `ClickerGame.test.js:7180,7235`; `storyStage.test.js:86` | `storyChapterOne.spec.js:48` | kicker `Capítulo 1 — Final`, title `A Devoradora da Clareira`, cta `Clique para começar`, hit `Começar a cena` |
+| STORY-47 | `storyStage.test.js:104` | `storyChapterOne.spec.js:156` | `Fim do Capítulo 1`, `A Devoradora da Clareira`, `Ao amanhecer, os cinco guardiões avançam.`, `Clique para continuar`, hit `Continuar`, then `Stage 1/10  Phase 1/5` and the flags `false` |
+| STORY-48 | `storyScenes.test.js:244,249,253`; `ClickerGame.test.js:7245,7252` | `storyReplay.spec.js:92,197,207` | `story-replay-chapter-1` aria-label `Assistir Capítulo 1`; absent at chapter 1 unseen |
+| STORY-49 | `storyPlayback.test.js:150,154,159,166`; `storyStage.test.js:118,132,142` | `storyChapterOne.spec.js:67,208` | `matrix(1.18, 0, 0, 1.18, 0, -129)` and `6s`; `matrix(1.75, 0, 0, 1.75, -551, -350)`, `1.8s`, `cubic-bezier(0.45, 0.05, 0.25, 1)` |
+| STORY-50 | `storyStage.test.js:152` | `storyChapterOne.spec.js:105` | face `width` `156px`, `border-radius` `50%`; box `left` `110px`, `width` `1060px`, `padding-left` `210px`; plate `left` `206px` |
+| STORY-51 | `storyStage.test.js:72` | `storyChapterOne.spec.js:83` | bars `0px` on the cards, `46px` on the lines, `rgb(0, 0, 0)`, `0.8s` |
+| STORY-52 | `storyStage.test.js:164` | `storyChapterOne.spec.js:130` | `is-veins` on lines 1 and 4 (`animation-name` `storyVeins`), off on line 2; `is-dawn` on line 7 and the end card |
+| STORY-53 | `storyPlayback.test.js:104,145`; `storyStage.test.js:86,104` | `storyChapterOne.spec.js:48,156` | title card `clearing` + `dark` (no `forest`, no `dawn`); end card `clearing` + `dark` + `dawn` |
+| STORY-54 | `storyCatalog.test.js:78`; `storyStage.test.js:63` | `storyChapterOne.spec.js:200` | 10 `.story-mote`, first `left` `120px`, `top` `520px` |
+| STORY-55 | `storyStage.test.js:86,104` | `storyChapterOne.spec.js:48,156`, `storyStage.spec.js:122` | chapter-boss: title `44px`, logo `520px`, end title `44px`, subtitle `28px`; chapter-start: logo `620px`, end title `56px`, subtitle `30px` |
+
+**Mutants** (cwd `game`): M1 `storyPlayback.js` `cameraOf` identity, M2 `storyScenes.js` `replayableScenes` passed-chapter condition, M3 `ClickerGame.js` `held = true`, M4 `ClickerGame.js` no `markSeen`, M5 `storyPlayer.js` no `stopPropagation`, M6 `style.css` overlay `z-index: 11`, M7 `style.css` motes visible under reduced motion, M8 `style.css` end title `55px`, M9 `style.css` plate `left: 207px`.
 
 ---
 
