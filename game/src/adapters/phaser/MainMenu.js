@@ -8,6 +8,11 @@ const TAGLINE_TEXT = 'Defenda a Grande Árvore das hordas do Submundo.';
 const WAKE_TEXT = 'Acordando o servidor, aguarde...';
 const WAKE_NOTICE_MS = 2000;
 
+const EMPTY_FIELDS_TEXT = 'Informe usuário e senha';
+const signedInText = (username) => `Bem-vindo de volta, ${username}!`;
+const signedUpText = (username) => `Conta criada, ${username}!`;
+const welcomeText = (username) => `Olá, ${username}!`;
+
 //  Everything the player reads or clicks sits in a parchment oval with a dark wood rim on the left; x is the centre of that column
 const COLUMN_X = 216;
 const OVAL = { x: 170, y: 380, width: 700, height: 1040, color: 0xead6ad, rim: 0x5a3d26, rimWidth: 6, shadow: 0x2e2b25 };
@@ -24,16 +29,16 @@ const OTHER_HEROES_TEXT = 'Os outros personagens podem ser encontrados no decorr
 
 const FORM_HTML = `
     <div class="auth-form">
-        <input type="text" name="username" placeholder="Username" autocomplete="username" />
-        <input type="password" name="password" placeholder="Password" autocomplete="current-password" />
+        <input type="text" name="username" placeholder="Usuário" autocomplete="username" />
+        <input type="password" name="password" placeholder="Senha" autocomplete="current-password" />
         <div class="auth-actions">
-            <button type="button" name="login">Login</button>
-            <button type="button" name="signup">Sign up</button>
+            <button type="button" name="login">Entrar</button>
+            <button type="button" name="signup">Criar conta</button>
         </div>
     </div>
 `;
 
-//  The screen after Sign up: the first hero of the new account, one button per starting element
+//  The screen after Criar conta: the first hero of the new account, one button per starting element
 const PATH_HTML = `
     <div class="path-choice">
         <h2 class="path-title">${CHOOSE_PATH_TEXT}</h2>
@@ -58,11 +63,11 @@ const LOGOUT_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"
 const WELCOME_HTML = `
     <div class="welcome">
         <p class="welcome-title"></p>
-        <p class="welcome-start">Click to Start!${PLAY_ICON}</p>
+        <p class="welcome-start">Clique para jogar!${PLAY_ICON}</p>
     </div>
 `;
 
-const LOGOUT_HTML = `<button type="button" class="logout" name="logout">${LOGOUT_ICON}Logout</button>`;
+const LOGOUT_HTML = `<button type="button" class="logout" name="logout">${LOGOUT_ICON}Sair</button>`;
 
 export class MainMenu extends Scene
 {
@@ -170,7 +175,7 @@ export class MainMenu extends Scene
 
             if (!username.value.trim() || !password.value)
             {
-                this.showMessage('Enter username and password', true);
+                this.showMessage(EMPTY_FIELDS_TEXT, true);
                 return false;
             }
 
@@ -203,19 +208,19 @@ export class MainMenu extends Scene
             }
         };
 
-        buttons[0].addEventListener('click', () => submit(this.users.login, (u) => `Welcome back, ${u.username}!`));
+        buttons[0].addEventListener('click', () => submit(this.users.login, (u) => signedInText(u.username)));
 
         //  Sign up first checks the credentials, then asks for the first hero on a screen of its own; the account is created by that choice
         buttons[1].addEventListener('click', () => {
 
             if (!username.value.trim() || !password.value)
             {
-                this.showMessage('Enter username and password', true);
+                this.showMessage(EMPTY_FIELDS_TEXT, true);
                 return;
             }
 
             this.showMessage('');
-            this.showPathChoice(form, (element) => submit((name, pass) => this.users.signUp(name, pass, element), (u) => `Account created, ${u.username}!`));
+            this.showPathChoice(form, (element) => submit((name, pass) => this.users.signUp(name, pass, element), (u) => signedUpText(u.username)));
         });
 
         //  Enter in either field logs in (click() is a no-op while the button is disabled)
@@ -274,7 +279,7 @@ export class MainMenu extends Scene
     {
         const welcome = this.add.dom(COLUMN_X + 10, 420).createFromHTML(WELCOME_HTML);
         welcome.pointerEvents = 'none';
-        welcome.node.querySelector('.welcome-title').textContent = `Hello, ${user.username}!`;
+        welcome.node.querySelector('.welcome-title').textContent = welcomeText(user.username);
 
         //  Own DOM element: the welcome block is click-through, the button must receive clicks
         const logout = this.add.dom(COLUMN_X, 515).createFromHTML(LOGOUT_HTML);

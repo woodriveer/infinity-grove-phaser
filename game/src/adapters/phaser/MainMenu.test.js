@@ -111,6 +111,39 @@ describe('MainMenu authentication', () => {
         expect(form.getChildByName('signup')).not.toBeNull();
     });
 
+    it('the form shows Usuário, Senha, Entrar and Criar conta', async () => {
+        const { scene, form } = createScene({ highscore: 0 });
+
+        await open(scene);
+
+        expect(form.getChildByName('username').placeholder).toBe('Usuário');
+        expect(form.getChildByName('password').placeholder).toBe('Senha');
+        expect(form.getChildByName('login').textContent).toBe('Entrar');
+        expect(form.getChildByName('signup').textContent).toBe('Criar conta');
+    });
+
+    it('a username of only spaces shows Informe usuário e senha and sends no request', async () => {
+        const { scene, form, message } = createScene({ highscore: 0 });
+        await open(scene);
+        fill(form, '   ', 'secret123');
+
+        form.getChildByName('login').click();
+        await flush();
+
+        expect(userApi.login).not.toHaveBeenCalled();
+        expect(userApi.signUp).not.toHaveBeenCalled();
+        expect(message()).toEqual({ text: 'Informe usuário e senha', isError: true });
+    });
+
+    it('the welcome screen shows Clique para jogar!', () => {
+        const { scene, doms } = createScene({ highscore: 3, user: { username: 'yan' } });
+
+        scene.create();
+
+        const start = doms.map((d) => d.node.querySelector('.welcome-start')).find(Boolean);
+        expect(start.textContent).toBe('Clique para jogar!');
+    });
+
     it('skips the form and greets a user that is already logged in', () => {
         const { scene, form, welcomeTitle, inputHandlers } = createScene({ highscore: 3, user: { username: 'yan' } });
 
@@ -118,7 +151,7 @@ describe('MainMenu authentication', () => {
 
         expect(sessionManager.restore).not.toHaveBeenCalled();
         expect(form.node).toBeUndefined();
-        expect(welcomeTitle()).toBe('Hello, yan!');
+        expect(welcomeTitle()).toBe('Olá, yan!');
 
         inputHandlers.pointerdown();
         expect(scene.scene.start).toHaveBeenCalledWith('ClickerGame');
@@ -133,7 +166,7 @@ describe('MainMenu authentication', () => {
         await flush();
 
         expect(userApi.login).not.toHaveBeenCalled();
-        expect(message()).toEqual({ text: 'Enter username and password', isError: true });
+        expect(message()).toEqual({ text: 'Informe usuário e senha', isError: true });
     });
 
     it('logs in, starts the session, stores the user in the registry and moves to the welcome state', async () => {
@@ -150,13 +183,13 @@ describe('MainMenu authentication', () => {
         expect(userApi.login).toHaveBeenCalledWith('yan', 'secret123');
         expect(sessionManager.start).toHaveBeenCalledWith(response);
         expect(registryData.user).toEqual(user);
-        expect(message()).toEqual({ text: 'Welcome back, yan!', isError: false });
-        expect(welcomeTitle()).toBe('Hello, yan!');
+        expect(message()).toEqual({ text: 'Bem-vindo de volta, yan!', isError: false });
+        expect(welcomeTitle()).toBe('Olá, yan!');
         expect(form.destroy).toHaveBeenCalled();
         expect(scene.input.once).toHaveBeenCalledWith('pointerdown', expect.any(Function));
     });
 
-    it('Sign up asks for the first hero on its own screen and sends no request yet', async () => {
+    it('Criar conta asks for the first hero on its own screen and sends no request yet', async () => {
         const { scene, form, path, message } = createScene({ highscore: 0 });
         await open(scene);
         fill(form, 'ana', 'secret123');
@@ -203,11 +236,11 @@ describe('MainMenu authentication', () => {
         expect(userApi.login).not.toHaveBeenCalled();
         expect(sessionManager.start).toHaveBeenCalledWith(response);
         expect(registryData.user).toEqual(user);
-        expect(message()).toEqual({ text: 'Account created, ana!', isError: false });
+        expect(message()).toEqual({ text: 'Conta criada, ana!', isError: false });
         expect(screen.destroy).toHaveBeenCalled();
     });
 
-    it('Sign up with an empty field shows the message and does not leave the form', async () => {
+    it('Criar conta with an empty field shows the message and does not leave the form', async () => {
         const { scene, form, doms, message } = createScene({ highscore: 0 });
         await open(scene);
         fill(form, 'ana', '');
@@ -215,7 +248,7 @@ describe('MainMenu authentication', () => {
         form.getChildByName('signup').click();
         await flush();
 
-        expect(message()).toEqual({ text: 'Enter username and password', isError: true });
+        expect(message()).toEqual({ text: 'Informe usuário e senha', isError: true });
         expect(form.setVisible).not.toHaveBeenCalled();
         expect(doms.some((d) => d.node.querySelector('.path-choice'))).toBe(false);
     });
@@ -267,7 +300,9 @@ describe('MainMenu authentication', () => {
     });
 
     it('shows the error and re-enables the buttons when the request fails', async () => {
-        vi.mocked(userApi.login).mockRejectedValue(new Error('Password is invalid'));
+        vi.mocked(userApi.login).mockRejectedValue(ApiError.from({
+            response: { status: 401, data: { detail: 'Password is invalid', code: 'LOGIN_INVALID_PASSWORD' } }
+        }));
         const { scene, form, registryData, message } = createScene({ highscore: 0 });
         await open(scene);
         fill(form, 'yan', 'wrong-pass');
@@ -276,7 +311,7 @@ describe('MainMenu authentication', () => {
         expect(form.getChildByName('login').disabled).toBe(true);
         await flush();
 
-        expect(message()).toEqual({ text: 'Password is invalid', isError: true });
+        expect(message()).toEqual({ text: 'Senha incorreta.', isError: true });
         expect(form.getChildByName('login').disabled).toBe(false);
         expect(form.getChildByName('signup').disabled).toBe(false);
         expect(registryData.user).toBeUndefined();
@@ -318,7 +353,7 @@ describe('MainMenu session restore', () => {
         await open(scene);
 
         expect(registryData.user).toEqual(user);
-        expect(welcomeTitle()).toBe('Hello, yan!');
+        expect(welcomeTitle()).toBe('Olá, yan!');
         expect(form.node).toBeUndefined();
         expect(inputHandlers.pointerdown).toEqual(expect.any(Function));
     });
@@ -335,13 +370,13 @@ describe('MainMenu session restore', () => {
     });
 
     it('shows the form and the error message when the server is unreachable', async () => {
-        vi.mocked(sessionManager.restore).mockResolvedValue({ status: 'offline', message: 'Cannot reach the server. Try again later.' });
+        vi.mocked(sessionManager.restore).mockResolvedValue({ status: 'offline', message: 'Não foi possível falar com o servidor. Tente de novo mais tarde.' });
         const { scene, form, message, registryData } = createScene({ highscore: 0 });
 
         await open(scene);
 
         expect(form.getChildByName('login')).not.toBeNull();
-        expect(message()).toEqual({ text: 'Cannot reach the server. Try again later.', isError: true });
+        expect(message()).toEqual({ text: 'Não foi possível falar com o servidor. Tente de novo mais tarde.', isError: true });
         expect(registryData.user).toBeUndefined();
     });
 
@@ -428,12 +463,12 @@ describe('MainMenu backend wake-up', () => {
 
     it('still restores the session when the backend cannot be reached', async () => {
         backend.wake.mockResolvedValue(false);
-        vi.mocked(sessionManager.restore).mockResolvedValue({ status: 'offline', message: 'Cannot reach the server. Try again later.' });
+        vi.mocked(sessionManager.restore).mockResolvedValue({ status: 'offline', message: 'Não foi possível falar com o servidor. Tente de novo mais tarde.' });
         const { scene, form, message } = createScene({ highscore: 0 });
 
         await open(scene);
 
-        expect(message()).toEqual({ text: 'Cannot reach the server. Try again later.', isError: true });
+        expect(message()).toEqual({ text: 'Não foi possível falar com o servidor. Tente de novo mais tarde.', isError: true });
         expect(form.getChildByName('login')).not.toBeNull();
     });
 
@@ -467,16 +502,16 @@ describe('MainMenu backend wake-up', () => {
 describe('MainMenu logout', () => {
     const loggedIn = () => createScene({ highscore: 0, user: { username: 'yan' } });
 
-    it('renders a Logout button in the welcome state', () => {
+    it('renders a Sair button in the welcome state', () => {
         const { scene, logoutButton } = loggedIn();
 
         scene.create();
 
-        expect(logoutButton().textContent).toBe('Logout');
+        expect(logoutButton().textContent).toBe('Sair');
         expect(logoutButton().tagName).toBe('BUTTON');
     });
 
-    it('does not render a Logout button in the auth form state', async () => {
+    it('does not render a Sair button in the auth form state', async () => {
         const { scene, logoutButton } = createScene({ highscore: 0 });
 
         await open(scene);

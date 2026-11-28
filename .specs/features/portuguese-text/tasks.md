@@ -153,7 +153,7 @@ T11
 
 ---
 
-#### T3: The main menu in Portuguese [ ]
+#### T3: The main menu in Portuguese [x]
 
 **Owner**: game-dev
 **Goal**: The sign-in form, its messages, the welcome screen and the page language are Portuguese (PT-01; spec Main menu AC 1 to 6, I1 to I10, I34).
@@ -180,9 +180,9 @@ T11
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The unit suite passes.
-- [ ] `git grep -n -E "Welcome back|Account created|Hello, |Click to Start|Enter username|>Login<|>Sign up<|Logout<|placeholder=\"(Username|Password)\"" -- game/src game/index.html` prints nothing.
-- [ ] The commit touches exactly `MainMenu.js`, `index.html`, `MainMenu.test.js` and this file.
+- [x] The unit suite passes.
+- [x] `git grep -n -E "Welcome back|Account created|Hello, |Click to Start|Enter username|>Login<|>Sign up<|Logout<|placeholder=\"(Username|Password)\"" -- game/src game/index.html` prints nothing.
+- [x] The commit touches exactly `MainMenu.js`, `index.html`, `MainMenu.test.js` and this file.
 
 **Commit**: `feat(game): translate the main menu to Portuguese`
 
