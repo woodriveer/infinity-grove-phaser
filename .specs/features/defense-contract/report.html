@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contrato da defesa do inimigo</title>
+<style>
+:root { --bg:#faf7f2; --surface:#fff; --text:#2b2622; --muted:#6f655c; --line:#e4dcd1; --ok:#2f7a4a; }
+@media (prefers-color-scheme: dark) { :root { --bg:#1d1a17; --surface:#27231f; --text:#efe8df; --muted:#a99d90; --line:#3a342e; --ok:#6cc28c; } }
+* { box-sizing: border-box; }
+body { margin:0; padding:32px 16px 64px; background:var(--bg); color:var(--text); font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+main { max-width:920px; margin:0 auto; }
+h1 { font-size:28px; margin:0 0 4px; } h2 { font-size:18px; margin:36px 0 12px; }
+.sub { color:var(--muted); margin:8px 0 0; }
+.verdict { display:inline-block; padding:4px 12px; border-radius:999px; background:var(--ok); color:var(--bg); font-weight:700; }
+table { width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--line); }
+th,td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { font-size:13px; color:var(--muted); font-weight:600; }
+td.n { font-variant-numeric:tabular-nums; }
+code { font-size:13px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Contrato da defesa do inimigo</h1>
+<p class="sub">Versão v0.15.0 · 28/11/2026 · <span class="verdict">CONCLUÍDO</span></p>
+
+<h2>Veredito</h2>
+<p>Todas as tarefas de <code>tasks.md</code> (T1 a T10) estão marcadas; as duas verificações de autoria do <code>test-engineer</code> (T8 e T10) não têm lacunas nem mutantes sobreviventes; tudo está em <code>origin/main</code>. Não há mudança visível ao jogador, então não houve revisão de UI. A defesa do inimigo passou a morar em uma só coluna (<code>enemies.defense</code>), as colunas antigas <code>physical_defense</code> e <code>magical_defense</code> foram removidas, a API responde só <code>defense</code> e o jogo lê só <code>defense</code> (paga TD-002 de AD-021).</p>
+<table>
+<tr><th>Item</th><th>Valor</th></tr>
+<tr><td>Commits da funcionalidade</td><td>10 commits, de <code>417e771b</code> a <code>196040bd</code>: T1 <code>417e771b</code> (V19), T2 <code>81cc6f3f</code>, T3 <code>fbdf9119</code>, T4 <code>76fc84dc</code>, T5 <code>9a584b72</code>, T6 <code>8519d57e</code>, T7 <code>b21a2dda</code>, T8 <code>6d3cabff</code>, T9 <code>cde19d26</code> (V20), T10 <code>196040bd</code>. Spec: <code>a84df48e</code>.</td></tr>
+<tr><td>Como os números foram separados</td><td>Outras funcionalidades têm commits intercalados nessa faixa (dano da equipe por clique, spec de histórias, traduções do <code>portuguese-text</code>). Os números abaixo vêm de <code>git show --numstat</code> somente dos 10 commits acima, não de <code>git diff</code> da faixa inteira.</td></tr>
+<tr><td>Revisão de UI</td><td>Não se aplica (nenhuma mudança visível)</td></tr>
+</table>
+
+<h2>Execuções do CI citadas</h2>
+<p>O commit <code>196040bd</code> teve a execução do Tests workflow (46110879407) cancelada porque um push posterior a substituiu (concorrência do workflow); o mesmo vale para as execuções de <code>c5795c20</code> e <code>cf45d26b</code>. Os números vêm da execução verde do ramo <code>ci/defense-contract-contract-check</code> no commit <code>1793c155</code>, a mesma árvore do contrato (<code>cde19d26</code> + a verificação de autoria T10) sem as traduções do <code>portuguese-text</code> que vieram depois em <code>main</code>:</p>
+<table>
+<tr><th>Execução</th><th>O que é</th><th>Resultado</th></tr>
+<tr><td class="n">46109471909</td><td>push, <code>1793c155</code>: todas as suítes (backend, game-unit, deploy-scripts, 12 shards e2e, e2e mesclado)</td><td>success</td></tr>
+<tr><td class="n">46109479046</td><td>workflow_dispatch, <code>1793c155</code>: mutantes da T10</td><td>success, 9 de 9 mortos</td></tr>
+<tr><td class="n">46108920629</td><td>push em <code>main</code>, <code>cde19d26</code> (V20)</td><td>success</td></tr>
+<tr><td class="n">46105777413</td><td>mutantes da T8 (release 1)</td><td>12 de 12 mortos</td></tr>
+</table>
+
+<h2>Verificação de autoria dos testes (test-engineer)</h2>
+<p>T8 (expansão, V19 e a ponte para o backend anterior): 12 mutantes, 12 mortos, 0 sobreviventes. T10 (contrato, V20): 9 mutantes, 9 mortos, 0 sobreviventes (M9, M9b, M10, M10b, M11, M12, M13, M14, M15). Nenhuma lacuna de critério de aceitação apontada.</p>
+
+<h2>Código de produção (somente os 10 commits da funcionalidade)</h2>
+<table>
+<tr><th>Área</th><th>Arquivos</th><th>Adicionadas</th><th>Removidas</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>): 3 arquivos Kotlin + 2 migrações SQL (V19 e V20)</td><td class="n">5</td><td class="n">46</td><td class="n">33</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes + <code>game/public/*.css</code>)</td><td class="n">4</td><td class="n">6</td><td class="n">8</td></tr>
+</table>
+<p class="sub">Backend: <code>V19__enemy_defense_expand.sql</code> (+24), <code>V20__enemy_defense_contract.sql</code> (+7), <code>ChapterEntities.kt</code> (+5/-7), <code>EnemyRepository.kt</code> (+8/-15), <code>ProgressController.kt</code> (+2/-11). Jogo: <code>monster.js</code> (+3/-3), <code>damage.js</code> (+1/-1), <code>campaign.js</code> (+1/-2), <code>talentCollection.js</code> (+1/-2). Além disso, o asset sem uso <code>game/public/assets/talent-break-magical.png</code> foi apagado (binário, sem contagem de linhas). Specs, scripts de captura de UI e testes não são código de produção.</p>
+
+<h2>Código de teste (somente os 10 commits)</h2>
+<table>
+<tr><th>Suíte</th><th>Arquivos</th><th>Adicionadas</th><th>Removidas</th><th>Total após a execução</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td class="n">9</td><td class="n">490</td><td class="n">108</td><td class="n">1398 testes, 0 falhas</td></tr>
+<tr><td>Unitário do jogo (<code>game/src/**/*.test.js</code>)</td><td class="n">11</td><td class="n">160</td><td class="n">82</td><td class="n">2492 testes, 0 falhas</td></tr>
+<tr><td>e2e (<code>game/e2e</code>)</td><td class="n">30</td><td class="n">52</td><td class="n">52</td><td class="n">798 cenários, 0 falhas</td></tr>
+<tr><td>Capturas de revisão de UI (<code>game/ui-review/*.shots.js</code>)</td><td class="n">11</td><td class="n">12</td><td class="n">12</td><td class="n">não é suíte de testes</td></tr>
+</table>
+<p class="sub">Testes adicionados (contagem das linhas <code>@Test</code>/<code>@ParameterizedTest</code> e <code>it(</code>/<code>test(</code> no diff, incluindo títulos renomeados): backend +19 / -1; jogo (unitário e e2e juntos) +19 / -15. Também há o teste de migração do deploy: <code>deploy-scripts</code> 306 testes, 0 falhas.</p>
+
+<h2>Cobertura de testes unitários (execução 46109471909)</h2>
+<table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Backend inteiro (JaCoCo)</td><td class="n">98,49%</td><td class="n">93,72%</td></tr>
+<tr><td>Jogo inteiro (Vitest, v8)</td><td class="n">98,73%</td><td class="n">95,10%</td></tr>
+<tr><td>Scripts de deploy (lcov)</td><td class="n">98,47%</td><td class="n">96,79%</td></tr>
+</table>
+<p>Arquivos que a funcionalidade alterou:</p>
+<table>
+<tr><th>Arquivo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td><code>ProgressController.kt</code></td><td class="n">107/107</td><td class="n">14/14</td></tr>
+<tr><td><code>EnemyRepository.kt</code></td><td class="n">8/8</td><td class="n">2/4</td></tr>
+<tr><td><code>ChapterEntities.kt</code></td><td class="n">122/137 (89,1%)</td><td class="n">1/2</td></tr>
+<tr><td><code>monster.js</code>, <code>damage.js</code>, <code>campaign.js</code>, <code>talentCollection.js</code></td><td class="n">100% cada</td><td class="n">100% cada</td></tr>
+</table>
+<p class="sub">As migrações SQL não têm cobertura de linhas; elas são exercitadas pelos testes de integração (<code>EnemyDefenseMigrationIT</code>, <code>PreviousBackendCompatibilityIT</code>, <code>EarlyGameRebalanceMigrationIT</code>).</p>
+
+<h2>Cobertura e2e (execução 46109471909)</h2>
+<p>Linhas do código do jogo exercitadas pelo Playwright (instrumentação istanbul, limite inferior): <b>94,51%</b> das linhas, 80,86% dos ramos, em 798 cenários. Arquivos alterados: <code>monster.js</code> 87,5% / 40%, <code>damage.js</code> 100% / 76,19%, <code>campaign.js</code> 92,45% / 83,78%, <code>talentCollection.js</code> 96,55% / 62,5% (linhas / ramos).</p>
+
+<h2>Cenários e2e da funcionalidade</h2>
+<p><code>unifiedDamage.spec.js</code>, 11 cenários, todos passaram, entre eles: monstro do payload novo mostra Defesa 40% e o clique o encontra (1,4 x 0,6 = 0,84); Quebra de defesa 5 a 6 muda Defesa 15% para 14% no mesmo monstro; Chuva de Meteoros ignora <code>physicalDefense</code> de um payload antigo (35); a linha do inimigo tem três chips; a tela de Talentos tem uma Quebra de defesa e nenhuma quebra mágica. Os outros 29 arquivos e2e que montavam inimigos no formato antigo foram convertidos e passam (798 de 798).</p>
+
+<h2>Falhas não causadas pela funcionalidade</h2>
+<p>Nenhuma. A execução 46109471909 passou inteira, sem repetição.</p>
+
+<h2>Implantação e produção</h2>
+<table>
+<tr><th>Item</th><th>Resultado</th></tr>
+<tr><td>Backend</td><td>V19 e a ponte entraram com o backend da T2 e T3; V20 (<code>cde19d26</code>) foi implantado depois, com a janela de rollback do release 1 já fechada (Q2 da spec). Slot ativo: <code>blue</code>, commit <code>cde19d26</code>. O contêiner <code>infinity-grove-backend-blue</code> está no ar e o túnel responde (401 <code>AUTH_UNAUTHENTICATED</code> sem login, como esperado).</td></tr>
+<tr><td>Jogo (Worker)</td><td>O observador tratou o commit <code>929b8fd5</code> (que contém <code>196040bd</code>) e republicou o Worker. O pacote do Worker não contém <code>physicalDefense</code>. O site responde 200.</td></tr>
+<tr><td>Navegador</td><td>A extensão Claude in Chrome não estava conectada, então a jogada do caminho principal no navegador não foi feita; a verificação foi por HTTP (site, pacote do Worker, túnel, contêineres).</td></tr>
+</table>
+<p class="sub">O site só está no ar enquanto <code>publish.sh</code> roda.</p>
+</main>
+</body>
+</html>

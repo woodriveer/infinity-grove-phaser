@@ -3,6 +3,20 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.15.0] - 2026-11-28
+
+Contrato da defesa do inimigo (`defense-contract`): a defesa dos inimigos passa a ter um único registro no jogo e no servidor. Nada muda na tela: os números e a linha do inimigo continuam como eram.
+
+### Alterado
+
+- A defesa de cada inimigo agora é guardada e enviada em um único campo, `defense`, no lugar de três valores repetidos. O jogo lê só esse campo, então o dano e o texto "Defesa" seguem as mesmas regras de antes.
+- A migração do servidor foi feita em duas etapas, sem parar o jogo: primeiro uma ponte que manteve o servidor anterior funcionando, depois a remoção das colunas antigas.
+
+### Removido
+
+- As colunas e campos antigos de defesa física e mágica, que eram cópias do mesmo valor.
+- O ícone sem uso da quebra mágica.
+
 ## [0.14.0] - 2026-11-28
 
 Dano da equipe por clique (`team-click-damage`): a equipe deixa de bater uma vez por segundo e passa a complementar o seu clique.
