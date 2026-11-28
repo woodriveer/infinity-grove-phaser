@@ -194,6 +194,11 @@ test.describe('A click brings the team (TCD-01)', () => {
         //  The click deals 1, Lyra's 20 kills the monster of 10 and Orina's hit of the same team strike does not land
         expect(await textsOf(page, ALLY)).toEqual([ '20' ]);
         expect(await scene(page, '(s) => s.monster.dead')).toBe(true);
+        //  Only the sprite of the slot that hit steps: Lyra's, not Orina's
+        const stepped = (hero) => scene(page, `(s) => s.tweens.getTweens().filter((t) => t.targets[0].texture?.key === "hero_${hero}").length`);
+
+        expect(await stepped('lyra')).toBe(1);
+        expect(await stepped('orina')).toBe(0);
 
         //  The respawn, the flying coins and the report run in real time; the new monster is read from the record of showEncounter (TD-012)
         await recordShownMonsters(page);
