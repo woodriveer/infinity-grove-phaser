@@ -524,7 +524,7 @@ object ClickPower {
 
 ---
 
-#### T4: Ranking repository (JDBC) [ ]
+#### T4: Ranking repository (JDBC) [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The clocks read and write, the records keep the better value in one SQL statement, and each board answers its top 10 and the caller's position (RNK-05, RNK-06; spec Boards API AC 1 to 7, Edge Cases on ties).
@@ -619,7 +619,7 @@ Board sources (a private `data class Source(val table: String, val column: Strin
 **Gate**: `git push origin HEAD:ci/rankings` then `node scripts/ci-wait.mjs ci/rankings`: `RankingRepositoryIT` passes in the `backend` job.
 **Done when**:
 
-- [ ] The 11 cases pass in CI; ktlint passes.
+- [x] The 11 cases pass in CI; ktlint passes.
 
 **Commit**: `feat(backend): store and read the ranking records`
 

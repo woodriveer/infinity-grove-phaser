@@ -8,8 +8,12 @@ import br.com.woodriver.infinity_grove_ws.domain.Hero
 import br.com.woodriver.infinity_grove_ws.domain.Piece
 import br.com.woodriver.infinity_grove_ws.domain.PlayerCards
 import br.com.woodriver.infinity_grove_ws.domain.Progress
+import br.com.woodriver.infinity_grove_ws.domain.RankingBoard
+import br.com.woodriver.infinity_grove_ws.domain.RankingEntry
+import br.com.woodriver.infinity_grove_ws.domain.RankingMe
 import br.com.woodriver.infinity_grove_ws.domain.RefreshToken
 import br.com.woodriver.infinity_grove_ws.domain.ResetLegacy
+import br.com.woodriver.infinity_grove_ws.domain.RunClock
 import br.com.woodriver.infinity_grove_ws.domain.Team
 import br.com.woodriver.infinity_grove_ws.domain.User
 import br.com.woodriver.infinity_grove_ws.domain.Wallet
@@ -30,6 +34,7 @@ import br.com.woodriver.infinity_grove_ws.port.LegacyRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.PasswordHasherPort
 import br.com.woodriver.infinity_grove_ws.port.PlayerCardsRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.ProgressRepositoryPort
+import br.com.woodriver.infinity_grove_ws.port.RankingRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenRepositoryPort
 import br.com.woodriver.infinity_grove_ws.port.RefreshTokenSecretPort
 import br.com.woodriver.infinity_grove_ws.port.ResetRepositoryPort
@@ -373,5 +378,99 @@ class InMemoryTeamRepository : TeamRepositoryPort {
         team: Team,
     ) {
         teams[username] = team
+    }
+}
+
+/** The rankings in memory: tests fill the maps (there is no trigger here); the keep-the-better rules and the board order are the SQL's. */
+class InMemoryRankingRepository : RankingRepositoryPort {
+    val clocks = mutableMapOf<String, RunClock>()
+    val bossTimes = mutableMapOf<Pair<String, Int>, Pair<Long, Long>>()
+    val storyTimes = mutableMapOf<String, Pair<Long, Long>>()
+    val powers = mutableMapOf<String, Pair<Double, Long>>()
+    val fortunes = mutableMapOf<String, Pair<Long, Long>>()
+
+    override fun clock(username: String) = clocks[username] ?: RunClock(username)
+
+    override fun saveClock(clock: RunClock) {
+        clocks[clock.username] = clock
+    }
+
+    override fun improveBossTime(
+        username: String,
+        chapter: Int,
+        ms: Long,
+        at: Long,
+    ): Boolean {
+        val stored = bossTimes[username to chapter]
+        if (stored != null && ms >= stored.first) return false
+        bossTimes[username to chapter] = ms to at
+        return true
+    }
+
+    override fun improveStoryTime(
+        username: String,
+        ms: Long,
+        at: Long,
+    ): Boolean {
+        val stored = storyTimes[username]
+        if (stored != null && ms >= stored.first) return false
+        storyTimes[username] = ms to at
+        return true
+    }
+
+    override fun improveClickPower(
+        username: String,
+        power: Double,
+        at: Long,
+    ): Boolean {
+        val stored = powers[username]
+        if (stored != null && power <= stored.first) return false
+        powers[username] = power to at
+        return true
+    }
+
+    override fun clickPower(username: String) = powers[username]?.first
+
+    override fun top(
+        board: RankingBoard,
+        chapter: Int?,
+        limit: Int,
+    ): List<RankingEntry> =
+        ordered(board, chapter).take(limit).mapIndexed {
+            index,
+            row,
+            ->
+            RankingEntry(index + 1, row.first, row.second.first)
+        }
+
+    override fun me(
+        board: RankingBoard,
+        chapter: Int?,
+        username: String,
+    ): RankingMe? {
+        val index = ordered(board, chapter).indexOfFirst { it.first == username }
+        if (index < 0) return null
+        return RankingMe(index + 1, username, ordered(board, chapter)[index].second.first)
+    }
+
+    /** Rows of [board] as (username, (value, at)) in board order: the better value, then the earlier record, then the username by code point. */
+    private fun ordered(
+        board: RankingBoard,
+        chapter: Int?,
+    ): List<Pair<String, Pair<Double, Long>>> {
+        val rows: List<Pair<String, Pair<Double, Long>>> =
+            when (board) {
+                RankingBoard.BOSS_TIME ->
+                    bossTimes.filterKeys { it.second == chapter }.map { (key, value) ->
+                        key.first to
+                            (value.first.toDouble() to value.second)
+                    }
+                RankingBoard.STORY_TIME -> storyTimes.map { (name, value) -> name to (value.first.toDouble() to value.second) }
+                RankingBoard.CLICK_POWER -> powers.map { (name, value) -> name to value }
+                RankingBoard.FORTUNE ->
+                    fortunes.filterValues { it.first > 0 }.map { (name, value) -> name to (value.first.toDouble() to value.second) }
+            }
+        val byValue = compareBy<Pair<String, Pair<Double, Long>>> { it.second.first }
+        return rows.sortedWith((if (board.lowerIsBetter) byValue else byValue.reversed()).thenBy { it.second.second }.thenBy { it.first })
     }
 }
