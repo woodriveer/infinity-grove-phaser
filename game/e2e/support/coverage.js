@@ -8,7 +8,18 @@ import { expect, test as base } from '@playwright/test';
 const collecting = process.env.VITE_COVERAGE === 'true';
 
 export const test = base.extend({
-    page: async ({ page }, use, testInfo) => {
+    //  Every spec starts with the prologue seen (spec story-scenes D23), so a chapter 1 battle opens on the fight;
+    //  the story specs turn it off with test.use({ storySeen: false }). A value the test wrote itself is kept.
+    storySeen: [ true, { option: true } ],
+    page: async ({ page, storySeen }, use, testInfo) => {
+        if (storySeen) {
+            await page.addInitScript(() => {
+                if (localStorage.getItem('infinity-grove.story-seen') === null) {
+                    localStorage.setItem('infinity-grove.story-seen', '["prologue"]');
+                }
+            });
+        }
+
         await use(page);
 
         if (!collecting) { return; }
