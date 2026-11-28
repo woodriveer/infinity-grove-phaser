@@ -30,7 +30,7 @@ novos guardiões.
 
 ## Loop principal
 1. O jogador clica nos inimigos para causar dano (dano de clique).
-2. Os heróis recrutados atacam automaticamente (dano por segundo, DPS).
+2. Os heróis da equipe golpeiam junto com cada clique, manual ou do auto clique (dano de clique secundário).
 3. Inimigos derrotados soltam **Seiva** (moeda principal).
 4. A Seiva é usada para subir o nível dos heróis e do clique.
 5. O jogador ativa habilidades no momento certo para vencer ondas difíceis e
