@@ -100,6 +100,34 @@ class EnemyDefenseMigrationIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `a row inserted with physical_defense 85 and magical_defense 86 gets defense 85 and keeps both old values`() {
+        scratchAt("19")
+
+        oldEnemy("DARKNESS", 85, 86, 94)
+
+        val row =
+            jdbc.queryForMap(
+                "select defense, physical_defense, magical_defense from $SCRATCH.enemies where element = 'DARKNESS' and crit_resistance = 94",
+            )
+        assertEquals(85, row["defense"])
+        assertEquals(85, row["physical_defense"])
+        assertEquals(86, row["magical_defense"])
+    }
+
+    @Test
+    fun `every enemy seeded by the new backend holds the same value in defense, physical_defense and magical_defense`() {
+        val total = jdbc.queryForObject("select count(*) from enemies", Int::class.java)
+        val different =
+            jdbc.queryForObject(
+                "select count(*) from enemies where defense <> physical_defense or defense <> magical_defense",
+                Int::class.java,
+            )
+
+        assertTrue(total!! > 0, "the seeder stored no enemy")
+        assertEquals(0, different)
+    }
+
+    @Test
     fun `the new backend inserts only defense and the old columns get it`() {
         scratchAt("19")
 
@@ -152,6 +180,25 @@ class EnemyDefenseMigrationIT : IntegrationTestBase() {
             "23505",
             sqlStateOf(
                 "insert into enemies (element, defense, crit_resistance) select element, defense, crit_resistance from enemies order by id limit 1",
+            ),
+        )
+    }
+
+    @Test
+    fun `uk_enemies_defense alone rejects a repeat of element, defense and critical resistance whose magical_defense differs`() {
+        scratchAt("19")
+        jdbc.update("insert into $SCRATCH.enemies (element, defense, crit_resistance) values ('FIRE', 33, 44)")
+
+        // magical_defense 34 keeps uk_enemies_attributes (element, physical_defense, magical_defense, crit_resistance) from firing
+        val state =
+            sqlStateOf("insert into $SCRATCH.enemies (element, defense, magical_defense, crit_resistance) values ('FIRE', 33, 34, 44)")
+
+        assertEquals("23505", state)
+        assertEquals(
+            1,
+            jdbc.queryForObject(
+                "select count(*) from $SCRATCH.enemies where element = 'FIRE' and defense = 33 and crit_resistance = 44",
+                Int::class.java,
             ),
         )
     }

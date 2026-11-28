@@ -416,7 +416,7 @@ export const RETIRED_TALENT_IDS = [
 
 ### Phase 4: Author check of release 1 and the game
 
-#### T8: Author check [ ]
+#### T8: Author check [x]
 
 **Owner**: test-engineer
 **Goal**: Every AC and edge case of DEF-01 to DEF-05 has a test that asserts its spec value, and the tests kill the injected faults.
@@ -436,7 +436,7 @@ export const RETIRED_TALENT_IDS = [
 **Gate**: `cd backend && ./gradlew test && cd ../game && npm test && npx playwright test e2e/unifiedDamage.spec.js e2e/heroTeamCombat.spec.js`
 **Done when**:
 
-- [ ] Every AC and edge case of DEF-01 to DEF-05 maps to a test; every mutant is killed or a fix task is listed.
+- [x] Every AC and edge case of DEF-01 to DEF-05 maps to a test; every mutant is killed or a fix task is listed.
 
 **Commit**: `test: author check of the defense contract release 1`
 
@@ -563,3 +563,74 @@ export const RETIRED_TALENT_IDS = [
 | T8 | check | - | runs | ✅ OK |
 | T9 | Migration | integration | integration | ✅ OK |
 | T10 | check | - | runs | ✅ OK |
+
+---
+
+## Author check
+
+Run on 2026-11-28 by `test-engineer` (T8, release 1 and the game). Paths: `B` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`, `G` = `game/src/`, `E` = `game/e2e/`. DEF-06 (T9) is pending and not part of this check.
+
+### AC to assertion table
+
+| AC | Spec value | Unit / integration test (`file:line`) | e2e |
+| --- | --- | --- | --- |
+| DEF-01 AC 1 | every row `defense` = its `physical_defense` (12 and 40 from rows 12/12 and 40/55) | `B adapter/repository/EnemyDefenseMigrationIT.kt:69` | n/a (no player-visible value) |
+| DEF-01 AC 2 | old insert (86, 86) -> `defense` 86 | `B ...EnemyDefenseMigrationIT.kt:80` | n/a |
+| DEF-01 AC 3 | new insert (defense 87) -> `physical_defense` 87, `magical_defense` 87 | `B ...EnemyDefenseMigrationIT.kt:131` | n/a |
+| DEF-01 AC 4 | defense 91 or -1 -> SQL state 23514 | `B ...EnemyDefenseMigrationIT.kt:167`; column type, not null and `ck_enemies_defense` at `:152` | n/a |
+| DEF-01 AC 5 | repeat of element, defense, critical resistance -> 23505 | `B ...EnemyDefenseMigrationIT.kt:178`; `:188` (added by T8: `magical_defense` differs, so only `uk_enemies_defense` can fire); `B adapter/repository/SchemaConstraintsIT.kt:323` | n/a |
+| DEF-01 AC 6 | V1 to V18 release validates, runs none, V19 is `FUTURE_SUCCESS` | `B ...PreviousBackendCompatibilityIT.kt:231` (`futureMigrations = 1`) | n/a |
+| DEF-01 AC 7 | the previous read path reads 81 and 81 for a row the new backend inserted with 81 | `B adapter/repository/EnemyRepositoryIT.kt:64` (81, 81, 81); `B ...EnemyDefenseMigrationIT.kt:131` (87, 87); `B ...PreviousBackendCompatibilityIT.kt:179` (the previous write and read shape) | n/a |
+| DEF-01 AC 8 | two rows sharing element, physical defense, critical resistance -> V19 fails, no `defense` column, no V19 history row | `B ...EnemyDefenseMigrationIT.kt:207` | n/a |
+| DEF-01 Edge 1 | the previous backend starts and serves enemies | `B ...PreviousBackendCompatibilityIT.kt:60` (entity schema check), `:179`, `:231` | n/a |
+| DEF-01 Edge 2 | every seeded row holds one value in the three columns | `B ...EnemyDefenseMigrationIT.kt:118` (added by T8: count > 0 and 0 rows where `defense` differs from either old column); `B ...EnemyRepositoryIT.kt:64` | n/a |
+| DEF-01 Edge 4 | physical 85, magical 86 -> `defense` 85 | `B ...EnemyDefenseMigrationIT.kt:103` (added by T8: reads 85, 85, 86) | n/a |
+| DEF-02 AC 1 | `EnemyStats(WATER, 81, 97)` saved naming `element`, `defense`, `crit_resistance`; a saved chapter reads back equal | `B ...EnemyRepositoryIT.kt:64`; `B adapter/repository/ChapterRepositoryIT.kt:196` (boss column 55), `:157` (read back equal) | n/a |
+| DEF-02 AC 2 | same stats twice -> same id, one row | `B ...EnemyRepositoryIT.kt:38`; `:47` (a differing attribute -> a new id) | n/a |
+| DEF-02 AC 3 | `EnemyStats.defense` from the column `defense` | `B ...ChapterRepositoryIT.kt:157` (rows written by SQL read back 85 and 88); mutant M5 | n/a |
+| DEF-02 AC 4 | `backend/src/main` names the old names only in V1, V16, V19 | `B DefenseContractSourceTest.kt:31`, `:40` (added by T8; V20 is allowed for T9); mutant M10 | n/a |
+| DEF-03 AC 1 | progress enemies carry `element`, `defense`, `critResistance`, no old key | `B adapter/web/ProgressControllerIT.kt:141` (boss, phase monster, miniboss) | the e2e payloads are a fake backend, so the real shape is pinned by this IT; the specs below read `defense` only |
+| DEF-03 AC 2 | farm enemies follow the same rule | `B adapter/web/FarmControllerIT.kt:304` (boss 35, no old key); `:330` (added by T8: the key set of the boss, the 10 monsters and the 10 minibosses is exactly `element`, `defense`, `critResistance`, both numbers `Int`) | same as AC 1 |
+| DEF-03 AC 3 | chapter 1 boss `defense` 30 | `B ...ProgressControllerIT.kt:141` (`definition.boss.defense` 30) | `E unifiedDamage.spec.js:102` (a new payload shows `Defesa 40%`) |
+| DEF-04 AC 1 | a payload without `defense` reads 0 whatever `physicalDefense`, `magicalDefense` | `G domain/combat/monster.test.js:228`, `:232`; `G domain/combat/damage.test.js:31`, `:49` (deals 1); `G domain/combat/fight.test.js:160` (reads 30); `G domain/combat/monsterAffix.test.js:38` (20); `G domain/talents/talents.test.js:151`, `:338`; `G adapters/phaser/ClickerGame.test.js:2051` (`maxHealth - 1`), `:2073` | `E heroTeamCombat.spec.js:164` (`dealt` 2) |
+| DEF-04 AC 2 | Orina 3 stars, critical 40 %, `{ WATER, physicalDefense 50, magicalDefense 10 }` -> `Water  Defesa 0%  Seu crítico: 40%` and Chuva de Meteoros 25 x 1.4 = 35 | `G adapters/phaser/ClickerGame.test.js:2073` (text of the same shape) | `E unifiedDamage.spec.js:92` (text and `dealt` `25 * STAR`, `STAR` 1.4) |
+| DEF-04 AC 3 | `defense` 40 and `physicalDefense` 70 -> 40 | `G domain/combat/monster.test.js:220`; `G domain/combat/damage.test.js:43` (0.6); `G adapters/phaser/ClickerGame.test.js:2067` (`Defesa 40%`) | `E unifiedDamage.spec.js:115` (`Defesa 40%`, `dealt` `STAR * 0.6`) |
+| DEF-04 AC 4 | `RETIRED_TALENT_IDS` = the six `BOSS_TIME*` and `CRIT_RESIST_BREAK*` ids | `G application/talents/talentCollection.test.js:197` (`toEqual` of the six); mutant M8 | `E unifiedDamage.spec.js:208` (no `talent-MAGICAL_BREAK*` node) |
+| DEF-04 AC 5 | `talent-break-magical.png` is gone and no file under `game/` names it | `G defenseContract.test.js:63` (added by T8) | n/a (no rendered asset) |
+| DEF-05 AC 1 | no `game` file names `physicalDefense` or `magicalDefense` except design § Legacy Payload Tests and the `monster.js` comment | `G defenseContract.test.js:56` (added by T8; scans `game/src`, `game/e2e`, `game/ui-review` and the rest of `game/`); mutant M11 | n/a |
+| DEF-05 AC 2 | the conversion keeps every asserted value | CI run `46106313665`: game unit 2492 of 2492 and e2e 798 of 798 pass on the converted fixtures | same run |
+| DEF-05 AC 3 | no backend test names the old columns except `EnemyDefenseMigrationIT` and `PreviousBackendCompatibilityIT` | `git grep -n -E "physical_defense\|magical_defense" -- backend/src/test` lists those two and `EnemyRepositoryIT.kt:67` (note 1) | n/a |
+
+Every player-visible AC (DEF-04 AC 1 to 4) has an e2e assertion. The spec names no CSS property, so there is no `toHaveCSS` check (spec Out of Scope: no player-visible change).
+
+Notes:
+
+1. DEF-05 AC 3 names two files, but task T2 keeps the `EnemyRepositoryIT` case `the defense is stored in the defense column and copied to the old columns until the contract` (`:64`) on purpose: it is also the Edge 2 evidence. T9 turns it into `the defense is stored in the defense column`. Not a gap.
+2. For T9: `EnemyDefenseMigrationIT.kt:118` (main schema, reads `physical_defense` and `magical_defense`) must go or be rewritten with V20. The cases at `:152` and `:178` run on the main schema too; after V20 they must read `defense` and `uk_enemies_defense` only. `DefenseContractSourceTest` already allows the V20 file.
+
+### Mutants
+
+Run in CI (`workflow_dispatch`, `suites=false`) on `ci/defense-contract-tests` at `2571715b`, run `46105777413`. Each runs one Gradle test class or one Vitest file. Result: 12 mutants, 12 killed, 0 survived, 0 invalid, isolation ok.
+
+| Mutant | Fault | Killed by |
+| --- | --- | --- |
+| M1 | V19 without `update enemies set defense = physical_defense` | `EnemyDefenseMigrationIT` |
+| M2 | trigger without `new.physical_defense := coalesce(...)` | `EnemyDefenseMigrationIT` |
+| M3 | trigger without `new.defense := coalesce(...)` | `EnemyDefenseMigrationIT` |
+| M4 | V19 without `uk_enemies_defense` | `EnemyDefenseMigrationIT` |
+| M5 | `EnemyEntity.toDomain()` with defense 0 | `ChapterRepositoryIT` |
+| M6 | `EnemyStatsResponse` still answering `physicalDefense` | `ProgressControllerIT` |
+| M6b | the same fault, read through `GET /farm` | `FarmControllerIT` |
+| M7 | `defenseOf` back to `stats.defense ?? stats.physicalDefense ?? 0` | `monster.test.js` |
+| M8 | `RETIRED_TALENT_IDS` listing `MAGICAL_BREAK` | `talentCollection.test.js` |
+| M9 | trigger filling `defense` from `magical_defense` (Edge 4) | `EnemyDefenseMigrationIT` (the case at `:103`, added by T8) |
+| M10 | a backend main file naming `physical_defense` | `DefenseContractSourceTest` |
+| M11 | a game source naming `physicalDefense` | `defenseContract.test.js` |
+
+### Suites
+
+CI Tests run `46106313665` of `de9b77c8` (branch `ci/defense-contract-tests`, the T7 tree `b21a2dda` plus the T8 tests): backend 1395 of 1395, game unit 2492 of 2492, e2e 798 of 798, deploy-scripts 306 of 306. JaCoCo lines 98.49 % and branches 93.72 %; game lines 98.73 % and branches 95.10 %; e2e lines 94.51 %.
+
+### Fix tasks
+
+None. Gaps found and closed with tests only (no production change): Edge 2 over the whole seed, Edge 4 (physical 85, magical 86), DEF-01 AC 5 isolated from `uk_enemies_attributes`, the `GET /farm` enemy key set (DEF-03 AC 2), and the new guards for DEF-02 AC 4, DEF-04 AC 5 and DEF-05 AC 1. Spec row DEF-04 was still `Pending` after T7 and is now `Implementing`.

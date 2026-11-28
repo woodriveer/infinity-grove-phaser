@@ -17,6 +17,7 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class FarmControllerIT : IntegrationTestBase() {
     @Autowired
@@ -323,6 +324,29 @@ class FarmControllerIT : IntegrationTestBase() {
             .body("definition.stages[0].miniboss", not(hasKey("magicalDefense")))
             .body("definition.stages[0].monster.defense", equalTo(0))
             .body("chapterBossWinsLeft", equalTo(10))
+    }
+
+    @Test
+    fun `GET farm answers every enemy of its definition with element, defense and critResistance only`() {
+        val token = register()
+        progressAt(4, "PHASE", chapter = 3)
+
+        val definition =
+            asUser(token)
+                .get("/farm?chapter=2")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+        val enemies =
+            listOf("definition.boss") +
+                (0..9).flatMap { listOf("definition.stages[$it].monster", "definition.stages[$it].miniboss") }
+
+        enemies.forEach { path ->
+            assertEquals(setOf("element", "defense", "critResistance"), definition.getMap<String, Any>(path).keys, path)
+            assertTrue(definition.get<Any>("$path.defense") is Int, "$path.defense")
+            assertTrue(definition.get<Any>("$path.critResistance") is Int, "$path.critResistance")
+        }
     }
 
     @Test
