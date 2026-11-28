@@ -180,8 +180,10 @@ $$ language plpgsql;
 
 drop trigger if exists wallets_peak_copper on wallets;
 
+-- No `of copper` column list: it would make the trigger depend on the column and block `drop column copper` (SchemaValidationIT). The
+-- wallet has no other column to update, and the function keeps the larger value anyway.
 create trigger wallets_peak_copper
-    after insert or update of copper on wallets
+    after insert or update on wallets
     for each row execute function record_peak_copper();
 
 -- Every existing wallet starts its peak at its current copper (spec Q12)
