@@ -202,37 +202,42 @@ class PreviousBackendCompatibilityIT : IntegrationTestBase() {
 
     @Test
     fun `the previous release starts on the migrated schema and its validation ignores V13`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 12, futureMigrations = 8)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 12, futureMigrations = 9)
     }
 
     @Test
     fun `the release before the black awareness staff starts on the migrated schema and its validation ignores V14`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 13, futureMigrations = 7)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 13, futureMigrations = 8)
     }
 
     @Test
     fun `the release before the talent tree rework starts on the migrated schema and its validation ignores V15`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 14, futureMigrations = 6)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 14, futureMigrations = 7)
     }
 
     @Test
     fun `the release before the early game rebalance starts on the migrated schema and its validation ignores V16 and V17`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 15, futureMigrations = 5)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 15, futureMigrations = 6)
     }
 
     @Test
     fun `the release before the reset legacy starts on the migrated schema and its validation ignores V18`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 17, futureMigrations = 3)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 17, futureMigrations = 4)
     }
 
     @Test
     fun `the release before the defense contract starts on the migrated schema and its validation ignores V19`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 18, futureMigrations = 2)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 18, futureMigrations = 3)
     }
 
     @Test
     fun `the release 1 of the defense contract starts on the migrated schema and its validation ignores V20`() {
-        previousReleaseStartsOnMigratedSchema(lastVersion = 19, futureMigrations = 1)
+        previousReleaseStartsOnMigratedSchema(lastVersion = 19, futureMigrations = 2)
+    }
+
+    @Test
+    fun `the release before the rankings starts on the migrated schema and its validation ignores V21`() {
+        previousReleaseStartsOnMigratedSchema(lastVersion = 20, futureMigrations = 1)
     }
 
     /** The release whose last migration is `V[lastVersion]` validates its own files and sees [futureMigrations] newer ones as future. */

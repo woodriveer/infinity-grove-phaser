@@ -109,7 +109,7 @@ T21
 
 ### Phase 1: Backend storage and rules
 
-#### T1: V21 migration: ranking tables and the fortune trigger [ ]
+#### T1: V21 migration: ranking tables and the fortune trigger [x]
 
 **Owner**: kotlin-backend-dev
 **Goal**: The five ranking tables exist, the fortune peak follows every wallet write, the existing wallets start their peak, and the previous release still starts (RNK-04, RNK-06; spec Fortune AC 1 to 5, Storage AC 1 to 4).
@@ -226,7 +226,7 @@ on conflict (username) do nothing;
 **Gate**: `git push origin HEAD:ci/rankings` then `node scripts/ci-wait.mjs ci/rankings`: the `backend` job passes `RankingsMigrationIT`, `PreviousBackendCompatibilityIT` and `SchemaValidationIT`.
 **Done when**:
 
-- [ ] The 8 cases and the 8 compatibility cases pass in CI; no other backend test fails.
+- [x] The 8 cases and the 8 compatibility cases pass in CI; no other backend test fails.
 
 **Commit**: `feat(backend): add the ranking tables and the fortune peak trigger`
 
