@@ -173,7 +173,7 @@ Checked on `main` at `55caf5b` and on the production stack on 2026-11-26.
 | DEF-03 | P1: Payload - AC 1 to 3 | Tasks T3 | Implementing |
 | DEF-04 | P1: Game - AC 1 to 5 | Tasks T7 | Implementing |
 | DEF-05 | P1: Fixtures - AC 1 to 3 | Tasks T4, T5, T6 | Implementing |
-| DEF-06 | P1: Contract - AC 1 to 5, Edge 3 | Tasks T9 | Pending |
+| DEF-06 | P1: Contract - AC 1 to 5, Edge 3 | Tasks T9, T10 | Implementing |
 
 **Coverage:** 6 total, 6 mapped to tasks, 0 unmapped
 

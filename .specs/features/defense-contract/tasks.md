@@ -506,7 +506,7 @@ export const RETIRED_TALENT_IDS = [
 
 ---
 
-#### T10: Author check of the contract [ ]
+#### T10: Author check of the contract [x]
 
 **Owner**: test-engineer
 **Goal**: DEF-06 AC 1 to 5 and Edge 3 map to tests that kill the injected faults.
@@ -526,7 +526,7 @@ export const RETIRED_TALENT_IDS = [
 **Gate**: `cd backend && ./gradlew test`
 **Done when**:
 
-- [ ] DEF-06 maps to tests; every mutant is killed or a fix task is listed.
+- [x] DEF-06 maps to tests; every mutant is killed or a fix task is listed.
 
 **Commit**: `test: author check of the defense contract step`
 
@@ -568,7 +568,7 @@ export const RETIRED_TALENT_IDS = [
 
 ## Author check
 
-Run on 2026-11-28 by `test-engineer` (T8, release 1 and the game). Paths: `B` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`, `G` = `game/src/`, `E` = `game/e2e/`. DEF-06 (T9) is pending and not part of this check.
+Run on 2026-11-28 by `test-engineer` (T8, release 1 and the game). Paths: `B` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`, `G` = `game/src/`, `E` = `game/e2e/`. DEF-06 (T9) is checked in § Contract (T10) below.
 
 ### AC to assertion table
 
@@ -634,3 +634,51 @@ CI Tests run `46106313665` of `de9b77c8` (branch `ci/defense-contract-tests`, th
 ### Fix tasks
 
 None. Gaps found and closed with tests only (no production change): Edge 2 over the whole seed, Edge 4 (physical 85, magical 86), DEF-01 AC 5 isolated from `uk_enemies_attributes`, the `GET /farm` enemy key set (DEF-03 AC 2), and the new guards for DEF-02 AC 4, DEF-04 AC 5 and DEF-05 AC 1. Spec row DEF-04 was still `Pending` after T7 and is now `Implementing`.
+
+### Contract (T10)
+
+Run on 2026-11-28 by `test-engineer` on the T9 tree (`cde19d26`, live in production). Paths: `B` = `backend/src/test/kotlin/br/com/woodriver/infinity_grove_ws/`.
+
+#### AC to assertion table
+
+| AC | Spec value | Integration test (`file:line`) |
+| --- | --- | --- |
+| DEF-06 AC 1 | no column `physical_defense` or `magical_defense` in `enemies`, no constraint `uk_enemies_attributes`, no trigger and no function `enemies_defense_sync` (all four counts 0) | `B adapter/repository/EnemyDefenseMigrationIT.kt:217` (the four counts, each `0`); mutants M9, M9b, M10, M10b |
+| DEF-06 AC 1 (data) | a database at V19 keeps its defenses through V20 (`[12, 40]`) | `B ...EnemyDefenseMigrationIT.kt:232`; mutant M14 |
+| DEF-06 AC 2 | release 1 (V1 to V19) validates, runs none, sees V20 as one `FUTURE_SUCCESS` | `B ...PreviousBackendCompatibilityIT.kt:234` (`lastVersion = 19`, `futureMigrations = 1`); mutant M12 |
+| DEF-06 AC 2 | release 1 reads and writes enemies through `defense`: insert `NATURE`, 88, 98 -> 1 row, one id, chapter 1 boss `defense` 30 | `B ...PreviousBackendCompatibilityIT.kt:178`; the entity columns and types of `enemies` (`id`, `element`, `defense`, `crit_resistance`) at `:92`; mutant M13 |
+| DEF-06 AC 3 | the contract task stops, reports pending and is not pushed when the Q2 precondition fails | no automated test: it is a procedure of T9. Evidence: the T9 commit body (`cde19d26`) quotes the precondition checked before the commit (`active.commit` `7385de71`, `previous` null, T3 an ancestor, no unhandled commit) |
+| DEF-06 AC 4 | every assertion of `EarlyGameRebalanceMigrationIT` passes with V16 replayed through `migrate()` | `B ...EarlyGameRebalanceMigrationIT.kt:22` (the four replacements) and its 10 cases at `:108` to `:231`; mutant M11 (replacement 4 only: without it the replay names `uk_enemies_attributes` and fails) |
+| DEF-06 AC 5 | `backend/src/main` names `physical_defense` or `magical_defense` only in V1, V16, V19, V20 | `B DefenseContractSourceTest.kt:37`, `:46`; mutant M15 is the test side |
+| DEF-06 AC 5 | `backend/src/test` names them only in the V16 replay and in the assertions that the columns are gone or bridged (`EnemyDefenseMigrationIT`, `EarlyGameRebalanceMigrationIT`, and the guard itself) | `B DefenseContractSourceTest.kt:53` (added by T10: before it, only a manual `git grep` guarded the test side); mutant M15 |
+| DEF-06 Edge 3 | the release 1 backend keeps serving on the database V20 left (maps only `defense`) | `B ...PreviousBackendCompatibilityIT.kt:60` (its entity columns against the migrated schema), `:178`; `B adapter/repository/SchemaValidationIT.kt:30` (the current entities, which are release 1's, validate on the V20 schema); `B ...EnemyRepositoryIT.kt:64` (`defense` 81) |
+
+Notes:
+
+1. The spec names no player-visible value and no CSS: no e2e or `toHaveCSS` check applies to DEF-06.
+2. The T8 table row "DEF-01 Edge 2" (`EnemyDefenseMigrationIT.kt:118`, every seeded row holds one value in the three columns) no longer has a main-schema test after V20: T9 removed that case, because it reads a column V20 drops. The Edge 2 statement ends at V20 ("until V20"), and the column-gone assertion at `:217` replaces it. Not a gap.
+3. A mutant that removes `drop constraint uk_enemies_attributes` was not run: PostgreSQL drops a multi-column constraint together with any of its columns, so it is equivalent to V20 as written (this is a reasoning, not a measured result).
+
+#### Mutants
+
+Run in CI (`workflow_dispatch`, `suites=false`) on `ci/defense-contract-contract-check` at `1793c155`, run `46109479046`. Each runs one Gradle test class (`sh gradlew test --tests <class>`). Result: 9 mutants, 9 killed, 0 survived, 0 invalid, isolation ok.
+
+| Mutant | Fault | Killed by |
+| --- | --- | --- |
+| M9 | V20 without `drop trigger` | `EnemyDefenseMigrationIT` |
+| M9b | V20 without `drop function` (the trigger goes, the function stays) | `EnemyDefenseMigrationIT` |
+| M10 | V20 without `drop column if exists magical_defense` | `EnemyDefenseMigrationIT` |
+| M10b | V20 without `drop column if exists physical_defense` | `EnemyDefenseMigrationIT` |
+| M11 | the V16 replay without replacement 4 (`uk_enemies_attributes`) | `EarlyGameRebalanceMigrationIT` |
+| M12 | `previousReleaseStartsOnMigratedSchema(lastVersion = 19, futureMigrations = 0)` | `PreviousBackendCompatibilityIT` |
+| M13 | V20 also drops `uk_enemies_defense` (the release 1 `on conflict` key) | `PreviousBackendCompatibilityIT` |
+| M14 | V20 sets every `defense` to 0 | `EnemyDefenseMigrationIT` |
+| M15 | `EnemyRepositoryIT` naming `physical_defense` in a test title | `DefenseContractSourceTest` |
+
+#### Suites
+
+CI Tests run `46109471909` of `1793c155` (branch `ci/defense-contract-contract-check`, the T9 tree plus the guard test): backend 1398 of 1398, game unit 2492 of 2492, e2e 798 of 798, deploy-scripts 306 of 306. JaCoCo lines 98.49 % and branches 93.72 %; game lines 98.73 % and branches 95.10 %; e2e lines 94.51 %.
+
+#### Fix tasks
+
+None. One gap closed with a test only (no production change): DEF-06 AC 5 on the test side (`DefenseContractSourceTest.kt:53`).
