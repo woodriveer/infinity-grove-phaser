@@ -3626,3 +3626,64 @@ body.piece-dragging .piece-tooltip {
     .story-overlay, .story-overlay * { animation: none !important; transition: none !important; }
     .story-mote { display: none; }
 }
+
+/* ══ Ranking (spec rankings): four tabs, the board heading, the boss chapter row and the top 10 ══ */
+.ranking-screen { display: flex; flex-direction: column; gap: 12px; }
+.ranking-tabs { display: flex; gap: 8px; }
+.ranking-tab {
+    flex: 1 1 0;
+    height: 40px;
+    padding: 0 12px 3px;
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--parchment-100);
+    background: var(--btn-bg);
+    background-color: var(--wood-800);
+    border: 2px solid var(--bronze-500);
+    border-radius: 999px;
+    box-shadow: var(--btn-shadow);
+    cursor: pointer;
+}
+.ranking-tab[aria-pressed="true"] { background: var(--btn-primary-bg); background-color: var(--ember-700); border-color: var(--gold-400); }
+.ranking-tab:hover { filter: brightness(1.15); }
+.ranking-tab:active { filter: brightness(0.9); }
+.ranking-tab:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.ranking-name { margin: 4px 0 0; font-family: var(--font-heading); font-size: 24px; font-weight: 700; color: var(--ink-900); }
+.ranking-subtitle { margin: 0; font-family: var(--font-body); font-size: 15px; line-height: 1.4; color: var(--ink-600); }
+.ranking-table { display: flex; flex-direction: column; gap: 4px; }
+.ranking-head,
+.ranking-row { display: grid; grid-template-columns: 64px minmax(0, 1fr) 240px; align-items: center; column-gap: 12px; padding: 0 12px; }
+.ranking-head { font-family: var(--font-body); font-size: 13px; font-weight: 700; color: var(--ink-600); }
+.ranking-head span:last-child { justify-self: end; }
+.ranking-list { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.ranking-row { height: 34px; border-radius: var(--radius-md); font-family: var(--font-body); font-size: 16px; font-weight: 600; color: var(--ink-900); }
+.ranking-row:nth-child(odd) { background: rgb(90 61 38 / 0.10); }
+.ranking-row.is-me { background: color-mix(in srgb, var(--ember-500) 24%, transparent); box-shadow: inset 0 0 0 2px var(--ember-700); }
+.ranking-position { font-family: var(--font-heading); font-size: 15px; font-weight: 700; color: var(--ink-600); }
+.ranking-position.is-gold,
+.ranking-position.is-silver,
+.ranking-position.is-copper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+    color: var(--wood-900);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--wood-900), inset 0 -2px 0 rgb(0 0 0 / 0.3);
+}
+.ranking-position.is-gold { background: radial-gradient(circle at 35% 30%, #fff1b0, #e0b45a 55%, #8a5a12); }
+.ranking-position.is-silver { background: radial-gradient(circle at 35% 30%, #ffffff, #c9ccd1 55%, #6f747b); }
+.ranking-position.is-copper { background: radial-gradient(circle at 35% 30%, #f6c08f, #b8652d 55%, #5e2c10); }
+.ranking-player { display: flex; align-items: center; min-width: 0; }
+.ranking-player-name { max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ranking-you { flex: none; margin-left: 8px; padding: 1px 8px; font-size: 12px; font-weight: 700; color: var(--parchment-100); background: var(--ember-700); border-radius: 999px; }
+.ranking-value { justify-self: end; font-family: var(--font-heading); font-size: 16px; font-weight: 700; white-space: nowrap; }
+/* the coins are children 2, 4 and 6 (each after its .sr-only label, which is out of the flow) */
+.ranking-value .coin:nth-child(n + 4) { margin-left: 12px; }
+.ranking-gap { height: 20px; font-weight: 700; text-align: center; color: var(--ink-600); }
+.ranking-none,
+.ranking-loading { margin: 8px 0 0; font-family: var(--font-body); font-size: 15px; font-weight: 600; text-align: center; color: var(--ink-600); }

@@ -1187,7 +1187,7 @@ Rules:
 
 ---
 
-#### T14: Ranking view and its styles [ ]
+#### T14: Ranking view and its styles [x]
 
 **Owner**: game-dev
 **Goal**: The DOM of the Ranking screen: tabs, heading, subtitle, chapter row, header and rows with medals, the own row, gap, pinned row, empty, none and loading states, styled in the Grove theme (RNK-08, RNK-09; spec Screen AC 4, 6, Rows AC 1 to 7, Loading AC 1).
@@ -1320,7 +1320,7 @@ CSS (append to `game/public/style.css`, exactly these rules; tokens of AD-022):
 **Gate**: `cd game && npm test && npm run build`
 **Done when**:
 
-- [ ] The 17 cases pass; the CSS block is appended as given.
+- [x] The 17 cases pass; the CSS block is appended as given.
 
 **Commit**: `feat(game): draw the ranking screen`
 
