@@ -3,6 +3,21 @@
 Todas as mudanças notáveis do Infinity Grove ficam neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.17.0] - 2026-11-28
+
+Cenas da história (`story-scenes`): o jogo passa a contar a história em cenas dentro da tela, com o prólogo e a cena do chefe do capítulo 1.
+
+### Adicionado
+
+- Cenas narradas sobre o jogo: cartões de título e de fim, narrador, vozes e personagens com retrato e rosto, fundos, cenas com vídeo, legendas que se digitam e música.
+- O prólogo abre na primeira vez que você joga, e a cena do chefe do capítulo 1 abre quando a campanha passa do capítulo 1 ao seguinte. Cada cena aparece uma vez por navegador.
+- Efeitos de cena: câmera, faixas de cinema, luzes escura, vermelha, dourada, de veias e de amanhecer, e partículas.
+- Botão Pular e botão de silêncio; a tecla Escape fecha a cena, e a luta fica parada enquanto ela passa.
+
+### Alterado
+
+- A aba "Rever chefes" agora se chama Mapa e também lista as cenas para rever: o prólogo e cada cena de capítulo já vista.
+
 ## [0.16.0] - 2026-11-28
 
 Textos em português (`portuguese-text`): tudo o que o jogador lê agora está em português, com acentos.

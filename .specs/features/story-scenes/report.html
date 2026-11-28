@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cenas da história</title>
+<style>
+:root { --bg:#faf7f2; --surface:#fff; --text:#2b2622; --muted:#6f655c; --line:#e4dcd1; --ok:#2f7a4a; }
+@media (prefers-color-scheme: dark) { :root { --bg:#1d1a17; --surface:#27231f; --text:#efe8df; --muted:#a99d90; --line:#3a342e; --ok:#6cc28c; } }
+* { box-sizing: border-box; }
+body { margin:0; padding:32px 16px 64px; background:var(--bg); color:var(--text); font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+main { max-width:920px; margin:0 auto; }
+h1 { font-size:28px; margin:0 0 4px; } h2 { font-size:18px; margin:36px 0 12px; }
+.sub { color:var(--muted); margin:8px 0 0; }
+.verdict { display:inline-block; padding:4px 12px; border-radius:999px; background:var(--ok); color:var(--bg); font-weight:700; }
+table { width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--line); }
+th,td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { font-size:13px; color:var(--muted); font-weight:600; }
+td.n { font-variant-numeric:tabular-nums; }
+code { font-size:13px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Cenas da história</h1>
+<p class="sub">Versão v0.17.0 · AD-036 · 28/11/2026 · <span class="verdict">CONCLUÍDO</span></p>
+
+<h2>Veredito</h2>
+<p>Todas as tarefas de <code>tasks.md</code> (T1 a T20) estão marcadas; a verificação de autoria do <code>test-engineer</code> não tem lacunas nem mutantes sobreviventes; a revisão do <code>ui-artist</code> está APROVADA; tudo está em <code>origin/main</code>. As quatro pendências F1 a F4 da T18 são um polimento posterior e não bloqueiam.</p>
+<table>
+<tr><th>Item</th><th>Valor</th></tr>
+<tr><td>Faixa de commits</td><td>27 commits, <code>d59e2690..f705e7aa</code> (12 feat, 1 fix, 10 test, 4 docs), rebaseados sobre <code>origin/main</code> (v0.16.0); sem conflitos e sem colisão de numeração (AD-036 livre)</td></tr>
+<tr><td>Revisão de UI</td><td>APROVADA (<code>ui-review.html</code>, commit <code>82ad70d5</code> antes do rebase)</td></tr>
+</table>
+
+<h2>Execuções do CI citadas</h2>
+<table>
+<tr><th>Execução</th><th>O que é</th><th>Resultado</th></tr>
+<tr><td class="n">46127706817</td><td>Tests workflow em <code>main</code>, commit <code>f705e7aa</code> (fonte de todos os números abaixo)</td><td>success</td></tr>
+<tr><td class="n">46126664714</td><td>Tests workflow na branch <code>ci/story-scenes</code>, <code>f705e7aa</code></td><td>success</td></tr>
+<tr><td class="n">46124415487</td><td>Tests workflow na branch, <code>4c41f0f6</code> (após o rebase)</td><td>falhou: os testes e2e da história esperavam os textos em inglês de login e de placa; corrigido em <code>f705e7aa</code></td></tr>
+<tr><td class="n">46121757345</td><td>Tests workflow, <code>4536e6f5</code> (verificação de autoria)</td><td>success, 9 de 9 mutantes mortos</td></tr>
+</table>
+<p class="sub">O commit de release adiciona só este relatório, o <code>CHANGELOG.md</code> e a versão em <code>game/package.json</code>.</p>
+
+<h2>Verificação de autoria dos testes (test-engineer)</h2>
+<p>55 de 55 critérios de aceitação cobertos; 9 mutantes, 9 mortos, 0 sobreviventes; sem lacunas.</p>
+
+<h2>Código de produção da faixa</h2>
+<table>
+<tr><th>Área</th><th>Arquivos</th><th>Adicionadas</th><th>Removidas</th></tr>
+<tr><td>Backend (<code>backend/src/main</code>)</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr><td>Jogo (<code>game/src</code> sem testes + <code>game/public/*.css</code>)</td><td class="n">12</td><td class="n">1312</td><td class="n">15</td></tr>
+</table>
+<p class="sub">Novos: <code>storyPlayer.js</code>, <code>storyStage.js</code>, <code>storySeen.js</code>, <code>storyCatalog.js</code>, <code>storyPlayback.js</code>, <code>storyScenes.js</code>, <code>storyText.js</code>; alterados: <code>ClickerGame.js</code>, <code>HeroUi.js</code>, <code>farmView.js</code>, <code>composition.js</code>, <code>style.css</code>. Mídia (vídeos, fundos, rostos) e <code>game/index.html</code> não contam como código de produção.</p>
+
+<h2>Código de teste da faixa</h2>
+<table>
+<tr><th>Suíte</th><th>Arquivos</th><th>Adicionadas</th><th>Removidas</th><th>Testes adicionados</th><th>Total após a execução (46127706817)</th></tr>
+<tr><td>Backend (<code>backend/src/test</code>)</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1398 testes, 0 falhas</td></tr>
+<tr><td>Jogo, unitários (<code>game/src/**/*.test.js</code>)</td><td class="n">12</td><td class="n">1887</td><td class="n">8</td><td class="n">195 (linhas <code>it(</code>/<code>test(</code> adicionadas)</td><td class="n">2728 testes, 0 falhas</td></tr>
+<tr><td>E2E (<code>game/e2e</code>)</td><td class="n">9</td><td class="n">1108</td><td class="n">4</td><td class="n">63 (idem)</td><td class="n">887 testes, 0 falhas</td></tr>
+<tr><td>Scripts de deploy</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">306 testes, 0 falhas</td></tr>
+</table>
+
+<h2>Cobertura de testes unitários</h2>
+<table>
+<tr><th>Escopo</th><th>Linhas</th><th>Ramos</th></tr>
+<tr><td>Backend (JaCoCo), projeto inteiro</td><td class="n">98,49% (3457 de 3510)</td><td class="n">93,73% (1135 de 1211)</td></tr>
+<tr><td>Jogo (Vitest v8), projeto inteiro</td><td class="n">98,69%</td><td class="n">95,20%</td></tr>
+<tr><td><code>storyCatalog.js</code>, <code>storyText.js</code>, <code>storySeen.js</code>, <code>composition.js</code></td><td class="n">100%</td><td class="n">100%</td></tr>
+<tr><td><code>storyStage.js</code></td><td class="n">100%</td><td class="n">97,82%</td></tr>
+<tr><td><code>storyPlayback.js</code></td><td class="n">100%</td><td class="n">98,03%</td></tr>
+<tr><td><code>storyScenes.js</code></td><td class="n">100%</td><td class="n">98,70%</td></tr>
+<tr><td><code>storyPlayer.js</code></td><td class="n">94,63%</td><td class="n">84,61%</td></tr>
+<tr><td><code>farmView.js</code></td><td class="n">100%</td><td class="n">95,34%</td></tr>
+<tr><td><code>HeroUi.js</code></td><td class="n">98,44%</td><td class="n">88,57%</td></tr>
+<tr><td><code>ClickerGame.js</code></td><td class="n">97,99%</td><td class="n">91,58%</td></tr>
+</table>
+<p class="sub">O backend não mudou nesta faixa; o número é do projeto inteiro. Scripts de deploy: 98,47% das linhas, 96,79% dos ramos.</p>
+
+<h2>Cobertura e2e</h2>
+<p>Linhas do código do jogo exercitadas pelo Playwright: <strong>93,43%</strong> (ramos 77,07%). É um limite inferior: uma página recarregada dentro de um teste perde o que contou antes. Por arquivo: <code>storyStage.js</code> 100%, <code>storyPlayer.js</code> 95,97%, <code>storyPlayback.js</code> 94,73%, <code>storySeen.js</code> 90%, <code>storyScenes.js</code> 22,64% (a validação dessa lógica é coberta pelos testes unitários), <code>farmView.js</code> 97,26%, <code>HeroUi.js</code> 95,34%, <code>ClickerGame.js</code> 93,99%.</p>
+
+<h2>Cenários e2e da funcionalidade (todos passaram)</h2>
+<table>
+<tr><th>Arquivo</th><th>Cenários</th><th>Resultado</th></tr>
+<tr><td><code>storyScenes.spec.js</code> (abertura, digitação, tintas, Pular, Escape, silêncio)</td><td class="n">19</td><td>passou</td></tr>
+<tr><td><code>storyStage.spec.js</code> (palco, escala, foco, cenas já vistas)</td><td class="n">16</td><td>passou</td></tr>
+<tr><td><code>storyReplay.spec.js</code> (aba Mapa e rever cenas)</td><td class="n">13</td><td>passou</td></tr>
+<tr><td><code>storyChapterOne.spec.js</code> (cena do chefe do capítulo 1)</td><td class="n">9</td><td>passou</td></tr>
+<tr><td><code>storyFixture.spec.js</code> (fixture compartilhada)</td><td class="n">5</td><td>passou</td></tr>
+</table>
+
+<h2>Falhas não causadas pela funcionalidade</h2>
+<p>Nenhuma na execução do commit de release. A execução 46124415487 falhou por causa da própria funcionalidade (textos em inglês nos testes após a tradução do <code>portuguese-text</code>); foi corrigida em <code>f705e7aa</code>.</p>
+
+<h2>Pendências de polimento (T18, não bloqueiam)</h2>
+<ul>
+<li>F1 (média): a aba Mapa ainda mostra o ícone de caveira de "Rever chefes"; desenhar um ícone de mapa ou pergaminho.</li>
+<li>F2 (baixa): nos cartões de título e de fim do capítulo 1 o logo cobre a cabeça de Kael e o texto cruza três heróis; escurecer o fundo atrás do texto ou subir o logo.</li>
+<li>F3 (baixa): o rosto redondo de Kael está fora do centro; reenquadrar <code>face-kael.jpg</code> (arte do dono).</li>
+<li>F4 (baixa): o amanhecer da fala 7 mal aparece; subir <code>.story-tint.is-dawn</code> para cerca de 0,5.</li>
+</ul>
+
+<h2>Implantação</h2>
+<p>Pendente: este computador (YAN-DESKTOP) não é o de publicação (DESKTOP-RCMC353), então o <code>publish.sh</code> não foi iniciado. O commit está em <code>origin/main</code> pronto para o deploy; o site só fica no ar enquanto o <code>publish.sh</code> roda.</p>
+</main>
+</body>
+</html>
